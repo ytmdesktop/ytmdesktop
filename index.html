@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>YouTube Music</title>
+    <link href="assets/css/material_icons.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="assets/css/styles.css" />
+    <link type="text/css" rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css"  media="screen,projection"/>
+  </head>
+  <body>
+
+    <div class="bar drag">
+
+      <div class="title">
+          <span id="music-title"></span>
+      </div>
+
+      <div class="cmd-btns">
+          <div class="no-drag pointer cmd-btn green-text hide" id="btn-update"> <i class="material-icons tiny" title="New Update">sync</i> </div>
+          <div class="no-drag pointer cmd-btn" id="btn-show-lyrics"> <i class="material-icons tiny" title="Show Lyrics">music_note</i> </div>
+          <div class="no-drag pointer cmd-btn" id="btn-minimize"> <i class="material-icons tiny" title="Minimize">remove</i> </div>
+          <div class="no-drag pointer cmd-btn" id="btn-maximize">
+            <i id="icon_maximize" class="material-icons tiny" title="Maximize">crop_square</i>
+            <i id="icon_restore" class="material-icons tiny hide" title="Restaure">filter_none</i>
+          </div>
+          <div class="no-drag pointer cmd-btn hover-red" id="btn-close"> <i class="material-icons tiny" title="Close">close</i> </div>
+      </div>
+
+    </div>
+
+    <script>
+        require('./renderer.js');
+    </script>
+
+  </body>
+</html>

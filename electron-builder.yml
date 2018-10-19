@@ -1,0 +1,31 @@
+productName: YouTube Music Desktop App
+appId: app.ytmd
+
+files:
+  - "**/*"
+  - "!LICENSE.md"
+  - "!package.json"
+  - "!package-lock.json"
+
+win:
+  icon: assets
+  publish:
+    provider: generic
+    url: 'https://dl.ytmdesktop.app/win'
+    channel: latest
+
+mac: 
+  icon: assets
+  category: public.app-category.music
+  publish:
+    provider: generic
+    url: 'https://dl.ytmdesktop.app/mac'
+    channel: latest
+
+linux:
+  icon: assets
+  category: Audio
+  publish:
+    provider: generic
+    url: 'https://dl.ytmdesktop.app/lin'
+    channel: latest

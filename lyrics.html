@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lyrics</title>
+    <link href="assets/css/material_icons.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="assets/css/styles.css" />
+    <link type="text/css" rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css"  media="screen,projection"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      html, body {
+        background: #232323;
+        color: #FFF;
+
+        padding: 5px;
+
+        width: 100%;
+        height: 100%;
+      }
+
+      .title { 
+        text-overflow: ellipsis;
+        overflow: hidden; 
+        width: 93%; 
+        white-space: nowrap;
+      }
+
+      /* width */
+      ::-webkit-scrollbar {
+          width: 6px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+          background: #232323; 
+      }
+      
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+          background: #f44336; 
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+          background: #555; 
+      }
+
+      #content {
+        overflow: auto;
+        width: 100%;
+        height: 94%;
+      }
+
+      #lyric {
+        font-size: 130%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="bar drag">
+
+      <div class="title">
+        <h6> <i class="material-icons tiny">music_note</i> <span id="now-playing"></span>  </h6>
+      </div>
+
+      <div class="cmd-btns">
+        <div class="no-drag pointer cmd-btn hover-red" id="btn-close"> <i class="material-icons tiny">close</i> </div>
+      </div>
+
+    </div>
+
+    <div id="content" style="margin-top: 34px; padding: 5px;">
+      <div id="lyric">
+          <span id="i18n_LABEL_LOADING"></span>
+      </div>
+    </div>
+
+    <script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <script>
+        require('./renderer_lyrics.js');
+    </script>
+  </body>
+</html>

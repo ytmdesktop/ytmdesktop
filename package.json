@@ -1,0 +1,38 @@
+{
+  "name": "youtube-music-desktop-app",
+  "version": "1.0.0",
+  "description": "YouTube Music Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "npx electron-builder --dir",
+    "dist": "npx electron-builder",
+    "publish:win": "build --win -p always --config electron-builder.yml",
+    "publish:mac": "build --mac -p always --config electron-builder.yml",
+    "publish:lin": "build --linux -p always --config electron-builder.yml"
+  },
+  "repository": "https://github.com/adlerluiz/ytmdesktop",
+  "keywords": [
+    "Electron",
+    "Youtube",
+    "Music"
+  ],
+  "author": "Adler Luiz <adlerluiz10@gmail.com>",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^3.0.4",
+    "electron-builder": "^20.28.4"
+  },
+  "dependencies": {
+    "discord-rpc": "^3.0.1",
+    "electron-google-analytics": "^0.1.0",
+    "electron-localshortcut": "^3.1.0",
+    "electron-store": "^2.0.0",
+    "electron-updater": "^3.1.2",
+    "i18n": "^0.8.3",
+    "materialize-css": "^1.0.0-rc.2",
+    "npx": "^10.2.0",
+    "register-scheme": "0.0.2",
+    "request": "^2.81.0"
+  }
+}
