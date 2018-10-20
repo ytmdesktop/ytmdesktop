@@ -1,7 +1,4 @@
 // Modules to control application life and create native browser window
-const Analytics  = require( 'electron-google-analytics' );
-const analytics = new Analytics.default( 'UA-127400126-1' );
-
 const { app, BrowserWindow, BrowserView, globalShortcut, Menu, ipcMain } = require( 'electron' );
 const path = require( 'path' );
 const electronStore = require( 'electron-store' );
@@ -245,7 +242,7 @@ app.on( 'ready', function() {
 
     tray.createTray( mainWindow, icon );
 
-    updater.checkUpdate( mainWindow );
+    //updater.checkUpdate( mainWindow );
     setInterval( function() {
         updater.checkUpdate( mainWindow );
     }, 1 * 60 * 60 * 1000 );
@@ -290,6 +287,7 @@ function createLyricsWindow() {
 const mediaControl = require( './mediaProvider' );
 const tray = require( './tray' );
 const updater = require( './updateProvider' );
+const analytics = require( './analyticsProvider' );
 
-
-analytics.screen('YouTube Music Desktop Player', app.getVersion(), 'com.ytm', 'com.ytm', 'YouTube Music Desktop Player')
+analytics.setEvent( 'main', 'start', 'v' + app.getVersion(), app.getVersion() );
+analytics.setScreen( 'main' );
