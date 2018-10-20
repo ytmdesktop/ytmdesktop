@@ -20,7 +20,7 @@
   "author": "Adler Luiz <adlerluiz10@gmail.com>",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^3.0.4",
+    "electron": "^3.0.5",
     "electron-builder": "^20.28.4"
   },
   "dependencies": {
