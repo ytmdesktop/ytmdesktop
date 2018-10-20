@@ -185,7 +185,9 @@ function createWindow() {
         mainWindow.send( 'window-is-maximized', mainWindow.isMaximized() );
 
         store.set( 'window-maximized', mainWindow.isMaximized() );
-        store.set( 'window-size', { width: windowSize[0], height: windowSize[1] } );
+        if ( !mainWindow.isMaximized() ) {
+            store.set( 'window-size', { width: windowSize[0], height: windowSize[1] } );
+        }
     } );
 
     mainWindow.on( 'close', function( e ) {
