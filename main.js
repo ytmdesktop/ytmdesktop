@@ -79,6 +79,14 @@ function createWindow() {
     // mainWindow.webContents.openDevTools();
     mediaControl.createThumbar( mainWindow, 'play', likeStatus );
 
+    if ( windowMaximized ) {
+        setTimeout( function() {
+            mainWindow.send( 'window-is-maximized', true );
+            view.setBounds( { x: 1, y: 29, width: mainWindowSize.width-2, height: mainWindowSize.height-45 } );
+            mainWindow.maximize();
+        }, 700 );
+    }
+
     // Emitted when the window is closed.
     mainWindow.on( 'closed', function () {
         // Dereference the window object, usually you would store windows
