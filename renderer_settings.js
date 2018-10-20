@@ -22,7 +22,7 @@ const elementToggleShowNotification = document.getElementById( 'toggle-show-noti
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
-const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
+//const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
 elementKeepBackground.addEventListener( 'click', function() {
     store.set('settings-keep-background', this.checked )
@@ -46,9 +46,9 @@ elementAppLanguage.addEventListener( 'change', function() {
     //elementBtnAppRelaunch.classList.remove( 'hide' );
 } );
 
-elementBtnAppRelaunch.addEventListener( 'click', function() {
+/*elementBtnAppRelaunch.addEventListener( 'click', function() {
     relaunch();
-} )
+} )*/
 
 /*const elementCheckUpdate = document.getElementById( 'check-update' );
 elementCheckUpdate.addEventListener( 'click', function() {
