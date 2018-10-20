@@ -14,7 +14,7 @@ exports.createTray = function( mainWindow, icon ) {
 
     const contextMenu = Menu.buildFromTemplate(
         [
-            { label: 'YTM Desktop', type: 'normal', click:
+            { label: 'YTMD App', type: 'normal', click:
                 function() { mainWindow.show(); } },
 
             { type: 'separator' },
