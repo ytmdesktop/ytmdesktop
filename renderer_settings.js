@@ -17,11 +17,16 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
     window.close();
 } );
 
+const elementKeepBackground = document.getElementById( 'toggle-keep-background' );
 const elementToggleShowNotification = document.getElementById( 'toggle-show-notifications' );
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
+
+elementKeepBackground.addEventListener( 'click', function() {
+    store.set('settings-keep-background', this.checked )
+} );
 
 elementToggleShowNotification.addEventListener( 'click', function() {
     store.set( 'settings-show-notifications', this.checked );
@@ -59,6 +64,10 @@ elementRangeZoom.addEventListener( 'input', function() {
 
 function loadSettings() {
 
+    if ( store.get( 'settings-keep-background' ) ) {
+        document.getElementById( 'toggle-keep-background' ).checked = true;
+    }
+
     if ( store.get( 'settings-show-notifications' ) ) {
         document.getElementById( 'toggle-show-notifications' ).checked = true;
     }
@@ -92,6 +101,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_ABOUT' ).innerText                            = __.trans( 'LABEL_SETTINGS_TAB_ABOUT' );
 
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS' ).innerText       = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF' ).innerText   = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' );

@@ -24,7 +24,7 @@ document.getElementById( 'btn-maximize' ).addEventListener( 'click', function() 
 } );
 
 document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
-    window.close();
+    ipc.send( 'will-close-mainwindow' )
 } );
 
 ipc.on( 'window-is-maximized', function( event, value ) {

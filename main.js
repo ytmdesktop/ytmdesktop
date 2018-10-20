@@ -217,6 +217,14 @@ function createWindow() {
     ipcMain.on( 'what-is-song-playing-now', function( e, data ) {
         e.sender.send( 'song-playing-now-is', { author: songAuthor, title: songTitle } )
     } )
+
+    ipcMain.on( 'will-close-mainwindow', function() {
+        if ( store.get( 'settings-keep-background' ) ) {
+            mainWindow.hide();
+        } else {
+            app.exit();
+        }
+    } )
 }
 
 // This method will be called when Electron has finished
