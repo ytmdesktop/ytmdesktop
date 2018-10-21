@@ -121,6 +121,10 @@ function loadi18n() {
     document.getElementById( 'i18n_MEDIA_CONTROL_SHUFFLE' ).innerText                               = __.trans( 'MEDIA_CONTROL_SHUFFLE' );
     document.getElementById( 'i18n_MEDIA_CONTROL_SEARCH' ).innerText                                = __.trans( 'MEDIA_CONTROL_SEARCH' );
     document.getElementById( 'i18n_MEDIA_CONTROL_QUEUE_OPEN_CLOSE' ).innerText                      = __.trans( 'MEDIA_CONTROL_QUEUE_OPEN_CLOSE' );    
+
+    document.getElementById( 'i18n_GLOBAL_MEDIA_CONTROL_PLAY_PAUSE' ).innerText                     = __.trans( 'MEDIA_CONTROL_PLAY_PAUSE' );
+    document.getElementById( 'i18n_GLOBAL_MEDIA_CONTROL_NEXT' ).innerText                           = __.trans( 'MEDIA_CONTROL_NEXT' );
+    document.getElementById( 'i18n_GLOBAL_MEDIA_CONTROL_PREVIOUS' ).innerText                       = __.trans( 'MEDIA_CONTROL_PREVIOUS' );
 }
 
 function relaunch() {
