@@ -5,6 +5,7 @@ const electronStore = require( 'electron-store' );
 const store = new electronStore();
 const discordRPC = require( './discordRpcProvider' );
 const __ = require( './translateProvider' );
+const isDev = require('electron-is-dev');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -242,10 +243,13 @@ app.on( 'ready', function() {
 
     tray.createTray( mainWindow, icon );
 
-    //updater.checkUpdate( mainWindow );
-    setInterval( function() {
+    if (!isDev) {
         updater.checkUpdate( mainWindow );
-    }, 1 * 60 * 60 * 1000 );
+        
+        setInterval( function() {
+            updater.checkUpdate( mainWindow );
+        }, 1 * 60 * 60 * 1000 );
+    }
 } );
 
 // Quit when all windows are closed.
