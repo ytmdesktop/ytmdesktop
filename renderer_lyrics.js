@@ -6,6 +6,10 @@ const url = 'https://api.vagalume.com.br/search.php';
 
 const window = remote.getCurrentWindow();
 const elementLyric = document.getElementById( 'lyric' );
+const elementDivSearchLyric = document.getElementById( 'div_search_lyric' );
+const elementInputLyricArtist = document.getElementById( 'input_lyric_artist' );
+const elementInputLyricSong = document.getElementById( 'input_lyric_song' );
+const elementButtonSearchLyric = document.getElementById( 'btn_search_lyric' );
 
 let lastSong;
 let lastArtist;
@@ -15,6 +19,10 @@ loadi18n();
 
 document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
     window.close();
+} );
+
+elementButtonSearchLyric.addEventListener( 'click', function() {
+    getLyric( elementInputLyricArtist.value, elementInputLyricSong.value );
 } );
 
 setInterval( function() {
@@ -38,7 +46,6 @@ function pageScroll() {
 function getLyric( artist, song ) {
 
     if ( artist != undefined && song != undefined ) {
-
         if ( artist != lastArtist && song != lastSong ) {
             lastSong = song;
             lastArtist = artist;
@@ -47,18 +54,24 @@ function getLyric( artist, song ) {
                 if ( err ) { 
                     console.log("LYRICS ERRO");
                     elementLyric.innerText = __.trans( 'LABEL_LYRICS_NOT_FOUND' ); 
-                    return; 
+                    elementDivSearchLyric.classList.remove('hide');
+                    elementInputLyricArtist.value = artist;
+                    elementInputLyricSong.value = song;
+                    return;
                 }
                 
                 document.getElementById( 'now-playing' ).innerText = artist + ' - ' + song;
                 if ( body.mus ) {
                     elementLyric.innerText = body.mus[ 0 ].text; 
+                    elementDivSearchLyric.classList.add('hide');
                 } else {
                     elementLyric.innerText = __.trans( 'LABEL_LYRICS_NOT_FOUND' );
+                    elementDivSearchLyric.classList.remove('hide');
+                    elementInputLyricArtist.value = artist;
+                    elementInputLyricSong.value = song;
                 }
 
                 document.getElementById( 'content' ).scrollTop = 0;
-                console.log('to top')
     
                 setTimeout( function() {
                     pageScroll();
@@ -80,7 +93,7 @@ function loadi18n() {
 
 function escapeHtml( text ) {
     var map = {
-      '&': '&amp;',
+      '&': 'and',
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',

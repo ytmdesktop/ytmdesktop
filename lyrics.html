@@ -55,6 +55,18 @@
         font-size: 130%;
         text-align: center;
       }
+
+      input {
+        color: #FFF;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      #div_search_lyric {
+        margin-top: 20%;
+      }
     </style>
   </head>
   <body>
@@ -74,6 +86,11 @@
     <div id="content" style="margin-top: 34px; padding: 5px;">
       <div id="lyric">
           <span id="i18n_LABEL_LOADING"></span>
+      </div>
+      <div id="div_search_lyric" class="hide center-align container">
+        <input id="input_lyric_song" type="text" />
+        <input class="hide" id="input_lyric_artist" type="text" />
+        <button class="btn" id="btn_search_lyric"><i class="material-icons">search</i></button>
       </div>
     </div>
 

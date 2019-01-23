@@ -40,7 +40,7 @@ exports.createTray = function( mainWindow, icon ) {
 
             { label: __.trans( 'LABEL_LYRICS' ), type: 'normal', click:
                 function() {
-                    const lyrics = new BrowserWindow( { frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 700, height: 800, icon: path.join( __dirname, 'assets/img/ytm_logo.png' ) } );
+                    const lyrics = new BrowserWindow( { frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 700, height: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
                     lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
                 }
             },
@@ -49,7 +49,7 @@ exports.createTray = function( mainWindow, icon ) {
 
             { label: __.trans( 'LABEL_SETTINGS' ), type: 'normal', click:
                 function() {
-                    const settings = new BrowserWindow( { parent: mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/img/ytm_logo.png' ) } );
+                    const settings = new BrowserWindow( { parent: mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
                     settings.loadFile( path.join( __dirname, 'settings.html' ) );
                 }
             },
