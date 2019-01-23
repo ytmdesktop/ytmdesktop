@@ -281,9 +281,10 @@ function createLyricsWindow() {
         backgroundColor: '#232323', 
         width: 700,
         height: 800, 
-        icon: path.join( __dirname, 'assets/img/ytm_logo.png' ) 
+        icon: path.join( __dirname, icon ) 
     } );
     lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
+    //lyrics.webContents.openDevTools();
 }
 
 // In this file you can include the rest of your app's specific main process
