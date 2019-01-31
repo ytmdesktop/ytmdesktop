@@ -125,6 +125,12 @@
         display: none;
       }
 
+      .divider {
+        height: 1px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+      }
+
     </style>
   </head>
   <body>
@@ -147,7 +153,8 @@
         <div class="col s12" style="padding: 0;">
           <ul class="tabs">
             <li class="tab col s4"><a class="active" href="#general"> <span id="i18n_LABEL_SETTINGS_TAB_GENERAL"></span> </a></li>
-            <!--li class="tab col s4 disabled"><a href="#mini-player"> <span id="i18n_LABEL_SETTINGS_TAB_MINIPLAYER"></span> </a></li-->
+
+                <!--li class="tab col s4 disabled"><a href="#mini-player"> <span id="i18n_LABEL_SETTINGS_TAB_MINIPLAYER"></span> </a></li-->
             <li class="tab col s4"><a href="#shortcuts"> <span id="i18n_LABEL_SETTINGS_TAB_SHORTCUTS"></span> </a></li>
             <li class="tab col s4"><a href="#about"> <span id="i18n_LABEL_SETTINGS_TAB_ABOUT"></span> </a></li>
           </ul>
@@ -165,7 +172,7 @@
                       <div class="switch">
                         <label>
                           <input type="checkbox" id="toggle-keep-background" />
-                          <span class="lever"></span>    
+                          <span class="lever"></span>
                         </label>
                       </div>
                     </td>
@@ -176,7 +183,7 @@
                     </td>
                     <td class="right">
                       <div class="switch">
-                        <label> 
+                        <label>
                           <input type="checkbox" id="toggle-show-notifications" />
                           <span class="lever"></span>
                         </label>
@@ -204,7 +211,7 @@
                       <div class="switch">
                         <label>
                           <input type="checkbox" id="toggle-discord-rich-presence" />
-                          <span class="lever"></span>    
+                          <span class="lever"></span>
                         </label>
                       </div>
                     </td>
@@ -228,8 +235,27 @@
                       <select id="select-app-language">
                         <option value="en">English</option>
                         <option value="pt">Português</option>
+                        <option value="zh">简体中文</option>
                       </select>
                       <!--button class="btn hide" id="btn-app-relaunch">Reload</button-->
+                    </td>
+                  </tr>
+                  <tr >
+                    <td colspan="2">
+                      <div class="divider" style="margin-top: 15%">&nbsp;<span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span id="i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY"></span>
+                    </td>
+                    <td class="right">
+                      <div class="switch">
+                        <label>
+                          <input type="checkbox" id="toggle-shiny-tray"/>
+                          <span class="lever"></span>
+                        </label>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -323,6 +349,18 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="macos" class="col s12" >
+          <div class="row">
+            <div class="col s12">
+              <table class="table">
+                <tbody>
+                </tbody>
+              </table>
+
             </div>
           </div>
         </div>

@@ -7,6 +7,8 @@ const discordRPC = require( './discordRpcProvider' );
 const __ = require( './translateProvider' );
 const isDev = require('electron-is-dev');
 
+let renderer_for_status_bar = null;
+global.sharedObj = {title: 'N/A', paused: true}
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -26,11 +28,10 @@ let likeStatus;
 let mainWindowUrl = "https://music.youtube.com";
 
 let icon = 'assets/favicon.png';
-
 if ( process.platform == 'win32' ) {
     icon = 'assets/favicon.ico'
 } else if ( process.platform == 'darwin' ) {
-    icon = 'assets/favicon.icns'
+    icon = 'assets/favicon.16x16.png'
 }
 
 function createWindow() {
@@ -43,7 +44,7 @@ function createWindow() {
     }
 
     mainWindow = new BrowserWindow( {
-        icon: path.join( __dirname, icon ),
+        icon: icon,
         width: mainWindowSize.width,
         height: mainWindowSize.height,
         show: true,
@@ -108,23 +109,26 @@ function createWindow() {
 
             /* Track */
             ::-webkit-scrollbar-track {
-                background: #232323; 
+                background: #232323;
             }
-            
+
             /* Handle */
             ::-webkit-scrollbar-thumb {
-                background: #f44336; 
+                background: #f44336;
             }
 
             /* Handle on hover */
             ::-webkit-scrollbar-thumb:hover {
-                background: #555; 
+                background: #555;
             }
         ` );
     } );
 
     view.webContents.on( 'media-started-playing', function () {
-
+      if (process.platform === 'darwin'){
+        global.sharedObj.paused = false;
+        renderer_for_status_bar.send('update-status-bar');
+      }
         view.webContents.executeJavaScript( `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`, null, function( title ) {
             songTitle = title;
 
@@ -137,7 +141,7 @@ function createWindow() {
 
             view.webContents.executeJavaScript( `
                 var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string'); 
+                var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
                 if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
                 title[0].innerText
             `, null, function ( author ) {
@@ -153,7 +157,10 @@ function createWindow() {
                         songCover = 'cover';
 
                         console.log( nowPlaying );
-
+                        if (process.platform === 'darwin'){
+                          global.sharedObj.title = nowPlaying;
+                          renderer_for_status_bar.send('update-status-bar');
+                        }
                         // view.webContents.executeJavaScript( `document.getElementsByClassName('image style-scope ytmusic-player-bar')[0].src`, null, function( cover ) {} );
 
                         mainWindow.setTitle( nowPlaying );
@@ -168,7 +175,17 @@ function createWindow() {
 
     view.webContents.on( 'media-paused', function () {
         console.log( 'Paused' );
-        mediaControl.createThumbar( mainWindow, 'play', likeStatus );
+        try{
+          if (process.platform === 'darwin'){
+            global.sharedObj.paused = true;
+            renderer_for_status_bar.send('update-status-bar');
+          }
+          mediaControl.createThumbar( mainWindow, 'play', likeStatus );
+        } catch{
+
+        }
+
+
     });
 
     mainWindow.on( 'resize', function() {
@@ -233,6 +250,26 @@ function createWindow() {
             app.exit();
         }
     } )
+
+
+
+    ipcMain.on ('register-renderer', (event, arg)=>{
+      renderer_for_status_bar = event.sender;
+      event.sender.send('update-status-bar');
+    })
+
+    ipcMain.on ('update-tray', () => {
+      renderer_for_status_bar.send('update-status-bar')
+      tray.setShinyTray();
+    })
+
+    ipcMain.on ('show-settings', function() {
+        const settings = new BrowserWindow( { parent: mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
+        settings.loadFile( path.join( __dirname, 'settings.html' ) );
+    }
+  )
+
+    // ipcMain.send('update-status-bar', '111', '222');
 }
 
 // This method will be called when Electron has finished
@@ -242,10 +279,13 @@ app.on( 'ready', function() {
     createWindow();
 
     tray.createTray( mainWindow, icon );
-
+    ipcMain.on ('updated-tray-image', function(event, payload) {
+      if (store.get('settings-shiny-tray'))
+        tray.updateImage(payload);
+    })
     if (!isDev) {
         updater.checkUpdate( mainWindow );
-        
+
         setInterval( function() {
             updater.checkUpdate( mainWindow );
         }, 1 * 60 * 60 * 1000 );
@@ -274,14 +314,14 @@ ipcMain.on( 'show-lyrics', function() {
 } )
 
 function createLyricsWindow() {
-    const lyrics = new BrowserWindow( { 
-        frame: false, 
-        center: true, 
-        resizable: true, 
-        backgroundColor: '#232323', 
+    const lyrics = new BrowserWindow( {
+        frame: false,
+        center: true,
+        resizable: true,
+        backgroundColor: '#232323',
         width: 700,
-        height: 800, 
-        icon: path.join( __dirname, icon ) 
+        height: 800,
+        icon: path.join( __dirname, icon )
     } );
     lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
     //lyrics.webContents.openDevTools();
