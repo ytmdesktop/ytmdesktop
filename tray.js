@@ -7,71 +7,83 @@ const store = new electronStore();
 const __ = require( './translateProvider' );
 
 let tray = null;
+let saved_icon = null;
+let saved_mainWindow = null;
+
+let init_tray = () => {
+  const contextMenu = Menu.buildFromTemplate(
+      [
+          { label: 'YTMD App', type: 'normal', click:
+              function() { saved_mainWindow.show(); } },
+
+          { type: 'separator' },
+
+          { label: __.trans( 'MEDIA_CONTROL_PLAY_PAUSE' ), type: 'normal', click:
+              function() { mediaControl.playPauseTrack( saved_mainWindow.getBrowserView() ) } },
+
+          { label: __.trans( 'MEDIA_CONTROL_PREVIOUS' ), type: 'normal', click:
+              function() { mediaControl.previousTrack( saved_mainWindow.getBrowserView() ) } },
+
+          { label: __.trans( 'MEDIA_CONTROL_NEXT' ), type: 'normal', click:
+              function() { mediaControl.nextTrack( saved_mainWindow.getBrowserView() ) } },
+
+          { type: 'separator' },
+
+          { label: __.trans( 'MEDIA_CONTROL_THUMBS_UP' ), type: 'normal', click:
+              function() { mediaControl.upVote( saved_mainWindow.getBrowserView() ) } },
+
+          { label: __.trans( 'MEDIA_CONTROL_THUMBS_DOWN' ), type: 'normal', click:
+              function() { mediaControl.downVote( saved_mainWindow.getBrowserView() ) } },
+
+          { type: 'separator' },
+
+          { label: __.trans( 'LABEL_LYRICS' ), type: 'normal', click:
+              function() {
+                  const lyrics = new BrowserWindow( { frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 700, height: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
+                  lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
+              }
+          },
+
+          { type: 'separator' },
+
+          { label: __.trans( 'LABEL_SETTINGS' ), type: 'normal', click:
+              function() {
+                  const settings = new BrowserWindow( { parent: saved_mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
+                  settings.loadFile( path.join( __dirname, 'settings.html' ) );
+              }
+          },
+
+          { type: 'separator' },
+
+          { label: __.trans( 'LABEL_EXIT' ), type: 'normal', click:
+              function() { app.exit(); }
+          }
+      ]
+  );
+
+  tray.setToolTip( 'YouTube Music Desktop App' );
+  tray.setContextMenu( contextMenu );
+
+  tray.addListener( 'click', function() {
+      saved_mainWindow.isVisible() ? saved_mainWindow.hide() : saved_mainWindow.show();
+  } );
+
+  tray.addListener( 'balloon-click', function() {
+      saved_mainWindow.isVisible() ? saved_mainWindow.focus() : saved_mainWindow.show();
+  } );
+}
 
 exports.createTray = function( mainWindow, icon ) {
-
-    tray = new Tray( path.join( __dirname, icon ) );
-
-    const contextMenu = Menu.buildFromTemplate(
-        [
-            { label: 'YTMD App', type: 'normal', click:
-                function() { mainWindow.show(); } },
-
-            { type: 'separator' },
-
-            { label: __.trans( 'MEDIA_CONTROL_PLAY_PAUSE' ), type: 'normal', click:
-                function() { mediaControl.playPauseTrack( mainWindow.getBrowserView() ) } },
-
-            { label: __.trans( 'MEDIA_CONTROL_PREVIOUS' ), type: 'normal', click:
-                function() { mediaControl.previousTrack( mainWindow.getBrowserView() ) } },
-
-            { label: __.trans( 'MEDIA_CONTROL_NEXT' ), type: 'normal', click:
-                function() { mediaControl.nextTrack( mainWindow.getBrowserView() ) } },    
-
-            { type: 'separator' },
-
-            { label: __.trans( 'MEDIA_CONTROL_THUMBS_UP' ), type: 'normal', click:
-                function() { mediaControl.upVote( mainWindow.getBrowserView() ) } },
-
-            { label: __.trans( 'MEDIA_CONTROL_THUMBS_DOWN' ), type: 'normal', click:
-                function() { mediaControl.downVote( mainWindow.getBrowserView() ) } },
-
-            { type: 'separator' },
-
-            { label: __.trans( 'LABEL_LYRICS' ), type: 'normal', click:
-                function() {
-                    const lyrics = new BrowserWindow( { frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 700, height: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
-                    lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
-                }
-            },
-
-            { type: 'separator' },
-
-            { label: __.trans( 'LABEL_SETTINGS' ), type: 'normal', click:
-                function() {
-                    const settings = new BrowserWindow( { parent: mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
-                    settings.loadFile( path.join( __dirname, 'settings.html' ) );
-                }
-            },
-
-            { type: 'separator' },
-
-            { label: __.trans( 'LABEL_EXIT' ), type: 'normal', click:
-                function() { app.exit(); }
-            }
-        ]
-    );
-
-    tray.setToolTip( 'YouTube Music Desktop App' );
-    tray.setContextMenu( contextMenu );
-
-    tray.addListener( 'click', function() {
-        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-    } );
-
-    tray.addListener( 'balloon-click', function() {
-        mainWindow.isVisible() ? mainWindow.focus() : mainWindow.show();
-    } );
+    saved_icon = path.join( __dirname, icon );
+    tray = new Tray( saved_icon );
+    saved_mainWindow = mainWindow;
+    if (process.platform != 'darwin') {
+      init_tray();
+    } else{
+      // on Mac OS X
+      tray.setHighlightMode('never')
+      exports.setShinyTray();
+    }
 };
 
 exports.balloon = function( title, content ) {
@@ -87,3 +99,33 @@ exports.balloon = function( title, content ) {
 exports.quit = function() {
     tray.quit();
 };
+
+exports.setShinyTray = function(){
+  if (store.get('settings-shiny-tray') && process.platform === 'darwin'){
+    // Shiny tray enabled
+    tray.setContextMenu(null);
+    tray.removeAllListeners();
+    tray.on('click', (event, bound, position) => {
+      // console.log(position);
+      if (position.x < 32) {
+        saved_mainWindow.isVisible() ? saved_mainWindow.hide() : saved_mainWindow.show();
+      }else if (position.x > 130) {
+        mediaControl.playPauseTrack( saved_mainWindow.getBrowserView() );
+      }
+    })
+  }else{
+    // Shiny tray disabled ||| on onther platform
+    tray.setImage(saved_icon);
+    tray.removeAllListeners();
+    init_tray();
+  }
+}
+
+
+exports.updateImage = function(payload) {
+  if (!store.get('settings-shiny-tray')) return;
+  var img = typeof nativeImage.createFromDataURL === 'function'
+    ? nativeImage.createFromDataURL(payload) // electron v0.36+
+    : nativeImage.createFromDataUrl(payload) // electron v0.30
+  tray.setImage(img);
+}

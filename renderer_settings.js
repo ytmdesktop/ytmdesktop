@@ -3,6 +3,8 @@ const electronStore = require( 'electron-store' );
 const store = new electronStore();
 const __ = require( './translateProvider' );
 
+const tray = require( './tray');
+
 loadSettings();
 loadi18n();
 
@@ -20,6 +22,7 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
 const elementKeepBackground = document.getElementById( 'toggle-keep-background' );
 const elementToggleShowNotification = document.getElementById( 'toggle-show-notifications' );
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
+const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
@@ -45,6 +48,11 @@ elementAppLanguage.addEventListener( 'change', function() {
     relaunch();
     //elementBtnAppRelaunch.classList.remove( 'hide' );
 } );
+
+elementToggleShinyTray.addEventListener( 'click', function(){
+    store.set( 'settings-shiny-tray', this.checked );
+    ipc.send('update-tray');
+})
 
 /*elementBtnAppRelaunch.addEventListener( 'click', function() {
     relaunch();
@@ -79,14 +87,18 @@ function loadSettings() {
     if ( store.get( 'settings-discord-rich-presence' ) ) {
         document.getElementById( 'toggle-discord-rich-presence' ).checked = true;
     }
-    
+
     if ( store.get( 'settings-app-language' ) ) {
         document.getElementById( 'select-app-language' ).value = store.get( 'settings-app-language' );
     }
-    
+
     if ( store.get( 'settings-page-zoom' ) ) {
         document.getElementById( 'range-zoom' ).value = store.get( 'settings-page-zoom' );
         document.getElementById('range-zoom-value').innerText = store.get( 'settings-page-zoom' );
+    }
+
+    if ( store.get( 'settings-shiny-tray' ) ) {
+        document.getElementById( 'toggle-shiny-tray' ).checked = true;
     }
 
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
@@ -107,7 +119,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
-
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' ).innerText                  = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' );
 
@@ -120,7 +132,7 @@ function loadi18n() {
     document.getElementById( 'i18n_MEDIA_CONTROL_REPEAT' ).innerText                                = __.trans( 'MEDIA_CONTROL_REPEAT' );
     document.getElementById( 'i18n_MEDIA_CONTROL_SHUFFLE' ).innerText                               = __.trans( 'MEDIA_CONTROL_SHUFFLE' );
     document.getElementById( 'i18n_MEDIA_CONTROL_SEARCH' ).innerText                                = __.trans( 'MEDIA_CONTROL_SEARCH' );
-    document.getElementById( 'i18n_MEDIA_CONTROL_QUEUE_OPEN_CLOSE' ).innerText                      = __.trans( 'MEDIA_CONTROL_QUEUE_OPEN_CLOSE' );    
+    document.getElementById( 'i18n_MEDIA_CONTROL_QUEUE_OPEN_CLOSE' ).innerText                      = __.trans( 'MEDIA_CONTROL_QUEUE_OPEN_CLOSE' );
 
     document.getElementById( 'i18n_GLOBAL_MEDIA_CONTROL_PLAY_PAUSE' ).innerText                     = __.trans( 'MEDIA_CONTROL_PLAY_PAUSE' );
     document.getElementById( 'i18n_GLOBAL_MEDIA_CONTROL_NEXT' ).innerText                           = __.trans( 'MEDIA_CONTROL_NEXT' );
