@@ -3,7 +3,6 @@ const electronStore = require( 'electron-store' );
 const store = new electronStore();
 const __ = require( './translateProvider' );
 
-const tray = require( './tray');
 
 loadSettings();
 loadi18n();

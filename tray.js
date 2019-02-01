@@ -73,6 +73,8 @@ let init_tray = () => {
   } );
 }
 
+let popUpMenu = null;
+
 exports.createTray = function( mainWindow, icon ) {
     saved_icon = path.join( __dirname, icon );
     tray = new Tray( saved_icon );
@@ -105,6 +107,16 @@ exports.setShinyTray = function(){
     // Shiny tray enabled
     tray.setContextMenu(null);
     tray.removeAllListeners();
+    tray.on('right-click', (event, bound, position)=> {
+        // console.log('right_clicked', bound);
+        if (!popUpMenu.isVisible()) {
+            popUpMenu.setPosition(bound.x, bound.y + bound.height + 1);
+            popUpMenu.show();
+        }else{
+            popUpMenu.hide();
+        }
+
+    })
     tray.on('click', (event, bound, position) => {
       // console.log(position);
       if (position.x < 32) {
@@ -112,7 +124,12 @@ exports.setShinyTray = function(){
       }else if (position.x > 130) {
         mediaControl.playPauseTrack( saved_mainWindow.getBrowserView() );
       }
-    })
+    });
+    popUpMenu = new BrowserWindow( { modal: true, frame: false, center: true, resizable: false, backgroundColor: '#232323', width: 160, height: 400 } );
+    popUpMenu.loadFile( path.join( __dirname, 'menu.html' ) );
+    popUpMenu.hide();
+    popUpMenu.on('blur', ()=>{popUpMenu.hide();})
+
   }else{
     // Shiny tray disabled ||| on onther platform
     tray.setImage(saved_icon);

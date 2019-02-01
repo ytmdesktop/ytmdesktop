@@ -206,6 +206,10 @@ function createWindow() {
     } );
 
     mainWindow.on( 'close', function( e ) {
+        if (process.platform === 'darwin'){ // Optimized for Mac OS X
+            app.quit();
+            return;
+        }
         e.preventDefault();
         mainWindow.hide();
     } );
@@ -251,7 +255,7 @@ function createWindow() {
         }
     } )
 
-
+    ipcMain.on( 'media-play-pause', ()=> {mediaControl.playPauseTrack( view)});
 
     ipcMain.on ('register-renderer', (event, arg)=>{
       renderer_for_status_bar = event.sender;
@@ -290,6 +294,7 @@ app.on( 'ready', function() {
             updater.checkUpdate( mainWindow );
         }, 1 * 60 * 60 * 1000 );
     }
+    // mediaControl.createTouchBar(mainWindow);
 } );
 
 // Quit when all windows are closed.
@@ -306,6 +311,8 @@ app.on( 'activate', function () {
     // dock icon is clicked and there are no other windows open.
     if ( mainWindow === null ) {
         createWindow();
+    }else{
+        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
     }
 } );
 
