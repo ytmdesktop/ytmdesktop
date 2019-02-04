@@ -10,7 +10,10 @@ let tray = null;
 
 exports.createTray = function( mainWindow, icon ) {
 
-    tray = new Tray( path.join( __dirname, icon ) );
+    const trayIcon = path.join(__dirname, icon);
+    const nativeImageIcon = nativeImage.createFromPath(trayIcon);
+
+    tray = new Tray( nativeImageIcon );
 
     const contextMenu = Menu.buildFromTemplate(
         [
