@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "discord-rpc": "^3.0.1",
+    "electron-canvas-to-buffer": "^2.0.0",
     "electron-google-analytics": "^0.1.0",
     "electron-is-dev": "^1.0.1",
     "electron-localshortcut": "^3.1.0",
