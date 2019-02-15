@@ -6,11 +6,11 @@
 	"MEDIA_CONTROL_PREVIOUS": "Anterior",
 	"MEDIA_CONTROL_THUMBS_UP": "Curtir",
 	"MEDIA_CONTROL_THUMBS_DOWN": "Descurtir",
-    "MEDIA_CONTROL_MUTE_UNMUTE": "Mutar / Desmutar",
-    "MEDIA_CONTROL_REPEAT": "Repetir",
+	"MEDIA_CONTROL_MUTE_UNMUTE": "Mutar / Desmutar",
+	"MEDIA_CONTROL_REPEAT": "Repetir",
 	"MEDIA_CONTROL_SHUFFLE": "Misturar",
-    "MEDIA_CONTROL_SEARCH": "Pesquisar",
-    "MEDIA_CONTROL_QUEUE_OPEN_CLOSE": "Abrir / Fechar Fila",
+	"MEDIA_CONTROL_SEARCH": "Pesquisar",
+	"MEDIA_CONTROL_QUEUE_OPEN_CLOSE": "Abrir / Fechar Fila",
 	"LABEL_SETTINGS": "Configurações",
 	"LABEL_LYRICS": "Letras de Músicas",
 	"LABEL_PLAY_MUSIC": "Inicie uma música",
@@ -18,6 +18,7 @@
 	"LABEL_LOADING": "Carregando...",
 	"LABEL_EXIT": "Sair",
 	"LABEL_SETTINGS_TAB_GENERAL": "Geral",
+	"LABEL_SETTINGS_TAB_MACOS": "Mac OS",
 	"LABEL_SETTINGS_TAB_MINIPLAYER": "Miniplayer",
 	"LABEL_SETTINGS_TAB_SHORTCUTS": "Atalhos",
 	"LABEL_SETTINGS_TAB_ABOUT": "Sobre",
@@ -28,5 +29,6 @@
 	"LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM": "Zoom da Página",
 	"LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE": "Linguagem",
 	"LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",
-	"LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Global"
+	"LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Global",
+	"LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Controle fácil na bandeja (Somente para Mac OS)"
 }
