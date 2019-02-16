@@ -5,6 +5,7 @@ const nativeImage = require( 'electron' ).nativeImage;
 const electronStore = require('electron-store');
 const store = new electronStore();
 const __ = require( './translateProvider' );
+const Notification = require('electron-native-notification');
 
 let tray = null;
 let saved_icon = null;
@@ -90,11 +91,15 @@ exports.createTray = function( mainWindow, icon ) {
 
 exports.balloon = function( title, content ) {
     if ( store.get( 'settings-show-notifications' ) ) {
-        tray.displayBalloon( {
-            icon: path.join( __dirname, 'assets/favicon.256x256.png' ),
-            title: title,
-            content: content
-        } );
+        if ( process.platform == 'win32' ) {
+            tray.displayBalloon( {
+                icon: path.join( __dirname, 'assets/favicon.256x256.png' ),
+                title: title,
+                content: content
+            } );
+        } else {
+            new Notification( title, { body: content, icon: path.join( __dirname, icon_png ) });
+        }
     }
 };
 
