@@ -98,7 +98,7 @@ exports.balloon = function( title, content ) {
                 content: content
             } );
         } else {
-            new Notification( title, { body: content, icon: path.join( __dirname, icon_png ) });
+            new Notification( title, { body: content, icon: path.join( __dirname, 'assets/favicon.256x256.png' ) });
         }
     }
 };
