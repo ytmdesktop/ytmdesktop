@@ -35,6 +35,10 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
     ipc.send( 'will-close-mainwindow' )
 } );
 
+const canvas = document.createElement('canvas');
+canvas.height = 32;
+canvas.width = 150;
+const ctx = canvas.getContext('2d');
 ipc.on( 'window-is-maximized', function( event, value ) {
     if ( value ) {
         document.getElementById( 'icon_maximize' ).classList.add( 'hide' );
@@ -54,15 +58,11 @@ ipc.on( 'downloaded-new-update', function( e, data ) {
 } );
 
 ipc.on( 'update-status-bar', function (event, arg) {
-  // ctx.drawImage();
-  const canvas = document.createElement('canvas');
-  canvas.height = 32;
-  canvas.width = 150;
-  const ctx = canvas.getContext('2d');
 
-	ctx.font = "15px Arial";
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+	ctx.font = "14px Arial";
 	ctx.fillStyle = "white";
-	ctx.fillText(cutstr(status.title,12),35,22);
+	ctx.fillText(cutstr(status.title,14),30,21);
 
   // console.log(arg)
   ctx.drawImage(icon_set.icons,8,8,16,16);

@@ -6,7 +6,6 @@ const __ = require( './translateProvider' );
 
 loadSettings();
 loadi18n();
-
 // remote.getCurrentWebContents().openDevTools();
 
 document.addEventListener( 'DOMContentLoaded', function() {
@@ -25,6 +24,10 @@ const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
+
+if (process.platform != "darwin"){
+    elementToggleShinyTray.disabled = true;
+}
 
 elementKeepBackground.addEventListener( 'click', function() {
     store.set('settings-keep-background', this.checked )
