@@ -1,11 +1,14 @@
 const { BrowserWindow, ipcRenderer: ipc } = require( 'electron' );
 const path = require( 'path' );
+const electronStore = require( 'electron-store' );
+const store = new electronStore();
 const remote = require( 'electron' ).remote;
 const status = remote.getGlobal('sharedObj');
 const window = remote.getCurrentWindow();
 
 const fs = require('fs');
-const icon_set = require('./icons_for_shiny_tray');
+const icons = require('./icons_for_shiny_tray');
+let icon_set = icons.bright;
 
 document.getElementById( 'btn-update' ).addEventListener( 'click', function() {
     ipc.send( 'btn-update-clicked', true );
@@ -60,11 +63,17 @@ ipc.on( 'downloaded-new-update', function( e, data ) {
 ipc.on( 'update-status-bar', function (event, arg) {
 
     ctx.clearRect(0,0, canvas.width, canvas.height);
-	ctx.font = "14px Arial";
-	ctx.fillStyle = "white";
+    ctx.font = "14px Arial";
+        if (store.get('settings-shiny-tray-dark', false)) {
+                ctx.fillStyle = "white";
+                icon_set = icons.dark;
+            }else{
+                ctx.fillStyle = "black";
+                icon_set = icons.bright;
+            }
 	ctx.fillText(cutstr(status.title,14),30,21);
 
-  // console.log(arg)
+    // console.log(arg)
   ctx.drawImage(icon_set.icons,8,8,16,16);
   if (status.paused){
     ctx.drawImage(icon_set.play, 135, 6, 20,20);
