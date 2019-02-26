@@ -1,11 +1,14 @@
 const { BrowserWindow, ipcRenderer: ipc } = require( 'electron' );
 const path = require( 'path' );
+const electronStore = require( 'electron-store' );
+const store = new electronStore();
 const remote = require( 'electron' ).remote;
 const status = remote.getGlobal('sharedObj');
 const window = remote.getCurrentWindow();
 
 const fs = require('fs');
-const icon_set = require('./icons_for_shiny_tray');
+const icons = require('./icons_for_shiny_tray');
+let icon_set = icons.bright;
 
 document.getElementById( 'btn-update' ).addEventListener( 'click', function() {
     ipc.send( 'btn-update-clicked', true );
@@ -35,6 +38,10 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
     ipc.send( 'will-close-mainwindow' )
 } );
 
+const canvas = document.createElement('canvas');
+canvas.height = 32;
+canvas.width = 150;
+const ctx = canvas.getContext('2d');
 ipc.on( 'window-is-maximized', function( event, value ) {
     if ( value ) {
         document.getElementById( 'icon_maximize' ).classList.add( 'hide' );
@@ -54,17 +61,19 @@ ipc.on( 'downloaded-new-update', function( e, data ) {
 } );
 
 ipc.on( 'update-status-bar', function (event, arg) {
-  // ctx.drawImage();
-  const canvas = document.createElement('canvas');
-  canvas.height = 32;
-  canvas.width = 150;
-  const ctx = canvas.getContext('2d');
 
-	ctx.font = "15px Arial";
-	ctx.fillStyle = "white";
-	ctx.fillText(cutstr(status.title,12),35,22);
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ctx.font = "14px Arial";
+        if (store.get('settings-shiny-tray-dark', false)) {
+                ctx.fillStyle = "white";
+                icon_set = icons.dark;
+            }else{
+                ctx.fillStyle = "black";
+                icon_set = icons.bright;
+            }
+	ctx.fillText(cutstr(status.title,14),30,21);
 
-  // console.log(arg)
+    // console.log(arg)
   ctx.drawImage(icon_set.icons,8,8,16,16);
   if (status.paused){
     ctx.drawImage(icon_set.play, 135, 6, 20,20);

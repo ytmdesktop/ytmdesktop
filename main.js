@@ -256,6 +256,9 @@ function createWindow() {
     } )
 
     ipcMain.on( 'media-play-pause', ()=> {mediaControl.playPauseTrack( view)});
+    ipcMain.on( 'media-next-track', ()=> {mediaControl.nextTrack( view)});
+    ipcMain.on( 'media-previous-track', ()=> {mediaControl.previousTrack( view)});
+
 
     ipcMain.on ('register-renderer', (event, arg)=>{
       renderer_for_status_bar = event.sender;
@@ -263,8 +266,10 @@ function createWindow() {
     })
 
     ipcMain.on ('update-tray', () => {
-      renderer_for_status_bar.send('update-status-bar')
-      tray.setShinyTray();
+        if(process.platform === "darwin"){
+            renderer_for_status_bar.send('update-status-bar')
+            tray.setShinyTray();
+        }
     })
 
     ipcMain.on ('show-settings', function() {

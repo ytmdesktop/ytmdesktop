@@ -6,7 +6,6 @@ const __ = require( './translateProvider' );
 
 loadSettings();
 loadi18n();
-
 // remote.getCurrentWebContents().openDevTools();
 
 document.addEventListener( 'DOMContentLoaded', function() {
@@ -22,9 +21,14 @@ const elementKeepBackground = document.getElementById( 'toggle-keep-background' 
 const elementToggleShowNotification = document.getElementById( 'toggle-show-notifications' );
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
 const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
+const elementToggleShinyTrayDark = document.getElementById( 'toggle-shiny-tray-dark');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
+
+if (process.platform != "darwin"){
+    elementToggleShinyTray.disabled = true;
+}
 
 elementKeepBackground.addEventListener( 'click', function() {
     store.set('settings-keep-background', this.checked )
@@ -51,7 +55,12 @@ elementAppLanguage.addEventListener( 'change', function() {
 elementToggleShinyTray.addEventListener( 'click', function(){
     store.set( 'settings-shiny-tray', this.checked );
     ipc.send('update-tray');
-})
+} );
+
+elementToggleShinyTrayDark.addEventListener( 'click', function(){
+    store.set( 'settings-shiny-tray-dark', this.checked );
+    ipc.send('update-tray');
+} );
 
 /*elementBtnAppRelaunch.addEventListener( 'click', function() {
     relaunch();
@@ -100,6 +109,9 @@ function loadSettings() {
         document.getElementById( 'toggle-shiny-tray' ).checked = true;
     }
 
+    if ( store.get( 'settings-shiny-tray-dark' ) ) {
+        document.getElementById( 'toggle-shiny-tray-dark' ).checked = true;
+    }
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
 
 }
@@ -119,6 +131,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY_DARK' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY_DARK');
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' ).innerText                  = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' );
 
