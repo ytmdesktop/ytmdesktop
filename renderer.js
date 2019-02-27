@@ -6,7 +6,6 @@ const remote = require( 'electron' ).remote;
 const status = remote.getGlobal('sharedObj');
 const window = remote.getCurrentWindow();
 
-const fs = require('fs');
 const icons = require('./icons_for_shiny_tray');
 let icon_set = icons.bright;
 
@@ -85,9 +84,13 @@ ipc.on( 'update-status-bar', function (event, arg) {
 
 });
 
-
 ipc.send('register-renderer');
 
+ipc.on('is-dev', function( event, args) {
+    if ( args ) {
+        document.title = document.title + ' DEV';
+    }
+} );
 
 function getStrLength(str) { // For cut str
 		var realLength = 0, len = str.length, charCode = -1;

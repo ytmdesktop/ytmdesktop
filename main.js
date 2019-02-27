@@ -125,10 +125,10 @@ function createWindow() {
     } );
 
     view.webContents.on( 'media-started-playing', function () {
-      if (process.platform === 'darwin'){
-        global.sharedObj.paused = false;
-        renderer_for_status_bar.send('update-status-bar');
-      }
+        if ( process.platform === 'darwin' ){
+            global.sharedObj.paused = false;
+            renderer_for_status_bar.send('update-status-bar');
+        }
         view.webContents.executeJavaScript( `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`, null, function( title ) {
             songTitle = title;
 
@@ -263,6 +263,7 @@ function createWindow() {
     ipcMain.on ('register-renderer', (event, arg)=>{
       renderer_for_status_bar = event.sender;
       event.sender.send('update-status-bar');
+      event.sender.send( 'is-dev', isDev );
     })
 
     ipcMain.on ('update-tray', () => {
@@ -288,10 +289,12 @@ app.on( 'ready', function() {
     createWindow();
 
     tray.createTray( mainWindow, icon );
+
     ipcMain.on ('updated-tray-image', function(event, payload) {
       if (store.get('settings-shiny-tray'))
         tray.updateImage(payload);
     })
+    
     if (!isDev) {
         updater.checkUpdate( mainWindow );
 
