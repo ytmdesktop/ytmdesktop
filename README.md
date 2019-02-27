@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord">
+
 # YouTube Music Desktop App
 
 This is a minimal Electron application based on the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start) within the Electron documentation.
@@ -29,20 +31,13 @@ npm start
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
 
-## Resources for Learning Electron
-
-- [electronjs.org/docs](https://electronjs.org/docs) - all of Electron's documentation
-- [electronjs.org/community#boilerplates](https://electronjs.org/community#boilerplates) - sample starter apps created by the community
-- [electron/electron-quick-start](https://github.com/electron/electron-quick-start) - a very basic starter Electron app
-- [electron/simple-samples](https://github.com/electron/simple-samples) - small applications with ideas for taking them further
-- [electron/electron-api-demos](https://github.com/electron/electron-api-demos) - an Electron app that teaches you how to use Electron
-- [hokein/electron-sample-apps](https://github.com/hokein/electron-sample-apps) - small demo apps for the various Electron APIs
 
 ## License
 
 [CC0 1.0 (Public Domain)](LICENSE.md)
 
 ## Contributors
-[<img alt="adlerluiz" src="https://avatars3.githubusercontent.com/u/2112638?v=4&s=120">](https://github.com/adlerluiz)
-[<img alt="rickinbsb" src="https://avatars0.githubusercontent.com/u/4140033?v=4&s=120">](https://github.com/rickinbsb)
-[<img alt="mingjun97" src="https://avatars2.githubusercontent.com/u/15214491?v=4&s=120">](https://github.com/mingjun97)
+[<img alt="adlerluiz" src="https://avatars3.githubusercontent.com/u/2112638?s=120&v=4">](https://github.com/adlerluiz)
+[<img alt="rickinbsb" src="https://avatars0.githubusercontent.com/u/4140033?s=120&v=4">](https://github.com/rickinbsb)
+[<img alt="mingjun97" src="https://avatars2.githubusercontent.com/u/15214491?s=120&v=4">](https://github.com/mingjun97)
+[<img alt="mingjun97" src="https://avatars2.githubusercontent.com/u/6710794?s=120&v=4">](https://github.com/kyjus25)

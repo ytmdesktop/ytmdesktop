@@ -47,6 +47,8 @@ function createWindow() {
         icon: icon,
         width: mainWindowSize.width,
         height: mainWindowSize.height,
+        minWidth: 800,
+        height: 600,
         show: true,
         autoHideMenuBar: true,
         backgroundColor: '#232323',
