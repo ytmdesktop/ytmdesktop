@@ -26,7 +26,7 @@ const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
-if (process.platform != "darwin"){
+if ( process.platform != "darwin" ) {
     elementToggleShinyTray.disabled = true;
 }
 
@@ -49,7 +49,6 @@ elementDiscordRichPresence.addEventListener( 'click', function() {
 elementAppLanguage.addEventListener( 'change', function() {
     store.set( 'settings-app-language', this.value );
     relaunch();
-    //elementBtnAppRelaunch.classList.remove( 'hide' );
 } );
 
 elementToggleShinyTray.addEventListener( 'click', function(){
@@ -72,6 +71,7 @@ elementCheckUpdate.addEventListener( 'click', function() {
 } );*/
 
 const elementRangeZoom = document.getElementById( 'range-zoom' );
+
 elementRangeZoom.addEventListener( 'input', function() {
     document.getElementById('range-zoom-value').innerText = this.value;
     store.set( 'settings-page-zoom', this.value );
@@ -112,6 +112,7 @@ function loadSettings() {
     if ( store.get( 'settings-shiny-tray-dark' ) ) {
         document.getElementById( 'toggle-shiny-tray-dark' ).checked = true;
     }
+
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
 
 }

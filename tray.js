@@ -146,7 +146,6 @@ exports.setShinyTray = function(){
   }
 }
 
-
 exports.updateImage = function(payload) {
   if (!store.get('settings-shiny-tray')) return;
   var img = typeof nativeImage.createFromDataURL === 'function'
