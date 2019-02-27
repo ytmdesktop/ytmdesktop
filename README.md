@@ -41,3 +41,8 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 ## License
 
 [CC0 1.0 (Public Domain)](LICENSE.md)
+
+## Contributors
+[<img alt="adlerluiz" src="https://avatars3.githubusercontent.com/u/2112638?v=4&s=120">](https://github.com/adlerluiz)
+[<img alt="rickinbsb" src="https://avatars0.githubusercontent.com/u/4140033?v=4&s=120">](https://github.com/rickinbsb)
+[<img alt="mingjun97" src="https://avatars2.githubusercontent.com/u/15214491?v=4&s=120">](https://github.com/mingjun97)
