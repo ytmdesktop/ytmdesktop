@@ -16,7 +16,7 @@ let init_tray = () => {
       [
           { label: 'YTMD App', type: 'normal', click:
               function() { saved_mainWindow.show(); } },
-
+        
           { type: 'separator' },
 
           { label: __.trans( 'MEDIA_CONTROL_PLAY_PAUSE' ), type: 'normal', click:
@@ -77,8 +77,10 @@ let init_tray = () => {
 let popUpMenu = null;
 
 exports.createTray = function( mainWindow, icon ) {
-    saved_icon = path.join( __dirname, icon );
-    tray = new Tray( saved_icon );
+    const saved_icon = path.join( __dirname, icon );
+    const nativeImageIcon = nativeImage.createFromPath( saved_icon );
+    tray = new Tray( nativeImageIcon );
+  
     saved_mainWindow = mainWindow;
     if (process.platform != 'darwin') {
       init_tray();
