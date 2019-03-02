@@ -1,4 +1,4 @@
-[<img alt="adlerluiz" src="https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord">](https://discord.gg/8wckSkm)
+[<img alt="Discord" src="https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord">](https://discord.gg/88P2n2a)
 
 # YouTube Music Desktop App
 

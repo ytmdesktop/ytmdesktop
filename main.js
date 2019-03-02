@@ -48,7 +48,7 @@ function createWindow() {
         width: mainWindowSize.width,
         height: mainWindowSize.height,
         minWidth: 800,
-        height: 600,
+        minHeight: 600,
         show: true,
         autoHideMenuBar: true,
         backgroundColor: '#232323',
@@ -86,6 +86,11 @@ function createWindow() {
             view.setBounds( { x: 1, y: 29, width: mainWindowSize.width-2, height: mainWindowSize.height-45 } );
             mainWindow.maximize();
         }, 700 );
+    } else {
+        let position = store.get('window-position');
+        if ( position != undefined ) {
+            mainWindow.setPosition( position.x, position.y );
+        }
     }
 
     // Emitted when the window is closed.
@@ -205,6 +210,11 @@ function createWindow() {
         if ( !mainWindow.isMaximized() ) {
             store.set( 'window-size', { width: windowSize[0], height: windowSize[1] } );
         }
+    } );
+
+    mainWindow.on( 'move', function() {
+        let position = mainWindow.getPosition();
+        store.set( 'window-position', { x: position[0], y: position[1] } );
     } );
 
     mainWindow.on( 'close', function( e ) {
