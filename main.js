@@ -102,7 +102,7 @@ function createWindow() {
     } );
 
     mainWindow.on( 'show', function () {
-        console.log('show')
+        logDebug('show')
         mediaControl.createThumbar( mainWindow, 'play', likeStatus );
     } );
 
@@ -136,9 +136,18 @@ function createWindow() {
             global.sharedObj.paused = false;
             renderer_for_status_bar.send('update-status-bar');
         }
+
+        /**
+         * GET SONG TITLE
+         */
         view.webContents.executeJavaScript( `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`, null, function( title ) {
             songTitle = title;
 
+            /**
+             * GET LIKE STATUS ATTRIBUTE
+             * 
+             * LIKE | DISLIKE | INDIFFERENT
+             */
             view.webContents.executeJavaScript(`
                 document.getElementById('like-button-renderer').getAttribute('like-status')
             `, null, function( data ) {
@@ -146,49 +155,59 @@ function createWindow() {
                 mediaControl.createThumbar( mainWindow, 'pause', likeStatus );
             } );
 
-            view.webContents.executeJavaScript( `
-                var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
-                if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
-                title[0].innerText
-            `, null, function ( author ) {
-                songAuthor = author;
+            /**
+             * This timeout is necessary because there is a certain delay when changing music and updating the div content
+             */
+            setTimeout( function() {
+                /**
+                 * GET SONG AUTHOR
+                 */
+                view.webContents.executeJavaScript( `
+                    var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
+                    var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
+                    if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
+                    title[0].innerText
+                `, null, function ( author ) {
+                    songAuthor = author;
 
-                if ( songTitle !== undefined && songAuthor !== undefined ) {
-                    if ( lastSongTitle !== songTitle || lastSongAuthor !== songAuthor ) {
-                        lastSongTitle = songTitle;
-                        lastSongAuthor = songAuthor;
-
-                        let nowPlaying = songTitle + ' - ' + songAuthor;
-
-                        songCover = 'cover';
-
-                        console.log( nowPlaying );
-                        if (process.platform === 'darwin'){
-                          global.sharedObj.title = nowPlaying;
-                          renderer_for_status_bar.send('update-status-bar');
+                    if ( songTitle !== undefined && songAuthor !== undefined ) {
+                        if ( lastSongTitle !== songTitle || lastSongAuthor !== songAuthor ) {
+                            lastSongTitle = songTitle;
+                            lastSongAuthor = songAuthor;
+                            songCover = 'cover';
+                            // view.webContents.executeJavaScript( `document.getElementsByClassName('image style-scope ytmusic-player-bar')[0].src`, null, function( cover ) {} );
+                            updateActivity( songTitle, songAuthor );
                         }
-                        // view.webContents.executeJavaScript( `document.getElementsByClassName('image style-scope ytmusic-player-bar')[0].src`, null, function( cover ) {} );
-
-                        mainWindow.setTitle( nowPlaying );
-                        tray.balloon( songTitle, songAuthor );
-                        discordRPC.activity( songTitle, songAuthor );
                     }
-                }
-            } );
+                } );
+            }, 500 );
         } );
 
     });
 
+    function updateActivity( songTitle, songAuthor ) {
+        let nowPlaying = songTitle + ' - ' + songAuthor;
+        logDebug( nowPlaying );
+
+        if ( process.platform === 'darwin' ) {
+            global.sharedObj.title = nowPlaying;
+            renderer_for_status_bar.send('update-status-bar');
+        }
+
+        mainWindow.setTitle( nowPlaying );
+        tray.balloon( songTitle, songAuthor );
+        discordRPC.activity( songTitle, songAuthor );
+    }
+
     view.webContents.on( 'media-paused', function () {
-        console.log( 'Paused' );
-        try{
-          if (process.platform === 'darwin'){
+        logDebug( 'Paused' );
+        try {
+          if ( process.platform === 'darwin' ) {
             global.sharedObj.paused = true;
             renderer_for_status_bar.send('update-status-bar');
           }
           mediaControl.createThumbar( mainWindow, 'play', likeStatus );
-        } catch{
+        } catch {
 
         }
 
@@ -218,7 +237,7 @@ function createWindow() {
     } );
 
     mainWindow.on( 'close', function( e ) {
-        if (process.platform === 'darwin'){ // Optimized for Mac OS X
+        if ( process.platform === 'darwin' ) { // Optimized for Mac OS X
             app.quit();
             return;
         }
@@ -354,6 +373,12 @@ function createLyricsWindow() {
     //lyrics.webContents.openDevTools();
 }
 
+function logDebug( data ) {
+    if ( true ) {
+        console.log( data );
+    }
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require( './mediaProvider' );
@@ -362,4 +387,5 @@ const updater = require( './updateProvider' );
 const analytics = require( './analyticsProvider' );
 
 analytics.setEvent( 'main', 'start', 'v' + app.getVersion(), app.getVersion() );
+analytics.setEvent( 'main', 'os', process.platform, process.platform );
 analytics.setScreen( 'main' );
