@@ -60,7 +60,7 @@ function getLyric( artist, song ) {
                     return;
                 }
                 
-                document.getElementById( 'now-playing' ).innerText = artist + ' - ' + song;
+                document.getElementById( 'now-playing' ).innerText = song + ' - ' + artist;
                 if ( body.mus ) {
                     elementLyric.innerText = body.mus[ 0 ].text; 
                     elementDivSearchLyric.classList.add('hide');
