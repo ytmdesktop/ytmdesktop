@@ -1,8 +1,6 @@
-const { BrowserWindow, ipcRenderer: ipc } = require( 'electron' );
-const path = require( 'path' );
+const { remote, ipcRenderer: ipc } = require( 'electron' );
 const electronStore = require( 'electron-store' );
 const store = new electronStore();
-const remote = require( 'electron' ).remote;
 const status = remote.getGlobal('sharedObj');
 const window = remote.getCurrentWindow();
 
