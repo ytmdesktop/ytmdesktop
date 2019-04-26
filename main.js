@@ -248,7 +248,7 @@ function createWindow() {
     globalShortcut.register( 'MediaPlayPause', function() {
         mediaControl.playPauseTrack( view );
     } );
-    globalShortcut.register( 'CmdOrCtrl+Shift+P', function() {
+    globalShortcut.register( 'CmdOrCtrl+Shift+Space', function() {
         mediaControl.playPauseTrack( view );
     } );
 
