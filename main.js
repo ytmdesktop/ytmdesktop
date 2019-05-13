@@ -1,10 +1,11 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, BrowserView, globalShortcut, Menu, ipcMain } = require( 'electron' );
+const { app, BrowserWindow, BrowserView, globalShortcut, Menu, ipcMain, systemPreferences } = require( 'electron' );
 const path = require( 'path' );
 const electronStore = require( 'electron-store' );
 const store = new electronStore();
 const discordRPC = require( './discordRpcProvider' );
 const __ = require( './translateProvider' );
+const {template} = require('./menu-for-mac');
 const isDev = require('electron-is-dev');
 
 let renderer_for_status_bar = null;
@@ -31,7 +32,10 @@ let icon = 'assets/favicon.png';
 if ( process.platform == 'win32' ) {
     icon = 'assets/favicon.ico'
 } else if ( process.platform == 'darwin' ) {
-    icon = 'assets/favicon.16x16.png'
+    icon = 'assets/favicon.16x16.png';
+    store.set( 'settings-shiny-tray-dark', systemPreferences.isDarkMode());
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 }
 
 function createWindow() {
@@ -238,11 +242,22 @@ function createWindow() {
 
     mainWindow.on( 'close', function( e ) {
         if ( process.platform === 'darwin' ) { // Optimized for Mac OS X
-            app.quit();
+            if ( store.get( 'settings-keep-background' ) ) {
+                e.preventDefault();
+                mainWindow.hide();
+            } else {
+                app.exit();
+            }
             return;
         }
         e.preventDefault();
         mainWindow.hide();
+    } );
+
+    app.on('before-quit', function( e ){
+        if (process.platform === 'darwin' ){
+            app.exit();
+        }
     } );
 
     globalShortcut.register( 'MediaPlayPause', function() {

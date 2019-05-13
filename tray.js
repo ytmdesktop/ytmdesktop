@@ -77,7 +77,7 @@ let init_tray = () => {
 let popUpMenu = null;
 
 exports.createTray = function( mainWindow, icon ) {
-    const saved_icon = path.join( __dirname, icon );
+    saved_icon = path.join( __dirname, icon );
     const nativeImageIcon = nativeImage.createFromPath( saved_icon );
     tray = new Tray( nativeImageIcon );
   
