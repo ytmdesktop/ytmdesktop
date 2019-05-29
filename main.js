@@ -25,6 +25,7 @@ let songCover;
 let lastSongTitle;
 let lastSongAuthor;
 let likeStatus;
+let doublePressPlayPause;
 
 let mainWindowUrl = "https://music.youtube.com";
 
@@ -46,8 +47,7 @@ function createWindow() {
         mainWindowSize.width = windowSize.width;
         mainWindowSize.height = windowSize.height;
     }
-
-    mainWindow = new BrowserWindow( {
+    broswerWindowConfig = {
         icon: icon,
         width: mainWindowSize.width,
         height: mainWindowSize.height,
@@ -62,7 +62,11 @@ function createWindow() {
         skipTaskbar: false,
         resize: true,
         maximizable: true
-    } );
+    };
+    if (process.platform == 'darwin') {// Mac Specific Configuration
+        broswerWindowConfig.titleBarStyle = 'hidden';
+    }
+    mainWindow = new BrowserWindow( broswerWindowConfig );
 
     const view = new BrowserView( {
         webPreferences: {
@@ -261,6 +265,13 @@ function createWindow() {
     } );
 
     globalShortcut.register( 'MediaPlayPause', function() {
+        if (!doublePressPlayPause){ // The first press
+            doublePressPlayPause = true;
+            setTimeout(()=>{doublePressPlayPause = false}, 200);
+        }else{ // The second press
+            doublePressPlayPause = false;
+            mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+        }
         mediaControl.playPauseTrack( view );
     } );
     globalShortcut.register( 'CmdOrCtrl+Shift+Space', function() {
