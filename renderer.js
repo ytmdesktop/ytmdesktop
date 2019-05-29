@@ -19,21 +19,28 @@ document.getElementById( 'btn-show-lyric' ).addEventListener( 'click', function(
     ipc.send('show-lyrics')
 } );
 
-document.getElementById( 'btn-minimize' ).addEventListener( 'click', function() {
-    window.minimize();
-} );
-
-document.getElementById( 'btn-maximize' ).addEventListener( 'click', function() {
-    if ( !window.isMaximized() ) {
-        window.maximize();
-    } else {
-        window.unmaximize();
-    }
-} );
-
-document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
-    ipc.send( 'will-close-mainwindow' )
-} );
+if(process.platform === 'darwin'){
+    document.getElementById( 'btn-minimize' ).style.display = "none";
+    document.getElementById( 'btn-maximize' ).style.display = "none";
+    document.getElementById( 'btn-close' ).style.display = "none";
+}
+else{
+    document.getElementById( 'btn-minimize' ).addEventListener( 'click', function() {
+        window.minimize();
+    } );
+    
+    document.getElementById( 'btn-maximize' ).addEventListener( 'click', function() {
+        if ( !window.isMaximized() ) {
+            window.maximize();
+        } else {
+            window.unmaximize();
+        }
+    } );
+    
+    document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
+        ipc.send( 'will-close-mainwindow' )
+    } );
+}
 
 const canvas = document.createElement('canvas');
 canvas.height = 32;
