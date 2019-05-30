@@ -61,7 +61,10 @@ function createWindow() {
         closable: true,
         skipTaskbar: false,
         resize: true,
-        maximizable: true
+        maximizable: true,
+        webPreferences: {
+            nodeIntegration: true
+        }
     };
     if (process.platform == 'darwin') {// Mac Specific Configuration
         broswerWindowConfig.titleBarStyle = 'hidden';
@@ -70,7 +73,7 @@ function createWindow() {
 
     const view = new BrowserView( {
         webPreferences: {
-            nodeIntegration: false
+            nodeIntegration: true
         }
     } );
 
@@ -85,7 +88,8 @@ function createWindow() {
     view.webContents.loadURL( mainWindowUrl );
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools({ mode: 'detach' });
+    // view.webContents.openDevTools({ mode: 'detach' });
     mediaControl.createThumbar( mainWindow, 'play', likeStatus );
 
     if ( windowMaximized ) {
@@ -331,7 +335,20 @@ function createWindow() {
     })
 
     ipcMain.on ('show-settings', function() {
-        const settings = new BrowserWindow( { parent: mainWindow, modal: true, frame: false, center: true, resizable: true, backgroundColor: '#232323', width: 800, icon: path.join( __dirname, 'assets/favicon.png' ) } );
+        const settings = new BrowserWindow( 
+            { 
+                parent: mainWindow, 
+                modal: true, 
+                frame: false, 
+                center: true, 
+                resizable: true, 
+                backgroundColor: '#232323', 
+                width: 800, 
+                icon: path.join( __dirname, 'assets/favicon.png' ), 
+                webPreferences: {
+                    nodeIntegration: true
+                }
+            } );
         settings.loadFile( path.join( __dirname, 'settings.html' ) );
     }
   )
@@ -393,7 +410,10 @@ function createLyricsWindow() {
         backgroundColor: '#232323',
         width: 700,
         height: 800,
-        icon: path.join( __dirname, icon )
+        icon: path.join( __dirname, icon ),
+        webPreferences: {
+            nodeIntegration: true
+        }
     } );
     lyrics.loadFile( path.join( __dirname, 'lyrics.html' ) );
     //lyrics.webContents.openDevTools();
