@@ -1,7 +1,7 @@
 const { remote, ipcRenderer: ipc } = require( 'electron' );
 const electronStore = require( 'electron-store' );
 const store = new electronStore();
-const __ = require( './translateProvider' );
+const __ = require( './providers/translateProvider' );
 
 
 loadSettings();
