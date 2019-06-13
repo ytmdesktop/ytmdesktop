@@ -271,12 +271,14 @@ function createWindow() {
     globalShortcut.register( 'MediaPlayPause', function() {
         if (!doublePressPlayPause){ // The first press
             doublePressPlayPause = true;
-            setTimeout(()=>{doublePressPlayPause = false}, 200);
+            setTimeout(()=>{
+                if(doublePressPlayPause) mediaControl.playPauseTrack( view );
+                doublePressPlayPause = false;
+            }, 200);
         }else{ // The second press
             doublePressPlayPause = false;
             mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
         }
-        mediaControl.playPauseTrack( view );
     } );
     globalShortcut.register( 'CmdOrCtrl+Shift+Space', function() {
         mediaControl.playPauseTrack( view );
