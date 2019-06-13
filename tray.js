@@ -132,7 +132,7 @@ exports.setShinyTray = function(){
         mediaControl.playPauseTrack( saved_mainWindow.getBrowserView() );
       }
     });
-    popUpMenu = new BrowserWindow( { modal: true, frame: false, center: true, resizable: false, backgroundColor: '#232323', width: 160, height: 277 } );
+    popUpMenu = new BrowserWindow( { frame: false, center: true, alwaysOnTop: true, autoHideMenuBar:true, resizable: false, backgroundColor: '#232323', width: 160, height: 277, webPreferences: {nodeIntegration: true} } );
     popUpMenu.loadFile( path.join( __dirname, 'menu.html' ) );
     popUpMenu.setVisibleOnAllWorkspaces(true);
     popUpMenu.hide();
