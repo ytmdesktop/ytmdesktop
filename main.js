@@ -3,9 +3,9 @@ const { app, BrowserWindow, BrowserView, globalShortcut, Menu, ipcMain, systemPr
 const path = require( 'path' );
 const electronStore = require( 'electron-store' );
 const store = new electronStore();
-const discordRPC = require( './discordRpcProvider' );
-const __ = require( './translateProvider' );
-const {template} = require('./menu-for-mac');
+const discordRPC = require( './providers/discordRpcProvider' );
+const __ = require( './providers/translateProvider' );
+const {template} = require('./mac-menu');
 const isDev = require('electron-is-dev');
 
 let renderer_for_status_bar = null;
@@ -429,10 +429,10 @@ function logDebug( data ) {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const mediaControl = require( './mediaProvider' );
+const mediaControl = require( './providers/mediaProvider' );
 const tray = require( './tray' );
-const updater = require( './updateProvider' );
-const analytics = require( './analyticsProvider' );
+const updater = require( './providers/updateProvider' );
+const analytics = require( './providers/analyticsProvider' );
 
 analytics.setEvent( 'main', 'start', 'v' + app.getVersion(), app.getVersion() );
 analytics.setEvent( 'main', 'os', process.platform, process.platform );
