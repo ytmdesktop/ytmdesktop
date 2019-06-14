@@ -1,7 +1,7 @@
 {
-	"MEDIA_CONTROL_PLAY": "Tocar",
+	"MEDIA_CONTROL_PLAY": "Reproduzir",
 	"MEDIA_CONTROL_PAUSE": "Pausar",
-	"MEDIA_CONTROL_PLAY_PAUSE": "Tocar / Pausar",
+	"MEDIA_CONTROL_PLAY_PAUSE": "Reproduzir / Pausar",
 	"MEDIA_CONTROL_NEXT": "Próximo",
 	"MEDIA_CONTROL_PREVIOUS": "Anterior",
 	"MEDIA_CONTROL_THUMBS_UP": "Curtir",
