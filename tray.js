@@ -147,41 +147,41 @@ exports.quit = function () {
     tray.quit();
 };
 
-exports.setShinyTray = function () {
-    if (store.get('settings-shiny-tray') && process.platform === 'darwin') {
-        // Shiny tray enabled
-        tray.setContextMenu(null);
-        tray.removeAllListeners();
-        tray.on('right-click', (event, bound, position) => {
-            // console.log('right_clicked', bound);
-            if (!popUpMenu.isVisible()) {
-                popUpMenu.setPosition(bound.x, bound.y + bound.height + 1);
-                popUpMenu.show();
-            } else {
-                popUpMenu.hide();
-            }
+exports.setShinyTray = function(){
+  if (store.get('settings-shiny-tray') && process.platform === 'darwin'){
+    // Shiny tray enabled
+    tray.setContextMenu(null);
+    tray.removeAllListeners();
+    tray.on('right-click', (event, bound, position)=> {
+        // console.log('right_clicked', bound);
+        if (!popUpMenu.isVisible()) {
+            popUpMenu.setPosition(bound.x, bound.y + bound.height + 1);
+            popUpMenu.show();
+        }else{
+            popUpMenu.hide();
+        }
 
-        })
-        tray.on('click', (event, bound, position) => {
-            // console.log(position);
-            if (position.x < 32) {
-                saved_mainWindow.isVisible() ? saved_mainWindow.hide() : saved_mainWindow.show();
-            } else if (position.x > 130) {
-                mediaControl.playPauseTrack(saved_mainWindow.getBrowserView());
-            }
-        });
-        popUpMenu = new BrowserWindow({ modal: true, frame: false, center: true, resizable: false, backgroundColor: '#232323', width: 160, height: 277 });
-        popUpMenu.loadFile(path.join(__dirname, 'mac-shiny-menu.html'));
-        popUpMenu.setVisibleOnAllWorkspaces(true);
-        popUpMenu.hide();
-        popUpMenu.on('blur', () => { popUpMenu.hide(); })
+    })
+    tray.on('click', (event, bound, position) => {
+      // console.log(position);
+      if (position.x < 32) {
+        saved_mainWindow.isVisible() ? saved_mainWindow.hide() : saved_mainWindow.show();
+      }else if (position.x > 130) {
+        mediaControl.playPauseTrack( saved_mainWindow.getBrowserView() );
+      }
+    });
+    popUpMenu = new BrowserWindow( { frame: false, center: true, alwaysOnTop: true, autoHideMenuBar:true, resizable: false, backgroundColor: '#232323', width: 160, height: 277, webPreferences: {nodeIntegration: true} } );
+    popUpMenu.loadFile( path.join( __dirname, 'menu.html' ) );
+    popUpMenu.setVisibleOnAllWorkspaces(true);
+    popUpMenu.hide();
+    popUpMenu.on('blur', ()=>{popUpMenu.hide();})
 
-    } else {
-        // Shiny tray disabled ||| on onther platform
-        tray.setImage(saved_icon);
-        tray.removeAllListeners();
-        init_tray();
-    }
+  }else{
+    // Shiny tray disabled ||| on onther platform
+    tray.setImage(saved_icon);
+    tray.removeAllListeners();
+    init_tray();
+  }
 }
 
 exports.updateImage = function (payload) {
