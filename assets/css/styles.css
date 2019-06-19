@@ -63,3 +63,12 @@ html, body {
 .shortcut-or {
     color: #AAA;
 }
+
+.center-loading {
+    width: 100vw; 
+    min-height: 100vh; 
+    text-align: center; 
+    line-height: 100vh;
+
+    font-size: 20px;
+}
