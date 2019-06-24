@@ -2,11 +2,11 @@ const i18n = require( 'i18n' );
 const electronStore = require('electron-store');
 const store = new electronStore();
 
-const defaultLocale = store.get( 'settings-app-language', 'en' )
+const defaultLocale = store.get( 'settings-app-language', 'en' );
 
 i18n.configure( {
     locales: [ 'en', 'pt' ],
-    directory: __dirname + '/locales',
+    directory: __dirname + '/../locales',
     defaultLocale: defaultLocale
 } );
 

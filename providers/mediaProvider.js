@@ -32,39 +32,39 @@ function mediaDownVote( mainWindow ) {
 }
 
 function createThumbar( mainWindow, type, likeStatus ) {
-    let thumbsUp = 'assets/img/controls/thumbs-up-button-outline.png';
-    let thumbsDown = 'assets/img/controls/thumbs-down-button-outline.png';
+    let thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
+    let thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
     let thumbsReverse = '';
 
     switch( likeStatus ) {
         case 'LIKE':
-            thumbsUp = 'assets/img/controls/thumbs-up-button.png';
-            thumbsDown = 'assets/img/controls/thumbs-down-button-outline.png';
+            thumbsUp = '../assets/img/controls/thumbs-up-button.png';
+            thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
             thumbsReverse = 'INDIFFERENT';
             break;
         
         case 'DISLIKE':
-            thumbsUp = 'assets/img/controls/thumbs-up-button-outline.png';
-            thumbsDown = 'assets/img/controls/thumbs-down-button.png';
+            thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
+            thumbsDown = '../assets/img/controls/thumbs-down-button.png';
             thumbsReverse = 'INDIFFERENT';
             break;
 
         case 'INDIFFERENT':
-            thumbsUp = 'assets/img/controls/thumbs-up-button-outline.png';
-            thumbsDown = 'assets/img/controls/thumbs-down-button-outline.png';
+            thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
+            thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
             thumbsReverse = ( likeStatus == 'LIKE' ) ? 'DISLIKE' : 'LIKE';
             break;
     }
 
     playOrPause = {
         tooltip: __.trans( 'MEDIA_CONTROL_PLAY' ),
-        icon: path.join( __dirname, 'assets/img/controls/play-button.png' ),
+        icon: path.join( __dirname, '../assets/img/controls/play-button.png' ),
         click: function() { mediaPlayPauseTrack( mainWindow.getBrowserView() ) }
     }
 
     if ( type !== 'play' ) {
         playOrPause.tooltip = __.trans( 'MEDIA_CONTROL_PAUSE' );
-        playOrPause.icon = path.join( __dirname, 'assets/img/controls/pause-button.png' );
+        playOrPause.icon = path.join( __dirname, '../assets/img/controls/pause-button.png' );
     }
 
     mainWindow.setThumbarButtons([
@@ -74,12 +74,12 @@ function createThumbar( mainWindow, type, likeStatus ) {
             click: function() { mediaDownVote( mainWindow.getBrowserView(), createThumbar( mainWindow, type, thumbsReverse ) ) }
         },
         {
-            icon: path.join( __dirname, 'assets/img/null.png' ),
+            icon: path.join( __dirname, '../assets/img/null.png' ),
             flags: [ 'disabled', 'nobackground' ]
         },
         {
             tooltip: __.trans( 'MEDIA_CONTROL_PREVIOUS' ),
-            icon: path.join( __dirname, 'assets/img/controls/play-previous-button.png' ),
+            icon: path.join( __dirname, '../assets/img/controls/play-previous-button.png' ),
             click: function() { mediaPreviousTrack( mainWindow.getBrowserView() ) }
         },
         {
@@ -89,11 +89,11 @@ function createThumbar( mainWindow, type, likeStatus ) {
         },
         {
             tooltip: __.trans( 'MEDIA_CONTROL_NEXT' ),
-            icon: path.join( __dirname, 'assets/img/controls/play-next-button.png' ),
+            icon: path.join( __dirname, '../assets/img/controls/play-next-button.png' ),
             click: function() { mediaNextTrack( mainWindow.getBrowserView() ) }
         },
         {
-            icon: path.join( __dirname, 'assets/img/null.png' ),
+            icon: path.join( __dirname, '../assets/img/null.png' ),
             flags: [ 'disabled', 'nobackground' ]
         },
         {
