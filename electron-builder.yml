@@ -9,6 +9,7 @@ files:
 
 electronDownload:
   arch: ia32
+  cache: '.cache/electron-builder/'
 
 win:
   icon: assets
