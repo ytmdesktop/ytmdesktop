@@ -41,9 +41,9 @@ let hasLoadedUrl;
 let mainWindowUrl = 'https://music.youtube.com';
 
 let icon = 'assets/favicon.png';
-if (process.platform == 'win32') {
+if (process.platform === 'win32') {
   icon = 'assets/favicon.ico';
-} else if (process.platform == 'darwin') {
+} else if (process.platform === 'darwin') {
   icon = 'assets/favicon.16x16.png';
   store.set('settings-shiny-tray-dark', systemPreferences.isDarkMode());
   const menu = Menu.buildFromTemplate(template);
@@ -94,7 +94,7 @@ function createWindow() {
       nodeIntegration: true
     }
   };
-  if (process.platform == 'darwin') {
+  if (process.platform === 'darwin') {
     // Mac Specific Configuration
     broswerWindowConfig.titleBarStyle = 'hidden';
   }
@@ -107,6 +107,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile('./index.html');
+  mainWindow.setBrowserView( view );
 
   view.setBounds({
     x: 1,
@@ -131,7 +132,7 @@ function createWindow() {
      * If online, consider that already loaded the url
      * If offline, mark the variable that the url was not read
      */
-    if (hasLoadedUrl == undefined) {
+    if (hasLoadedUrl === undefined) {
         hasLoadedUrl = is_online;
     }
 
@@ -144,26 +145,26 @@ function createWindow() {
      * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL 
      * else set BrowserView to null to show Loading circle and show icon that not have connection
      */
-    if (is_online == true) {
-        if (lastConnectionStatusIsOnline == false) {
+    if (is_online === true) {
+        if (lastConnectionStatusIsOnline === false) {
             mainWindow.setBrowserView( view );
-            if ( hasLoadedUrl == false ) {
+            if ( hasLoadedUrl === false ) {
                 view.webContents.loadURL( mainWindowUrl );
                 hasLoadedUrl = true;
             }
         }
     } else {
-        if ( lastConnectionStatusIsOnline == true ) {
+        if ( lastConnectionStatusIsOnline === true ) {
             mainWindow.setBrowserView( null );
             mediaControl.createThumbar(mainWindow, 'play', likeStatus);
-            mediaControl.stopTrack(view);
+            if (!global.sharedObj.paused) mediaControl.stopTrack(view);
         }
     }
 
     lastConnectionStatusIsOnline = is_online;
     
     /**
-     * Check connection every 30 seconds
+     * Check connection every 10 seconds
      */
     setTimeout( function() {
         checkConnection();

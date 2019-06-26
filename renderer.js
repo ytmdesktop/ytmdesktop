@@ -7,7 +7,7 @@ const window = remote.getCurrentWindow();
 const icons = require('./icons_for_shiny_tray');
 let icon_set = icons.bright;
 
-ipc.on( 'is-online', function( e, isOnline ) {
+ipc.on( 'is-online', function( _, isOnline ) {
     
     if ( isOnline ) {
         document.getElementById( 'is-offline' ).classList.add( 'hide' );

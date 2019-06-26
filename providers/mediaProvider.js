@@ -109,12 +109,14 @@ function createTouchBar( mainWindow ) {
     // mainWindow.setTouchBar();
 }
 
-exports.playPauseTrack = mediaPlayPauseTrack;
-exports.stopTrack = mediaStopTrack;
-exports.nextTrack = mediaNextTrack;
-exports.previousTrack = mediaPreviousTrack;
-exports.upVote = mediaUpVote;
-exports.downVote = mediaDownVote;
+const guarder = (mainWindow,f) => {if (mainWindow && mainWindow.webContents) f(mainWindow)};
+
+exports.playPauseTrack = (v)=>guarder(v,mediaPlayPauseTrack);
+exports.stopTrack = (v)=>guarder(v,mediaStopTrack);
+exports.nextTrack = (v)=>guarder(v,mediaNextTrack);
+exports.previousTrack = (v)=>guarder(v,mediaPreviousTrack);
+exports.upVote = (v)=>guarder(v,mediaUpVote);
+exports.downVote = (v)=>guarder(v,mediaDownVote);
 
 // For Windows
 exports.createThumbar = createThumbar;
