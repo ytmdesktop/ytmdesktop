@@ -19,6 +19,7 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
 
 const elementKeepBackground = document.getElementById( 'toggle-keep-background' );
 const elementToggleShowNotification = document.getElementById( 'toggle-show-notifications' );
+const elementToggleStartOnBoot = document.getElementById( 'toggle-start-on-boot' );
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
 const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
@@ -44,6 +45,10 @@ elementToggleLeftOf.addEventListener( 'click', function() {
     store.set( 'settings-continue-where-left-of', this.checked );
 } );
 
+elementToggleStartOnBoot.addEventListener( 'click', function() {
+    store.set( 'settings-start-on-boot', this.checked );
+    relaunch();
+} );
 elementDiscordRichPresence.addEventListener( 'click', function() {
     store.set( 'settings-discord-rich-presence', this.checked );
 } );
@@ -93,6 +98,10 @@ function loadSettings() {
         document.getElementById( 'toggle-discord-rich-presence' ).checked = true;
     }
 
+    if ( store.get( 'settings-start-on-boot' ) ) {
+        document.getElementById( 'toggle-start-on-boot' ).checked = true;
+    }
+
     if ( store.get( 'settings-app-language' ) ) {
         document.getElementById( 'select-app-language' ).value = store.get( 'settings-app-language' );
     }
@@ -108,6 +117,10 @@ function loadSettings() {
 
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
 
+    // Disable unsupported platforms which may get an API later
+    if (!['darwin', 'win32'].includes(platform.process)) {
+        document.getElementById('toggle-start-on-boot').setAttribute('disabled', 'disabled');
+    }
 }
 
 function loadi18n() {
@@ -119,6 +132,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_ABOUT' ).innerText                            = __.trans( 'LABEL_SETTINGS_TAB_ABOUT' );
 
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND' );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT' ).innerText            = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS' ).innerText       = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF' ).innerText   = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' );
