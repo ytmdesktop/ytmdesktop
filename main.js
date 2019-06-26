@@ -15,6 +15,7 @@ const discordRPC = require('./providers/discordRpcProvider');
 const __ = require('./providers/translateProvider');
 const { template } = require('./mac-menu');
 const isDev = require('electron-is-dev');
+const isOnline = require('is-online');
 
 let renderer_for_status_bar = null;
 global.sharedObj = { title: 'N/A', paused: true };
@@ -34,6 +35,7 @@ let lastSongTitle;
 let lastSongAuthor;
 let likeStatus;
 let doublePressPlayPause;
+let lastConnectionStatusIsOnline = false;
 
 let mainWindowUrl = 'https://music.youtube.com';
 
@@ -103,20 +105,40 @@ function createWindow() {
     }
   });
 
-  mainWindow.setBrowserView(view);
+  mainWindow.loadFile('./index.html');
+
   view.setBounds({
     x: 1,
     y: 29,
     width: mainWindowSize.width - 2,
     height: mainWindowSize.height - 30
   });
-
-  mainWindow.loadFile('./index.html');
+  view.webContents.loadURL( mainWindowUrl );
 
   if (store.get('settings-continue-where-left-of') && store.get('window-url')) {
     mainWindowUrl = store.get('window-url');
   }
-  view.webContents.loadURL(mainWindowUrl);
+  
+  async function checkConnection() {
+    var is_online = await isOnline();
+    mainWindow.send( 'is-online', is_online );
+
+    if (is_online == true) {
+        if (lastConnectionStatusIsOnline == false) {
+            mainWindow.setBrowserView( view );
+            view.webContents.loadURL( mainWindowUrl );
+        }
+    } else {
+        mainWindow.setBrowserView( null );
+    }
+
+    lastConnectionStatusIsOnline = is_online;
+}
+
+checkConnection();
+setInterval( function() {
+    checkConnection();
+}, 10 * 1000 );
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
