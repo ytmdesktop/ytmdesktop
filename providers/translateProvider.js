@@ -15,5 +15,14 @@ exports.setLocale = function( locale ) {
 }
 
 exports.trans = function( id ) {
-    return i18n.__( id );
+    try{
+        let tmp = i18n.__( id )
+        if (tmp === id){
+            return i18n.__({phrase: id, locale: 'en'}); // fallback to english
+        }else{
+            return tmp;
+        }
+    }catch(_){
+        return i18n.__({phrase: id, locale: 'en'}); // fallback to english
+    }
 }
