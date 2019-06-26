@@ -11,8 +11,10 @@ ipc.on( 'is-online', function( e, isOnline ) {
     
     if ( isOnline ) {
         document.getElementById( 'is-offline' ).classList.add( 'hide' );
+        document.getElementById( 'center-loading' ).classList.remove( 'hide' );
     } else {
         document.getElementById( 'is-offline' ).classList.remove( 'hide' );
+        document.getElementById( 'center-loading' ).classList.add( 'hide' );
     }
 
 } );

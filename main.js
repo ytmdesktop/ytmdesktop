@@ -36,6 +36,7 @@ let lastSongAuthor;
 let likeStatus;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
+let hasLoadedUrl;
 
 let mainWindowUrl = 'https://music.youtube.com';
 
@@ -113,32 +114,63 @@ function createWindow() {
     width: mainWindowSize.width - 2,
     height: mainWindowSize.height - 30
   });
-  view.webContents.loadURL( mainWindowUrl );
 
   if (store.get('settings-continue-where-left-of') && store.get('window-url')) {
     mainWindowUrl = store.get('window-url');
   }
+
+  view.webContents.loadURL( mainWindowUrl );
   
   async function checkConnection() {
+    /**
+     * Check if is online
+     */ 
     var is_online = await isOnline();
+
+    /**
+     * If online, consider that already loaded the url
+     * If offline, mark the variable that the url was not read
+     */
+    if (hasLoadedUrl == undefined) {
+        hasLoadedUrl = is_online;
+    }
+
+    /**
+     * Emmit is online or offline to render.js
+     */
     mainWindow.send( 'is-online', is_online );
 
+    /**
+     * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL 
+     * else set BrowserView to null to show Loading circle and show icon that not have connection
+     */
     if (is_online == true) {
         if (lastConnectionStatusIsOnline == false) {
             mainWindow.setBrowserView( view );
-            view.webContents.loadURL( mainWindowUrl );
+            if ( hasLoadedUrl == false ) {
+                view.webContents.loadURL( mainWindowUrl );
+                hasLoadedUrl = true;
+            }
         }
     } else {
-        mainWindow.setBrowserView( null );
+        if ( lastConnectionStatusIsOnline == true ) {
+            mainWindow.setBrowserView( null );
+            mediaControl.createThumbar(mainWindow, 'play', likeStatus);
+            mediaControl.stopTrack(view);
+        }
     }
 
     lastConnectionStatusIsOnline = is_online;
-}
+    
+    /**
+     * Check connection every 30 seconds
+     */
+    setTimeout( function() {
+        checkConnection();
+    }, 10 * 1000 );
+  }
 
-checkConnection();
-setInterval( function() {
-    checkConnection();
-}, 10 * 1000 );
+  checkConnection();
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
