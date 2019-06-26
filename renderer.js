@@ -7,6 +7,16 @@ const window = remote.getCurrentWindow();
 const icons = require('./icons_for_shiny_tray');
 let icon_set = icons.bright;
 
+ipc.on( 'is-online', function( e, isOnline ) {
+    
+    if ( isOnline ) {
+        document.getElementById( 'is-offline' ).classList.add( 'hide' );
+    } else {
+        document.getElementById( 'is-offline' ).classList.remove( 'hide' );
+    }
+
+} );
+
 document.getElementById( 'btn-update' ).addEventListener( 'click', function() {
     ipc.send( 'btn-update-clicked', true );
 } );

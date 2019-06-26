@@ -31,7 +31,7 @@
 
     <div class="center-loading">
       <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue">
+        <div class="spinner-layer spinner-blue-only">
           <div class="circle-clipper left">
             <div class="circle"></div>
           </div><div class="gap-patch">
@@ -41,39 +41,12 @@
           </div>
         </div>
       </div>
-      <div class="spinner-layer spinner-red">
-        <div class="circle-clipper left">
-          <div class="circle"></div>
-        </div><div class="gap-patch">
-          <div class="circle"></div>
-        </div><div class="circle-clipper right">
-          <div class="circle"></div>
-        </div>
-      </div>
-
-      <div class="spinner-layer spinner-yellow">
-        <div class="circle-clipper left">
-          <div class="circle"></div>
-        </div><div class="gap-patch">
-          <div class="circle"></div>
-        </div><div class="circle-clipper right">
-          <div class="circle"></div>
-        </div>
-      </div>
-
-      <div class="spinner-layer spinner-green">
-        <div class="circle-clipper left">
-          <div class="circle"></div>
-        </div><div class="gap-patch">
-          <div class="circle"></div>
-        </div><div class="circle-clipper right">
-          <div class="circle"></div>
-        </div>
-      </div>
     </div>
 
+    <div id="is-offline" class="hide is-offline"> <i class="material-icons">signal_wifi_off</i> </div>
+
     <script>
-        require('./renderer.js');
+      require('./renderer.js');
     </script>
 
   </body>

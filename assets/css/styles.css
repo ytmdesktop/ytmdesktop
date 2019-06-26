@@ -72,3 +72,11 @@ html, body {
 
     font-size: 20px;
 }
+
+.is-offline {
+    bottom: 20px;
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    color: #EEE;
+}
