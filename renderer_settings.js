@@ -26,8 +26,8 @@ const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
-if ( process.platform != "darwin" ) {
-    let macSpecificNodes = document.getElementsByClassName('macos-specific');
+if ( process.platform !== "darwin" ) {
+    const macSpecificNodes = document.getElementsByClassName('macos-specific');
     for(let i = 0; i < macSpecificNodes.length ; i++){
         macSpecificNodes.item(i).style.display = 'none';
     }
@@ -47,7 +47,6 @@ elementToggleLeftOf.addEventListener( 'click', function() {
 
 elementToggleStartOnBoot.addEventListener( 'click', function() {
     store.set( 'settings-start-on-boot', this.checked );
-    relaunch();
 } );
 elementDiscordRichPresence.addEventListener( 'click', function() {
     store.set( 'settings-discord-rich-presence', this.checked );
@@ -118,8 +117,10 @@ function loadSettings() {
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
 
     // Disable unsupported platforms which may get an API later
-    if (!['darwin', 'win32'].includes(platform.process)) {
-        document.getElementById('toggle-start-on-boot').setAttribute('disabled', 'disabled');
+    if (['darwin', 'win32'].includes(process.platform)) {
+        const startOnBootEl = document.getElementById('toggle-start-on-boot');
+        startOnBootEl.checked = false;
+        startOnBootEl.setAttribute('disabled', 'disabled');
     }
 }
 
