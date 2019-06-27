@@ -41,6 +41,7 @@
     "materialize-css": "^1.0.0",
     "npx": "^10.2.0",
     "register-scheme": "0.0.2",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "socket.io": "^2.2.0"
   }
 }
