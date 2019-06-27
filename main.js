@@ -37,6 +37,7 @@ let likeStatus;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
+let isPaused = true;
 
 let mainWindowUrl = 'https://music.youtube.com';
 
@@ -155,20 +156,20 @@ function createWindow() {
         }
     } else {
         if ( lastConnectionStatusIsOnline === true ) {
+            if (!global.sharedObj.paused) mediaControl.stopTrack(view);
             mainWindow.setBrowserView( null );
             mediaControl.createThumbar(mainWindow, 'play', likeStatus);
-            if (!global.sharedObj.paused) mediaControl.stopTrack(view);
         }
     }
 
     lastConnectionStatusIsOnline = is_online;
     
     /**
-     * Check connection every 10 seconds
+     * Check connection every 30 seconds
      */
     setTimeout( function() {
         checkConnection();
-    }, 10 * 1000 );
+    }, 30 * 1000 );
   }
 
   checkConnection();
@@ -316,13 +317,35 @@ function createWindow() {
     discordRPC.activity(songTitle, songAuthor);
   }
 
+  view.webContents.on('media-started-playing', function() {
+    logDebug('Playing');
+    try {
+      if (process.platform === 'darwin') {
+        renderer_for_status_bar.send('update-status-bar');
+      }
+
+      global.sharedObj.paused = false;
+      mediaControl.createThumbar(mainWindow, 'pause', likeStatus);        
+      ipcMain.emit( 'play-pause', {
+        author: songAuthor,
+        title: songTitle,
+        isPaused: global.sharedObj.paused
+      });
+    } catch {}
+  });
   view.webContents.on('media-paused', function() {
     logDebug('Paused');
     try {
       if (process.platform === 'darwin') {
-        global.sharedObj.paused = true;
         renderer_for_status_bar.send('update-status-bar');
       }
+
+      global.sharedObj.paused = true;
+      ipcMain.emit( 'play-pause', {
+        author: songAuthor,
+        title: songTitle,
+        isPaused: global.sharedObj.paused
+      });
       mediaControl.createThumbar(mainWindow, 'play', likeStatus);
     } catch {}
   });
@@ -437,12 +460,31 @@ function createWindow() {
 
   ipcMain.on('media-play-pause', () => {
     mediaControl.playPauseTrack(view);
+    ipcMain.emit( 'play-pause', {
+      author: songAuthor,
+      title: songTitle,
+      isPaused: global.sharedObj.paused
+    });
   });
   ipcMain.on('media-next-track', () => {
     mediaControl.nextTrack(view);
+    ipcMain.emit( 'changed-track', {
+      author: songAuthor,
+      title: songTitle
+    });
   });
   ipcMain.on('media-previous-track', () => {
     mediaControl.previousTrack(view);
+    ipcMain.emit( 'changed-track', {
+      author: songAuthor,
+      title: songTitle
+    });
+  });
+  ipcMain.on('media-up-vote', () => {
+    mediaControl.upVote(view);
+  });
+  ipcMain.on('media-down-vote', () => {
+    mediaControl.downVote(view);
   });
 
   ipcMain.on('register-renderer', (event, arg) => {
