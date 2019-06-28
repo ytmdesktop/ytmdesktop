@@ -61,9 +61,9 @@ const io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
     
-    socket.on('require-song-playing-now', function() {
+    setInterval( function() {
         ipcMain.emit('what-is-song-playing-now');
-    });
+    }, 1000);
 
     ipcMain.on('song-playing-now-is', function(data) {
         socket.emit('media-now-playing', data);
