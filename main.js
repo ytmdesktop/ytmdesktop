@@ -28,9 +28,9 @@ let mainWindowSize = {
   height: 800
 };
 
-let songTitle;
-let songAuthor;
-let songCover;
+let songTitle = '';
+let songAuthor = '';
+let songCover = '';
 let lastSongTitle;
 let lastSongAuthor;
 let likeStatus;
