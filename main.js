@@ -42,9 +42,9 @@ let isPaused = true;
 let mainWindowUrl = 'https://music.youtube.com';
 
 let icon = 'assets/favicon.png';
-if (process.platform === 'win32') {
+if (isWindows()) {
   icon = 'assets/favicon.ico';
-} else if (process.platform === 'darwin') {
+} else if (isMac()) {
   icon = 'assets/favicon.16x16.png';
   store.set('settings-shiny-tray-dark', systemPreferences.isDarkMode());
   const menu = Menu.buildFromTemplate(template);
@@ -52,7 +52,7 @@ if (process.platform === 'win32') {
 }
 
 function createWindow() {
-  if (process.platform === 'darwin' || process.platform === 'win32') {
+  if (isMac() || isWindows()) {
     const execApp = path.basename(process.execPath);
     const startArgs = ['--processStart', `"${execApp}"`];
     const startOnBoot = store.get('settings-start-on-boot');
@@ -95,7 +95,7 @@ function createWindow() {
       nodeIntegration: true
     }
   };
-  if (process.platform === 'darwin') {
+  if (isMac()) {
     // Mac Specific Configuration
     broswerWindowConfig.titleBarStyle = 'hidden';
   }
@@ -236,7 +236,7 @@ function createWindow() {
   });
 
   view.webContents.on('media-started-playing', function() {
-    if (process.platform === 'darwin') {
+    if (isMac()) {
       global.sharedObj.paused = false;
       renderer_for_status_bar.send('update-status-bar');
     }
@@ -292,7 +292,13 @@ function createWindow() {
                   lastSongTitle = songTitle;
                   lastSongAuthor = songAuthor;
                   songCover = 'cover';
-                  // view.webContents.executeJavaScript( `document.getElementsByClassName('image style-scope ytmusic-player-bar')[0].src`, null, function( cover ) {} );
+                  view.webContents.executeJavaScript( `
+                    var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
+                    var b = a.getElementsByClassName('yt-img-shadow')[0];
+                    b.src
+                  `, null, function( cover ) {
+                    songCover = cover;
+                  } );
                   updateActivity(songTitle, songAuthor);
                 }
               }
@@ -307,7 +313,7 @@ function createWindow() {
     let nowPlaying = songTitle + ' - ' + songAuthor;
     logDebug(nowPlaying);
 
-    if (process.platform === 'darwin') {
+    if (isMac()) {
       global.sharedObj.title = nowPlaying;
       renderer_for_status_bar.send('update-status-bar');
     }
@@ -320,7 +326,7 @@ function createWindow() {
   view.webContents.on('media-started-playing', function() {
     logDebug('Playing');
     try {
-      if (process.platform === 'darwin') {
+      if (isMac()) {
         renderer_for_status_bar.send('update-status-bar');
       }
 
@@ -329,6 +335,7 @@ function createWindow() {
       ipcMain.emit( 'play-pause', {
         author: songAuthor,
         title: songTitle,
+        cover: songCover,
         isPaused: global.sharedObj.paused
       });
     } catch {}
@@ -336,7 +343,7 @@ function createWindow() {
   view.webContents.on('media-paused', function() {
     logDebug('Paused');
     try {
-      if (process.platform === 'darwin') {
+      if (isMac()) {
         renderer_for_status_bar.send('update-status-bar');
       }
 
@@ -344,6 +351,7 @@ function createWindow() {
       ipcMain.emit( 'play-pause', {
         author: songAuthor,
         title: songTitle,
+        cover: songCover,
         isPaused: global.sharedObj.paused
       });
       mediaControl.createThumbar(mainWindow, 'play', likeStatus);
@@ -383,7 +391,7 @@ function createWindow() {
   });
 
   mainWindow.on('close', function(e) {
-    if (process.platform === 'darwin') {
+    if (isMac()) {
       // Optimized for Mac OS X
       if (store.get('settings-keep-background')) {
         e.preventDefault();
@@ -398,7 +406,7 @@ function createWindow() {
   });
 
   app.on('before-quit', function(e) {
-    if (process.platform === 'darwin') {
+    if (isMac()) {
       app.exit();
     }
   });
@@ -444,9 +452,19 @@ function createWindow() {
   });
 
   ipcMain.on('what-is-song-playing-now', function(e, data) {
-    e.sender.send('song-playing-now-is', {
+    if ( e !== undefined ) {
+      e.sender.send('song-playing-now-is', {
+        author: songAuthor,
+        title: songTitle,
+        cover: songCover,
+        isPaused: global.sharedObj.paused
+      });
+    }
+    ipcMain.emit('song-playing-now-is', {
       author: songAuthor,
-      title: songTitle
+      title: songTitle,
+      cover: songCover,
+      isPaused: global.sharedObj.paused
     });
   });
 
@@ -460,25 +478,37 @@ function createWindow() {
 
   ipcMain.on('media-play-pause', () => {
     mediaControl.playPauseTrack(view);
-    ipcMain.emit( 'play-pause', {
-      author: songAuthor,
-      title: songTitle,
-      isPaused: global.sharedObj.paused
-    });
+    setTimeout(function() {
+      ipcMain.emit( 'play-pause', {
+        author: songAuthor,
+        title: songTitle,
+        cover: songCover,
+        isPaused: global.sharedObj.paused
+      });
+    }, 1000);
+
   });
   ipcMain.on('media-next-track', () => {
     mediaControl.nextTrack(view);
-    ipcMain.emit( 'changed-track', {
-      author: songAuthor,
-      title: songTitle
-    });
+    setTimeout(function() {
+      ipcMain.emit( 'changed-track', {
+        author: songAuthor,
+        title: songTitle,
+        cover: songCover,
+        isPaused: global.sharedObj.paused
+      });
+    }, 1000);
   });
   ipcMain.on('media-previous-track', () => {
     mediaControl.previousTrack(view);
-    ipcMain.emit( 'changed-track', {
-      author: songAuthor,
-      title: songTitle
-    });
+    setTimeout(function() {
+      ipcMain.emit( 'changed-track', {
+        author: songAuthor,
+        title: songTitle,
+        cover: songCover,
+        isPaused: global.sharedObj.paused
+      });
+    }, 1000);
   });
   ipcMain.on('media-up-vote', () => {
     mediaControl.upVote(view);
@@ -494,7 +524,7 @@ function createWindow() {
   });
 
   ipcMain.on('update-tray', () => {
-    if (process.platform === 'darwin') {
+    if (isMac()) {
       renderer_for_status_bar.send('update-status-bar');
       tray.setShinyTray();
     }
@@ -546,7 +576,7 @@ app.on('ready', function() {
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  if (!isMac()) {
     app.quit();
   }
 });
@@ -586,6 +616,18 @@ function logDebug(data) {
   if (true) {
     console.log(data);
   }
+}
+
+function isWindows() {
+  return process.platform === 'win32';
+}
+
+function isLinux() {
+  return process.platform === 'freebsd' || process.platform === 'linux' || process.platform === 'openbsd';
+}
+
+function isMac() {
+  return process.platform === 'darwin';
 }
 
 // In this file you can include the rest of your app's specific main process
