@@ -117,7 +117,7 @@ function loadSettings() {
     document.getElementById( 'app-version' ).innerText = remote.app.getVersion();
 
     // Disable unsupported platforms which may get an API later
-    if (['darwin', 'win32'].includes(process.platform)) {
+    if (!['darwin', 'win32'].includes(process.platform)) {
         const startOnBootEl = document.getElementById('toggle-start-on-boot');
         startOnBootEl.checked = false;
         startOnBootEl.setAttribute('disabled', 'disabled');
