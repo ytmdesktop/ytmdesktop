@@ -122,7 +122,7 @@ function createWindow() {
   }
 
   view.webContents.loadURL( mainWindowUrl );
-  
+  let checkConnectionTimeoutHandler;
   async function checkConnection() {
     /**
      * Check if is online
@@ -167,12 +167,21 @@ function createWindow() {
     /**
      * Check connection every 30 seconds
      */
-    setTimeout( function() {
-        checkConnection();
-    }, 30 * 1000 );
+    checkConnectionTimeoutHandler = setTimeout(() => checkConnection(), 30 * 1000);
   }
 
   checkConnection();
+
+  // Preserving Performance
+  // Why check if Windows is closed/hidden
+  // Check again on open/ready
+  mainWindow.on('close', () => clearTimeout(checkConnectionTimeoutHandler));
+  mainWindow.on('hide', () => clearTimeout(checkConnectionTimeoutHandler));
+  mainWindow.on('ready-to-show', () => {
+    if (checkConnectionTimeoutHandler) {
+      checkConnection();
+    }
+  });
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
