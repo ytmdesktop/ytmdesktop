@@ -3,7 +3,7 @@ const os = require( 'os' );
 const networkInterfaces = os.networkInterfaces();
 
 const ip = '0.0.0.0';
-const port = 8899;
+const port = 9863;
 const http = require('http');
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
@@ -60,25 +60,14 @@ server.listen(port, ip);
 const io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-
-    ipcMain.on('changed-track', function( data ) {
-        //console.log(data);
-        //socket.emit('media-now-playing', data);
-    });
-
-    ipcMain.on('play-pause', function( data ) {
-        //console.log(data);
-        //socket.emit('media-play-pause', data);
-    });
-
-    setInterval( function() {
+    
+    socket.on('require-song-playing-now', function() {
         ipcMain.emit('what-is-song-playing-now');
-    }, 2000);
+    });
 
     ipcMain.on('song-playing-now-is', function(data) {
-        //console.log(data)
         socket.emit('media-now-playing', data);
-    })
+    });
 
     socket.on('media-commands', function( cmd ) {
         switch( cmd ) {
