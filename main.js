@@ -31,6 +31,8 @@ let mainWindowSize = {
 let songTitle = '';
 let songAuthor = '';
 let songCover = '';
+let songDuration = 0;
+let songCurrentPosition = 0;
 let lastSongTitle;
 let lastSongAuthor;
 let likeStatus;
@@ -275,6 +277,22 @@ function createWindow() {
           }
         );
 
+        view.webContents.executeJavaScript(`
+          document.getElementById('progress-bar').getAttribute('aria-valuemax');
+        `, null,
+        function( data ) {
+            songDuration = parseInt(data);
+        });
+
+        setInterval( function() {
+          view.webContents.executeJavaScript(`
+            document.getElementById('progress-bar').getAttribute('aria-valuenow');
+          `, null,
+          function( data ) {
+              songCurrentPosition = parseInt(data);
+          });
+        }, 500);
+
         /**
          * This timeout is necessary because there is a certain delay when changing music and updating the div content
          */
@@ -345,6 +363,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
     } catch {}
@@ -361,6 +381,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
       mediaControl.createThumbar(mainWindow, 'play', likeStatus);
@@ -466,6 +488,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
     }
@@ -473,6 +497,8 @@ function createWindow() {
       author: songAuthor,
       title: songTitle,
       cover: songCover,
+      duration: songDuration,
+      currentPosition: songCurrentPosition,
       isPaused: global.sharedObj.paused
     });
   });
@@ -492,6 +518,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
     }, 1000);
@@ -504,6 +532,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
     }, 1000);
@@ -515,6 +545,8 @@ function createWindow() {
         author: songAuthor,
         title: songTitle,
         cover: songCover,
+        duration: songDuration,
+        currentPosition: songCurrentPosition,
         isPaused: global.sharedObj.paused
       });
     }, 1000);
