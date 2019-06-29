@@ -55,24 +55,29 @@ const server = http.createServer( ( req, res ) => {
     res.end();
 } );
 
-
 server.listen(port, ip);
 const io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    
-    setInterval( function() {
+
+    let timer = setInterval( function() {
         ipcMain.emit('what-is-song-playing-now');
     }, 1000);
 
+    socket.on('disconnect', () => {
+        clearInterval(timer);
+        //console.log( Object.keys(io.sockets.sockets).length );
+    });
+    
     ipcMain.on('song-playing-now-is', function(data) {
         socket.emit('media-now-playing', data);
+        //console.log(data);
     });
 
     socket.on('media-commands', function( cmd ) {
         switch( cmd ) {
             case 'previous-track':
-                ipcMain.emit('media-previous-track', true)
+                ipcMain.emit('media-previous-track', true);
                 break;
 
             case 'play-track': 
@@ -84,28 +89,26 @@ io.on('connection', function (socket) {
                 break;
 
             case 'next-track':
-                ipcMain.emit('media-next-track', true)
+                ipcMain.emit('media-next-track', true);
                 break;
 
             case 'thumbs-up-track':
-                ipcMain.emit('media-up-vote', true)
+                ipcMain.emit('media-up-vote', true);
                 break;
 
             case 'thumbs-down-track':
-                ipcMain.emit('media-down-vote', true)
+                ipcMain.emit('media-down-vote', true);
+                break;
+
+            case 'volume-up':
+                ipcMain.emit('media-volume-up', true)
+                break;
+
+            case 'volume-down':
+                ipcMain.emit('media-volume-down', true)
                 break;
         }
     } );
-
-    socket.on('settings', function( cmd ) {
-        switch( cmd ) {
-            case 'show-settings':
-                ipcMain.emit('show-settings', true);
-                break;
-        }
-    } );
-
-
 
 });
 

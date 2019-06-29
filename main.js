@@ -35,7 +35,8 @@ let songDuration = 0;
 let songCurrentPosition = 0;
 let lastSongTitle;
 let lastSongAuthor;
-let likeStatus;
+let likeStatus = 'INDIFFERENT';
+let volumePercent = 0;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
@@ -226,7 +227,7 @@ function createWindow() {
     view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
-                width: 8px;
+                width: 9px;
             }
 
             /* Track */
@@ -261,22 +262,6 @@ function createWindow() {
       function(title) {
         songTitle = title;
 
-        /**
-         * GET LIKE STATUS ATTRIBUTE
-         *
-         * LIKE | DISLIKE | INDIFFERENT
-         */
-        view.webContents.executeJavaScript(
-          `
-                document.getElementById('like-button-renderer').getAttribute('like-status')
-            `,
-          null,
-          function(data) {
-            likeStatus = data;
-            mediaControl.createThumbar(mainWindow, 'pause', likeStatus);
-          }
-        );
-
         view.webContents.executeJavaScript(`
           document.getElementById('progress-bar').getAttribute('aria-valuemax');
         `, null,
@@ -285,12 +270,46 @@ function createWindow() {
         });
 
         setInterval( function() {
+          /**
+           * GET LIKE STATUS ATTRIBUTE
+           *
+           * LIKE | DISLIKE | INDIFFERENT
+           */
+          view.webContents.executeJavaScript(
+            `
+                  document.getElementById('like-button-renderer').getAttribute('like-status')
+              `,
+            true,
+            function(data) {
+              likeStatus = data;
+              mediaControl.createThumbar(mainWindow, 'pause', likeStatus);
+            }
+          );
+
+          /**
+           * GET CURRENT SEEK BAR POSITION
+           */
           view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').getAttribute('aria-valuenow');
           `, null,
           function( data ) {
-              songCurrentPosition = parseInt(data);
+            songCurrentPosition = parseInt(data);
           });
+
+          view.webContents.executeJavaScript(`
+            document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
+          `, true, 
+          function( data ) {
+            volumePercent = parseInt(data);
+          });
+
+          /*view.webContents.executeJavaScript(`
+            document.getElementById('progress-bar').setAttribute('value', 10)
+          `, false,
+          function(data ) {
+            console.log(data);
+          });
+          view.webContents.openDevTools({ mode: 'detach' });*/
         }, 500);
 
         /**
@@ -359,14 +378,7 @@ function createWindow() {
 
       global.sharedObj.paused = false;
       mediaControl.createThumbar(mainWindow, 'pause', likeStatus);        
-      ipcMain.emit( 'play-pause', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      ipcMain.emit( 'play-pause', songInfo() );
     } catch {}
   });
   view.webContents.on('media-paused', function() {
@@ -377,14 +389,7 @@ function createWindow() {
       }
 
       global.sharedObj.paused = true;
-      ipcMain.emit( 'play-pause', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      ipcMain.emit( 'play-pause', songInfo() );
       mediaControl.createThumbar(mainWindow, 'play', likeStatus);
     } catch {}
   });
@@ -484,23 +489,9 @@ function createWindow() {
 
   ipcMain.on('what-is-song-playing-now', function(e, data) {
     if ( e !== undefined ) {
-      e.sender.send('song-playing-now-is', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      e.sender.send('song-playing-now-is', songInfo() );
     }
-    ipcMain.emit('song-playing-now-is', {
-      author: songAuthor,
-      title: songTitle,
-      cover: songCover,
-      duration: songDuration,
-      currentPosition: songCurrentPosition,
-      isPaused: global.sharedObj.paused
-    });
+    ipcMain.emit('song-playing-now-is', songInfo() );
   });
 
   ipcMain.on('will-close-mainwindow', function() {
@@ -514,41 +505,20 @@ function createWindow() {
   ipcMain.on('media-play-pause', () => {
     mediaControl.playPauseTrack(view);
     setTimeout(function() {
-      ipcMain.emit( 'play-pause', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      ipcMain.emit( 'play-pause', songInfo() );
     }, 1000);
 
   });
   ipcMain.on('media-next-track', () => {
     mediaControl.nextTrack(view);
     setTimeout(function() {
-      ipcMain.emit( 'changed-track', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      ipcMain.emit( 'changed-track', songInfo() );
     }, 1000);
   });
   ipcMain.on('media-previous-track', () => {
     mediaControl.previousTrack(view);
     setTimeout(function() {
-      ipcMain.emit( 'changed-track', {
-        author: songAuthor,
-        title: songTitle,
-        cover: songCover,
-        duration: songDuration,
-        currentPosition: songCurrentPosition,
-        isPaused: global.sharedObj.paused
-      });
+      ipcMain.emit( 'changed-track', songInfo() );
     }, 1000);
   });
   ipcMain.on('media-up-vote', () => {
@@ -556,6 +526,12 @@ function createWindow() {
   });
   ipcMain.on('media-down-vote', () => {
     mediaControl.downVote(view);
+  });
+  ipcMain.on('media-volume-up', () => {
+    mediaControl.volumeUp(view);
+  });
+  ipcMain.on('media-volume-down', () => {
+    mediaControl.volumeDown(view);
   });
 
   ipcMain.on('register-renderer', (event, arg) => {
@@ -669,6 +645,19 @@ function isLinux() {
 
 function isMac() {
   return process.platform === 'darwin';
+}
+
+function songInfo() {
+  return {
+    author: songAuthor,
+    title: songTitle,
+    cover: songCover,
+    duration: songDuration,
+    currentPosition: songCurrentPosition,
+    likeStatus: likeStatus,
+    volumePercent: volumePercent,
+    isPaused: global.sharedObj.paused
+  };
 }
 
 // In this file you can include the rest of your app's specific main process
