@@ -5,16 +5,33 @@ const networkInterfaces = os.networkInterfaces();
 const ip = '0.0.0.0';
 const port = 9863;
 const http = require('http');
+
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
+    let interface = {};
 
     Object.keys(networkInterfaces).forEach( ( v, k ) => {
-        collection += `<tr>
-                            <td>${v}</td> 
-                            <td>${ JSON.stringify(networkInterfaces[v][0]['address']).toString().replace(/^"(.*)"$/, '$1') }</td>
-                            <td>${ ( networkInterfaces[v][1] ) ? JSON.stringify(networkInterfaces[v][1]['address']).toString().replace(/^"(.*)"$/, '$1') : '' }</td>
-                        </tr>
-                        `;
+        
+        networkInterfaces[v].forEach( ( vv, kk) => {
+            if ( vv.family == 'IPv4' ) {
+                interface[v] = vv.address;
+            }
+        });
+
+        collection += `
+            <div class="row" style="margin-top: 10px;">
+                <div class="col s12">
+                    <div class="card white z-depth-3">
+                        <div class="card-content">
+                            <div class="row" style="margin-bottom: 0 !important;">
+                                <div class="col s6"> <h5>${v}</h5> </div>
+                                <div class="col s6" style="border-left: solid 1px #EEE !important;"> <h5 style="font-weight: 100 !important;">${interface[v]}</h5> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     } );
 
     res.writeHead( 200, {'Content-Type': 'text/html'});
@@ -28,26 +45,26 @@ const server = http.createServer( ( req, res ) => {
                     margin: 0;
                     padding: 0;
                     text-align: center;
+                    background-image: url('https://ytmdesktop.app/img/bg/1.jpg')
+                }
+                h5 {
+                    margin: 1rem 0 1rem 0 !important;
                 }
             </style>
         </head>
         <body>
-            <h2>YTMDesktop Companion Server</h2>
+            <nav>
+                <div class="nav-wrapper blue">
+                <a href="#" class="brand-logo center">YTMDesktop Companion Server</a>
+                </div>
+            </nav>
 
             <div class="container">
-                <table class="striped highlight">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>IPV6</th>
-                            <th>IPV4</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${collection}
-                    </tbody>
-                </table>
+
+                ${collection}
+
             </div>
+
         </body>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     </html>`);
