@@ -1,10 +1,40 @@
 const { ipcMain, ipcRenderer } = require('electron');
 const os = require( 'os' );
+const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
 
 const ip = '0.0.0.0';
 const port = 9863;
 const http = require('http');
+
+function createAdvertisement() {
+    try {
+        var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, {
+            name:'ytmdesktop._companion',
+            port: port,
+            txt:{
+                txtvers:'1'
+              },
+          });
+        //ad.on('error', handleError);
+        ad.start();
+    } catch (ex) {
+        handleError(ex);
+    }
+}
+
+function handleError(error) {
+    switch (error.errorCode) {
+        case mdns.kDNSServiceErr_Unknown:
+        console.warn(error);
+        setTimeout(createAdvertisement, 5000);
+        break;
+        default:
+        throw error;
+    } 
+}
+
+createAdvertisement();
 
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
@@ -34,7 +64,7 @@ const server = http.createServer( ( req, res ) => {
         `;
     } );
 
-    res.writeHead( 200, {'Content-Type': 'text/html'});
+    res.writeHead( 200, {'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*'});
 
     res.write(`<html>
         <head>
@@ -76,6 +106,7 @@ server.listen(port, ip);
 const io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
+    console.log('conectado')
 
     let timer = setInterval( function() {
         ipcMain.emit('what-is-song-playing-now');
