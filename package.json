@@ -39,6 +39,7 @@
     "i18n": "^0.8.3",
     "is-online": "^8.2.0",
     "materialize-css": "^1.0.0",
+    "mdns-js": "^1.0.3",
     "npx": "^10.2.0",
     "register-scheme": "0.0.2",
     "request": "^2.88.0",
