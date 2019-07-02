@@ -9,13 +9,15 @@ const http = require('http');
 
 function createAdvertisement() {
     try {
-        var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, {
-            name:'ytmdesktop._companion',
-            port: port,
-            txt:{
-                txtvers:'1'
-              },
-          });
+        var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, 
+            {
+                name:'ytmdesktop._companion',
+                port: port,
+                txt: {
+                    txtvers:'1'
+                },
+            }
+        );
         //ad.on('error', handleError);
         ad.start();
     } catch (ex) {
@@ -26,11 +28,12 @@ function createAdvertisement() {
 function handleError(error) {
     switch (error.errorCode) {
         case mdns.kDNSServiceErr_Unknown:
-        console.warn(error);
-        setTimeout(createAdvertisement, 5000);
+            console.warn(error);
+            setTimeout(createAdvertisement, 5000);
         break;
+
         default:
-        throw error;
+            throw error;
     } 
 }
 
@@ -105,24 +108,33 @@ const server = http.createServer( ( req, res ) => {
 server.listen(port, ip);
 const io = require('socket.io')(server);
 
-io.on('connection', function (socket) {
+setInterval(() => {
+    console.log(Object.keys(io.sockets.sockets).length);
+    console.log(Object.keys(io.sockets.sockets));
+}, 1000);
+
+io.on('connection', (socket) => {
     console.log('conectado')
 
-    let timer = setInterval( function() {
+    let timer = setInterval( () => {
         ipcMain.emit('what-is-song-playing-now');
+        console.log('what-is-song-playing-now............');
     }, 1000);
 
     socket.on('disconnect', () => {
+        socket.disconnect();
         clearInterval(timer);
         //console.log( Object.keys(io.sockets.sockets).length );
     });
     
-    ipcMain.on('song-playing-now-is', function(data) {
+    ipcMain.on('song-playing-now-is', (data) => {
         socket.emit('media-now-playing', data);
         //console.log(data);
     });
 
-    socket.on('media-commands', function( cmd ) {
+    socket.on('media-commands', (cmd) => {
+        console.log(cmd);
+
         switch( cmd ) {
             case 'previous-track':
                 ipcMain.emit('media-previous-track', true);
