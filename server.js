@@ -6,6 +6,7 @@ const networkInterfaces = os.networkInterfaces();
 const ip = '0.0.0.0';
 const port = 9863;
 const http = require('http');
+const pattIgnoreInterface = /(virtual)\w*/gmi;
 
 let connectionsTotal = 0;
 
@@ -20,7 +21,6 @@ function createAdvertisement() {
                 },
             }
         );
-        //ad.on('error', handleError);
         ad.start();
     } catch (ex) {
         handleError(ex);
@@ -43,30 +43,37 @@ createAdvertisement();
 
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
-    let interface = {};
 
     Object.keys(networkInterfaces).forEach( ( v, k ) => {
-        
-        networkInterfaces[v].forEach( ( vv, kk) => {
-            if ( vv.family == 'IPv4' ) {
-                interface[v] = vv.address;
-            }
-        });
+        if( !pattIgnoreInterface.test( v ) ) {
+            
+            networkInterfaces[v].forEach( ( vv, kk) => {
 
-        collection += `
-            <div class="row" style="margin-top: 10px;">
-                <div class="col s12">
-                    <div class="card white z-depth-3">
-                        <div class="card-content">
-                            <div class="row" style="margin-bottom: 0 !important;">
-                                <div class="col s6"> <h5>${v}</h5> </div>
-                                <div class="col s6" style="border-left: solid 1px #EEE !important;"> <h5 style="font-weight: 100 !important;">${interface[v]}</h5> </div>
+                if ( vv.family == 'IPv4' && vv.internal == false ) {
+                    
+                    collection += `
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col s12">
+                                <div class="card white z-depth-3">
+                                    <div class="card-content">
+                                        <div class="row" style="margin-bottom: 0 !important;">
+                                            <div class="col s6"> <h3>${v}</h3> <h5 style="font-weight: 100 !important;">${vv.address}</h5> </div>
+                                            <div class="col s6" style="border-left: solid 1px #EEE !important;"> 
+                                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=%7B++%27name%27%3A%27${v}%27%2C+%27ip%27%3A+%27${vv.address}%27+%7D&size=220x220&margin=0" width="136" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        `;
+                    `;
+
+                }
+
+            });
+    
+        }
+
     } );
 
     res.writeHead( 200, {'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*'});
@@ -74,7 +81,9 @@ const server = http.createServer( ( req, res ) => {
     res.write(`<html>
         <head>
             <title>YTMDesktop Companion Server</title>
-            <meta http-equiv="refresh" content="30">
+            <meta http-equiv="refresh" content="60">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
             <style>
                 html, body {
@@ -91,18 +100,27 @@ const server = http.createServer( ( req, res ) => {
         <body>
             <nav>
                 <div class="nav-wrapper blue">
-                <a href="#" class="brand-logo center">YTMDesktop Companion Server</a>
+                <a class="brand-logo center">YTMDesktop Companion Server - ${os.hostname()}</a>
                 </div>
             </nav>
 
             <div class="container">
                 ${collection}
 
-                <div class="card-panel lighten-2"><b>${connectionsTotal}</b> Devices Connected</div>
+                <div class="card-panel lighten-2">
+                    <a class="black-text btn-flat tooltipped" data-position="bottom" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${connectionsTotal}</a>
+                </div>
+
             </div>
 
         </body>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('.tooltipped');
+                M.Tooltip.init(elems, {});
+            });
+        </script>
     </html>`);
 
     res.end();
