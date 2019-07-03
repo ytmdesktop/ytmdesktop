@@ -7,6 +7,8 @@ const ip = '0.0.0.0';
 const port = 9863;
 const http = require('http');
 
+let connectionsTotal = 0;
+
 function createAdvertisement() {
     try {
         var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, 
@@ -72,6 +74,7 @@ const server = http.createServer( ( req, res ) => {
     res.write(`<html>
         <head>
             <title>YTMDesktop Companion Server</title>
+            <meta http-equiv="refresh" content="30">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
             <style>
                 html, body {
@@ -93,9 +96,9 @@ const server = http.createServer( ( req, res ) => {
             </nav>
 
             <div class="container">
-
                 ${collection}
 
+                <div class="card-panel lighten-2"><b>${connectionsTotal}</b> Devices Connected</div>
             </div>
 
         </body>
@@ -108,32 +111,47 @@ const server = http.createServer( ( req, res ) => {
 server.listen(port, ip);
 const io = require('socket.io')(server);
 
-setInterval(() => {
-    console.log(Object.keys(io.sockets.sockets).length);
-    console.log(Object.keys(io.sockets.sockets));
+function convertToHuman(time) {
+    var _aux = time;
+    var _minutes = 0;
+    var _seconds = 0;
+
+    while (_aux >= 60) {
+        _aux = _aux - 60;
+        _minutes++;
+    }
+
+    _seconds = _aux;
+
+    if (_seconds < 10) {
+        return _minutes + ':0' + _seconds;
+    }
+    return _minutes + ':' + _seconds;
+}
+
+setInterval( () => {
+    connectionsTotal = Object.keys(io.sockets.sockets).length;
+    console.log(connectionsTotal + ' devices connected');
 }, 1000);
 
 io.on('connection', (socket) => {
-    console.log('conectado')
-
+    
     let timer = setInterval( () => {
         ipcMain.emit('what-is-song-playing-now');
-        console.log('what-is-song-playing-now............');
-    }, 1000);
+    }, 800);
 
     socket.on('disconnect', () => {
-        socket.disconnect();
         clearInterval(timer);
-        //console.log( Object.keys(io.sockets.sockets).length );
     });
     
     ipcMain.on('song-playing-now-is', (data) => {
-        socket.emit('media-now-playing', data);
-        //console.log(data);
+        data['durationHuman'] = convertToHuman(data['duration']);
+        data['currentPositionHuman'] = convertToHuman(data['currentPosition']);
+
+        io.emit('media-now-playing', data);
     });
 
     socket.on('media-commands', (cmd) => {
-        console.log(cmd);
 
         switch( cmd ) {
             case 'previous-track':
