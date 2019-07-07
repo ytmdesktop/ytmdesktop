@@ -72,7 +72,7 @@ function createThumbar( mainWindow, type, likeStatus ) {
         click: function() { mediaPlayPauseTrack( mainWindow.getBrowserView() ) }
     }
 
-    if ( type !== 'play' ) {
+    if ( type == false ) {
         playOrPause.tooltip = __.trans( 'MEDIA_CONTROL_PAUSE' );
         playOrPause.icon = path.join( __dirname, '../assets/img/controls/pause-button.png' );
     }
