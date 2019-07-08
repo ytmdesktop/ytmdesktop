@@ -59,7 +59,7 @@ const server = http.createServer( ( req, res ) => {
                                         <div class="row" style="margin-bottom: 0 !important;">
                                             <div class="col s6"> <h3>${v}</h3> <h5 style="font-weight: 100 !important;">${vv.address}</h5> </div>
                                             <div class="col s6" style="border-left: solid 1px #EEE !important;"> 
-                                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=%7B++%27name%27%3A%27${v}%27%2C+%27ip%27%3A+%27${vv.address}%27+%7D&size=220x220&margin=0" width="136" />
+                                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=%7B++%27name%27%3A%27${os.hostname()}%27%2C+%27ip%27%3A+%27${vv.address}%27+%7D&size=220x220&margin=0" width="136" />
                                             </div>
                                         </div>
                                     </div>
