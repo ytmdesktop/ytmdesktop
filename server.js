@@ -98,11 +98,15 @@ const server = http.createServer( ( req, res ) => {
             </style>
         </head>
         <body>
-            <nav>
+            <!--nav>
                 <div class="nav-wrapper blue">
                 <a class="brand-logo center">YTMDesktop Companion Server - ${os.hostname()}</a>
                 </div>
-            </nav>
+            </nav-->
+
+            <div class="col s12">
+                <h4>YTMDesktop Companion Server <br /> ${os.hostname()}</h4>
+            </div>
 
             <div class="container">
                 ${collection}
