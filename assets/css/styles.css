@@ -64,11 +64,17 @@ html, body {
     color: #AAA;
 }
 
-.center-loading {
+.center-flex {
     width: 100vw; 
     min-height: 100vh; 
     text-align: center; 
     line-height: 100vh;
 
     font-size: 20px;
+}
+
+.is-offline {
+    width: 100%;
+    text-align: center;
+    color: #EEE;
 }
