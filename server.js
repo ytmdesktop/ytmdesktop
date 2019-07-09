@@ -1,4 +1,4 @@
-const { ipcMain, ipcRenderer } = require('electron');
+const { ipcMain } = require('electron');
 const os = require( 'os' );
 const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
