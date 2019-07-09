@@ -3,3 +3,5 @@ node_modules
 dist
 .DS_Store
 yarn.lock
+/youtube-music-desktop-app-*.tgz
+/.cache

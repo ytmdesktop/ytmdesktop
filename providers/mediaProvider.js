@@ -31,6 +31,16 @@ function mediaDownVote( mainWindow ) {
     console.log('mediaDownVote');
 }
 
+function mediaVolumeUp( mainWindow ) {
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: '=' } );
+    console.log('mediaVolumeUp');
+}
+
+function mediaVolumeDown( mainWindow ) {
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: '-' } );
+    console.log('mediaVolumeDown');
+}
+
 function createThumbar( mainWindow, type, likeStatus ) {
     let thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
     let thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
@@ -62,7 +72,7 @@ function createThumbar( mainWindow, type, likeStatus ) {
         click: function() { mediaPlayPauseTrack( mainWindow.getBrowserView() ) }
     }
 
-    if ( type !== 'play' ) {
+    if ( type == false ) {
         playOrPause.tooltip = __.trans( 'MEDIA_CONTROL_PAUSE' );
         playOrPause.icon = path.join( __dirname, '../assets/img/controls/pause-button.png' );
     }
@@ -109,12 +119,16 @@ function createTouchBar( mainWindow ) {
     // mainWindow.setTouchBar();
 }
 
-exports.playPauseTrack = mediaPlayPauseTrack;
-exports.stopTrack = mediaStopTrack;
-exports.nextTrack = mediaNextTrack;
-exports.previousTrack = mediaPreviousTrack;
-exports.upVote = mediaUpVote;
-exports.downVote = mediaDownVote;
+const guarder = (mainWindow,f) => {if (mainWindow && mainWindow.webContents) f(mainWindow)};
+
+exports.playPauseTrack = (v)=>guarder(v,mediaPlayPauseTrack);
+exports.stopTrack = (v)=>guarder(v,mediaStopTrack);
+exports.nextTrack = (v)=>guarder(v,mediaNextTrack);
+exports.previousTrack = (v)=>guarder(v,mediaPreviousTrack);
+exports.upVote = (v)=>guarder(v,mediaUpVote);
+exports.downVote = (v)=>guarder(v,mediaDownVote);
+exports.volumeUp = (v)=>guarder(v,mediaVolumeUp);
+exports.volumeDown = (v)=>guarder(v,mediaVolumeDown);
 
 // For Windows
 exports.createThumbar = createThumbar;
