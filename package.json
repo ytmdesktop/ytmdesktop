@@ -1,6 +1,6 @@
 {
   "name": "youtube-music-desktop-app",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "YouTube Music Desktop App",
   "main": "main.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "5.0.0",
-    "electron-builder": "20.39.0"
+    "electron-builder": "20.43.0"
   },
   "dependencies": {
     "discord-rpc": "^3.0.1",

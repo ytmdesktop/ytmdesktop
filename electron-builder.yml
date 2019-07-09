@@ -6,6 +6,7 @@ files:
   - '!LICENSE.md'
   - '!package.json'
   - '!package-lock.json'
+  - '!.cache'
 
 electronDownload:
   arch: ia32
