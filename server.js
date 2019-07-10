@@ -167,8 +167,8 @@ io.on('connection', (socket) => {
     });
     
     ipcMain.on('song-playing-now-is', (data) => {
-        data['durationHuman'] = convertToHuman(data['duration']);
-        data['currentPositionHuman'] = convertToHuman(data['currentPosition']);
+        data['song']['durationHuman'] = convertToHuman(data['song']['duration']);
+        data['player']['seekbarCurrentPositionHuman'] = convertToHuman(data['player']['seekbarCurrentPosition']);
 
         io.emit('media-now-playing', data);
     });
