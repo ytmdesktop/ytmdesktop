@@ -161,7 +161,7 @@ function createWindow() {
         if ( lastConnectionStatusIsOnline === true ) {
             if (!global.sharedObj.paused) mediaControl.stopTrack(view);
             mainWindow.setBrowserView( null );
-            mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);
+            mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
         }
     }
 
@@ -189,7 +189,7 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
   // view.webContents.openDevTools({ mode: 'detach' });
-  mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);
+  mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
 
   if (windowMaximized) {
     setTimeout(function() {
@@ -219,7 +219,7 @@ function createWindow() {
 
   mainWindow.on('show', function() {
     logDebug('show');
-    mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);
+    mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
   });
 
   view.webContents.on('did-navigate-in-page', function() {
@@ -282,7 +282,7 @@ function createWindow() {
             true,
             function(data) {
               likeStatus = data;
-              mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);
+              mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
             }
           );
 
@@ -377,7 +377,7 @@ function createWindow() {
       }
 
       global.sharedObj.paused = false;
-      mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);    
+      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);    
       ipcMain.emit( 'play-pause', songInfo() );
     } catch {}
   });
@@ -390,7 +390,7 @@ function createWindow() {
 
       global.sharedObj.paused = true;
       ipcMain.emit( 'play-pause', songInfo() );
-      mediaControl.createThumbar(mainWindow, songInfo()['isPaused'], likeStatus);
+      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
     } catch {}
   });
 
