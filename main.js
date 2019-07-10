@@ -491,7 +491,7 @@ function createWindow() {
     if ( e !== undefined ) {
       e.sender.send('song-playing-now-is', songInfo() );
     }
-    ipcMain.emit('song-playing-now-is', songInfo() );
+    ipcMain.emit('song-playing-now-is', getAll() );
   });
 
   ipcMain.on('will-close-mainwindow', function() {
@@ -653,11 +653,23 @@ function songInfo() {
     title: songTitle,
     cover: songCover,
     duration: songDuration,
-    currentPosition: songCurrentPosition,
-    likeStatus: likeStatus,
-    volumePercent: volumePercent,
-    isPaused: global.sharedObj.paused
   };
+}
+
+function playerInfo() {
+  return {
+    isPaused: global.sharedObj.paused,
+    volumePercent: volumePercent,
+    seekbarCurrentPosition: songCurrentPosition,
+    likeStatus: likeStatus,
+  };
+}
+
+function getAll() {
+  return {
+    song: songInfo(),
+    player: playerInfo()
+  }
 }
 
 // In this file you can include the rest of your app's specific main process
@@ -666,7 +678,7 @@ const mediaControl = require('./providers/mediaProvider');
 const tray = require('./tray');
 const updater = require('./providers/updateProvider');
 const analytics = require('./providers/analyticsProvider');
-//require('./server');
+require('./server');
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion());
 analytics.setEvent('main', 'os', process.platform, process.platform);
