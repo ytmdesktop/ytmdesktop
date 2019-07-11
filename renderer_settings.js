@@ -20,6 +20,7 @@ document.getElementById( 'btn-close' ).addEventListener( 'click', function() {
 const elementKeepBackground = document.getElementById( 'toggle-keep-background' );
 const elementToggleShowNotification = document.getElementById( 'toggle-show-notifications' );
 const elementToggleStartOnBoot = document.getElementById( 'toggle-start-on-boot' );
+const elementToggleCompanionServer = document.getElementById( 'toggle-companion-server' );
 const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left-of' );
 const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
@@ -48,6 +49,12 @@ elementToggleLeftOf.addEventListener( 'click', function() {
 elementToggleStartOnBoot.addEventListener( 'click', function() {
     store.set( 'settings-start-on-boot', this.checked );
 } );
+
+elementToggleCompanionServer.addEventListener( 'click', function() {
+    store.set( 'settings-companion-server', this.checked );
+    relaunch();
+} );
+
 elementDiscordRichPresence.addEventListener( 'click', function() {
     store.set( 'settings-discord-rich-presence', this.checked );
 } );
@@ -101,6 +108,11 @@ function loadSettings() {
         document.getElementById( 'toggle-start-on-boot' ).checked = true;
     }
 
+    if ( store.get( 'settings-companion-server' ) ) {
+        document.getElementById( 'toggle-companion-server' ).checked = true;
+        document.getElementById('i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO').classList.remove('hide');
+    }
+
     if ( store.get( 'settings-app-language' ) ) {
         document.getElementById( 'select-app-language' ).value = store.get( 'settings-app-language' );
     }
@@ -139,7 +151,9 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
-    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' ).innerText         = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO', { url: unescape('find.ytmdesktop.com') } );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText               = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' ).innerText                  = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' );
 
