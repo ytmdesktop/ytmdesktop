@@ -152,7 +152,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' ).innerText         = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' );
-    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO', { url: unescape('find.ytmdesktop.com') } );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO', { url: 'find.ytmdesktop.app' } );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText               = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' ).innerText                  = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' );
