@@ -62,7 +62,7 @@ const server = http.createServer( ( req, res ) => {
                                     <div class="card-content">
                                         <div class="row" style="margin-bottom: 0 !important;">
                                             <div class="col s6"> 
-                                                <img class="card card-content" style="padding: 10px !important; height: 180px;" src="${qr.createDataURL(6)}" width="180" />
+                                                <img class="card card-content" style="padding: 10px !important;" src="${qr.createDataURL(6)}" width="180" />
                                             </div>
                                             <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
                                                 <h3>${os.hostname()}</h3> 
