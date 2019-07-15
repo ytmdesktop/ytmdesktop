@@ -537,6 +537,12 @@ function createWindow() {
   ipcMain.on('media-volume-down', () => {
     mediaControl.volumeDown(view);
   });
+  ipcMain.on('media-forward-X-seconds', () => {
+    mediaControl.mediaForwardXSeconds(view);
+  });
+  ipcMain.on('media-rewind-X-seconds', () => {
+    mediaControl.mediaRewindXSeconds(view);
+  });
 
   ipcMain.on('register-renderer', (event, arg) => {
     renderer_for_status_bar = event.sender;

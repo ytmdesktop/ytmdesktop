@@ -217,6 +217,14 @@ io.on('connection', (socket) => {
             case 'volume-down':
                 ipcMain.emit('media-volume-down', true)
                 break;
+
+            case 'forward-X-seconds':
+                ipcMain.emit('media-forward-X-seconds', true)
+                break;
+
+            case 'rewind-X-seconds':
+                ipcMain.emit('media-rewind-X-seconds', true)
+                break;
         }
     } );
 
