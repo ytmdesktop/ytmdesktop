@@ -2,6 +2,7 @@ const { ipcMain } = require('electron');
 const os = require( 'os' );
 const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
+const qrcode = require('qrcode-generator');
 
 const ip = '0.0.0.0';
 const port = 9863;
@@ -50,7 +51,10 @@ const server = http.createServer( ( req, res ) => {
             networkInterfaces[v].forEach( ( vv, kk) => {
 
                 if ( vv.family == 'IPv4' && vv.internal == false ) {
-                    
+                    var qr = qrcode(0, 'M');
+                    qr.addData(`{ "name": "${os.hostname()}", "ip":"${vv.address}" }`);
+                    qr.make();
+
                     collection += `
                         <div class="row" style="margin-top: 10px;">
                             <div class="col s12">
@@ -58,7 +62,7 @@ const server = http.createServer( ( req, res ) => {
                                     <div class="card-content">
                                         <div class="row" style="margin-bottom: 0 !important;">
                                             <div class="col s6"> 
-                                                <img class="card card-content" style="padding: 10px !important; height: 180px;" src="https://api.qrserver.com/v1/create-qr-code/?data=%7B%22name%22%3A%22${os.hostname()}%22%2C%22ip%22%3A%22${vv.address}%22%7D&size=220x220&margin=0" width="180" />
+                                                <img class="card card-content" style="padding: 10px !important; height: 180px;" src="${qr.createDataURL(6)}" width="180" />
                                             </div>
                                             <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
                                                 <h3>${os.hostname()}</h3> 
