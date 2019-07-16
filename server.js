@@ -1,6 +1,6 @@
 const { ipcMain } = require('electron');
 const os = require( 'os' );
-const mdns = require('mdns-js');
+//const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
 const qrcode = require('qrcode-generator');
 
@@ -11,7 +11,7 @@ const pattIgnoreInterface = /(virtual)\w*/gmi;
 
 let connectionsTotal = 0;
 
-function createAdvertisement() {
+/*function createAdvertisement() {
     try {
         var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, 
             {
@@ -41,6 +41,7 @@ function handleError(error) {
 }
 
 createAdvertisement();
+*/
 
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
