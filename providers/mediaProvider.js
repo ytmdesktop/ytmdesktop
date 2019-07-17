@@ -41,6 +41,16 @@ function mediaVolumeDown( mainWindow ) {
     console.log('mediaVolumeDown');
 }
 
+function mediaForwardXSeconds( mainWindow ) {
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'h' } );
+    console.log('mediaForwardXSeconds');
+}
+
+function mediaRewindXSeconds( mainWindow ) {
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'l' } );
+    console.log('mediaRewindXSeconds');
+}
+
 function createThumbar( mainWindow, type, likeStatus ) {
     let thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
     let thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
@@ -133,6 +143,8 @@ exports.upVote = (v)=>guarder(v,mediaUpVote);
 exports.downVote = (v)=>guarder(v,mediaDownVote);
 exports.volumeUp = (v)=>guarder(v,mediaVolumeUp);
 exports.volumeDown = (v)=>guarder(v,mediaVolumeDown);
+exports.mediaForwardXSeconds = (v)=>guarder(v,mediaForwardXSeconds);
+exports.mediaRewindXSeconds = (v)=>guarder(v,mediaRewindXSeconds);
 
 // For Windows
 exports.createThumbar = createThumbar;

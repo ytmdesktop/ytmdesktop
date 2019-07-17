@@ -18,6 +18,10 @@ const calcYTViewSize = require('./utils/calcYTViewSize');
 const isDev = require('electron-is-dev');
 const isOnline = require('is-online');
 
+if ( store.get('settings-companion-server') ) {
+  require('./server');
+}
+
 let renderer_for_status_bar = null;
 global.sharedObj = { title: 'N/A', paused: true };
 // Keep a global reference of the window object, if you don't, the window will
@@ -513,6 +517,12 @@ function createWindow() {
   ipcMain.on('media-volume-down', () => {
     mediaControl.volumeDown(view);
   });
+  ipcMain.on('media-forward-X-seconds', () => {
+    mediaControl.mediaForwardXSeconds(view);
+  });
+  ipcMain.on('media-rewind-X-seconds', () => {
+    mediaControl.mediaRewindXSeconds(view);
+  });
 
   ipcMain.on('register-renderer', (event, arg) => {
     renderer_for_status_bar = event.sender;
@@ -658,7 +668,6 @@ const mediaControl = require('./providers/mediaProvider');
 const tray = require('./tray');
 const updater = require('./providers/updateProvider');
 const analytics = require('./providers/analyticsProvider');
-require('./server');
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion());
 analytics.setEvent('main', 'os', process.platform, process.platform);
