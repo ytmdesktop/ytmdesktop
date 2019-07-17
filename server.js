@@ -1,7 +1,8 @@
 const { ipcMain } = require('electron');
 const os = require( 'os' );
-const mdns = require('mdns-js');
+//const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
+const qrcode = require('qrcode-generator');
 
 const ip = '0.0.0.0';
 const port = 9863;
@@ -10,7 +11,7 @@ const pattIgnoreInterface = /(virtual)\w*/gmi;
 
 let connectionsTotal = 0;
 
-function createAdvertisement() {
+/*function createAdvertisement() {
     try {
         var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, 
             {
@@ -40,6 +41,7 @@ function handleError(error) {
 }
 
 createAdvertisement();
+*/
 
 const server = http.createServer( ( req, res ) => {    
     let collection = '';
@@ -50,17 +52,22 @@ const server = http.createServer( ( req, res ) => {
             networkInterfaces[v].forEach( ( vv, kk) => {
 
                 if ( vv.family == 'IPv4' && vv.internal == false ) {
-                    
+                    var qr = qrcode(0, 'M');
+                    qr.addData(`{ "name": "${os.hostname()}", "ip":"${vv.address}" }`);
+                    qr.make();
+
                     collection += `
                         <div class="row" style="margin-top: 10px;">
                             <div class="col s12">
-                                <div class="card white z-depth-3">
+                                <div class="card transparent z-depth-0">
                                     <div class="card-content">
                                         <div class="row" style="margin-bottom: 0 !important;">
-                                            <div class="col s6"> <h3>${v}</h3> <h5 style="font-weight: 100 !important;">${vv.address}</h5> </div>
-                                            <div class="col s6" style="border-left: solid 1px #EEE !important;"> 
-                                                <!--img src="https://api.qrserver.com/v1/create-qr-code/?data=%7B++%27name%27%3A%27${os.hostname()}%27%2C+%27ip%27%3A+%27${vv.address}%27+%7D&size=220x220&margin=0" width="136" /-->
-                                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=%7B%22name%22%3A%22${os.hostname()}%22%2C%22ip%22%3A%22${vv.address}%22%7D&size=220x220&margin=0" width="136" />
+                                            <div class="col s6"> 
+                                                <img class="card card-content" style="padding: 10px !important;" src="${qr.createDataURL(6)}" width="180" />
+                                            </div>
+                                            <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
+                                                <h3>${os.hostname()}</h3> 
+                                                <h5 style="font-weight: 100 !important;">${vv.address}</h5> 
                                             </div>
                                         </div>
                                     </div>
@@ -91,7 +98,9 @@ const server = http.createServer( ( req, res ) => {
                     margin: 0;
                     padding: 0;
                     text-align: center;
-                    background-image: url('https://ytmdesktop.app/img/bg/1.jpg')
+                    //background: #1d1d1d;
+                    //background-image: url('https://ytmdesktop.app/img/bg/1.jpg');
+                    background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
                 }
                 h5 {
                     margin: 1rem 0 1rem 0 !important;
@@ -101,21 +110,26 @@ const server = http.createServer( ( req, res ) => {
         <body>
             <!--nav>
                 <div class="nav-wrapper blue">
-                <a class="brand-logo center">YTMDesktop Companion Server - ${os.hostname()}</a>
+                <a class="brand-logo center">YTMDesktop Companion</a>
                 </div>
             </nav-->
 
             <div class="col s12">
-                <h4>YTMDesktop Companion Server <br /> ${os.hostname()}</h4>
+                <h3 class="red-text">YTMDesktop Companion</h3>
             </div>
 
-            <div class="container">
+            <div class="container" style="margin-top: 13%;">
+
                 ${collection}
 
-                <div class="card-panel lighten-2">
-                    <a class="black-text btn-flat tooltipped" data-position="bottom" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${connectionsTotal}</a>
-                </div>
+                <!--div class="card-panel transparent z-depth-0" style="margin-top: 15%;">
+                    <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${connectionsTotal}</a>
+                </div-->
 
+            </div>
+
+            <div class="card-panel transparent z-depth-0" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
+                <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${connectionsTotal}</a>
             </div>
 
         </body>
@@ -207,6 +221,14 @@ io.on('connection', (socket) => {
 
             case 'volume-down':
                 ipcMain.emit('media-volume-down', true)
+                break;
+
+            case 'forward-X-seconds':
+                ipcMain.emit('media-forward-X-seconds', true)
+                break;
+
+            case 'rewind-X-seconds':
+                ipcMain.emit('media-rewind-X-seconds', true)
                 break;
         }
     } );
