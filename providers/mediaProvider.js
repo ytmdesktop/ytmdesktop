@@ -42,12 +42,12 @@ function mediaVolumeDown( mainWindow ) {
 }
 
 function mediaForwardXSeconds( mainWindow ) {
-    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'h' } );
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'l' } );
     console.log('mediaForwardXSeconds');
 }
 
 function mediaRewindXSeconds( mainWindow ) {
-    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'l' } );
+    mainWindow.webContents.sendInputEvent( { type:'keydown', keyCode: 'h' } );
     console.log('mediaRewindXSeconds');
 }
 
