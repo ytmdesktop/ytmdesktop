@@ -19,6 +19,10 @@ ipc.on( 'is-online', function( _, isOnline ) {
 
 } );
 
+if (store.get('titlebar-type', 'nice') !== 'nice') {
+    document.getElementById('nice-titlebar').style.display = 'none';
+}
+
 document.getElementById( 'btn-update' ).addEventListener( 'click', function() {
     ipc.send( 'btn-update-clicked', true );
 } );
