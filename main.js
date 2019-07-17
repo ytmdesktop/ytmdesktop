@@ -14,6 +14,7 @@ const store = new electronStore();
 const discordRPC = require('./providers/discordRpcProvider');
 const __ = require('./providers/translateProvider');
 const { template } = require('./mac-menu');
+const calcYTViewSize = require('./utils/calcYTViewSize');
 const isDev = require('electron-is-dev');
 const isOnline = require('is-online');
 
@@ -88,7 +89,7 @@ function createWindow() {
     show: true,
     autoHideMenuBar: true,
     backgroundColor: '#232323',
-    frame: false,
+    frame: store.get('titlebar-type', 'nice') !== 'nice',
     center: true,
     closable: true,
     skipTaskbar: false,
@@ -113,12 +114,9 @@ function createWindow() {
   mainWindow.loadFile('./index.html');
   mainWindow.setBrowserView( view );
 
-  view.setBounds({
-    x: 1,
-    y: 29,
-    width: mainWindowSize.width - 2,
-    height: mainWindowSize.height - 30
-  });
+  view.setBounds(
+    calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
+  );
 
   if (store.get('settings-continue-where-left-of') && store.get('window-url')) {
     mainWindowUrl = store.get('window-url');
@@ -194,12 +192,9 @@ function createWindow() {
   if (windowMaximized) {
     setTimeout(function() {
       mainWindow.send('window-is-maximized', true);
-      view.setBounds({
-        x: 1,
-        y: 29,
-        width: mainWindowSize.width - 2,
-        height: mainWindowSize.height - 45
-      });
+      view.setBounds(
+        calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
+      );
       mainWindow.maximize();
     }, 700);
   } else {
@@ -396,22 +391,7 @@ function createWindow() {
 
   mainWindow.on('resize', function() {
     const windowSize = mainWindow.getSize();
-
-    if (mainWindow.isMaximized()) {
-      view.setBounds({
-        x: 1,
-        y: 29,
-        width: windowSize[0] - 2,
-        height: windowSize[1] - 45
-      });
-    } else {
-      view.setBounds({
-        x: 1,
-        y: 29,
-        width: windowSize[0] - 2,
-        height: windowSize[1] - 30
-      });
-    }
+    view.setBounds(calcYTViewSize(store, windowSize));
 
     mainWindow.send('window-is-maximized', mainWindow.isMaximized());
 
