@@ -25,6 +25,7 @@ const elementToggleLeftOf = document.getElementById( 'toggle-continue-where-left
 const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
+const elementTitlebarStyle = document.getElementById( 'select-titlebar-style' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
 if ( process.platform !== "darwin" ) {
@@ -63,6 +64,11 @@ elementAppLanguage.addEventListener( 'change', function() {
     store.set( 'settings-app-language', this.value );
     relaunch();
 } );
+
+elementTitlebarStyle.addEventListener('change', function() {
+    store.set('titlebar-type', this.value);
+    relaunch();
+});
 
 elementToggleShinyTray.addEventListener( 'click', function(){
     store.set( 'settings-shiny-tray', this.checked );
@@ -117,6 +123,8 @@ function loadSettings() {
         document.getElementById( 'select-app-language' ).value = store.get( 'settings-app-language' );
     }
 
+    document.getElementById('select-titlebar-style').value = store.get('titlebar-type', 'nice');
+
     if ( store.get( 'settings-page-zoom' ) ) {
         document.getElementById( 'range-zoom' ).value = store.get( 'settings-page-zoom' );
         document.getElementById('range-zoom-value').innerText = store.get( 'settings-page-zoom' );
@@ -151,6 +159,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM' ).innerText                        = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE' ).innerText     = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' ).innerText         = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO', { url: 'find.ytmdesktop.app' } );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText               = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
