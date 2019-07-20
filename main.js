@@ -18,7 +18,7 @@ const calcYTViewSize = require('./utils/calcYTViewSize');
 const isDev = require('electron-is-dev');
 const isOnline = require('is-online');
 
-if ( store.get('settings-companion-server') ) {
+if (store.get('settings-companion-server')) {
   require('./server');
 }
 
@@ -116,7 +116,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile('./index.html');
-  mainWindow.setBrowserView( view );
+  mainWindow.setBrowserView(view);
 
   view.setBounds(
     calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
@@ -126,12 +126,12 @@ function createWindow() {
     mainWindowUrl = store.get('window-url');
   }
 
-  view.webContents.loadURL( mainWindowUrl );
+  view.webContents.loadURL(mainWindowUrl);
   let checkConnectionTimeoutHandler;
   async function checkConnection() {
     /**
      * Check if is online
-     */ 
+     */
     var is_online = await isOnline();
 
     /**
@@ -139,36 +139,36 @@ function createWindow() {
      * If offline, mark the variable that the url was not read
      */
     if (hasLoadedUrl === undefined) {
-        hasLoadedUrl = is_online;
+      hasLoadedUrl = is_online;
     }
 
     /**
      * Emmit is online or offline to render.js
      */
-    mainWindow.send( 'is-online', is_online );
+    mainWindow.send('is-online', is_online);
 
     /**
      * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL 
      * else set BrowserView to null to show Loading circle and show icon that not have connection
      */
     if (is_online === true) {
-        if (lastConnectionStatusIsOnline === false) {
-            mainWindow.setBrowserView( view );
-            if ( hasLoadedUrl === false ) {
-                view.webContents.loadURL( mainWindowUrl );
-                hasLoadedUrl = true;
-            }
+      if (lastConnectionStatusIsOnline === false) {
+        mainWindow.setBrowserView(view);
+        if (hasLoadedUrl === false) {
+          view.webContents.loadURL(mainWindowUrl);
+          hasLoadedUrl = true;
         }
+      }
     } else {
-        if ( lastConnectionStatusIsOnline === true ) {
-            if (!global.sharedObj.paused) mediaControl.stopTrack(view);
-            mainWindow.setBrowserView( null );
-            mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
-        }
+      if (lastConnectionStatusIsOnline === true) {
+        if (!global.sharedObj.paused) mediaControl.stopTrack(view);
+        mainWindow.setBrowserView(null);
+        mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+      }
     }
 
     lastConnectionStatusIsOnline = is_online;
-    
+
     /**
      * Check connection every 30 seconds
      */
@@ -194,7 +194,7 @@ function createWindow() {
   mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
 
   if (windowMaximized) {
-    setTimeout(function() {
+    setTimeout(function () {
       mainWindow.send('window-is-maximized', true);
       view.setBounds(
         calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
@@ -209,19 +209,19 @@ function createWindow() {
   }
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
+  mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
   });
 
-  mainWindow.on('show', function() {
+  mainWindow.on('show', function () {
     logDebug('show');
     mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
   });
 
-  view.webContents.on('did-navigate-in-page', function() {
+  view.webContents.on('did-navigate-in-page', function () {
     store.set('window-url', view.webContents.getURL());
     view.webContents.insertCSS(`
             /* width */
@@ -246,7 +246,7 @@ function createWindow() {
         `);
   });
 
-  view.webContents.on('media-started-playing', function() {
+  view.webContents.on('media-started-playing', function () {
     if (isMac()) {
       global.sharedObj.paused = false;
       renderer_for_status_bar.send('update-status-bar');
@@ -258,17 +258,17 @@ function createWindow() {
     view.webContents.executeJavaScript(
       `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
       null,
-      function(title) {
+      function (title) {
         songTitle = title;
 
         view.webContents.executeJavaScript(`
           document.getElementById('progress-bar').getAttribute('aria-valuemax');
         `, null,
-        function( data ) {
+          function (data) {
             songDuration = parseInt(data);
-        });
+          });
 
-        setInterval( function() {
+        setInterval(function () {
           /**
            * GET LIKE STATUS ATTRIBUTE
            *
@@ -279,7 +279,7 @@ function createWindow() {
                   document.getElementById('like-button-renderer').getAttribute('like-status')
               `,
             true,
-            function(data) {
+            function (data) {
               likeStatus = data;
               mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
             }
@@ -291,16 +291,16 @@ function createWindow() {
           view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').getAttribute('aria-valuenow');
           `, null,
-          function( data ) {
-            songCurrentPosition = parseInt(data);
-          });
+            function (data) {
+              songCurrentPosition = parseInt(data);
+            });
 
           view.webContents.executeJavaScript(`
             document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
-          `, true, 
-          function( data ) {
-            volumePercent = parseInt(data);
-          });
+          `, true,
+            function (data) {
+              volumePercent = parseInt(data);
+            });
 
           /*view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').setAttribute('value', 10)
@@ -314,7 +314,7 @@ function createWindow() {
         /**
          * This timeout is necessary because there is a certain delay when changing music and updating the div content
          */
-        setTimeout(function() {
+        setTimeout(function () {
           /**
            * GET SONG AUTHOR
            */
@@ -326,7 +326,7 @@ function createWindow() {
                     title[0].innerText
                 `,
             null,
-            function(author) {
+            function (author) {
               songAuthor = author;
 
               if (songTitle !== undefined && songAuthor !== undefined) {
@@ -337,13 +337,13 @@ function createWindow() {
                   lastSongTitle = songTitle;
                   lastSongAuthor = songAuthor;
                   songCover = 'cover';
-                  view.webContents.executeJavaScript( `
+                  view.webContents.executeJavaScript(`
                     var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
                     var b = a.getElementsByClassName('yt-img-shadow')[0];
                     b.src
-                  `, null, function( cover ) {
-                    songCover = cover;
-                  } );
+                  `, null, function (cover) {
+                      songCover = cover;
+                    });
                   updateActivity(songTitle, songAuthor);
                 }
               }
@@ -368,7 +368,7 @@ function createWindow() {
     discordRPC.activity(songTitle, songAuthor);
   }
 
-  view.webContents.on('media-started-playing', function() {
+  view.webContents.on('media-started-playing', function () {
     logDebug('Playing');
     try {
       if (isMac()) {
@@ -376,11 +376,11 @@ function createWindow() {
       }
 
       global.sharedObj.paused = false;
-      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);    
-      ipcMain.emit( 'play-pause', songInfo() );
-    } catch {}
+      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+      ipcMain.emit('play-pause', songInfo());
+    } catch { }
   });
-  view.webContents.on('media-paused', function() {
+  view.webContents.on('media-paused', function () {
     logDebug('Paused');
     try {
       if (isMac()) {
@@ -388,12 +388,12 @@ function createWindow() {
       }
 
       global.sharedObj.paused = true;
-      ipcMain.emit( 'play-pause', songInfo() );
+      ipcMain.emit('play-pause', songInfo());
       mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
-    } catch {}
+    } catch { }
   });
 
-  mainWindow.on('resize', function() {
+  mainWindow.on('resize', function () {
     const windowSize = mainWindow.getSize();
     view.setBounds(calcYTViewSize(store, windowSize));
 
@@ -405,12 +405,12 @@ function createWindow() {
     }
   });
 
-  mainWindow.on('move', function() {
+  mainWindow.on('move', function () {
     let position = mainWindow.getPosition();
     store.set('window-position', { x: position[0], y: position[1] });
   });
 
-  mainWindow.on('close', function(e) {
+  mainWindow.on('close', function (e) {
     if (isMac()) {
       // Optimized for Mac OS X
       if (store.get('settings-keep-background')) {
@@ -425,13 +425,13 @@ function createWindow() {
     mainWindow.hide();
   });
 
-  app.on('before-quit', function(e) {
+  app.on('before-quit', function (e) {
     if (isMac()) {
       app.exit();
     }
   });
 
-  globalShortcut.register('MediaPlayPause', function() {
+  globalShortcut.register('MediaPlayPause', function () {
     if (!doublePressPlayPause) {
       // The first press
       doublePressPlayPause = true;
@@ -445,40 +445,40 @@ function createWindow() {
       mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
     }
   });
-  globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
+  globalShortcut.register('CmdOrCtrl+Shift+Space', function () {
     mediaControl.playPauseTrack(view);
   });
 
-  globalShortcut.register('MediaStop', function() {
+  globalShortcut.register('MediaStop', function () {
     mediaControl.stopTrack(view);
   });
 
-  globalShortcut.register('MediaPreviousTrack', function() {
+  globalShortcut.register('MediaPreviousTrack', function () {
     mediaControl.previousTrack(view);
   });
-  globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
+  globalShortcut.register('CmdOrCtrl+Shift+PageDown', function () {
     mediaControl.previousTrack(view);
   });
 
-  globalShortcut.register('MediaNextTrack', function() {
+  globalShortcut.register('MediaNextTrack', function () {
     mediaControl.nextTrack(view);
   });
-  globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
+  globalShortcut.register('CmdOrCtrl+Shift+PageUp', function () {
     mediaControl.nextTrack(view);
   });
 
-  ipcMain.on('settings-changed-zoom', function(e, value) {
+  ipcMain.on('settings-changed-zoom', function (e, value) {
     view.webContents.setZoomFactor(value / 100);
   });
 
-  ipcMain.on('what-is-song-playing-now', function(e, data) {
-    if ( e !== undefined ) {
-      e.sender.send('song-playing-now-is', songInfo() );
+  ipcMain.on('what-is-song-playing-now', function (e, data) {
+    if (e !== undefined) {
+      e.sender.send('song-playing-now-is', songInfo());
     }
-    ipcMain.emit('song-playing-now-is', getAll() );
+    ipcMain.emit('song-playing-now-is', getAll());
   });
 
-  ipcMain.on('will-close-mainwindow', function() {
+  ipcMain.on('will-close-mainwindow', function () {
     if (store.get('settings-keep-background')) {
       mainWindow.hide();
     } else {
@@ -488,21 +488,21 @@ function createWindow() {
 
   ipcMain.on('media-play-pause', () => {
     mediaControl.playPauseTrack(view);
-    setTimeout(function() {
-      ipcMain.emit( 'play-pause', songInfo() );
+    setTimeout(function () {
+      ipcMain.emit('play-pause', songInfo());
     }, 1000);
 
   });
   ipcMain.on('media-next-track', () => {
     mediaControl.nextTrack(view);
-    setTimeout(function() {
-      ipcMain.emit( 'changed-track', songInfo() );
+    setTimeout(function () {
+      ipcMain.emit('changed-track', songInfo());
     }, 1000);
   });
   ipcMain.on('media-previous-track', () => {
     mediaControl.previousTrack(view);
-    setTimeout(function() {
-      ipcMain.emit( 'changed-track', songInfo() );
+    setTimeout(function () {
+      ipcMain.emit('changed-track', songInfo());
     }, 1000);
   });
   ipcMain.on('media-up-vote', () => {
@@ -537,7 +537,7 @@ function createWindow() {
     }
   });
 
-  ipcMain.on('show-settings', function() {
+  ipcMain.on('show-settings', function () {
     const settings = new BrowserWindow({
       parent: mainWindow,
       modal: true,
@@ -549,30 +549,37 @@ function createWindow() {
       icon: path.join(__dirname, 'assets/favicon.png'),
       webPreferences: {
         nodeIntegration: true
-      }
+      },
+      autoHideMenuBar: true,
+
     });
     settings.loadFile(path.join(__dirname, 'settings.html'));
   });
 
+
   // ipcMain.send('update-status-bar', '111', '222');
 }
+
+app.on('browser-window-created', function (e, window) {
+  window.setMenu(null);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', function() {
+app.on('ready', function () {
   createWindow();
 
   tray.createTray(mainWindow, icon);
 
-  ipcMain.on('updated-tray-image', function(event, payload) {
+  ipcMain.on('updated-tray-image', function (event, payload) {
     if (store.get('settings-shiny-tray')) tray.updateImage(payload);
   });
 
   if (!isDev) {
     updater.checkUpdate(mainWindow);
 
-    setInterval(function() {
+    setInterval(function () {
       updater.checkUpdate(mainWindow);
     }, 1 * 60 * 60 * 1000);
   }
@@ -580,7 +587,7 @@ app.on('ready', function() {
 });
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (!isMac()) {
@@ -588,7 +595,7 @@ app.on('window-all-closed', function() {
   }
 });
 
-app.on('activate', function() {
+app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
@@ -598,7 +605,7 @@ app.on('activate', function() {
   }
 });
 
-ipcMain.on('show-lyrics', function() {
+ipcMain.on('show-lyrics', function () {
   createLyricsWindow();
 });
 

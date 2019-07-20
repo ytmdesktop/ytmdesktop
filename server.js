@@ -98,8 +98,6 @@ const server = http.createServer( ( req, res ) => {
                     margin: 0;
                     padding: 0;
                     text-align: center;
-                    //background: #1d1d1d;
-                    //background-image: url('https://ytmdesktop.app/img/bg/1.jpg');
                     background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
                 }
                 h5 {
@@ -108,11 +106,6 @@ const server = http.createServer( ( req, res ) => {
             </style>
         </head>
         <body>
-            <!--nav>
-                <div class="nav-wrapper blue">
-                <a class="brand-logo center">YTMDesktop Companion</a>
-                </div>
-            </nav-->
 
             <div class="col s12">
                 <h3 class="red-text">YTMDesktop Companion</h3>
@@ -121,10 +114,6 @@ const server = http.createServer( ( req, res ) => {
             <div class="container" style="margin-top: 13%;">
 
                 ${collection}
-
-                <!--div class="card-panel transparent z-depth-0" style="margin-top: 15%;">
-                    <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${connectionsTotal}</a>
-                </div-->
 
             </div>
 
