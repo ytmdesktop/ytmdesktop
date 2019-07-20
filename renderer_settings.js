@@ -2,7 +2,7 @@ const { remote, ipcRenderer: ipc } = require( 'electron' );
 const electronStore = require( 'electron-store' );
 const store = new electronStore();
 const __ = require( './providers/translateProvider' );
-
+const companion_url = 'https://find.ytmdesktop.app';
 
 loadSettings();
 loadi18n();
@@ -26,6 +26,7 @@ const elementToggleShinyTray = document.getElementById( 'toggle-shiny-tray');
 const elementDiscordRichPresence = document.getElementById( 'toggle-discord-rich-presence' );
 const elementAppLanguage = document.getElementById( 'select-app-language' );
 const elementTitlebarStyle = document.getElementById( 'select-titlebar-style' );
+const elementSettingsCompanionApp = document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
 if ( process.platform !== "darwin" ) {
@@ -73,6 +74,10 @@ elementTitlebarStyle.addEventListener('change', function() {
 elementToggleShinyTray.addEventListener( 'click', function(){
     store.set( 'settings-shiny-tray', this.checked );
     ipc.send('update-tray');
+} );
+
+elementSettingsCompanionApp.addEventListener( 'click', function(){
+    window.open(companion_url, 'YTMDesktop Companion Server', 'frame=true,resizable=no,minimizable=no,width=1100,height=700');
 } );
 
 /*elementBtnAppRelaunch.addEventListener( 'click', function() {
@@ -161,7 +166,7 @@ function loadi18n() {
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' ).innerText          = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE' ).innerText     = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' ).innerText         = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER' );
-    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO', { url: 'find.ytmdesktop.app' } );
+    document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' ).innerText    = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY' ).innerText               = __.trans( 'LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY');
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' ).innerText                  = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL' );
     document.getElementById( 'i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' ).innerText                 = __.trans( 'LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL' );

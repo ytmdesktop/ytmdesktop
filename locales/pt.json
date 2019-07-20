@@ -31,7 +31,7 @@
 	"LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE": "Estilo da barra",
 	"LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "Iniciar com o sistema (experimental, Mac/Win32)",
 	"LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "Controle Remoto",
-	"LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "Acesse https://{{url}} e escaneie o QR Code",
+	"LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "Clique aqui e escaneie o QR Code",
 	"LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",
 	"LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Global",
 	"LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Controle fácil na bandeja (Somente para Mac OS)"
