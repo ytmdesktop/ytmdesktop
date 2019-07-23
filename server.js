@@ -164,7 +164,7 @@ io.on('connection', (socket) => {
     
     let timer = setInterval( () => {
         ipcMain.emit('what-is-song-playing-now');
-    }, 800);
+    }, 500);
 
     socket.on('disconnect', () => {
         clearInterval(timer);
@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
         io.emit('media-now-playing', data);
     });
 
-    socket.on('media-commands', (cmd) => {
+    socket.on('media-commands', (cmd, data) => {
 
         switch( cmd ) {
             case 'previous-track':
@@ -205,19 +205,23 @@ io.on('connection', (socket) => {
                 break;
 
             case 'volume-up':
-                ipcMain.emit('media-volume-up', true)
+                ipcMain.emit('media-volume-up', true);
                 break;
 
             case 'volume-down':
-                ipcMain.emit('media-volume-down', true)
+                ipcMain.emit('media-volume-down', true);
                 break;
 
             case 'forward-X-seconds':
-                ipcMain.emit('media-forward-X-seconds', true)
+                ipcMain.emit('media-forward-X-seconds', true);
                 break;
 
             case 'rewind-X-seconds':
-                ipcMain.emit('media-rewind-X-seconds', true)
+                ipcMain.emit('media-rewind-X-seconds', true);
+                break;
+
+            case 'change-seekbar':
+                ipcMain.emit('media-change-seekbar', data);
                 break;
         }
     } );
