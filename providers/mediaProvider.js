@@ -51,6 +51,19 @@ function mediaRewindXSeconds( mainWindow ) {
     console.log('mediaRewindXSeconds');
 }
 
+function mediaChangeSeekbar( mainWindow, time ) {
+    mainWindow.webContents.executeJavaScript(
+        `
+        var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
+        var sliderKnob = document.querySelectorAll('#progress-bar')[0];
+
+        slider.click();
+
+        sliderKnob.value = ${time};
+        `
+    );
+}
+
 function createThumbar( mainWindow, type, likeStatus ) {
     let thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png';
     let thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png';
@@ -145,6 +158,7 @@ exports.volumeUp = (v)=>guarder(v,mediaVolumeUp);
 exports.volumeDown = (v)=>guarder(v,mediaVolumeDown);
 exports.mediaForwardXSeconds = (v)=>guarder(v,mediaForwardXSeconds);
 exports.mediaRewindXSeconds = (v)=>guarder(v,mediaRewindXSeconds);
+exports.changeSeekbar = mediaChangeSeekbar;
 
 // For Windows
 exports.createThumbar = createThumbar;

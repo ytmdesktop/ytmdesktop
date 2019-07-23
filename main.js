@@ -523,6 +523,9 @@ function createWindow() {
   ipcMain.on('media-rewind-X-seconds', () => {
     mediaControl.mediaRewindXSeconds(view);
   });
+  ipcMain.on('media-change-seekbar', ( value ) => {
+    mediaControl.changeSeekbar(view, value);
+  });
 
   ipcMain.on('register-renderer', (event, arg) => {
     renderer_for_status_bar = event.sender;
