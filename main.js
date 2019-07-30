@@ -410,6 +410,10 @@ function createWindow() {
     store.set('window-position', { x: position[0], y: position[1] });
   });
 
+  mainWindow.on("focus", () => {
+    view.webContents.focus();
+  });
+
   mainWindow.on('close', function (e) {
     if (isMac()) {
       // Optimized for Mac OS X
