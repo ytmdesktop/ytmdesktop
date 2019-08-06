@@ -405,9 +405,15 @@ function createWindow() {
     }
   });
 
-  mainWindow.on('move', function () {
+  let storePositionTimer;
+  mainWindow.on('move', function (e) {
     let position = mainWindow.getPosition();
-    store.set('window-position', { x: position[0], y: position[1] });
+    if(storePositionTimer){
+      clearTimeout(storePositionTimer);
+    }
+    storePositionTimer = setTimeout(() => {
+      store.set('window-position', { x: position[0], y: position[1] });
+    },500)
   });
 
   mainWindow.on("focus", () => {
