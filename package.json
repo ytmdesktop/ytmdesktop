@@ -6,9 +6,9 @@
   "scripts": {
     "start": "electron .",
     "pack": "npx electron-builder --dir",
-    "pack:x64": "npm run pack -- --arch x64",
+    "pack:x64": "npm run pack -- --arch x64 --config electron-builder64.yml",
     "dist": "npx electron-builder",
-    "dist:x64": "npm run dist -- --arch x64",
+    "dist:x64": "npm run dist -- --arch x64 --config electron-builder64.yml",
     "publish:win64": "build --win -p always --config electron-builder64.yml",
     "publish:win32": "build --win -p always --config electron-builder.yml",
     "publish:win": "npm run publish:win32 && npm run publish:win64",
