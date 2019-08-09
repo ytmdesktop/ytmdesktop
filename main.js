@@ -7,23 +7,28 @@ const {
   Menu,
   ipcMain,
   systemPreferences
-} = require('electron');
-const path = require('path');
-const electronStore = require('electron-store');
+} = require("electron");
+const path = require("path");
+const electronStore = require("electron-store");
 const store = new electronStore();
-const discordRPC = require('./providers/discordRpcProvider');
-const __ = require('./providers/translateProvider');
-const { template } = require('./mac-menu');
-const calcYTViewSize = require('./utils/calcYTViewSize');
-const isDev = require('electron-is-dev');
-const isOnline = require('is-online');
+const discordRPC = require("./providers/discordRpcProvider");
+const __ = require("./providers/translateProvider");
+const { template } = require("./mac-menu");
+const calcYTViewSize = require("./utils/calcYTViewSize");
+const isDev = require("electron-is-dev");
+const isOnline = require("is-online");
+const {
+  companionUrl,
+  companionWindowTitle,
+  companionWindowSettings
+} = require("./server.config");
 
-if (store.get('settings-companion-server')) {
-  require('./server');
+if (store.get("settings-companion-server")) {
+  require("./server");
 }
 
 let renderer_for_status_bar = null;
-global.sharedObj = { title: 'N/A', paused: true };
+global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -33,28 +38,28 @@ let mainWindowSize = {
   height: 800
 };
 
-let songTitle = '';
-let songAuthor = '';
-let songCover = '';
+let songTitle = "";
+let songAuthor = "";
+let songCover = "";
 let songDuration = 0;
 let songCurrentPosition = 0;
 let lastSongTitle;
 let lastSongAuthor;
-let likeStatus = 'INDIFFERENT';
+let likeStatus = "INDIFFERENT";
 let volumePercent = 0;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
 let isPaused = true;
 
-let mainWindowUrl = 'https://music.youtube.com';
+let mainWindowUrl = "https://music.youtube.com";
 
-let icon = 'assets/favicon.png';
+let icon = "assets/favicon.png";
 if (isWindows()) {
-  icon = 'assets/favicon.ico';
+  icon = "assets/favicon.ico";
 } else if (isMac()) {
-  icon = 'assets/favicon.16x16.png';
-  store.set('settings-shiny-tray-dark', systemPreferences.isDarkMode());
+  icon = "assets/favicon.16x16.png";
+  store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 }
@@ -62,8 +67,8 @@ if (isWindows()) {
 function createWindow() {
   if (isMac() || isWindows()) {
     const execApp = path.basename(process.execPath);
-    const startArgs = ['--processStart', `"${execApp}"`];
-    const startOnBoot = store.get('settings-start-on-boot');
+    const startArgs = ["--processStart", `"${execApp}"`];
+    const startOnBoot = store.get("settings-start-on-boot");
     if (startOnBoot) {
       app.setLoginItemSettings({
         openAtLogin: true,
@@ -77,8 +82,8 @@ function createWindow() {
       });
     }
   }
-  windowSize = store.get('window-size');
-  windowMaximized = store.get('window-maximized');
+  windowSize = store.get("window-size");
+  windowMaximized = store.get("window-maximized");
 
   if (windowSize) {
     mainWindowSize.width = windowSize.width;
@@ -92,8 +97,8 @@ function createWindow() {
     minHeight: 300,
     show: true,
     autoHideMenuBar: true,
-    backgroundColor: '#232323',
-    frame: store.get('titlebar-type', 'nice') !== 'nice',
+    backgroundColor: "#232323",
+    frame: store.get("titlebar-type", "nice") !== "nice",
     center: true,
     closable: true,
     skipTaskbar: false,
@@ -105,7 +110,7 @@ function createWindow() {
   };
   if (isMac()) {
     // Mac Specific Configuration
-    broswerWindowConfig.titleBarStyle = 'hidden';
+    broswerWindowConfig.titleBarStyle = "hidden";
   }
   mainWindow = new BrowserWindow(broswerWindowConfig);
 
@@ -115,15 +120,15 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('./index.html');
+  mainWindow.loadFile("./index.html");
   mainWindow.setBrowserView(view);
 
   view.setBounds(
     calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
   );
 
-  if (store.get('settings-continue-where-left-of') && store.get('window-url')) {
-    mainWindowUrl = store.get('window-url');
+  if (store.get("settings-continue-where-left-of") && store.get("window-url")) {
+    mainWindowUrl = store.get("window-url");
   }
 
   view.webContents.loadURL(mainWindowUrl);
@@ -145,10 +150,10 @@ function createWindow() {
     /**
      * Emmit is online or offline to render.js
      */
-    mainWindow.send('is-online', is_online);
+    mainWindow.send("is-online", is_online);
 
     /**
-     * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL 
+     * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL
      * else set BrowserView to null to show Loading circle and show icon that not have connection
      */
     if (is_online === true) {
@@ -163,7 +168,11 @@ function createWindow() {
       if (lastConnectionStatusIsOnline === true) {
         if (!global.sharedObj.paused) mediaControl.stopTrack(view);
         mainWindow.setBrowserView(null);
-        mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+        mediaControl.createThumbar(
+          mainWindow,
+          playerInfo()["isPaused"],
+          likeStatus
+        );
       }
     }
 
@@ -172,7 +181,10 @@ function createWindow() {
     /**
      * Check connection every 30 seconds
      */
-    checkConnectionTimeoutHandler = setTimeout(() => checkConnection(), 30 * 1000);
+    checkConnectionTimeoutHandler = setTimeout(
+      () => checkConnection(),
+      30 * 1000
+    );
   }
 
   checkConnection();
@@ -180,9 +192,9 @@ function createWindow() {
   // Preserving Performance
   // Why check if Windows is closed/hidden
   // Check again on open/ready
-  mainWindow.on('close', () => clearTimeout(checkConnectionTimeoutHandler));
-  mainWindow.on('hide', () => clearTimeout(checkConnectionTimeoutHandler));
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.on("close", () => clearTimeout(checkConnectionTimeoutHandler));
+  mainWindow.on("hide", () => clearTimeout(checkConnectionTimeoutHandler));
+  mainWindow.on("ready-to-show", () => {
     if (checkConnectionTimeoutHandler) {
       checkConnection();
     }
@@ -191,38 +203,42 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
   // view.webContents.openDevTools({ mode: 'detach' });
-  mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+  mediaControl.createThumbar(mainWindow, playerInfo()["isPaused"], likeStatus);
 
   if (windowMaximized) {
-    setTimeout(function () {
-      mainWindow.send('window-is-maximized', true);
+    setTimeout(function() {
+      mainWindow.send("window-is-maximized", true);
       view.setBounds(
         calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
       );
       mainWindow.maximize();
     }, 700);
   } else {
-    let position = store.get('window-position');
+    let position = store.get("window-position");
     if (position != undefined) {
       mainWindow.setPosition(position.x, position.y);
     }
   }
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
+  mainWindow.on("closed", function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
   });
 
-  mainWindow.on('show', function () {
-    logDebug('show');
-    mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+  mainWindow.on("show", function() {
+    logDebug("show");
+    mediaControl.createThumbar(
+      mainWindow,
+      playerInfo()["isPaused"],
+      likeStatus
+    );
   });
 
-  view.webContents.on('did-navigate-in-page', function () {
-    store.set('window-url', view.webContents.getURL());
+  view.webContents.on("did-navigate-in-page", function() {
+    store.set("window-url", view.webContents.getURL());
     view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
@@ -246,10 +262,10 @@ function createWindow() {
         `);
   });
 
-  view.webContents.on('media-started-playing', function () {
+  view.webContents.on("media-started-playing", function() {
     if (isMac()) {
       global.sharedObj.paused = false;
-      renderer_for_status_bar.send('update-status-bar');
+      renderer_for_status_bar.send("update-status-bar");
     }
 
     /**
@@ -258,17 +274,20 @@ function createWindow() {
     view.webContents.executeJavaScript(
       `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
       null,
-      function (title) {
+      function(title) {
         songTitle = title;
 
-        view.webContents.executeJavaScript(`
+        view.webContents.executeJavaScript(
+          `
           document.getElementById('progress-bar').getAttribute('aria-valuemax');
-        `, null,
-          function (data) {
+        `,
+          null,
+          function(data) {
             songDuration = parseInt(data);
-          });
+          }
+        );
 
-        setInterval(function () {
+        setInterval(function() {
           /**
            * GET LIKE STATUS ATTRIBUTE
            *
@@ -279,28 +298,38 @@ function createWindow() {
                   document.getElementById('like-button-renderer').getAttribute('like-status')
               `,
             true,
-            function (data) {
+            function(data) {
               likeStatus = data;
-              mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
+              mediaControl.createThumbar(
+                mainWindow,
+                playerInfo()["isPaused"],
+                likeStatus
+              );
             }
           );
 
           /**
            * GET CURRENT SEEK BAR POSITION
            */
-          view.webContents.executeJavaScript(`
+          view.webContents.executeJavaScript(
+            `
             document.getElementById('progress-bar').getAttribute('aria-valuenow');
-          `, null,
-            function (data) {
+          `,
+            null,
+            function(data) {
               songCurrentPosition = parseInt(data);
-            });
+            }
+          );
 
-          view.webContents.executeJavaScript(`
+          view.webContents.executeJavaScript(
+            `
             document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
-          `, true,
-            function (data) {
+          `,
+            true,
+            function(data) {
               volumePercent = parseInt(data);
-            });
+            }
+          );
 
           /*view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').setAttribute('value', 10)
@@ -314,7 +343,7 @@ function createWindow() {
         /**
          * This timeout is necessary because there is a certain delay when changing music and updating the div content
          */
-        setTimeout(function () {
+        setTimeout(function() {
           /**
            * GET SONG AUTHOR
            */
@@ -326,7 +355,7 @@ function createWindow() {
                     title[0].innerText
                 `,
             null,
-            function (author) {
+            function(author) {
               songAuthor = author;
 
               if (songTitle !== undefined && songAuthor !== undefined) {
@@ -336,14 +365,18 @@ function createWindow() {
                 ) {
                   lastSongTitle = songTitle;
                   lastSongAuthor = songAuthor;
-                  songCover = 'cover';
-                  view.webContents.executeJavaScript(`
+                  songCover = "cover";
+                  view.webContents.executeJavaScript(
+                    `
                     var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
                     var b = a.getElementsByClassName('yt-img-shadow')[0];
                     b.src
-                  `, null, function (cover) {
+                  `,
+                    null,
+                    function(cover) {
                       songCover = cover;
-                    });
+                    }
+                  );
                   updateActivity(songTitle, songAuthor);
                 }
               }
@@ -355,12 +388,12 @@ function createWindow() {
   });
 
   function updateActivity(songTitle, songAuthor) {
-    let nowPlaying = songTitle + ' - ' + songAuthor;
+    let nowPlaying = songTitle + " - " + songAuthor;
     logDebug(nowPlaying);
 
     if (isMac()) {
       global.sharedObj.title = nowPlaying;
-      renderer_for_status_bar.send('update-status-bar');
+      renderer_for_status_bar.send("update-status-bar");
     }
 
     mainWindow.setTitle(nowPlaying);
@@ -368,62 +401,70 @@ function createWindow() {
     discordRPC.activity(songTitle, songAuthor);
   }
 
-  view.webContents.on('media-started-playing', function () {
-    logDebug('Playing');
+  view.webContents.on("media-started-playing", function() {
+    logDebug("Playing");
     try {
       if (isMac()) {
-        renderer_for_status_bar.send('update-status-bar');
+        renderer_for_status_bar.send("update-status-bar");
       }
 
       global.sharedObj.paused = false;
-      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
-      ipcMain.emit('play-pause', songInfo());
-    } catch { }
+      mediaControl.createThumbar(
+        mainWindow,
+        playerInfo()["isPaused"],
+        likeStatus
+      );
+      ipcMain.emit("play-pause", songInfo());
+    } catch {}
   });
-  view.webContents.on('media-paused', function () {
-    logDebug('Paused');
+  view.webContents.on("media-paused", function() {
+    logDebug("Paused");
     try {
       if (isMac()) {
-        renderer_for_status_bar.send('update-status-bar');
+        renderer_for_status_bar.send("update-status-bar");
       }
 
       global.sharedObj.paused = true;
-      ipcMain.emit('play-pause', songInfo());
-      mediaControl.createThumbar(mainWindow, playerInfo()['isPaused'], likeStatus);
-    } catch { }
+      ipcMain.emit("play-pause", songInfo());
+      mediaControl.createThumbar(
+        mainWindow,
+        playerInfo()["isPaused"],
+        likeStatus
+      );
+    } catch {}
   });
 
-  mainWindow.on('resize', function () {
+  mainWindow.on("resize", function() {
     const windowSize = mainWindow.getSize();
     view.setBounds(calcYTViewSize(store, windowSize));
 
-    mainWindow.send('window-is-maximized', mainWindow.isMaximized());
+    mainWindow.send("window-is-maximized", mainWindow.isMaximized());
 
-    store.set('window-maximized', mainWindow.isMaximized());
+    store.set("window-maximized", mainWindow.isMaximized());
     if (!mainWindow.isMaximized()) {
-      store.set('window-size', { width: windowSize[0], height: windowSize[1] });
+      store.set("window-size", { width: windowSize[0], height: windowSize[1] });
     }
   });
 
   let storePositionTimer;
-  mainWindow.on('move', function (e) {
+  mainWindow.on("move", function(e) {
     let position = mainWindow.getPosition();
-    if(storePositionTimer){
+    if (storePositionTimer) {
       clearTimeout(storePositionTimer);
     }
     storePositionTimer = setTimeout(() => {
-      store.set('window-position', { x: position[0], y: position[1] });
-    },500)
+      store.set("window-position", { x: position[0], y: position[1] });
+    }, 500);
   });
 
   mainWindow.on("focus", () => {
     view.webContents.focus();
   });
 
-  mainWindow.on('close', function (e) {
+  mainWindow.on("close", function(e) {
     if (isMac()) {
       // Optimized for Mac OS X
-      if (store.get('settings-keep-background')) {
+      if (store.get("settings-keep-background")) {
         e.preventDefault();
         mainWindow.hide();
       } else {
@@ -435,13 +476,13 @@ function createWindow() {
     mainWindow.hide();
   });
 
-  app.on('before-quit', function (e) {
+  app.on("before-quit", function(e) {
     if (isMac()) {
       app.exit();
     }
   });
 
-  globalShortcut.register('MediaPlayPause', function () {
+  globalShortcut.register("MediaPlayPause", function() {
     if (!doublePressPlayPause) {
       // The first press
       doublePressPlayPause = true;
@@ -455,152 +496,151 @@ function createWindow() {
       mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
     }
   });
-  globalShortcut.register('CmdOrCtrl+Shift+Space', function () {
+  globalShortcut.register("CmdOrCtrl+Shift+Space", function() {
     mediaControl.playPauseTrack(view);
   });
 
-  globalShortcut.register('MediaStop', function () {
+  globalShortcut.register("MediaStop", function() {
     mediaControl.stopTrack(view);
   });
 
-  globalShortcut.register('MediaPreviousTrack', function () {
+  globalShortcut.register("MediaPreviousTrack", function() {
     mediaControl.previousTrack(view);
   });
-  globalShortcut.register('CmdOrCtrl+Shift+PageDown', function () {
+  globalShortcut.register("CmdOrCtrl+Shift+PageDown", function() {
     mediaControl.previousTrack(view);
   });
 
-  globalShortcut.register('MediaNextTrack', function () {
+  globalShortcut.register("MediaNextTrack", function() {
     mediaControl.nextTrack(view);
   });
-  globalShortcut.register('CmdOrCtrl+Shift+PageUp', function () {
+  globalShortcut.register("CmdOrCtrl+Shift+PageUp", function() {
     mediaControl.nextTrack(view);
   });
 
-  ipcMain.on('settings-changed-zoom', function (e, value) {
+  ipcMain.on("settings-changed-zoom", function(e, value) {
     view.webContents.setZoomFactor(value / 100);
   });
 
-  ipcMain.on('what-is-song-playing-now', function (e, data) {
+  ipcMain.on("what-is-song-playing-now", function(e, data) {
     if (e !== undefined) {
-      e.sender.send('song-playing-now-is', songInfo());
+      e.sender.send("song-playing-now-is", songInfo());
     }
-    ipcMain.emit('song-playing-now-is', getAll());
+    ipcMain.emit("song-playing-now-is", getAll());
   });
 
-  ipcMain.on('will-close-mainwindow', function () {
-    if (store.get('settings-keep-background')) {
+  ipcMain.on("will-close-mainwindow", function() {
+    if (store.get("settings-keep-background")) {
       mainWindow.hide();
     } else {
       app.exit();
     }
   });
 
-  ipcMain.on('media-play-pause', () => {
+  ipcMain.on("media-play-pause", () => {
     mediaControl.playPauseTrack(view);
-    setTimeout(function () {
-      ipcMain.emit('play-pause', songInfo());
+    setTimeout(function() {
+      ipcMain.emit("play-pause", songInfo());
     }, 1000);
-
   });
-  ipcMain.on('media-next-track', () => {
+  ipcMain.on("media-next-track", () => {
     mediaControl.nextTrack(view);
-    setTimeout(function () {
-      ipcMain.emit('changed-track', songInfo());
+    setTimeout(function() {
+      ipcMain.emit("changed-track", songInfo());
     }, 1000);
   });
-  ipcMain.on('media-previous-track', () => {
+  ipcMain.on("media-previous-track", () => {
     mediaControl.previousTrack(view);
-    setTimeout(function () {
-      ipcMain.emit('changed-track', songInfo());
+    setTimeout(function() {
+      ipcMain.emit("changed-track", songInfo());
     }, 1000);
   });
-  ipcMain.on('media-up-vote', () => {
+  ipcMain.on("media-up-vote", () => {
     mediaControl.upVote(view);
   });
-  ipcMain.on('media-down-vote', () => {
+  ipcMain.on("media-down-vote", () => {
     mediaControl.downVote(view);
   });
-  ipcMain.on('media-volume-up', () => {
+  ipcMain.on("media-volume-up", () => {
     mediaControl.volumeUp(view);
   });
-  ipcMain.on('media-volume-down', () => {
+  ipcMain.on("media-volume-down", () => {
     mediaControl.volumeDown(view);
   });
-  ipcMain.on('media-forward-X-seconds', () => {
+  ipcMain.on("media-forward-X-seconds", () => {
     mediaControl.mediaForwardXSeconds(view);
   });
-  ipcMain.on('media-rewind-X-seconds', () => {
+  ipcMain.on("media-rewind-X-seconds", () => {
     mediaControl.mediaRewindXSeconds(view);
   });
-  ipcMain.on('media-change-seekbar', ( value ) => {
+  ipcMain.on("media-change-seekbar", value => {
     mediaControl.changeSeekbar(view, value);
   });
 
-  ipcMain.on('register-renderer', (event, arg) => {
+  ipcMain.on("register-renderer", (event, arg) => {
     renderer_for_status_bar = event.sender;
-    event.sender.send('update-status-bar');
-    event.sender.send('is-dev', isDev);
+    event.sender.send("update-status-bar");
+    event.sender.send("is-dev", isDev);
+    event.sender.send("register-renderer", app);
   });
 
-  ipcMain.on('update-tray', () => {
+  ipcMain.on("update-tray", () => {
     if (isMac()) {
-      renderer_for_status_bar.send('update-status-bar');
+      renderer_for_status_bar.send("update-status-bar");
       tray.setShinyTray();
     }
   });
 
-  ipcMain.on('show-settings', function () {
+  ipcMain.on("show-settings", function() {
     const settings = new BrowserWindow({
       parent: mainWindow,
       modal: true,
       frame: false,
       center: true,
       resizable: true,
-      backgroundColor: '#232323',
+      backgroundColor: "#232323",
       width: 800,
-      icon: path.join(__dirname, 'assets/favicon.png'),
+      icon: path.join(__dirname, "assets/favicon.png"),
       webPreferences: {
         nodeIntegration: true
       },
-      autoHideMenuBar: true,
-
+      autoHideMenuBar: true
     });
-    settings.loadFile(path.join(__dirname, 'settings.html'));
+    settings.loadFile(path.join(__dirname, "settings.html"));
   });
-
 
   // ipcMain.send('update-status-bar', '111', '222');
 }
 
-app.on('browser-window-created', function (e, window) {
+app.on("browser-window-created", function(e, window) {
   window.setMenu(null);
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', function () {
+app.on("ready", function(ev) {
   createWindow();
 
   tray.createTray(mainWindow, icon);
 
-  ipcMain.on('updated-tray-image', function (event, payload) {
-    if (store.get('settings-shiny-tray')) tray.updateImage(payload);
+  ipcMain.on("updated-tray-image", function(event, payload) {
+    if (store.get("settings-shiny-tray")) tray.updateImage(payload);
   });
 
   if (!isDev) {
     updater.checkUpdate(mainWindow);
 
-    setInterval(function () {
+    setInterval(function() {
       updater.checkUpdate(mainWindow);
     }, 1 * 60 * 60 * 1000);
   }
+  ipcMain.emit("ready", app);
   // mediaControl.createTouchBar(mainWindow);
 });
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
+app.on("window-all-closed", function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (!isMac()) {
@@ -608,7 +648,7 @@ app.on('window-all-closed', function () {
   }
 });
 
-app.on('activate', function () {
+app.on("activate", function() {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
@@ -618,8 +658,32 @@ app.on('activate', function () {
   }
 });
 
-ipcMain.on('show-lyrics', function () {
+ipcMain.on("show-lyrics", function() {
   createLyricsWindow();
+});
+
+ipcMain.on("show-companion", function() {
+  const x = mainWindow.getPosition()[0];
+  const y = mainWindow.getPosition()[1];
+  const width = 800;
+  const settings = new BrowserWindow({
+    // parent: mainWindow,
+    skipTaskbar: false,
+    frame: true,
+    x: x + width / 2,
+    y,
+    resizable: false,
+    backgroundColor: "#232323",
+    width: 800,
+    title: companionWindowTitle,
+    webPreferences: {
+      nodeIntegration: false
+    },
+    icon: path.join(__dirname, icon),
+    autoHideMenuBar: true
+  });
+  settings.loadURL(companionUrl);
+  // window.open(companionUrl, companionWindowTitle, companionWindowSettings);
 });
 
 function createLyricsWindow() {
@@ -627,7 +691,7 @@ function createLyricsWindow() {
     frame: false,
     center: true,
     resizable: true,
-    backgroundColor: '#232323',
+    backgroundColor: "#232323",
     width: 700,
     height: 800,
     icon: path.join(__dirname, icon),
@@ -635,7 +699,7 @@ function createLyricsWindow() {
       nodeIntegration: true
     }
   });
-  lyrics.loadFile(path.join(__dirname, 'lyrics.html'));
+  lyrics.loadFile(path.join(__dirname, "lyrics.html"));
   //lyrics.webContents.openDevTools();
 }
 
@@ -646,15 +710,19 @@ function logDebug(data) {
 }
 
 function isWindows() {
-  return process.platform === 'win32';
+  return process.platform === "win32";
 }
 
 function isLinux() {
-  return process.platform === 'freebsd' || process.platform === 'linux' || process.platform === 'openbsd';
+  return (
+    process.platform === "freebsd" ||
+    process.platform === "linux" ||
+    process.platform === "openbsd"
+  );
 }
 
 function isMac() {
-  return process.platform === 'darwin';
+  return process.platform === "darwin";
 }
 
 function songInfo() {
@@ -662,7 +730,7 @@ function songInfo() {
     author: songAuthor,
     title: songTitle,
     cover: songCover,
-    duration: songDuration,
+    duration: songDuration
   };
 }
 
@@ -671,7 +739,7 @@ function playerInfo() {
     isPaused: global.sharedObj.paused,
     volumePercent: volumePercent,
     seekbarCurrentPosition: songCurrentPosition,
-    likeStatus: likeStatus,
+    likeStatus: likeStatus
   };
 }
 
@@ -679,16 +747,16 @@ function getAll() {
   return {
     song: songInfo(),
     player: playerInfo()
-  }
+  };
 }
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const mediaControl = require('./providers/mediaProvider');
-const tray = require('./tray');
-const updater = require('./providers/updateProvider');
-const analytics = require('./providers/analyticsProvider');
+const mediaControl = require("./providers/mediaProvider");
+const tray = require("./tray");
+const updater = require("./providers/updateProvider");
+const analytics = require("./providers/analyticsProvider");
 
-analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion());
-analytics.setEvent('main', 'os', process.platform, process.platform);
-analytics.setScreen('main');
+analytics.setEvent("main", "start", "v" + app.getVersion(), app.getVersion());
+analytics.setEvent("main", "os", process.platform, process.platform);
+analytics.setScreen("main");
