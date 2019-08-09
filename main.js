@@ -9,6 +9,7 @@ const {
   systemPreferences
 } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const electronStore = require("electron-store");
 const store = new electronStore();
 const discordRPC = require("./providers/discordRpcProvider");
@@ -260,6 +261,11 @@ function createWindow() {
                 background: #555;
             }
         `);
+    // Currently just that simple
+    const themePath = path.join(__dirname, "assets/theme.css");
+    if (fs.existsSync(themePath)) {
+      view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+    }
   });
 
   view.webContents.on("media-started-playing", function() {
