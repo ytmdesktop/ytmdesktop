@@ -4,7 +4,7 @@
   "description": "YouTube Music Desktop App",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "npx electron .",
     "pack": "npx electron-builder --dir",
     "pack:x64": "npm run pack -- --arch x64 --config electron-builder64.yml",
     "dist": "npx electron-builder",
@@ -23,9 +23,16 @@
   ],
   "author": "Adler Luiz <adlerluiz10@gmail.com>",
   "license": "CC0-1.0",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --pattern \"**/*.js\" --pattern \"**/*.html\" --pattern \"**/*.json\""
+    }
+  },
   "devDependencies": {
-    "electron": "5.0.0",
-    "electron-builder": "20.43.0"
+    "electron": "^6.0.1",
+    "electron-builder": "20.43.0",
+    "husky": "^3.0.3",
+    "pretty-quick": "^1.11.1"
   },
   "dependencies": {
     "discord-rpc": "^3.0.1",
@@ -40,6 +47,7 @@
     "is-online": "^8.2.0",
     "materialize-css": "^1.0.0",
     "npx": "^10.2.0",
+    "prettier": "^1.18.2",
     "qrcode-generator": "^1.4.3",
     "register-scheme": "0.0.2",
     "request": "^2.88.0",
