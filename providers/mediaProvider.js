@@ -136,6 +136,7 @@ function createThumbar( mainWindow, type, likeStatus ) {
                 click: function() { mediaUpVote( mainWindow.getBrowserView(), createThumbar( mainWindow, type, thumbsReverse ) ) },
             }
         ]);
+        mainWindow.setSkipTaskbar(false);
     } catch(e) {
         console.log(e);
     }
