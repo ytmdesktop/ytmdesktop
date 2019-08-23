@@ -19,14 +19,6 @@ win:
     url: 'https://dl.ytmdesktop.app/win'
     channel: latest
 
-mac:
-  icon: assets
-  category: public.app-category.music
-  publish:
-    provider: generic
-    url: 'https://dl.ytmdesktop.app/mac'
-    channel: latest
-
 linux:
   icon: assets
   category: Audio
