@@ -9,7 +9,7 @@ const {
 } = require("./server.config");
 
 loadSettings();
-loadi18n();
+__.loadi18n();
 // remote.getCurrentWebContents().openDevTools();
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -173,104 +173,6 @@ function loadSettings() {
     startOnBootEl.checked = false;
     startOnBootEl.setAttribute("disabled", "disabled");
   }
-}
-
-function loadi18n() {
-  document.getElementById("i18n_LABEL_SETTINGS").innerText = __.trans(
-    "LABEL_SETTINGS"
-  );
-
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL");
-  //document.getElementById( 'i18n_LABEL_SETTINGS_TAB_MINIPLAYER' ).innerText                       = __.trans( 'LABEL_SETTINGS_TAB_MINIPLAYER' );
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_SHORTCUTS"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_SHORTCUTS");
-  document.getElementById("i18n_LABEL_SETTINGS_TAB_ABOUT").innerText = __.trans(
-    "LABEL_SETTINGS_TAB_ABOUT"
-  );
-
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_PAGE_ZOOM"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL");
-  document.getElementById(
-    "i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL"
-  ).innerText = __.trans("LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL");
-
-  document.getElementById("i18n_MEDIA_CONTROL_PLAY_PAUSE").innerText = __.trans(
-    "MEDIA_CONTROL_PLAY_PAUSE"
-  );
-  document.getElementById("i18n_MEDIA_CONTROL_NEXT").innerText = __.trans(
-    "MEDIA_CONTROL_NEXT"
-  );
-  document.getElementById("i18n_MEDIA_CONTROL_PREVIOUS").innerText = __.trans(
-    "MEDIA_CONTROL_PREVIOUS"
-  );
-  document.getElementById(
-    "i18n_MEDIA_CONTROL_MUTE_UNMUTE"
-  ).innerText = __.trans("MEDIA_CONTROL_MUTE_UNMUTE");
-  document.getElementById("i18n_MEDIA_CONTROL_THUMBS_UP").innerText = __.trans(
-    "MEDIA_CONTROL_THUMBS_UP"
-  );
-  document.getElementById(
-    "i18n_MEDIA_CONTROL_THUMBS_DOWN"
-  ).innerText = __.trans("MEDIA_CONTROL_THUMBS_DOWN");
-  document.getElementById("i18n_MEDIA_CONTROL_REPEAT").innerText = __.trans(
-    "MEDIA_CONTROL_REPEAT"
-  );
-  document.getElementById("i18n_MEDIA_CONTROL_SHUFFLE").innerText = __.trans(
-    "MEDIA_CONTROL_SHUFFLE"
-  );
-  document.getElementById("i18n_MEDIA_CONTROL_SEARCH").innerText = __.trans(
-    "MEDIA_CONTROL_SEARCH"
-  );
-  document.getElementById(
-    "i18n_MEDIA_CONTROL_QUEUE_OPEN_CLOSE"
-  ).innerText = __.trans("MEDIA_CONTROL_QUEUE_OPEN_CLOSE");
-
-  document.getElementById(
-    "i18n_GLOBAL_MEDIA_CONTROL_PLAY_PAUSE"
-  ).innerText = __.trans("MEDIA_CONTROL_PLAY_PAUSE");
-  document.getElementById(
-    "i18n_GLOBAL_MEDIA_CONTROL_NEXT"
-  ).innerText = __.trans("MEDIA_CONTROL_NEXT");
-  document.getElementById(
-    "i18n_GLOBAL_MEDIA_CONTROL_PREVIOUS"
-  ).innerText = __.trans("MEDIA_CONTROL_PREVIOUS");
 }
 
 function relaunch() {
