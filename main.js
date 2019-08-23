@@ -15,7 +15,7 @@ const store = new electronStore();
 const discordRPC = require("./providers/discordRpcProvider");
 const __ = require("./providers/translateProvider");
 const { template } = require("./mac-menu");
-const calcYTViewSize = require("./utils/calcYTViewSize");
+const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
 const isDev = require("electron-is-dev");
 const isOnline = require("is-online");
 const {
@@ -111,7 +111,12 @@ function createWindow() {
   };
   if (isMac()) {
     // Mac Specific Configuration
-    broswerWindowConfig.titleBarStyle = "hidden";
+    if (store.get("titlebar-type", "nice") === "nice") {
+      broswerWindowConfig.titleBarStyle = "hidden";
+      broswerWindowConfig.frame = false;
+    } else {
+      broswerWindowConfig.frame = true;
+    }
   }
   mainWindow = new BrowserWindow(broswerWindowConfig);
 
@@ -123,7 +128,7 @@ function createWindow() {
 
   mainWindow.loadFile("./index.html");
   mainWindow.setBrowserView(view);
-
+  setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(
     calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
   );

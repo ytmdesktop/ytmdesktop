@@ -1,20 +1,46 @@
 const PADDING = 1;
 const TITLE_BAR_HEIGHT = 28;
 
+const TITLE_BAR_HEIGHT_MAC = 21;
+
 /**
  * @param {ElectonStore} store
- * @param {Array.<width: Number, height: Number, isMaximized: Boolean>} sizes
+ * @param {Array.<width: Number, height: Number, isMac: Boolean, isMaximized: Boolean>} sizes
  */
-module.exports = function calculateYoutubeViewSize(store, [width, height, isMaximized]) {
-  const isNiceTitleBarDisabled = store.get('titlebar-type', 'nice') !== 'nice';
-  const x = PADDING;
-  const y = isNiceTitleBarDisabled 
-    ? PADDING
-    : PADDING + TITLE_BAR_HEIGHT;
+let isMac = false;
 
-  return {
-      x, y,
-      width: width - x - PADDING,
-      height: height - y - PADDING,
-  };
-}
+module.exports = {
+  setMac: ismac => {
+    isMac = ismac;
+  },
+  calcYTViewSize: function calculateYoutubeViewSize(
+    store,
+    [width, height, isMaximized]
+  ) {
+    const isNiceTitleBarDisabled =
+      store.get("titlebar-type", "nice") !== "nice";
+    const x = PADDING;
+    if (isMac) {
+      // For MacOS
+      const y = isNiceTitleBarDisabled
+        ? PADDING + TITLE_BAR_HEIGHT_MAC
+        : PADDING + TITLE_BAR_HEIGHT;
+
+      return {
+        x,
+        y,
+        width: width - x - PADDING,
+        height: height - y - PADDING
+      };
+    } else {
+      const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT;
+
+      return {
+        x,
+        y,
+        width: width - x - PADDING,
+        height: height - y - PADDING
+      };
+    }
+  }
+};
