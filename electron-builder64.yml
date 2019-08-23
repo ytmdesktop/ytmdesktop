@@ -18,3 +18,14 @@ win:
     provider: generic
     url: 'https://dl.ytmdesktop.app/win'
     channel: latest
+
+mac:
+  icon: assets
+  category: public.app-category.music
+  target:
+    - dmg
+    - pkg
+  publish:
+    provider: generic
+    url: 'https://dl.ytmdesktop.app/mac'
+    channel: latest
