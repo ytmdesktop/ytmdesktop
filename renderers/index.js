@@ -4,7 +4,7 @@ const store = new electronStore();
 const status = remote.getGlobal("sharedObj");
 const window = remote.getCurrentWindow();
 
-const icons = require("./icons_for_shiny_tray");
+const icons = require("../icons_for_shiny_tray");
 let icon_set = icons.bright;
 
 ipc.on("is-online", function(_, isOnline) {

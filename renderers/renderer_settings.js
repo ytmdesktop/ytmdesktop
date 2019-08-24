@@ -1,12 +1,12 @@
 const { remote, ipcRenderer: ipc } = require("electron");
 const electronStore = require("electron-store");
 const store = new electronStore();
-const __ = require("./providers/translateProvider");
+const __ = require("../providers/translateProvider");
 const {
   companionUrl,
   companionWindowTitle,
   companionWindowSettings
-} = require("./server.config");
+} = require("../server.config");
 
 loadSettings();
 __.loadi18n();
