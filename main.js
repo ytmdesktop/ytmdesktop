@@ -14,7 +14,7 @@ const electronStore = require("electron-store");
 const store = new electronStore();
 const discordRPC = require("./providers/discordRpcProvider");
 const __ = require("./providers/translateProvider");
-const { template } = require("./mac-menu");
+const { statusBarMenu } = require("./providers/templateProvider");
 const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
 const isDev = require("electron-is-dev");
 const isOnline = require("is-online");
@@ -61,7 +61,7 @@ if (isWindows()) {
 } else if (isMac()) {
   icon = "assets/favicon.16x16.png";
   store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
-  const menu = Menu.buildFromTemplate(template);
+  const menu = Menu.buildFromTemplate(statusBarMenu);
   Menu.setApplicationMenu(menu);
 }
 
@@ -126,7 +126,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile("./index.html");
+  mainWindow.loadFile("./pages/index.html");
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(
@@ -617,7 +617,7 @@ function createWindow() {
       },
       autoHideMenuBar: true
     });
-    settings.loadFile(path.join(__dirname, "settings.html"));
+    settings.loadFile(path.join(__dirname, "./pages/settings.html"));
   });
 
   // ipcMain.send('update-status-bar', '111', '222');
@@ -710,7 +710,7 @@ function createLyricsWindow() {
       nodeIntegration: true
     }
   });
-  lyrics.loadFile(path.join(__dirname, "lyrics.html"));
+  lyrics.loadFile(path.join(__dirname, "./pages/lyrics.html"));
   //lyrics.webContents.openDevTools();
 }
 

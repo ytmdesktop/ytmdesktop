@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Settings</title>
+    <link href="../assets/css/material_icons.css" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="../assets/css/styles.css" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="../node_modules/materialize-css/dist/css/materialize.min.css"
+      media="screen,projection"
+    />
+    <style>
+      body {
+        background-color: #131313;
+      }
+
+      .title {
+        margin: -6px 8px;
+      }
+
+      label {
+        color: #fff !important;
+      }
+
+      tbody,
+      td,
+      th {
+        padding: 10px 5px;
+      }
+
+      ul,
+      li {
+        background-color: #232323;
+      }
+
+      ul,
+      li,
+      a {
+        color: #eee !important;
+      }
+
+      .tabs .tab a:focus,
+      .tabs .tab a:focus.active {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .indicator {
+        background-color: #f44336 !important;
+      }
+
+      .switch label input[type="checkbox"]:checked + .lever {
+        background-color: #d32f2f;
+      }
+
+      .switch label input[type="checkbox"]:checked + .lever:after {
+        background-color: #f44336;
+      }
+
+      .dropdown-trigger {
+        color: #f44336 !important;
+        height: 26px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .dropdown-content li > a,
+      .dropdown-content li > span {
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected {
+        background-color: #f44336 !important;
+      }
+
+      .select-dropdown.dropdown-content li:hover {
+        background-color: #f44336 !important;
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected span {
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected span:hover {
+        color: #fff !important;
+      }
+
+      input[type="range"] {
+        border: 1px solid #d32f2f;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"]::-ms-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"] + .thumb {
+        background-color: #fff;
+      }
+
+      input[type="range"] + .thumb.active .value {
+        color: #f44336;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        background: #d32f2f;
+      }
+
+      .select-wrapper input.select-dropdown {
+        text-align: center;
+        border: none;
+      }
+
+      .select-wrapper input.select-dropdown:focus {
+        border: none;
+      }
+
+      .select-wrapper input.select-dropdown {
+        text-align: right;
+        right: 14px;
+      }
+
+      .caret {
+        display: none;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      .divider {
+        height: 1px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="content" style="margin-top: 3px;text-align: center">
+      <div id="general" class="col s12">
+        <div class="row">
+          <div class="col s12">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td class="item">
+                    <center>
+                      <span
+                        i18n="_i18n_LABEL_POPUPMENU_TITLE"
+                        style="margin: auto"
+                        >YTMDesktop App</span
+                      >
+                    </center>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="btn" id="btn-play-pause" style="width: 100%">
+                    <span i18n="i18n_MEDIA_CONTROL_PLAY_PAUSE"
+                      >Play / Pause</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="btn"
+                    id="btn-previous"
+                    style="width: 100%; margin-top: -1px"
+                  >
+                    <span i18n="i18n_MEDIA_CONTROL_PREVIOUS"
+                      >Previous Track</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="btn"
+                    id="btn-next"
+                    style="width: 100%; margin-top: -1px"
+                  >
+                    <span i18n="i18n_MEDIA_CONTROL_NEXT">Next Track</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="btn"
+                    id="btn-show-lyric"
+                    style="width: 100%; margin-top: 5px"
+                  >
+                    <span i18n="i18n_LABEL_LYRICS">Lyrics</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="btn"
+                    id="btn-show-settings"
+                    style="width: 100%; margin-top: -1px"
+                  >
+                    <span i18n="i18n_LABEL_SETTINGS">Settings</span>
+                  </td>
+                </tr>
+                <tr class="divider"></tr>
+                <tr>
+                  <td
+                    class="btn"
+                    id="btn-exit"
+                    style="width: 100%;  margin-top: 5px"
+                  >
+                    <span i18n="i18n_LABEL_TITLE">Exit</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <script>
+      require("../renderers/renderer_menu.js");
+    </script>
+  </body>
+</html>
