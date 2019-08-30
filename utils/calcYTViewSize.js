@@ -1,4 +1,6 @@
 const PADDING = 1;
+const PADDING_MAXIMIZED = 15;
+
 const TITLE_BAR_HEIGHT = 28;
 
 const TITLE_BAR_HEIGHT_MAC = 21;
@@ -39,7 +41,7 @@ module.exports = {
         x,
         y,
         width: width - x - PADDING,
-        height: height - y - PADDING
+        height: height - y - ((isMaximized) ? PADDING_MAXIMIZED : PADDING)
       };
     }
   }

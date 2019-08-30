@@ -446,7 +446,13 @@ function createWindow() {
   });
 
   mainWindow.on("resize", function() {
-    const windowSize = mainWindow.getSize();
+    let windowSize = mainWindow.getSize();
+    if ( mainWindow.isMaximized()) {
+      windowSize[2] = true;
+    } else {
+      windowSize[2] = false;
+    }
+    console.log(windowSize);
     view.setBounds(calcYTViewSize(store, windowSize));
 
     mainWindow.send("window-is-maximized", mainWindow.isMaximized());
