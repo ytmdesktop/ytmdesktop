@@ -136,9 +136,7 @@ function loadSettings() {
 
   if (store.get("settings-companion-server")) {
     document.getElementById("toggle-companion-server").checked = true;
-    document
-      .getElementById("i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO")
-      .classList.remove("hide");
+    document.getElementById("i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO").classList.remove("hide");
   }
 
   if (store.get("settings-app-language")) {
