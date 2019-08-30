@@ -16,6 +16,7 @@ const discordRPC = require("./providers/discordRpcProvider");
 const __ = require("./providers/translateProvider");
 const { statusBarMenu } = require("./providers/templateProvider");
 const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
+const { isWindows, isMac } = require("./utils/systemInfo");
 const isDev = require("electron-is-dev");
 const isOnline = require("is-online");
 const {
@@ -447,12 +448,11 @@ function createWindow() {
 
   mainWindow.on("resize", function() {
     let windowSize = mainWindow.getSize();
-    if ( mainWindow.isMaximized()) {
+    if (mainWindow.isMaximized()) {
       windowSize[2] = true;
     } else {
       windowSize[2] = false;
     }
-    console.log(windowSize);
     view.setBounds(calcYTViewSize(store, windowSize));
 
     mainWindow.send("window-is-maximized", mainWindow.isMaximized());
@@ -724,22 +724,6 @@ function logDebug(data) {
   if (true) {
     console.log(data);
   }
-}
-
-function isWindows() {
-  return process.platform === "win32";
-}
-
-function isLinux() {
-  return (
-    process.platform === "freebsd" ||
-    process.platform === "linux" ||
-    process.platform === "openbsd"
-  );
-}
-
-function isMac() {
-  return process.platform === "darwin";
 }
 
 function songInfo() {
