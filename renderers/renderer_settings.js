@@ -41,7 +41,7 @@ const elementDiscordRichPresence = document.getElementById(
 const elementAppLanguage = document.getElementById("select-app-language");
 const elementTitlebarStyle = document.getElementById("select-titlebar-style");
 const elementSettingsCompanionApp = document.getElementById(
-  "i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO"
+  "COMPANION_SERVER_INFO"
 );
 //const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
 
@@ -136,7 +136,7 @@ function loadSettings() {
 
   if (store.get("settings-companion-server")) {
     document.getElementById("toggle-companion-server").checked = true;
-    document.getElementById("i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO").classList.remove("hide");
+    document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
   }
 
   if (store.get("settings-app-language")) {
