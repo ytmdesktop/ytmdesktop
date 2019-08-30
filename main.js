@@ -624,7 +624,6 @@ function createWindow() {
       autoHideMenuBar: true
     });
     settings.loadFile(path.join(__dirname, "./pages/settings.html"));
-    settings.webContents.openDevTools({ mode: 'detach' });
   });
 
   // ipcMain.send('update-status-bar', '111', '222');
