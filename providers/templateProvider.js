@@ -241,12 +241,12 @@ const popUpMenu = (
           backgroundColor: "#232323",
           width: 700,
           height: 800,
-          icon: path.join(__dirname, "assets/favicon.png"),
+          icon: path.join(__dirname, "../assets/favicon.png"),
           webPreferences: {
             nodeIntegration: true
           }
         });
-        lyrics.loadFile(path.join(__dirname, "./pages/lyrics.html"));
+        lyrics.loadFile(path.join(__dirname, "../pages/lyrics.html"));
       }
     },
 
