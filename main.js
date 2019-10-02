@@ -62,6 +62,12 @@ if (isWindows()) {
 } else if (isMac()) {
   icon = "assets/favicon.16x16.png";
   store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
+  systemPreferences.subscribeNotification(
+    "AppleInterfaceThemeChangedNotification",
+    function theThemeHasChanged() {
+      store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
+    }
+  );
   const menu = Menu.buildFromTemplate(statusBarMenu);
   Menu.setApplicationMenu(menu);
 }
