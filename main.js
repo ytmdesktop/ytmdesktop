@@ -159,7 +159,7 @@ function createWindow() {
      * If offline, mark the variable that the url was not read
      */
     if (hasLoadedUrl === undefined) {
-      hasLoadedUrl = is_online;
+      lastConnectionStatusIsOnline = hasLoadedUrl = is_online;
     }
 
     /**
@@ -202,7 +202,7 @@ function createWindow() {
     );
   }
 
-  checkConnection();
+  setTimeout(() => checkConnection(), 15 * 1000);
 
   // Preserving Performance
   // Why check if Windows is closed/hidden
