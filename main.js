@@ -66,6 +66,8 @@ if (isWindows()) {
     "AppleInterfaceThemeChangedNotification",
     function theThemeHasChanged() {
       store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
+      if (renderer_for_status_bar)
+        renderer_for_status_bar.send("update-status-bar");
     }
   );
   const menu = Menu.buildFromTemplate(statusBarMenu);
