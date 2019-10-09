@@ -264,12 +264,12 @@ const popUpMenu = (
           resizable: true,
           backgroundColor: "#232323",
           width: 800,
-          icon: path.join(__dirname, "assets/favicon.png"),
+          icon: path.join(__dirname, "../assets/favicon.png"),
           webPreferences: {
             nodeIntegration: true
           }
         });
-        settings.loadFile(path.join(__dirname, "./pages/settings.html"));
+        settings.loadFile(path.join(__dirname, "../pages/settings.html"));
       }
     },
 
