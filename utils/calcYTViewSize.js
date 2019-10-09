@@ -1,5 +1,5 @@
 const PADDING = 1;
-const PADDING_MAXIMIZED = 15;
+const PADDING_MAXIMIZED = 16;
 
 const TITLE_BAR_HEIGHT = 28;
 
@@ -15,10 +15,9 @@ module.exports = {
   setMac: ismac => {
     isMac = ismac;
   },
-  calcYTViewSize: function calculateYoutubeViewSize(
-    store,
-    [width, height, isMaximized]
-  ) {
+  calcYTViewSize: function calculateYoutubeViewSize(store, window) {
+    const windowSize = window.getSize();
+    const isMaximized = window.isMaximized();
     const isNiceTitleBarDisabled =
       store.get("titlebar-type", "nice") !== "nice";
     const x = PADDING;
@@ -31,8 +30,8 @@ module.exports = {
       return {
         x,
         y,
-        width: width - x - PADDING,
-        height: height - y - PADDING
+        width: windowSize[0] - x - PADDING,
+        height: windowSize[1] - y - PADDING
       };
     } else {
       const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT;
@@ -40,8 +39,10 @@ module.exports = {
       return {
         x,
         y,
-        width: width - x - PADDING,
-        height: height - y - ((isMaximized) ? PADDING_MAXIMIZED : PADDING)
+        width: isMaximized
+          ? windowSize[0] - x - PADDING_MAXIMIZED
+          : windowSize[0] - x - PADDING,
+        height: windowSize[1] - y - (isMaximized ? PADDING_MAXIMIZED : PADDING)
       };
     }
   }

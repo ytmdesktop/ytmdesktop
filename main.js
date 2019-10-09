@@ -138,9 +138,7 @@ function createWindow() {
   mainWindow.loadFile("./pages/index.html");
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
-  view.setBounds(
-    calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
-  );
+  view.setBounds(calcYTViewSize(store, mainWindow));
 
   if (store.get("settings-continue-where-left-of") && store.get("window-url")) {
     mainWindowUrl = store.get("window-url");
@@ -223,9 +221,7 @@ function createWindow() {
   if (windowMaximized) {
     setTimeout(function() {
       mainWindow.send("window-is-maximized", true);
-      view.setBounds(
-        calcYTViewSize(store, [mainWindowSize.width, mainWindowSize.height])
-      );
+      view.setBounds(calcYTViewSize(store, mainWindow));
       mainWindow.maximize();
     }, 700);
   } else {
@@ -456,12 +452,14 @@ function createWindow() {
 
   mainWindow.on("resize", function() {
     let windowSize = mainWindow.getSize();
-    if (mainWindow.isMaximized()) {
+    /*if (mainWindow.isMaximized()) {
       windowSize[2] = true;
     } else {
       windowSize[2] = false;
-    }
-    view.setBounds(calcYTViewSize(store, windowSize));
+    }*/
+    setTimeout(() => {
+      view.setBounds(calcYTViewSize(store, mainWindow));
+    }, 200);
 
     mainWindow.send("window-is-maximized", mainWindow.isMaximized());
 
