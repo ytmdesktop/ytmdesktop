@@ -1,5 +1,8 @@
+const { isLinux } = require("./systemInfo");
+
 const PADDING = 1;
 const PADDING_MAXIMIZED = 16;
+const PADDING_LINUX = 0;
 
 const TITLE_BAR_HEIGHT = 28;
 
@@ -33,7 +36,17 @@ module.exports = {
         width: windowSize[0] - x - PADDING,
         height: windowSize[1] - y - PADDING
       };
-    } else {
+    } else if (isLinux()) {
+      const y = PADDING_LINUX;
+
+      return {
+        x,
+        y,
+        width: windowSize[0] - x,
+        height: windowSize[1] - y
+      };
+    }
+    {
       const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT;
 
       return {
