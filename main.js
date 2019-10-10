@@ -452,11 +452,6 @@ function createWindow() {
 
   mainWindow.on("resize", function() {
     let windowSize = mainWindow.getSize();
-    /*if (mainWindow.isMaximized()) {
-      windowSize[2] = true;
-    } else {
-      windowSize[2] = false;
-    }*/
     setTimeout(() => {
       view.setBounds(calcYTViewSize(store, mainWindow));
     }, 200);
