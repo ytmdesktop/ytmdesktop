@@ -37,5 +37,6 @@
   "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "Click here and scan QR Code",
   "LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",
   "LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Global",
-  "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Easy Tray Control(For Mac OS only)"
+  "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Easy Tray Control(For Mac OS only)",
+  "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Read clipboard for youtube links"
 }

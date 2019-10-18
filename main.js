@@ -19,6 +19,7 @@ const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
 const { isWindows, isMac } = require("./utils/systemInfo");
 const isDev = require("electron-is-dev");
 const isOnline = require("is-online");
+const ClipboardWatcher = require("electron-clipboard-watcher");
 const {
   companionUrl,
   companionWindowTitle,
@@ -53,6 +54,8 @@ let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
 let isPaused = true;
+let isClipboardWatcherRunning = false;
+let clipboardWatcher = null;
 
 let mainWindowUrl = "https://music.youtube.com";
 
@@ -626,7 +629,47 @@ function createWindow() {
     settings.loadFile(path.join(__dirname, "./pages/settings.html"));
   });
 
+  ipcMain.on("switch-clipboard-watcher", () => {
+    switchClipboardWatcher();
+  });
+
   // ipcMain.send('update-status-bar', '111', '222');
+
+  function switchClipboardWatcher(){
+    logDebug("Switch clipboard watcher: " + store.get("settings-clipboard-read"));
+  
+    if(isClipboardWatcherRunning){
+        clipboardWatcher !== null && clipboardWatcher.stop();
+        clipboardWatcher = null;
+        isClipboardWatcherRunning = false;
+    }else{
+      if(store.get("settings-clipboard-read")){
+        clipboardWatcher = ClipboardWatcher({
+          watchDelay: 1000,
+          onImageChange: function (nativeImage) { },
+          onTextChange: function (text) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+            let match = text.match(regExp);
+            if (match && match[2].length == 11) {
+              let videoId = match[2];
+              logDebug("Video readed from clipboard: " + videoId);
+              loadMusicByVideoId(videoId);
+            }
+          }
+        });
+
+        isClipboardWatcherRunning = true;
+      }
+    }
+  }
+  
+  function loadMusicByVideoId(videoId){
+    view.webContents.loadURL("https://music.youtube.com/watch?v=" + videoId);
+  }
+
+  setTimeout(function() {
+    ipcMain.emit("switch-clipboard-watcher");
+  }, 1000);
 }
 
 app.on("browser-window-created", function(e, window) {

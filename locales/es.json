@@ -31,5 +31,6 @@
 	"LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",
 	"LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Global",
 	"LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Control de la bandeja fácil (Solo para Mac OS)",
-	"LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT"
+	"LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "Iniciar el reproductor al encender el equipo",
+	"LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Leer enlaces de youtube desde el portapapeles"
 }

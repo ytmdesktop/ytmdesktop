@@ -31,6 +31,7 @@
     "LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "Démarrer au lancement de Windows (expérimental, Mac/Win32)",
     "LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",
     "LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "International",
-    "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Contrôle facile du plateau (Tray) pour Mac OS"
+    "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Contrôle facile du plateau (Tray) pour Mac OS",
+    "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Read clipboard for youtube links"
   }
   

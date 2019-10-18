@@ -15,6 +15,7 @@
 | `settings-app-language`               | String  | `en`, `pt`                   | `en`                         | Language of the app                                            |
 | `settings-discord-rich-presence`      | Boolean | `true` or `false`            | `false`                      | Integration with Discord Rich Presence                         |
 | `settings-start-on-boot`              | Boolean | `true` or `false`            | `false`                      | Open player when system starts                                 |
+| `settings-clipboard-read`             | Boolean | `true` or `false`            | `false`                      | Reads the clipboard for youtube links                          |
 | `settings-companion-server`           | Boolean | `true` or `false`            | `false`                      | Companion Server to control the player remotely                |
 
 ## Window
