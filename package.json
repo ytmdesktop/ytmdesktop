@@ -12,7 +12,7 @@
     "publish:win64": "build --win -p always --config electron-builder64.yml",
     "publish:win32": "build --win -p always --config electron-builder.yml",
     "publish:win": "npm run publish:win32 && npm run publish:win64",
-    "publish:mac": "build --mac -p always --config electron-builder.yml",
+    "publish:mac": "build --mac -p always --config electron-builder64.yml",
     "publish:lin": "build --linux -p always --config electron-builder.yml"
   },
   "repository": "https://github.com/adlerluiz/ytmdesktop",
@@ -37,6 +37,7 @@
   "dependencies": {
     "discord-rpc": "^3.0.1",
     "electron-canvas-to-buffer": "^2.0.0",
+    "electron-clipboard-watcher": "^1.0.1",
     "electron-google-analytics": "^0.1.0",
     "electron-is-dev": "^1.1.0",
     "electron-localshortcut": "^3.1.0",

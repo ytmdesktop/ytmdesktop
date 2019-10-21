@@ -39,6 +39,7 @@ const elementDiscordRichPresence = document.getElementById(
   "toggle-discord-rich-presence"
 );
 const elementAppLanguage = document.getElementById("select-app-language");
+const elementClipboardRead = document.getElementById("toggle-clipboard-read");
 const elementTitlebarStyle = document.getElementById("select-titlebar-style");
 const elementSettingsCompanionApp = document.getElementById(
   "COMPANION_SERVER_INFO"
@@ -80,6 +81,11 @@ elementDiscordRichPresence.addEventListener("click", function() {
 elementAppLanguage.addEventListener("change", function() {
   store.set("settings-app-language", this.value);
   relaunch();
+});
+
+elementClipboardRead.addEventListener("change", function() {
+  store.set("settings-clipboard-read", this.checked);
+  ipc.send("switch-clipboard-watcher");
 });
 
 elementTitlebarStyle.addEventListener("change", function() {
@@ -143,6 +149,10 @@ function loadSettings() {
     document.getElementById("select-app-language").value = store.get(
       "settings-app-language"
     );
+  }
+
+  if (store.get("settings-clipboard-read")) {
+    document.getElementById("toggle-clipboard-read").checked = true;
   }
 
   document.getElementById("select-titlebar-style").value = store.get(
