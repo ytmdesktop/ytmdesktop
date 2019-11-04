@@ -195,15 +195,15 @@ function createWindow() {
     lastConnectionStatusIsOnline = is_online;
 
     /**
-     * Check connection every 30 seconds
+     * Check connection every 60 seconds
      */
     checkConnectionTimeoutHandler = setTimeout(
       () => checkConnection(),
-      30 * 1000
+      60 * 1000
     );
   }
 
-  setTimeout(() => checkConnection(), 15 * 1000);
+  //setTimeout(() => checkConnection(), 15 * 1000);
 
   // Preserving Performance
   // Why check if Windows is closed/hidden
@@ -636,19 +636,21 @@ function createWindow() {
 
   // ipcMain.send('update-status-bar', '111', '222');
 
-  function switchClipboardWatcher(){
-    logDebug("Switch clipboard watcher: " + store.get("settings-clipboard-read"));
-  
-    if(isClipboardWatcherRunning){
-        clipboardWatcher !== null && clipboardWatcher.stop();
-        clipboardWatcher = null;
-        isClipboardWatcherRunning = false;
-    }else{
-      if(store.get("settings-clipboard-read")){
+  function switchClipboardWatcher() {
+    logDebug(
+      "Switch clipboard watcher: " + store.get("settings-clipboard-read")
+    );
+
+    if (isClipboardWatcherRunning) {
+      clipboardWatcher !== null && clipboardWatcher.stop();
+      clipboardWatcher = null;
+      isClipboardWatcherRunning = false;
+    } else {
+      if (store.get("settings-clipboard-read")) {
         clipboardWatcher = ClipboardWatcher({
           watchDelay: 1000,
-          onImageChange: function (nativeImage) { },
-          onTextChange: function (text) {
+          onImageChange: function(nativeImage) {},
+          onTextChange: function(text) {
             let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
             let match = text.match(regExp);
             if (match && match[2].length == 11) {
@@ -663,8 +665,8 @@ function createWindow() {
       }
     }
   }
-  
-  function loadMusicByVideoId(videoId){
+
+  function loadMusicByVideoId(videoId) {
     view.webContents.loadURL("https://music.youtube.com/watch?v=" + videoId);
   }
 
