@@ -39,7 +39,7 @@ const elementDiscordRichPresence = document.getElementById(
   "toggle-discord-rich-presence"
 );
 const elementAppLanguage = document.getElementById("select-app-language");
-const elementClipboardRead = document.getElementById("toggle-clipboard-read");
+//const elementClipboardRead = document.getElementById("toggle-clipboard-read");
 const elementTitlebarStyle = document.getElementById("select-titlebar-style");
 const elementSettingsCompanionApp = document.getElementById(
   "COMPANION_SERVER_INFO"
@@ -83,10 +83,10 @@ elementAppLanguage.addEventListener("change", function() {
   relaunch();
 });
 
-elementClipboardRead.addEventListener("change", function() {
+/*elementClipboardRead.addEventListener("change", function() {
   store.set("settings-clipboard-read", this.checked);
   ipc.send("switch-clipboard-watcher");
-});
+});*/
 
 elementTitlebarStyle.addEventListener("change", function() {
   store.set("titlebar-type", this.value);
@@ -152,7 +152,7 @@ function loadSettings() {
   }
 
   if (store.get("settings-clipboard-read")) {
-    document.getElementById("toggle-clipboard-read").checked = true;
+    //document.getElementById("toggle-clipboard-read").checked = true;
   }
 
   document.getElementById("select-titlebar-style").value = store.get(
