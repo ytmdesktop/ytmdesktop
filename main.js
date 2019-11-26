@@ -212,7 +212,7 @@ function createWindow() {
   mainWindow.on("hide", () => clearTimeout(checkConnectionTimeoutHandler));
   mainWindow.on("ready-to-show", () => {
     if (checkConnectionTimeoutHandler) {
-      checkConnection();
+      //checkConnection();
     }
   });
 
