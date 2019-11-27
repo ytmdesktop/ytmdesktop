@@ -29,3 +29,4 @@ mac:
     provider: generic
     url: 'https://dl.ytmdesktop.app/mac'
     channel: latest
+  darkModeSupport: true
