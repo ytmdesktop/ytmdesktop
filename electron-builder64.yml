@@ -29,3 +29,11 @@ mac:
     provider: generic
     url: 'https://dl.ytmdesktop.app/mac'
     channel: latest
+
+linux:
+  icon: assets
+  category: Audio
+  publish:
+    provider: generic
+    url: 'https://dl.ytmdesktop.app/lin'
+    channel: latest
