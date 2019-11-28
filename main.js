@@ -56,6 +56,7 @@ let hasLoadedUrl;
 let isPaused = true;
 let isClipboardWatcherRunning = false;
 let clipboardWatcher = null;
+let likeStatusWatcher = null;
 
 let mainWindowUrl = "https://music.youtube.com";
 
@@ -305,59 +306,59 @@ function createWindow() {
             songDuration = parseInt(data);
           }
         );
+        if (!likeStatusWatcher)
+          likeStatusWatcher = setInterval(function() {
+            /**
+             * GET LIKE STATUS ATTRIBUTE
+             *
+             * LIKE | DISLIKE | INDIFFERENT
+             */
+            view.webContents.executeJavaScript(
+              `
+                    document.getElementById('like-button-renderer').getAttribute('like-status')
+                `,
+              true,
+              function(data) {
+                likeStatus = data;
+                mediaControl.createThumbar(
+                  mainWindow,
+                  playerInfo()["isPaused"],
+                  likeStatus
+                );
+              }
+            );
 
-        setInterval(function() {
-          /**
-           * GET LIKE STATUS ATTRIBUTE
-           *
-           * LIKE | DISLIKE | INDIFFERENT
-           */
-          view.webContents.executeJavaScript(
-            `
-                  document.getElementById('like-button-renderer').getAttribute('like-status')
-              `,
-            true,
-            function(data) {
-              likeStatus = data;
-              mediaControl.createThumbar(
-                mainWindow,
-                playerInfo()["isPaused"],
-                likeStatus
-              );
-            }
-          );
-
-          /**
-           * GET CURRENT SEEK BAR POSITION
-           */
-          view.webContents.executeJavaScript(
-            `
+            /**
+             * GET CURRENT SEEK BAR POSITION
+             */
+            view.webContents.executeJavaScript(
+              `
             document.getElementById('progress-bar').getAttribute('aria-valuenow');
           `,
-            null,
-            function(data) {
-              songCurrentPosition = parseInt(data);
-            }
-          );
+              null,
+              function(data) {
+                songCurrentPosition = parseInt(data);
+              }
+            );
 
-          view.webContents.executeJavaScript(
-            `
+            view.webContents.executeJavaScript(
+              `
             document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
           `,
-            true,
-            function(data) {
-              volumePercent = parseInt(data);
-            }
-          );
+              true,
+              function(data) {
+                volumePercent = parseInt(data);
+              }
+            );
 
-          /*view.webContents.executeJavaScript(`
+            /*view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').setAttribute('value', 10)
           `, false,
           function(data ) {
             console.log(data);
           });
           view.webContents.openDevTools({ mode: 'detach' });*/
-        }, 500);
+          }, 1000);
 
         /**
          * This timeout is necessary because there is a certain delay when changing music and updating the div content
@@ -401,7 +402,7 @@ function createWindow() {
               }
             }
           );
-        }, 500);
+        }, 1000);
       }
     );
   });
