@@ -630,7 +630,7 @@ function createWindow() {
       }
     });
     settings.loadFile(path.join(__dirname, "./pages/settings.html"));
-    //settings.webContents.openDevTools();
+    // settings.webContents.openDevTools();
   });
 
   ipcMain.on("switch-clipboard-watcher", () => {

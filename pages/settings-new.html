@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Settings</title>
+    <link href="../assets/css/material_icons.css" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="../assets/css/styles.css" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="../node_modules/materialize-css/dist/css/materialize.min.css"
+      media="screen,projection"
+    />
+    <style>
+      body {
+        background-color: #131313;
+      }
+
+      .title {
+        margin: -6px 8px;
+      }
+
+      label {
+        color: #fff !important;
+      }
+
+      tbody,
+      td,
+      th {
+        padding: 10px 5px;
+      }
+
+      ul,
+      li {
+        background-color: #232323;
+      }
+
+      ul,
+      li,
+      a {
+        color: #eee !important;
+      }
+
+      .tabs .tab a:focus,
+      .tabs .tab a:focus.active {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .indicator {
+        background-color: #f44336 !important;
+      }
+
+      .switch label input[type="checkbox"]:checked + .lever {
+        background-color: #d32f2f;
+      }
+
+      .switch label input[type="checkbox"]:checked + .lever:after {
+        background-color: #f44336;
+      }
+
+      .dropdown-trigger {
+        color: #f44336 !important;
+        height: 26px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .dropdown-content li > a,
+      .dropdown-content li > span {
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected {
+        background-color: #f44336 !important;
+      }
+
+      .select-dropdown.dropdown-content li:hover {
+        background-color: #f44336 !important;
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected span {
+        color: #fff !important;
+      }
+
+      .select-dropdown.dropdown-content li.selected span:hover {
+        color: #fff !important;
+      }
+
+      input[type="range"] {
+        border: 1px solid #d32f2f;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"]::-ms-thumb {
+        background-color: #f44336;
+      }
+
+      input[type="range"] + .thumb {
+        background-color: #fff;
+      }
+
+      input[type="range"] + .thumb.active .value {
+        color: #f44336;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        background: #d32f2f;
+      }
+
+      .select-wrapper input.select-dropdown {
+        text-align: center;
+        border: none;
+      }
+
+      .select-wrapper input.select-dropdown:focus {
+        border: none;
+      }
+
+      .select-wrapper input.select-dropdown {
+        text-align: right;
+        right: 14px;
+      }
+
+      .caret {
+        display: none;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      .divider {
+        height: 1px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+      }
+
+      .media-icons {
+        vertical-align: sub;
+        font-size: 16px;
+      }
+
+      .collection {
+        border: 0;
+      }
+
+      .collection-item {
+        background-color: transparent !important;
+        border: 0 !important;
+      }
+
+      .collection-item.active {
+        background-color: white !important;
+        color: black !important;
+      }
+
+      li.tab.side {
+        display: block;
+        text-align: inherit;
+      }
+
+      .tab .active {
+        background-color: #ddd !important;
+        color: #000 !important;
+      }
+
+      ul#slide-out.tabs {
+        display: block;
+      }
+      ul#slide-out.tabs .indicator {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="bar drag" style="background: #232323 !important;">
+      <div class="title">
+        <h6>
+          <i class="material-icons tiny">settings</i>
+          <span i18n="i18n_LABEL_SETTINGS" id="i18n_LABEL_SETTINGS"></span>
+        </h6>
+      </div>
+
+      <div class="cmd-btns">
+        <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
+          <i class="material-icons tiny">close</i>
+        </div>
+      </div>
+    </div>
+
+    <div id="content" style="margin-top: 29px;">
+      <div class="row">
+        <div class="col s3">
+          <div class="collection">
+            <a class="collection-item active">General</a>
+            <a class="collection-item">Appearence</a>
+            <a class="collection-item">Integration</a>
+            <a class="collection-item">Shortcut</a>
+            <a class="collection-item">About</a>
+          </div>
+        </div>
+        <div class="col s9">
+          Keep YTMD App on background when window close
+        </div>
+      </div>
+    </div>
+
+    <script src="../node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <script>
+      require("../renderers/renderer_settings_new.js");
+    </script>
+  </body>
+</html>
