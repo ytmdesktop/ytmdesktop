@@ -1,6 +1,6 @@
 const { remote, ipcRenderer } = require("electron");
 const request = require("request");
-const __ = require("../providers/translateProvider");
+const __ = require("../../providers/translateProvider");
 
 const url = "https://api.vagalume.com.br/search.php";
 

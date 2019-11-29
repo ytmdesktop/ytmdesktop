@@ -139,7 +139,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile("./pages/index.html");
+  mainWindow.loadFile("./pages/home/index.html");
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(store, mainWindow));
@@ -629,7 +629,7 @@ function createWindow() {
         nodeIntegration: true
       }
     });
-    settings.loadFile(path.join(__dirname, "./pages/settings.html"));
+    settings.loadFile(path.join(__dirname, "./pages/settings/settings.html"));
     // settings.webContents.openDevTools();
   });
 
@@ -765,7 +765,7 @@ function createLyricsWindow() {
       nodeIntegration: true
     }
   });
-  lyrics.loadFile(path.join(__dirname, "./pages/lyrics.html"));
+  lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
   //lyrics.webContents.openDevTools();
 }
 
