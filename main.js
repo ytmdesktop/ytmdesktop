@@ -615,18 +615,19 @@ function createWindow() {
 
   ipcMain.on("show-settings", function() {
     const settings = new BrowserWindow({
-      parent: mainWindow,
-      modal: true,
+      //parent: mainWindow,
+      modal: false,
       frame: false,
       center: true,
       resizable: true,
       backgroundColor: "#232323",
       width: 800,
       icon: path.join(__dirname, "./assets/favicon.png"),
+      autoHideMenuBar: false,
+      skipTaskbar: false,
       webPreferences: {
         nodeIntegration: true
-      },
-      autoHideMenuBar: true
+      }
     });
     settings.loadFile(path.join(__dirname, "./pages/settings.html"));
     //settings.webContents.openDevTools();
