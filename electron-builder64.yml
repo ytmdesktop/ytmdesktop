@@ -37,3 +37,4 @@ linux:
     provider: generic
     url: 'https://dl.ytmdesktop.app/lin'
     channel: latest
+  darkModeSupport: true

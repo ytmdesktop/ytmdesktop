@@ -106,7 +106,7 @@ exports.setShinyTray = function() {
       height: 277,
       webPreferences: { nodeIntegration: true }
     });
-    popUpMenu.loadFile(path.join(__dirname, "./pages/mac-shiny-menu.html"));
+    popUpMenu.loadFile(path.join(__dirname, "./pages/settings/mac_shiny.html"));
     popUpMenu.setVisibleOnAllWorkspaces(true);
     popUpMenu.hide();
     popUpMenu.on("blur", () => {

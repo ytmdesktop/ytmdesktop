@@ -1,6 +1,6 @@
 {
   "name": "youtube-music-desktop-app",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "YouTube Music Desktop App",
   "main": "main.js",
   "scripts": {
@@ -31,29 +31,29 @@
     }
   },
   "devDependencies": {
-    "electron": "^6.0.12",
-    "electron-builder": "20.43.0",
-    "husky": "^3.0.3",
+    "electron": "^6.1.5",
+    "electron-builder": "^20.44.4",
+    "husky": "^3.1.0",
     "pretty-quick": "^1.11.1"
   },
   "dependencies": {
-    "discord-rpc": "^3.0.1",
+    "discord-rpc": "^3.1.0",
     "electron-canvas-to-buffer": "^2.0.0",
     "electron-clipboard-watcher": "^1.0.1",
     "electron-google-analytics": "^0.1.0",
     "electron-is-dev": "^1.1.0",
-    "electron-localshortcut": "^3.1.0",
+    "electron-localshortcut": "^3.2.1",
     "electron-native-notification": "^1.2.1",
-    "electron-store": "^3.2.0",
-    "electron-updater": "^4.0.6",
-    "i18n": "^0.8.3",
-    "is-online": "^8.2.0",
+    "electron-store": "^3.3.0",
+    "electron-updater": "^4.2.0",
+    "i18n": "^0.8.4",
+    "is-online": "^8.2.1",
     "materialize-css": "^1.0.0",
     "npx": "^10.2.0",
-    "prettier": "^1.18.2",
-    "qrcode-generator": "^1.4.3",
+    "prettier": "^1.19.1",
+    "qrcode-generator": "^1.4.4",
     "register-scheme": "0.0.2",
     "request": "^2.88.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.3.0"
   }
 }
