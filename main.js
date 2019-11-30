@@ -407,6 +407,18 @@ function createWindow() {
     );
   });
 
+  view.webContents.on("did-start-navigation", function(event) {
+    view.webContents.executeJavaScript("window.location", null, function(
+      location
+    ) {
+      if (location.hostname != "music.youtube.com") {
+        mainWindow.send("off-the-road");
+      } else {
+        mainWindow.send("on-the-road");
+      }
+    });
+  });
+
   function updateActivity(songTitle, songAuthor) {
     let nowPlaying = songTitle + " - " + songAuthor;
     logDebug(nowPlaying);
@@ -635,6 +647,10 @@ function createWindow() {
 
   ipcMain.on("switch-clipboard-watcher", () => {
     switchClipboardWatcher();
+  });
+
+  ipcMain.on("reset-url", () => {
+    mainWindow.getBrowserView().webContents.loadURL(mainWindowUrl);
   });
 
   // ipcMain.send('update-status-bar', '111', '222');

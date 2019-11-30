@@ -65,6 +65,10 @@ if (process.platform === "darwin") {
   });
 }
 
+document.getElementById("btn-reset-url").addEventListener("click", function() {
+  ipc.send("reset-url");
+});
+
 const canvas = document.createElement("canvas");
 canvas.height = 32;
 canvas.width = 150;
@@ -81,6 +85,14 @@ ipc.on("window-is-maximized", function(event, value) {
 
 ipc.on("have-new-update", function(e, data) {
   // document.getElementById( 'btn-update' ).classList.remove( 'hide' );
+});
+
+ipc.on("off-the-road", function(e, data) {
+  document.getElementById("btn-reset-url").classList.remove("hide");
+});
+
+ipc.on("on-the-road", function(e, data) {
+  document.getElementById("btn-reset-url").classList.add("hide");
 });
 
 ipc.on("downloaded-new-update", function(e, data) {
