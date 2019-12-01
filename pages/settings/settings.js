@@ -23,25 +23,20 @@ document.getElementById("btn-close").addEventListener("click", function() {
   window.close();
 });
 
-initElement("settings-keep-background", "click", "checkbox");
-initElement("settings-show-notifications", "click", "checkbox");
-initElement("settings-start-on-boot", "click", "checkbox");
-initElement(
-  "settings-companion-server",
-  "click",
-  "checkbox",
-  showRelaunchButton
-);
-initElement("settings-continue-where-left-of", "click", "checkbox");
-initElement("settings-shiny-tray", "click", "checkbox", () => {
+initElement("settings-keep-background", "click");
+initElement("settings-show-notifications", "click");
+initElement("settings-start-on-boot", "click");
+initElement("settings-companion-server", "click", showRelaunchButton);
+initElement("settings-continue-where-left-of", "click");
+initElement("settings-shiny-tray", "click", () => {
   ipc.send("update-tray");
 });
-initElement("settings-discord-rich-presence", "click", "checkbox");
-initElement("settings-app-language", "change", "value", showRelaunchButton);
-initElement("settings-clipboard-read", "click", "checkbox", () => {
+initElement("settings-discord-rich-presence", "click");
+initElement("settings-app-language", "change", showRelaunchButton);
+initElement("settings-clipboard-read", "click", () => {
   ipc.send("switch-clipboard-watcher");
 });
-initElement("titlebar-type", "change", "value", showRelaunchButton);
+initElement("titlebar-type", "change", showRelaunchButton);
 
 elementSettingsCompanionApp.addEventListener("click", function() {
   window.open(companionUrl, companionWindowTitle, companionWindowSettings);
@@ -75,17 +70,16 @@ function showRelaunchButton() {
  * Initialize element and create listener for it
  * @param {*} elementName
  * @param {*} eventType
- * @param {*} settingsContext
  * @param {*} fn
  */
-function initElement(elementName, eventType, settingsContext, fn) {
+function initElement(elementName, eventType, fn) {
   if (fn === undefined) {
     fn = () => {};
   }
   const element = document.getElementById(elementName);
 
   if (element) {
-    createListener(element, elementName, eventType, settingsContext, fn);
+    createListener(element, elementName, eventType, fn);
   }
 }
 
@@ -94,17 +88,16 @@ function initElement(elementName, eventType, settingsContext, fn) {
  * @param {*} element
  * @param {*} settingsName
  * @param {*} eventType
- * @param {*} settingsContext
  * @param {*} fn
  */
-function createListener(element, settingsName, eventType, settingsContext, fn) {
+function createListener(element, settingsName, eventType, fn) {
   element.addEventListener(eventType, function() {
-    switch (settingsContext) {
-      case "checkbox":
+    switch (eventType) {
+      case "click":
         store.set(settingsName, this.checked);
         break;
 
-      case "value":
+      case "change":
         store.set(settingsName, this.value);
         break;
     }

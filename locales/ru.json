@@ -32,6 +32,7 @@
   "LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "Запуск при загрузке (экспериментальный, Mac / Win32)",
   "LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Локальный",
   "LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL": "Глобальный",
-  "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Easy Tray Control(For Mac OS only)",
-  "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Read clipboard for youtube links"
+  "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Easy Tray Control (For Mac OS only)",
+  "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Читать буфер обмена для ссылок на YouTube",
+  "LABEL_SETTINGS_RELAUNCH": "Применить и перезапустить"
 }
