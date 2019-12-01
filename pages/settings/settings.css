@@ -154,7 +154,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     height: 48px;
     padding: 0;
     margin: 0;
-    text-transform: uppercase;
+    text-transform: capitalize;
     text-overflow: ellipsis;
 }
 
@@ -196,9 +196,19 @@ input[type="range"]::-webkit-slider-runnable-track {
     display: none;
 }
 
-
-
-
 .mt-1 {
     margin-top: 0.7rem;
+}
+
+.mt-2 {
+    margin-top: 0.9rem;
+}
+
+.bottom {
+    position: absolute;
+    padding: 5px;
+    bottom: 0;
+    width: 100%;
+    background-color: #131313;
+    text-transform: none;
 }

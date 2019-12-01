@@ -8,9 +8,11 @@ const {
   companionWindowSettings
 } = require("../../server.config");
 
-loadSettings();
-__.loadi18n();
-// remote.getCurrentWebContents().openDevTools();
+const elementSettingsCompanionApp = document.getElementById(
+  "COMPANION_SERVER_INFO"
+);
+const elementRangeZoom = document.getElementById("range-zoom");
+const elementBtnAppRelaunch = document.getElementById("btn-relaunch");
 
 document.addEventListener("DOMContentLoaded", function() {
   M.FormSelect.init(document.querySelectorAll("select"), {});
@@ -21,97 +23,29 @@ document.getElementById("btn-close").addEventListener("click", function() {
   window.close();
 });
 
-const elementKeepBackground = document.getElementById("toggle-keep-background");
-const elementToggleShowNotification = document.getElementById(
-  "toggle-show-notifications"
+initElement("settings-keep-background", "click", "checkbox");
+initElement("settings-show-notifications", "click", "checkbox");
+initElement("settings-start-on-boot", "click", "checkbox");
+initElement(
+  "settings-companion-server",
+  "click",
+  "checkbox",
+  showRelaunchButton
 );
-const elementToggleStartOnBoot = document.getElementById(
-  "toggle-start-on-boot"
-);
-const elementToggleCompanionServer = document.getElementById(
-  "toggle-companion-server"
-);
-const elementToggleLeftOf = document.getElementById(
-  "toggle-continue-where-left-of"
-);
-const elementToggleShinyTray = document.getElementById("toggle-shiny-tray");
-const elementDiscordRichPresence = document.getElementById(
-  "toggle-discord-rich-presence"
-);
-const elementAppLanguage = document.getElementById("select-app-language");
-const elementClipboardRead = document.getElementById("toggle-clipboard-read");
-const elementTitlebarStyle = document.getElementById("select-titlebar-style");
-const elementSettingsCompanionApp = document.getElementById(
-  "COMPANION_SERVER_INFO"
-);
-//const elementBtnAppRelaunch = document.getElementById( 'btn-app-relaunch' );
-
-if (process.platform !== "darwin") {
-  const macSpecificNodes = document.getElementsByClassName("macos-specific");
-  for (let i = 0; i < macSpecificNodes.length; i++) {
-    macSpecificNodes.item(i).style.display = "none";
-  }
-}
-
-elementKeepBackground.addEventListener("click", function() {
-  store.set("settings-keep-background", this.checked);
-});
-
-elementToggleShowNotification.addEventListener("click", function() {
-  store.set("settings-show-notifications", this.checked);
-});
-
-elementToggleLeftOf.addEventListener("click", function() {
-  store.set("settings-continue-where-left-of", this.checked);
-});
-
-elementToggleStartOnBoot.addEventListener("click", function() {
-  store.set("settings-start-on-boot", this.checked);
-});
-
-elementToggleCompanionServer.addEventListener("click", function() {
-  store.set("settings-companion-server", this.checked);
-  relaunch();
-});
-
-elementDiscordRichPresence.addEventListener("click", function() {
-  store.set("settings-discord-rich-presence", this.checked);
-});
-
-elementAppLanguage.addEventListener("change", function() {
-  store.set("settings-app-language", this.value);
-  relaunch();
-});
-
-elementClipboardRead.addEventListener("change", function() {
-  store.set("settings-clipboard-read", this.checked);
-  ipc.send("switch-clipboard-watcher");
-});
-
-elementTitlebarStyle.addEventListener("change", function() {
-  store.set("titlebar-type", this.value);
-  relaunch();
-});
-
-elementToggleShinyTray.addEventListener("click", function() {
-  store.set("settings-shiny-tray", this.checked);
+initElement("settings-continue-where-left-of", "click", "checkbox");
+initElement("settings-shiny-tray", "click", "checkbox", () => {
   ipc.send("update-tray");
 });
+initElement("settings-discord-rich-presence", "click", "checkbox");
+initElement("settings-app-language", "change", "value", showRelaunchButton);
+initElement("settings-clipboard-read", "click", "checkbox", () => {
+  ipc.send("switch-clipboard-watcher");
+});
+initElement("titlebar-type", "click", "checkbox", showRelaunchButton);
 
 elementSettingsCompanionApp.addEventListener("click", function() {
   window.open(companionUrl, companionWindowTitle, companionWindowSettings);
 });
-
-/*elementBtnAppRelaunch.addEventListener( 'click', function() {
-    relaunch();
-} )*/
-
-/*const elementCheckUpdate = document.getElementById( 'check-update' );
-elementCheckUpdate.addEventListener( 'click', function() {
-    elementCheckUpdate.setAttribute( 'disabled', true );
-} );*/
-
-const elementRangeZoom = document.getElementById("range-zoom");
 
 elementRangeZoom.addEventListener("input", function() {
   document.getElementById("range-zoom-value").innerText = this.value;
@@ -119,43 +53,102 @@ elementRangeZoom.addEventListener("input", function() {
   ipc.send("settings-changed-zoom", this.value);
 });
 
+elementBtnAppRelaunch.addEventListener("click", function() {
+  relaunch();
+});
+
+if (process.platform !== "darwin") {
+  const macSpecificNodes = document.getElementsByClassName("macos-specific");
+  for (let i = 0; i < macSpecificNodes.length; i++) {
+    macSpecificNodes.item(i).classList.add("hide");
+  }
+}
+
+loadSettings();
+__.loadi18n();
+
+function showRelaunchButton() {
+  elementBtnAppRelaunch.classList.remove("hide");
+}
+
+/**
+ * Initialize element and create listener for it
+ * @param {*} elementName
+ * @param {*} eventType
+ * @param {*} settingsContext
+ * @param {*} fn
+ */
+function initElement(elementName, eventType, settingsContext, fn) {
+  if (fn === undefined) {
+    fn = () => {};
+  }
+  const element = document.getElementById(elementName);
+
+  if (element) {
+    createListener(element, elementName, eventType, settingsContext, fn);
+  }
+}
+
+/**
+ *
+ * @param {*} element
+ * @param {*} settingsName
+ * @param {*} eventType
+ * @param {*} settingsContext
+ * @param {*} fn
+ */
+function createListener(element, settingsName, eventType, settingsContext, fn) {
+  element.addEventListener(eventType, function() {
+    switch (settingsContext) {
+      case "checkbox":
+        store.set(settingsName, this.checked);
+        break;
+
+      case "value":
+        store.set(settingsName, this.value);
+        break;
+    }
+    fn();
+  });
+}
+
 function loadSettings() {
   if (store.get("settings-keep-background")) {
-    document.getElementById("toggle-keep-background").checked = true;
+    document.getElementById("settings-keep-background").checked = true;
   }
 
   if (store.get("settings-show-notifications")) {
-    document.getElementById("toggle-show-notifications").checked = true;
+    document.getElementById("settings-show-notifications").checked = true;
   }
 
   if (store.get("settings-continue-where-left-of")) {
-    document.getElementById("toggle-continue-where-left-of").checked = true;
+    document.getElementById("settings-continue-where-left-of").checked = true;
   }
 
   if (store.get("settings-discord-rich-presence")) {
-    document.getElementById("toggle-discord-rich-presence").checked = true;
+    document.getElementById("settings-discord-rich-presence").checked = true;
   }
 
   if (store.get("settings-start-on-boot")) {
-    document.getElementById("toggle-start-on-boot").checked = true;
+    document.getElementById("settings-start-on-boot").checked = true;
   }
 
   if (store.get("settings-companion-server")) {
-    document.getElementById("toggle-companion-server").checked = true;
+    document.getElementById("settings-companion-server").checked = true;
     document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
   }
 
   if (store.get("settings-app-language")) {
-    document.getElementById("select-app-language").value = store.get(
+    document.getElementById("settings-app-language").value = store.get(
       "settings-app-language"
     );
   }
 
   if (store.get("settings-clipboard-read")) {
-    document.getElementById("toggle-clipboard-read").checked = true;
+    document.getElementById("settings-clipboard-read").checked = true;
   }
 
-  document.getElementById("select-titlebar-style").value = store.get(
+  document.getElementById("titlebar-type").value = store.get(
     "titlebar-type",
     "nice"
   );
@@ -170,7 +163,7 @@ function loadSettings() {
   }
 
   if (store.get("settings-shiny-tray")) {
-    document.getElementById("toggle-shiny-tray").checked = true;
+    document.getElementById("settings-shiny-tray").checked = true;
   }
 
   document.getElementById("app-version").innerText = remote.app.getVersion();

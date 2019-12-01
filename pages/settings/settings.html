@@ -78,7 +78,10 @@
                     <td class="right">
                       <div class="switch">
                         <label>
-                          <input type="checkbox" id="toggle-keep-background" />
+                          <input
+                            type="checkbox"
+                            id="settings-keep-background"
+                          />
                           <span class="lever"></span>
                         </label>
                       </div>
@@ -95,7 +98,7 @@
                         <label>
                           <input
                             type="checkbox"
-                            id="toggle-show-notifications"
+                            id="settings-show-notifications"
                           />
                           <span class="lever"></span>
                         </label>
@@ -113,7 +116,7 @@
                         <label>
                           <input
                             type="checkbox"
-                            id="toggle-continue-where-left-of"
+                            id="settings-continue-where-left-of"
                           />
                           <span class="lever"></span>
                         </label>
@@ -130,7 +133,7 @@
                     <td class="right">
                       <div class="switch">
                         <label>
-                          <input type="checkbox" id="toggle-start-on-boot" />
+                          <input type="checkbox" id="settings-start-on-boot" />
                           <span class="lever"></span>
                         </label>
                       </div>
@@ -149,7 +152,7 @@
                       >
                     </td>
                     <td>
-                      <select id="select-app-language">
+                      <select id="settings-app-language">
                         <option value="en">English</option>
                         <option value="pt">Português</option>
                         <option value="es">Español</option>
@@ -158,7 +161,6 @@
                         <option value="ko">한국어</option>
                         <option value="ru">русский</option>
                       </select>
-                      <!--button class="btn hide" id="btn-app-relaunch">Reload</button-->
                     </td>
                   </tr>
 
@@ -176,7 +178,7 @@
                     <td class="right">
                       <div class="switch">
                         <label>
-                          <input type="checkbox" id="toggle-shiny-tray" />
+                          <input type="checkbox" id="settings-shiny-tray" />
                           <span class="lever"></span>
                         </label>
                       </div>
@@ -219,7 +221,7 @@
                       ></span>
                     </td>
                     <td>
-                      <select id="select-titlebar-style">
+                      <select id="titlebar-type">
                         <option
                           value="nice"
                           i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NICE"
@@ -256,7 +258,7 @@
                         <label>
                           <input
                             type="checkbox"
-                            id="toggle-discord-rich-presence"
+                            id="settings-discord-rich-presence"
                           />
                           <span class="lever"></span>
                         </label>
@@ -283,7 +285,10 @@
                     <td class="right">
                       <div class="switch">
                         <label>
-                          <input type="checkbox" id="toggle-companion-server" />
+                          <input
+                            type="checkbox"
+                            id="settings-companion-server"
+                          />
                           <span class="lever"></span>
                         </label>
                       </div>
@@ -298,7 +303,7 @@
                     <td class="right">
                       <div class="switch">
                         <label>
-                          <input type="checkbox" id="toggle-clipboard-read" />
+                          <input type="checkbox" id="settings-clipboard-read" />
                           <span class="lever"></span>
                         </label>
                       </div>
@@ -465,6 +470,13 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="bottom">
+      <button class="btn red hide" id="btn-relaunch">
+        <i class="material-icons left">refresh</i
+        ><span i18n="i18n_LABEL_SETTINGS_RELAUNCH"></span>
+      </button>
     </div>
 
     <script src="../../node_modules/materialize-css/dist/js/materialize.min.js"></script>

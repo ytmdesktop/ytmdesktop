@@ -635,6 +635,8 @@ function createWindow() {
       backgroundColor: "#232323",
       width: 900,
       minWidth: 900,
+      height: 550,
+      minHeight: 550,
       icon: path.join(__dirname, "./assets/favicon.png"),
       autoHideMenuBar: false,
       skipTaskbar: false,
