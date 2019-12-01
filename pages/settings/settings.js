@@ -41,7 +41,7 @@ initElement("settings-app-language", "change", "value", showRelaunchButton);
 initElement("settings-clipboard-read", "click", "checkbox", () => {
   ipc.send("switch-clipboard-watcher");
 });
-initElement("titlebar-type", "change", "checkbox", showRelaunchButton);
+initElement("titlebar-type", "change", "value", showRelaunchButton);
 
 elementSettingsCompanionApp.addEventListener("click", function() {
   window.open(companionUrl, companionWindowTitle, companionWindowSettings);
