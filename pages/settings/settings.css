@@ -56,6 +56,11 @@ a {
     color: #fff !important;
 }
 
+.select-dropdown.dropdown-content {
+    background-color: black !important;
+    max-height: 300px !important;
+}
+
 .select-dropdown.dropdown-content li.selected {
     background-color: #f44336 !important;
 }
