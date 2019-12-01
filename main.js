@@ -139,7 +139,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile("./pages/home/index.html");
+  mainWindow.loadFile("./pages/home/home.html");
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(store, mainWindow));
