@@ -21,7 +21,7 @@ win:
 
 linux:
   icon: assets
-  category: Audio
+  category: Audio, AudioVideo
   publish:
     provider: generic
     url: 'https://dl.ytmdesktop.app/lin'
