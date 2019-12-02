@@ -48,3 +48,4 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 [<img alt="KimVuu" src="https://avatars3.githubusercontent.com/u/23237044?s=1200&v=4" width="120px">](https://github.com/KimVuu)
 [<img alt="Venipa" src="https://avatars1.githubusercontent.com/u/17952364?s=1200&v=4" width="120px">](https://github.com/Venipa)
 [<img alt="garfunkel" src="https://avatars1.githubusercontent.com/u/2189900?s=120&v=4" width="120px">](https://github.com/garfunkel)
+[<img alt="SN9NV" src="https://avatars1.githubusercontent.com/u/10219618?s=120&v=4" width="120px">](https://github.com/SN9NV)

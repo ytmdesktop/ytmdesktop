@@ -13,7 +13,9 @@
     "publish:win32": "build --win -p always --config electron-builder.yml",
     "publish:win": "npm run publish:win32 && npm run publish:win64",
     "publish:mac": "build --mac -p always --config electron-builder64.yml",
-    "publish:lin": "build --linux -p always --config electron-builder.yml"
+    "publish:lin64": "build --linux -p always --config electron-builder64.yml",
+    "publish:lin32": "build --linux -p always --config electron-builder.yml",
+    "publish:lin": "npm run publish:lin32 && npm run publish:lin64"
   },
   "repository": "https://github.com/adlerluiz/ytmdesktop",
   "keywords": [
