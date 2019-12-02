@@ -33,7 +33,7 @@ mac:
 
 linux:
   icon: assets
-  category: Audio, AudioVideo
+  category: AudioVideo
   publish:
     provider: generic
     url: 'https://dl.ytmdesktop.app/lin'
