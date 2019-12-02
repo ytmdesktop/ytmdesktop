@@ -163,7 +163,7 @@ function loadSettings() {
 
   // Disable unsupported platforms which may get an API later
   if (!["darwin", "win32"].includes(process.platform)) {
-    const startOnBootEl = document.getElementById("toggle-start-on-boot");
+    const startOnBootEl = document.getElementById("settings-start-on-boot");
     startOnBootEl.checked = false;
     startOnBootEl.setAttribute("disabled", "disabled");
   }
