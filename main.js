@@ -278,9 +278,13 @@ function createWindow() {
         `);
 
     // Currently just that simple
-    const themePath = path.join(__dirname, "assets/theme.css");
-    if (fs.existsSync(themePath)) {
-      view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+    if (store.get("custom-theme")) {
+      const themePath = path.join(__dirname, "assets/custom-theme.css");
+      if (fs.existsSync(themePath)) {
+        view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+      } else {
+        fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
+      }
     }
   });
 

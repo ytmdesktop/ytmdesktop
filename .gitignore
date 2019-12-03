@@ -6,3 +6,4 @@ dist
 package-lock.json
 /youtube-music-desktop-app-*.tgz
 /.cache
+assets/custom-theme.css
