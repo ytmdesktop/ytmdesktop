@@ -132,14 +132,14 @@ function createWindow() {
     }
   }
   mainWindow = new BrowserWindow(broswerWindowConfig);
-
   const view = new BrowserView({
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      preload: path.join(app.getAppPath(), "/utils/preloadContextMenu.js")
     }
   });
 
-  mainWindow.loadFile("./pages/home/home.html");
+  mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(store, mainWindow));
@@ -252,6 +252,7 @@ function createWindow() {
     );
   });
 
+  // view.webContents.openDevTools({ mode: 'detach' });
   view.webContents.on("did-navigate-in-page", function() {
     store.set("window-url", view.webContents.getURL());
     view.webContents.insertCSS(`
@@ -267,14 +268,15 @@ function createWindow() {
 
             /* Handle */
             ::-webkit-scrollbar-thumb {
-                background: #f44336;
+                background: #555;
             }
 
             /* Handle on hover */
             ::-webkit-scrollbar-thumb:hover {
-                background: #555;
+                background: #f44336;
             }
         `);
+
     // Currently just that simple
     const themePath = path.join(__dirname, "assets/theme.css");
     if (fs.existsSync(themePath)) {
