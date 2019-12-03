@@ -276,16 +276,6 @@ function createWindow() {
                 background: #f44336;
             }
         `);
-
-    // Currently just that simple
-    if (store.get("custom-theme")) {
-      const themePath = path.join(__dirname, "assets/custom-theme.css");
-      if (fs.existsSync(themePath)) {
-        view.webContents.insertCSS(fs.readFileSync(themePath).toString());
-      } else {
-        fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
-      }
-    }
   });
 
   view.webContents.on("media-started-playing", function() {
@@ -522,6 +512,10 @@ function createWindow() {
     }
   });
 
+  app.on("quit", function() {
+    tray.destroy();
+  });
+
   globalShortcut.register("MediaPlayPause", function() {
     if (!doublePressPlayPause) {
       // The first press
@@ -650,8 +644,10 @@ function createWindow() {
         nodeIntegration: true
       }
     });
-    settings.loadFile(path.join(__dirname, "./pages/settings/settings.html"));
-    // settings.webContents.openDevTools();
+    settings.loadFile(
+      path.join(app.getAppPath(), "/pages/settings/settings.html")
+    );
+    //settings.webContents.openDevTools();
   });
 
   ipcMain.on("switch-clipboard-watcher", () => {
@@ -660,6 +656,30 @@ function createWindow() {
 
   ipcMain.on("reset-url", () => {
     mainWindow.getBrowserView().webContents.loadURL(mainWindowUrl);
+  });
+
+  ipcMain.on("show-editor-theme", function() {
+    const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
+    if (fs.existsSync(themePath)) {
+      view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+    } else {
+      fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
+    }
+
+    const editor = new BrowserWindow({
+      frame: false,
+      center: true,
+      resizable: true,
+      backgroundColor: "#232323",
+      width: 700,
+      height: 800,
+      icon: path.join(__dirname, icon),
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
+
+    editor.loadFile(themePath);
   });
 
   // ipcMain.send('update-status-bar', '111', '222');

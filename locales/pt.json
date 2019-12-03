@@ -42,5 +42,6 @@
   "LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NONE": "Nenhum",
   "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Leia a área de transferência para obter links do Youtube",
   "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Mostrar/Ocultar janela principal",
-  "LABEL_SETTINGS_RELAUNCH": "Aplicar e reiniciar"
+  "LABEL_SETTINGS_RELAUNCH": "Aplicar e reiniciar",
+  "LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME": "Tema customizado"
 }

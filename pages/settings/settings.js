@@ -2,6 +2,9 @@ const { remote, ipcRenderer: ipc } = require("electron");
 const electronStore = require("electron-store");
 const store = new electronStore();
 const __ = require("../../providers/translateProvider");
+const path = require("path");
+const fs = require("fs");
+
 const {
   companionUrl,
   companionWindowTitle,
@@ -13,6 +16,7 @@ const elementSettingsCompanionApp = document.getElementById(
 );
 const elementRangeZoom = document.getElementById("range-zoom");
 const elementBtnAppRelaunch = document.getElementById("btn-relaunch");
+const elementBtnOpenEditor = document.getElementById("btn-editor-custom-theme");
 
 document.addEventListener("DOMContentLoaded", function() {
   M.FormSelect.init(document.querySelectorAll("select"), {});
@@ -37,20 +41,33 @@ initElement("settings-clipboard-read", "click", () => {
   ipc.send("switch-clipboard-watcher");
 });
 initElement("titlebar-type", "change", showRelaunchButton);
+initElement("settings-custom-theme", "click", showRelaunchButton);
 
-elementSettingsCompanionApp.addEventListener("click", function() {
-  window.open(companionUrl, companionWindowTitle, companionWindowSettings);
-});
+if (elementSettingsCompanionApp) {
+  elementSettingsCompanionApp.addEventListener("click", function() {
+    window.open(companionUrl, companionWindowTitle, companionWindowSettings);
+  });
+}
 
-elementRangeZoom.addEventListener("input", function() {
-  document.getElementById("range-zoom-value").innerText = this.value;
-  store.set("settings-page-zoom", this.value);
-  ipc.send("settings-changed-zoom", this.value);
-});
+if (elementRangeZoom) {
+  elementRangeZoom.addEventListener("input", function() {
+    document.getElementById("range-zoom-value").innerText = this.value;
+    store.set("settings-page-zoom", this.value);
+    ipc.send("settings-changed-zoom", this.value);
+  });
+}
 
-elementBtnAppRelaunch.addEventListener("click", function() {
-  relaunch();
-});
+if (elementBtnOpenEditor) {
+  elementBtnOpenEditor.addEventListener("click", function() {
+    ipc.send("show-editor-theme");
+  });
+}
+
+if (elementBtnAppRelaunch) {
+  elementBtnAppRelaunch.addEventListener("click", function() {
+    relaunch();
+  });
+}
 
 if (process.platform !== "darwin") {
   const macSpecificNodes = document.getElementsByClassName("macos-specific");
@@ -157,6 +174,10 @@ function loadSettings() {
 
   if (store.get("settings-shiny-tray")) {
     document.getElementById("settings-shiny-tray").checked = true;
+  }
+
+  if (store.get("settings-custom-theme")) {
+    document.getElementById("settings-custom-theme").checked = true;
   }
 
   document.getElementById("app-version").innerText = remote.app.getVersion();

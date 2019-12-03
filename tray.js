@@ -68,7 +68,7 @@ exports.balloon = function(title, content) {
 };
 
 exports.quit = function() {
-  tray.quit();
+  tray.destroy();
 };
 
 exports.setShinyTray = function() {
