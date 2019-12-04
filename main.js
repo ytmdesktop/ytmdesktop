@@ -672,8 +672,11 @@ function createWindow() {
       center: true,
       resizable: true,
       backgroundColor: "#232323",
+      frame: store.get("titlebar-type", "nice") !== "nice",
       width: 700,
       height: 800,
+      maxHeight: 800,
+      minHeight: 800,
       icon: path.join(__dirname, icon),
       webPreferences: {
         nodeIntegration: true

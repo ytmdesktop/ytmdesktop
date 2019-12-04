@@ -1,19 +1,37 @@
 <html>
   <head>
     <link
+      type="text/css"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+      href="../../node_modules/materialize-css/dist/css/materialize.min.css"
+      media="screen,projection"
     />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-    <link href="./editor.css" rel="stylesheet" />
+    <link href="../../assets/css/material_icons.css" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="../../assets/css/styles.css" />
+    <link type="text/css" rel="stylesheet" href="./editor.css" />
   </head>
 
   <body>
-    <textarea id="editor"></textarea>
-    <button id="save" class="btn">Save</button>
+    <div class="bar drag">
+      <div class="title">
+        <i class="material-icons tiny left">color_lens</i>
+        <span i18n="i18n_LABEL_SETTINGS" id="i18n_LABEL_SETTINGS">CSS</span>
+      </div>
+
+      <div class="cmd-btns">
+        <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
+          <i class="material-icons tiny">close</i>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <textarea id="editor"></textarea>
+      <div class="center">
+        <button id="save" class="btn btn-small blue">
+          <i class="material-icons">save</i>
+        </button>
+      </div>
+    </div>
   </body>
 
   <script src="./editor.js"></script>

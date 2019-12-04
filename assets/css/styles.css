@@ -21,7 +21,7 @@ html, body {
 
 .bar {
     position: absolute;
-    top: 1px;
+    top: 0;
     left: 0;
     right: 0;
     background-color: #232323;
@@ -32,8 +32,12 @@ html, body {
 
 .title {
     float: left;
-    margin: -4px 0 0 4px;
+    margin: 3px 0 0 6px;
     color: #FFF;
+}
+
+.title i {
+    margin-top: 4px;
 }
 
 .cmd-btns {
@@ -44,8 +48,8 @@ html, body {
 .cmd-btn {
     float: left;
     width: 40px;
-    height: 30px;
-    margin: -2px 0 0 0;
+    height: 28px;
+    margin: 0;
     padding: 6px 0;
     text-align: center;
 }
@@ -79,4 +83,28 @@ html, body {
     width: 100%;
     text-align: center;
     color: #EEE;
+}
+
+.content {
+    margin-top: 29px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #232323;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #f44336;
 }
