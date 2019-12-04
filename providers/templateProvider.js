@@ -30,6 +30,20 @@ let statusBarMenu = [
       },
       {
         role: "selectall"
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Speech",
+        submenu: [
+          {
+            role: "startspeaking"
+          },
+          {
+            role: "stopspeaking"
+          }
+        ]
       }
     ]
   },
@@ -72,13 +86,64 @@ let statusBarMenu = [
     ]
   },
   {
+    label: "History",
+    submenu: [
+      {
+        label: "Home(YTMusic)",
+        accelerator: "CmdOrCtrl+H",
+        click(item, focusedWindow) {
+          if (focusedWindow)
+            focusedWindow
+              .getBrowserView()
+              .webContents.loadURL("https://music.youtube.com");
+        }
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Back",
+        accelerator: "CmdOrCtrl+[",
+        click(item, focusedWindow) {
+          if (focusedWindow)
+            if (focusedWindow.getBrowserView().webContents.canGoBack())
+              focusedWindow.getBrowserView().webContents.goBack();
+        }
+      },
+      {
+        label: "Forward",
+        accelerator: "CmdOrCtrl+]",
+        click(item, focusedWindow) {
+          if (focusedWindow)
+            if (focusedWindow.getBrowserView().webContents.canGoForward())
+              focusedWindow.getBrowserView().webContents.goForward();
+        }
+      }
+    ]
+  },
+  {
     role: "window",
     submenu: [
       {
+        label: "Close",
+        accelerator: "CmdOrCtrl+W",
+        role: "close"
+      },
+      {
+        label: "Minimize",
+        accelerator: "CmdOrCtrl+M",
         role: "minimize"
       },
       {
-        role: "close"
+        label: "Zoom",
+        role: "zoom"
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Bring All to Front",
+        role: "front"
       }
     ]
   },
@@ -127,47 +192,6 @@ statusBarMenu.unshift({
     }
   ]
 });
-// Edit menu.
-statusBarMenu[1].submenu.push(
-  {
-    type: "separator"
-  },
-  {
-    label: "Speech",
-    submenu: [
-      {
-        role: "startspeaking"
-      },
-      {
-        role: "stopspeaking"
-      }
-    ]
-  }
-);
-// Window menu.
-statusBarMenu[3].submenu = [
-  {
-    label: "Close",
-    accelerator: "CmdOrCtrl+W",
-    role: "close"
-  },
-  {
-    label: "Minimize",
-    accelerator: "CmdOrCtrl+M",
-    role: "minimize"
-  },
-  {
-    label: "Zoom",
-    role: "zoom"
-  },
-  {
-    type: "separator"
-  },
-  {
-    label: "Bring All to Front",
-    role: "front"
-  }
-];
 
 const popUpMenu = (
   __,
