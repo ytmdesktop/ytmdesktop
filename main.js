@@ -13,6 +13,7 @@ const fs = require("fs");
 const electronStore = require("electron-store");
 const store = new electronStore();
 const discordRPC = require("./providers/discordRpcProvider");
+const scrobblerProvider = require("./providers/scrobblerProvider");
 const __ = require("./providers/translateProvider");
 const { statusBarMenu } = require("./providers/templateProvider");
 const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
@@ -435,6 +436,7 @@ function createWindow() {
     mainWindow.setTitle(nowPlaying);
     tray.balloon(songTitle, songAuthor);
     discordRPC.activity(songTitle, songAuthor);
+    scrobblerProvider.updateTrackInfo(songTitle, songAuthor);
   }
 
   view.webContents.on("media-started-playing", function() {

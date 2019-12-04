@@ -55,6 +55,7 @@
     "qrcode-generator": "^1.4.4",
     "register-scheme": "0.0.2",
     "request": "^2.88.0",
+    "scribble": "0.0.5",
     "socket.io": "^2.3.0"
   }
 }

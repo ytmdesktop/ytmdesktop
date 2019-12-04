@@ -2,6 +2,7 @@ const { remote, ipcRenderer: ipc } = require("electron");
 const electronStore = require("electron-store");
 const store = new electronStore();
 const __ = require("../../providers/translateProvider");
+const scrobblerProvider = require("../../providers/scrobblerProvider");
 const path = require("path");
 const fs = require("fs");
 
@@ -17,6 +18,7 @@ const elementSettingsCompanionApp = document.getElementById(
 const elementRangeZoom = document.getElementById("range-zoom");
 const elementBtnAppRelaunch = document.getElementById("btn-relaunch");
 const elementBtnOpenEditor = document.getElementById("btn-editor-custom-theme");
+const elementBtnLastFmLogin = document.getElementById("btn-last-fm-login");
 
 document.addEventListener("DOMContentLoaded", function() {
   M.FormSelect.init(document.querySelectorAll("select"), {});
@@ -42,6 +44,7 @@ initElement("settings-clipboard-read", "click", () => {
 });
 initElement("titlebar-type", "change", showRelaunchButton);
 initElement("settings-custom-theme", "click", showRelaunchButton);
+initElement("settings-last-fm-scrobbler", "click");
 
 if (elementSettingsCompanionApp) {
   elementSettingsCompanionApp.addEventListener("click", function() {
@@ -60,6 +63,12 @@ if (elementRangeZoom) {
 if (elementBtnOpenEditor) {
   elementBtnOpenEditor.addEventListener("click", function() {
     ipc.send("show-editor-theme");
+  });
+}
+
+if (elementBtnLastFmLogin) {
+  elementBtnLastFmLogin.addEventListener("click", function() {
+    scrobblerProvider.getToken();
   });
 }
 
@@ -178,6 +187,10 @@ function loadSettings() {
 
   if (store.get("settings-custom-theme")) {
     document.getElementById("settings-custom-theme").checked = true;
+  }
+
+  if (store.get("settings-last-fm-scrobbler")) {
+    document.getElementById("settings-last-fm-scrobbler").checked = true;
   }
 
   document.getElementById("app-version").innerText = remote.app.getVersion();
