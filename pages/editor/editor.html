@@ -22,20 +22,24 @@
       </div>
 
       <div class="cmd-btns">
+        <div class="no-drag pointer cmd-btn green-text" id="btn-save">
+          <i class="material-icons tiny">save</i>
+        </div>
         <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
           <i class="material-icons tiny">close</i>
         </div>
       </div>
     </div>
     <div class="content">
-      <textarea id="editor"></textarea>
-      <div class="center">
-        <button id="save" class="btn btn-small blue">
-          <i class="material-icons">save</i>
-        </button>
-      </div>
+      <pre id="editor"></pre>
     </div>
   </body>
+
+  <script
+    src="../../node_modules/ace-builds/src-noconflict/ace.js"
+    type="text/javascript"
+    charset="utf-8"
+  ></script>
 
   <script src="./editor.js"></script>
 </html>

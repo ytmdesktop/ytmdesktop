@@ -684,6 +684,7 @@ function createWindow() {
     });
 
     editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
+    // editor.webContents.openDevTools();
   });
 
   ipcMain.on("update-custom-theme", function() {

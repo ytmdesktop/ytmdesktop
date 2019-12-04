@@ -37,6 +37,7 @@
     "pretty-quick": "^1.11.1"
   },
   "dependencies": {
+    "ace-builds": "^1.4.7",
     "discord-rpc": "^3.1.0",
     "electron-canvas-to-buffer": "^2.0.0",
     "electron-clipboard-watcher": "^1.0.1",
