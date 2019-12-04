@@ -30,13 +30,13 @@ html, body {
     max-height: 28px;
 }
 
-.title {
+.bar .title {
     float: left;
     margin: 3px 0 0 6px;
     color: #FFF;
 }
 
-.title i {
+.bar .title i {
     margin-top: 4px;
 }
 
