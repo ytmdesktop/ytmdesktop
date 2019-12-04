@@ -25,6 +25,7 @@ const {
   companionWindowTitle,
   companionWindowSettings
 } = require("./server.config");
+const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
 
 if (store.get("settings-companion-server")) {
   require("./server");
@@ -76,6 +77,10 @@ if (isWindows()) {
   );
   const menu = Menu.buildFromTemplate(statusBarMenu);
   Menu.setApplicationMenu(menu);
+}
+
+if (!themePath) {
+  fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
 }
 
 function createWindow() {
@@ -149,6 +154,7 @@ function createWindow() {
   }
 
   view.webContents.loadURL(mainWindowUrl);
+
   let checkConnectionTimeoutHandler;
   async function checkConnection() {
     /**
@@ -404,6 +410,8 @@ function createWindow() {
   });
 
   view.webContents.on("did-start-navigation", function(event) {
+    loadCustomTheme(view);
+
     view.webContents.executeJavaScript("window.location", null, function(
       location
     ) {
@@ -659,13 +667,6 @@ function createWindow() {
   });
 
   ipcMain.on("show-editor-theme", function() {
-    const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
-    if (fs.existsSync(themePath)) {
-      view.webContents.insertCSS(fs.readFileSync(themePath).toString());
-    } else {
-      fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
-    }
-
     const editor = new BrowserWindow({
       frame: false,
       center: true,
@@ -679,10 +680,22 @@ function createWindow() {
       }
     });
 
-    editor.loadFile(themePath);
+    editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
+  });
+
+  ipcMain.on("update-custom-theme", function() {
+    loadCustomTheme(view);
   });
 
   // ipcMain.send('update-status-bar', '111', '222');
+
+  function loadCustomTheme(view) {
+    if (store.get("settings-custom-theme")) {
+      if (fs.existsSync(themePath)) {
+        view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+      }
+    }
+  }
 
   function switchClipboardWatcher() {
     logDebug(

@@ -1,0 +1,17 @@
+body {
+    margin: 2px;
+}
+
+textarea {
+    width: 100%;
+    height: 95vh;
+    color: #EEE;
+    background: transparent;
+    border: none;
+
+    resize: none;
+}
+
+textarea:focus {
+    outline: 0;
+}
