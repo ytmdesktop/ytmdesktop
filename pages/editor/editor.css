@@ -13,5 +13,6 @@ body {
 
 .bottom {
     position: absolute;
-    bottom: 0;
+    bottom: 12px;
+    right: 12px
 }

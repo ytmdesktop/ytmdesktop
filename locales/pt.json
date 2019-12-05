@@ -44,5 +44,6 @@
   "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Mostrar/Ocultar janela principal",
   "LABEL_SETTINGS_RELAUNCH": "Aplicar e reiniciar",
   "LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME": "Tema customizado",
-  "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)"
+  "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
+  "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "Salvar e autorizar"
 }

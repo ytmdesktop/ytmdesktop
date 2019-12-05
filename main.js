@@ -660,7 +660,32 @@ function createWindow() {
     settings.loadFile(
       path.join(app.getAppPath(), "/pages/settings/settings.html")
     );
-    //settings.webContents.openDevTools();
+    // settings.webContents.openDevTools();
+  });
+
+  ipcMain.on("show-last-fm-login", function() {
+    const lastfm = new BrowserWindow({
+      //parent: mainWindow,
+      modal: false,
+      frame: false,
+      center: true,
+      resizable: true,
+      backgroundColor: "#232323",
+      width: 300,
+      minWidth: 300,
+      height: 260,
+      minHeight: 260,
+      icon: path.join(__dirname, "./assets/favicon.png"),
+      autoHideMenuBar: false,
+      skipTaskbar: false,
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
+    lastfm.loadFile(
+      path.join(app.getAppPath(), "/pages/settings/last-fm-login.html")
+    );
+    // lastfm.webContents.openDevTools();
   });
 
   ipcMain.on("switch-clipboard-watcher", () => {
@@ -816,7 +841,6 @@ ipcMain.on("show-companion", function() {
     autoHideMenuBar: true
   });
   settings.loadURL(companionUrl);
-  // window.open(companionUrl, companionWindowTitle, companionWindowSettings);
 });
 
 function createLyricsWindow() {
@@ -833,7 +857,7 @@ function createLyricsWindow() {
     }
   });
   lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
-  //lyrics.webContents.openDevTools();
+  // lyrics.webContents.openDevTools();
 }
 
 function logDebug(data) {

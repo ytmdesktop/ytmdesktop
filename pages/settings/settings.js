@@ -44,7 +44,12 @@ initElement("settings-clipboard-read", "click", () => {
 });
 initElement("titlebar-type", "change", showRelaunchButton);
 initElement("settings-custom-theme", "click", showRelaunchButton);
-initElement("settings-last-fm-scrobbler", "click");
+initElement("settings-last-fm-scrobbler", "click", () => {
+  var login = store.get("last-fm-login");
+  if (!login) {
+    ipc.send("show-last-fm-login");
+  }
+});
 
 if (elementSettingsCompanionApp) {
   elementSettingsCompanionApp.addEventListener("click", function() {
@@ -68,7 +73,7 @@ if (elementBtnOpenEditor) {
 
 if (elementBtnLastFmLogin) {
   elementBtnLastFmLogin.addEventListener("click", function() {
-    scrobblerProvider.getToken();
+    ipc.send("show-last-fm-login");
   });
 }
 

@@ -42,5 +42,8 @@
   "LABEL_SETTINGS_TAB_GENERAL_SHINY_TRAY": "Easy Tray Control(For Mac OS only)",
   "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Read clipboard for youtube links",
   "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Show/Hide Main Window",
-  "LABEL_SETTINGS_RELAUNCH": "Apply and restart"
+  "LABEL_SETTINGS_RELAUNCH": "Apply and restart",
+  "LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME": "Custom theme",
+  "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
+  "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "Save and authorize"
 }
