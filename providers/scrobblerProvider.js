@@ -28,7 +28,7 @@ function setLogin(username, password) {
 }
 
 function getLogin() {
-  var login = store.get("last-fm-login");
+  var login = store.get("last-fm-login", { username: "", password: "" });
   login.password = Base64.decode(login.password);
 
   return login;
