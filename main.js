@@ -138,6 +138,9 @@ function createWindow() {
     }
   }
   mainWindow = new BrowserWindow(broswerWindowConfig);
+  mainWindow.webContents.session.setUserAgent(
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0"
+  );
   const view = new BrowserView({
     webPreferences: {
       nodeIntegration: true,
