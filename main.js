@@ -422,6 +422,18 @@ function createWindow() {
       if (location.hostname != "music.youtube.com") {
         mainWindow.send("off-the-road");
       } else {
+        setTimeout(function() {
+          view.webContents.executeJavaScript(
+            `
+            document.getElementsByClassName('title ytmusic-player-bar')[0].innerText
+          `,
+            null,
+            function(title) {
+              songTitle = title;
+              updateActivity(songTitle, songAuthor);
+            }
+          );
+        }, 1000);
         mainWindow.send("on-the-road");
       }
     });
