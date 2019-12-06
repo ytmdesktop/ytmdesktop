@@ -1,13 +1,13 @@
-const { ipcMain } = require('electron');
-const os = require( 'os' );
+const { ipcMain } = require("electron");
+const os = require("os");
 //const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
-const qrcode = require('qrcode-generator');
+const qrcode = require("qrcode-generator");
 
-const ip = '0.0.0.0';
+const ip = "0.0.0.0";
 const port = 9863;
-const http = require('http');
-const pattIgnoreInterface = /(virtual)\w*/gmi;
+const http = require("http");
+const pattIgnoreInterface = /(virtual)\w*/gim;
 
 let connectionsTotal = 0;
 
@@ -43,31 +43,33 @@ function handleError(error) {
 createAdvertisement();
 */
 
-const server = http.createServer( ( req, res ) => {    
-    let collection = '';
+const server = http.createServer((req, res) => {
+  let collection = "";
 
-    Object.keys(networkInterfaces).forEach( ( v, k ) => {
-        if( !pattIgnoreInterface.test( v ) ) {
-            
-            networkInterfaces[v].forEach( ( vv, kk) => {
+  Object.keys(networkInterfaces).forEach((v, k) => {
+    if (!pattIgnoreInterface.test(v)) {
+      networkInterfaces[v].forEach((vv, kk) => {
+        if (vv.family == "IPv4" && vv.internal == false) {
+          var qr = qrcode(0, "M");
+          qr.addData(`{ "name": "${os.hostname()}", "ip":"${vv.address}" }`);
+          qr.make();
 
-                if ( vv.family == 'IPv4' && vv.internal == false ) {
-                    var qr = qrcode(0, 'M');
-                    qr.addData(`{ "name": "${os.hostname()}", "ip":"${vv.address}" }`);
-                    qr.make();
-
-                    collection += `
+          collection += `
                         <div class="row" style="margin-top: 10px;">
                             <div class="col s12">
                                 <div class="card transparent z-depth-0">
                                     <div class="card-content">
                                         <div class="row" style="margin-bottom: 0 !important;">
                                             <div class="col s6"> 
-                                                <img class="card card-content" style="padding: 10px !important;" src="${qr.createDataURL(6)}" width="180" />
+                                                <img class="card card-content" style="padding: 10px !important;" src="${qr.createDataURL(
+                                                  6
+                                                )}" width="180" />
                                             </div>
                                             <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
                                                 <h3>${os.hostname()}</h3> 
-                                                <h5 style="font-weight: 100 !important;">${vv.address}</h5> 
+                                                <h5 style="font-weight: 100 !important;">${
+                                                  vv.address
+                                                }</h5> 
                                             </div>
                                         </div>
                                     </div>
@@ -75,18 +77,17 @@ const server = http.createServer( ( req, res ) => {
                             </div>
                         </div>
                     `;
-
-                }
-
-            });
-    
         }
+      });
+    }
+  });
 
-    } );
+  res.writeHead(200, {
+    "Content-Type": "text/html",
+    "Access-Control-Allow-Origin": "*"
+  });
 
-    res.writeHead( 200, {'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*'});
-
-    res.write(`<html>
+  res.write(`<html>
         <head>
             <title>YTMDesktop Companion Server</title>
             <meta http-equiv="refresh" content="60">
@@ -131,101 +132,100 @@ const server = http.createServer( ( req, res ) => {
         </script>
     </html>`);
 
-    res.end();
-} );
+  res.end();
+});
 
 server.listen(port, ip);
-const io = require('socket.io')(server);
+const io = require("socket.io")(server);
 
 function convertToHuman(time) {
-    var _aux = time;
-    var _minutes = 0;
-    var _seconds = 0;
+  var _aux = time;
+  var _minutes = 0;
+  var _seconds = 0;
 
-    while (_aux >= 60) {
-        _aux = _aux - 60;
-        _minutes++;
-    }
+  while (_aux >= 60) {
+    _aux = _aux - 60;
+    _minutes++;
+  }
 
-    _seconds = _aux;
+  _seconds = _aux;
 
-    if (_seconds < 10) {
-        return _minutes + ':0' + _seconds;
-    }
-    return _minutes + ':' + _seconds;
+  if (_seconds < 10) {
+    return _minutes + ":0" + _seconds;
+  }
+  return _minutes + ":" + _seconds;
 }
 
-setInterval( () => {
-    connectionsTotal = Object.keys(io.sockets.sockets).length;
-    console.log(connectionsTotal + ' devices connected');
+setInterval(() => {
+  connectionsTotal = Object.keys(io.sockets.sockets).length;
+  //console.log(connectionsTotal + ' devices connected');
 }, 1000);
 
-io.on('connection', (socket) => {
-    
-    let timer = setInterval( () => {
-        ipcMain.emit('what-is-song-playing-now');
-    }, 500);
+io.on("connection", socket => {
+  let timer = setInterval(() => {
+    ipcMain.emit("what-is-song-playing-now");
+  }, 500);
 
-    socket.on('disconnect', () => {
-        clearInterval(timer);
-    });
-    
-    ipcMain.on('song-playing-now-is', (data) => {
-        data['song']['durationHuman'] = convertToHuman(data['song']['duration']);
-        data['player']['seekbarCurrentPositionHuman'] = convertToHuman(data['player']['seekbarCurrentPosition']);
+  socket.on("disconnect", () => {
+    clearInterval(timer);
+  });
 
-        io.emit('media-now-playing', data);
-    });
+  ipcMain.on("song-playing-now-is", data => {
+    data["song"]["durationHuman"] = convertToHuman(data["song"]["duration"]);
+    data["player"]["seekbarCurrentPositionHuman"] = convertToHuman(
+      data["player"]["seekbarCurrentPosition"]
+    );
 
-    socket.on('media-commands', (cmd, data) => {
+    io.emit("media-now-playing", data);
+  });
 
-        switch( cmd ) {
-            case 'previous-track':
-                ipcMain.emit('media-previous-track', true);
-                break;
+  socket.on("media-commands", (cmd, data) => {
+    switch (cmd) {
+      case "previous-track":
+        ipcMain.emit("media-previous-track", true);
+        break;
 
-            case 'play-track': 
-                ipcMain.emit('media-play-pause', true);
-                break;
+      case "play-track":
+        ipcMain.emit("media-play-pause", true);
+        break;
 
-            case 'pause-track':
-                ipcMain.emit('media-play-pause', true);
-                break;
+      case "pause-track":
+        ipcMain.emit("media-play-pause", true);
+        break;
 
-            case 'next-track':
-                ipcMain.emit('media-next-track', true);
-                break;
+      case "next-track":
+        ipcMain.emit("media-next-track", true);
+        break;
 
-            case 'thumbs-up-track':
-                ipcMain.emit('media-up-vote', true);
-                break;
+      case "thumbs-up-track":
+        ipcMain.emit("media-up-vote", true);
+        break;
 
-            case 'thumbs-down-track':
-                ipcMain.emit('media-down-vote', true);
-                break;
+      case "thumbs-down-track":
+        ipcMain.emit("media-down-vote", true);
+        break;
 
-            case 'volume-up':
-                ipcMain.emit('media-volume-up', true);
-                break;
+      case "volume-up":
+        ipcMain.emit("media-volume-up", true);
+        break;
 
-            case 'volume-down':
-                ipcMain.emit('media-volume-down', true);
-                break;
+      case "volume-down":
+        ipcMain.emit("media-volume-down", true);
+        break;
 
-            case 'forward-X-seconds':
-                ipcMain.emit('media-forward-X-seconds', true);
-                break;
+      case "forward-X-seconds":
+        ipcMain.emit("media-forward-X-seconds", true);
+        break;
 
-            case 'rewind-X-seconds':
-                ipcMain.emit('media-rewind-X-seconds', true);
-                break;
+      case "rewind-X-seconds":
+        ipcMain.emit("media-rewind-X-seconds", true);
+        break;
 
-            case 'change-seekbar':
-                ipcMain.emit('media-change-seekbar', data);
-                break;
-        }
-    } );
-
+      case "change-seekbar":
+        ipcMain.emit("media-change-seekbar", data);
+        break;
+    }
+  });
 });
 
 console.log("Companion Server listening on port " + port);

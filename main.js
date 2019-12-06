@@ -32,6 +32,10 @@ if (store.get("settings-companion-server")) {
   require("./server");
 }
 
+if (store.get("settings-rainmeter-web-now-playing")) {
+  require("./providers/rainmeterNowPlaying");
+}
+
 let renderer_for_status_bar = null;
 global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
@@ -430,7 +434,7 @@ function createWindow() {
             null,
             function(title) {
               songTitle = title;
-              updateActivity(songTitle, songAuthor);
+              //updateActivity(songTitle, songAuthor);
             }
           );
         }, 1000);

@@ -50,6 +50,7 @@ initElement("settings-last-fm-scrobbler", "click", () => {
     ipc.send("show-last-fm-login");
   }
 });
+initElement("settings-rainmeter-web-now-playing", "click", showRelaunchButton);
 
 if (elementSettingsCompanionApp) {
   elementSettingsCompanionApp.addEventListener("click", function() {
@@ -196,6 +197,12 @@ function loadSettings() {
 
   if (store.get("settings-last-fm-scrobbler")) {
     document.getElementById("settings-last-fm-scrobbler").checked = true;
+  }
+
+  if (store.get("settings-rainmeter-web-now-playing")) {
+    document.getElementById(
+      "settings-rainmeter-web-now-playing"
+    ).checked = true;
   }
 
   document.getElementById("app-version").innerText = remote.app.getVersion();
