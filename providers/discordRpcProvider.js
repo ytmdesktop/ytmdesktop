@@ -1,43 +1,41 @@
-'use strict';
-
-const electronStore = require('electron-store');
-const store = new electronStore();
-const DiscordRPC = require('discord-rpc');
+"use strict";
+const settingsProvider = require("./settingsProvider");
+const DiscordRPC = require("discord-rpc");
 const startTimestamp = new Date();
-const clientId = '495666957501071390';
-DiscordRPC.register( clientId );
-let rpc = new DiscordRPC.Client( { transport: 'ipc' } );
+const clientId = "495666957501071390";
+DiscordRPC.register(clientId);
+let rpc = new DiscordRPC.Client({ transport: "ipc" });
 // only needed for discord allowing spectate, join, ask to join
 
-function setActivity( songTitle, songAuthor ) {
+function setActivity(songTitle, songAuthor) {
   if (!rpc) {
     return;
   }
 
-  if ( store.get( 'settings-discord-rich-presence' ) ) {   
-
-    rpc.login( { clientId } ).then(
+  if (settingsProvider.get("settings-discord-rich-presence")) {
+    rpc.login({ clientId }).then(
       function() {
         // RPC Connected
-        rpc.setActivity( {
+        rpc.setActivity({
           details: songTitle,
           state: songAuthor,
           startTimestamp,
-          largeImageKey: 'ytm_logo_512',
-          instance: false,
-        } );
+          largeImageKey: "ytm_logo_512",
+          instance: false
+        });
       },
       function() {
         // Error connecting to RPC
-        setTimeout( function() {
+        setTimeout(function() {
           // Trying connect to RPC
-          rpc = new DiscordRPC.Client( { transport: 'ipc' } );
-          setActivity( songTitle, songAuthor );
-        }, 10000 );
+          rpc = new DiscordRPC.Client({ transport: "ipc" });
+          setActivity(songTitle, songAuthor);
+        }, 10000);
       }
-    )
-      
+    );
   }
 }
 
-exports.activity = setActivity;
+module.exports = {
+  activity: setActivity
+};

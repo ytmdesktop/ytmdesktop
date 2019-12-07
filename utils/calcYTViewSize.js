@@ -9,7 +9,7 @@ const TITLE_BAR_HEIGHT = 28;
 const TITLE_BAR_HEIGHT_MAC = 21;
 
 /**
- * @param {ElectonStore} store
+ * @param {settingsProvider} store
  * @param {Array.<width: Number, height: Number, isMac: Boolean, isMaximized: Boolean>} sizes
  */
 let isMac = false;

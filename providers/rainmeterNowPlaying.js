@@ -141,3 +141,11 @@ ipcMain.on("song-playing-now-is", data => {
   );
   updateInfo(data);
 });
+
+function terminate() {
+  ws.terminate();
+}
+
+module.exports = {
+  terminate: terminate
+};

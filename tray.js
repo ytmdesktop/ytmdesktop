@@ -2,8 +2,7 @@ const { app, Menu, Tray, BrowserWindow } = require("electron");
 const path = require("path");
 const mediaControl = require("./providers/mediaProvider");
 const nativeImage = require("electron").nativeImage;
-const electronStore = require("electron-store");
-const store = new electronStore();
+const settingsProvider = require("./providers/settingsProvider");
 const __ = require("./providers/translateProvider");
 const Notification = require("electron-native-notification");
 
@@ -51,7 +50,7 @@ exports.createTray = function(mainWindow, icon) {
 };
 
 exports.balloon = function(title, content) {
-  if (store.get("settings-show-notifications")) {
+  if (settingsProvider.get("settings-show-notifications")) {
     if (process.platform == "win32") {
       tray.displayBalloon({
         icon: path.join(__dirname, "assets/favicon.256x256.png"),
@@ -72,7 +71,10 @@ exports.quit = function() {
 };
 
 exports.setShinyTray = function() {
-  if (store.get("settings-shiny-tray") && process.platform === "darwin") {
+  if (
+    settingsProvider.get("settings-shiny-tray") &&
+    process.platform === "darwin"
+  ) {
     // Shiny tray enabled
     tray.setContextMenu(null);
     tray.removeAllListeners();
@@ -121,7 +123,7 @@ exports.setShinyTray = function() {
 };
 
 exports.updateImage = function(payload) {
-  if (!store.get("settings-shiny-tray")) return;
+  if (!settingsProvider.get("settings-shiny-tray")) return;
   var img =
     typeof nativeImage.createFromDataURL === "function"
       ? nativeImage.createFromDataURL(payload) // electron v0.36+

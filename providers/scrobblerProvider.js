@@ -1,6 +1,5 @@
 const scribble = require("scribble");
-const electronStore = require("electron-store");
-const store = new electronStore();
+const settingsProvider = require("./settingsProvider");
 const http = require("http");
 const Base64 = require("js-base64").Base64;
 
@@ -9,29 +8,35 @@ const apiSecret = "9d8830c167627e65dac63786be101964";
 
 var Scrobbler;
 
-var userLogin = getLogin();
+var userLogin;
 
 function signIn() {
-  Scrobbler = new scribble(
-    apiKey,
-    apiSecret,
-    userLogin.username,
-    userLogin.password
-  );
+  userLogin = getLogin();
+  if (userLogin) {
+    Scrobbler = new scribble(
+      apiKey,
+      apiSecret,
+      userLogin.username,
+      userLogin.password
+    );
+  }
 }
 
 function setLogin(username, password) {
-  store.set("last-fm-login", {
+  settingsProvider.set("last-fm-login", {
     username: username,
     password: Base64.encode(password)
   });
 }
 
 function getLogin() {
-  var login = store.get("last-fm-login", { username: "", password: "" });
-  login.password = Base64.decode(login.password);
+  var login = settingsProvider.get("last-fm-login");
+  if (login.username != "") {
+    login.password = Base64.decode(login.password);
+    return login;
+  }
 
-  return login;
+  return false;
 }
 
 function getToken() {
@@ -55,7 +60,7 @@ function getToken() {
 }
 
 function updateTrackInfo(title, author) {
-  if (store.get("settings-last-fm-scrobbler")) {
+  if (settingsProvider.get("settings-last-fm-scrobbler")) {
     if (Scrobbler === undefined) {
       signIn();
     }

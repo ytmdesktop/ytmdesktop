@@ -1,4 +1,6 @@
-// Modules to control application life and create native browser window
+require("./utils/defaultSettings");
+const settingsProvider = require("./providers/settingsProvider");
+
 const {
   app,
   BrowserWindow,
@@ -10,8 +12,6 @@ const {
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const electronStore = require("electron-store");
-const store = new electronStore();
 const discordRPC = require("./providers/discordRpcProvider");
 const scrobblerProvider = require("./providers/scrobblerProvider");
 const __ = require("./providers/translateProvider");
@@ -28,11 +28,11 @@ const {
 } = require("./server.config");
 const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
 
-if (store.get("settings-companion-server")) {
+if (settingsProvider.get("settings-companion-server")) {
   require("./server");
 }
 
-if (store.get("settings-rainmeter-web-now-playing")) {
+if (settingsProvider.get("settings-rainmeter-web-now-playing")) {
   require("./providers/rainmeterNowPlaying");
 }
 
@@ -71,11 +71,17 @@ if (isWindows()) {
   icon = "assets/favicon.ico";
 } else if (isMac()) {
   icon = "assets/favicon.16x16.png";
-  store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
+  settingsProvider.set(
+    "settings-shiny-tray-dark",
+    systemPreferences.isDarkMode()
+  );
   systemPreferences.subscribeNotification(
     "AppleInterfaceThemeChangedNotification",
     function theThemeHasChanged() {
-      store.set("settings-shiny-tray-dark", systemPreferences.isDarkMode());
+      settingsProvider.set(
+        "settings-shiny-tray-dark",
+        systemPreferences.isDarkMode()
+      );
       if (renderer_for_status_bar)
         renderer_for_status_bar.send("update-status-bar");
     }
@@ -92,7 +98,7 @@ function createWindow() {
   if (isMac() || isWindows()) {
     const execApp = path.basename(process.execPath);
     const startArgs = ["--processStart", `"${execApp}"`];
-    const startOnBoot = store.get("settings-start-on-boot");
+    const startOnBoot = settingsProvider.get("settings-start-on-boot");
     if (startOnBoot) {
       app.setLoginItemSettings({
         openAtLogin: true,
@@ -106,8 +112,8 @@ function createWindow() {
       });
     }
   }
-  windowSize = store.get("window-size");
-  windowMaximized = store.get("window-maximized");
+  windowSize = settingsProvider.get("window-size");
+  windowMaximized = settingsProvider.get("window-maximized");
 
   if (windowSize) {
     mainWindowSize.width = windowSize.width;
@@ -122,7 +128,6 @@ function createWindow() {
     show: true,
     autoHideMenuBar: true,
     backgroundColor: "#232323",
-    frame: store.get("titlebar-type", "nice") !== "nice",
     center: true,
     closable: true,
     skipTaskbar: false,
@@ -132,15 +137,23 @@ function createWindow() {
       nodeIntegration: true
     }
   };
-  if (isMac()) {
-    // Mac Specific Configuration
-    if (store.get("titlebar-type", "nice") === "nice") {
-      broswerWindowConfig.titleBarStyle = "hidden";
+
+  switch (settingsProvider.get("titlebar-type")) {
+    case "nice":
       broswerWindowConfig.frame = false;
-    } else {
+      broswerWindowConfig.titleBarStyle = "hidden";
+      break;
+
+    case "system":
       broswerWindowConfig.frame = true;
-    }
+      break;
+
+    case "none":
+      broswerWindowConfig.frame = false;
+      broswerWindowConfig.titleBarStyle = "hidden";
+      break;
   }
+
   mainWindow = new BrowserWindow(broswerWindowConfig);
   mainWindow.webContents.session.setUserAgent(
     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0"
@@ -148,17 +161,20 @@ function createWindow() {
   const view = new BrowserView({
     webPreferences: {
       nodeIntegration: true,
-      preload: path.join(app.getAppPath(), "/utils/preloadContextMenu.js")
+      preload: path.join(app.getAppPath(), "/utils/injectContextMenu.js")
     }
   });
 
   mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
-  view.setBounds(calcYTViewSize(store, mainWindow));
+  view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
 
-  if (store.get("settings-continue-where-left-of") && store.get("window-url")) {
-    mainWindowUrl = store.get("window-url");
+  if (
+    settingsProvider.get("settings-continue-where-left-of") &&
+    settingsProvider.get("window-url")
+  ) {
+    mainWindowUrl = settingsProvider.get("window-url");
   }
 
   view.webContents.loadURL(mainWindowUrl);
@@ -239,11 +255,11 @@ function createWindow() {
   if (windowMaximized) {
     setTimeout(function() {
       mainWindow.send("window-is-maximized", true);
-      view.setBounds(calcYTViewSize(store, mainWindow));
+      view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
       mainWindow.maximize();
     }, 700);
   } else {
-    let position = store.get("window-position");
+    let position = settingsProvider.get("window-position");
     if (position != undefined) {
       mainWindow.setPosition(position.x, position.y);
     }
@@ -268,7 +284,7 @@ function createWindow() {
 
   // view.webContents.openDevTools({ mode: 'detach' });
   view.webContents.on("did-navigate-in-page", function() {
-    store.set("window-url", view.webContents.getURL());
+    settingsProvider.set("window-url", view.webContents.getURL());
     view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
@@ -494,14 +510,17 @@ function createWindow() {
   mainWindow.on("resize", function() {
     let windowSize = mainWindow.getSize();
     setTimeout(() => {
-      view.setBounds(calcYTViewSize(store, mainWindow));
+      view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
     }, 200);
 
     mainWindow.send("window-is-maximized", mainWindow.isMaximized());
 
-    store.set("window-maximized", mainWindow.isMaximized());
+    settingsProvider.set("window-maximized", mainWindow.isMaximized());
     if (!mainWindow.isMaximized()) {
-      store.set("window-size", { width: windowSize[0], height: windowSize[1] });
+      settingsProvider.set("window-size", {
+        width: windowSize[0],
+        height: windowSize[1]
+      });
     }
   });
 
@@ -512,7 +531,10 @@ function createWindow() {
       clearTimeout(storePositionTimer);
     }
     storePositionTimer = setTimeout(() => {
-      store.set("window-position", { x: position[0], y: position[1] });
+      settingsProvider.set("window-position", {
+        x: position[0],
+        y: position[1]
+      });
     }, 500);
   });
 
@@ -523,7 +545,7 @@ function createWindow() {
   mainWindow.on("close", function(e) {
     if (isMac()) {
       // Optimized for Mac OS X
-      if (store.get("settings-keep-background")) {
+      if (settingsProvider.get("settings-keep-background")) {
         e.preventDefault();
         mainWindow.hide();
       } else {
@@ -593,7 +615,7 @@ function createWindow() {
   });
 
   ipcMain.on("will-close-mainwindow", function() {
-    if (store.get("settings-keep-background")) {
+    if (settingsProvider.get("settings-keep-background")) {
       mainWindow.hide();
     } else {
       app.exit();
@@ -718,7 +740,7 @@ function createWindow() {
       center: true,
       resizable: true,
       backgroundColor: "#232323",
-      frame: store.get("titlebar-type", "nice") !== "nice",
+      frame: settingsProvider.get("titlebar-type", "nice") !== "nice",
       width: 700,
       height: 800,
       maxHeight: 800,
@@ -740,7 +762,7 @@ function createWindow() {
   // ipcMain.send('update-status-bar', '111', '222');
 
   function loadCustomTheme(view) {
-    if (store.get("settings-custom-theme")) {
+    if (settingsProvider.get("settings-custom-theme")) {
       if (fs.existsSync(themePath)) {
         view.webContents.insertCSS(fs.readFileSync(themePath).toString());
       }
@@ -749,7 +771,8 @@ function createWindow() {
 
   function switchClipboardWatcher() {
     logDebug(
-      "Switch clipboard watcher: " + store.get("settings-clipboard-read")
+      "Switch clipboard watcher: " +
+        settingsProvider.get("settings-clipboard-read")
     );
 
     if (isClipboardWatcherRunning) {
@@ -757,7 +780,7 @@ function createWindow() {
       clipboardWatcher = null;
       isClipboardWatcherRunning = false;
     } else {
-      if (store.get("settings-clipboard-read")) {
+      if (settingsProvider.get("settings-clipboard-read")) {
         clipboardWatcher = ClipboardWatcher({
           watchDelay: 1000,
           onImageChange: function(nativeImage) {},
@@ -799,7 +822,7 @@ app.on("ready", function(ev) {
   tray.createTray(mainWindow, icon);
 
   ipcMain.on("updated-tray-image", function(event, payload) {
-    if (store.get("settings-shiny-tray")) tray.updateImage(payload);
+    if (settingsProvider.get("settings-shiny-tray")) tray.updateImage(payload);
   });
 
   if (!isDev) {

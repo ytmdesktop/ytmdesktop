@@ -1,8 +1,7 @@
 const i18n = require("i18n");
-const electronStore = require("electron-store");
-const store = new electronStore();
+const settingsProvider = require("./settingsProvider");
 
-const defaultLocale = store.get("settings-app-language", "en");
+const defaultLocale = settingsProvider.get("settings-app-language", "en");
 
 i18n.configure({
   locales: ["en", "pt"],
@@ -53,6 +52,8 @@ function loadi18n() {
   });
 }
 
-exports.setLocale = setLocale;
-exports.trans = trans;
-exports.loadi18n = loadi18n;
+module.exports = {
+  setLocale: setLocale,
+  trans: trans,
+  loadi18n: loadi18n
+};

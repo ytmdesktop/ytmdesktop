@@ -286,5 +286,7 @@ const popUpMenu = (
   ];
 };
 
-exports.statusBarMenu = statusBarMenu;
-exports.popUpMenu = popUpMenu;
+module.exports = {
+  statusBarMenu: statusBarMenu,
+  popUpMenu: popUpMenu
+};
