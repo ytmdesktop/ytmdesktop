@@ -351,36 +351,28 @@ function createWindow() {
       if (location.hostname != "music.youtube.com") {
         mainWindow.send("off-the-road");
       } else {
-        setTimeout(function() {
-          view.webContents.executeJavaScript(
-            `
-            document.getElementsByClassName('title ytmusic-player-bar')[0].innerText
-          `,
-            null,
-            function(title) {
-              songTitle = title;
-              //updateActivity(songTitle, songAuthor);
-            }
-          );
-        }, 1000);
         mainWindow.send("on-the-road");
       }
     });
   });
 
   function updateActivity(songTitle, songAuthor) {
-    let nowPlaying = songTitle + " - " + songAuthor;
-    logDebug(nowPlaying);
+    try {
+      let nowPlaying = songTitle + " - " + songAuthor;
+      logDebug(nowPlaying);
 
-    if (isMac()) {
-      global.sharedObj.title = nowPlaying;
-      renderer_for_status_bar.send("update-status-bar");
+      if (isMac()) {
+        global.sharedObj.title = nowPlaying;
+        renderer_for_status_bar.send("update-status-bar");
+      }
+
+      mainWindow.setTitle(nowPlaying);
+      tray.balloon(songTitle, songAuthor);
+      discordRPC.activity(songTitle, songAuthor);
+      scrobblerProvider.updateTrackInfo(songTitle, songAuthor);
+    } catch (err) {
+      console.log("================== Error: " + err);
     }
-
-    mainWindow.setTitle(nowPlaying);
-    tray.balloon(songTitle, songAuthor);
-    discordRPC.activity(songTitle, songAuthor);
-    scrobblerProvider.updateTrackInfo(songTitle, songAuthor);
   }
 
   view.webContents.on("media-started-playing", function() {

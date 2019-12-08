@@ -4,8 +4,9 @@ var player = {
   isPaused: true,
   volumePercent: 0,
   seekbarCurrentPosition: 0,
-  likeStatus: "",
-  repatType: ""
+  seekbarCurrentPositionHuman: 0,
+  likeStatus: "INDIFFERENT",
+  repatType: "NONE"
 };
 
 var track = {
@@ -13,6 +14,7 @@ var track = {
   title: "",
   cover: "",
   duration: 0,
+  durationHuman: 0,
   url: "",
   id: ""
 };
@@ -80,6 +82,7 @@ function getDuration(webContents) {
     function(duration) {
       debug(`Duration is: ${parseInt(duration)}`);
       track.duration = parseInt(duration);
+      track.durationHuman = convertToHuman(parseInt(duration));
     }
   );
 }
@@ -111,6 +114,7 @@ function getSeekbarPosition(webContents) {
     function(position) {
       debug(`Seekbar position is: ${parseInt(position)}`);
       player.seekbarCurrentPosition = parseInt(position);
+      player.seekbarCurrentPositionHuman = convertToHuman(parseInt(position));
     }
   );
 }
@@ -181,6 +185,24 @@ function getUrl(webContents) {
       track.id = searchParams.get("v");
     }
   );
+}
+
+function convertToHuman(time) {
+  var _aux = time;
+  var _minutes = 0;
+  var _seconds = 0;
+
+  while (_aux >= 60) {
+    _aux = _aux - 60;
+    _minutes++;
+  }
+
+  _seconds = _aux;
+
+  if (_seconds < 10) {
+    return _minutes + ":0" + _seconds;
+  }
+  return _minutes + ":" + _seconds;
 }
 
 function hasInitialized() {
