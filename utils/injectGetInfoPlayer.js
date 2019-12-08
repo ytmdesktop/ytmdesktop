@@ -1,4 +1,4 @@
-var webContents;
+var webContents, initialized;
 
 var player = {
   isPaused: true,
@@ -17,6 +17,7 @@ var track = {
 
 function init(view) {
   webContents = view.webContents;
+  initialized = true;
 }
 
 function getAllInfo() {
@@ -164,6 +165,10 @@ function getRepeatType(webContents) {
   );
 }
 
+function hasInitialized() {
+  return initialized;
+}
+
 function debug(data) {
   // console.log(data);
 }
@@ -172,5 +177,6 @@ module.exports = {
   init: init,
   getAllInfo: getAllInfo,
   getPlayerInfo: getPlayerInfo,
-  getTrackInfo: getTrackInfo
+  getTrackInfo: getTrackInfo,
+  hasInitialized: hasInitialized
 };

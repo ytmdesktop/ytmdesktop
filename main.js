@@ -286,7 +286,7 @@ function createWindow() {
 
   // view.webContents.openDevTools({ mode: 'detach' });
   view.webContents.on("did-navigate-in-page", function() {
-    infoPlayer.init(view);
+    initialized = true;
     settingsProvider.set("window-url", view.webContents.getURL());
     view.webContents.insertCSS(`
             /* width */
@@ -312,6 +312,8 @@ function createWindow() {
   });
 
   view.webContents.on("media-started-playing", function() {
+    infoPlayer.init(view);
+
     if (isMac()) {
       global.sharedObj.paused = false;
       renderer_for_status_bar.send("update-status-bar");
@@ -336,127 +338,6 @@ function createWindow() {
           updateActivity(songTitle, songAuthor);
         }
       }, 800);
-    }
-
-    if (false) {
-      /**
-       * GET SONG TITLE
-       */
-      view.webContents.executeJavaScript(
-        `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
-        null,
-        function(title) {
-          songTitle = title;
-
-          view.webContents.executeJavaScript(
-            `
-          document.getElementById('progress-bar').getAttribute('aria-valuemax');
-        `,
-            null,
-            function(data) {
-              songDuration = parseInt(data);
-            }
-          );
-          if (!likeStatusWatcher)
-            likeStatusWatcher = setInterval(function() {
-              /**
-               * GET LIKE STATUS ATTRIBUTE
-               *
-               * LIKE | DISLIKE | INDIFFERENT
-               */
-              view.webContents.executeJavaScript(
-                `
-                    document.getElementById('like-button-renderer').getAttribute('like-status')
-                `,
-                true,
-                function(data) {
-                  likeStatus = data;
-                  mediaControl.createThumbar(
-                    mainWindow,
-                    playerInfo()["isPaused"],
-                    likeStatus
-                  );
-                }
-              );
-
-              /**
-               * GET CURRENT SEEK BAR POSITION
-               */
-              view.webContents.executeJavaScript(
-                `
-            document.getElementById('progress-bar').getAttribute('aria-valuenow');
-          `,
-                null,
-                function(data) {
-                  songCurrentPosition = parseInt(data);
-                }
-              );
-
-              view.webContents.executeJavaScript(
-                `
-            document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
-          `,
-                true,
-                function(data) {
-                  volumePercent = parseInt(data);
-                }
-              );
-
-              /*view.webContents.executeJavaScript(`
-            document.getElementById('progress-bar').setAttribute('value', 10)
-          `, false,
-          function(data ) {
-            console.log(data);
-          });
-          view.webContents.openDevTools({ mode: 'detach' });*/
-            }, 1000);
-          //END WATCHER LIKE
-
-          /**
-           * This timeout is necessary because there is a certain delay when changing music and updating the div content
-           */
-          setTimeout(function() {
-            /**
-             * GET SONG AUTHOR
-             */
-            view.webContents.executeJavaScript(
-              `
-              var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-              var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
-              if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
-              title[0].innerText
-             `,
-              null,
-              function(author) {
-                songAuthor = author;
-
-                if (songTitle !== undefined && songAuthor !== undefined) {
-                  if (
-                    lastSongTitle !== songTitle ||
-                    lastSongAuthor !== songAuthor
-                  ) {
-                    lastSongTitle = songTitle;
-                    lastSongAuthor = songAuthor;
-                    songCover = "cover";
-                    view.webContents.executeJavaScript(
-                      `
-                    var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
-                    var b = a.getElementsByClassName('yt-img-shadow')[0];
-                    b.src
-                  `,
-                      null,
-                      function(cover) {
-                        songCover = cover;
-                      }
-                    );
-                    updateActivity(songTitle, songAuthor);
-                  }
-                }
-              }
-            );
-          }, 1000);
-        }
-      );
     }
   });
 
@@ -638,7 +519,10 @@ function createWindow() {
     if (e !== undefined) {
       e.sender.send("song-playing-now-is", songInfo());
     }
-    ipcMain.emit("song-playing-now-is", getAll());
+
+    if (infoPlayer.hasInitialized()) {
+      ipcMain.emit("song-playing-now-is", getAll());
+    }
   });
 
   ipcMain.on("will-close-mainwindow", function() {
@@ -651,21 +535,21 @@ function createWindow() {
 
   ipcMain.on("media-play-pause", () => {
     mediaControl.playPauseTrack(view);
-    setTimeout(function() {
+    /*setTimeout(function() {
       ipcMain.emit("play-pause", songInfo());
-    }, 1000);
+    }, 1000);*/
   });
   ipcMain.on("media-next-track", () => {
     mediaControl.nextTrack(view);
-    setTimeout(function() {
+    /*setTimeout(function() {
       ipcMain.emit("changed-track", songInfo());
-    }, 1000);
+    }, 1000);*/
   });
   ipcMain.on("media-previous-track", () => {
     mediaControl.previousTrack(view);
-    setTimeout(function() {
+    /*setTimeout(function() {
       ipcMain.emit("changed-track", songInfo());
-    }, 1000);
+    }, 1000);*/
   });
   ipcMain.on("media-up-vote", () => {
     mediaControl.upVote(view);
@@ -934,22 +818,10 @@ function logDebug(data) {
 
 function songInfo() {
   return infoPlayer.getTrackInfo();
-  return {
-    author: songAuthor,
-    title: songTitle,
-    cover: songCover,
-    duration: songDuration
-  };
 }
 
 function playerInfo() {
   return infoPlayer.getPlayerInfo();
-  return {
-    isPaused: global.sharedObj.paused,
-    volumePercent: volumePercent,
-    seekbarCurrentPosition: songCurrentPosition,
-    likeStatus: likeStatus
-  };
 }
 
 function getAll() {
