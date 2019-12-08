@@ -743,6 +743,8 @@ app.on("browser-window-created", function(e, window) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", function(ev) {
+  checkWindowBounds();
+
   createWindow();
 
   tray.createTray(mainWindow, icon);
@@ -844,6 +846,28 @@ function getAll() {
     song: songInfo(),
     player: playerInfo()
   };
+}
+
+function checkWindowBounds() {
+  const { screen } = require("electron");
+
+  let displays = screen.getAllDisplays();
+  let externalDisplay = displays.find(display => {
+    return display.bounds.x !== 0 || display.bounds.y !== 0;
+  });
+
+  if (externalDisplay === undefined) {
+    primaryDisplayPosition = displays[0].bounds;
+    windowPosition = settingsProvider.get("window-position");
+
+    if (windowPosition.x > primaryDisplayPosition.width) {
+      var position = {
+        x: windowPosition.x - primaryDisplayPosition.width,
+        y: windowPosition.y
+      };
+      settingsProvider.set("window-position", position);
+    }
+  }
 }
 
 // In this file you can include the rest of your app's specific main process
