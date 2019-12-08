@@ -1,6 +1,8 @@
 require("./utils/defaultSettings");
 const settingsProvider = require("./providers/settingsProvider");
 const infoPlayer = require("./utils/injectGetInfoPlayer");
+const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
+const companionServer = require("./companionServer");
 var infoPlayerInterval;
 
 const {
@@ -31,11 +33,11 @@ const {
 const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
 
 if (settingsProvider.get("settings-companion-server")) {
-  require("./server");
+  companionServer.start();
 }
 
 if (settingsProvider.get("settings-rainmeter-web-now-playing")) {
-  require("./providers/rainmeterNowPlaying");
+  rainmeterNowPlaying.start();
 }
 
 let renderer_for_status_bar = null;
@@ -523,6 +525,26 @@ function createWindow() {
       mainWindow.hide();
     } else {
       app.exit();
+    }
+  });
+
+  ipcMain.on("settings-value-changed", (e, data) => {
+    switch (data.key) {
+      case "settings-rainmeter-web-now-playing":
+        if (data.value) {
+          rainmeterNowPlaying.start();
+        } else {
+          rainmeterNowPlaying.stop();
+        }
+        break;
+
+      case "settings-companion-server":
+        if (data.value) {
+          companionServer.start();
+        } else {
+          companionServer.stop();
+        }
+        break;
     }
   });
 

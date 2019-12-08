@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initElement("settings-keep-background", "click");
   initElement("settings-show-notifications", "click");
   initElement("settings-start-on-boot", "click");
-  initElement("settings-companion-server", "click", showRelaunchButton);
+  initElement("settings-companion-server", "click");
   initElement("settings-continue-where-left-of", "click");
   initElement("settings-shiny-tray", "click", () => {
     ipc.send("update-tray");
@@ -41,11 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
       ipc.send("show-last-fm-login");
     }
   });
-  initElement(
-    "settings-rainmeter-web-now-playing",
-    "click",
-    showRelaunchButton
-  );
+  initElement("settings-rainmeter-web-now-playing", "click");
 
   M.FormSelect.init(document.querySelectorAll("select"), {});
   M.Tabs.init(document.getElementsByClassName("tabs")[0], {});
@@ -131,10 +127,18 @@ function createListener(element, settingsName, eventType, fn) {
     switch (eventType) {
       case "click":
         settingsProvider.set(settingsName, this.checked);
+        ipc.send("settings-value-changed", {
+          key: settingsName,
+          value: this.checked
+        });
         break;
 
       case "change":
         settingsProvider.set(settingsName, this.value);
+        ipc.send("settings-value-changed", {
+          key: settingsName,
+          value: this.value
+        });
         break;
     }
     fn();

@@ -6,7 +6,7 @@ var reconnect;
 var volumePercent;
 var seekPosition;
 
-function init() {
+function start() {
   ws = new WebSocket("ws://127.0.0.1:8974", {
     perMessageDeflate: false
   });
@@ -37,29 +37,9 @@ function init() {
   ws.on("close", () => {
     clearInterval(sendData);
     reconnect = setTimeout(() => {
-      init();
+      start();
     }, 5000);
   });
-}
-
-init();
-
-function convertToHuman(time) {
-  var _aux = time;
-  var _minutes = 0;
-  var _seconds = 0;
-
-  while (_aux >= 60) {
-    _aux = _aux - 60;
-    _minutes++;
-  }
-
-  _seconds = _aux;
-
-  if (_seconds < 10) {
-    return _minutes + ":0" + _seconds;
-  }
-  return _minutes + ":" + _seconds;
 }
 
 function doAction(data) {
@@ -135,17 +115,14 @@ function updateInfo(data) {
 }
 
 ipcMain.on("song-playing-now-is", data => {
-  data["song"]["durationHuman"] = convertToHuman(data["song"]["duration"]);
-  data["player"]["seekbarCurrentPositionHuman"] = convertToHuman(
-    data["player"]["seekbarCurrentPosition"]
-  );
   updateInfo(data);
 });
 
-function terminate() {
+function stop() {
   ws.terminate();
 }
 
 module.exports = {
-  terminate: terminate
+  start: start,
+  stop: stop
 };

@@ -1,6 +1,5 @@
 const { ipcMain } = require("electron");
 const os = require("os");
-//const mdns = require('mdns-js');
 const networkInterfaces = os.networkInterfaces();
 const qrcode = require("qrcode-generator");
 
@@ -9,42 +8,10 @@ const port = 9863;
 const http = require("http");
 const pattIgnoreInterface = /(virtual)\w*/gim;
 
-let connectionsTotal = 0;
-
-/*function createAdvertisement() {
-    try {
-        var ad = mdns.createAdvertisement(mdns.tcp('_http'), port, 
-            {
-                name:'ytmdesktop._companion',
-                port: port,
-                txt: {
-                    txtvers:'1'
-                },
-            }
-        );
-        ad.start();
-    } catch (ex) {
-        handleError(ex);
-    }
-}
-
-function handleError(error) {
-    switch (error.errorCode) {
-        case mdns.kDNSServiceErr_Unknown:
-            console.warn(error);
-            setTimeout(createAdvertisement, 5000);
-        break;
-
-        default:
-            throw error;
-    } 
-}
-
-createAdvertisement();
-*/
+var connectionsTotal = 0;
 
 const server = http.createServer((req, res) => {
-  let collection = "";
+  var collection = "";
 
   Object.keys(networkInterfaces).forEach((v, k) => {
     if (!pattIgnoreInterface.test(v)) {
@@ -135,97 +102,86 @@ const server = http.createServer((req, res) => {
   res.end();
 });
 
-server.listen(port, ip);
-const io = require("socket.io")(server);
+function start() {
+  server.listen(port, ip);
+  const io = require("socket.io")(server);
 
-function convertToHuman(time) {
-  var _aux = time;
-  var _minutes = 0;
-  var _seconds = 0;
+  setInterval(() => {
+    connectionsTotal = Object.keys(io.sockets.sockets).length;
+    //console.log(connectionsTotal + ' devices connected');
+  }, 1000);
 
-  while (_aux >= 60) {
-    _aux = _aux - 60;
-    _minutes++;
-  }
+  io.on("connection", socket => {
+    let timer = setInterval(() => {
+      ipcMain.emit("what-is-song-playing-now");
+    }, 500);
 
-  _seconds = _aux;
+    socket.on("disconnect", () => {
+      clearInterval(timer);
+    });
 
-  if (_seconds < 10) {
-    return _minutes + ":0" + _seconds;
-  }
-  return _minutes + ":" + _seconds;
+    ipcMain.on("song-playing-now-is", data => {
+      io.emit("media-now-playing", data);
+    });
+
+    socket.on("media-commands", (cmd, data) => {
+      switch (cmd) {
+        case "previous-track":
+          ipcMain.emit("media-previous-track", true);
+          break;
+
+        case "play-track":
+          ipcMain.emit("media-play-pause", true);
+          break;
+
+        case "pause-track":
+          ipcMain.emit("media-play-pause", true);
+          break;
+
+        case "next-track":
+          ipcMain.emit("media-next-track", true);
+          break;
+
+        case "thumbs-up-track":
+          ipcMain.emit("media-up-vote", true);
+          break;
+
+        case "thumbs-down-track":
+          ipcMain.emit("media-down-vote", true);
+          break;
+
+        case "volume-up":
+          ipcMain.emit("media-volume-up", true);
+          break;
+
+        case "volume-down":
+          ipcMain.emit("media-volume-down", true);
+          break;
+
+        case "forward-X-seconds":
+          ipcMain.emit("media-forward-X-seconds", true);
+          break;
+
+        case "rewind-X-seconds":
+          ipcMain.emit("media-rewind-X-seconds", true);
+          break;
+
+        case "change-seekbar":
+          ipcMain.emit("media-change-seekbar", data);
+          break;
+      }
+    });
+  });
+
+  console.log("Companion Server listening on port " + port);
 }
 
-setInterval(() => {
-  connectionsTotal = Object.keys(io.sockets.sockets).length;
-  //console.log(connectionsTotal + ' devices connected');
-}, 1000);
+function stop() {
+  server.close();
+  console.log("Companion Server has stopped");
+}
 
-io.on("connection", socket => {
-  let timer = setInterval(() => {
-    ipcMain.emit("what-is-song-playing-now");
-  }, 500);
-
-  socket.on("disconnect", () => {
-    clearInterval(timer);
-  });
-
-  ipcMain.on("song-playing-now-is", data => {
-    data["song"]["durationHuman"] = convertToHuman(data["song"]["duration"]);
-    data["player"]["seekbarCurrentPositionHuman"] = convertToHuman(
-      data["player"]["seekbarCurrentPosition"]
-    );
-
-    io.emit("media-now-playing", data);
-  });
-
-  socket.on("media-commands", (cmd, data) => {
-    switch (cmd) {
-      case "previous-track":
-        ipcMain.emit("media-previous-track", true);
-        break;
-
-      case "play-track":
-        ipcMain.emit("media-play-pause", true);
-        break;
-
-      case "pause-track":
-        ipcMain.emit("media-play-pause", true);
-        break;
-
-      case "next-track":
-        ipcMain.emit("media-next-track", true);
-        break;
-
-      case "thumbs-up-track":
-        ipcMain.emit("media-up-vote", true);
-        break;
-
-      case "thumbs-down-track":
-        ipcMain.emit("media-down-vote", true);
-        break;
-
-      case "volume-up":
-        ipcMain.emit("media-volume-up", true);
-        break;
-
-      case "volume-down":
-        ipcMain.emit("media-volume-down", true);
-        break;
-
-      case "forward-X-seconds":
-        ipcMain.emit("media-forward-X-seconds", true);
-        break;
-
-      case "rewind-X-seconds":
-        ipcMain.emit("media-rewind-X-seconds", true);
-        break;
-
-      case "change-seekbar":
-        ipcMain.emit("media-change-seekbar", data);
-        break;
-    }
-  });
-});
-
-console.log("Companion Server listening on port " + port);
+module.exports = {
+  start: start,
+  stop: stop
+};
