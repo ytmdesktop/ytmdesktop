@@ -1,5 +1,7 @@
 require("./utils/defaultSettings");
 const settingsProvider = require("./providers/settingsProvider");
+const infoPlayer = require("./utils/injectGetInfoPlayer");
+var infoPlayerInterval;
 
 const {
   app,
@@ -284,6 +286,7 @@ function createWindow() {
 
   // view.webContents.openDevTools({ mode: 'detach' });
   view.webContents.on("did-navigate-in-page", function() {
+    infoPlayer.init(view);
     settingsProvider.set("window-url", view.webContents.getURL());
     view.webContents.insertCSS(`
             /* width */
@@ -314,123 +317,147 @@ function createWindow() {
       renderer_for_status_bar.send("update-status-bar");
     }
 
-    /**
-     * GET SONG TITLE
-     */
-    view.webContents.executeJavaScript(
-      `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
-      null,
-      function(title) {
-        songTitle = title;
+    if (infoPlayerInterval === undefined) {
+      infoPlayerInterval = setInterval(() => {
+        var trackInfo = infoPlayer.getTrackInfo();
+        var playerInfo = infoPlayer.getPlayerInfo();
 
-        view.webContents.executeJavaScript(
-          `
+        songTitle = trackInfo.title;
+        songAuthor = trackInfo.author;
+        songDuration = trackInfo.duration;
+        likeStatus = playerInfo.likeStatus;
+        songCurrentPosition = playerInfo.seekbarCurrentPosition;
+        volumePercent = playerInfo.volumePercent;
+        mediaControl.createThumbar(mainWindow, playerInfo.isPaused, likeStatus);
+
+        if (lastSongTitle !== songTitle || lastSongAuthor !== songAuthor) {
+          lastSongTitle = songTitle;
+          lastSongAuthor = songAuthor;
+          updateActivity(songTitle, songAuthor);
+        }
+      }, 800);
+    }
+
+    if (false) {
+      /**
+       * GET SONG TITLE
+       */
+      view.webContents.executeJavaScript(
+        `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
+        null,
+        function(title) {
+          songTitle = title;
+
+          view.webContents.executeJavaScript(
+            `
           document.getElementById('progress-bar').getAttribute('aria-valuemax');
         `,
-          null,
-          function(data) {
-            songDuration = parseInt(data);
-          }
-        );
-        if (!likeStatusWatcher)
-          likeStatusWatcher = setInterval(function() {
-            /**
-             * GET LIKE STATUS ATTRIBUTE
-             *
-             * LIKE | DISLIKE | INDIFFERENT
-             */
-            view.webContents.executeJavaScript(
-              `
+            null,
+            function(data) {
+              songDuration = parseInt(data);
+            }
+          );
+          if (!likeStatusWatcher)
+            likeStatusWatcher = setInterval(function() {
+              /**
+               * GET LIKE STATUS ATTRIBUTE
+               *
+               * LIKE | DISLIKE | INDIFFERENT
+               */
+              view.webContents.executeJavaScript(
+                `
                     document.getElementById('like-button-renderer').getAttribute('like-status')
                 `,
-              true,
-              function(data) {
-                likeStatus = data;
-                mediaControl.createThumbar(
-                  mainWindow,
-                  playerInfo()["isPaused"],
-                  likeStatus
-                );
-              }
-            );
+                true,
+                function(data) {
+                  likeStatus = data;
+                  mediaControl.createThumbar(
+                    mainWindow,
+                    playerInfo()["isPaused"],
+                    likeStatus
+                  );
+                }
+              );
 
-            /**
-             * GET CURRENT SEEK BAR POSITION
-             */
-            view.webContents.executeJavaScript(
-              `
+              /**
+               * GET CURRENT SEEK BAR POSITION
+               */
+              view.webContents.executeJavaScript(
+                `
             document.getElementById('progress-bar').getAttribute('aria-valuenow');
           `,
-              null,
-              function(data) {
-                songCurrentPosition = parseInt(data);
-              }
-            );
+                null,
+                function(data) {
+                  songCurrentPosition = parseInt(data);
+                }
+              );
 
-            view.webContents.executeJavaScript(
-              `
+              view.webContents.executeJavaScript(
+                `
             document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')
           `,
-              true,
-              function(data) {
-                volumePercent = parseInt(data);
-              }
-            );
+                true,
+                function(data) {
+                  volumePercent = parseInt(data);
+                }
+              );
 
-            /*view.webContents.executeJavaScript(`
+              /*view.webContents.executeJavaScript(`
             document.getElementById('progress-bar').setAttribute('value', 10)
           `, false,
           function(data ) {
             console.log(data);
           });
           view.webContents.openDevTools({ mode: 'detach' });*/
-          }, 1000);
+            }, 1000);
+          //END WATCHER LIKE
 
-        /**
-         * This timeout is necessary because there is a certain delay when changing music and updating the div content
-         */
-        setTimeout(function() {
           /**
-           * GET SONG AUTHOR
+           * This timeout is necessary because there is a certain delay when changing music and updating the div content
            */
-          view.webContents.executeJavaScript(
-            `
-                    var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                    var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
-                    if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
-                    title[0].innerText
-                `,
-            null,
-            function(author) {
-              songAuthor = author;
+          setTimeout(function() {
+            /**
+             * GET SONG AUTHOR
+             */
+            view.webContents.executeJavaScript(
+              `
+              var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
+              var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
+              if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
+              title[0].innerText
+             `,
+              null,
+              function(author) {
+                songAuthor = author;
 
-              if (songTitle !== undefined && songAuthor !== undefined) {
-                if (
-                  lastSongTitle !== songTitle ||
-                  lastSongAuthor !== songAuthor
-                ) {
-                  lastSongTitle = songTitle;
-                  lastSongAuthor = songAuthor;
-                  songCover = "cover";
-                  view.webContents.executeJavaScript(
-                    `
+                if (songTitle !== undefined && songAuthor !== undefined) {
+                  if (
+                    lastSongTitle !== songTitle ||
+                    lastSongAuthor !== songAuthor
+                  ) {
+                    lastSongTitle = songTitle;
+                    lastSongAuthor = songAuthor;
+                    songCover = "cover";
+                    view.webContents.executeJavaScript(
+                      `
                     var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
                     var b = a.getElementsByClassName('yt-img-shadow')[0];
                     b.src
                   `,
-                    null,
-                    function(cover) {
-                      songCover = cover;
-                    }
-                  );
-                  updateActivity(songTitle, songAuthor);
+                      null,
+                      function(cover) {
+                        songCover = cover;
+                      }
+                    );
+                    updateActivity(songTitle, songAuthor);
+                  }
                 }
               }
-            }
-          );
-        }, 1000);
-      }
-    );
+            );
+          }, 1000);
+        }
+      );
+    }
   });
 
   view.webContents.on("did-start-navigation", function(event) {
@@ -900,12 +927,13 @@ function createLyricsWindow() {
 }
 
 function logDebug(data) {
-  if (true) {
+  if (false) {
     console.log(data);
   }
 }
 
 function songInfo() {
+  return infoPlayer.getTrackInfo();
   return {
     author: songAuthor,
     title: songTitle,
@@ -915,6 +943,7 @@ function songInfo() {
 }
 
 function playerInfo() {
+  return infoPlayer.getPlayerInfo();
   return {
     isPaused: global.sharedObj.paused,
     volumePercent: volumePercent,

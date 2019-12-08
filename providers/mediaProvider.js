@@ -51,6 +51,16 @@ function mediaRewindXSeconds(mainWindow) {
   console.log("mediaRewindXSeconds");
 }
 
+function mediaRepeat(mainWindow) {
+  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "r" });
+  console.log("mediaRepeat");
+}
+
+function mediaShuffle(mainWindow) {
+  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "s" });
+  console.log("mediaShuffle");
+}
+
 function mediaChangeSeekbar(mainWindow, time) {
   mainWindow.webContents.executeJavaScript(
     `
@@ -189,6 +199,8 @@ exports.volumeDown = v => guarder(v, mediaVolumeDown);
 exports.mediaForwardXSeconds = v => guarder(v, mediaForwardXSeconds);
 exports.mediaRewindXSeconds = v => guarder(v, mediaRewindXSeconds);
 exports.changeSeekbar = mediaChangeSeekbar;
+exports.repeat = mediaRepeat;
+exports.shuffle = mediaShuffle;
 
 // For Windows
 exports.createThumbar = createThumbar;
