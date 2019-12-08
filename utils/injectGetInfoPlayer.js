@@ -12,7 +12,9 @@ var track = {
   author: "",
   title: "",
   cover: "",
-  duration: 0
+  duration: 0,
+  url: "",
+  id: ""
 };
 
 function init(view) {
@@ -44,6 +46,7 @@ function getTrackInfo() {
     getTitle(webContents);
     getCover(webContents);
     getDuration(webContents);
+    getUrl(webContents);
   }
   return track;
 }
@@ -161,6 +164,21 @@ function getRepeatType(webContents) {
     function(repeatType) {
       debug(`Repeat type is: ${repeatType}`);
       player.repatType = repeatType;
+    }
+  );
+}
+
+function getUrl(webContents) {
+  webContents.executeJavaScript(
+    `document.getElementsByClassName('ytp-title-link yt-uix-sessionlink')[0].href`,
+    null,
+    function(url) {
+      track.url = url;
+
+      var url = new URL(url);
+      var searchParams = new URLSearchParams(url.search);
+
+      track.id = searchParams.get("v");
     }
   );
 }

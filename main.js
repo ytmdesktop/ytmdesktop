@@ -55,6 +55,7 @@ let songCover = "";
 let songDuration = 0;
 let songCurrentPosition = 0;
 let lastSongTitle;
+let lastTrackId;
 let lastSongAuthor;
 let likeStatus = "INDIFFERENT";
 let volumePercent = 0;
@@ -327,14 +328,14 @@ function createWindow() {
         songTitle = trackInfo.title;
         songAuthor = trackInfo.author;
         songDuration = trackInfo.duration;
+        songCover = trackInfo.cover;
         likeStatus = playerInfo.likeStatus;
         songCurrentPosition = playerInfo.seekbarCurrentPosition;
         volumePercent = playerInfo.volumePercent;
         mediaControl.createThumbar(mainWindow, playerInfo.isPaused, likeStatus);
 
-        if (lastSongTitle !== songTitle || lastSongAuthor !== songAuthor) {
-          lastSongTitle = songTitle;
-          lastSongAuthor = songAuthor;
+        if (lastTrackId !== trackInfo.id) {
+          lastTrackId = trackInfo.id;
           updateActivity(songTitle, songAuthor);
         }
       }, 800);
