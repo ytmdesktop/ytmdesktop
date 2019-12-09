@@ -1,22 +1,15 @@
 const { ipcMain } = require("electron");
 const WebSocket = require("ws");
-var ws;
-var sendData;
-var reconnect;
-var volumePercent;
-var seekPosition;
-var initialized;
+const url = "ws://127.0.0.1:8974";
+var ws, reconnect, volumePercent, seekPosition, initialized;
 
 function start() {
-  ws = new WebSocket("ws://127.0.0.1:8974", {
+  ws = new WebSocket(url, {
     perMessageDeflate: false
   });
 
   ws.on("open", function open() {
     initialized = true;
-    sendData = setInterval(() => {
-      ipcMain.emit("what-is-song-playing-now");
-    }, 900);
   });
 
   ws.on("message", function incoming(data) {
@@ -37,13 +30,33 @@ function start() {
   });
 
   ws.on("close", () => {
-    clearInterval(sendData);
     reconnect = setTimeout(() => {
       if (initialized) {
         start();
       }
     }, 5000);
   });
+}
+
+function stop() {
+  initialized = false;
+  ws.terminate();
+}
+
+function setActivity(data) {
+  if (initialized) {
+    volumePercent = data.player.volumePercent;
+    seekPosition = data.player.seekbarCurrentPosition;
+
+    ws.send("COVER:" + data.track.cover);
+    ws.send("TITLE:" + data.track.title);
+    ws.send("ARTIST:" + data.track.author);
+    //ws.send("ALBUM:" + 'Album');
+    ws.send("STATE:" + data.player.isPaused ? 2 : 1);
+    ws.send("DURATION:" + data.track.durationHuman);
+    ws.send("POSITION:" + data.player.seekbarCurrentPositionHuman);
+    ws.send("VOLUME:" + volumePercent);
+  }
 }
 
 function doAction(data) {
@@ -104,30 +117,8 @@ function doAction(data) {
   }
 }
 
-function updateInfo(data) {
-  volumePercent = data.player.volumePercent;
-  seekPosition = data.player.seekbarCurrentPosition;
-
-  ws.send("COVER:" + data.song.cover);
-  ws.send("TITLE:" + data.song.title);
-  ws.send("ARTIST:" + data.song.author);
-  //ws.send("ALBUM:" + 'Album');
-  ws.send("STATE:" + data.player.isPaused ? 2 : 1);
-  ws.send("DURATION:" + data.song.durationHuman);
-  ws.send("POSITION:" + data.player.seekbarCurrentPositionHuman);
-  ws.send("VOLUME:" + volumePercent);
-}
-
-ipcMain.on("song-playing-now-is", data => {
-  updateInfo(data);
-});
-
-function stop() {
-  initialized = false;
-  ws.terminate();
-}
-
 module.exports = {
   start: start,
-  stop: stop
+  stop: stop,
+  setActivity: setActivity
 };

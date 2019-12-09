@@ -65,11 +65,11 @@ function updateTrackInfo(title, author) {
       signIn();
     }
 
-    var song = {
+    var track = {
       artist: author,
       track: title
     };
-    Scrobbler.Scrobble(song, function(_) {});
+    Scrobbler.Scrobble(track, function(_) {});
   }
 }
 

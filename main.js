@@ -3,6 +3,7 @@ const settingsProvider = require("./providers/settingsProvider");
 const infoPlayer = require("./utils/injectGetInfoPlayer");
 const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
 const companionServer = require("./companionServer");
+const discordRPC = require("./providers/discordRpcProvider");
 var infoPlayerInterval;
 
 const {
@@ -16,7 +17,6 @@ const {
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const discordRPC = require("./providers/discordRpcProvider");
 const scrobblerProvider = require("./providers/scrobblerProvider");
 const __ = require("./providers/translateProvider");
 const { statusBarMenu } = require("./providers/templateProvider");
@@ -40,6 +40,10 @@ if (settingsProvider.get("settings-rainmeter-web-now-playing")) {
   rainmeterNowPlaying.start();
 }
 
+if (settingsProvider.get("settings-discord-rich-presence")) {
+  discordRPC.start();
+}
+
 let renderer_for_status_bar = null;
 global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
@@ -53,14 +57,14 @@ let mainWindowSize = {
 
 let songTitle = "";
 let songAuthor = "";
-let songCover = "";
-let songDuration = 0;
-let songCurrentPosition = 0;
-let lastSongTitle;
+// let songCover = "";
+// let songDuration = 0;
+// let songCurrentPosition = 0;
+// let lastSongTitle;
 let lastTrackId;
-let lastSongAuthor;
+// let lastSongAuthor;
 let likeStatus = "INDIFFERENT";
-let volumePercent = 0;
+// let volumePercent = 0;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
@@ -222,7 +226,7 @@ function createWindow() {
         mainWindow.setBrowserView(null);
         mediaControl.createThumbar(
           mainWindow,
-          playerInfo()["isPaused"],
+          infoPlayer.getPlayerInfo().isPaused,
           likeStatus
         );
       }
@@ -255,7 +259,11 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
   // view.webContents.openDevTools({ mode: 'detach' });
-  mediaControl.createThumbar(mainWindow, playerInfo()["isPaused"], likeStatus);
+  mediaControl.createThumbar(
+    mainWindow,
+    infoPlayer.getPlayerInfo().isPaused,
+    likeStatus
+  );
 
   if (windowMaximized) {
     setTimeout(function() {
@@ -282,7 +290,7 @@ function createWindow() {
     logDebug("show");
     mediaControl.createThumbar(
       mainWindow,
-      playerInfo()["isPaused"],
+      infoPlayer.getPlayerInfo().isPaused,
       likeStatus
     );
   });
@@ -324,28 +332,12 @@ function createWindow() {
 
     if (infoPlayerInterval === undefined) {
       infoPlayerInterval = setInterval(() => {
-        var trackInfo = infoPlayer.getTrackInfo();
-        var playerInfo = infoPlayer.getPlayerInfo();
-
-        songTitle = trackInfo.title;
-        songAuthor = trackInfo.author;
-        songDuration = trackInfo.duration;
-        songCover = trackInfo.cover;
-        likeStatus = playerInfo.likeStatus;
-        songCurrentPosition = playerInfo.seekbarCurrentPosition;
-        volumePercent = playerInfo.volumePercent;
-        mediaControl.createThumbar(mainWindow, playerInfo.isPaused, likeStatus);
-        mediaControl.setProgress(mainWindow, trackInfo.statePercent);
-
-        if (lastTrackId !== trackInfo.id) {
-          lastTrackId = trackInfo.id;
-          updateActivity(songTitle, songAuthor);
-        }
+        updateActivity();
       }, 800);
     }
   });
 
-  view.webContents.on("did-start-navigation", function(event) {
+  view.webContents.on("did-start-navigation", function(_) {
     loadCustomTheme(view);
 
     view.webContents.executeJavaScript("window.location", null, function(
@@ -359,10 +351,35 @@ function createWindow() {
     });
   });
 
-  function updateActivity(songTitle, songAuthor) {
-    try {
-      let nowPlaying = songTitle + " - " + songAuthor;
-      logDebug(nowPlaying);
+  function updateActivity() {
+    var trackInfo = infoPlayer.getTrackInfo();
+    var playerInfo = infoPlayer.getPlayerInfo();
+
+    var title = trackInfo.title;
+    var author = trackInfo.author;
+    var nowPlaying = title + " - " + author;
+
+    logDebug(nowPlaying);
+
+    discordRPC.setActivity(getAll());
+    rainmeterNowPlaying.setActivity(getAll());
+
+    mediaControl.createThumbar(
+      mainWindow,
+      playerInfo.isPaused,
+      playerInfo.likeStatus
+    );
+    mediaControl.setProgress(
+      mainWindow,
+      trackInfo.statePercent,
+      playerInfo.isPaused
+    );
+
+    /**
+     * Update only when change track
+     */
+    if (lastTrackId !== trackInfo.id) {
+      lastTrackId = trackInfo.id;
 
       if (isMac()) {
         global.sharedObj.title = nowPlaying;
@@ -370,11 +387,8 @@ function createWindow() {
       }
 
       mainWindow.setTitle(nowPlaying);
-      tray.balloon(songTitle, songAuthor);
-      discordRPC.activity(songTitle, songAuthor);
-      scrobblerProvider.updateTrackInfo(songTitle, songAuthor);
-    } catch (err) {
-      console.log("================== Error: " + err);
+      tray.balloon(title, author);
+      scrobblerProvider.updateTrackInfo(title, author);
     }
   }
 
@@ -391,7 +405,7 @@ function createWindow() {
         playerInfo()["isPaused"],
         likeStatus
       );
-      ipcMain.emit("play-pause", songInfo());
+      ipcMain.emit("play-pause", infoPlayer.getTrackInfo());
     } catch {}
   });
   view.webContents.on("media-paused", function() {
@@ -402,7 +416,7 @@ function createWindow() {
       }
 
       global.sharedObj.paused = true;
-      ipcMain.emit("play-pause", songInfo());
+      ipcMain.emit("play-pause", infoPlayer.getTrackInfo());
       mediaControl.createThumbar(
         mainWindow,
         playerInfo()["isPaused"],
@@ -513,11 +527,11 @@ function createWindow() {
 
   ipcMain.on("what-is-song-playing-now", function(e, data) {
     if (e !== undefined) {
-      e.sender.send("song-playing-now-is", songInfo());
+      e.sender.send("song-playing-now-is", infoPlayer.getTrackInfo());
     }
 
     if (infoPlayer.hasInitialized()) {
-      ipcMain.emit("song-playing-now-is", getAll());
+      ipcMain.emit("song-playing-now-is", infoPlayer.getAllInfo());
     }
   });
 
@@ -544,6 +558,14 @@ function createWindow() {
           companionServer.start();
         } else {
           companionServer.stop();
+        }
+        break;
+
+      case "settings-discord-rich-presence":
+        if (data.value) {
+          discordRPC.start();
+        } else {
+          discordRPC.stop();
         }
         break;
     }
@@ -835,7 +857,7 @@ function playerInfo() {
 
 function getAll() {
   return {
-    song: songInfo(),
+    track: songInfo(),
     player: playerInfo()
   };
 }

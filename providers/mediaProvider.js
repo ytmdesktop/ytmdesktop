@@ -1,4 +1,5 @@
 const __ = require("./translateProvider");
+const systemInfo = require("../utils/systemInfo");
 const path = require("path");
 
 function mediaPlayPauseTrack(mainWindow) {
@@ -179,8 +180,14 @@ function createThumbar(mainWindow, type, likeStatus) {
   }
 }
 
-function setProgress(mainWindow, progress) {
-  mainWindow.setProgressBar(progress);
+function setProgress(mainWindow, progress, isPaused) {
+  if (systemInfo.isWindows()) {
+    mainWindow.setProgressBar(progress, {
+      mode: isPaused ? "paused" : "normal"
+    });
+  } else {
+    mainWindow.setProgressBar(progress);
+  }
 }
 
 function createTouchBar(mainWindow) {

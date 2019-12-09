@@ -25,7 +25,7 @@
   "LABEL_SETTINGS_TAB_GENERAL_KEEP_BACKGROUND": "Mantiene YTMDApp en segundo plano cuando la ventana es cerrada",
   "LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS": "Mostrar notificaciones",
   "LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF": "Continuar desde donde lo has dejado",
-  "LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE": "Habilitar integración con Discord",
+  "LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE": "Discord Rich Presence",
   "LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM": "Zoom de la página",
   "LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE": "Lenguaje",
   "LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL": "Local",

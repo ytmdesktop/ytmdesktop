@@ -157,7 +157,7 @@ function getCover(webContents) {
       `,
     null,
     function(cover) {
-      debug(`Song cover is: ${cover}`);
+      debug(`Cover is: ${cover}`);
       track.cover = cover;
     }
   );
