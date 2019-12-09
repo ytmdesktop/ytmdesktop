@@ -108,7 +108,7 @@ function updateInfo(data) {
   ws.send("TITLE:" + data.song.title);
   ws.send("ARTIST:" + data.song.author);
   //ws.send("ALBUM:" + 'Album');
-  ws.send("STATE:" + data.player.isPaused ? 1 : 2);
+  ws.send("STATE:" + data.player.isPaused ? 2 : 1);
   ws.send("DURATION:" + data.song.durationHuman);
   ws.send("POSITION:" + data.player.seekbarCurrentPositionHuman);
   ws.send("VOLUME:" + volumePercent);
