@@ -19,6 +19,11 @@ function start() {
       }, 10000);
     }
   });
+
+  client.on("disconnected", () => {
+    initialized = false;
+    start();
+  });
 }
 
 function stop() {
