@@ -1,7 +1,15 @@
 const { ipcMain } = require("electron");
 const WebSocket = require("ws");
 const url = "ws://127.0.0.1:8974";
-var ws, reconnect, volumePercent, seekPosition, initialized;
+var ws, reconnect, volumePercent, seekPosition, _isStarted;
+
+function isStarted() {
+  return _isStarted;
+}
+
+function _setIsStarted(value) {
+  _isStarted = value;
+}
 
 function start() {
   ws = new WebSocket(url, {
@@ -9,7 +17,7 @@ function start() {
   });
 
   ws.on("open", function open() {
-    initialized = true;
+    _setIsStarted(true);
   });
 
   ws.on("message", function incoming(data) {
@@ -31,7 +39,7 @@ function start() {
 
   ws.on("close", () => {
     reconnect = setTimeout(() => {
-      if (initialized) {
+      if (isStarted()) {
         start();
       }
     }, 5000);
@@ -39,12 +47,12 @@ function start() {
 }
 
 function stop() {
-  initialized = false;
+  _setIsStarted(false);
   ws.terminate();
 }
 
 function setActivity(data) {
-  if (initialized) {
+  if (isStarted()) {
     volumePercent = data.player.volumePercent;
     seekPosition = data.player.seekbarCurrentPosition;
 

@@ -2,17 +2,26 @@ const clientId = "495666957501071390";
 const RPC = require("discord-rpc");
 const startTimestamp = new Date();
 var client;
-var initialized;
+
+var _isStarted;
+
+function isStarted() {
+  return _isStarted;
+}
+
+function _setIsStarted(value) {
+  _isStarted = value;
+}
 
 function start() {
   client = new RPC.Client({ transport: "ipc" });
 
   client.on("ready", () => {
-    initialized = true;
+    _setIsStarted(true);
   });
 
   client.login({ clientId }).catch(() => {
-    if (!initialized) {
+    if (!isStarted()) {
       setTimeout(function() {
         // console.log('trying to connect')
         start();
@@ -21,18 +30,18 @@ function start() {
   });
 
   client.on("disconnected", () => {
-    initialized = false;
+    _setIsStarted(false);
     start();
   });
 }
 
 function stop() {
   client.destroy();
-  initialized = false;
+  _setIsStarted(false);
 }
 
 function setActivity(info) {
-  if (initialized) {
+  if (isStarted()) {
     client
       .setActivity({
         details: info.track.title,
@@ -52,6 +61,7 @@ function setActivity(info) {
 
 module.exports = {
   start: start,
+  isStarted: isStarted,
   stop: stop,
   setActivity: setActivity
 };
