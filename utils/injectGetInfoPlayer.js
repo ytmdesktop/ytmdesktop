@@ -15,6 +15,7 @@ var track = {
   cover: "",
   duration: 0,
   durationHuman: 0,
+  statePercent: 0,
   url: "",
   id: ""
 };
@@ -49,6 +50,7 @@ function getTrackInfo() {
     getCover(webContents);
     getDuration(webContents);
     getUrl(webContents);
+    setPercent(player.seekbarCurrentPosition, track.duration);
   }
   return track;
 }
@@ -203,6 +205,10 @@ function convertToHuman(time) {
     return _minutes + ":0" + _seconds;
   }
   return _minutes + ":" + _seconds;
+}
+
+function setPercent(px, ptotal) {
+  track.statePercent = px / ptotal;
 }
 
 function hasInitialized() {

@@ -179,6 +179,10 @@ function createThumbar(mainWindow, type, likeStatus) {
   }
 }
 
+function setProgress(mainWindow, progress) {
+  mainWindow.setProgressBar(progress);
+}
+
 function createTouchBar(mainWindow) {
   // TODO: Implement touchbar
   // mainWindow.setTouchBar();
@@ -204,5 +208,6 @@ exports.shuffle = mediaShuffle;
 
 // For Windows
 exports.createThumbar = createThumbar;
+exports.setProgress = setProgress;
 // For Mac
 // exports.createTouchBar = createTouchBar;

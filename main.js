@@ -335,6 +335,7 @@ function createWindow() {
         songCurrentPosition = playerInfo.seekbarCurrentPosition;
         volumePercent = playerInfo.volumePercent;
         mediaControl.createThumbar(mainWindow, playerInfo.isPaused, likeStatus);
+        mediaControl.setProgress(mainWindow, trackInfo.statePercent);
 
         if (lastTrackId !== trackInfo.id) {
           lastTrackId = trackInfo.id;
