@@ -11,7 +11,14 @@ function start() {
     initialized = true;
   });
 
-  client.login({ clientId }).catch(console.error);
+  client.login({ clientId }).catch(() => {
+    if (!initialized) {
+      setTimeout(function() {
+        // console.log('trying to connect')
+        start();
+      }, 10000);
+    }
+  });
 }
 
 function stop() {
