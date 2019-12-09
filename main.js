@@ -550,21 +550,12 @@ function createWindow() {
 
   ipcMain.on("media-play-pause", () => {
     mediaControl.playPauseTrack(view);
-    /*setTimeout(function() {
-      ipcMain.emit("play-pause", songInfo());
-    }, 1000);*/
   });
   ipcMain.on("media-next-track", () => {
     mediaControl.nextTrack(view);
-    /*setTimeout(function() {
-      ipcMain.emit("changed-track", songInfo());
-    }, 1000);*/
   });
   ipcMain.on("media-previous-track", () => {
     mediaControl.previousTrack(view);
-    /*setTimeout(function() {
-      ipcMain.emit("changed-track", songInfo());
-    }, 1000);*/
   });
   ipcMain.on("media-up-vote", () => {
     mediaControl.upVote(view);

@@ -5,6 +5,7 @@ var sendData;
 var reconnect;
 var volumePercent;
 var seekPosition;
+var initialized;
 
 function start() {
   ws = new WebSocket("ws://127.0.0.1:8974", {
@@ -12,6 +13,7 @@ function start() {
   });
 
   ws.on("open", function open() {
+    initialized = true;
     sendData = setInterval(() => {
       ipcMain.emit("what-is-song-playing-now");
     }, 900);
@@ -37,7 +39,9 @@ function start() {
   ws.on("close", () => {
     clearInterval(sendData);
     reconnect = setTimeout(() => {
-      start();
+      if (initialized) {
+        start();
+      }
     }, 5000);
   });
 }
@@ -119,6 +123,7 @@ ipcMain.on("song-playing-now-is", data => {
 });
 
 function stop() {
+  initialized = false;
   ws.terminate();
 }
 
