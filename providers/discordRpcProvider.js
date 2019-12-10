@@ -40,13 +40,26 @@ function stop() {
   _setIsStarted(false);
 }
 
+var rpData = {
+  songName: "",
+  songAuthor: "",
+  songStartedTime: Date.now(),
+  songCurrentTime: Date.now() + 133337,
+  songEndsTime: Date.now() + 133337,
+  songPaused: false
+};
+
 function setActivity(info) {
   if (isStarted()) {
+    var now = Date.now();
     client
       .setActivity({
         details: info.track.title,
         state: info.track.author,
-        startTimestamp,
+        startTimestamp: now + info.player.seekbarCurrentPosition * 1000,
+        endTimestamp:
+          now +
+          (info.track.duration - info.player.seekbarCurrentPosition) * 1000,
         largeImageKey: "ytm_logo_512",
         smallImageKey: info.player.isPaused
           ? "discordrpc-pause"
