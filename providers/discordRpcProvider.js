@@ -41,7 +41,7 @@ function stop() {
 }
 
 function setActivity(info) {
-  if (isStarted()) {
+  if (isStarted() && info.track.title) {
     var now = Date.now();
     client
       .setActivity({
