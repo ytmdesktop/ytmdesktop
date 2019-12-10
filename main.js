@@ -323,7 +323,9 @@ function createWindow() {
   });
 
   view.webContents.on("media-started-playing", function() {
-    infoPlayer.init(view);
+    if (!infoPlayer.hasInitialized()) {
+      infoPlayer.init(view);
+    }
 
     if (isMac()) {
       global.sharedObj.paused = false;

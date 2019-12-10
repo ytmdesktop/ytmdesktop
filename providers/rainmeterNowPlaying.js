@@ -126,6 +126,7 @@ function doAction(data) {
 }
 
 module.exports = {
+  isStarted: isStarted,
   start: start,
   stop: stop,
   setActivity: setActivity

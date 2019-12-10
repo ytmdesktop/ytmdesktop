@@ -60,8 +60,8 @@ function setActivity(info) {
 }
 
 module.exports = {
-  start: start,
   isStarted: isStarted,
+  start: start,
   stop: stop,
   setActivity: setActivity
 };
