@@ -79,7 +79,7 @@ function getTitle(webContents) {
 
 function getDuration(webContents) {
   webContents.executeJavaScript(
-    `document.getElementById('progress-bar').getAttribute('aria-valuemax');`,
+    `document.getElementById('progress-bar').getAttribute('aria-valuemax')`,
     null,
     function(duration) {
       debug(`Duration is: ${parseInt(duration)}`);
@@ -111,7 +111,7 @@ function getLikeStatus(webContents) {
  */
 function getSeekbarPosition(webContents) {
   webContents.executeJavaScript(
-    `document.getElementById('progress-bar').getAttribute('aria-valuenow');`,
+    `document.getElementById('progress-bar').getAttribute('aria-valuenow')`,
     null,
     function(position) {
       debug(`Seekbar position is: ${parseInt(position)}`);
@@ -131,14 +131,18 @@ function getVolume(webContents) {
     }
   );
 }
-
+// FIX
 function getAuthor(webContents) {
   webContents.executeJavaScript(
     `
-                var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                var title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string');
-                if( !title.length ) { title = bar.getElementsByClassName('byline ytmusic-player-bar') }
-                title[0].innerText
+    var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
+				  
+    if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
+      title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].innerText;
+    } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
+      title = bar.getElementsByClassName('byline ytmusic-player-bar')[0].innerText;
+    }
+    title;
             `,
     null,
     function(author) {
@@ -151,9 +155,9 @@ function getAuthor(webContents) {
 function getCover(webContents) {
   webContents.executeJavaScript(
     `
-        var a = document.getElementsByClassName('thumbnail style-scope ytmusic-player no-transition')[0];
-        var b = a.getElementsByClassName('yt-img-shadow')[0];
-        b.src
+        var thumbnail = document.getElementsByClassName('thumbnail ytmusic-player no-transition')[0];
+        var image = thumbnail.getElementsByClassName('yt-img-shadow')[0];
+        image.src
       `,
     null,
     function(cover) {
