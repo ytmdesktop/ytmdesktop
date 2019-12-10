@@ -51,17 +51,19 @@ exports.createTray = function(mainWindow, icon) {
 
 exports.balloon = function(title, content) {
   if (settingsProvider.get("settings-show-notifications")) {
-    if (process.platform == "win32") {
-      tray.displayBalloon({
-        icon: path.join(__dirname, "assets/favicon.256x256.png"),
-        title: title,
-        content: content
-      });
-    } else {
-      new Notification(title, {
-        body: content,
-        icon: path.join(__dirname, "assets/favicon.256x256.png")
-      });
+    if (title && content) {
+      if (process.platform == "win32") {
+        tray.displayBalloon({
+          icon: path.join(__dirname, "assets/favicon.256x256.png"),
+          title: title,
+          content: content
+        });
+      } else {
+        new Notification(title, {
+          body: content,
+          icon: path.join(__dirname, "assets/favicon.256x256.png")
+        });
+      }
     }
   }
 };

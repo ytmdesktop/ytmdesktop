@@ -40,15 +40,6 @@ function stop() {
   _setIsStarted(false);
 }
 
-var rpData = {
-  songName: "",
-  songAuthor: "",
-  songStartedTime: Date.now(),
-  songCurrentTime: Date.now() + 133337,
-  songEndsTime: Date.now() + 133337,
-  songPaused: false
-};
-
 function setActivity(info) {
   if (isStarted()) {
     var now = Date.now();

@@ -388,9 +388,11 @@ function createWindow() {
         renderer_for_status_bar.send("update-status-bar");
       }
 
-      mainWindow.setTitle(nowPlaying);
-      tray.balloon(title, author);
-      scrobblerProvider.updateTrackInfo(title, author);
+      setTimeout(() => {
+        mainWindow.setTitle(nowPlaying);
+        tray.balloon(title, author);
+        scrobblerProvider.updateTrackInfo(title, author);
+      }, 500);
     }
   }
 
