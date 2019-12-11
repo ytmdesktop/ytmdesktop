@@ -5,6 +5,7 @@ const nativeImage = require("electron").nativeImage;
 const settingsProvider = require("./providers/settingsProvider");
 const __ = require("./providers/translateProvider");
 const Notification = require("electron-native-notification");
+const { doBehavior } = require("./utils/window");
 
 let tray = null;
 let saved_icon = null;
@@ -19,16 +20,12 @@ let init_tray = () => {
   tray.setToolTip("YouTube Music Desktop App");
   tray.setContextMenu(contextMenu);
 
-  tray.addListener("click", function() {
-    saved_mainWindow.isVisible()
-      ? saved_mainWindow.hide()
-      : saved_mainWindow.show();
+  tray.addListener("click", () => {
+    doBehavior(saved_mainWindow);
   });
 
   tray.addListener("balloon-click", function() {
-    saved_mainWindow.isVisible()
-      ? saved_mainWindow.focus()
-      : saved_mainWindow.show();
+    doBehavior(saved_mainWindow);
   });
 };
 
@@ -92,9 +89,7 @@ exports.setShinyTray = function() {
     tray.on("click", (event, bound, position) => {
       // console.log(position);
       if (position.x < 32) {
-        saved_mainWindow.isVisible()
-          ? saved_mainWindow.hide()
-          : saved_mainWindow.show();
+        doBehavior(saved_mainWindow);
       } else if (position.x > 130) {
         mediaControl.playPauseTrack(saved_mainWindow.getBrowserView());
       }

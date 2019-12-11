@@ -1,4 +1,5 @@
 const { ipcMain } = require("electron");
+const { doBehavior } = require("../utils/window");
 
 let statusBarMenu = [
   {
@@ -206,7 +207,7 @@ const popUpMenu = (
       label: "YTMD App",
       type: "normal",
       click: function() {
-        saved_mainWindow.show();
+        doBehavior(saved_mainWindow);
       }
     },
 

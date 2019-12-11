@@ -4,6 +4,7 @@ const infoPlayer = require("./utils/injectGetInfoPlayer");
 const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
 const companionServer = require("./companionServer");
 const discordRPC = require("./providers/discordRpcProvider");
+const { checkBounds, doBehavior } = require("./utils/window");
 var infoPlayerInterval;
 var customThemeCSSKey;
 
@@ -480,10 +481,11 @@ function createWindow() {
     if (isMac()) {
       app.exit();
     }
+    tray.quit();
   });
 
   app.on("quit", function() {
-    tray.destroy();
+    tray.quit();
   });
 
   globalShortcut.register("MediaPlayPause", function() {
@@ -497,7 +499,7 @@ function createWindow() {
     } else {
       // The second press
       doublePressPlayPause = false;
-      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+      doBehavior(mainWindow);
     }
   });
   globalShortcut.register("CmdOrCtrl+Shift+Space", function() {
@@ -778,7 +780,7 @@ app.on("browser-window-created", function(e, window) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", function(ev) {
-  checkWindowBounds();
+  checkBounds();
 
   createWindow();
 
@@ -881,28 +883,6 @@ function getAll() {
     track: songInfo(),
     player: playerInfo()
   };
-}
-
-function checkWindowBounds() {
-  const { screen } = require("electron");
-
-  let displays = screen.getAllDisplays();
-  let externalDisplay = displays.find(display => {
-    return display.bounds.x !== 0 || display.bounds.y !== 0;
-  });
-
-  if (externalDisplay === undefined) {
-    primaryDisplayPosition = displays[0].bounds;
-    windowPosition = settingsProvider.get("window-position");
-
-    if (windowPosition.x > primaryDisplayPosition.width) {
-      var position = {
-        x: windowPosition.x - primaryDisplayPosition.width,
-        y: windowPosition.y
-      };
-      settingsProvider.set("window-position", position);
-    }
-  }
 }
 
 // In this file you can include the rest of your app's specific main process
