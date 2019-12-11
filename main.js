@@ -389,7 +389,7 @@ function createWindow() {
 
       mainWindow.setTitle(nowPlaying);
       tray.balloon(title, author);
-      // scrobblerProvider.updateTrackInfo(title, author);
+      scrobblerProvider.updateTrackInfo(title, author);
     }
   }
 
