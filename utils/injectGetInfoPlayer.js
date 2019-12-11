@@ -183,12 +183,14 @@ function getUrl(webContents) {
     `document.getElementsByClassName('ytp-title-link yt-uix-sessionlink')[0].href`,
     null,
     function(url) {
-      track.url = url;
+      if (url) {
+        track.url = url;
 
-      var url = new URL(url);
-      var searchParams = new URLSearchParams(url.search);
+        var newUrl = new URL(url);
+        var searchParams = new URLSearchParams(newUrl.search);
 
-      track.id = searchParams.get("v");
+        track.id = searchParams.get("v");
+      }
     }
   );
 }
