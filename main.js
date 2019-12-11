@@ -342,9 +342,7 @@ function createWindow() {
   view.webContents.on("did-start-navigation", function(_) {
     loadCustomTheme(view);
 
-    view.webContents.executeJavaScript("window.location", null, function(
-      location
-    ) {
+    view.webContents.executeJavaScript("window.location").then(location => {
       if (location.hostname != "music.youtube.com") {
         mainWindow.send("off-the-road");
       } else {
@@ -390,7 +388,7 @@ function createWindow() {
 
       mainWindow.setTitle(nowPlaying);
       tray.balloon(title, author);
-      scrobblerProvider.updateTrackInfo(title, author);
+      // scrobblerProvider.updateTrackInfo(title, author);
     }
   }
 
@@ -752,7 +750,8 @@ function createWindow() {
 }
 
 app.on("browser-window-created", function(e, window) {
-  window.setMenu(null);
+  // window.setMenu(null);
+  window.removeMenu();
 });
 
 // This method will be called when Electron has finished

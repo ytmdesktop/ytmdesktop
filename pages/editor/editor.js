@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
-const path = require("path");
-const fs = require("fs");
+const path = require("electron").remote.require("path");
+const fs = require("electron").remote.require("fs");
 const __ = require("../../providers/translateProvider");
 const themePath = path.join(__dirname, "../../assets/custom-theme.css");
 var editor;

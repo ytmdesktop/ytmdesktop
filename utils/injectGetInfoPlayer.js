@@ -56,37 +56,35 @@ function getTrackInfo() {
 }
 
 function isPaused(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementsByTagName('video')[0].paused`,
-    null,
-    function(isPaused) {
+  webContents
+    .executeJavaScript(`document.getElementsByTagName('video')[0].paused;`)
+    .then(isPaused => {
       debug(`Is paused: ${isPaused}`);
       player.isPaused = isPaused;
-    }
-  );
+    });
 }
 
 function getTitle(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText`,
-    null,
-    function(title) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText;`
+    )
+    .then(title => {
       debug(`Title is: ${title}`);
       track.title = title;
-    }
-  );
+    });
 }
 
 function getDuration(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementById('progress-bar').getAttribute('aria-valuemax')`,
-    null,
-    function(duration) {
+  webContents
+    .executeJavaScript(
+      `document.getElementById('progress-bar').getAttribute('aria-valuemax');`
+    )
+    .then(duration => {
       debug(`Duration is: ${parseInt(duration)}`);
       track.duration = parseInt(duration);
       track.durationHuman = convertToHuman(parseInt(duration));
-    }
-  );
+    });
 }
 
 /**
@@ -95,14 +93,14 @@ function getDuration(webContents) {
  * @param {*} webContents
  */
 function getLikeStatus(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementById('like-button-renderer').getAttribute('like-status')`,
-    true,
-    function(likeStatus) {
+  webContents
+    .executeJavaScript(
+      `document.getElementById('like-button-renderer').getAttribute('like-status');`
+    )
+    .then(likeStatus => {
       debug(`Like status is: ${likeStatus}`);
       player.likeStatus = likeStatus;
-    }
-  );
+    });
 }
 
 /**
@@ -110,31 +108,32 @@ function getLikeStatus(webContents) {
  * @param {*} webContents
  */
 function getSeekbarPosition(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementById('progress-bar').getAttribute('aria-valuenow')`,
-    null,
-    function(position) {
+  webContents
+    .executeJavaScript(
+      `document.getElementById('progress-bar').getAttribute('aria-valuenow');`
+    )
+    .then(position => {
       debug(`Seekbar position is: ${parseInt(position)}`);
       player.seekbarCurrentPosition = parseInt(position);
       player.seekbarCurrentPositionHuman = convertToHuman(parseInt(position));
-    }
-  );
+    });
 }
 
 function getVolume(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value')`,
-    true,
-    function(volume) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value');`
+    )
+    .then(volume => {
       debug(`Volume % is: ${parseInt(volume)}`);
       player.volumePercent = parseInt(volume);
-    }
-  );
+    });
 }
 // FIX
 function getAuthor(webContents) {
-  webContents.executeJavaScript(
-    `
+  webContents
+    .executeJavaScript(
+      `
     var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
 				  
     if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
@@ -143,46 +142,46 @@ function getAuthor(webContents) {
       title = bar.getElementsByClassName('byline ytmusic-player-bar')[0].innerText;
     }
     title;
-            `,
-    null,
-    function(author) {
+            `
+    )
+    .then(author => {
       debug(`Author is: ${author}`);
       track.author = author;
-    }
-  );
+    });
 }
 
 function getCover(webContents) {
-  webContents.executeJavaScript(
-    `
+  webContents
+    .executeJavaScript(
+      `
         var thumbnail = document.getElementsByClassName('thumbnail ytmusic-player no-transition')[0];
         var image = thumbnail.getElementsByClassName('yt-img-shadow')[0];
-        image.src
-      `,
-    null,
-    function(cover) {
+        image.src;
+      `
+    )
+    .then(cover => {
       debug(`Cover is: ${cover}`);
       track.cover = cover;
-    }
-  );
+    });
 }
 
 function getRepeatType(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementsByTagName("ytmusic-player-bar")[0].getAttribute("repeat-mode_")`,
-    null,
-    function(repeatType) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByTagName("ytmusic-player-bar")[0].getAttribute("repeat-mode_");`
+    )
+    .then(repeatType => {
       debug(`Repeat type is: ${repeatType}`);
       player.repatType = repeatType;
-    }
-  );
+    });
 }
 
 function getUrl(webContents) {
-  webContents.executeJavaScript(
-    `document.getElementsByClassName('ytp-title-link yt-uix-sessionlink')[0].href`,
-    null,
-    function(url) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByClassName('ytp-title-link yt-uix-sessionlink')[0].href`
+    )
+    .then(url => {
       if (url) {
         track.url = url;
 
@@ -191,8 +190,7 @@ function getUrl(webContents) {
 
         track.id = searchParams.get("v");
       }
-    }
-  );
+    });
 }
 
 function convertToHuman(time) {

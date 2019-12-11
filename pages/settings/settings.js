@@ -1,9 +1,6 @@
 const { remote, ipcRenderer: ipc } = require("electron");
 const settingsProvider = require("../../providers/settingsProvider");
 const __ = require("../../providers/translateProvider");
-const scrobblerProvider = require("../../providers/scrobblerProvider");
-const path = require("path");
-const fs = require("fs");
 
 const {
   companionUrl,
