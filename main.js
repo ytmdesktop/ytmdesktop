@@ -5,6 +5,7 @@ const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
 const companionServer = require("./companionServer");
 const discordRPC = require("./providers/discordRpcProvider");
 var infoPlayerInterval;
+var customThemeCSSKey;
 
 const {
   app,
@@ -340,7 +341,7 @@ function createWindow() {
   });
 
   view.webContents.on("did-start-navigation", function(_) {
-    loadCustomTheme(view);
+    loadCustomTheme();
 
     view.webContents.executeJavaScript("window.location").then(location => {
       if (location.hostname != "music.youtube.com") {
@@ -568,6 +569,14 @@ function createWindow() {
           discordRPC.stop();
         }
         break;
+
+      case "settings-custom-theme":
+        if (data.value) {
+          loadCustomTheme();
+        } else {
+          removeCustomTheme();
+        }
+        break;
     }
   });
 
@@ -696,17 +705,28 @@ function createWindow() {
   });
 
   ipcMain.on("update-custom-theme", function() {
-    loadCustomTheme(view);
+    loadCustomTheme();
   });
 
   // ipcMain.send('update-status-bar', '111', '222');
 
-  function loadCustomTheme(view) {
+  function loadCustomTheme() {
     if (settingsProvider.get("settings-custom-theme")) {
       if (fs.existsSync(themePath)) {
-        view.webContents.insertCSS(fs.readFileSync(themePath).toString());
+        if (customThemeCSSKey) {
+          removeCustomTheme();
+        }
+        view.webContents
+          .insertCSS(fs.readFileSync(themePath).toString())
+          .then(key => {
+            customThemeCSSKey = key;
+          });
       }
     }
+  }
+
+  function removeCustomTheme() {
+    view.webContents.removeInsertedCSS(customThemeCSSKey);
   }
 
   function switchClipboardWatcher() {

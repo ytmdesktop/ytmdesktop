@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ipc.send("switch-clipboard-watcher");
   });
   initElement("titlebar-type", "change", showRelaunchButton);
-  initElement("settings-custom-theme", "click", showRelaunchButton);
+  initElement("settings-custom-theme", "click");
   initElement("settings-last-fm-scrobbler", "click", () => {
     var login = settingsProvider.get("last-fm-login");
     if (login.username == "") {
