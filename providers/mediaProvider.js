@@ -181,12 +181,14 @@ function createThumbar(mainWindow, type, likeStatus) {
 }
 
 function setProgress(mainWindow, progress, isPaused) {
-  if (systemInfo.isWindows()) {
-    mainWindow.setProgressBar(progress, {
-      mode: isPaused ? "paused" : "normal"
-    });
-  } else {
-    mainWindow.setProgressBar(progress);
+  if (mainWindow) {
+    if (systemInfo.isWindows()) {
+      mainWindow.setProgressBar(progress, {
+        mode: isPaused ? "paused" : "normal"
+      });
+    } else {
+      mainWindow.setProgressBar(progress);
+    }
   }
 }
 
