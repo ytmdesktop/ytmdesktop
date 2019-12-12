@@ -42,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   M.FormSelect.init(document.querySelectorAll("select"), {});
   M.Tabs.init(document.getElementsByClassName("tabs")[0], {});
+
+  document.getElementById("content").classList.remove("hide");
 });
 
 document.getElementById("btn-close").addEventListener("click", function() {
