@@ -2,7 +2,7 @@ require("./utils/defaultSettings");
 const settingsProvider = require("./providers/settingsProvider");
 const infoPlayer = require("./utils/injectGetInfoPlayer");
 const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
-const companionServer = require("./companionServer");
+const companionServer = require("./providers/companionServer");
 const discordRPC = require("./providers/discordRpcProvider");
 const { checkBounds, doBehavior } = require("./utils/window");
 var infoPlayerInterval;
