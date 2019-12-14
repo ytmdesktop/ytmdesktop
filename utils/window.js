@@ -1,3 +1,5 @@
+const settingsProvider = require("../providers/settingsProvider");
+
 function create() {
   // for create window
 }
