@@ -9,6 +9,7 @@ const apiSecret = "9d8830c167627e65dac63786be101964";
 var Scrobbler;
 
 var userLogin;
+var updateTrackInfoTimeout;
 
 function signIn() {
   userLogin = getLogin();
@@ -61,15 +62,20 @@ function getToken() {
 
 function updateTrackInfo(title, author) {
   if (settingsProvider.get("settings-last-fm-scrobbler")) {
-    if (Scrobbler === undefined) {
-      signIn();
+    if (updateTrackInfoTimeout) {
+      clearInterval(updateTrackInfoTimeout);
     }
+    updateTrackInfoTimeout = setTimeout(() => {
+      if (Scrobbler === undefined) {
+        signIn();
+      }
 
-    var track = {
-      artist: author,
-      track: title
-    };
-    Scrobbler.Scrobble(track, function(_) {});
+      var track = {
+        artist: author,
+        track: title
+      };
+      Scrobbler.Scrobble(track, function(_) {});
+    }, 10 * 1000);
   }
 }
 
