@@ -1,12 +1,4 @@
 require("./utils/defaultSettings");
-const settingsProvider = require("./providers/settingsProvider");
-const infoPlayer = require("./utils/injectGetInfoPlayer");
-const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
-const companionServer = require("./providers/companionServer");
-const discordRPC = require("./providers/discordRpcProvider");
-const { checkBounds, doBehavior } = require("./utils/window");
-var infoPlayerInterval;
-var customThemeCSSKey;
 
 const {
   app,
@@ -32,7 +24,17 @@ const {
   companionWindowTitle,
   companionWindowSettings
 } = require("./server.config");
+const settingsProvider = require("./providers/settingsProvider");
+const infoPlayer = require("./utils/injectGetInfoPlayer");
+const rainmeterNowPlaying = require("./providers/rainmeterNowPlaying");
+const companionServer = require("./providers/companionServer");
+const discordRPC = require("./providers/discordRpcProvider");
+const { checkBounds, doBehavior } = require("./utils/window");
+
 const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
+if (!themePath) {
+  fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
+}
 
 if (settingsProvider.get("settings-companion-server")) {
   companionServer.start();
@@ -52,30 +54,20 @@ global.sharedObj = { title: "N/A", paused: true };
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-let mainWindowSize = {
+let mainWindowParams = {
+  url: "https://music.youtube.com",
   width: 1500,
   height: 800
 };
 
-let songTitle = "";
-let songAuthor = "";
-// let songCover = "";
-// let songDuration = 0;
-// let songCurrentPosition = 0;
-// let lastSongTitle;
+let infoPlayerInterval;
+let customThemeCSSKey;
 let lastTrackId;
-// let lastSongAuthor;
-let likeStatus = "INDIFFERENT";
-// let volumePercent = 0;
 let doublePressPlayPause;
 let lastConnectionStatusIsOnline = false;
 let hasLoadedUrl;
-let isPaused = true;
 let isClipboardWatcherRunning = false;
 let clipboardWatcher = null;
-let likeStatusWatcher = null;
-
-let mainWindowUrl = "https://music.youtube.com";
 
 let icon = "assets/favicon.png";
 if (isWindows()) {
@@ -101,10 +93,6 @@ if (isWindows()) {
   Menu.setApplicationMenu(menu);
 }
 
-if (!themePath) {
-  fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
-}
-
 function createWindow() {
   if (isMac() || isWindows()) {
     const execApp = path.basename(process.execPath);
@@ -127,13 +115,13 @@ function createWindow() {
   windowMaximized = settingsProvider.get("window-maximized");
 
   if (windowSize) {
-    mainWindowSize.width = windowSize.width;
-    mainWindowSize.height = windowSize.height;
+    mainWindowParams.width = windowSize.width;
+    mainWindowParams.height = windowSize.height;
   }
   broswerWindowConfig = {
     icon: icon,
-    width: mainWindowSize.width,
-    height: mainWindowSize.height,
+    width: mainWindowParams.width,
+    height: mainWindowParams.height,
     minWidth: 300,
     minHeight: 300,
     show: true,
@@ -185,10 +173,10 @@ function createWindow() {
     settingsProvider.get("settings-continue-where-left-of") &&
     settingsProvider.get("window-url")
   ) {
-    mainWindowUrl = settingsProvider.get("window-url");
+    mainWindowParams.url = settingsProvider.get("window-url");
   }
 
-  view.webContents.loadURL(mainWindowUrl);
+  view.webContents.loadURL(mainWindowParams.url);
 
   let checkConnectionTimeoutHandler;
   async function checkConnection() {
@@ -218,7 +206,7 @@ function createWindow() {
       if (lastConnectionStatusIsOnline === false) {
         mainWindow.setBrowserView(view);
         if (hasLoadedUrl === false) {
-          view.webContents.loadURL(mainWindowUrl);
+          view.webContents.loadURL(mainWindowParams.url);
           hasLoadedUrl = true;
         }
       }
@@ -229,7 +217,7 @@ function createWindow() {
         mediaControl.createThumbar(
           mainWindow,
           infoPlayer.getPlayerInfo().isPaused,
-          likeStatus
+          infoPlayer.getPlayerInfo().likeStatus
         );
       }
     }
@@ -264,7 +252,7 @@ function createWindow() {
   mediaControl.createThumbar(
     mainWindow,
     infoPlayer.getPlayerInfo().isPaused,
-    likeStatus
+    infoPlayer.getPlayerInfo().likeStatus
   );
 
   if (windowMaximized) {
@@ -293,7 +281,7 @@ function createWindow() {
     mediaControl.createThumbar(
       mainWindow,
       infoPlayer.getPlayerInfo().isPaused,
-      likeStatus
+      infoPlayer.getPlayerInfo().likeStatus
     );
   });
 
@@ -405,7 +393,7 @@ function createWindow() {
       mediaControl.createThumbar(
         mainWindow,
         playerInfo()["isPaused"],
-        likeStatus
+        playerInfo()["likeStatus"]
       );
       ipcMain.emit("play-pause", infoPlayer.getTrackInfo());
     } catch {}
@@ -422,7 +410,7 @@ function createWindow() {
       mediaControl.createThumbar(
         mainWindow,
         playerInfo()["isPaused"],
-        likeStatus
+        playerInfo()["likeStatus"]
       );
     } catch {}
   });
@@ -682,7 +670,7 @@ function createWindow() {
   });
 
   ipcMain.on("reset-url", () => {
-    mainWindow.getBrowserView().webContents.loadURL(mainWindowUrl);
+    mainWindow.getBrowserView().webContents.loadURL(mainWindowParams.url);
   });
 
   ipcMain.on("show-editor-theme", function() {
