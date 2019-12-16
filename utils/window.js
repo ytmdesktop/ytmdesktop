@@ -16,7 +16,7 @@ function checkBounds() {
     primaryDisplayPosition = displays[0].bounds;
     windowPosition = settingsProvider.get("window-position");
 
-    if (windowPosition.x > primaryDisplayPosition.width) {
+    if (windowPosition && windowPosition.x > primaryDisplayPosition.width) {
       var position = {
         x: windowPosition.x - primaryDisplayPosition.width,
         y: windowPosition.y
