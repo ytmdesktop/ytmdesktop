@@ -75,7 +75,7 @@ function updateTrackInfo(title, author) {
         track: title
       };
       Scrobbler.Scrobble(track, function(_) {});
-    }, 10 * 1000);
+    }, 10 * 2000);
   }
 }
 
