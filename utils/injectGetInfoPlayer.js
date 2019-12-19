@@ -17,7 +17,8 @@ var track = {
   durationHuman: 0,
   statePercent: 0,
   url: "",
-  id: ""
+  id: "",
+  isVideo: false
 };
 
 function init(view) {
@@ -51,6 +52,7 @@ function getTrackInfo() {
     getDuration(webContents);
     getUrl(webContents);
     setPercent(player.seekbarCurrentPosition, track.duration);
+    isVideo(webContents);
   }
   return track;
 }
@@ -190,6 +192,17 @@ function getUrl(webContents) {
 
         track.id = searchParams.get("v");
       }
+    });
+}
+
+function isVideo(webContents) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByClassName('ytp-player-content ytp-iv-player-content').length`
+    )
+    .then(isVideo => {
+      track.isVideo = !!isVideo;
+      console.log(track.isVideo);
     });
 }
 
