@@ -53,17 +53,21 @@ function stop() {
 
 function setActivity(data) {
   if (isStarted()) {
-    volumePercent = data.player.volumePercent;
-    seekPosition = data.player.seekbarCurrentPosition;
-
-    ws.send("COVER:" + data.track.cover);
-    ws.send("TITLE:" + data.track.title);
-    ws.send("ARTIST:" + data.track.author);
+    ws.send(`COVER:${data.track.cover}`);
+    ws.send(`TITLE:${data.track.title}`);
+    ws.send(`ARTIST:${data.track.author}`);
     //ws.send("ALBUM:" + 'Album');
-    ws.send("STATE:" + data.player.isPaused ? 2 : 1);
-    ws.send("DURATION:" + data.track.durationHuman);
-    ws.send("POSITION:" + data.player.seekbarCurrentPositionHuman);
-    ws.send("VOLUME:" + volumePercent);
+    ws.send(`STATE:${data.player.isPaused ? 2 : 1}`);
+    ws.send(`DURATION:${data.track.durationHuman}`);
+    ws.send(`POSITION:${data.player.seekbarCurrentPositionHuman}`);
+    ws.send(`VOLUME:${data.player.volumePercent}`);
+    if (data.player.likeStatus === "LIKE") {
+      ws.send(`RATING:5`);
+    } else if (data.player.likeStatus === "DISLIKE") {
+      ws.send(`RATING:1`);
+    } else {
+      ws.send(`RATING:0`);
+    }
   }
 }
 

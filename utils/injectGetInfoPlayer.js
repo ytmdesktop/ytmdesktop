@@ -4,7 +4,7 @@ var player = {
   isPaused: true,
   volumePercent: 0,
   seekbarCurrentPosition: 0,
-  seekbarCurrentPositionHuman: 0,
+  seekbarCurrentPositionHuman: "0:00",
   likeStatus: "INDIFFERENT",
   repatType: "NONE"
 };
@@ -14,7 +14,7 @@ var track = {
   title: "",
   cover: "",
   duration: 0,
-  durationHuman: 0,
+  durationHuman: "0:00",
   statePercent: 0,
   url: "",
   id: "",
@@ -191,6 +191,8 @@ function getUrl(webContents) {
         var searchParams = new URLSearchParams(newUrl.search);
 
         track.id = searchParams.get("v");
+        debug(`Track Url: ${track.url}`);
+        debug(`Track id: ${track.id}`);
       }
     });
 }
@@ -202,7 +204,7 @@ function isVideo(webContents) {
     )
     .then(isVideo => {
       track.isVideo = !!isVideo;
-      console.log(track.isVideo);
+      debug(`Is video: ${track.isVideo}`);
     });
 }
 

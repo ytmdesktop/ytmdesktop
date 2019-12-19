@@ -490,6 +490,7 @@ function createWindow() {
       doBehavior(mainWindow);
     }
   });
+
   globalShortcut.register("CmdOrCtrl+Shift+Space", function() {
     mediaControl.playPauseTrack(view);
   });
