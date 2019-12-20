@@ -13,7 +13,6 @@ const elementButtonSearchLyric = document.getElementById("btn_search_lyric");
 
 let lastSong;
 let lastArtist;
-let scrollInterval;
 
 loadi18n();
 
@@ -30,18 +29,13 @@ setInterval(function() {
 }, 1000);
 
 ipcRenderer.on("song-playing-now-is", function(e, data) {
+  var scrollHeight = document.getElementById("content").scrollHeight;
+  document
+    .getElementById("content")
+    .scrollTo(0, (scrollHeight * data.statePercent) / 2);
+
   getLyric(data.author, data.title);
 });
-
-function pageScroll() {
-  //document.getElementById( 'content' ).scrollBy( 0, 5 )
-  clearInterval(scrollInterval);
-
-  scrollInterval = setInterval(function() {
-    document.getElementById("content").scrollBy(0, 5);
-  }, 4000);
-  //scrollDelay = setTimeout( pageScroll, 4000 );
-}
 
 function getLyric(artist, song) {
   if (artist != undefined && song != undefined) {
@@ -75,10 +69,6 @@ function getLyric(artist, song) {
           }
 
           document.getElementById("content").scrollTop = 0;
-
-          setTimeout(function() {
-            pageScroll();
-          }, 20 * 1000);
         }
       );
     }
