@@ -359,6 +359,7 @@ function createWindow() {
       playerInfo.isPaused,
       playerInfo.likeStatus
     );
+
     mediaControl.setProgress(
       mainWindow,
       trackInfo.statePercent,

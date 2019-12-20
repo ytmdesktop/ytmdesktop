@@ -200,7 +200,7 @@ function getUrl(webContents) {
 function isVideo(webContents) {
   webContents
     .executeJavaScript(
-      `document.getElementsByClassName('ytp-player-content ytp-iv-player-content').length`
+      `document.getElementById('player').attributes['video-mode_']`
     )
     .then(isVideo => {
       track.isVideo = !!isVideo;
