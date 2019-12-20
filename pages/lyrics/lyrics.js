@@ -32,7 +32,7 @@ ipcRenderer.on("song-playing-now-is", function(e, data) {
   var scrollHeight = document.getElementById("content").scrollHeight;
   document
     .getElementById("content")
-    .scrollTo(0, (scrollHeight * data.statePercent) / 2);
+    .scrollTo(0, (scrollHeight * data.statePercent) / 1.4);
 
   getLyric(data.author, data.title);
 });

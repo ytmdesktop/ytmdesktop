@@ -40,6 +40,9 @@ body {
     overflow: auto;
     width: 100%;
     height: 94%;
+    margin-top: 34px; 
+    padding: 50% 5px 5px 5px;
+    transition: .5s ease-in-out all;
 }
 
 #lyric {
