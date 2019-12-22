@@ -156,9 +156,18 @@ function getCover(webContents) {
   webContents
     .executeJavaScript(
       `
+        var cover;
+
         var thumbnail = document.getElementsByClassName('thumbnail ytmusic-player no-transition')[0];
-        var image = thumbnail.getElementsByClassName('yt-img-shadow')[0];
-        image.src;
+        var image = thumbnail.getElementsByClassName('yt-img-shadow')[0].src;
+
+        cover = image;
+
+        if (cover.includes("data:image")) {
+          cover = document.getElementsByClassName("image ytmusic-player-bar")[0].src
+        }
+
+        cover;
       `
     )
     .then(cover => {
