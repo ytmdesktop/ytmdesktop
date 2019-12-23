@@ -88,6 +88,7 @@ function createMenu() {
         var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
         var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
+        var buttonPageOpenMiniplayer = document.getElementsByClassName('player-minimize-button ytmusic-player')[0];
 
         document.addEventListener('contextmenu', function (e) {
             var posX = e.clientX;
@@ -120,6 +121,10 @@ function createMenu() {
 
         if (buttonOpenMiniplayer) {
             buttonOpenMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer'); } );
+        }
+
+        if (buttonPageOpenMiniplayer) {
+            buttonPageOpenMiniplayer.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); ipcRenderer.send('show-miniplayer'); } );
         }
         
         function showMenu(x, y) {
