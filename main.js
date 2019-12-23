@@ -160,7 +160,7 @@ function createWindow() {
   const view = new BrowserView({
     webPreferences: {
       nodeIntegration: true,
-      preload: path.join(app.getAppPath(), "/utils/injectContextMenu.js")
+      preload: path.join(app.getAppPath(), "/utils/injectControls.js")
     }
   });
 

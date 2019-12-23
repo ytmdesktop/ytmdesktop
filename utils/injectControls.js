@@ -5,6 +5,7 @@ var content = remote.getCurrentWebContents();
 
 content.addListener("dom-ready", function() {
   createMenu();
+  createRightContent();
 });
 
 function createMenu() {
@@ -78,51 +79,28 @@ function createMenu() {
         document.body.prepend(menuDiv);
     `);
 
+  // LISTENERS FOR MENU OPTIONS
   content.executeJavaScript(`
-        var i = document.getElementById("ytmd-menu").style;
-    
-        if (document.addEventListener) {
-            document.addEventListener('contextmenu', function (e) {
-            var posX = e.clientX;
-            var posY = e.clientY;
-            menu(posX, posY);
-            e.preventDefault();
-            }, false);
-            document.addEventListener('click', function (e) {
-            i.opacity = "0";
-            setTimeout(function () {
-                i.visibility = "hidden";
-            }, 501);
-            }, false);
-        } else {
-            document.attachEvent('oncontextmenu', function (e) {
-            var posX = e.clientX;
-            var posY = e.clientY;
-            menu(posX, posY);
-            e.preventDefault();
-            });
-            document.attachEvent('onclick', function (e) {
-            i.opacity = "0";
-            setTimeout(function () {
-                i.visibility = "hidden";
-            }, 501);
-            });
-        }
+        var menuElement = document.getElementById("ytmd-menu").style;
 
-        function menu(x, y) {
-            i.top = y + "px";
-            i.left = x + "px";
-            i.visibility = "visible";
-            i.opacity = "1";
-        }
-    `);
-
-  content.executeJavaScript(`
         var buttonHistoryBack = document.getElementById('ytmd-menu-history-back');
         var buttonOpenSettings = document.getElementById('ytmd-menu-settings');
         var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
         var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
+
+        document.addEventListener('contextmenu', function (e) {
+            var posX = e.clientX;
+            var posY = e.clientY;
+            showMenu(posX, posY);
+            e.preventDefault();
+            }, false);
+            document.addEventListener('click', function (e) {
+            menuElement.opacity = "0";
+            setTimeout(function () {
+                menuElement.visibility = "hidden";
+            }, 501);
+        }, false);
 
         if (buttonHistoryBack) {
             buttonHistoryBack.addEventListener('click', function() { history.go(-1); } );
@@ -143,12 +121,21 @@ function createMenu() {
         if (buttonOpenMiniplayer) {
             buttonOpenMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer'); } );
         }
+        
+        function showMenu(x, y) {
+            menuElement.top = y + "px";
+            menuElement.left = x + "px";
+            menuElement.visibility = "visible";
+            menuElement.opacity = "1";
+        }
     `);
+}
 
+function createRightContent() {
+  // ADD BUTTONS TO RIGHT CONTENT (side to the photo)
   content.executeJavaScript(
     `
             var right_content = document.getElementById('right-content');
-
 
             // SETTINGS
             var element = document.createElement('i');
@@ -159,7 +146,6 @@ function createMenu() {
             element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
             
             right_content.prepend(element);
-
     `
   );
 }
