@@ -12,6 +12,7 @@ var player = {
 var track = {
   author: "",
   title: "",
+  album: "",
   cover: "",
   duration: 0,
   durationHuman: "0:00",
@@ -48,6 +49,7 @@ function getTrackInfo() {
   if (webContents !== undefined) {
     getAuthor(webContents);
     getTitle(webContents);
+    getAlbum(webContents);
     getCover(webContents);
     getDuration(webContents);
     getUrl(webContents);
@@ -149,6 +151,30 @@ function getAuthor(webContents) {
     .then(author => {
       debug(`Author is: ${author}`);
       track.author = author;
+    });
+}
+
+function getAlbum(webContents) {
+  webContents
+    .executeJavaScript(
+      `
+      var album = '';
+      var player_bar = document.getElementsByClassName("byline ytmusic-player-bar")[0].children;
+      var arr_player_bar = Array.from(player_bar);
+      
+      arr_player_bar.forEach( function(data, index) {
+      
+       if (data.getAttribute('href') != null && data.getAttribute('href').includes('browse')) {
+          album = data.innerText;
+       }
+      } )
+      
+      album
+      `
+    )
+    .then(album => {
+      debug(`Album is: ${album}`);
+      track.album = album;
     });
 }
 
