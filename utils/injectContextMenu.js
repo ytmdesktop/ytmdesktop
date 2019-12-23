@@ -55,6 +55,18 @@ function createMenu() {
             height: 21px;
             display: inline-block;
         }
+
+        .hide {
+            visibility: hidden;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        .ytmd-icons {
+            margin: 0 20px 0 10px !important;
+        }
     `);
 
   var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-companion-server"><i class="material-icons">surround_sound</i></a>`;
@@ -127,4 +139,22 @@ function createMenu() {
             buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('show-companion'); } );
         }
     `);
+
+  content.executeJavaScript(
+    `
+            var right_content = document.getElementById('right-content');
+
+
+            // SETTINGS
+            var element = document.createElement('i');
+            element.id = 'ytmd_settings';
+            element.classList.add('material-icons', 'green-text', 'pointer', 'ytmd-icons');
+            element.innerText = 'settings';
+
+            element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
+            
+            right_content.prepend(element);
+
+    `
+  );
 }
