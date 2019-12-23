@@ -664,6 +664,7 @@ function createWindow() {
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
     // settings.webContents.openDevTools();
+    mainWindow.hide();
   });
 
   ipcMain.on("show-last-fm-login", function() {
