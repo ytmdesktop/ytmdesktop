@@ -56,7 +56,7 @@ function setActivity(data) {
     ws.send(`COVER:${data.track.cover}`);
     ws.send(`TITLE:${data.track.title}`);
     ws.send(`ARTIST:${data.track.author}`);
-    //ws.send("ALBUM:" + 'Album');
+    ws.send(`ALBUM:${data.track.album}`);
     ws.send(`STATE:${data.player.isPaused ? 2 : 1}`);
     ws.send(`DURATION:${data.track.durationHuman}`);
     ws.send(`POSITION:${data.player.seekbarCurrentPositionHuman}`);
