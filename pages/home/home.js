@@ -31,6 +31,12 @@ document
     ipc.send("show-settings");
   });
 
+document
+  .getElementById("btn-show-miniplayer")
+  .addEventListener("click", function() {
+    ipc.send("show-miniplayer");
+  });
+
 document.getElementById("btn-show-lyric").addEventListener("click", function() {
   ipc.send("show-lyrics");
 });

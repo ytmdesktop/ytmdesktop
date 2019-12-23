@@ -642,6 +642,30 @@ function createWindow() {
     // settings.webContents.openDevTools();
   });
 
+  ipcMain.on("show-miniplayer", function() {
+    const miniplayer = new BrowserWindow({
+      modal: false,
+      frame: false,
+      center: true,
+      resizable: true,
+      backgroundColor: "#232323",
+      width: 400,
+      minWidth: 400,
+      height: 400,
+      minHeight: 400,
+      icon: path.join(__dirname, "./assets/favicon.png"),
+      autoHideMenuBar: true,
+      skipTaskbar: false,
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
+    miniplayer.loadFile(
+      path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
+    );
+    // settings.webContents.openDevTools();
+  });
+
   ipcMain.on("show-last-fm-login", function() {
     const lastfm = new BrowserWindow({
       //parent: mainWindow,

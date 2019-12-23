@@ -258,14 +258,20 @@ const popUpMenu = (
     { type: "separator" },
 
     {
+      label: __.trans("LABEL_MINIPLAYER"),
+      type: "normal",
+      click: function() {
+        ipcMain.emit("show-miniplayer", true);
+      }
+    },
+
+    {
       label: __.trans("LABEL_LYRICS"),
       type: "normal",
       click: function() {
         ipcMain.emit("show-lyrics", true);
       }
     },
-
-    { type: "separator" },
 
     {
       label: __.trans("LABEL_SETTINGS"),

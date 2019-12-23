@@ -69,7 +69,7 @@ function createMenu() {
         }
     `);
 
-  var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-companion-server"><i class="material-icons">surround_sound</i></a>`;
+  var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">photo_size_select_small</i></a> <a id="ytmd-menu-companion-server"><i class="material-icons">surround_sound</i></a>`;
 
   content.executeJavaScript(`
         var menuDiv = document.createElement("div");
@@ -122,6 +122,7 @@ function createMenu() {
         var buttonOpenSettings = document.getElementById('ytmd-menu-settings');
         var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
+        var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
 
         if (buttonHistoryBack) {
             buttonHistoryBack.addEventListener('click', function() { history.go(-1); } );
@@ -137,6 +138,10 @@ function createMenu() {
         
         if (buttonOpenCompanion) {
             buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('show-companion'); } );
+        }
+
+        if (buttonOpenMiniplayer) {
+            buttonOpenMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer'); } );
         }
     `);
 
