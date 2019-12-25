@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "ace-builds": "^1.4.7",
+    "base64-img": "^1.0.4",
     "castv2-player": "^2.1.0",
     "discord-rpc": "^3.1.0",
     "electron-canvas-to-buffer": "^2.0.0",

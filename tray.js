@@ -6,6 +6,7 @@ const settingsProvider = require("./providers/settingsProvider");
 const __ = require("./providers/translateProvider");
 const Notification = require("electron-native-notification");
 const { doBehavior } = require("./utils/window");
+const base64Img = require("base64-img");
 
 let tray = null;
 let saved_icon = null;
@@ -46,23 +47,27 @@ exports.createTray = function(mainWindow, icon) {
   }
 };
 
-exports.balloon = function(title, content) {
-  if (settingsProvider.get("settings-show-notifications")) {
-    if (title && content) {
-      if (process.platform == "win32") {
-        tray.displayBalloon({
-          icon: path.join(__dirname, "assets/favicon.256x256.png"),
-          title: title,
-          content: content
-        });
-      } else {
-        new Notification(title, {
-          body: content,
-          icon: path.join(__dirname, "assets/favicon.256x256.png")
-        });
+exports.balloon = function(title, content, cover) {
+  base64Img.requestBase64(cover, function(err, res, body) {
+    var image = nativeImage.createFromDataURL(body);
+
+    if (settingsProvider.get("settings-show-notifications")) {
+      if (title && content) {
+        if (process.platform == "win32") {
+          tray.displayBalloon({
+            icon: image,
+            title: title,
+            content: content
+          });
+        } else {
+          new Notification(title, {
+            body: content,
+            icon: image
+          });
+        }
       }
     }
-  }
+  });
 };
 
 exports.quit = function() {

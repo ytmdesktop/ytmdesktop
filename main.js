@@ -347,6 +347,7 @@ function createWindow() {
 
     var title = trackInfo.title;
     var author = trackInfo.author;
+    var cover = trackInfo.cover;
     var nowPlaying = title + " - " + author;
 
     logDebug(nowPlaying);
@@ -378,7 +379,7 @@ function createWindow() {
       }
 
       mainWindow.setTitle(nowPlaying);
-      tray.balloon(title, author);
+      tray.balloon(title, author, cover);
       scrobblerProvider.updateTrackInfo(title, author);
     }
   }
