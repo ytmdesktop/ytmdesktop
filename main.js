@@ -517,6 +517,10 @@ function createWindow() {
     mediaControl.nextTrack(view);
   });
 
+  ipcMain.on("restore-main-window", function() {
+    mainWindow.show();
+  });
+
   ipcMain.on("settings-changed-zoom", function(e, value) {
     view.webContents.setZoomFactor(value / 100);
   });
@@ -668,7 +672,7 @@ function createWindow() {
     miniplayer.loadFile(
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
-    miniplayer.webContents.openDevTools();
+    // miniplayer.webContents.openDevTools();
     mainWindow.hide();
   });
 
