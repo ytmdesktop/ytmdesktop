@@ -379,8 +379,10 @@ function createWindow() {
       }
 
       mainWindow.setTitle(nowPlaying);
-      tray.balloon(title, author, cover);
       scrobblerProvider.updateTrackInfo(title, author);
+      if (!mainWindow.isFocused()) {
+        tray.balloon(title, author, cover);
+      }
     }
   }
 
