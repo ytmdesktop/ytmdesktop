@@ -522,10 +522,12 @@ function createWindow() {
   });
 
   ipcMain.on("what-is-song-playing-now", function(e, data) {
+    // IPCRenderer
     if (e !== undefined) {
-      e.sender.send("song-playing-now-is", infoPlayer.getTrackInfo());
+      e.sender.send("song-playing-now-is", infoPlayer.getAllInfo());
     }
 
+    // IPCMain
     if (infoPlayer.hasInitialized()) {
       ipcMain.emit("song-playing-now-is", infoPlayer.getAllInfo());
     }
@@ -666,7 +668,7 @@ function createWindow() {
     miniplayer.loadFile(
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
-    // settings.webContents.openDevTools();
+    miniplayer.webContents.openDevTools();
     mainWindow.hide();
   });
 
