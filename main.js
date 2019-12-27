@@ -178,77 +178,10 @@ function createWindow() {
 
   view.webContents.loadURL(mainWindowParams.url);
 
-  let checkConnectionTimeoutHandler;
-  async function checkConnection() {
-    /**
-     * Check if is online
-     */
-    var is_online = await isOnline();
-
-    /**
-     * If online, consider that already loaded the url
-     * If offline, mark the variable that the url was not read
-     */
-    if (hasLoadedUrl === undefined) {
-      lastConnectionStatusIsOnline = hasLoadedUrl = is_online;
-    }
-
-    /**
-     * Emmit is online or offline to render.js
-     */
-    mainWindow.send("is-online", is_online);
-
-    /**
-     * If online and lastConnectionStatusIsOnline is false, set BrowserView and check hasLoadedUrl to loadURL
-     * else set BrowserView to null to show Loading circle and show icon that not have connection
-     */
-    if (is_online === true) {
-      if (lastConnectionStatusIsOnline === false) {
-        mainWindow.setBrowserView(view);
-        if (hasLoadedUrl === false) {
-          view.webContents.loadURL(mainWindowParams.url);
-          hasLoadedUrl = true;
-        }
-      }
-    } else {
-      if (lastConnectionStatusIsOnline === true) {
-        if (!global.sharedObj.paused) mediaControl.stopTrack(view);
-        mainWindow.setBrowserView(null);
-        mediaControl.createThumbar(
-          mainWindow,
-          infoPlayer.getPlayerInfo().isPaused,
-          infoPlayer.getPlayerInfo().likeStatus
-        );
-      }
-    }
-
-    lastConnectionStatusIsOnline = is_online;
-
-    /**
-     * Check connection every 60 seconds
-     */
-    checkConnectionTimeoutHandler = setTimeout(
-      () => checkConnection(),
-      60 * 1000
-    );
-  }
-
-  //setTimeout(() => checkConnection(), 15 * 1000);
-
-  // Preserving Performance
-  // Why check if Windows is closed/hidden
-  // Check again on open/ready
-  mainWindow.on("close", () => clearTimeout(checkConnectionTimeoutHandler));
-  mainWindow.on("hide", () => clearTimeout(checkConnectionTimeoutHandler));
-  mainWindow.on("ready-to-show", () => {
-    if (checkConnectionTimeoutHandler) {
-      //checkConnection();
-    }
-  });
-
   // Open the DevTools.
   // mainWindow.webContents.openDevTools({ mode: 'detach' });
   // view.webContents.openDevTools({ mode: 'detach' });
+
   mediaControl.createThumbar(
     mainWindow,
     infoPlayer.getPlayerInfo().isPaused,
@@ -626,9 +559,37 @@ function createWindow() {
     }
   });
 
+  ipcMain.on("show-guest-mode", function() {
+    incognitoWindow = new BrowserWindow({
+      icon: icon,
+      width: mainWindowParams.width,
+      height: mainWindowParams.height,
+      minWidth: 300,
+      minHeight: 300,
+      show: true,
+      autoHideMenuBar: true,
+      backgroundColor: "#232323",
+      center: true,
+      closable: true,
+      skipTaskbar: false,
+      resize: true,
+      maximizable: true,
+      frame: true,
+      webPreferences: {
+        nodeIntegration: true,
+        partition: `guest-mode-${Date.now()}`
+      }
+    });
+
+    incognitoWindow.webContents.session.setUserAgent(
+      "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0"
+    );
+
+    incognitoWindow.webContents.loadURL(mainWindowParams.url);
+  });
+
   ipcMain.on("show-settings", function() {
     const settings = new BrowserWindow({
-      //parent: mainWindow,
       modal: false,
       frame: false,
       center: true,
@@ -670,11 +631,13 @@ function createWindow() {
         nodeIntegration: true
       }
     });
+
     miniplayer.loadFile(
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
-    // miniplayer.webContents.openDevTools();
+
     mainWindow.hide();
+    // miniplayer.webContents.openDevTools();
   });
 
   ipcMain.on("show-last-fm-login", function() {
@@ -696,9 +659,11 @@ function createWindow() {
         nodeIntegration: true
       }
     });
+
     lastfm.loadFile(
       path.join(app.getAppPath(), "/pages/settings/last-fm-login.html")
     );
+
     // lastfm.webContents.openDevTools();
   });
 
@@ -728,14 +693,13 @@ function createWindow() {
     });
 
     editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
+
     // editor.webContents.openDevTools();
   });
 
   ipcMain.on("update-custom-theme", function() {
     loadCustomTheme();
   });
-
-  // ipcMain.send('update-status-bar', '111', '222');
 
   function loadCustomTheme() {
     if (settingsProvider.get("settings-custom-theme")) {
