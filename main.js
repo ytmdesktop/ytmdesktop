@@ -118,7 +118,7 @@ function createWindow() {
     mainWindowParams.width = windowSize.width;
     mainWindowParams.height = windowSize.height;
   }
-  broswerWindowConfig = {
+  browserWindowConfig = {
     icon: icon,
     width: mainWindowParams.width,
     height: mainWindowParams.height,
@@ -139,21 +139,21 @@ function createWindow() {
 
   switch (settingsProvider.get("titlebar-type")) {
     case "nice":
-      broswerWindowConfig.frame = false;
-      broswerWindowConfig.titleBarStyle = "hidden";
+      browserWindowConfig.frame = false;
+      browserWindowConfig.titleBarStyle = "hidden";
       break;
 
     case "system":
-      broswerWindowConfig.frame = true;
+      browserWindowConfig.frame = true;
       break;
 
     case "none":
-      broswerWindowConfig.frame = false;
-      broswerWindowConfig.titleBarStyle = "hidden";
+      browserWindowConfig.frame = false;
+      browserWindowConfig.titleBarStyle = "hidden";
       break;
   }
 
-  mainWindow = new BrowserWindow(broswerWindowConfig);
+  mainWindow = new BrowserWindow(browserWindowConfig);
   mainWindow.webContents.session.setUserAgent(
     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0"
   );
@@ -651,13 +651,14 @@ function createWindow() {
     const miniplayer = new BrowserWindow({
       modal: false,
       frame: false,
-      center: true,
-      resizable: true,
-      backgroundColor: "#232323",
-      width: 400,
-      minWidth: 400,
-      height: 400,
-      minHeight: 400,
+      center: false,
+      resizable: false,
+      alwaysOnTop: true,
+      backgroundColor: "#000000",
+      width: 200,
+      minWidth: 200,
+      height: 200,
+      minHeight: 200,
       icon: path.join(__dirname, "./assets/favicon.png"),
       autoHideMenuBar: true,
       skipTaskbar: false,
@@ -668,7 +669,7 @@ function createWindow() {
     miniplayer.loadFile(
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
-    miniplayer.webContents.openDevTools();
+    // miniplayer.webContents.openDevTools();
     mainWindow.hide();
   });
 
