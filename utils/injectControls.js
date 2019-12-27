@@ -6,6 +6,7 @@ var content = remote.getCurrentWebContents();
 content.addListener("dom-ready", function() {
   createMenu();
   createRightContent();
+  playerBarScrollToChangeVolume();
 });
 
 function createMenu() {
@@ -132,25 +133,34 @@ function createMenu() {
             menuElement.left = x + "px";
             menuElement.visibility = "visible";
             menuElement.opacity = "1";
-        }
-    `);
+        }`);
 }
 
 function createRightContent() {
   // ADD BUTTONS TO RIGHT CONTENT (side to the photo)
-  content.executeJavaScript(
-    `
-            var right_content = document.getElementById('right-content');
+  content.executeJavaScript(`
+        var right_content = document.getElementById('right-content');
 
-            // SETTINGS
-            var element = document.createElement('i');
-            element.id = 'ytmd_settings';
-            element.classList.add('material-icons', 'green-text', 'pointer', 'ytmd-icons');
-            element.innerText = 'settings';
+        // SETTINGS
+        var element = document.createElement('i');
+        element.id = 'ytmd_settings';
+        element.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        element.innerText = 'settings';
 
-            element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
-            
-            right_content.prepend(element);
-    `
-  );
+        element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
+        
+        right_content.prepend(element);`);
+}
+
+function playerBarScrollToChangeVolume() {
+  content.executeJavaScript(`
+        var playerBar = document.getElementsByTagName('ytmusic-player-bar')[0];
+
+        playerBar.addEventListener('wheel', function(ev) { 
+            if ( ev.deltaY < 0) {
+                ipcRenderer.send('media-volume-up');
+            } else {
+                ipcRenderer.send('media-volume-down');
+            }
+        });`);
 }

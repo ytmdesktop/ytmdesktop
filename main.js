@@ -517,6 +517,10 @@ function createWindow() {
     mediaControl.nextTrack(view);
   });
 
+  ipcMain.on("restore-main-window", function() {
+    mainWindow.show();
+  });
+
   ipcMain.on("settings-changed-zoom", function(e, value) {
     view.webContents.setZoomFactor(value / 100);
   });
