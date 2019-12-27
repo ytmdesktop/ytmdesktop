@@ -398,8 +398,10 @@ function createWindow() {
       }
       return;
     }
-    e.preventDefault();
-    mainWindow.hide();
+    if (settingsProvider.get("settings-keep-background")) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
   });
 
   app.on("before-quit", function(e) {
@@ -560,7 +562,7 @@ function createWindow() {
   });
 
   ipcMain.on("show-guest-mode", function() {
-    incognitoWindow = new BrowserWindow({
+    const incognitoWindow = new BrowserWindow({
       icon: icon,
       width: mainWindowParams.width,
       height: mainWindowParams.height,

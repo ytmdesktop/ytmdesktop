@@ -37,7 +37,7 @@ function createMenu() {
 
             z-index: 999999 !important;
 
-            min-width: 208px;
+            min-width: 256px;
         }
     
         #ytmd-menu a {
