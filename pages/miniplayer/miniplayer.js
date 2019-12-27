@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-const body = document.getElementsByTagName("body")[0];
+const coverBG = document.getElementById("coverBG");
 
 let timer = setInterval(() => {
   ipcRenderer.send("what-is-song-playing-now");
@@ -11,7 +11,5 @@ ipcRenderer.on("song-playing-now-is", (e, data) => {
 });
 
 function setBackgroundCover(cover) {
-  body.style.backgroundSize = "cover";
-  body.style.backgroundRepeat = "no-repeat";
-  body.style.backgroundImage = `url(${cover})`;
+  coverBG.style.backgroundImage = `url(${cover})`;
 }
