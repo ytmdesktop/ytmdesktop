@@ -284,6 +284,16 @@ const popUpMenu = (
     { type: "separator" },
 
     {
+      label: __.trans("LABEL_GUEST"),
+      type: "normal",
+      click: () => {
+        ipcMain.emit("show-guest-mode", true);
+      }
+    },
+
+    { type: "separator" },
+
+    {
       label: __.trans("LABEL_EXIT"),
       type: "normal",
       click: function() {
