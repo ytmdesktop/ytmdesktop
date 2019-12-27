@@ -144,7 +144,7 @@ function createRightContent() {
         // SETTINGS
         var element = document.createElement('i');
         element.id = 'ytmd_settings';
-        element.classList.add('material-icons', 'green-text', 'pointer', 'ytmd-icons');
+        element.classList.add('material-icons', 'pointer', 'ytmd-icons');
         element.innerText = 'settings';
 
         element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
@@ -157,6 +157,10 @@ function playerBarScrollToChangeVolume() {
         var playerBar = document.getElementsByTagName('ytmusic-player-bar')[0];
 
         playerBar.addEventListener('wheel', function(ev) { 
-            console.log(ev.deltaY);
+            if ( ev.deltaY < 0) {
+                ipcRenderer.send('media-volume-up');
+            } else {
+                ipcRenderer.send('media-volume-down');
+            }
         });`);
 }
