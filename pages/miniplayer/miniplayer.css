@@ -28,10 +28,36 @@ body {
 
 .controls {
     display: flex;
+    margin: 0 10px;
     justify-content: center;
 }
 
 .ctrl-btn {
     float: left;
     padding: 3px;
+    margin: 10px 2px;
+    border-radius: 50%;
+}
+
+.ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#btn-play-pause {
+    margin: 0;
+}
+
+#btn-like,
+#btn-dislike {
+    margin: 10px 5px;
+}
+
+#btn-like i,
+#btn-dislike i {
+    font-size: 14px;
+    padding: 5px;
+}
+
+#btn-play-pause i {
+    font-size: 44px;
 }
