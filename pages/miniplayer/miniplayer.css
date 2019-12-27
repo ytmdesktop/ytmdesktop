@@ -1,14 +1,37 @@
-html, body {
+html,
+body {
     margin: 0;
-    -webkit-app-region: drag;
 }
 
-#coverBG {
+.cover-bg {
     position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
     width: 100%;
     height: 100%;
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    filter: blur(5px);
+    filter: brightness(50%);
+}
+
+.cover-bg:hover {
+    filter: brightness(0%);
+}
+
+.cmd-btn {
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+}
+
+.ctrl-btn {
+    float: left;
+    padding: 3px;
 }

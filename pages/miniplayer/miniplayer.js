@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
 
-const coverBG = document.getElementById("coverBG");
+const coverbg = document.getElementById("cover-bg");
 const buttonClose = document.getElementById("btn-close");
 
 buttonClose.addEventListener("click", () => {
@@ -22,5 +22,5 @@ function init() {
 }
 
 function setBackgroundCover(cover) {
-  coverBG.style.backgroundImage = `url(${cover})`;
+  coverbg.style.backgroundImage = `url(${cover})`;
 }

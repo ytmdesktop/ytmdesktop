@@ -1,24 +1,64 @@
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <title>YouTube Music</title>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="../../node_modules/materialize-css/dist/css/materialize.min.css"
+      media="screen,projection"
+    />
     <link href="../../assets/css/material_icons.css" rel="stylesheet" />
     <link type="text/css" rel="stylesheet" href="../../assets/css/styles.css" />
     <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
   </head>
 
   <body class="drag">
-    <div class="bar">
-      <div class="cmd-btns">
-        <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
-          <i class="material-icons tiny">aspect_ratio</i>
-        </div>
+    <div id="cover-bg" class="cover-bg"></div>
+    <div class="no-drag pointer cmd-btn right" id="btn-close">
+      <i class="material-icons tiny">aspect_ratio</i>
+    </div>
+
+    <div id="author">Nome da banda</div>
+
+    <div id="title">Nome da musica</div>
+
+    <div class="controls no-drag">
+      <p>0:10</p>
+      <input id="seekbar" type="range" min="0" max="100" step="10" />
+      <p>3:34</p>
+    </div>
+
+    <div class="controls no-drag">
+      <div class="pointer ctrl-btn" id="dislike">
+        <i class="material-icons">thumb_down</i>
+      </div>
+      <div class="pointer ctrl-btn" id="previous">
+        <i class="material-icons">skip_previous</i>
+      </div>
+      <div class="pointer ctrl-btn" id="play">
+        <i class="material-icons">play_arrow</i>
+      </div>
+      <div class="pointer ctrl-btn" id="pause">
+        <i class="material-icons">pause</i>
+      </div>
+      <div class="pointer ctrl-btn" id="next">
+        <i class="material-icons">skip_next</i>
+      </div>
+      <div class="pointer ctrl-btn" id="like">
+        <i class="material-icons">thumb_up</i>
       </div>
     </div>
-    <div id="coverBG"></div>
-    <i class="material-icons">thumb_down</i>
-    <i class="material-icons">skip_previows</i>
-    <i class="material-icons">play_arrow</i>
-    <i class="material-icons">skip_next</i>
-    <i class="material-icons">thumb_up</i>
+
+    <div class="controls no-drag">
+      <div class="no-drag pointer ctrl-btn" id="vol-down">
+        <i class="material-icons tiny">volume_down</i>
+      </div>
+      <input id="vol-range" type="range" min="0" max="100" step="10" />
+      <div class="no-drag pointer ctrl-btn" id="vol-up">
+        <i class="material-icons tiny">volume_up</i>
+      </div>
+    </div>
   </body>
 
   <script src="./miniplayer.js"></script>
