@@ -3,7 +3,14 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(../fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+  src: url(../fonts/normal.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Icons Outlined';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/outlined.woff2) format('woff2');
 }
 
 .material-icons {
@@ -20,4 +27,8 @@
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+}
+
+.material-icons.outlined {
+  font-family: 'Material Icons Outlined';
 }
