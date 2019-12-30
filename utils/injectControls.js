@@ -66,6 +66,10 @@ function createMenu() {
             cursor: pointer;
         }
 
+        #ytmd_settings {
+            color: #909090 !important;
+        }
+
         .ytmd-icons {
             margin: 0 20px 0 10px !important;
         }
@@ -147,9 +151,24 @@ function createRightContent() {
         element.classList.add('material-icons', 'pointer', 'ytmd-icons');
         element.innerText = 'settings';
 
-        element.addEventListener('click', function() { ipcRenderer.send('show-settings'); } )
+        element.addEventListener('click', function() { ipcRenderer.send('show-settings', true); } )
         
-        right_content.prepend(element);`);
+        right_content.prepend(element);
+        
+        // UPDATE
+        var element = document.createElement('i');
+        element.id = 'ytmd_update';
+        element.classList.add('material-icons', 'green-text', 'pointer', 'ytmd-icons', 'hide');
+        element.style.color = '#4CAF50';
+        element.innerText = 'arrow_downward';
+
+        element.addEventListener('click', function() { ipcRenderer.send('btn-update-clicked', true); } )
+
+        right_content.prepend(element);
+
+        ipcRenderer.on('downloaded-new-update', function(e, data) {
+            document.getElementById("ytmd_update").classList.remove("hide");
+        } );`);
 }
 
 function playerBarScrollToChangeVolume() {

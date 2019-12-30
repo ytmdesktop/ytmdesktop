@@ -1,7 +1,7 @@
 const { ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 
-function checkUpdate(mainWindow) {
+function checkUpdate(mainWindow, view) {
   autoUpdater.checkForUpdates();
 
   autoUpdater.on("checking-for-update", () => {
@@ -40,13 +40,15 @@ function checkUpdate(mainWindow) {
   autoUpdater.on("update-downloaded", info => {
     // tray.balloon( 'Update downloaded', 'Auto Update' );
     mainWindow.send("downloaded-new-update", true);
-  });
-
-  ipcMain.on("btn-update-clicked", () => {
-    autoUpdater.quitAndInstall();
+    view.webContents.send("downloaded-new-update", true);
   });
 }
 
+function quitAndInstall() {
+  autoUpdater.quitAndInstall();
+}
+
 module.exports = {
-  checkUpdate: checkUpdate
+  checkUpdate: checkUpdate,
+  quitAndInstall: quitAndInstall
 };

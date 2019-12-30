@@ -52,7 +52,7 @@ let renderer_for_status_bar = null;
 global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+let mainWindow, view;
 
 let mainWindowParams = {
   url: "https://music.youtube.com",
@@ -157,7 +157,7 @@ function createWindow() {
   mainWindow.webContents.session.setUserAgent(
     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0"
   );
-  const view = new BrowserView({
+  view = new BrowserView({
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(app.getAppPath(), "/utils/injectControls.js")
@@ -561,6 +561,10 @@ function createWindow() {
     }
   });
 
+  ipcMain.on("btn-update-clicked", () => {
+    updater.quitAndInstall();
+  });
+
   ipcMain.on("show-guest-mode", function() {
     const incognitoWindow = new BrowserWindow({
       icon: icon,
@@ -780,16 +784,14 @@ app.on("ready", function(ev) {
   ipcMain.on("updated-tray-image", function(event, payload) {
     if (settingsProvider.get("settings-shiny-tray")) tray.updateImage(payload);
   });
-
   if (!isDev) {
-    updater.checkUpdate(mainWindow);
+    updater.checkUpdate(mainWindow, view);
 
     setInterval(function() {
-      updater.checkUpdate(mainWindow);
+      updater.checkUpdate(mainWindow, view);
     }, 1 * 60 * 60 * 1000);
   }
   ipcMain.emit("ready", app);
-  // mediaControl.createTouchBar(mainWindow);
 });
 
 // Quit when all windows are closed.
