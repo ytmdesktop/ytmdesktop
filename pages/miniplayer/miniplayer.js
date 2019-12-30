@@ -1,6 +1,12 @@
 const { ipcRenderer } = require("electron");
 
-const coverbg = document.getElementById("cover-bg");
+const body = document.getElementsByTagName("body")[0];
+const title = document.getElementById("title");
+const author = document.getElementById("author");
+
+const current = document.getElementById("current");
+const duration = document.getElementById("duration");
+const progress = document.getElementById("progress");
 
 const btnClose = document.getElementById("btn-close");
 const btnDislike = document.getElementById("btn-dislike");
@@ -39,14 +45,41 @@ init();
 function init() {
   setInterval(() => {
     ipcRenderer.send("what-is-song-playing-now");
-  }, 1000);
+  }, 900);
 
   ipcRenderer.on("song-playing-now-is", (e, data) => {
-    // console.log(data);
-    setBackgroundCover(data.track.cover);
+    setPlayerInfo(data);
   });
 }
 
-function setBackgroundCover(cover) {
-  coverbg.style.backgroundImage = `url(${cover})`;
+function setPlayerInfo(data) {
+  body.style.backgroundImage = `url(${data.track.cover})`;
+  title.innerHTML = data.track.title;
+  author.innerHTML = data.track.author;
+  current.innerHTML = data.player.seekbarCurrentPositionHuman;
+  duration.innerHTML = data.track.durationHuman;
+  progress.style.width = data.track.statePercent * 200;
+
+  if (data.player.isPaused) {
+    btnPlayPause.children[0].innerHTML = "play_arrow";
+  } else {
+    btnPlayPause.children[0].innerHTML = "pause";
+  }
+
+  switch (data.player.likeStatus) {
+    case "LIKE":
+      btnLike.children[0].classList.remove("outlined");
+      btnDislike.children[0].classList.add("outlined");
+      break;
+
+    case "DISLIKE":
+      btnLike.children[0].classList.add("outlined");
+      btnDislike.children[0].classList.remove("outlined");
+      break;
+
+    case "INDIFFERENT":
+      btnLike.children[0].classList.add("outlined");
+      btnDislike.children[0].classList.add("outlined");
+      break;
+  }
 }

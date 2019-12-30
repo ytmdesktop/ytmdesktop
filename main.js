@@ -643,7 +643,7 @@ function createWindow() {
     );
 
     mainWindow.hide();
-    miniplayer.webContents.openDevTools();
+    // miniplayer.webContents.openDevTools();
   });
 
   ipcMain.on("show-last-fm-login", function() {

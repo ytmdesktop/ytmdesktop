@@ -13,25 +13,29 @@
     <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
   </head>
 
-  <body class="drag">
-    <div id="cover-bg" class="cover-bg"></div>
-    <div class="no-drag pointer cmd-btn right" id="btn-close">
+  <body>
+    <div class="drag cmd-btn left" id="btn-drag">
+      <i class="material-icons tiny">drag_indicator</i>
+    </div>
+    <div class="pointer cmd-btn right" id="btn-close">
       <i class="material-icons tiny">aspect_ratio</i>
     </div>
 
-    <div id="author">Nome da banda</div>
-
-    <div id="title">Nome da musica</div>
-
-    <div class="controls no-drag">
-      <p>0:10</p>
-      <input id="seekbar" type="range" min="0" max="100" step="10" />
-      <p>3:34</p>
+    <div class="title center">
+      <span id="title">TITLE</span>
     </div>
 
-    <div class="controls no-drag">
+    <div class="author center">
+      <span id="author">AUTHOR</span>
+    </div>
+
+    <div class="duration center">
+      <span id="current">0:00</span> / <span id="duration">0:00</span>
+    </div>
+
+    <div class="controls">
       <div class="pointer ctrl-btn" id="btn-dislike">
-        <i class="material-icons">thumb_down</i>
+        <i class="material-icons outlined">thumb_down</i>
       </div>
       <div class="pointer ctrl-btn" id="btn-previous">
         <i class="material-icons">skip_previous</i>
@@ -43,8 +47,12 @@
         <i class="material-icons">skip_next</i>
       </div>
       <div class="pointer ctrl-btn" id="btn-like">
-        <i class="material-icons">thumb_up</i>
+        <i class="material-icons outlined">thumb_up</i>
       </div>
+    </div>
+
+    <div class="progress-bar">
+      <div id="progress"></div>
     </div>
   </body>
 
