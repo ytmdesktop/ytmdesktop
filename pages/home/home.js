@@ -21,16 +21,6 @@ if (store.get("titlebar-type", "nice") !== "nice") {
   document.getElementById("nice-titlebar").style.display = "none";
 }
 
-document.getElementById("btn-update").addEventListener("click", function() {
-  ipc.send("btn-update-clicked", true);
-});
-
-document
-  .getElementById("btn-show-settings")
-  .addEventListener("click", function() {
-    ipc.send("show-settings");
-  });
-
 document
   .getElementById("btn-show-miniplayer")
   .addEventListener("click", function() {
@@ -89,20 +79,12 @@ ipc.on("window-is-maximized", function(event, value) {
   }
 });
 
-ipc.on("have-new-update", function(e, data) {
-  // document.getElementById( 'btn-update' ).classList.remove( 'hide' );
-});
-
 ipc.on("off-the-road", function(e, data) {
   document.getElementById("btn-reset-url").classList.remove("hide");
 });
 
 ipc.on("on-the-road", function(e, data) {
   document.getElementById("btn-reset-url").classList.add("hide");
-});
-
-ipc.on("downloaded-new-update", function(e, data) {
-  document.getElementById("btn-update").classList.remove("hide");
 });
 
 ipc.on("update-status-bar", function(event, arg) {
