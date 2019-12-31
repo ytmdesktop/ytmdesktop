@@ -3,9 +3,36 @@ const electronStore = require("electron-store");
 const store = new electronStore();
 const status = remote.getGlobal("sharedObj");
 const window = remote.getCurrentWindow();
-
+const { isWindows, isMac, isLinux } = require("../../utils/systemInfo");
 const icons = require("../../icons_for_shiny_tray");
+
 let icon_set = icons.bright;
+
+if (isMac()) {
+  document.getElementById("win").remove();
+  document.getElementById("lin").remove();
+} else if (isWindows()) {
+  document.getElementById("mac").remove();
+  document.getElementById("lin").remove();
+} else {
+  document.getElementById("win").remove();
+  document.getElementById("mac").remove();
+}
+
+setInterval(() => {
+  ipc.send("what-is-song-playing-now");
+}, 500);
+
+ipc.on("song-playing-now-is", (e, data) => {
+  let title = data.track.title;
+  let author = data.track.author;
+
+  if (title && author) {
+    document.getElementById("music-title").innerText = `${title} - ${author}`;
+  } else {
+    document.getElementById("music-title").innerText = "YouTube Music";
+  }
+});
 
 ipc.on("is-online", function(_, isOnline) {
   if (isOnline) {
@@ -21,28 +48,10 @@ if (store.get("titlebar-type", "nice") !== "nice") {
   document.getElementById("nice-titlebar").style.display = "none";
 }
 
-document
-  .getElementById("btn-show-miniplayer")
-  .addEventListener("click", function() {
-    ipc.send("show-miniplayer");
-  });
-
-document.getElementById("btn-show-lyric").addEventListener("click", function() {
-  ipc.send("show-lyrics");
-});
-
-if (!!store.get("settings-companion-server")) {
-  document.getElementById("btn-show-companion").classList.remove("hide");
-  document
-    .getElementById("btn-show-companion")
-    .addEventListener("click", function() {
-      ipc.send("show-companion");
-    });
-}
 if (process.platform === "darwin") {
-  document.getElementById("btn-minimize").style.display = "none";
-  document.getElementById("btn-maximize").style.display = "none";
-  document.getElementById("btn-close").style.display = "none";
+  // document.getElementById("btn-minimize").style.display = "none";
+  // document.getElementById("btn-maximize").style.display = "none";
+  // document.getElementById("btn-close").style.display = "none";
 } else {
   document.getElementById("btn-minimize").addEventListener("click", function() {
     window.minimize();
@@ -61,10 +70,6 @@ if (process.platform === "darwin") {
   });
 }
 
-document.getElementById("btn-reset-url").addEventListener("click", function() {
-  ipc.send("reset-url");
-});
-
 const canvas = document.createElement("canvas");
 canvas.height = 32;
 canvas.width = 150;
@@ -77,14 +82,6 @@ ipc.on("window-is-maximized", function(event, value) {
     document.getElementById("icon_restore").classList.add("hide");
     document.getElementById("icon_maximize").classList.remove("hide");
   }
-});
-
-ipc.on("off-the-road", function(e, data) {
-  document.getElementById("btn-reset-url").classList.remove("hide");
-});
-
-ipc.on("on-the-road", function(e, data) {
-  document.getElementById("btn-reset-url").classList.add("hide");
 });
 
 ipc.on("update-status-bar", function(event, arg) {
@@ -110,6 +107,7 @@ ipc.on("update-status-bar", function(event, arg) {
 });
 
 ipc.send("register-renderer");
+
 ipc.on("is-dev", function(event, args) {
   if (args) {
     document.title = document.title + " DEV";

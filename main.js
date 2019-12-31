@@ -281,7 +281,7 @@ function createWindow() {
     var title = trackInfo.title;
     var author = trackInfo.author;
     var cover = trackInfo.cover;
-    var nowPlaying = title + " - " + author;
+    var nowPlaying = `${title} - ${author}`;
 
     logDebug(nowPlaying);
 
@@ -460,7 +460,7 @@ function createWindow() {
     view.webContents.setZoomFactor(value / 100);
   });
 
-  ipcMain.on("what-is-song-playing-now", function(e, data) {
+  ipcMain.on("what-is-song-playing-now", function(e, _) {
     // IPCRenderer
     if (e !== undefined) {
       e.sender.send("song-playing-now-is", infoPlayer.getAllInfo());

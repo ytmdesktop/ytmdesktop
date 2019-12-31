@@ -31,8 +31,7 @@ html, body {
 }
 
 .bar .title {
-    float: left;
-    margin: 3px 0 0 6px;
+    padding: 3px 0 0 6px;
     color: #FFF;
 }
 
@@ -45,9 +44,12 @@ html, body {
     color: white;
 }
 
+.bar .row .col {
+    padding: 0 !important;
+}
 
 .cmd-btn {
-    float: left;
+    display: inline-block;
     width: 40px;
     height: 28px;
     margin: 0;

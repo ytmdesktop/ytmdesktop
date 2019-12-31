@@ -16,42 +16,97 @@
 
   <body>
     <div id="nice-titlebar" class="bar drag">
-      <div class="title">
-        <span id="music-title"></span>
+      <div id="mac">
+        <div class="row">
+          <div class="col s3 left-align">
+            <div class="no-drag pointer cmd-btn" id="btn-close">
+              <i class="material-icons red-text lighten-1 tiny">brightness_1</i>
+            </div>
+            <div class="no-drag pointer cmd-btn" id="btn-maximize">
+              <i
+                id="icon_maximize"
+                class="material-icons orange-text lighten-1 tiny"
+                >brightness_1</i
+              >
+              <i
+                id="icon_restore"
+                class="material-icons orange-text lighten-1 tiny hide"
+                >brightness_1</i
+              >
+            </div>
+            <div class="no-drag pointer cmd-btn" id="btn-minimize">
+              <i class="material-icons grey-text lighten-5 tiny"
+                >brightness_1</i
+              >
+            </div>
+          </div>
+
+          <div class="col s6 center">
+            <div class="title">
+              <span id="music-title"></span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="cmd-btns">
-        <div class="no-drag pointer cmd-btn hide" id="btn-show-companion">
-          <i class="material-icons tiny" title="Show Companion"
-            >surround_sound</i
-          >
+      <div id="win">
+        <div class="row">
+          <div class="col s9 left-align">
+            <div class="title">
+              <span id="music-title"></span>
+            </div>
+          </div>
+
+          <div class="col s3 right-align">
+            <div class="no-drag pointer cmd-btn" id="btn-minimize">
+              <i class="material-icons tiny" title="Minimize">remove</i>
+            </div>
+            <div class="no-drag pointer cmd-btn" id="btn-maximize">
+              <i id="icon_maximize" class="material-icons tiny" title="Maximize"
+                >crop_square</i
+              >
+              <i
+                id="icon_restore"
+                class="material-icons tiny hide"
+                title="Restaure"
+                >filter_none</i
+              >
+            </div>
+            <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
+              <i class="material-icons tiny" title="Close">close</i>
+            </div>
+          </div>
         </div>
-        <div class="no-drag pointer cmd-btn hide red-text" id="btn-reset-url">
-          <i class="material-icons tiny" title="Go To YTMusic"
-            >settings_backup_restore</i
-          >
-        </div>
-        <div class="no-drag pointer cmd-btn hide" id="btn-show-miniplayer">
-          <i class="material-icons tiny" title="Show Miniplayer"
-            >picture_in_picture_alt</i
-          >
-        </div>
-        <div class="no-drag pointer cmd-btn" id="btn-show-lyric">
-          <i class="material-icons tiny" title="Show Lyrics">music_note</i>
-        </div>
-        <div class="no-drag pointer cmd-btn" id="btn-minimize">
-          <i class="material-icons tiny" title="Minimize">remove</i>
-        </div>
-        <div class="no-drag pointer cmd-btn" id="btn-maximize">
-          <i id="icon_maximize" class="material-icons tiny" title="Maximize"
-            >crop_square</i
-          >
-          <i id="icon_restore" class="material-icons tiny hide" title="Restaure"
-            >filter_none</i
-          >
-        </div>
-        <div class="no-drag pointer cmd-btn hover-red" id="btn-close">
-          <i class="material-icons tiny" title="Close">close</i>
+      </div>
+
+      <div id="lin">
+        <div class="row">
+          <div class="col left-align">
+            <div class="no-drag pointer cmd-btn" id="btn-close">
+              <i class="material-icons red-text lighten-1 tiny">brightness_1</i>
+            </div>
+            <div class="no-drag pointer cmd-btn" id="btn-maximize">
+              <i
+                id="icon_maximize"
+                class="material-icons orange-text lighten-1 tiny"
+                >brightness_1</i
+              >
+              <i
+                id="icon_restore"
+                class="material-icons orange-text lighten-1 tiny hide"
+                >brightness_1</i
+              >
+            </div>
+            <div class="no-drag pointer cmd-btn" id="btn-minimize">
+              <i class="material-icons grey-text lighten-5 tiny"
+                >brightness_1</i
+              >
+            </div>
+          </div>
+
+          <div class="title">
+            <span id="music-title"></span>
+          </div>
         </div>
       </div>
     </div>
