@@ -1,24 +1,28 @@
 const { app, Menu, Tray, BrowserWindow } = require("electron");
 const path = require("path");
-const mediaControl = require("./providers/mediaProvider");
+const mediaControl = require("./mediaProvider");
 const nativeImage = require("electron").nativeImage;
-const settingsProvider = require("./providers/settingsProvider");
-const __ = require("./providers/translateProvider");
+const settingsProvider = require("./settingsProvider");
+const __ = require("./translateProvider");
 const Notification = require("electron-native-notification");
-const { doBehavior } = require("./utils/window");
+const { doBehavior } = require("../utils/window");
 const base64Img = require("base64-img");
 
 let tray = null;
 let saved_icon = null;
 let saved_mainWindow = null;
 
+function setTooltip(tooltip) {
+  tray.setToolTip(tooltip);
+}
+
 let init_tray = () => {
-  const { popUpMenu } = require("./providers/templateProvider");
+  const { popUpMenu } = require("./templateProvider");
   const contextMenu = Menu.buildFromTemplate(
     popUpMenu(__, saved_mainWindow, mediaControl, BrowserWindow, path, app)
   );
 
-  tray.setToolTip("YouTube Music Desktop App");
+  setTooltip("YouTube Music Desktop App");
   tray.setContextMenu(contextMenu);
 
   tray.addListener("click", () => {
@@ -32,8 +36,8 @@ let init_tray = () => {
 
 let popUpMenu = null;
 
-exports.createTray = function(mainWindow, icon) {
-  saved_icon = path.join(__dirname, icon);
+function createTray(mainWindow, icon) {
+  saved_icon = path.join(__dirname, `../${icon}`);
   const nativeImageIcon = nativeImage.createFromPath(saved_icon);
   tray = new Tray(nativeImageIcon);
 
@@ -45,9 +49,9 @@ exports.createTray = function(mainWindow, icon) {
     tray.setHighlightMode("never");
     exports.setShinyTray();
   }
-};
+}
 
-exports.balloon = function(title, content, cover) {
+function balloon(title, content, cover) {
   base64Img.requestBase64(cover, function(err, res, body) {
     var image = nativeImage.createFromDataURL(body);
 
@@ -68,13 +72,13 @@ exports.balloon = function(title, content, cover) {
       }
     }
   });
-};
+}
 
-exports.quit = function() {
+function quit() {
   tray.destroy();
-};
+}
 
-exports.setShinyTray = function() {
+function setShinyTray() {
   if (
     settingsProvider.get("settings-shiny-tray") &&
     process.platform === "darwin"
@@ -122,13 +126,22 @@ exports.setShinyTray = function() {
     tray.removeAllListeners();
     init_tray();
   }
-};
+}
 
-exports.updateImage = function(payload) {
+function updateImage(payload) {
   if (!settingsProvider.get("settings-shiny-tray")) return;
   var img =
     typeof nativeImage.createFromDataURL === "function"
       ? nativeImage.createFromDataURL(payload) // electron v0.36+
       : nativeImage.createFromDataUrl(payload); // electron v0.30
   tray.setImage(img);
+}
+
+module.exports = {
+  setTooltip: setTooltip,
+  createTray: createTray,
+  balloon: balloon,
+  quit: quit,
+  setShinyTray: setShinyTray,
+  updateImage: updateImage
 };

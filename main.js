@@ -312,7 +312,9 @@ function createWindow() {
       }
 
       mainWindow.setTitle(nowPlaying);
+      tray.setTooltip(nowPlaying);
       scrobblerProvider.updateTrackInfo(title, author);
+
       if (!mainWindow.isFocused()) {
         tray.balloon(title, author, cover);
       }
@@ -881,7 +883,7 @@ function getAll() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require("./providers/mediaProvider");
-const tray = require("./tray");
+const tray = require("./providers/trayProvider");
 const updater = require("./providers/updateProvider");
 const analytics = require("./providers/analyticsProvider");
 

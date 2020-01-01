@@ -19,21 +19,6 @@ if (isMac()) {
   document.getElementById("mac").remove();
 }
 
-setInterval(() => {
-  ipc.send("what-is-song-playing-now");
-}, 500);
-
-ipc.on("song-playing-now-is", (e, data) => {
-  let title = data.track.title;
-  let author = data.track.author;
-
-  if (title && author) {
-    document.getElementById("music-title").innerText = `${title} - ${author}`;
-  } else {
-    document.getElementById("music-title").innerText = "YouTube Music";
-  }
-});
-
 ipc.on("is-online", function(_, isOnline) {
   if (isOnline) {
     document.getElementById("is-offline").classList.add("hide");
@@ -48,27 +33,21 @@ if (store.get("titlebar-type", "nice") !== "nice") {
   document.getElementById("nice-titlebar").style.display = "none";
 }
 
-if (process.platform === "darwin") {
-  // document.getElementById("btn-minimize").style.display = "none";
-  // document.getElementById("btn-maximize").style.display = "none";
-  // document.getElementById("btn-close").style.display = "none";
-} else {
-  document.getElementById("btn-minimize").addEventListener("click", function() {
-    window.minimize();
-  });
+document.getElementById("btn-minimize").addEventListener("click", function() {
+  window.minimize();
+});
 
-  document.getElementById("btn-maximize").addEventListener("click", function() {
-    if (!window.isMaximized()) {
-      window.maximize();
-    } else {
-      window.unmaximize();
-    }
-  });
+document.getElementById("btn-maximize").addEventListener("click", function() {
+  if (!window.isMaximized()) {
+    window.maximize();
+  } else {
+    window.unmaximize();
+  }
+});
 
-  document.getElementById("btn-close").addEventListener("click", function() {
-    ipc.send("will-close-mainwindow");
-  });
-}
+document.getElementById("btn-close").addEventListener("click", function() {
+  ipc.send("will-close-mainwindow");
+});
 
 const canvas = document.createElement("canvas");
 canvas.height = 32;
