@@ -69,6 +69,11 @@ let hasLoadedUrl;
 let isClipboardWatcherRunning = false;
 let clipboardWatcher = null;
 
+let windowConfig = {
+  frame: false,
+  titleBarStyle: ""
+};
+
 let icon = "assets/favicon.png";
 if (isWindows()) {
   icon = "assets/favicon.ico";
@@ -142,15 +147,24 @@ function createWindow() {
     case "nice":
       browserWindowConfig.frame = false;
       browserWindowConfig.titleBarStyle = "hidden";
+
+      windowConfig.frame = false;
+      windowConfig.titleBarStyle = "hidden";
       break;
 
     case "system":
       browserWindowConfig.frame = true;
+
+      windowConfig.frame = true;
+      windowConfig.titleBarStyle = "hidden";
       break;
 
     case "none":
       browserWindowConfig.frame = false;
       browserWindowConfig.titleBarStyle = "hidden";
+
+      windowConfig.frame = false;
+      windowConfig.titleBarStyle = "hidden";
       break;
   }
 
@@ -597,7 +611,8 @@ function createWindow() {
   ipcMain.on("show-settings", function() {
     const settings = new BrowserWindow({
       modal: false,
-      frame: false,
+      frame: windowConfig.frame,
+      titleBarStyle: windowConfig.titleBarStyle,
       center: true,
       resizable: true,
       backgroundColor: "#232323",
@@ -656,7 +671,8 @@ function createWindow() {
     const lastfm = new BrowserWindow({
       //parent: mainWindow,
       modal: false,
-      frame: false,
+      frame: windowConfig.frame,
+      titleBarStyle: windowConfig.titleBarStyle,
       center: true,
       resizable: true,
       backgroundColor: "#232323",
@@ -694,7 +710,8 @@ function createWindow() {
 
   ipcMain.on("show-editor-theme", function() {
     const editor = new BrowserWindow({
-      frame: false,
+      frame: windowConfig.frame,
+      titleBarStyle: windowConfig.titleBarStyle,
       center: true,
       resizable: true,
       backgroundColor: "#232323",
@@ -842,7 +859,8 @@ ipcMain.on("show-companion", function() {
   const settings = new BrowserWindow({
     // parent: mainWindow,
     skipTaskbar: false,
-    frame: true,
+    frame: windowConfig.frame,
+    titleBarStyle: windowConfig.titleBarStyle,
     x: x + width / 2,
     y,
     resizable: false,
@@ -860,7 +878,8 @@ ipcMain.on("show-companion", function() {
 
 function createLyricsWindow() {
   const lyrics = new BrowserWindow({
-    frame: false,
+    frame: windowConfig.frame,
+    titleBarStyle: windowConfig.titleBarStyle,
     center: true,
     resizable: true,
     backgroundColor: "#232323",
