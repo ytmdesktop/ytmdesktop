@@ -20,6 +20,12 @@ if (isMac()) {
 
 if (store.get("titlebar-type", "nice") !== "nice") {
   document.getElementById("nice-titlebar").style.display = "none";
+  document.getElementById("nice-titlebar").style.height = 0;
+
+  document.getElementById("webview").style.height = "100vh";
+} else {
+  document.getElementById("webview").style.height = "95vh";
+  document.getElementById("content").style.marginTop = "29px";
 }
 
 ipc.on("window-is-maximized", function(_, value) {

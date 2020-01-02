@@ -18,7 +18,7 @@
   </head>
 
   <body>
-    <div id="nice-titlebar" class="bar drag">
+    <div id="nice-titlebar" class="bar drag" style="margin-bottom: 30px;">
       <div id="mac" class="hide">
         <div class="row">
           <div class="col s3 left-align">
@@ -86,12 +86,8 @@
       </div>
     </div>
 
-    <div class="content">
-      <webview
-        id="webview"
-        style="width: 100vw; height: 100vh;"
-        nodeintegration
-      ></webview>
+    <div id="content" class="content">
+      <webview id="webview" style="width: 100vw;" nodeintegration></webview>
     </div>
 
     <script src="../../../node_modules/materialize-css/dist/js/materialize.min.js"></script>
