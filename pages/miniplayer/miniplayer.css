@@ -2,14 +2,43 @@ body {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    filter: opacity(0);
-    transition: .3s;
+    transition: .4s;
 }
 
-body:hover {
-    filter: opacity(1);
-    transition: .3s;
+body:hover,
+body.paused {
     backdrop-filter: blur(3px) brightness(0.7);
+    transition: .4s;
+}
+
+.cmd-btn,
+.title,
+.author,
+.duration,
+.controls {
+    filter: opacity(0);
+    transition: .4s;
+}
+
+body:hover .cmd-btn,
+body:hover .title,
+body:hover .author,
+body:hover .duration,
+body:hover .controls,
+body.paused .cmd-btn,
+body.paused .title,
+body.paused .author,
+body.paused .duration,
+body.paused .controls {
+    filter: opacity(1);
+    transition: .4s;
+}
+
+body:hover .progress-bar,
+body.paused .progress-bar {
+    margin-top: 15px;
+    height: 3px;
+    transition: .4s;
 }
 
 .cmd-btn {
@@ -41,7 +70,7 @@ body:hover {
 }
 
 .controls {
-    margin: 15px 0;
+    margin-top: 15px;
     display: flex;
     justify-content: center;
 }
@@ -77,7 +106,9 @@ body:hover {
 }
 
 .progress-bar {
-    height: 3px;
+    margin-top: 17px;
+    height: 1px;
+    transition: .4s;
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
 }
@@ -90,4 +121,31 @@ body:hover {
 
 .drag {
     cursor: grab;
+}
+
+.bt,
+.bb,
+.bl,
+.br {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 5px;
+    -webkit-app-region: drag;
+}
+
+.bb {
+    top: 195px;
+}
+
+.bl {
+    width: 5px;
+    height: 200px;
+}
+
+.br {
+    left: 195px;
+    width: 5px;
+    height: 200px;
 }

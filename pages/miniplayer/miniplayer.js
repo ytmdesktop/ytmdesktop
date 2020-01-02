@@ -30,6 +30,7 @@ btnPrevious.addEventListener("click", () => {
 
 btnPlayPause.addEventListener("click", () => {
   ipcRenderer.send("media-play-pause", true);
+  body.classList.toggle("paused");
 });
 
 btnNext.addEventListener("click", () => {
@@ -62,8 +63,10 @@ function setPlayerInfo(data) {
 
   if (data.player.isPaused) {
     btnPlayPause.children[0].innerHTML = "play_arrow";
+    body.classList.add("paused");
   } else {
     btnPlayPause.children[0].innerHTML = "pause";
+    body.classList.remove("paused");
   }
 
   switch (data.player.likeStatus) {
