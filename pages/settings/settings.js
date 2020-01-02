@@ -53,10 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("content").classList.remove("hide");
 });
 
-document.getElementById("btn-close").addEventListener("click", function() {
-  window.close();
-});
-
 if (elementSettingsCompanionApp) {
   elementSettingsCompanionApp.addEventListener("click", function() {
     window.open(companionUrl, companionWindowTitle, companionWindowSettings);

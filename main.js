@@ -133,7 +133,8 @@ function createWindow() {
     resize: true,
     maximizable: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webviewTag: true
     }
   };
 
@@ -164,7 +165,11 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
+  // mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
+  mainWindow.loadFile(
+    path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+    { search: "page=home/home&title=YouTube Music" }
+  );
   mainWindow.setBrowserView(view);
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
@@ -390,20 +395,13 @@ function createWindow() {
   });
 
   mainWindow.on("close", function(e) {
-    if (isMac()) {
-      // Optimized for Mac OS X
-      if (settingsProvider.get("settings-keep-background")) {
-        e.preventDefault();
-        mainWindow.hide();
-      } else {
-        app.exit();
-      }
-      return;
-    }
     if (settingsProvider.get("settings-keep-background")) {
       e.preventDefault();
       mainWindow.hide();
+    } else {
+      app.exit();
     }
+    return;
   });
 
   app.on("before-quit", function(e) {
@@ -474,13 +472,13 @@ function createWindow() {
     }
   });
 
-  ipcMain.on("will-close-mainwindow", function() {
+  /*ipcMain.on("will-close-mainwindow", function() {
     if (settingsProvider.get("settings-keep-background")) {
       mainWindow.hide();
     } else {
       app.exit();
     }
-  });
+  });*/
 
   ipcMain.on("settings-value-changed", (e, data) => {
     switch (data.key) {
@@ -611,11 +609,17 @@ function createWindow() {
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        webviewTag: true
       }
     });
+    // settings.loadFile(path.join(app.getAppPath(), "/pages/settings/settings.html"));
     settings.loadFile(
-      path.join(app.getAppPath(), "/pages/settings/settings.html")
+      path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+      {
+        search:
+          "page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize"
+      }
     );
     // settings.webContents.openDevTools();
   });
@@ -664,14 +668,19 @@ function createWindow() {
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        webviewTag: true
       }
     });
 
+    // lastfm.loadFile(path.join(app.getAppPath(), "/pages/settings/last-fm-login.html"));
     lastfm.loadFile(
-      path.join(app.getAppPath(), "/pages/settings/last-fm-login.html")
+      path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+      {
+        search:
+          "page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize"
+      }
     );
-
     // lastfm.webContents.openDevTools();
   });
 
@@ -696,12 +705,19 @@ function createWindow() {
       minHeight: 800,
       icon: path.join(__dirname, icon),
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        webviewTag: true
       }
     });
 
-    editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
-
+    // editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
+    editor.loadFile(
+      path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+      {
+        search:
+          "page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize"
+      }
+    );
     // editor.webContents.openDevTools();
   });
 
@@ -852,10 +868,18 @@ function createLyricsWindow() {
     height: 800,
     icon: path.join(__dirname, icon),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webviewTag: true
     }
   });
-  lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
+  lyrics.loadFile(
+    path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+    {
+      search:
+        "page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize"
+    }
+  );
+  // lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
   // lyrics.webContents.openDevTools();
 }
 

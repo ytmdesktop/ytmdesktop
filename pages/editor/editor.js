@@ -7,7 +7,6 @@ var editor;
 
 const textEditor = document.getElementById("editor");
 const btnSave = document.getElementById("btn-save");
-const btnClose = document.getElementById("btn-close");
 
 __.loadi18n();
 
@@ -20,12 +19,6 @@ if (btnSave) {
     var code = editor.getValue();
     fs.writeFileSync(themePath, code);
     ipcRenderer.send("update-custom-theme");
-  });
-}
-
-if (btnClose) {
-  btnClose.addEventListener("click", function() {
-    window.close();
   });
 }
 

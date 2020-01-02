@@ -3,7 +3,8 @@ body {
     background: #232323;
     color: #fff;
 
-    padding: 5px;
+    /* padding: 5px; */
+    padding: 0;
 
     width: 100%;
     height: 100%;

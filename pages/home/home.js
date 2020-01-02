@@ -8,15 +8,6 @@ const icons = require("../../icons_for_shiny_tray");
 
 let icon_set = icons.bright;
 
-if (isMac()) {
-  document.getElementById("win").remove();
-} else if (isWindows()) {
-  document.getElementById("mac").remove();
-} else if (isLinux()) {
-  document.getElementById("win").remove();
-  document.getElementById("mac").remove();
-}
-
 ipc.on("is-online", function(_, isOnline) {
   if (isOnline) {
     document.getElementById("is-offline").classList.add("hide");
@@ -27,39 +18,10 @@ ipc.on("is-online", function(_, isOnline) {
   }
 });
 
-if (store.get("titlebar-type", "nice") !== "nice") {
-  document.getElementById("nice-titlebar").style.display = "none";
-}
-
-document.getElementById("btn-minimize").addEventListener("click", function() {
-  window.minimize();
-});
-
-document.getElementById("btn-maximize").addEventListener("click", function() {
-  if (!window.isMaximized()) {
-    window.maximize();
-  } else {
-    window.unmaximize();
-  }
-});
-
-document.getElementById("btn-close").addEventListener("click", function() {
-  ipc.send("will-close-mainwindow");
-});
-
 const canvas = document.createElement("canvas");
 canvas.height = 32;
 canvas.width = 150;
 const ctx = canvas.getContext("2d");
-ipc.on("window-is-maximized", function(event, value) {
-  if (value) {
-    document.getElementById("icon_maximize").classList.add("hide");
-    document.getElementById("icon_restore").classList.remove("hide");
-  } else {
-    document.getElementById("icon_restore").classList.add("hide");
-    document.getElementById("icon_maximize").classList.remove("hide");
-  }
-});
 
 ipc.on("update-status-bar", function(event, arg) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);

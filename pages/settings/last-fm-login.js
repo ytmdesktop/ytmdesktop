@@ -3,10 +3,6 @@ const scrobbleProvider = require("../../providers/scrobblerProvider");
 __.loadi18n();
 const Base64 = require("js-base64").Base64;
 
-document.getElementById("btn-close").addEventListener("click", function() {
-  window.close();
-});
-
 var login = scrobbleProvider.getLogin();
 if (login) {
   document.getElementById("username").value = login.username;

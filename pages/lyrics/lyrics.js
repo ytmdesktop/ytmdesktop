@@ -16,9 +16,9 @@ let lastArtist;
 
 loadi18n();
 
-document.getElementById("btn-close").addEventListener("click", function() {
+/*document.getElementById("btn-close").addEventListener("click", function() {
   window.close();
-});
+});*/
 
 elementButtonSearchLyric.addEventListener("click", function() {
   getLyric(elementInputLyricArtist.value, elementInputLyricSong.value);
@@ -56,8 +56,7 @@ function getLyric(artist, song) {
             return;
           }
 
-          document.getElementById("now-playing").innerText =
-            song + " - " + artist;
+          //document.getElementById("now-playing").innerText = song + " - " + artist;
           if (body.mus) {
             elementLyric.innerText = body.mus[0].text;
             elementDivSearchLyric.classList.add("hide");
