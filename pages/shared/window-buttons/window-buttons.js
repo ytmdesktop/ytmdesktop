@@ -89,5 +89,3 @@ function checkUrlParams() {
     });
   }
 }
-
-console.log(window.location);
