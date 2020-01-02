@@ -49,6 +49,7 @@ function init() {
   }, 900);
 
   ipcRenderer.on("song-playing-now-is", (e, data) => {
+    document.title = `${data.track.title} - ${data.track.author}`;
     setPlayerInfo(data);
   });
 }
