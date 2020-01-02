@@ -10,11 +10,9 @@ let icon_set = icons.bright;
 
 if (isMac()) {
   document.getElementById("win").remove();
-  document.getElementById("lin").remove();
 } else if (isWindows()) {
   document.getElementById("mac").remove();
-  document.getElementById("lin").remove();
-} else {
+} else if (isLinux()) {
   document.getElementById("win").remove();
   document.getElementById("mac").remove();
 }

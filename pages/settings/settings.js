@@ -1,6 +1,7 @@
 const { remote, ipcRenderer: ipc } = require("electron");
 const settingsProvider = require("../../providers/settingsProvider");
 const __ = require("../../providers/translateProvider");
+const { isLinux } = require("../../utils/systemInfo");
 
 const {
   companionUrl,
@@ -15,6 +16,12 @@ const elementRangeZoom = document.getElementById("range-zoom");
 const elementBtnAppRelaunch = document.getElementById("btn-relaunch");
 const elementBtnOpenEditor = document.getElementById("btn-editor-custom-theme");
 const elementBtnLastFmLogin = document.getElementById("btn-last-fm-login");
+
+if (isLinux()) {
+  document
+    .getElementById("i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NICE")
+    .remove();
+}
 
 document.addEventListener("DOMContentLoaded", function() {
   initElement("settings-keep-background", "click");
