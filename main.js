@@ -7,7 +7,8 @@ const {
   globalShortcut,
   Menu,
   ipcMain,
-  systemPreferences
+  systemPreferences,
+  nativeTheme
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -81,14 +82,14 @@ if (isWindows()) {
   icon = "assets/favicon.16x16.png";
   settingsProvider.set(
     "settings-shiny-tray-dark",
-    systemPreferences.isDarkMode()
+    nativeTheme.shouldUseDarkColors
   );
   systemPreferences.subscribeNotification(
     "AppleInterfaceThemeChangedNotification",
     function theThemeHasChanged() {
       settingsProvider.set(
         "settings-shiny-tray-dark",
-        systemPreferences.isDarkMode()
+        nativeTheme.shouldUseDarkColors
       );
       if (renderer_for_status_bar)
         renderer_for_status_bar.send("update-status-bar");

@@ -46,8 +46,7 @@ function createTray(mainWindow, icon) {
     init_tray();
   } else {
     // on Mac OS X
-    tray.setHighlightMode("never");
-    exports.setShinyTray();
+    setShinyTray();
   }
 }
 
