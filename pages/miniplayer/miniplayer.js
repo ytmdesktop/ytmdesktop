@@ -56,10 +56,10 @@ function init() {
 
 function setPlayerInfo(data) {
   body.style.backgroundImage = `url(${data.track.cover})`;
-  title.innerHTML = data.track.title;
-  author.innerHTML = data.track.author;
-  current.innerHTML = data.player.seekbarCurrentPositionHuman;
-  duration.innerHTML = data.track.durationHuman;
+  title.innerHTML = data.track.title || "Title";
+  author.innerHTML = data.track.author || "Author";
+  current.innerHTML = data.player.seekbarCurrentPositionHuman || "0:00";
+  duration.innerHTML = data.track.durationHuman || "0:00";
   progress.style.width = data.track.statePercent * 200;
 
   if (data.player.isPaused) {

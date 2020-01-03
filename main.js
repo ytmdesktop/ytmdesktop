@@ -433,6 +433,10 @@ function createWindow() {
   globalShortcut.register("MediaPlayPause", function() {
     if (!doublePressPlayPause) {
       // The first press
+      if (infoPlayer.getTrackInfo().id == "") {
+        infoPlayer.firstPlay(view.webContents);
+      }
+
       doublePressPlayPause = true;
       setTimeout(() => {
         if (doublePressPlayPause) mediaControl.playPauseTrack(view);

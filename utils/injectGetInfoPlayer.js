@@ -269,6 +269,17 @@ function hasInitialized() {
   return initialized;
 }
 
+function firstPlay(webContents) {
+  webContents.executeJavaScript(
+    `
+      var carousel = document.getElementsByClassName('carousel')[0];
+      var firstChild = carousel.querySelector('#items').children[0];
+      var playButton = firstChild.querySelector('#play-button')
+      
+      playButton.click();`
+  );
+}
+
 function debug(data) {
   // console.log(data);
 }
@@ -278,5 +289,6 @@ module.exports = {
   getAllInfo: getAllInfo,
   getPlayerInfo: getPlayerInfo,
   getTrackInfo: getTrackInfo,
-  hasInitialized: hasInitialized
+  hasInitialized: hasInitialized,
+  firstPlay: firstPlay
 };
