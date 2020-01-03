@@ -129,7 +129,7 @@ function createMenu() {
         }
 
         if (buttonPageOpenMiniplayer) {
-            buttonPageOpenMiniplayer.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); ipcRenderer.send('show-miniplayer'); } );
+            buttonPageOpenMiniplayer.addEventListener('click', function(e) { /* Temporary fix */ document.getElementsByClassName('player-maximize-button ytmusic-player')[0].click(); ipcRenderer.send('show-miniplayer'); } );
         }
         
         function showMenu(x, y) {
