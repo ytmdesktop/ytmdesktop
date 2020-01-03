@@ -1,9 +1,5 @@
 const { ipcRenderer } = require("electron");
 
-let animationId;
-let mouseX;
-let mouseY;
-
 const body = document.getElementsByTagName("body")[0];
 const title = document.getElementById("title");
 const author = document.getElementById("author");
@@ -55,15 +51,6 @@ function init() {
   ipcRenderer.on("song-playing-now-is", (e, data) => {
     setPlayerInfo(data);
   });
-
-  ipcRenderer.on("windowMoving", (e, { mouseX, mouseY }) => {
-    const { x, y } = electron.screen.getCursorScreenPoint();
-    this.win.setPosition(x - mouseX, y - mouseY);
-  });
-
-  ipcRenderer.on("windowMoved", () => {
-    // Do somehting when dragging stop
-  });
 }
 
 function setPlayerInfo(data) {
@@ -99,28 +86,4 @@ function setPlayerInfo(data) {
       btnDislike.children[0].classList.add("outlined");
       break;
   }
-}
-
-function onMouseDown(e) {
-  console.log("down");
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  document.addEventListener("mouseup", onMouseUp);
-  requestAnimationFrame(this.moveWindow);
-}
-
-function onMouseUp(e) {
-  console.log("up");
-  ipcRenderer.send("windowMoved");
-  document.removeEventListener("mouseup", onMouseUp);
-  cancelAnimationFrame(animationId);
-}
-
-function moveWindow() {
-  console.log("move");
-  ipcRenderer.send("windowMoving", {
-    mouseX,
-    mouseY
-  });
-  animationId = requestAnimationFrame(moveWindow);
 }

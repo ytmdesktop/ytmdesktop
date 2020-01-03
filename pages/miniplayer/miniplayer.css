@@ -118,3 +118,30 @@ body.paused .progress-bar {
     width: 0;
     background: #FF0000;
 }
+
+.bt,
+.bb,
+.bl,
+.br {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 5px;
+    -webkit-app-region: drag;
+}
+
+.bb {
+    top: 195px;
+}
+
+.bl {
+    width: 5px;
+    height: 200px;
+}
+
+.br {
+    left: 195px;
+    width: 5px;
+    height: 200px;
+}
