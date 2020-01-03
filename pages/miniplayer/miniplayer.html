@@ -13,10 +13,7 @@
     <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
   </head>
 
-  <body>
-    <div class="drag cmd-btn left" id="btn-drag">
-      <i class="material-icons tiny">drag_indicator</i>
-    </div>
+  <body onmousedown="onMouseDown(event)">
     <div class="pointer cmd-btn right" id="btn-close">
       <i class="material-icons tiny">launch</i>
     </div>
@@ -54,11 +51,6 @@
     <div class="progress-bar">
       <div id="progress"></div>
     </div>
-
-    <div class="bt"></div>
-    <div class="bb"></div>
-    <div class="bl"></div>
-    <div class="br"></div>
   </body>
 
   <script src="./miniplayer.js"></script>
