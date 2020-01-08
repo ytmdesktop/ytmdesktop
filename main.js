@@ -664,9 +664,28 @@ function createWindow() {
       }
     });
 
+    let miniplayerPosition = settingsProvider.get("miniplayer-position");
+    if (miniplayerPosition != undefined) {
+      miniplayer.setPosition(miniplayerPosition.x, miniplayerPosition.y);
+    }
+
     miniplayer.loadFile(
       path.join(app.getAppPath(), "/pages/miniplayer/miniplayer.html")
     );
+
+    miniplayer.on("move", function(e) {
+      let storeMiniplayerPositionTimer;
+      let position = miniplayer.getPosition();
+      if (storeMiniplayerPositionTimer) {
+        clearTimeout(storeMiniplayerPositionTimer);
+      }
+      storeMiniplayerPositionTimer = setTimeout(() => {
+        settingsProvider.set("miniplayer-position", {
+          x: position[0],
+          y: position[1]
+        });
+      }, 500);
+    });
 
     mainWindow.hide();
     // miniplayer.webContents.openDevTools();
