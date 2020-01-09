@@ -2,13 +2,11 @@ body {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    transition: .4s;
 }
 
 body:hover,
 body.paused {
     backdrop-filter: blur(3px) brightness(0.7);
-    transition: .4s;
 }
 
 .cmd-btn,
@@ -17,7 +15,7 @@ body.paused {
 .duration,
 .controls {
     filter: opacity(0);
-    transition: .4s;
+    /* transition: .4s; */
 }
 
 body:hover .cmd-btn,
@@ -108,7 +106,7 @@ body.paused .progress-bar {
 .progress-bar {
     margin-top: 17px;
     height: 1px;
-    transition: .4s;
+    /* transition: .4s; */
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
 }
