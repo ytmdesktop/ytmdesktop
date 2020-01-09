@@ -872,7 +872,50 @@ app.on("activate", function() {
 });
 
 ipcMain.on("show-lyrics", function() {
-  createLyricsWindow();
+  const lyrics = new BrowserWindow({
+    frame: windowConfig.frame,
+    titleBarStyle: windowConfig.titleBarStyle,
+    center: true,
+    resizable: true,
+    backgroundColor: "#232323",
+    width: 700,
+    height: 800,
+    icon: path.join(__dirname, icon),
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true
+    }
+  });
+
+  let lyricsPosition = settingsProvider.get("lyrics-position");
+  if (lyricsPosition != undefined) {
+    lyrics.setPosition(lyricsPosition.x, lyricsPosition.y);
+  }
+
+  lyrics.loadFile(
+    path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+    {
+      search:
+        "page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize"
+    }
+  );
+
+  lyrics.on("move", function(e) {
+    let storeLyricsPositionTimer;
+    let position = lyrics.getPosition();
+    if (storeLyricsPositionTimer) {
+      clearTimeout(storeLyricsPositionTimer);
+    }
+    storeLyricsPositionTimer = setTimeout(() => {
+      settingsProvider.set("lyrics-position", {
+        x: position[0],
+        y: position[1]
+      });
+    }, 500);
+  });
+
+  // lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
+  // lyrics.webContents.openDevTools();
 });
 
 ipcMain.on("show-companion", function() {
@@ -898,32 +941,6 @@ ipcMain.on("show-companion", function() {
   });
   settings.loadURL(companionUrl);
 });
-
-function createLyricsWindow() {
-  const lyrics = new BrowserWindow({
-    frame: windowConfig.frame,
-    titleBarStyle: windowConfig.titleBarStyle,
-    center: true,
-    resizable: true,
-    backgroundColor: "#232323",
-    width: 700,
-    height: 800,
-    icon: path.join(__dirname, icon),
-    webPreferences: {
-      nodeIntegration: true,
-      webviewTag: true
-    }
-  });
-  lyrics.loadFile(
-    path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
-    {
-      search:
-        "page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize"
-    }
-  );
-  // lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
-  // lyrics.webContents.openDevTools();
-}
 
 function logDebug(data) {
   if (false) {
