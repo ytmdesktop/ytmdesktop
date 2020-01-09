@@ -32,6 +32,8 @@ const companionServer = require("./providers/companionServer");
 const discordRPC = require("./providers/discordRpcProvider");
 const { checkBounds, doBehavior } = require("./utils/window");
 
+const electronLocalshortcut = require("electron-localshortcut");
+
 const themePath = path.join(app.getAppPath(), "/assets/custom-theme.css");
 if (!themePath) {
   fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`);
@@ -186,6 +188,7 @@ function createWindow() {
     { search: "page=home/home&title=YouTube Music" }
   );
   mainWindow.setBrowserView(view);
+
   setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
 
@@ -430,6 +433,16 @@ function createWindow() {
     tray.quit();
   });
 
+  // LOCAL
+  electronLocalshortcut.register(view, "CmdOrCtrl+S", () => {
+    ipcMain.emit("show-settings");
+  });
+
+  electronLocalshortcut.register(view, "CmdOrCtrl+M", () => {
+    ipcMain.emit("show-miniplayer");
+  });
+
+  // GLOBAL
   globalShortcut.register("MediaPlayPause", function() {
     if (!doublePressPlayPause) {
       // The first press
