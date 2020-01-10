@@ -7,6 +7,7 @@ const author = document.getElementById("author");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
 const progress = document.getElementById("progress");
+const secondsEffect = document.getElementById("secondsEffect");
 
 const btnClose = document.getElementById("btn-close");
 const btnDislike = document.getElementById("btn-dislike");
@@ -88,10 +89,19 @@ function setPlayerInfo(data) {
   }
 }
 
+function showDbClickAnimation(side) {
+  secondsEffect.classList.add(side);
+  setTimeout(() => {
+    secondsEffect.classList.remove(side);
+  }, 200);
+}
+
 document.addEventListener("dblclick", ev => {
   if (ev.clientX >= 100) {
     ipcRenderer.send("media-forward-X-seconds", true);
+    showDbClickAnimation("right");
   } else {
     ipcRenderer.send("media-rewind-X-seconds", true);
+    showDbClickAnimation("left");
   }
 });

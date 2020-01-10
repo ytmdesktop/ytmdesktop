@@ -117,6 +117,24 @@ body.paused .progress-bar {
     background: #FF0000;
 }
 
+#secondsEffect {
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    width: 125px;
+    height: 200px;
+}
+
+#secondsEffect.left {
+    left: 0;
+    background: linear-gradient(to right, rgba(255,255,255,.5), transparent);
+}
+
+#secondsEffect.right {
+    right: 0;
+    background: linear-gradient(to left, rgba(255,255,255,.5), transparent);
+}
+
 .bt,
 .bb,
 .bl,

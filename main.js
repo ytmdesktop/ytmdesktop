@@ -55,7 +55,7 @@ let renderer_for_status_bar = null;
 global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, view;
+let mainWindow, view, miniplayer;
 
 let mainWindowParams = {
   url: "https://music.youtube.com",
@@ -233,6 +233,8 @@ function createWindow() {
   });
 
   mainWindow.on("show", function() {
+    globalShortcut.unregister("CmdOrCtrl+M");
+
     logDebug("show");
     mediaControl.createThumbar(
       mainWindow,
@@ -658,7 +660,7 @@ function createWindow() {
   });
 
   ipcMain.on("show-miniplayer", function() {
-    const miniplayer = new BrowserWindow({
+    miniplayer = new BrowserWindow({
       modal: false,
       frame: false,
       center: false,
@@ -701,6 +703,12 @@ function createWindow() {
     });
 
     mainWindow.hide();
+
+    globalShortcut.register("CmdOrCtrl+M", function() {
+      miniplayer.hide();
+      mainWindow.show();
+    });
+
     // miniplayer.webContents.openDevTools();
   });
 
