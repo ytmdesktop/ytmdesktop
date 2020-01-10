@@ -37,7 +37,7 @@ function createMenu() {
 
             z-index: 999999 !important;
 
-            min-width: 256px;
+            min-width: 205px;
         }
     
         #ytmd-menu a {
@@ -75,7 +75,7 @@ function createMenu() {
         }
     `);
 
-  var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> <a id="ytmd-menu-companion-server"><i class="material-icons">surround_sound</i></a>`;
+  var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
 
   content.executeJavaScript(`
         var menuDiv = document.createElement("div");
