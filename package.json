@@ -39,6 +39,7 @@
   "dependencies": {
     "ace-builds": "^1.4.7",
     "base64-img": "^1.0.4",
+    "bufferutil": "^4.0.1",
     "castv2-player": "^2.1.0",
     "discord-rpc": "^3.1.0",
     "electron-canvas-to-buffer": "^2.0.0",
@@ -60,6 +61,7 @@
     "request": "^2.88.0",
     "scribble": "0.0.5",
     "socket.io": "^2.3.0",
+    "utf-8-validate": "^5.0.2",
     "ws": "^7.2.1"
   }
 }
