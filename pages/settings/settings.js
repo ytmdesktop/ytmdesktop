@@ -161,7 +161,7 @@ function loadValue(element, settingsName, eventType) {
 
 function loadSettings() {
   if (settingsProvider.get("settings-companion-server")) {
-    document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
+    // document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
   }
 
   if (settingsProvider.get("settings-page-zoom")) {
