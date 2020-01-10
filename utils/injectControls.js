@@ -175,7 +175,9 @@ function playerBarScrollToChangeVolume() {
   content.executeJavaScript(`
         var playerBar = document.getElementsByTagName('ytmusic-player-bar')[0];
 
-        playerBar.addEventListener('wheel', function(ev) { 
+        playerBar.addEventListener('wheel', function(ev) {
+            ev.preventDefault();
+            
             if ( ev.deltaY < 0) {
                 ipcRenderer.send('media-volume-up');
             } else {
