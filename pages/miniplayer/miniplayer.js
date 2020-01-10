@@ -87,3 +87,11 @@ function setPlayerInfo(data) {
       break;
   }
 }
+
+document.addEventListener("dblclick", ev => {
+  if (ev.clientX >= 100) {
+    ipcRenderer.send("media-forward-X-seconds", true);
+  } else {
+    ipcRenderer.send("media-rewind-X-seconds", true);
+  }
+});
