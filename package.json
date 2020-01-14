@@ -9,13 +9,9 @@
     "pack:x64": "npm run pack -- --x64 --config electron-builder64.yml",
     "dist": "npx electron-builder",
     "dist:x64": "npm run dist -- --x64 --config electron-builder64.yml",
-    "publish:win64": "build --win -p always --config electron-builder64.yml",
-    "publish:win32": "build --win -p always --config electron-builder.yml",
-    "publish:win": "npm run publish:win32 && npm run publish:win64",
+    "publish:win": "build --win -p always --config electron-builder64.yml",
     "publish:mac": "build --mac -p always --config electron-builder64.yml",
-    "publish:lin64": "build --linux -p always --config electron-builder64.yml",
-    "publish:lin32": "build --linux -p always --config electron-builder.yml",
-    "publish:lin": "npm run publish:lin32 && npm run publish:lin64"
+    "publish:lin": "electron-builder --linux -p always --config electron-builder64.yml"
   },
   "repository": "https://github.com/adlerluiz/ytmdesktop",
   "keywords": [
@@ -31,7 +27,7 @@
     }
   },
   "devDependencies": {
-    "electron": "^7.1.7",
+    "electron": "^7.1.9",
     "electron-builder": "^21.2.0",
     "husky": "^3.1.0",
     "pretty-quick": "^1.11.1"
