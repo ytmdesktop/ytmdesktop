@@ -61,7 +61,7 @@ function setPlayerInfo(data) {
   author.innerHTML = data.track.author || "Author";
   current.innerHTML = data.player.seekbarCurrentPositionHuman || "0:00";
   duration.innerHTML = data.track.durationHuman || "0:00";
-  progress.style.width = data.track.statePercent * 200;
+  progress.style.width = data.track.statePercent * 100 + "vw";
 
   if (data.player.isPaused) {
     btnPlayPause.children[0].innerHTML = "play_arrow";
