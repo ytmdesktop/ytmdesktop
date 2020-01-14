@@ -25,7 +25,6 @@ mac:
   darkModeSupport: true
   target:
     - dmg
-    - pkg
   publish:
     provider: generic
     url: 'https://dl.ytmdesktop.app/mac'
