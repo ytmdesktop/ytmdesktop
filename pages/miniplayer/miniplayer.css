@@ -40,7 +40,7 @@ body.paused .hide-on-play {
     font-weight: bold;
     font-size: 8.5vmin;
     padding: 0 2.5vmin;
-    margin-top: 14vmin;
+    margin-top: 10vmin;
 }
 
 .author {
@@ -58,10 +58,9 @@ body.paused .hide-on-play {
 }
 
 .controls {
-    height: 25vmin;
     display: flex;
     justify-content: center;
-    margin-top: 7vmin;
+    margin-top: 10vmin;
 }
 
 .ctrl-btn {
@@ -133,4 +132,33 @@ body.paused .progress-bar {
 #secondsEffect.right {
     right: 0;
     background: linear-gradient(to left, rgba(255, 255, 255, .5), transparent);
+}
+
+
+/* Hover hack for windows */
+.hover-top,
+.hover-left,
+.hover-right,
+.hover-bottom {
+    -webkit-app-region: drag;
+    position: absolute;
+    height: 1vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+}
+
+.hover-bottom {
+    top: 99vh;
+}
+
+.hover-left {
+    height: 100vh;
+    width: 1vw;
+}
+
+.hover-right {
+    height: 100vh;
+    width: 1vw;
+    left: 99vw;
 }
