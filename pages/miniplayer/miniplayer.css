@@ -102,6 +102,7 @@ body.paused .hide-on-play {
     height: .6vmin;
     width: 100vw;
     background: rgba(255, 255, 255, 0.2);
+    transition: .4s ease-out;
 }
 
 body:hover .progress-bar,
@@ -134,7 +135,6 @@ body.paused .progress-bar {
     background: linear-gradient(to left, rgba(255, 255, 255, .5), transparent);
 }
 
-
 /* Hover hack for windows */
 .hover-top,
 .hover-left,
@@ -142,23 +142,30 @@ body.paused .progress-bar {
 .hover-bottom {
     -webkit-app-region: drag;
     position: absolute;
-    height: 1vh;
+    height: 2vh;
     width: 100vw;
     top: 0;
     left: 0;
 }
 
 .hover-bottom {
-    top: 99vh;
+    top: 98vh;
 }
 
 .hover-left {
     height: 100vh;
-    width: 1vw;
+    width: 2vw;
 }
 
 .hover-right {
     height: 100vh;
-    width: 1vw;
-    left: 99vw;
+    width: 2vw;
+    left: 98vw;
+}
+
+/* transitions */
+body,
+.hide-on-play,
+.progress-bar {
+    transition: .2s ease-out;
 }
