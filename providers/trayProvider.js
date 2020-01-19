@@ -51,26 +51,28 @@ function createTray(mainWindow, icon) {
 }
 
 function balloon(title, content, cover) {
-  base64Img.requestBase64(cover, function(err, res, body) {
-    var image = nativeImage.createFromDataURL(body);
-
-    if (settingsProvider.get("settings-show-notifications")) {
-      if (title && content) {
-        if (process.platform == "win32") {
-          tray.displayBalloon({
-            icon: image,
-            title: title,
-            content: content
-          });
-        } else {
-          new Notification(title, {
-            body: content,
-            icon: image
-          });
+  if (title && content && cover) {
+    base64Img.requestBase64(cover, function(err, res, body) {
+      var image = nativeImage.createFromDataURL(body);
+  
+      if (settingsProvider.get("settings-show-notifications")) {
+        if (title && content) {
+          if (process.platform == "win32") {
+            tray.displayBalloon({
+              icon: image,
+              title: title,
+              content: content
+            });
+          } else {
+            new Notification(title, {
+              body: content,
+              icon: image
+            });
+          }
         }
       }
-    }
-  });
+    });
+  }
 }
 
 function quit() {
