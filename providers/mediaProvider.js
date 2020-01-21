@@ -28,7 +28,7 @@ function mediaUpVote(mainWindow) {
 }
 
 function mediaDownVote(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "-" });
+  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "_" });
   console.log("mediaDownVote");
 }
 
