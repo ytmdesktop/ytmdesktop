@@ -15,7 +15,7 @@ const fs = require("fs");
 const scrobblerProvider = require("./providers/scrobblerProvider");
 const __ = require("./providers/translateProvider");
 const { statusBarMenu } = require("./providers/templateProvider");
-const { setMac, calcYTViewSize } = require("./utils/calcYTViewSize");
+const { calcYTViewSize } = require("./utils/calcYTViewSize");
 const { isWindows, isMac } = require("./utils/systemInfo");
 const isDev = require("electron-is-dev");
 const isOnline = require("is-online");
@@ -189,7 +189,6 @@ function createWindow() {
   );
   mainWindow.setBrowserView(view);
 
-  setMac(isMac()); // Pass true to utils if currently running under mac
   view.setBounds(calcYTViewSize(settingsProvider, mainWindow));
 
   if (
