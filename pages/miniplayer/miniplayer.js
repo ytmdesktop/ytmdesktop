@@ -97,7 +97,7 @@ function setPlayerInfo(data) {
   Vibrant.from(data.track.cover)
     .getPalette()
     .then(palette => {
-      body.style.color = palette.LightVibrant.hex;
+      // body.style.color = palette.LightVibrant.hex;
     });
 }
 

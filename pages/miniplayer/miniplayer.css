@@ -167,5 +167,5 @@ body.showinfo .progress-bar {
 body,
 .hide-on-play,
 .progress-bar {
-    transition: .2s ease-out;
+    transition: .1s ease-out;
 }
