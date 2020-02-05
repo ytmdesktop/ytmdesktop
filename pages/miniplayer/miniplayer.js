@@ -22,9 +22,9 @@ btnClose.addEventListener("click", () => {
   window.close();
 });
 
-btnOnTop.addEventListener("click", () => {
-  ipcRenderer.send("miniplayer-toggle-ontop", true);
-});
+// btnOnTop.addEventListener("click", () => {
+//   ipcRenderer.send("miniplayer-toggle-ontop", true);
+// });
 
 btnDislike.addEventListener("click", () => {
   ipcRenderer.send("media-down-vote", true);
