@@ -27,13 +27,13 @@
     }
   },
   "devDependencies": {
-    "electron": "^7.1.9",
+    "electron": "^7.1.11",
     "electron-builder": "^21.2.0",
     "husky": "^3.1.0",
     "pretty-quick": "^1.11.1"
   },
   "dependencies": {
-    "ace-builds": "^1.4.7",
+    "ace-builds": "^1.4.8",
     "base64-img": "^1.0.4",
     "bufferutil": "^4.0.1",
     "castv2-player": "^2.1.0",
@@ -44,14 +44,14 @@
     "electron-is-dev": "^1.1.0",
     "electron-localshortcut": "^3.2.1",
     "electron-native-notification": "^1.2.1",
-    "electron-store": "^3.3.0",
+    "electron-store": "^5.1.0",
     "electron-updater": "^4.2.0",
-    "i18n": "^0.8.4",
+    "i18n": "^0.8.5",
     "is-online": "^8.2.1",
     "js-base64": "^2.5.1",
     "materialize-css": "^1.0.0",
     "node-vibrant": "^3.1.5",
-    "npx": "^10.2.0",
+    "npx": "^10.2.2",
     "prettier": "^1.19.1",
     "qrcode-generator": "^1.4.4",
     "register-scheme": "0.0.2",
