@@ -11,9 +11,9 @@ function getLocal(asset) {
   let type = ".png";
   let localAsset = path.join(app.getAppPath(), "assets", `${asset}`);
 
-  if (systemInfo.isWindows) {
+  if (systemInfo.isWindows()) {
     type = ".ico";
-  } else if (systemInfo.isMac) {
+  } else if (systemInfo.isMac()) {
     type = ".icns";
   } else {
     type = ".png";
