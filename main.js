@@ -1,4 +1,5 @@
 require("./utils/defaultSettings");
+const assetsProvider = require("./providers/assetsProvider");
 
 const {
   app,
@@ -8,7 +9,8 @@ const {
   Menu,
   ipcMain,
   systemPreferences,
-  nativeTheme
+  nativeTheme,
+  screen
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -125,7 +127,14 @@ function createWindow() {
   if (windowSize) {
     mainWindowParams.width = windowSize.width;
     mainWindowParams.height = windowSize.height;
+  } else {
+    let electronScreen = screen;
+    let size = electronScreen.getPrimaryDisplay().workAreaSize;
+
+    mainWindowParams.width = size.width - 150;
+    mainWindowParams.height = size.height - 150;
   }
+
   browserWindowConfig = {
     icon: icon,
     width: mainWindowParams.width,
@@ -342,6 +351,12 @@ function createWindow() {
       if (!mainWindow.isFocused()) {
         tray.balloon(title, author, cover);
       }
+    }
+
+    if (playerInfo.isPaused) {
+      tray.updateTrayIcon(assetsProvider.getLocal("favicon_pause"));
+    } else {
+      tray.updateTrayIcon(assetsProvider.getLocal("favicon_play"));
     }
   }
 
@@ -639,7 +654,7 @@ function createWindow() {
       minWidth: 900,
       height: 550,
       minHeight: 550,
-      icon: path.join(__dirname, "./assets/favicon.png"),
+      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {
@@ -670,7 +685,7 @@ function createWindow() {
       minWidth: 100,
       height: 200,
       minHeight: 100,
-      icon: path.join(__dirname, "./assets/favicon.png"),
+      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: true,
       skipTaskbar: false,
       webPreferences: {
@@ -724,7 +739,7 @@ function createWindow() {
       minWidth: 300,
       height: 260,
       minHeight: 260,
-      icon: path.join(__dirname, "./assets/favicon.png"),
+      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {

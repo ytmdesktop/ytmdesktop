@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const Vibrant = require("node-vibrant");
 
 const body = document.getElementsByTagName("body")[0];
 const title = document.getElementById("title");
@@ -87,6 +88,12 @@ function setPlayerInfo(data) {
       btnDislike.children[0].classList.add("outlined");
       break;
   }
+
+  Vibrant.from(data.track.cover)
+    .getPalette()
+    .then(palette => {
+      body.style.color = palette.LightVibrant.hex;
+    });
 }
 
 function showDbClickAnimation(side) {

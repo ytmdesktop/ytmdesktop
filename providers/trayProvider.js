@@ -38,7 +38,7 @@ let popUpMenu = null;
 
 function createTray(mainWindow, icon) {
   saved_icon = path.join(__dirname, `../${icon}`);
-  const nativeImageIcon = nativeImage.createFromPath(saved_icon);
+  let nativeImageIcon = nativeImage.createFromPath(saved_icon);
   tray = new Tray(nativeImageIcon);
 
   saved_mainWindow = mainWindow;
@@ -50,11 +50,16 @@ function createTray(mainWindow, icon) {
   }
 }
 
+function updateTrayIcon(icon) {
+  let nativeImageIcon = nativeImage.createFromPath(icon);
+  tray.setImage(nativeImageIcon);
+}
+
 function balloon(title, content, cover) {
   if (title && content && cover) {
     base64Img.requestBase64(cover, function(err, res, body) {
       var image = nativeImage.createFromDataURL(body);
-  
+
       if (settingsProvider.get("settings-show-notifications")) {
         if (title && content) {
           if (process.platform == "win32") {
@@ -146,5 +151,6 @@ module.exports = {
   balloon: balloon,
   quit: quit,
   setShinyTray: setShinyTray,
-  updateImage: updateImage
+  updateImage: updateImage,
+  updateTrayIcon: updateTrayIcon
 };

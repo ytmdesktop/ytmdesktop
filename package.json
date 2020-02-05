@@ -50,6 +50,7 @@
     "is-online": "^8.2.1",
     "js-base64": "^2.5.1",
     "materialize-css": "^1.0.0",
+    "node-vibrant": "^3.1.5",
     "npx": "^10.2.0",
     "prettier": "^1.19.1",
     "qrcode-generator": "^1.4.4",
