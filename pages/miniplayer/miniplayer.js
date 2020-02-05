@@ -23,9 +23,9 @@ btnClose.addEventListener("click", () => {
   window.close();
 });
 
-// btnOnTop.addEventListener("click", () => {
-//   ipcRenderer.send("miniplayer-toggle-ontop", true);
-// });
+btnOnTop.addEventListener("click", () => {
+  ipcRenderer.send("miniplayer-toggle-ontop", true);
+});
 
 btnDislike.addEventListener("click", () => {
   ipcRenderer.send("media-down-vote", true);
@@ -37,7 +37,7 @@ btnPrevious.addEventListener("click", () => {
 
 btnPlayPause.addEventListener("click", () => {
   ipcRenderer.send("media-play-pause", true);
-  body.classList.toggle("paused");
+  body.classList.toggle("showinfo");
 });
 
 btnNext.addEventListener("click", () => {
@@ -71,10 +71,10 @@ function setPlayerInfo(data) {
 
   if (data.player.isPaused) {
     btnPlayPause.children[0].innerHTML = "play_arrow";
-    body.classList.add("paused");
+    body.classList.add("showinfo");
   } else {
     btnPlayPause.children[0].innerHTML = "pause";
-    body.classList.remove("paused");
+    body.classList.remove("showinfo");
   }
 
   switch (data.player.likeStatus) {

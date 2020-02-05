@@ -5,7 +5,7 @@ body {
 }
 
 body:hover,
-body.paused {
+body.showinfo {
     backdrop-filter: blur(3px) brightness(0.7);
 }
 
@@ -15,7 +15,7 @@ body.paused {
 }
 
 body:hover .hide-on-play,
-body.paused .hide-on-play {
+body.showinfo .hide-on-play {
     filter: opacity(1);
 }
 
@@ -106,7 +106,7 @@ body.paused .hide-on-play {
 }
 
 body:hover .progress-bar,
-body.paused .progress-bar {
+body.showinfo .progress-bar {
     margin-top: 0;
     height: 2vmin;
 }

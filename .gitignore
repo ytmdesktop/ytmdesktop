@@ -3,7 +3,7 @@ node_modules
 dist
 .DS_Store
 # yarn.lock
-package-lock.json
+# package-lock.json
 /youtube-music-desktop-app-*.tgz
 /.cache
 assets/custom-theme.css
