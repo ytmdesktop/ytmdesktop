@@ -13,8 +13,6 @@ function getLocal(asset) {
 
   if (systemInfo.isWindows()) {
     type = ".ico";
-  } else if (systemInfo.isMac()) {
-    type = ".icns";
   } else {
     type = ".png";
   }

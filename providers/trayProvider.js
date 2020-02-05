@@ -52,6 +52,13 @@ function createTray(mainWindow, icon) {
 
 function updateTrayIcon(icon) {
   let nativeImageIcon = nativeImage.createFromPath(icon);
+  if (process.platform == "darwin") {
+    nativeImageIcon = nativeImageIcon.resize({
+      height: 18,
+      width: 18,
+      quality: "best"
+    });
+  }
   tray.setImage(nativeImageIcon);
 }
 

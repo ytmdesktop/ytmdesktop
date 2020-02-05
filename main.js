@@ -352,11 +352,12 @@ function createWindow() {
         tray.balloon(title, author, cover);
       }
     }
-
-    if (playerInfo.isPaused) {
-      tray.updateTrayIcon(assetsProvider.getLocal("favicon_pause"));
-    } else {
-      tray.updateTrayIcon(assetsProvider.getLocal("favicon_play"));
+    if (!settingsProvider.get("settings-shiny-tray")) {
+      if (playerInfo.isPaused) {
+        tray.updateTrayIcon(assetsProvider.getLocal("favicon_pause"));
+      } else {
+        tray.updateTrayIcon(assetsProvider.getLocal("favicon_play"));
+      }
     }
   }
 
