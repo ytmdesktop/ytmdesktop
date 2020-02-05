@@ -748,6 +748,10 @@ function createWindow() {
     switchClipboardWatcher();
   });
 
+  ipcMain.on("miniplayer-toggle-ontop", function() {
+    miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop());
+  });
+
   ipcMain.on("reset-url", () => {
     mainWindow.getBrowserView().webContents.loadURL(mainWindowParams.url);
   });

@@ -10,6 +10,7 @@ const progress = document.getElementById("progress");
 const secondsEffect = document.getElementById("secondsEffect");
 
 const btnClose = document.getElementById("btn-close");
+const btnOnTop = document.getElementById("btn-pin");
 const btnDislike = document.getElementById("btn-dislike");
 const btnPrevious = document.getElementById("btn-previous");
 const btnPlayPause = document.getElementById("btn-play-pause");
@@ -19,6 +20,10 @@ const btnLike = document.getElementById("btn-like");
 btnClose.addEventListener("click", () => {
   ipcRenderer.send("restore-main-window");
   window.close();
+});
+
+btnOnTop.addEventListener("click", () => {
+  ipcRenderer.send("miniplayer-toggle-ontop", true);
 });
 
 btnDislike.addEventListener("click", () => {
