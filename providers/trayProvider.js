@@ -7,6 +7,7 @@ const __ = require("./translateProvider");
 const Notification = require("electron-native-notification");
 const { doBehavior } = require("../utils/window");
 const base64Img = require("base64-img");
+const systemInfo = require("../utils/systemInfo");
 
 let tray = null;
 let saved_icon = null;
@@ -42,7 +43,7 @@ function createTray(mainWindow, icon) {
   tray = new Tray(nativeImageIcon);
 
   saved_mainWindow = mainWindow;
-  if (process.platform != "darwin") {
+  if (!systemInfo.isMac()) {
     init_tray();
   } else {
     // on Mac OS X
@@ -52,7 +53,7 @@ function createTray(mainWindow, icon) {
 
 function updateTrayIcon(icon) {
   let nativeImageIcon = nativeImage.createFromPath(icon);
-  if (process.platform == "darwin") {
+  if (systemInfo.isMac()) {
     nativeImageIcon = nativeImageIcon.resize({
       height: 18,
       width: 18,
@@ -65,7 +66,7 @@ function updateTrayIcon(icon) {
 function balloon(title, content, cover) {
   if (title && content && cover) {
     base64Img.requestBase64(cover, function(err, res, body) {
-      var image = nativeImage.createFromDataURL(body);
+      let image = nativeImage.createFromDataURL(body);
 
       if (settingsProvider.get("settings-show-notifications")) {
         if (title && content) {

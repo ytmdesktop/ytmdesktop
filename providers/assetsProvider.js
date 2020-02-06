@@ -8,21 +8,23 @@ const systemInfo = require("../utils/systemInfo");
  * @param {*} asset
  */
 function getLocal(asset) {
-  let type = ".png";
-  let localAsset = path.join(app.getAppPath(), "assets", `${asset}`);
+  return path.join(app.getAppPath(), "assets", `${asset}`);
+}
+
+function getIcon(assetPath) {
+  let localAsset = path.join(app.getAppPath(), "assets", `${assetPath}`);
 
   if (systemInfo.isWindows()) {
-    type = ".ico";
+    return `${localAsset}.ico`;
   } else {
-    type = ".png";
+    return `${localAsset}.png`;
   }
-
-  return localAsset + type;
 }
 
 function getExternal() {}
 
 module.exports = {
   getLocal: getLocal,
-  getExternal: getExternal
+  getExternal: getExternal,
+  getIcon: getIcon
 };

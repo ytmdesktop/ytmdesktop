@@ -352,11 +352,12 @@ function createWindow() {
         tray.balloon(title, author, cover);
       }
     }
-    if (!settingsProvider.get("settings-shiny-tray")) {
+
+    if (!isMac() && !settingsProvider.get("settings-shiny-tray")) {
       if (playerInfo.isPaused) {
-        tray.updateTrayIcon(assetsProvider.getLocal("favicon_pause"));
+        tray.updateTrayIcon(assetsProvider.getIcon("favicon_pause"));
       } else {
-        tray.updateTrayIcon(assetsProvider.getLocal("favicon_play"));
+        tray.updateTrayIcon(assetsProvider.getIcon("favicon_play"));
       }
     }
   }
