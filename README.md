@@ -38,6 +38,7 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 ## Linux Distribution Packages
 
 - Arch Linux (AUR): https://aur.archlinux.org/packages/ytmdesktop-git
+- Snap: https://snapcraft.io/youtube-music-desktop-app
 
 ## License
 
