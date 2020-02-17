@@ -5,6 +5,7 @@ var content = remote.getCurrentWebContents();
 
 content.addListener("dom-ready", function() {
   createMenu();
+  createMiddleContent();
   createRightContent();
   playerBarScrollToChangeVolume();
 });
@@ -67,11 +68,19 @@ function createMenu() {
         }
 
         #ytmd_settings {
-            color: #909090 !important;
+            color: #909090;
         }
 
         .ytmd-icons {
             margin: 0 20px 0 10px !important;
+        }
+
+        .pointer:hover {
+            color: #FFF !important;
+        }
+
+        .center-content {
+            padding-top: 12px;
         }
     `);
 
@@ -138,6 +147,23 @@ function createMenu() {
             menuElement.visibility = "visible";
             menuElement.opacity = "1";
         }`);
+}
+
+function createMiddleContent() {
+  content.executeJavaScript(`
+        var center_content = document.getElementsByTagName('ytmusic-pivot-bar-renderer')[0];
+
+        // HISTORY BACK
+        var element = document.createElement('i');
+        element.id = 'ytmd_history_back';
+        element.classList.add('material-icons', 'pointer', 'ytmd-icons', 'center-content');
+        element.style.color = '#666';
+        element.innerText = 'keyboard_backspace';
+
+        element.addEventListener('click', function() { history.go(-1); } )
+        
+        center_content.prepend(element);
+    `);
 }
 
 function createRightContent() {
