@@ -378,6 +378,7 @@ function createWindow() {
       ipcMain.emit("play-pause", infoPlayer.getTrackInfo());
     } catch {}
   });
+
   view.webContents.on("media-paused", function() {
     logDebug("Paused");
     try {

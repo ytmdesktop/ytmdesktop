@@ -102,7 +102,7 @@ body.showinfo .hide-on-play {
     height: .6vmin;
     width: 100vw;
     background: rgba(255, 255, 255, 0.2);
-    transition: .4s ease-out;
+    transition: .2s ease-out;
 }
 
 body:hover .progress-bar,
@@ -167,5 +167,5 @@ body.showinfo .progress-bar {
 body,
 .hide-on-play,
 .progress-bar {
-    transition: .1s ease-out;
+    /* transition: .1s ease-out; */
 }

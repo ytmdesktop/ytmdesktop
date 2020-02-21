@@ -8,6 +8,7 @@ content.addListener("dom-ready", function() {
   createMiddleContent();
   createRightContent();
   playerBarScrollToChangeVolume();
+  createPlayerBarContent();
 });
 
 function createMenu() {
@@ -38,7 +39,7 @@ function createMenu() {
 
             z-index: 999999 !important;
 
-            min-width: 205px;
+            min-width: 48px;
         }
     
         #ytmd-menu a {
@@ -67,10 +68,6 @@ function createMenu() {
             cursor: pointer;
         }
 
-        #ytmd_settings {
-            color: #909090;
-        }
-
         .ytmd-icons {
             margin: 0 20px 0 10px !important;
         }
@@ -82,9 +79,13 @@ function createMenu() {
         .center-content {
             padding-top: 12px;
         }
+
+        .btn-disabled {
+            color: #000 !important;
+        }
     `);
 
-  var menu = `<a id="ytmd-menu-history-back"><i class="material-icons">chevron_left</i></a> <div class="divider"></div> <a id="ytmd-menu-settings"><i class="material-icons">settings</i></a> <a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
+  var menu = `<a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
 
   content.executeJavaScript(`
         var menuDiv = document.createElement("div");
@@ -97,9 +98,6 @@ function createMenu() {
   content.executeJavaScript(`
         var menuElement = document.getElementById("ytmd-menu").style;
 
-        var buttonHistoryBack = document.getElementById('ytmd-menu-history-back');
-        var buttonOpenSettings = document.getElementById('ytmd-menu-settings');
-        var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
         var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
         var buttonPageOpenMiniplayer = document.getElementsByClassName('player-minimize-button ytmusic-player')[0];
@@ -116,18 +114,6 @@ function createMenu() {
                 menuElement.visibility = "hidden";
             }, 501);
         }, false);
-
-        if (buttonHistoryBack) {
-            buttonHistoryBack.addEventListener('click', function() { history.go(-1); } );
-        }
-
-        if (buttonOpenSettings) {
-            buttonOpenSettings.addEventListener('click', function() { ipcRenderer.send('show-settings'); } );
-        }
-        
-        if (buttonOpenLyrics) {
-            buttonOpenLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics'); } );
-        }
         
         if (buttonOpenCompanion) {
             buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('show-companion'); } );
@@ -172,14 +158,26 @@ function createRightContent() {
         var right_content = document.getElementById('right-content');
 
         // SETTINGS
-        var element = document.createElement('i');
-        element.id = 'ytmd_settings';
-        element.classList.add('material-icons', 'pointer', 'ytmd-icons');
-        element.innerText = 'settings';
+        var elementSettings = document.createElement('i');
+        elementSettings.id = 'ytmd_settings';
+        elementSettings.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        elementSettings.style.color = '#909090';
+        elementSettings.innerText = 'settings';
 
-        element.addEventListener('click', function() { ipcRenderer.send('show-settings', true); } )
+        elementSettings.addEventListener('click', function() { ipcRenderer.send('show-settings', true); } )
         
-        right_content.prepend(element);
+        right_content.prepend(elementSettings);
+
+        // LYRICS
+        var elementLyrics = document.createElement('i');
+        elementLyrics.id = 'ytmd_lyrics';
+        elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        elementLyrics.style.color = '#909090';
+        elementLyrics.innerText = 'music_note';
+
+        elementLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics', true); } )
+        
+        right_content.prepend(elementLyrics);
         
         // UPDATE
         var element = document.createElement('i');
@@ -195,6 +193,30 @@ function createRightContent() {
         ipcRenderer.on('downloaded-new-update', function(e, data) {
             document.getElementById("ytmd_update").classList.remove("hide");
         } );`);
+}
+
+function createPlayerBarContent() {
+  content.executeJavaScript(`
+        var playerBarRightControls = document.getElementsByClassName('right-controls-buttons style-scope ytmusic-player-bar')[0];
+
+        // LYRICS
+        /*var elementLyrics = document.createElement('i');
+        elementLyrics.id = 'ytmd_lyrics';
+        elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        elementLyrics.innerText = 'music_note';
+
+        elementLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics', true); } )
+        
+        playerBarRightControls.append(elementLyrics);*/
+        
+        var elementMiniplayer = document.createElement('i');
+        elementMiniplayer.id = 'ytmd_miniplayer';
+        elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        elementMiniplayer.innerText = 'picture_in_picture_alt';
+
+        elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer', true); } )
+        playerBarRightControls.append(elementMiniplayer);
+    `);
 }
 
 function playerBarScrollToChangeVolume() {
