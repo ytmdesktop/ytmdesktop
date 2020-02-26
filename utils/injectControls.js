@@ -39,7 +39,7 @@ function createMenu() {
 
             z-index: 999999 !important;
 
-            min-width: 48px;
+            min-width: 99px;
         }
     
         #ytmd-menu a {
@@ -69,7 +69,7 @@ function createMenu() {
         }
 
         .ytmd-icons {
-            margin: 0 20px 0 10px !important;
+            margin: 0 10px 0 10px !important;
         }
 
         .pointer:hover {
@@ -85,7 +85,7 @@ function createMenu() {
         }
     `);
 
-  var menu = `<a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
+  var menu = `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
 
   content.executeJavaScript(`
         var menuDiv = document.createElement("div");
@@ -100,6 +100,7 @@ function createMenu() {
 
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
         var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
+        var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
         var buttonPageOpenMiniplayer = document.getElementsByClassName('player-minimize-button ytmusic-player')[0];
 
         document.addEventListener('contextmenu', function (e) {
@@ -117,6 +118,10 @@ function createMenu() {
         
         if (buttonOpenCompanion) {
             buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('show-companion'); } );
+        }
+
+        if (buttonOpenLyrics) {
+            buttonOpenLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics'); } );
         }
 
         if (buttonOpenMiniplayer) {
@@ -168,17 +173,6 @@ function createRightContent() {
         
         right_content.prepend(elementSettings);
 
-        // LYRICS
-        var elementLyrics = document.createElement('i');
-        elementLyrics.id = 'ytmd_lyrics';
-        elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
-        elementLyrics.style.color = '#909090';
-        elementLyrics.innerText = 'music_note';
-
-        elementLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics', true); } )
-        
-        right_content.prepend(elementLyrics);
-        
         // UPDATE
         var element = document.createElement('i');
         element.id = 'ytmd_update';
@@ -200,15 +194,16 @@ function createPlayerBarContent() {
         var playerBarRightControls = document.getElementsByClassName('right-controls-buttons style-scope ytmusic-player-bar')[0];
 
         // LYRICS
-        /*var elementLyrics = document.createElement('i');
+        var elementLyrics = document.createElement('i');
         elementLyrics.id = 'ytmd_lyrics';
         elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
         elementLyrics.innerText = 'music_note';
 
         elementLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics', true); } )
         
-        playerBarRightControls.append(elementLyrics);*/
-        
+        playerBarRightControls.append(elementLyrics);
+
+        // MINIPLAYER
         var elementMiniplayer = document.createElement('i');
         elementMiniplayer.id = 'ytmd_miniplayer';
         elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
@@ -231,5 +226,6 @@ function playerBarScrollToChangeVolume() {
             } else {
                 ipcRenderer.send('media-volume-down');
             }
-        });`);
+        });
+    `);
 }
