@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
   initElement("settings-rainmeter-web-now-playing", "click");
+  initElement("settings-enable-double-tapping-show-hide", "click");
 
   initElement("settings-miniplayer-always-top", "click");
   initElement("settings-miniplayer-always-show-controls", "click");
