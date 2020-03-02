@@ -9,6 +9,8 @@ const elementLyric = document.getElementById("lyric");
 
 let lastSong;
 let lastArtist;
+let target;
+let toggled;
 
 loadi18n();
 
@@ -16,15 +18,33 @@ loadi18n();
   window.close();
 });*/
 
+document.getElementById("content").addEventListener("dblclick", function(e) {
+  this.scrollTo(0, target);
+});
+document.getElementById("content").addEventListener("scroll", function(e) {
+  var scrollTop = document.getElementById("content").scrollTop;
+  var differential =
+    target > scrollTop ? target - scrollTop : scrollTop - target;
+  if (differential >= 40) {
+    document.getElementById("tips").innerText = __.trans(
+      "DOUBLE_CLICK_TO_RESET_POSITION"
+    );
+    toggled = false;
+  } else {
+    document.getElementById("tips").innerText = "";
+    toggled = true;
+  }
+});
 setInterval(function() {
   ipcRenderer.send("what-is-song-playing-now");
 }, 1000);
 
 ipcRenderer.on("song-playing-now-is", function(e, data) {
   var scrollHeight = document.getElementById("content").scrollHeight;
-  document
-    .getElementById("content")
-    .scrollTo(0, (scrollHeight * data.track.statePercent) / 1.4);
+  target = (scrollHeight * data.track.statePercent) / 1.4;
+  if (toggled) {
+    document.getElementById("content").scrollTo(0, target);
+  }
 
   getLyric(data.track.author, data.track.title);
 });
@@ -34,6 +54,7 @@ function getLyric(artist, song) {
     if (artist != lastArtist && song != lastSong) {
       lastSong = song;
       lastArtist = artist;
+      toggled = true;
 
       request(
         url + "?art=" + escapeHtml(artist) + "&mus=" + escapeHtml(song),
