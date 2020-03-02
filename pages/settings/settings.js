@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
   initElement("settings-rainmeter-web-now-playing", "click");
+  initElement("settings-enable-double-tapping-show-hide", "click");
 
   M.FormSelect.init(document.querySelectorAll("select"), {});
   M.Tabs.init(document.getElementsByClassName("tabs")[0], {});

@@ -452,21 +452,25 @@ function createWindow() {
 
   // GLOBAL
   globalShortcut.register("MediaPlayPause", function() {
-    if (!doublePressPlayPause) {
-      // The first press
-      if (infoPlayer.getTrackInfo().id == "") {
-        infoPlayer.firstPlay(view.webContents);
-      }
+    if (settingsProvider.get("settings-enable-double-tapping-show-hide")) {
+      if (!doublePressPlayPause) {
+        // The first press
+        if (infoPlayer.getTrackInfo().id == "") {
+          infoPlayer.firstPlay(view.webContents);
+        }
 
-      doublePressPlayPause = true;
-      setTimeout(() => {
-        if (doublePressPlayPause) mediaControl.playPauseTrack(view);
+        doublePressPlayPause = true;
+        setTimeout(() => {
+          if (doublePressPlayPause) mediaControl.playPauseTrack(view);
+          doublePressPlayPause = false;
+        }, 200);
+      } else {
+        // The second press
         doublePressPlayPause = false;
-      }, 200);
+        doBehavior(mainWindow);
+      }
     } else {
-      // The second press
-      doublePressPlayPause = false;
-      doBehavior(mainWindow);
+      mediaControl.playPauseTrack(view);
     }
   });
 
@@ -1028,3 +1032,8 @@ const analytics = require("./providers/analyticsProvider");
 analytics.setEvent("main", "start", "v" + app.getVersion(), app.getVersion());
 analytics.setEvent("main", "os", process.platform, process.platform);
 analytics.setScreen("main");
+
+settingsProvider.setInitialValue(
+  "settings-enable-double-tapping-show-hide",
+  true
+);

@@ -17,6 +17,7 @@
 | `settings-start-on-boot`              | Boolean | `true` or `false`            | `false`                      | Open player when system starts                                 |
 | `settings-clipboard-read`             | Boolean | `true` or `false`            | `false`                      | Reads the clipboard for youtube links                          |
 | `settings-companion-server`           | Boolean | `true` or `false`            | `false`                      | Companion Server to control the player remotely                |
+| `settings-enable-double-tapping-show-hide`| Boolean | `true` or `false`        | `true`                       | Enable or disable double-tapping to show/hide main window |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |
