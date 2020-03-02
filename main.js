@@ -441,17 +441,6 @@ function createWindow() {
     return;
   });
 
-  app.on("before-quit", function(e) {
-    if (isMac()) {
-      app.exit();
-    }
-    tray.quit();
-  });
-
-  app.on("quit", function() {
-    tray.quit();
-  });
-
   // LOCAL
   electronLocalshortcut.register(view, "CmdOrCtrl+S", () => {
     ipcMain.emit("show-settings");
@@ -866,52 +855,76 @@ function createWindow() {
   }, 1000);
 }
 
-app.on("browser-window-created", function(e, window) {
-  // window.setMenu(null);
-  window.removeMenu();
-});
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", function(ev) {
-  checkBounds();
+const gotTheLock = app.requestSingleInstanceLock();
 
-  createWindow();
-
-  tray.createTray(mainWindow, icon);
-
-  ipcMain.on("updated-tray-image", function(event, payload) {
-    if (settingsProvider.get("settings-shiny-tray")) tray.updateImage(payload);
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    if (myWindow) {
+      if (myWindow.isMinimized()) myWindow.restore();
+      myWindow.focus();
+    }
   });
-  if (!isDev) {
-    updater.checkUpdate(mainWindow, view);
 
-    setInterval(function() {
-      updater.checkUpdate(mainWindow, view);
-    }, 1 * 60 * 60 * 1000);
-  }
-  ipcMain.emit("ready", app);
-});
+  app.on("ready", function(ev) {
+    checkBounds();
 
-// Quit when all windows are closed.
-app.on("window-all-closed", function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (!isMac()) {
-    app.quit();
-  }
-});
-
-app.on("activate", function() {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
     createWindow();
-  } else {
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-  }
-});
+
+    tray.createTray(mainWindow, icon);
+
+    ipcMain.on("updated-tray-image", function(event, payload) {
+      if (settingsProvider.get("settings-shiny-tray"))
+        tray.updateImage(payload);
+    });
+    if (!isDev) {
+      updater.checkUpdate(mainWindow, view);
+
+      setInterval(function() {
+        updater.checkUpdate(mainWindow, view);
+      }, 1 * 60 * 60 * 1000);
+    }
+    ipcMain.emit("ready", app);
+  });
+
+  app.on("browser-window-created", function(e, window) {
+    window.removeMenu();
+  });
+
+  // Quit when all windows are closed.
+  app.on("window-all-closed", function() {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (!isMac()) {
+      app.quit();
+    }
+  });
+
+  app.on("activate", function() {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+      createWindow();
+    } else {
+      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+    }
+  });
+
+  app.on("before-quit", function(e) {
+    if (isMac()) {
+      app.exit();
+    }
+    tray.quit();
+  });
+
+  app.on("quit", function() {
+    tray.quit();
+  });
+}
 
 ipcMain.on("show-lyrics", function() {
   const lyrics = new BrowserWindow({
