@@ -676,9 +676,7 @@ function createWindow() {
       resizable: false,
       alwaysOnTop: settingsProvider.get("settings-miniplayer-always-top"),
       backgroundColor: "#000000",
-      width: 200,
       minWidth: 100,
-      height: 200,
       minHeight: 100,
       autoHideMenuBar: true,
       skipTaskbar: false,
@@ -686,6 +684,25 @@ function createWindow() {
         nodeIntegration: true
       }
     });
+
+    // Small => 170 | Medium => 200 | Large => 230
+    switch (settingsProvider.get("settings-miniplayer-size")) {
+      case "1":
+        miniplayer.setSize(170, 170);
+        break;
+
+      case "2":
+        miniplayer.setSize(200, 200);
+        break;
+
+      case "3":
+        miniplayer.setSize(230, 230);
+        break;
+
+      default:
+        miniplayer.setSize(200, 200);
+        break;
+    }
 
     let miniplayerPosition = settingsProvider.get("miniplayer-position");
     if (miniplayerPosition != undefined) {
@@ -707,7 +724,7 @@ function createWindow() {
           x: position[0],
           y: position[1]
         });
-      }, 500);
+      }, 1000);
     });
 
     mainWindow.hide();

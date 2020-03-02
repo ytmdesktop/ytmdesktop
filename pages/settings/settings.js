@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initElement("settings-miniplayer-always-top", "click");
   initElement("settings-miniplayer-always-show-controls", "click");
   initElement("settings-miniplayer-paint-controls", "click");
+  initElement("settings-miniplayer-size", "change");
 
   M.FormSelect.init(document.querySelectorAll("select"), {});
   M.Tabs.init(document.getElementsByClassName("tabs")[0], {});
@@ -165,7 +166,7 @@ function loadValue(element, settingsName, eventType) {
 }
 
 function loadSettings() {
-  readLocales();
+  // readLocales();
 
   if (settingsProvider.get("settings-companion-server")) {
     // document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
