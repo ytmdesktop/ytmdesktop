@@ -636,6 +636,8 @@ function createWindow() {
 
   ipcMain.on("show-settings", function() {
     const settings = new BrowserWindow({
+      title: __.trans("LABEL_SETTINGS"),
+      icon: icon,
       modal: false,
       frame: windowConfig.frame,
       titleBarStyle: windowConfig.titleBarStyle,
@@ -646,7 +648,6 @@ function createWindow() {
       minWidth: 900,
       height: 550,
       minHeight: 550,
-      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {
@@ -667,17 +668,18 @@ function createWindow() {
 
   ipcMain.on("show-miniplayer", function() {
     miniplayer = new BrowserWindow({
+      title: __.trans("LABEL_MINIPLAYER"),
+      icon: icon,
       modal: false,
       frame: false,
       center: false,
       resizable: false,
-      alwaysOnTop: true,
+      alwaysOnTop: settingsProvider.get("settings-miniplayer-always-top"),
       backgroundColor: "#000000",
       width: 200,
       minWidth: 100,
       height: 200,
       minHeight: 100,
-      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: true,
       skipTaskbar: false,
       webPreferences: {
@@ -721,6 +723,7 @@ function createWindow() {
   ipcMain.on("show-last-fm-login", function() {
     const lastfm = new BrowserWindow({
       //parent: mainWindow,
+      icon: icon,
       modal: false,
       frame: windowConfig.frame,
       titleBarStyle: windowConfig.titleBarStyle,
@@ -731,7 +734,6 @@ function createWindow() {
       minWidth: 300,
       height: 260,
       minHeight: 260,
-      icon: assetsProvider.getLocal("favicon"),
       autoHideMenuBar: false,
       skipTaskbar: false,
       webPreferences: {
@@ -765,6 +767,7 @@ function createWindow() {
 
   ipcMain.on("show-editor-theme", function() {
     const editor = new BrowserWindow({
+      icon: path.join(__dirname, icon),
       frame: windowConfig.frame,
       titleBarStyle: windowConfig.titleBarStyle,
       center: true,
@@ -774,7 +777,6 @@ function createWindow() {
       height: 800,
       maxHeight: 800,
       minHeight: 800,
-      icon: path.join(__dirname, icon),
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true

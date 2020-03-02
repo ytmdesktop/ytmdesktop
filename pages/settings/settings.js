@@ -2,6 +2,7 @@ const { remote, ipcRenderer: ipc } = require("electron");
 const settingsProvider = require("../../providers/settingsProvider");
 const __ = require("../../providers/translateProvider");
 const { isLinux } = require("../../utils/systemInfo");
+const fs = require("fs");
 
 const {
   companionUrl,
@@ -46,6 +47,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
   initElement("settings-rainmeter-web-now-playing", "click");
+
+  initElement("settings-miniplayer-always-top", "click");
+  initElement("settings-miniplayer-always-show-controls", "click");
+  initElement("settings-miniplayer-paint-controls", "click");
 
   M.FormSelect.init(document.querySelectorAll("select"), {});
   M.Tabs.init(document.getElementsByClassName("tabs")[0], {});
@@ -160,6 +165,8 @@ function loadValue(element, settingsName, eventType) {
 }
 
 function loadSettings() {
+  readLocales();
+
   if (settingsProvider.get("settings-companion-server")) {
     // document.getElementById("COMPANION_SERVER_INFO").classList.remove("hide");
   }
@@ -186,4 +193,10 @@ function loadSettings() {
 function relaunch() {
   remote.app.relaunch();
   remote.app.exit(0);
+}
+
+function readLocales() {
+  fs.readdir(__dirname, (err, files) => {
+    console.log(files);
+  });
 }

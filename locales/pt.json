@@ -13,6 +13,7 @@
   "MEDIA_CONTROL_QUEUE_OPEN_CLOSE": "Abrir / Fechar Fila",
   "LABEL_SETTINGS": "Configurações",
   "LABEL_LYRICS": "Letra da Música",
+  "LABEL_MINIPLAYER": "Miniplayer",
   "LABEL_PLAY_MUSIC": "Inicie uma música",
   "LABEL_LYRICS_NOT_FOUND": "Letra não encontrada",
   "LABEL_LOADING": "Carregando...",
@@ -48,5 +49,8 @@
   "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
   "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "Salvar e autorizar",
   "LABEL_SETTINGS_TAB_RAINMETER_WEB_NOW_PLAYING": "Rainmeter (WebNowPlaying)",
-  "LABEL_MINIPLAYER": "LABEL_MINIPLAYER"
+  "DOUBLE_CLICK_TO_RESET_POSITION": "Clique duplo para resetar a posição",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_ALWAYS_ON_TOP": "Sempre no topo",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_ALWAYS_SHOW_CONTROLS": "Sempre mostrar os controles",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_PAINT_CONTROLS": "Colorir os controles com as cores do álbum"
 }

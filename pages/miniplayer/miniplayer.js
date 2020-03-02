@@ -1,4 +1,6 @@
 const { ipcRenderer } = require("electron");
+const settingsProvider = require("../../providers/settingsProvider");
+
 const Vibrant = require("node-vibrant");
 
 const body = document.getElementsByTagName("body")[0];
@@ -63,6 +65,7 @@ function init() {
 function setPlayerInfo(data) {
   document.title = `${data.track.title} - ${data.track.author}`;
   body.style.backgroundImage = `url(${data.track.cover})`;
+  body.style.textShadow = "0 0 3px #000";
   title.innerHTML = data.track.title || "Title";
   author.innerHTML = data.track.author || "Author";
   current.innerHTML = data.player.seekbarCurrentPositionHuman || "0:00";
@@ -94,11 +97,19 @@ function setPlayerInfo(data) {
       break;
   }
 
-  Vibrant.from(data.track.cover)
-    .getPalette()
-    .then(palette => {
-      // body.style.color = palette.LightVibrant.hex;
-    });
+  if (settingsProvider.get("settings-miniplayer-paint-controls")) {
+    Vibrant.from(data.track.cover)
+      .getPalette()
+      .then(palette => {
+        body.style.color = palette.LightVibrant.hex;
+      });
+  } else {
+    body.style.color = "#FFF";
+  }
+
+  if (settingsProvider.get("settings-miniplayer-always-show-controls")) {
+    body.classList.add("showinfo");
+  }
 }
 
 function showDbClickAnimation(side) {

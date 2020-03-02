@@ -49,5 +49,8 @@
   "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
   "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "Save and authorize",
   "LABEL_SETTINGS_TAB_RAINMETER_WEB_NOW_PLAYING": "Rainmeter (WebNowPlaying)",
-  "DOUBLE_CLICK_TO_RESET_POSITION": "Double Click to Reset Position"
+  "DOUBLE_CLICK_TO_RESET_POSITION": "Double Click to Reset Position",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_ALWAYS_ON_TOP": "Always on top",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_ALWAYS_SHOW_CONTROLS": "Always show controls",
+  "LABEL_SETTINGS_TAB_MINIPLAYER_PAINT_CONTROLS": "Paint controls with album color"
 }
