@@ -1,10 +1,21 @@
-const { remote, ipcRenderer } = require("electron");
+const { ipcRenderer } = require("electron");
 const request = require("request");
 const __ = require("../../providers/translateProvider");
+const settingsProvider = require("../../providers/settingsProvider");
 
-const url = "https://api.vagalume.com.br/search.php";
+const lyricProviders = [
+  {
+    name: "ovh",
+    url: "https://api.lyrics.ovh/v1/:artist/:music",
+    response: "body.lyrics"
+  },
+  {
+    name: "vagalume",
+    url: "https://api.vagalume.com.br/search.php?art=:artist&mus=:music",
+    response: "body.mus[0].text"
+  }
+];
 
-const window = remote.getCurrentWindow();
 const elementLyric = document.getElementById("lyric");
 
 let lastSong;
@@ -14,13 +25,10 @@ let toggled;
 
 loadi18n();
 
-/*document.getElementById("btn-close").addEventListener("click", function() {
-  window.close();
-});*/
-
 document.getElementById("content").addEventListener("dblclick", function(e) {
   this.scrollTo(0, target);
 });
+
 document.getElementById("content").addEventListener("scroll", function(e) {
   var scrollTop = document.getElementById("content").scrollTop;
   var differential =
@@ -35,6 +43,7 @@ document.getElementById("content").addEventListener("scroll", function(e) {
     toggled = true;
   }
 });
+
 setInterval(function() {
   ipcRenderer.send("what-is-song-playing-now");
 }, 1000);
@@ -55,9 +64,15 @@ function getLyric(artist, song) {
       lastSong = song;
       lastArtist = artist;
       toggled = true;
+      let providerSelected = settingsProvider.get("settings-lyrics-provider");
+      providerSelected = parseInt(providerSelected) - 1;
 
       request(
-        url + "?art=" + escapeHtml(artist) + "&mus=" + escapeHtml(song),
+        urlReplace(
+          lyricProviders[providerSelected].url,
+          removeAccents(artist),
+          removeAccents(song)
+        ),
         { json: true },
         function(err, res, body) {
           if (err) {
@@ -66,9 +81,10 @@ function getLyric(artist, song) {
             return;
           }
 
-          //document.getElementById("now-playing").innerText = song + " - " + artist;
-          if (body.mus) {
-            elementLyric.innerText = body.mus[0].text;
+          if (body) {
+            elementLyric.innerText = eval(
+              lyricProviders[providerSelected].response
+            );
           } else {
             elementLyric.innerText = __.trans("LABEL_LYRICS_NOT_FOUND");
           }
@@ -88,16 +104,99 @@ function loadi18n() {
   );
 }
 
-function escapeHtml(text) {
-  var map = {
-    "&": "and",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  };
+function removeAccents(strAccents) {
+  strAccents = strAccents.split("");
+  strAccentsOut = new Array();
+  strAccentsLen = strAccents.length;
 
-  return text.replace(/[&<>"']/g, function(m) {
-    return map[m];
-  });
+  var accents =
+    "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž";
+  var accentsOut = [
+    "A",
+    "A",
+    "A",
+    "A",
+    "A",
+    "A",
+    "a",
+    "a",
+    "a",
+    "a",
+    "a",
+    "a",
+    "O",
+    "O",
+    "O",
+    "O",
+    "O",
+    "O",
+    "O",
+    "o",
+    "o",
+    "o",
+    "o",
+    "o",
+    "o",
+    "E",
+    "E",
+    "E",
+    "E",
+    "e",
+    "e",
+    "e",
+    "e",
+    "e",
+    "C",
+    "c",
+    "D",
+    "I",
+    "I",
+    "I",
+    "I",
+    "i",
+    "i",
+    "i",
+    "i",
+    "U",
+    "U",
+    "U",
+    "U",
+    "u",
+    "u",
+    "u",
+    "u",
+    "N",
+    "n",
+    "S",
+    "s",
+    "Y",
+    "y",
+    "y",
+    "Z",
+    "z"
+  ];
+
+  for (var y = 0; y < strAccentsLen; y++) {
+    if (accents.indexOf(strAccents[y]) != -1) {
+      strAccentsOut[y] = accentsOut[accents.indexOf(strAccents[y])];
+    } else strAccentsOut[y] = strAccents[y];
+  }
+
+  strAccentsOut = strAccentsOut.join("");
+
+  return strAccentsOut;
+}
+
+function urlReplace(url, artist, music) {
+  let urlReturn = url;
+
+  if (url.indexOf(":artist") !== -1) {
+    urlReturn = urlReturn.replace(":artist", artist);
+  }
+
+  if (url.indexOf(":music") !== -1) {
+    urlReturn = urlReturn.replace(":music", music);
+  }
+
+  return urlReturn;
 }

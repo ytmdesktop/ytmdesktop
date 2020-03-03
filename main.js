@@ -819,6 +819,10 @@ function createWindow() {
     loadCustomTheme();
   });
 
+  ipcMain.on("debug", (event, message) => {
+    console.log(message);
+  });
+
   function loadCustomTheme() {
     if (settingsProvider.get("settings-custom-theme")) {
       if (fs.existsSync(themePath)) {
@@ -992,7 +996,6 @@ ipcMain.on("show-lyrics", function() {
     }, 500);
   });
 
-  // lyrics.loadFile(path.join(__dirname, "./pages/lyrics/lyrics.html"));
   // lyrics.webContents.openDevTools();
 });
 
