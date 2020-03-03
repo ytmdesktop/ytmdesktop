@@ -69,7 +69,7 @@ function createMenu() {
         }
 
         .ytmd-icons {
-            margin: 0 10px 0 10px !important;
+            margin: 0 18px 0 2px !important;
         }
 
         .pointer:hover {

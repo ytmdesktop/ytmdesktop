@@ -55,7 +55,7 @@ init();
 function init() {
   setInterval(() => {
     ipcRenderer.send("what-is-song-playing-now");
-  }, 900);
+  }, 500);
 
   ipcRenderer.on("song-playing-now-is", (e, data) => {
     setPlayerInfo(data);
