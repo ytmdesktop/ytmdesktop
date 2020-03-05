@@ -892,7 +892,13 @@ if (!gotTheLock) {
 } else {
   app.on("second-instance", (event, commandLine, workingDirectory) => {
     if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
+      if (mainWindow.isVisible()) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        }
+      } else {
+        mainWindow.show();
+      }
       mainWindow.focus();
     }
   });
