@@ -62,3 +62,4 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 [<img alt="AdityaTD" src="https://github.com/AdityaTD.png?size=120" width="120px">](https://github.com/AdityaTD)
 [<img alt="vbackeberg" src="https://github.com/vbackeberg.png?size=120" width="120px">](https://github.com/vbackeberg)
 [<img alt="Vistaus" src="https://github.com/Vistaus.png?size=120" width="120px">](https://github.com/vistaus)
+[<img alt="ddarkr" src="https://github.com/ddarkr.png?size=120" width="120px">](https://github.com/ddarkr)
