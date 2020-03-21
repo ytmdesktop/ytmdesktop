@@ -10,7 +10,8 @@ const {
   ipcMain,
   systemPreferences,
   nativeTheme,
-  screen
+  screen,
+  shell
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -20,7 +21,6 @@ const { statusBarMenu } = require("./providers/templateProvider");
 const { calcYTViewSize } = require("./utils/calcYTViewSize");
 const { isWindows, isMac } = require("./utils/systemInfo");
 const isDev = require("electron-is-dev");
-const isOnline = require("is-online");
 const ClipboardWatcher = require("electron-clipboard-watcher");
 const {
   companionUrl,
@@ -69,8 +69,6 @@ let infoPlayerInterval;
 let customThemeCSSKey;
 let lastTrackId;
 let doublePressPlayPause;
-let lastConnectionStatusIsOnline = false;
-let hasLoadedUrl;
 let isClipboardWatcherRunning = false;
 let clipboardWatcher = null;
 
@@ -821,6 +819,21 @@ function createWindow() {
 
   ipcMain.on("debug", (event, message) => {
     console.log(message);
+  });
+
+  ipcMain.on("bug-report", (event, message) => {
+    var os_platform = process.platform || "-";
+    var os_arch = process.arch || "-";
+    var os_system_version = process.getSystemVersion() || "-";
+
+    var node_version = process.versions["node"] || "-";
+
+    var ytmdesktop_version = process.env["npm_package_version"] || "-";
+
+    var template = `%23%23%23%23 Problem %0A%23%23%23%23%23%23 (Describe the problem here) %0A%23%23%23%23 Environment %0A * YTMDesktop: ${ytmdesktop_version} %0A * Platform: ${os_platform} %0A * Arch: ${os_arch} %0A * Version: ${os_system_version} %0A * Node: ${node_version}`;
+    shell.openExternal(
+      `https://github.com/ytmdesktop/ytmdesktop/issues/new?title=Issue%20title&body=${template}`
+    );
   });
 
   function loadCustomTheme() {

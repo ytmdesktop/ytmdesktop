@@ -83,9 +83,13 @@ function createMenu() {
         .btn-disabled {
             color: #000 !important;
         }
+
+        .text-red {
+            color: red !important;
+        }
     `);
 
-  var menu = `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> `;
+  var menu = `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> <a id="ytmd-menu-bug-report"><i class="material-icons text-red">bug_report</i></a>`;
 
   content.executeJavaScript(`
         var menuDiv = document.createElement("div");
@@ -101,6 +105,7 @@ function createMenu() {
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
         var buttonOpenMiniplayer = document.getElementById('ytmd-menu-miniplayer');
         var buttonOpenLyrics = document.getElementById('ytmd-menu-lyrics');
+        var buttonOpenBugReport = document.getElementById('ytmd-menu-bug-report');
         var buttonPageOpenMiniplayer = document.getElementsByClassName('player-minimize-button ytmusic-player')[0];
 
         document.addEventListener('contextmenu', function (e) {
@@ -132,6 +137,10 @@ function createMenu() {
             buttonPageOpenMiniplayer.addEventListener('click', function(e) { /* Temporary fix */ document.getElementsByClassName('player-maximize-button ytmusic-player')[0].click(); ipcRenderer.send('show-miniplayer'); } );
         }
         
+        if (buttonOpenBugReport) {
+            buttonOpenBugReport.addEventListener('click', function() { ipcRenderer.send('bug-report'); } );
+        }
+
         function showMenu(x, y) {
             menuElement.top = y + "px";
             menuElement.left = x + "px";

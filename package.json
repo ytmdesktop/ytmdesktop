@@ -47,7 +47,6 @@
     "electron-store": "^5.1.0",
     "electron-updater": "^4.2.0",
     "i18n": "^0.8.5",
-    "is-online": "^8.2.1",
     "js-base64": "^2.5.1",
     "materialize-css": "^1.0.0",
     "node-vibrant": "^3.1.5",
