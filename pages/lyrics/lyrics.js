@@ -5,7 +5,7 @@ const settingsProvider = require("../../providers/settingsProvider");
 
 const lyricProviders = [
   {
-    name: "ovh",
+    name: "lyrics.ovh",
     url: "https://api.lyrics.ovh/v1/:artist/:music",
     response: "body.lyrics"
   },
