@@ -19,7 +19,6 @@ class Mpris {
   }
 
   setActivity(info) {
-    console.log(info);
     this.player.metadata = {
       "mpris:trackid": this.player.objectPath("track/0"),
       "mpris:length": info.track.duration * 1000 * 1000, // In microseconds
