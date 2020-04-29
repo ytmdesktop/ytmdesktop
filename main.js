@@ -344,7 +344,9 @@ function createWindow() {
 
       mainWindow.setTitle(nowPlaying);
       tray.setTooltip(nowPlaying);
-      scrobblerProvider.updateTrackInfo(title, author);
+      if (!trackInfo.isAdvertisement) {
+        scrobblerProvider.updateTrackInfo(title, author);
+      }
 
       if (!mainWindow.isFocused()) {
         tray.balloon(title, author, cover);
@@ -832,7 +834,7 @@ function createWindow() {
 
     var template = `%23%23%23%23 Problem %0A%23%23%23%23%23%23 (Describe the problem here) %0A%23%23%23%23 Environment %0A * YTMDesktop: ${ytmdesktop_version} %0A * Platform: ${os_platform} %0A * Arch: ${os_arch} %0A * Version: ${os_system_version} %0A * Node: ${node_version}`;
     shell.openExternal(
-      `https://github.com/ytmdesktop/ytmdesktop/issues/new?title=Issue%20title&body=${template}`
+      `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
     );
   });
 
