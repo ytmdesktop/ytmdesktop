@@ -15,6 +15,7 @@
 | `settings-app-language`               | String  | `en`, `pt`                   | `en`                         | Language of the app                                            |
 | `settings-discord-rich-presence`      | Boolean | `true` or `false`            | `false`                      | Integration with Discord Rich Presence                         |
 | `settings-start-on-boot`              | Boolean | `true` or `false`            | `false`                      | Open player when system starts                                 |
+| `settings-start-minimized`            | Boolean | `true` or `false`            | `false`                      | Open player minimized in tray                                  |
 | `settings-clipboard-read`             | Boolean | `true` or `false`            | `false`                      | Reads the clipboard for youtube links                          |
 | `settings-companion-server`           | Boolean | `true` or `false`            | `false`                      | Companion Server to control the player remotely                |
 | `settings-enable-double-tapping-show-hide`| Boolean | `true` or `false`        | `true`                       | Enable or disable double-tapping to show/hide main window |

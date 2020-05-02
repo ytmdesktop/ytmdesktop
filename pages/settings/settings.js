@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initElement("settings-keep-background", "click");
   initElement("settings-show-notifications", "click");
   initElement("settings-start-on-boot", "click");
+  initElement("settings-start-minimized", "click");
   initElement("settings-companion-server", "click");
   initElement("settings-continue-where-left-of", "click");
   initElement("settings-shiny-tray", "click", () => {
