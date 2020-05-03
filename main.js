@@ -253,6 +253,11 @@ function createWindow() {
     );
   });
 
+  view.webContents.on("new-window", function(event, url) {
+    event.preventDefault();
+    shell.openExternal(url);
+  });
+
   // view.webContents.openDevTools({ mode: 'detach' });
   view.webContents.on("did-navigate-in-page", function() {
     initialized = true;
