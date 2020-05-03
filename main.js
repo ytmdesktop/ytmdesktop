@@ -124,6 +124,7 @@ function createWindow() {
   }
   windowSize = settingsProvider.get("window-size");
   windowMaximized = settingsProvider.get("window-maximized");
+  windowMinimized = settingsProvider.get("settings-start-minimized");
 
   if (windowSize) {
     mainWindowParams.width = windowSize.width;
@@ -142,7 +143,7 @@ function createWindow() {
     height: mainWindowParams.height,
     minWidth: 300,
     minHeight: 300,
-    show: true,
+    show: windowMinimized ? false : true,
     autoHideMenuBar: true,
     backgroundColor: "#232323",
     center: true,
