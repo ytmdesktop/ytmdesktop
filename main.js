@@ -60,7 +60,7 @@ let renderer_for_status_bar = null;
 global.sharedObj = { title: "N/A", paused: true };
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, view, miniplayer;
+let mainWindow, view, miniplayer, lyrics, settings;
 
 let mainWindowParams = {
   url: "https://music.youtube.com",
@@ -649,35 +649,47 @@ function createWindow() {
   });
 
   ipcMain.on("show-settings", function() {
-    const settings = new BrowserWindow({
-      title: __.trans("LABEL_SETTINGS"),
-      icon: icon,
-      modal: false,
-      frame: windowConfig.frame,
-      titleBarStyle: windowConfig.titleBarStyle,
-      center: true,
-      resizable: true,
-      backgroundColor: "#232323",
-      width: 900,
-      minWidth: 900,
-      height: 550,
-      minHeight: 550,
-      autoHideMenuBar: false,
-      skipTaskbar: false,
-      webPreferences: {
-        nodeIntegration: true,
-        webviewTag: true
-      }
+    if (settings) {
+      settings.show();
+    } else {
+      settings = new BrowserWindow({
+        title: __.trans("LABEL_SETTINGS"),
+        icon: icon,
+        modal: false,
+        frame: windowConfig.frame,
+        titleBarStyle: windowConfig.titleBarStyle,
+        center: true,
+        resizable: true,
+        backgroundColor: "#232323",
+        width: 900,
+        minWidth: 900,
+        height: 550,
+        minHeight: 550,
+        autoHideMenuBar: false,
+        skipTaskbar: false,
+        webPreferences: {
+          nodeIntegration: true,
+          webviewTag: true
+        }
+      });
+
+      // settings.loadFile(path.join(app.getAppPath(), "/pages/settings/settings.html"));
+      settings.loadFile(
+        path.join(
+          __dirname,
+          "./pages/shared/window-buttons/window-buttons.html"
+        ),
+        {
+          search:
+            "page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize"
+        }
+      );
+      // settings.webContents.openDevTools();
+    }
+
+    settings.on("closed", function() {
+      settings = null;
     });
-    // settings.loadFile(path.join(app.getAppPath(), "/pages/settings/settings.html"));
-    settings.loadFile(
-      path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
-      {
-        search:
-          "page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize"
-      }
-    );
-    // settings.webContents.openDevTools();
   });
 
   ipcMain.on("show-miniplayer", function() {
@@ -985,49 +997,57 @@ if (!gotTheLock) {
 }
 
 ipcMain.on("show-lyrics", function() {
-  const lyrics = new BrowserWindow({
-    frame: windowConfig.frame,
-    titleBarStyle: windowConfig.titleBarStyle,
-    center: true,
-    resizable: true,
-    backgroundColor: "#232323",
-    width: 700,
-    height: 800,
-    icon: path.join(__dirname, icon),
-    webPreferences: {
-      nodeIntegration: true,
-      webviewTag: true
-    }
-  });
+  if (lyrics) {
+    lyrics.show();
+  } else {
+    lyrics = new BrowserWindow({
+      frame: windowConfig.frame,
+      titleBarStyle: windowConfig.titleBarStyle,
+      center: true,
+      resizable: true,
+      backgroundColor: "#232323",
+      width: 700,
+      height: 800,
+      icon: path.join(__dirname, icon),
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true
+      }
+    });
 
-  let lyricsPosition = settingsProvider.get("lyrics-position");
-  if (lyricsPosition != undefined) {
-    lyrics.setPosition(lyricsPosition.x, lyricsPosition.y);
+    let lyricsPosition = settingsProvider.get("lyrics-position");
+    if (lyricsPosition != undefined) {
+      lyrics.setPosition(lyricsPosition.x, lyricsPosition.y);
+    }
+
+    lyrics.loadFile(
+      path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
+      {
+        search:
+          "page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize"
+      }
+    );
+
+    lyrics.on("move", function(e) {
+      let storeLyricsPositionTimer;
+      let position = lyrics.getPosition();
+      if (storeLyricsPositionTimer) {
+        clearTimeout(storeLyricsPositionTimer);
+      }
+      storeLyricsPositionTimer = setTimeout(() => {
+        settingsProvider.set("lyrics-position", {
+          x: position[0],
+          y: position[1]
+        });
+      }, 500);
+    });
+
+    // lyrics.webContents.openDevTools();
   }
 
-  lyrics.loadFile(
-    path.join(__dirname, "./pages/shared/window-buttons/window-buttons.html"),
-    {
-      search:
-        "page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize"
-    }
-  );
-
-  lyrics.on("move", function(e) {
-    let storeLyricsPositionTimer;
-    let position = lyrics.getPosition();
-    if (storeLyricsPositionTimer) {
-      clearTimeout(storeLyricsPositionTimer);
-    }
-    storeLyricsPositionTimer = setTimeout(() => {
-      settingsProvider.set("lyrics-position", {
-        x: position[0],
-        y: position[1]
-      });
-    }, 500);
+  lyrics.on("closed", function() {
+    lyrics = null;
   });
-
-  // lyrics.webContents.openDevTools();
 });
 
 ipcMain.on("show-companion", function() {
