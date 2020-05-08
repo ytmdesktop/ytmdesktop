@@ -323,6 +323,7 @@ function createWindow() {
 
         var title = trackInfo.title
         var author = trackInfo.author
+        var album = trackInfo.album
         var cover = trackInfo.cover
         var nowPlaying = `${title} - ${author}`
 
@@ -358,7 +359,7 @@ function createWindow() {
             mainWindow.setTitle(nowPlaying)
             tray.setTooltip(nowPlaying)
             if (!trackInfo.isAdvertisement) {
-                scrobblerProvider.updateTrackInfo(title, author)
+                scrobblerProvider.updateTrackInfo(title, author, album)
             }
 
             if (!mainWindow.isFocused()) {
