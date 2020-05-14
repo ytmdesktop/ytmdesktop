@@ -32,6 +32,7 @@ const infoPlayer = require('./utils/injectGetInfoPlayer')
 const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
 const companionServer = require('./providers/companionServer')
 const discordRPC = require('./providers/discordRpcProvider')
+app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 const mprisProvider = require('./providers/mprisProvider')
 const { checkBounds, doBehavior } = require('./utils/window')
 
@@ -291,6 +292,7 @@ function createWindow() {
     view.webContents.on('media-started-playing', function() {
         if (!infoPlayer.hasInitialized()) {
             infoPlayer.init(view)
+            mprisProvider.setRealPlayer(infoPlayer) //this lets us keep track of the current time in playback.
         }
 
         if (isMac()) {
