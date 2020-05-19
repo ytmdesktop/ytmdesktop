@@ -216,7 +216,7 @@ function createWindow() {
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    // view.webContents.openDevTools({ mode: 'detach' });
+    view.webContents.openDevTools({ mode: 'detach' })
 
     mediaControl.createThumbar(
         mainWindow,
@@ -287,7 +287,10 @@ function createWindow() {
             }
         `)
     })
-
+    setInterval(() => {
+        console.log(getAll())
+        // document.querySelector('ytmusic-player-bar')
+    }, 1000)
     view.webContents.on('media-started-playing', function() {
         if (!infoPlayer.hasInitialized()) {
             infoPlayer.init(view)
@@ -300,7 +303,10 @@ function createWindow() {
 
         if (infoPlayerInterval === undefined) {
             infoPlayerInterval = setInterval(() => {
-                updateActivity()
+                console.log(global.on_the_road)
+                if (global.on_the_road) {
+                    updateActivity()
+                }
             }, 800)
         }
     })
@@ -309,10 +315,19 @@ function createWindow() {
         loadCustomTheme()
 
         view.webContents.executeJavaScript('window.location').then(location => {
+            console.log(location.hostname)
             if (location.hostname != 'music.youtube.com') {
                 mainWindow.send('off-the-road')
+                console.log(
+                    '================================= n está na página ================================='
+                )
+                global.on_the_road = false
             } else {
                 mainWindow.send('on-the-road')
+                console.log(
+                    '+++++++++++++++++++++++++++++++++ está na página +++++++++++++++++++++++++++++++++'
+                )
+                global.on_the_road = true
             }
         })
     })
