@@ -18,4 +18,4 @@ settingsProvider.setInitialValue("settings-app-language", "en"); // English
 
 settingsProvider.setInitialValue("settings-miniplayer-size", "2"); // Normal size
 
-settingsProvider.setInitialValue("settings-lyrics-provider", "0"); // OVH
+settingsProvider.setInitialValue("settings-lyrics-provider", "1"); // OVH

@@ -19,7 +19,8 @@ var track = {
   statePercent: 0,
   url: "",
   id: "",
-  isVideo: false
+  isVideo: false,
+  isAdvertisement: false
 };
 
 function init(view) {
@@ -55,6 +56,7 @@ function getTrackInfo() {
     getUrl(webContents);
     setPercent(player.seekbarCurrentPosition, track.duration);
     isVideo(webContents);
+    isAdvertisement(webContents);
   }
   return track;
 }
@@ -240,6 +242,17 @@ function isVideo(webContents) {
     .then(isVideo => {
       track.isVideo = !!isVideo;
       debug(`Is video: ${track.isVideo}`);
+    });
+}
+
+function isAdvertisement(webContents) {
+  webContents
+    .executeJavaScript(
+      `document.getElementsByClassName('advertisement ')[0].hasAttribute('hidden')`
+    )
+    .then(isAdvertisement => {
+      track.isAdvertisement = !isAdvertisement;
+      debug(`Is advertisement: ${track.isAdvertisement}`);
     });
 }
 
