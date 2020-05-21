@@ -289,7 +289,7 @@ function createWindow() {
         `)
     })
     setInterval(() => {
-        console.log(getAll())
+        // console.log(getAll())
         // document.querySelector('ytmusic-player-bar')
     }, 1000)
     view.webContents.on('media-started-playing', function() {
@@ -317,18 +317,11 @@ function createWindow() {
         loadCustomTheme()
 
         view.webContents.executeJavaScript('window.location').then(location => {
-            console.log(location.hostname)
             if (location.hostname != 'music.youtube.com') {
                 mainWindow.send('off-the-road')
-                console.log(
-                    '================================= n está na página ================================='
-                )
                 global.on_the_road = false
             } else {
                 mainWindow.send('on-the-road')
-                console.log(
-                    '+++++++++++++++++++++++++++++++++ está na página +++++++++++++++++++++++++++++++++'
-                )
                 global.on_the_road = true
             }
         })
@@ -971,7 +964,7 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('ready', function(ev) {
+    app.whenReady().then(function() {
         checkBounds()
 
         createWindow()
@@ -991,6 +984,10 @@ if (!gotTheLock) {
         }
         ipcMain.emit('ready', app)
     })
+
+    /*app.on('ready', function(ev) {
+        
+    })*/
 
     app.on('browser-window-created', function(e, window) {
         window.removeMenu()

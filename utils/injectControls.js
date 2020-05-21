@@ -4,21 +4,21 @@ window.ipcRenderer = ipcRenderer
 var content = remote.getCurrentWebContents()
 
 content.addListener('dom-ready', function() {
+    createContextMenu()
+
     content.executeJavaScript('window.location').then(location => {
-        if (location.hostname != 'music.youtube.com') {
-            // Show menu off the road;
-        } else {
+        if (location.hostname == 'music.youtube.com') {
             createMiddleContent()
             createRightContent()
             playerBarScrollToChangeVolume()
             createPlayerBarContent()
+        } else {
+            // Show menu off the road;
         }
-
-        createMenu()
     })
 })
 
-function createMenu() {
+function createContextMenu() {
     content.executeJavaScript(`
         var materialIcons = document.createElement('link');
         materialIcons.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons');
