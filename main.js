@@ -528,7 +528,7 @@ function createWindow() {
         view.webContents.setZoomFactor(value / 100)
     })
 
-    ipcMain.on('what-is-song-playing-now', function(e, _) {
+    ipcMain.on('retrieve-player-info', function(e, _) {
         // IPCRenderer
         if (e !== undefined) {
             e.sender.send('song-playing-now-is', infoPlayer.getAllInfo())
@@ -753,8 +753,8 @@ function createWindow() {
             path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
         )
 
+        let storeMiniplayerPositionTimer
         miniplayer.on('move', function(e) {
-            let storeMiniplayerPositionTimer
             let position = miniplayer.getPosition()
             if (storeMiniplayerPositionTimer) {
                 clearTimeout(storeMiniplayerPositionTimer)
@@ -898,7 +898,9 @@ function createWindow() {
             .then( devices => {
                 var audioDevices = devices.filter(device => device.kind === 'audiooutput');
                 var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
-                document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+                if(result.length) {
+                    document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+                }
             });
         `
             )
@@ -1086,8 +1088,8 @@ ipcMain.on('show-lyrics', function() {
             }
         )
 
+        let storeLyricsPositionTimer
         lyrics.on('move', function(e) {
-            let storeLyricsPositionTimer
             let position = lyrics.getPosition()
             if (storeLyricsPositionTimer) {
                 clearTimeout(storeLyricsPositionTimer)
@@ -1100,12 +1102,12 @@ ipcMain.on('show-lyrics', function() {
             }, 500)
         })
 
+        lyrics.on('closed', function() {
+            lyrics = null
+        })
+
         // lyrics.webContents.openDevTools();
     }
-
-    lyrics.on('closed', function() {
-        lyrics = null
-    })
 })
 
 ipcMain.on('show-companion', function() {

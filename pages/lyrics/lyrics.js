@@ -44,8 +44,8 @@ document.getElementById('content').addEventListener('scroll', function(e) {
 })
 
 setInterval(function() {
-    ipcRenderer.send('what-is-song-playing-now')
-}, 1000)
+    ipcRenderer.send('retrieve-player-info')
+}, 3 * 1000)
 
 ipcRenderer.on('song-playing-now-is', function(e, data) {
     var scrollHeight = document.getElementById('content').scrollHeight

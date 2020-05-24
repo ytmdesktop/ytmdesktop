@@ -1,4 +1,4 @@
-const { remote, ipcRenderer: ipc } = require('electron')
+const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const { isLinux } = require('../../utils/systemInfo')
@@ -17,6 +17,9 @@ const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
 const elementBtnOpenEditor = document.getElementById('btn-editor-custom-theme')
 const elementBtnLastFmLogin = document.getElementById('btn-last-fm-login')
+const elementBtnOpenCompanionServer = document.getElementById(
+    'btn-open-companion-server'
+)
 
 if (isLinux()) {
     document
@@ -116,6 +119,12 @@ if (elementBtnOpenEditor) {
 if (elementBtnLastFmLogin) {
     elementBtnLastFmLogin.addEventListener('click', function() {
         ipc.send('show-last-fm-login')
+    })
+}
+
+if (elementBtnOpenCompanionServer) {
+    elementBtnOpenCompanionServer.addEventListener('click', function() {
+        shell.openExternal(`http://localhost:9863`)
     })
 }
 
