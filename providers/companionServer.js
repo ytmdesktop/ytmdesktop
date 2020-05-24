@@ -128,16 +128,39 @@ var serverFunction = function(req, res) {
 
         res.end()
     }
+
+    if (req.url === '/query') {
+        res.writeHead(200, {
+            'Content-Type': 'text/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*',
+        })
+
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayer.getAllInfo()))
+            res.end()
+        }
+
+        // Implement secret to prevent anonymous control
+        if (req.method === 'POST') {
+            let body = []
+
+            req.on('data', chunk => {
+                body.push(chunk)
+            }).on('end', () => {
+                try {
+                    body = Buffer.concat(body).toString()
+                    let cmd = JSON.parse(body)
+                    execCmd(cmd.command, cmd.value)
+                    res.end(body)
+                } catch {
+                    res.end('error')
+                }
+            })
+        }
+    }
 }
 
 var server = http.createServer(serverFunction)
-
-server.on('request', function(req, res) {
-    if (req.url === '/query') {
-        res.write(JSON.stringify(infoPlayer.getAllInfo()))
-        res.end()
-    }
-})
 
 function start() {
     server.listen(port, ip)
@@ -152,52 +175,8 @@ function start() {
     }, 800)
 
     io.on('connection', socket => {
-        socket.on('media-commands', (cmd, data) => {
-            switch (cmd) {
-                case 'previous-track':
-                    ipcMain.emit('media-previous-track', true)
-                    break
-
-                case 'play-track':
-                    ipcMain.emit('media-play-pause', true)
-                    break
-
-                case 'pause-track':
-                    ipcMain.emit('media-play-pause', true)
-                    break
-
-                case 'next-track':
-                    ipcMain.emit('media-next-track', true)
-                    break
-
-                case 'thumbs-up-track':
-                    ipcMain.emit('media-up-vote', true)
-                    break
-
-                case 'thumbs-down-track':
-                    ipcMain.emit('media-down-vote', true)
-                    break
-
-                case 'volume-up':
-                    ipcMain.emit('media-volume-up', true)
-                    break
-
-                case 'volume-down':
-                    ipcMain.emit('media-volume-down', true)
-                    break
-
-                case 'forward-X-seconds':
-                    ipcMain.emit('media-forward-X-seconds', true)
-                    break
-
-                case 'rewind-X-seconds':
-                    ipcMain.emit('media-rewind-X-seconds', true)
-                    break
-
-                case 'change-seekbar':
-                    ipcMain.emit('media-change-seekbar', data)
-                    break
-            }
+        socket.on('media-commands', (cmd, value) => {
+            execCmd(cmd, value)
         })
     })
 
@@ -208,6 +187,54 @@ function stop() {
     clearInterval(timerTotalConections)
     server.close()
     console.log('Companion Server has stopped')
+}
+
+function execCmd(cmd, value) {
+    switch (cmd) {
+        case 'previous-track':
+            ipcMain.emit('media-previous-track', true)
+            break
+
+        case 'play-track':
+            ipcMain.emit('media-play-pause', true)
+            break
+
+        case 'pause-track':
+            ipcMain.emit('media-play-pause', true)
+            break
+
+        case 'next-track':
+            ipcMain.emit('media-next-track', true)
+            break
+
+        case 'thumbs-up-track':
+            ipcMain.emit('media-up-vote', true)
+            break
+
+        case 'thumbs-down-track':
+            ipcMain.emit('media-down-vote', true)
+            break
+
+        case 'volume-up':
+            ipcMain.emit('media-volume-up', true)
+            break
+
+        case 'volume-down':
+            ipcMain.emit('media-volume-down', true)
+            break
+
+        case 'forward-X-seconds':
+            ipcMain.emit('media-forward-X-seconds', true)
+            break
+
+        case 'rewind-X-seconds':
+            ipcMain.emit('media-rewind-X-seconds', true)
+            break
+
+        case 'set-seekbar':
+            ipcMain.emit('media-change-seekbar', value)
+            break
+    }
 }
 
 module.exports = {
