@@ -739,6 +739,18 @@ function createWindow() {
                 miniplayer.setSize(230, 230)
                 break
 
+            case '4':
+                miniplayer.setSize(260, 260)
+                break
+
+            case '5':
+                miniplayer.setSize(290, 290)
+                break
+
+            case '6':
+                miniplayer.setSize(320, 320)
+                break
+
             default:
                 miniplayer.setSize(200, 200)
                 break
