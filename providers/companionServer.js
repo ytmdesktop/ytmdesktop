@@ -190,48 +190,50 @@ function stop() {
 }
 
 function execCmd(cmd, value) {
+    value = value || true
+
     switch (cmd) {
-        case 'previous-track':
+        case 'track-previous':
             ipcMain.emit('media-previous-track', true)
             break
 
-        case 'play-track':
+        case 'track-play':
             ipcMain.emit('media-play-pause', true)
             break
 
-        case 'pause-track':
+        case 'track-pause':
             ipcMain.emit('media-play-pause', true)
             break
 
-        case 'next-track':
+        case 'track-next':
             ipcMain.emit('media-next-track', true)
             break
 
-        case 'thumbs-up-track':
+        case 'track-thumbs-up':
             ipcMain.emit('media-up-vote', true)
             break
 
-        case 'thumbs-down-track':
+        case 'track-thumbs-down':
             ipcMain.emit('media-down-vote', true)
             break
 
-        case 'volume-up':
+        case 'player-volume-up':
             ipcMain.emit('media-volume-up', true)
             break
 
-        case 'volume-down':
+        case 'player-volume-down':
             ipcMain.emit('media-volume-down', true)
             break
 
-        case 'forward-X-seconds':
+        case 'player-forward':
             ipcMain.emit('media-forward-X-seconds', true)
             break
 
-        case 'rewind-X-seconds':
+        case 'player-rewind':
             ipcMain.emit('media-rewind-X-seconds', true)
             break
 
-        case 'set-seekbar':
+        case 'player-set-seekbar':
             ipcMain.emit('media-change-seekbar', value)
             break
     }
