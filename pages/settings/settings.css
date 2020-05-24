@@ -213,3 +213,9 @@ input[type="range"]::-webkit-slider-runnable-track {
     background-color: #131313;
     text-transform: none;
 }
+
+
+.dropdown-trigger {
+    min-width: 300px;
+    font-size: 13px !important;
+}

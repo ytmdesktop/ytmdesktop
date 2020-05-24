@@ -13,7 +13,7 @@
         "publish:mac": "build --mac -p always --config electron-builder64.yml",
         "publish:lin": "electron-builder --linux -p always --config electron-builder64.yml"
     },
-    "repository": "https://github.com/adlerluiz/ytmdesktop",
+    "repository": "https://github.com/ytmdesktop/ytmdesktop",
     "keywords": [
         "Electron",
         "Youtube",

@@ -55,7 +55,7 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
-mprisProvider.start()
+//mprisProvider.start()
 
 let renderer_for_status_bar = null
 global.sharedObj = { title: 'N/A', paused: true }
@@ -217,7 +217,7 @@ function createWindow() {
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    view.webContents.openDevTools({ mode: 'detach' })
+    // view.webContents.openDevTools({ mode: 'detach' })
 
     mediaControl.createThumbar(
         mainWindow,
@@ -295,7 +295,7 @@ function createWindow() {
     view.webContents.on('media-started-playing', function() {
         if (!infoPlayer.hasInitialized()) {
             infoPlayer.init(view)
-            mprisProvider.setRealPlayer(infoPlayer) //this lets us keep track of the current time in playback.
+            //mprisProvider.setRealPlayer(infoPlayer) //this lets us keep track of the current time in playback.
         }
 
         if (isMac()) {
@@ -305,7 +305,6 @@ function createWindow() {
 
         if (infoPlayerInterval === undefined) {
             infoPlayerInterval = setInterval(() => {
-                console.log(global.on_the_road)
                 if (global.on_the_road) {
                     updateActivity()
                 }
@@ -314,6 +313,7 @@ function createWindow() {
     })
 
     view.webContents.on('did-start-navigation', function(_) {
+        loadAudioOutput()
         loadCustomTheme()
 
         view.webContents.executeJavaScript('window.location').then(location => {
@@ -341,7 +341,7 @@ function createWindow() {
 
         discordRPC.setActivity(getAll())
         rainmeterNowPlaying.setActivity(getAll())
-        mprisProvider.setActivity(getAll())
+        //mprisProvider.setActivity(getAll())
 
         mediaControl.createThumbar(
             mainWindow,
@@ -883,6 +883,33 @@ function createWindow() {
             `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
         )
     })
+
+    ipcMain.on('change-audio-output', (event, data) => {
+        setAudioOutput(data)
+    })
+
+    function setAudioOutput(audioLabel) {
+        view.webContents
+            .executeJavaScript(
+                `
+            navigator
+            .mediaDevices
+            .enumerateDevices()
+            .then( devices => {
+                var audioDevices = devices.filter(device => device.kind === 'audiooutput');
+                var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
+                document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+            });
+        `
+            )
+            .then(_ => {})
+    }
+
+    function loadAudioOutput() {
+        if (settingsProvider.get('settings-app-audio-output')) {
+            setAudioOutput(settingsProvider.get('settings-app-audio-output'))
+        }
+    }
 
     function loadCustomTheme() {
         if (settingsProvider.get('settings-custom-theme')) {
