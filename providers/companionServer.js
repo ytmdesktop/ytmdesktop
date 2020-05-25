@@ -4,6 +4,7 @@ const os = require('os')
 const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
 const infoPlayer = require('../utils/injectGetInfoPlayer')
+const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
 const port = 9863
@@ -57,10 +58,9 @@ var serverFunction = function(req, res) {
             }
         })
 
-        res.writeHead(200, {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Access-Control-Allow-Origin': '*',
-        })
+        res.setHeader('Content-Type', 'text/json; charset=utf-8')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.writeHead(200)
 
         res.write(`<html>
           <head>
@@ -130,32 +130,49 @@ var serverFunction = function(req, res) {
     }
 
     if (req.url === '/query') {
-        res.writeHead(200, {
-            'Content-Type': 'text/json; charset=utf-8',
-            'Access-Control-Allow-Origin': '*',
-        })
+        res.setHeader('Content-Type', 'text/json; charset=utf-8')
+        res.setHeader('Access-Control-Allow-Origin', '*')
 
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayer.getAllInfo()))
             res.end()
         }
 
-        // Implement secret to prevent anonymous control
         if (req.method === 'POST') {
-            let body = []
+            try {
+                let headerAuth = req.headers.authorization
+                let auth = headerAuth.split(' ')[1]
 
-            req.on('data', chunk => {
-                body.push(chunk)
-            }).on('end', () => {
-                try {
-                    body = Buffer.concat(body).toString()
-                    let cmd = JSON.parse(body)
-                    execCmd(cmd.command, cmd.value)
-                    res.end(body)
-                } catch {
-                    res.end('error')
+                if (
+                    auth ==
+                    settingsProvider.get('settings-companion-server-token')
+                ) {
+                    let body = []
+
+                    req.on('data', chunk => {
+                        body.push(chunk)
+                    }).on('end', () => {
+                        try {
+                            body = Buffer.concat(body).toString()
+                            let cmd = JSON.parse(body)
+                            execCmd(cmd.command, cmd.value)
+                            res.end(body)
+                        } catch {
+                            res.end(
+                                JSON.stringify({
+                                    error: 'error to execute command',
+                                })
+                            )
+                        }
+                    })
+                } else {
+                    res.writeHead(401)
+                    res.end(JSON.stringify({ error: 'Unathorized' }))
                 }
-            })
+            } catch {
+                res.writeHead(400)
+                res.end(JSON.stringify({ error: 'No token provided' }))
+            }
         }
     }
 }

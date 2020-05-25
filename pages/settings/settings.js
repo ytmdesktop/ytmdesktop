@@ -222,6 +222,10 @@ function loadSettings() {
 
     document.getElementById('app-version').innerText = remote.app.getVersion()
 
+    document.getElementById(
+        'label-settings-companion-server-token'
+    ).innerText = settingsProvider.get('settings-companion-server-token')
+
     // Disable unsupported platforms which may get an API later
     if (!['darwin', 'win32'].includes(process.platform)) {
         const startOnBootEl = document.getElementById('settings-start-on-boot')
