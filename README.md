@@ -14,21 +14,17 @@
 ## Windows
 
 - Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
-- Release: https://github.com/ytmdesktop/ytmdesktop/releases
+- Binaries: https://github.com/ytmdesktop/ytmdesktop/releases
 
 ## Linux
 
 - Arch Linux (AUR): https://aur.archlinux.org/packages/ytmdesktop-git
 - Snap: https://snapcraft.io/youtube-music-desktop-app
-- Release: https://github.com/ytmdesktop/ytmdesktop/releases
+- Binaries: https://github.com/ytmdesktop/ytmdesktop/releases
 
 ## Mac
 
-- Release: https://github.com/ytmdesktop/ytmdesktop/releases
-
-# License
-
-[CC0 1.0 (Public Domain)](LICENSE.md)
+- Binaries: https://github.com/ytmdesktop/ytmdesktop/releases
 
 # To Contribute
 

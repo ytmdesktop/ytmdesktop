@@ -59,12 +59,29 @@ loadAudioOutputList().then(devices => {
     mInit()
 })
 
+function checkCompanionStatus() {
+    if (settingsProvider.get('settings-companion-server')) {
+        document
+            .getElementById('companion-server-protect')
+            .classList.remove('hide')
+    } else {
+        document
+            .getElementById('companion-server-protect')
+            .classList.add('hide')
+    }
+}
+
+checkCompanionStatus()
+
 document.addEventListener('DOMContentLoaded', function() {
     initElement('settings-keep-background', 'click')
     initElement('settings-show-notifications', 'click')
     initElement('settings-start-on-boot', 'click')
     initElement('settings-start-minimized', 'click')
-    initElement('settings-companion-server', 'click')
+    initElement('settings-companion-server', 'click', () => {
+        checkCompanionStatus()
+    })
+    initElement('settings-companion-server-protect', 'click')
     initElement('settings-continue-where-left-of', 'click')
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
@@ -124,7 +141,7 @@ if (elementBtnLastFmLogin) {
 
 if (elementBtnOpenCompanionServer) {
     elementBtnOpenCompanionServer.addEventListener('click', function() {
-        shell.openExternal(`http://localhost:9863`)
+        shell.openExternal(`https://find.ytmdesktop.app`)
     })
 }
 

@@ -58,7 +58,7 @@ var serverFunction = function(req, res) {
             }
         })
 
-        res.setHeader('Content-Type', 'text/json; charset=utf-8')
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
@@ -139,40 +139,56 @@ var serverFunction = function(req, res) {
         }
 
         if (req.method === 'POST') {
-            try {
-                let headerAuth = req.headers.authorization
-                let auth = headerAuth.split(' ')[1]
+            let body = []
 
-                if (
-                    auth ==
-                    settingsProvider.get('settings-companion-server-token')
-                ) {
-                    let body = []
+            req.on('data', chunk => {
+                body.push(chunk)
+            }).on('end', () => {
+                try {
+                    body = Buffer.concat(body).toString()
+                    let { command, value } = JSON.parse(body)
 
-                    req.on('data', chunk => {
-                        body.push(chunk)
-                    }).on('end', () => {
+                    if (
+                        settingsProvider.get(
+                            'settings-companion-server-protect'
+                        )
+                    ) {
                         try {
-                            body = Buffer.concat(body).toString()
-                            let cmd = JSON.parse(body)
-                            execCmd(cmd.command, cmd.value)
-                            res.end(body)
+                            let headerAuth = req.headers.authorization
+                            let auth = headerAuth.split(' ')[1]
+
+                            if (
+                                auth ==
+                                settingsProvider.get(
+                                    'settings-companion-server-token'
+                                )
+                            ) {
+                                execCmd(command, value)
+                            } else {
+                                res.writeHead(401)
+                                res.end(
+                                    JSON.stringify({ error: 'Unathorized' })
+                                )
+                            }
                         } catch {
+                            res.writeHead(400)
                             res.end(
-                                JSON.stringify({
-                                    error: 'error to execute command',
-                                })
+                                JSON.stringify({ error: 'No token provided' })
                             )
                         }
-                    })
-                } else {
-                    res.writeHead(401)
-                    res.end(JSON.stringify({ error: 'Unathorized' }))
+                    } else {
+                        execCmd(command, value)
+                    }
+
+                    res.end(body)
+                } catch {
+                    res.end(
+                        JSON.stringify({
+                            error: 'error to execute command',
+                        })
+                    )
                 }
-            } catch {
-                res.writeHead(400)
-                res.end(JSON.stringify({ error: 'No token provided' }))
-            }
+            })
         }
     }
 }

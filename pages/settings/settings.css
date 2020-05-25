@@ -219,3 +219,9 @@ input[type="range"]::-webkit-slider-runnable-track {
     min-width: 300px;
     font-size: 13px !important;
 }
+
+.btn-tiny {
+    padding: 0 2px;
+    height: auto;
+    line-height: normal;
+}

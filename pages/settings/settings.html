@@ -451,17 +451,17 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME"
                                             ></span>
-                                            <button
-                                                class="waves-effect waves-light btn-flat white-text"
-                                                id="btn-editor-custom-theme"
-                                            >
-                                                <i class="material-icons"
-                                                    >settings</i
-                                                >
-                                            </button>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-editor-custom-theme"
+                                                >
+                                                    <i class="material-icons"
+                                                        >settings</i
+                                                    >
+                                                </button>
                                                 <label>
                                                     <input
                                                         type="checkbox"
@@ -484,9 +484,8 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER"
                                             ></span>
-
                                             <button
-                                                class="waves-effect waves-light btn-flat white-text"
+                                                class="waves-effect waves-light btn-flat white-text btn-tiny"
                                                 id="btn-open-companion-server"
                                             >
                                                 <i class="material-icons tiny"
@@ -501,13 +500,36 @@
                                         </td>
                                         <td class="right">
                                             <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-companion-server"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr id="companion-server-protect">
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT"
+                                            ></span>
+                                            <span
+                                                id="COMPANION_SERVER_INFO"
+                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO"
+                                                class="hide grey-text pointer"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
                                                 <span
                                                     id="label-settings-companion-server-token"
                                                 ></span>
                                                 <label>
                                                     <input
                                                         type="checkbox"
-                                                        id="settings-companion-server"
+                                                        id="settings-companion-server-protect"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>
@@ -555,17 +577,17 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER"
                                             ></span>
-                                            <button
-                                                class="waves-effect waves-light btn-flat white-text"
-                                                id="btn-last-fm-login"
-                                            >
-                                                <i class="material-icons"
-                                                    >settings</i
-                                                >
-                                            </button>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-last-fm-login"
+                                                >
+                                                    <i class="material-icons"
+                                                        >settings</i
+                                                    >
+                                                </button>
                                                 <label>
                                                     <input
                                                         type="checkbox"

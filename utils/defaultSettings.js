@@ -20,6 +20,8 @@ settingsProvider.setInitialValue('settings-miniplayer-size', '2') // Normal size
 
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
+settingsProvider.setInitialValue('settings-companion-server-protect', true)
+
 settingsProvider.setInitialValue(
     'settings-companion-server-token',
     Math.random()
