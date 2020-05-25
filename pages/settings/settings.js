@@ -266,3 +266,33 @@ function mInit() {
     M.FormSelect.init(document.querySelectorAll('select'), {})
     M.Tabs.init(document.getElementsByClassName('tabs')[0], {})
 }
+
+function validateKey(e) {
+    if (e.key == ' ') return 'Space'
+    return e.key
+}
+
+function preventSpecialKeys(e) {
+    return !(e.key == 'Control' || e.key == 'Alt' || e.key == 'Shift')
+}
+
+document.addEventListener('keyup', function(e) {
+    if (preventSpecialKeys(e)) {
+        let keyBindings = ''
+
+        if (e.ctrlKey) {
+            keyBindings += 'CmdOrCtrl+'
+        }
+
+        if (e.altKey) {
+            keyBindings += 'Alt+'
+        }
+
+        if (e.shiftKey) {
+            keyBindings += 'Shift+'
+        }
+
+        keyBindings += validateKey(e)
+        console.log(keyBindings)
+    }
+})
