@@ -6,16 +6,19 @@ var content = remote.getCurrentWebContents()
 content.addListener('dom-ready', function() {
     createContextMenu()
 
-    content.executeJavaScript('window.location').then(location => {
-        if (location.hostname == 'music.youtube.com') {
-            createMiddleContent()
-            createRightContent()
-            playerBarScrollToChangeVolume()
-            createPlayerBarContent()
-        } else {
-            // Show menu off the road;
-        }
-    })
+    content
+        .executeJavaScript('window.location')
+        .then(location => {
+            if (location.hostname == 'music.youtube.com') {
+                createMiddleContent()
+                createRightContent()
+                playerBarScrollToChangeVolume()
+                createPlayerBarContent()
+            } else {
+                createOffTheRoadContent()
+            }
+        })
+        .catch(_ => ipcRenderer.send('debug', 'error on inject'))
 })
 
 function createContextMenu() {
@@ -244,4 +247,25 @@ function playerBarScrollToChangeVolume() {
             }
         });
     `)
+}
+
+function createOffTheRoadContent() {
+    content.executeJavaScript(
+        `
+        var body = document.getElementsByTagName('body')[0];
+
+        var elementBack = document.createElement('i');
+        elementBack.id = 'ytmd_lyrics';
+        elementBack.classList.add('material-icons');
+        elementBack.style.cssFloat = "left";
+        elementBack.style.cursor = "pointer";
+        elementBack.innerText = 'arrow_back';
+
+        elementBack.addEventListener('click', function() { ipcRenderer.send('reset-url') } )
+        
+        body.prepend(elementBack);
+
+
+        `
+    )
 }

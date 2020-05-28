@@ -63,8 +63,10 @@ global.sharedObj = { title: 'N/A', paused: true }
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, view, miniplayer, lyrics, settings
 
+const defaultUrl = 'https://music.youtube.com'
+
 let mainWindowParams = {
-    url: 'https://music.youtube.com',
+    url: defaultUrl,
     width: 1500,
     height: 800,
 }
@@ -190,11 +192,11 @@ function createWindow() {
     view = new BrowserView({
         webPreferences: {
             nodeIntegration: true,
+            webviewTag: true,
             preload: path.join(app.getAppPath(), '/utils/injectControls.js'),
         },
     })
 
-    // mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
     mainWindow.loadFile(
         path.join(
             __dirname,
@@ -202,7 +204,8 @@ function createWindow() {
         ),
         { search: 'page=home/home&title=YouTube Music' }
     )
-    mainWindow.setBrowserView(view)
+
+    mainWindow.addBrowserView(view)
 
     view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
 
@@ -279,10 +282,7 @@ function createWindow() {
             }
         `)
     })
-    setInterval(() => {
-        // console.log(getAll())
-        // document.querySelector('ytmusic-player-bar')
-    }, 1000)
+
     view.webContents.on('media-started-playing', function() {
         if (!infoPlayer.hasInitialized()) {
             infoPlayer.init(view)
@@ -304,9 +304,6 @@ function createWindow() {
     })
 
     view.webContents.on('did-start-navigation', function(_) {
-        loadAudioOutput()
-        loadCustomTheme()
-
         view.webContents.executeJavaScript('window.location').then(location => {
             if (location.hostname != 'music.youtube.com') {
                 mainWindow.send('off-the-road')
@@ -314,6 +311,9 @@ function createWindow() {
             } else {
                 mainWindow.send('on-the-road')
                 global.on_the_road = true
+
+                loadAudioOutput()
+                loadCustomTheme()
             }
         })
     })
@@ -812,7 +812,10 @@ function createWindow() {
     })
 
     ipcMain.on('reset-url', () => {
-        mainWindow.getBrowserView().webContents.loadURL(mainWindowParams.url)
+        mainWindowParams.url = defaultUrl
+
+        const options = { extraHeaders: 'pragma: no-cache\n' }
+        view.webContents.loadURL(mainWindowParams.url, options)
     })
 
     ipcMain.on('show-editor-theme', function() {

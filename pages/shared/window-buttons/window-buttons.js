@@ -7,6 +7,8 @@ const currentWindow = remote.getCurrentWindow()
 const winElement = document.getElementById('win')
 const macElement = document.getElementById('mac')
 
+const webview = document.querySelector('webview')
+
 if (isMac()) {
     winElement.remove()
     macElement.classList.remove('hide')
@@ -38,32 +40,38 @@ ipc.on('window-is-maximized', function(_, value) {
     }
 })
 
-document.addEventListener('DOMContentLoaded', function() {
-    checkUrlParams()
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+        checkUrlParams()
 
-    document
-        .getElementById('btn-minimize')
-        .addEventListener('click', function() {
-            currentWindow.minimize()
-        })
+        document
+            .getElementById('btn-minimize')
+            .addEventListener('click', function() {
+                currentWindow.minimize()
+            })
 
-    document
-        .getElementById('btn-maximize')
-        .addEventListener('click', function() {
-            if (!currentWindow.isMaximized()) {
-                currentWindow.maximize()
-            } else {
-                currentWindow.unmaximize()
-            }
-        })
+        document
+            .getElementById('btn-maximize')
+            .addEventListener('click', function() {
+                if (!currentWindow.isMaximized()) {
+                    currentWindow.maximize()
+                } else {
+                    currentWindow.unmaximize()
+                }
+            })
 
-    document.getElementById('btn-close').addEventListener('click', function() {
-        currentWindow.close()
-    })
-})
+        document
+            .getElementById('btn-close')
+            .addEventListener('click', function() {
+                currentWindow.close()
+            })
+    },
+    false
+)
 
 // ENABLE FOR DEBUG
-// document.getElementById("webview").addEventListener("dom-ready", function(){ webview.openDevTools(); });
+// webview.addEventListener("did-start-loading", () => { webview.openDevTools(); });
 
 function checkUrlParams() {
     const params = new URL(window.location).searchParams
@@ -74,7 +82,7 @@ function checkUrlParams() {
     let hide = params.get('hide')
 
     if (page) {
-        document.getElementById('webview').src = `../../${page}.html`
+        webview.src = `../../${page}.html`
     }
 
     if (icon) {
@@ -82,7 +90,7 @@ function checkUrlParams() {
     }
 
     if (title) {
-        document.getElementById('music-title').innerText = title
+        // document.getElementById('music-title').innerText = title
     }
 
     if (hide) {
