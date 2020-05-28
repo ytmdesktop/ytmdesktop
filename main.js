@@ -608,19 +608,19 @@ function createWindow() {
                 mediaControl.volumeDown(view)
                 break
 
-            case 'media-forward-10-seconds':
+            case 'media-seekbar-forward':
                 mediaControl.mediaForwardTenSeconds(view)
                 break
 
-            case 'media-rewind-10-seconds':
+            case 'media-seekbar-rewind':
                 mediaControl.mediaRewindTenSeconds(view)
                 break
 
-            case 'media-set-seekbar':
+            case 'media-seekbar-set':
                 mediaControl.changeSeekbar(view, data.value)
                 break
 
-            case 'media-set-volume':
+            case 'media-volume-set':
                 mediaControl.changeVolume(view, data.value)
                 break
         }

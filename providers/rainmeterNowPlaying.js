@@ -139,12 +139,12 @@ function doAction(data) {
             var currentPosition = actionParams[0].split(':')[0]
             if (currentPosition >= seekPosition) {
                 ipcMain.emit('media-command', {
-                    command: 'media-forward-10-seconds',
+                    command: 'media-seekbar-forward',
                     value: true,
                 })
             } else {
                 ipcMain.emit('media-command', {
-                    command: 'media-rewind-10-seconds',
+                    command: 'media-seekbar-rewind',
                     value: true,
                 })
             }
@@ -152,7 +152,7 @@ function doAction(data) {
 
         case 'SetPositionSeekbar':
             ipcMain.emit('media-command', {
-                command: 'media-set-seekbar',
+                command: 'media-seekbar-set',
                 value: actionParams[0],
             })
             break

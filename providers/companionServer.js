@@ -284,28 +284,28 @@ function execCmd(cmd, value) {
 
         case 'player-forward':
             ipcMain.emit('media-command', {
-                command: 'media-forward-10-seconds',
+                command: 'media-seekbar-forward',
                 value: true,
             })
             break
 
         case 'player-rewind':
             ipcMain.emit('media-command', {
-                command: 'media-rewind-10-seconds',
+                command: 'media-seekbar-rewind',
                 value: true,
             })
             break
 
         case 'player-set-seekbar':
             ipcMain.emit('media-command', {
-                command: 'media-set-seekbar',
+                command: 'media-seekbar-set',
                 value: value,
             })
             break
 
         case 'player-set-volume':
             ipcMain.emit('media-command', {
-                command: 'media-set-volume',
+                command: 'media-volume-set',
                 value: value,
             })
             break
