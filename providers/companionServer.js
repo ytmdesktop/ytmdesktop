@@ -226,48 +226,88 @@ function execCmd(cmd, value) {
     value = value || true
 
     switch (cmd) {
-        case 'track-previous':
-            ipcMain.emit('media-previous-track', true)
-            break
-
         case 'track-play':
-            ipcMain.emit('media-play-pause', true)
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
             break
 
         case 'track-pause':
-            ipcMain.emit('media-play-pause', true)
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
             break
 
         case 'track-next':
-            ipcMain.emit('media-next-track', true)
+            ipcMain.emit('media-command', {
+                command: 'media-track-next',
+                value: true,
+            })
+            break
+
+        case 'track-previous':
+            ipcMain.emit('media-command', {
+                command: 'media-track-previous',
+                value: true,
+            })
             break
 
         case 'track-thumbs-up':
-            ipcMain.emit('media-up-vote', true)
+            ipcMain.emit('media-command', {
+                command: 'media-vote-up',
+                value: true,
+            })
             break
 
         case 'track-thumbs-down':
-            ipcMain.emit('media-down-vote', true)
+            ipcMain.emit('media-command', {
+                command: 'media-vote-down',
+                value: true,
+            })
             break
 
         case 'player-volume-up':
-            ipcMain.emit('media-volume-up', true)
+            ipcMain.emit('media-command', {
+                command: 'media-volume-up',
+                value: true,
+            })
             break
 
         case 'player-volume-down':
-            ipcMain.emit('media-volume-down', true)
+            ipcMain.emit('media-command', {
+                command: 'media-volume-down',
+                value: true,
+            })
             break
 
         case 'player-forward':
-            ipcMain.emit('media-forward-X-seconds', true)
+            ipcMain.emit('media-command', {
+                command: 'media-forward-10-seconds',
+                value: true,
+            })
             break
 
         case 'player-rewind':
-            ipcMain.emit('media-rewind-X-seconds', true)
+            ipcMain.emit('media-command', {
+                command: 'media-rewind-10-seconds',
+                value: true,
+            })
             break
 
         case 'player-set-seekbar':
-            ipcMain.emit('media-change-seekbar', value)
+            ipcMain.emit('media-command', {
+                command: 'media-set-seekbar',
+                value: value,
+            })
+            break
+
+        case 'player-set-volume':
+            ipcMain.emit('media-command', {
+                command: 'media-set-volume',
+                value: value,
+            })
             break
     }
 }

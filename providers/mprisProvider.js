@@ -43,8 +43,8 @@ class Mpris {
     setInitialEvents() {
         const events = {
             quit: () => process.exit(0),
-            previous: 'media-previous-track',
-            next: 'media-next-track',
+            previous: 'media-track-previous',
+            next: 'media-track-next',
             pause: 'media-play-pause',
             play: 'media-play-pause',
             playpause: 'media-play-pause', //KDE Connect only sends this event it looked like.
@@ -53,7 +53,10 @@ class Mpris {
         for (let [event, action] of Object.entries(events)) {
             if (typeof action === 'string') {
                 this.player.on(event, () => {
-                    ipcMain.emit(action, true)
+                    ipcMain.emit('media-command', {
+                        command: action,
+                        value: true,
+                    })
                 })
             } else if (typeof action === 'function') {
                 this.player.on(event, action)
@@ -61,15 +64,18 @@ class Mpris {
         }
         this.player.on('position', args => {
             // the position event sends through {trackId : ###, position : ###}
-            ipcMain.emit('media-change-seekbar', args.position / (1000 * 1000))
+            ipcMain.emit('media-command', {
+                command: 'media-set-seekbar',
+                value: args.position / (1000 * 1000),
+            })
         })
 
         this.player.on('seek', offset => {
             // the seek event sends through the difference from where we should be in microseconds, positive forward, negative backward
-            ipcMain.emit(
-                'media-change-seekbar',
-                (this.player.getPosition() + offset) / (1000 * 1000)
-            )
+            ipcMain.emit('media-command', {
+                command: 'media-set-seekbar',
+                value: (this.player.getPosition() + offset) / (1000 * 1000),
+            })
         })
     }
 }

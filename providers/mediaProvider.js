@@ -1,5 +1,6 @@
 const __ = require('./translateProvider')
 const systemInfo = require('../utils/systemInfo')
+const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const path = require('path')
 
 function mediaPlayPauseTrack(mainWindow) {
@@ -42,12 +43,12 @@ function mediaVolumeDown(mainWindow) {
     console.log('mediaVolumeDown')
 }
 
-function mediaForwardXSeconds(mainWindow) {
+function mediaForwardTenSeconds(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'l' })
-    console.log('mediaForwardXSeconds')
+    console.log('mediaForward10Seconds')
 }
 
-function mediaRewindXSeconds(mainWindow) {
+function mediaRewindTenSeconds(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'h' })
     console.log('mediaRewindXSeconds')
 }
@@ -63,16 +64,11 @@ function mediaShuffle(mainWindow) {
 }
 
 function mediaChangeSeekbar(mainWindow, time) {
-    mainWindow.webContents.executeJavaScript(
-        `
-        var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
-        var sliderKnob = document.querySelectorAll('#progress-bar')[0];
+    infoPlayerProvider.setSeekbar(mainWindow.webContents, time)
+}
 
-        slider.click();
-
-        sliderKnob.value = ${time};
-        `
-    )
+function mediaChangeVolume(mainWindow, time) {
+    infoPlayerProvider.setVolume(mainWindow.webContents, time)
 }
 
 function createThumbar(mainWindow, mediaInfo) {
@@ -218,9 +214,10 @@ exports.upVote = v => guarder(v, mediaUpVote)
 exports.downVote = v => guarder(v, mediaDownVote)
 exports.volumeUp = v => guarder(v, mediaVolumeUp)
 exports.volumeDown = v => guarder(v, mediaVolumeDown)
-exports.mediaForwardXSeconds = v => guarder(v, mediaForwardXSeconds)
-exports.mediaRewindXSeconds = v => guarder(v, mediaRewindXSeconds)
+exports.mediaForwardTenSeconds = v => guarder(v, mediaForwardTenSeconds)
+exports.mediaRewindTenSeconds = v => guarder(v, mediaRewindTenSeconds)
 exports.changeSeekbar = mediaChangeSeekbar
+exports.changeVolume = mediaChangeVolume
 exports.repeat = mediaRepeat
 exports.shuffle = mediaShuffle
 

@@ -271,6 +271,34 @@ function isAdvertisement(webContents) {
         .catch(_ => console.log('error isAdvertisement'))
 }
 
+function setVolume(webContents, time) {
+    webContents
+        .executeJavaScript(
+            `
+        var slider = document.querySelector('#volume-slider');
+        slider.value = ${time};
+        `
+        )
+        .then()
+        .catch(_ => console.log('error changeVolume'))
+}
+
+function setSeekbar(webContents, time) {
+    webContents
+        .executeJavaScript(
+            `
+        var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
+        var sliderKnob = document.querySelectorAll('#progress-bar')[0];
+
+        slider.click();
+
+        sliderKnob.value = ${time};
+        `
+        )
+        .then()
+        .catch(_ => console.log('error changeSeekbar'))
+}
+
 function convertToHuman(time) {
     var _aux = time
     var _minutes = 0
@@ -298,14 +326,17 @@ function hasInitialized() {
 }
 
 function firstPlay(webContents) {
-    webContents.executeJavaScript(
-        `
+    webContents
+        .executeJavaScript(
+            `
       var carousel = document.getElementsByClassName('carousel')[0];
       var firstChild = carousel.querySelector('#items').children[0];
       var playButton = firstChild.querySelector('#play-button')
       
       playButton.click();`
-    )
+        )
+        .then()
+        .catch(_ => console.log('error firstPlay'))
 }
 
 function debug(data) {
@@ -319,4 +350,6 @@ module.exports = {
     getTrackInfo: getTrackInfo,
     hasInitialized: hasInitialized,
     firstPlay: firstPlay,
+    setVolume: setVolume,
+    setSeekbar: setSeekbar,
 }

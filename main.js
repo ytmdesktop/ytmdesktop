@@ -578,35 +578,52 @@ function createWindow() {
         }
     })
 
-    ipcMain.on('media-play-pause', () => {
-        mediaControl.playPauseTrack(view)
-    })
-    ipcMain.on('media-next-track', () => {
-        mediaControl.nextTrack(view)
-    })
-    ipcMain.on('media-previous-track', () => {
-        mediaControl.previousTrack(view)
-    })
-    ipcMain.on('media-up-vote', () => {
-        mediaControl.upVote(view)
-    })
-    ipcMain.on('media-down-vote', () => {
-        mediaControl.downVote(view)
-    })
-    ipcMain.on('media-volume-up', () => {
-        mediaControl.volumeUp(view)
-    })
-    ipcMain.on('media-volume-down', () => {
-        mediaControl.volumeDown(view)
-    })
-    ipcMain.on('media-forward-X-seconds', () => {
-        mediaControl.mediaForwardXSeconds(view)
-    })
-    ipcMain.on('media-rewind-X-seconds', () => {
-        mediaControl.mediaRewindXSeconds(view)
-    })
-    ipcMain.on('media-change-seekbar', value => {
-        mediaControl.changeSeekbar(view, value)
+    ipcMain.on('media-command', data => {
+        switch (data.command) {
+            case 'media-play-pause':
+                mediaControl.playPauseTrack(view)
+                break
+
+            case 'media-track-next':
+                mediaControl.nextTrack(view)
+                break
+
+            case 'media-track-previous':
+                mediaControl.previousTrack(view)
+                break
+
+            case 'media-vote-up':
+                mediaControl.upVote(view)
+                break
+
+            case 'media-vote-down':
+                mediaControl.downVote(view)
+                break
+
+            case 'media-volume-up':
+                mediaControl.volumeUp(view)
+                break
+
+            case 'media-volume-down':
+                mediaControl.volumeDown(view)
+                break
+
+            case 'media-forward-10-seconds':
+                mediaControl.mediaForwardTenSeconds(view)
+                break
+
+            case 'media-rewind-10-seconds':
+                mediaControl.mediaRewindTenSeconds(view)
+                break
+
+            case 'media-set-seekbar':
+                mediaControl.changeSeekbar(view, data.value)
+                break
+
+            case 'media-set-volume':
+                mediaControl.changeVolume(view, data.value)
+                break
+        }
     })
 
     ipcMain.on('register-renderer', (event, arg) => {
@@ -913,6 +930,7 @@ function createWindow() {
         `
             )
             .then(_ => {})
+            .catch(_ => console.log('error setAudioOutput'))
     }
 
     function loadAudioOutput() {
