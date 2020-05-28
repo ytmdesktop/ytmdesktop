@@ -48,7 +48,6 @@
         "i18n": "^0.8.5",
         "js-base64": "^2.5.1",
         "materialize-css": "^1.0.0",
-        "mpris-service": "^2.1.0",
         "node-vibrant": "^3.1.5",
         "npx": "^10.2.2",
         "prettier": "^1.19.1",
@@ -59,5 +58,9 @@
         "socket.io": "^2.3.0",
         "utf-8-validate": "^5.0.2",
         "ws": "^7.2.1"
+    },
+    "optionalDependencies": {
+        "@nodert-win10/windows.media.playback": "^0.2.95",
+        "mpris-service": "^2.1.0"
     }
 }

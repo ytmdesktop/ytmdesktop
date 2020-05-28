@@ -28,7 +28,7 @@ const {
     companionWindowSettings,
 } = require('./server.config')
 const settingsProvider = require('./providers/settingsProvider')
-const infoPlayer = require('./utils/injectGetInfoPlayer')
+const infoPlayerProvider = require('./providers/infoPlayerProvider')
 const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
 const companionServer = require('./providers/companionServer')
 const discordRPC = require('./providers/discordRpcProvider')
@@ -222,7 +222,7 @@ function createWindow() {
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
     // view.webContents.openDevTools({ mode: 'detach' })
 
-    mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
+    mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
     if (windowMaximized) {
         setTimeout(function() {
@@ -237,6 +237,10 @@ function createWindow() {
         }
     }
 
+    mainWindow.on('ready-to-show', () => {
+        console.log('show')
+    })
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
         // Dereference the window object, usually you would store windows
@@ -248,7 +252,7 @@ function createWindow() {
     mainWindow.on('show', function() {
         globalShortcut.unregister('CmdOrCtrl+M')
 
-        mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
+        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
     view.webContents.on('new-window', function(event, url) {
@@ -284,9 +288,9 @@ function createWindow() {
     })
 
     view.webContents.on('media-started-playing', function() {
-        if (!infoPlayer.hasInitialized()) {
-            infoPlayer.init(view)
-            //mprisProvider.setRealPlayer(infoPlayer) //this lets us keep track of the current time in playback.
+        if (!infoPlayerProvider.hasInitialized()) {
+            infoPlayerProvider.init(view)
+            //mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
         }
 
         if (isMac()) {
@@ -319,8 +323,8 @@ function createWindow() {
     })
 
     function updateActivity() {
-        var trackInfo = infoPlayer.getTrackInfo()
-        var playerInfo = infoPlayer.getPlayerInfo()
+        var trackInfo = infoPlayerProvider.getTrackInfo()
+        var playerInfo = infoPlayerProvider.getPlayerInfo()
 
         var title = trackInfo.title
         var author = trackInfo.author
@@ -334,7 +338,7 @@ function createWindow() {
         rainmeterNowPlaying.setActivity(getAll())
         //mprisProvider.setActivity(getAll())
 
-        mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
+        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
         mediaControl.setProgress(
             mainWindow,
@@ -381,8 +385,11 @@ function createWindow() {
             }
 
             global.sharedObj.paused = false
-            mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
-            ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
+            mediaControl.createThumbar(
+                mainWindow,
+                infoPlayerProvider.getAllInfo()
+            )
+            ipcMain.emit('play-pause', infoPlayerProvider.getTrackInfo())
         } catch {}
     })
 
@@ -394,8 +401,11 @@ function createWindow() {
             }
 
             global.sharedObj.paused = true
-            ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
-            mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
+            ipcMain.emit('play-pause', infoPlayerProvider.getTrackInfo())
+            mediaControl.createThumbar(
+                mainWindow,
+                infoPlayerProvider.getAllInfo()
+            )
         } catch {}
     })
 
@@ -458,8 +468,8 @@ function createWindow() {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
-                if (infoPlayer.getTrackInfo().id == '') {
-                    infoPlayer.firstPlay(view.webContents)
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
                 }
 
                 doublePressPlayPause = true
@@ -477,10 +487,6 @@ function createWindow() {
         }
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
-        mediaControl.playPauseTrack(view)
-    })
-
     globalShortcut.register('MediaStop', function() {
         mediaControl.stopTrack(view)
     })
@@ -488,13 +494,19 @@ function createWindow() {
     globalShortcut.register('MediaPreviousTrack', function() {
         mediaControl.previousTrack(view)
     })
-    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
-        mediaControl.previousTrack(view)
-    })
 
     globalShortcut.register('MediaNextTrack', function() {
         mediaControl.nextTrack(view)
     })
+
+    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
+        mediaControl.playPauseTrack(view)
+    })
+
+    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
+        mediaControl.previousTrack(view)
+    })
+
     globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
         mediaControl.nextTrack(view)
     })
@@ -510,12 +522,15 @@ function createWindow() {
     ipcMain.on('retrieve-player-info', function(e, _) {
         // IPCRenderer
         if (e !== undefined) {
-            e.sender.send('song-playing-now-is', infoPlayer.getAllInfo())
+            e.sender.send(
+                'song-playing-now-is',
+                infoPlayerProvider.getAllInfo()
+            )
         }
 
         // IPCMain
-        if (infoPlayer.hasInitialized()) {
-            ipcMain.emit('song-playing-now-is', infoPlayer.getAllInfo())
+        if (infoPlayerProvider.hasInitialized()) {
+            ipcMain.emit('song-playing-now-is', infoPlayerProvider.getAllInfo())
         }
     })
 
@@ -1134,11 +1149,11 @@ function logDebug(data) {
 }
 
 function songInfo() {
-    return infoPlayer.getTrackInfo()
+    return infoPlayerProvider.getTrackInfo()
 }
 
 function playerInfo() {
-    return infoPlayer.getPlayerInfo()
+    return infoPlayerProvider.getPlayerInfo()
 }
 
 function getAll() {

@@ -3,7 +3,7 @@ const http = require('http')
 const os = require('os')
 const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
-const infoPlayer = require('../utils/injectGetInfoPlayer')
+const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
@@ -85,21 +85,21 @@ var serverFunction = function(req, res) {
               <h3 class="red-text">YouTube Music Desktop</h3>
               
               <div class="row" style="height: 0; visibility: ${
-                  infoPlayer.getTrackInfo().id ? 'visible' : 'hidden'
+                  infoPlayerProvider.getTrackInfo().id ? 'visible' : 'hidden'
               }">
                 <div class="col s8 offset-s2 m6 offset-m3 l2 offset-l5">
                     <div class="card horizontal">
                       <div class="card-image" style="padding: 3px;">
                         <img src="${
-                            infoPlayer.getTrackInfo().cover
+                            infoPlayerProvider.getTrackInfo().cover
                         }" style="min-width: 78px; width: 78px;">
                       </div>
                       <div class="card-stacked" style="width: 74%;">
                         <div class="card-content" style="font-size: 11px;">
                           <p class="truncate"><strong>${
-                              infoPlayer.getTrackInfo().title
+                              infoPlayerProvider.getTrackInfo().title
                           }</strong></p>
-                          ${infoPlayer.getTrackInfo().author}
+                          ${infoPlayerProvider.getTrackInfo().author}
                         </div>
                       </div>
                     </div>
@@ -134,7 +134,7 @@ var serverFunction = function(req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
 
         if (req.method === 'GET') {
-            res.write(JSON.stringify(infoPlayer.getAllInfo()))
+            res.write(JSON.stringify(infoPlayerProvider.getAllInfo()))
             res.end()
         }
 
@@ -203,7 +203,7 @@ function start() {
         totalConnections = Object.keys(io.sockets.sockets).length
 
         if (totalConnections) {
-            io.emit('query', infoPlayer.getAllInfo())
+            io.emit('query', infoPlayerProvider.getAllInfo())
         }
     }, 800)
 
