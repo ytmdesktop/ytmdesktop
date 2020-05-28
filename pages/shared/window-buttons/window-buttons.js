@@ -82,7 +82,7 @@ function checkUrlParams() {
     }
 
     if (title) {
-        // document.getElementById("music-title").innerText = title;
+        document.getElementById('music-title').innerText = title
     }
 
     if (hide) {

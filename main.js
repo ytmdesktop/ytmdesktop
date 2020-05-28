@@ -219,11 +219,7 @@ function createWindow() {
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
     // view.webContents.openDevTools({ mode: 'detach' })
 
-    mediaControl.createThumbar(
-        mainWindow,
-        infoPlayer.getPlayerInfo().isPaused,
-        infoPlayer.getPlayerInfo().likeStatus
-    )
+    mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
 
     if (windowMaximized) {
         setTimeout(function() {
@@ -249,12 +245,7 @@ function createWindow() {
     mainWindow.on('show', function() {
         globalShortcut.unregister('CmdOrCtrl+M')
 
-        logDebug('show')
-        mediaControl.createThumbar(
-            mainWindow,
-            infoPlayer.getPlayerInfo().isPaused,
-            infoPlayer.getPlayerInfo().likeStatus
-        )
+        mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
     })
 
     view.webContents.on('new-window', function(event, url) {
@@ -343,11 +334,7 @@ function createWindow() {
         rainmeterNowPlaying.setActivity(getAll())
         //mprisProvider.setActivity(getAll())
 
-        mediaControl.createThumbar(
-            mainWindow,
-            playerInfo.isPaused,
-            playerInfo.likeStatus
-        )
+        mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
 
         mediaControl.setProgress(
             mainWindow,
@@ -394,11 +381,7 @@ function createWindow() {
             }
 
             global.sharedObj.paused = false
-            mediaControl.createThumbar(
-                mainWindow,
-                playerInfo()['isPaused'],
-                playerInfo()['likeStatus']
-            )
+            mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
             ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
         } catch {}
     })
@@ -412,11 +395,7 @@ function createWindow() {
 
             global.sharedObj.paused = true
             ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
-            mediaControl.createThumbar(
-                mainWindow,
-                playerInfo()['isPaused'],
-                playerInfo()['likeStatus']
-            )
+            mediaControl.createThumbar(mainWindow, infoPlayer.getAllInfo())
         } catch {}
     })
 
@@ -725,7 +704,10 @@ function createWindow() {
             },
         })
 
-        // Small => 170 | Medium => 200 | Large => 230
+        miniplayer.loadFile(
+            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
+        )
+
         switch (settingsProvider.get('settings-miniplayer-size')) {
             case '1':
                 miniplayer.setSize(170, 170)
@@ -760,10 +742,6 @@ function createWindow() {
         if (miniplayerPosition != undefined) {
             miniplayer.setPosition(miniplayerPosition.x, miniplayerPosition.y)
         }
-
-        miniplayer.loadFile(
-            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
-        )
 
         let storeMiniplayerPositionTimer
         miniplayer.on('move', function(e) {

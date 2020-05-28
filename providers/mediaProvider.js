@@ -1,70 +1,70 @@
-const __ = require("./translateProvider");
-const systemInfo = require("../utils/systemInfo");
-const path = require("path");
+const __ = require('./translateProvider')
+const systemInfo = require('../utils/systemInfo')
+const path = require('path')
 
 function mediaPlayPauseTrack(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: ";" });
-  console.log("mediaPlayPause");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
+    console.log('mediaPlayPause')
 }
 
 function mediaStopTrack(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: ";" });
-  console.log("mediaStop");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
+    console.log('mediaStop')
 }
 
 function mediaNextTrack(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "j" });
-  console.log("mediaNext");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'j' })
+    console.log('mediaNext')
 }
 
 function mediaPreviousTrack(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "k" });
-  console.log("mediaPrevious");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'k' })
+    console.log('mediaPrevious')
 }
 
 function mediaUpVote(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "+" });
-  console.log("mediaUpVote");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '+' })
+    console.log('mediaUpVote')
 }
 
 function mediaDownVote(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "_" });
-  console.log("mediaDownVote");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '_' })
+    console.log('mediaDownVote')
 }
 
 function mediaVolumeUp(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "=" });
-  console.log("mediaVolumeUp");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
+    console.log('mediaVolumeUp')
 }
 
 function mediaVolumeDown(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "-" });
-  console.log("mediaVolumeDown");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
+    console.log('mediaVolumeDown')
 }
 
 function mediaForwardXSeconds(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "l" });
-  console.log("mediaForwardXSeconds");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'l' })
+    console.log('mediaForwardXSeconds')
 }
 
 function mediaRewindXSeconds(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "h" });
-  console.log("mediaRewindXSeconds");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'h' })
+    console.log('mediaRewindXSeconds')
 }
 
 function mediaRepeat(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "r" });
-  console.log("mediaRepeat");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'r' })
+    console.log('mediaRepeat')
 }
 
 function mediaShuffle(mainWindow) {
-  mainWindow.webContents.sendInputEvent({ type: "keydown", keyCode: "s" });
-  console.log("mediaShuffle");
+    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 's' })
+    console.log('mediaShuffle')
 }
 
 function mediaChangeSeekbar(mainWindow, time) {
-  mainWindow.webContents.executeJavaScript(
-    `
+    mainWindow.webContents.executeJavaScript(
+        `
         var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
         var sliderKnob = document.querySelectorAll('#progress-bar')[0];
 
@@ -72,151 +72,160 @@ function mediaChangeSeekbar(mainWindow, time) {
 
         sliderKnob.value = ${time};
         `
-  );
+    )
 }
 
-function createThumbar(mainWindow, type, likeStatus) {
-  let thumbsUp = "../assets/img/controls/thumbs-up-button-outline.png";
-  let thumbsDown = "../assets/img/controls/thumbs-down-button-outline.png";
-  let thumbsReverse = "";
+function createThumbar(mainWindow, mediaInfo) {
+    let isPaused = mediaInfo.player.isPaused
+    let likeStatus = mediaInfo.player.likeStatus
+    let hasId = mediaInfo.track.id
 
-  switch (likeStatus) {
-    case "LIKE":
-      thumbsUp = "../assets/img/controls/thumbs-up-button.png";
-      thumbsDown = "../assets/img/controls/thumbs-down-button-outline.png";
-      thumbsReverse = "INDIFFERENT";
-      break;
+    let thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png'
+    let thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png'
+    let thumbsReverse = ''
 
-    case "DISLIKE":
-      thumbsUp = "../assets/img/controls/thumbs-up-button-outline.png";
-      thumbsDown = "../assets/img/controls/thumbs-down-button.png";
-      thumbsReverse = "INDIFFERENT";
-      break;
+    switch (likeStatus) {
+        case 'LIKE':
+            thumbsUp = '../assets/img/controls/thumbs-up-button.png'
+            thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png'
+            thumbsReverse = 'INDIFFERENT'
+            break
 
-    case "INDIFFERENT":
-      thumbsUp = "../assets/img/controls/thumbs-up-button-outline.png";
-      thumbsDown = "../assets/img/controls/thumbs-down-button-outline.png";
-      thumbsReverse = likeStatus == "LIKE" ? "DISLIKE" : "LIKE";
-      break;
-  }
+        case 'DISLIKE':
+            thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png'
+            thumbsDown = '../assets/img/controls/thumbs-down-button.png'
+            thumbsReverse = 'INDIFFERENT'
+            break
 
-  playOrPause = {
-    tooltip: __.trans("MEDIA_CONTROL_PLAY"),
-    icon: path.join(__dirname, "../assets/img/controls/play-button.png"),
-    click: function() {
-      mediaPlayPauseTrack(mainWindow.getBrowserView());
+        case 'INDIFFERENT':
+            thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png'
+            thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png'
+            thumbsReverse = likeStatus == 'LIKE' ? 'DISLIKE' : 'LIKE'
+            break
     }
-  };
 
-  if (type == false) {
-    playOrPause.tooltip = __.trans("MEDIA_CONTROL_PAUSE");
-    playOrPause.icon = path.join(
-      __dirname,
-      "../assets/img/controls/pause-button.png"
-    );
-  }
+    playOrPause = {
+        tooltip: __.trans('MEDIA_CONTROL_PLAY'),
+        icon: path.join(__dirname, '../assets/img/controls/play-button.png'),
+        click: function() {
+            mediaPlayPauseTrack(mainWindow.getBrowserView())
+        },
+    }
 
-  try {
-    mainWindow.setThumbarButtons([
-      {
-        tooltip: __.trans("MEDIA_CONTROL_THUMBS_DOWN"),
-        icon: path.join(__dirname, thumbsDown),
-        click: function() {
-          mediaDownVote(
-            mainWindow.getBrowserView(),
-            createThumbar(mainWindow, type, thumbsReverse)
-          );
-        }
-      },
-      {
-        icon: path.join(__dirname, "../assets/img/null.png"),
-        flags: ["disabled", "nobackground"]
-      },
-      {
-        tooltip: __.trans("MEDIA_CONTROL_PREVIOUS"),
-        icon: path.join(
-          __dirname,
-          "../assets/img/controls/play-previous-button.png"
-        ),
-        click: function() {
-          mediaPreviousTrack(mainWindow.getBrowserView());
-        }
-      },
-      {
-        tooltip: playOrPause.tooltip,
-        icon: playOrPause.icon,
-        click: function() {
-          mediaPlayPauseTrack(mainWindow.getBrowserView());
-        }
-      },
-      {
-        tooltip: __.trans("MEDIA_CONTROL_NEXT"),
-        icon: path.join(
-          __dirname,
-          "../assets/img/controls/play-next-button.png"
-        ),
-        click: function() {
-          mediaNextTrack(mainWindow.getBrowserView());
-        }
-      },
-      {
-        icon: path.join(__dirname, "../assets/img/null.png"),
-        flags: ["disabled", "nobackground"]
-      },
-      {
-        tooltip: __.trans("MEDIA_CONTROL_THUMBS_UP"),
-        icon: path.join(__dirname, thumbsUp),
-        click: function() {
-          mediaUpVote(
-            mainWindow.getBrowserView(),
-            createThumbar(mainWindow, type, thumbsReverse)
-          );
-        }
-      }
-    ]);
-    mainWindow.setSkipTaskbar(false);
-  } catch (e) {
-    //console.log(e);
-  }
+    if (isPaused == false) {
+        playOrPause.tooltip = __.trans('MEDIA_CONTROL_PAUSE')
+        playOrPause.icon = path.join(
+            __dirname,
+            '../assets/img/controls/pause-button.png'
+        )
+    }
+
+    try {
+        mainWindow.setThumbarButtons([
+            {
+                tooltip: __.trans('MEDIA_CONTROL_THUMBS_DOWN'),
+                icon: path.join(__dirname, thumbsDown),
+                click: function() {
+                    mediaDownVote(
+                        mainWindow.getBrowserView(),
+                        createThumbar(mainWindow, mediaInfo)
+                    )
+                },
+                flags: !hasId ? ['disabled'] : [],
+            },
+            {
+                icon: path.join(__dirname, '../assets/img/null.png'),
+                flags: ['disabled', 'nobackground'],
+            },
+            {
+                tooltip: __.trans('MEDIA_CONTROL_PREVIOUS'),
+                icon: path.join(
+                    __dirname,
+                    '../assets/img/controls/play-previous-button.png'
+                ),
+                click: function() {
+                    mediaPreviousTrack(mainWindow.getBrowserView())
+                },
+                flags: !hasId ? ['disabled'] : [],
+            },
+            {
+                tooltip: playOrPause.tooltip,
+                icon: playOrPause.icon,
+                click: function() {
+                    mediaPlayPauseTrack(mainWindow.getBrowserView())
+                },
+                flags: !hasId ? ['disabled'] : [],
+            },
+            {
+                tooltip: __.trans('MEDIA_CONTROL_NEXT'),
+                icon: path.join(
+                    __dirname,
+                    '../assets/img/controls/play-next-button.png'
+                ),
+                click: function() {
+                    mediaNextTrack(mainWindow.getBrowserView())
+                },
+                flags: !hasId ? ['disabled'] : [],
+            },
+            {
+                icon: path.join(__dirname, '../assets/img/null.png'),
+                flags: ['disabled', 'nobackground'],
+            },
+            {
+                tooltip: __.trans('MEDIA_CONTROL_THUMBS_UP'),
+                icon: path.join(__dirname, thumbsUp),
+                click: function() {
+                    mediaUpVote(
+                        mainWindow.getBrowserView(),
+                        createThumbar(mainWindow, mediaInfo)
+                    )
+                },
+                flags: !hasId ? ['disabled'] : [],
+            },
+        ])
+        mainWindow.setSkipTaskbar(false)
+    } catch (e) {
+        //console.log(e);
+    }
 }
 
 function setProgress(mainWindow, progress, isPaused) {
-  if (mainWindow) {
-    if (systemInfo.isWindows()) {
-      mainWindow.setProgressBar(progress, {
-        mode: isPaused ? "paused" : "normal"
-      });
-    } else {
-      mainWindow.setProgressBar(progress);
+    if (mainWindow) {
+        if (systemInfo.isWindows()) {
+            mainWindow.setProgressBar(progress, {
+                mode: isPaused ? 'paused' : 'normal',
+            })
+        } else {
+            mainWindow.setProgressBar(progress)
+        }
     }
-  }
 }
 
 function createTouchBar(mainWindow) {
-  // TODO: Implement touchbar
-  // mainWindow.setTouchBar();
+    // TODO: Implement touchbar
+    // mainWindow.setTouchBar();
 }
 
 const guarder = (mainWindow, f) => {
-  if (mainWindow && mainWindow.webContents) f(mainWindow);
-};
+    if (mainWindow && mainWindow.webContents) f(mainWindow)
+}
 
-exports.playPauseTrack = v => guarder(v, mediaPlayPauseTrack);
-exports.stopTrack = v => guarder(v, mediaStopTrack);
-exports.nextTrack = v => guarder(v, mediaNextTrack);
-exports.previousTrack = v => guarder(v, mediaPreviousTrack);
-exports.upVote = v => guarder(v, mediaUpVote);
-exports.downVote = v => guarder(v, mediaDownVote);
-exports.volumeUp = v => guarder(v, mediaVolumeUp);
-exports.volumeDown = v => guarder(v, mediaVolumeDown);
-exports.mediaForwardXSeconds = v => guarder(v, mediaForwardXSeconds);
-exports.mediaRewindXSeconds = v => guarder(v, mediaRewindXSeconds);
-exports.changeSeekbar = mediaChangeSeekbar;
-exports.repeat = mediaRepeat;
-exports.shuffle = mediaShuffle;
+exports.playPauseTrack = v => guarder(v, mediaPlayPauseTrack)
+exports.stopTrack = v => guarder(v, mediaStopTrack)
+exports.nextTrack = v => guarder(v, mediaNextTrack)
+exports.previousTrack = v => guarder(v, mediaPreviousTrack)
+exports.upVote = v => guarder(v, mediaUpVote)
+exports.downVote = v => guarder(v, mediaDownVote)
+exports.volumeUp = v => guarder(v, mediaVolumeUp)
+exports.volumeDown = v => guarder(v, mediaVolumeDown)
+exports.mediaForwardXSeconds = v => guarder(v, mediaForwardXSeconds)
+exports.mediaRewindXSeconds = v => guarder(v, mediaRewindXSeconds)
+exports.changeSeekbar = mediaChangeSeekbar
+exports.repeat = mediaRepeat
+exports.shuffle = mediaShuffle
 
 // For Windows
-exports.createThumbar = createThumbar;
-exports.setProgress = setProgress;
+exports.createThumbar = createThumbar
+exports.setProgress = setProgress
 // For Mac
 // exports.createTouchBar = createTouchBar;
