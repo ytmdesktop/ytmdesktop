@@ -39,8 +39,9 @@ const { checkBounds, doBehavior } = require('./utils/window')
 const electronLocalshortcut = require('electron-localshortcut')
 
 const themePath = path.join(app.getAppPath(), '/assets/custom-theme.css')
+
 if (!themePath) {
-    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`)
+    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`, { flag: 'w+' })
 }
 
 if (settingsProvider.get('settings-companion-server')) {
