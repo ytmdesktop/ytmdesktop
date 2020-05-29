@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     initElement('settings-discord-rich-presence', 'click')
     initElement('settings-app-language', 'change', showRelaunchButton)
-    initElement('settings-lyrics-provider', 'change')
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
     })

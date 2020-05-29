@@ -34,7 +34,7 @@ const companionServer = require('./providers/companionServer')
 const discordRPC = require('./providers/discordRpcProvider')
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 const mprisProvider = require('./providers/mprisProvider')
-const { checkBounds, doBehavior } = require('./utils/window')
+const { checkWindowPosition, doBehavior } = require('./utils/window')
 
 const electronLocalshortcut = require('electron-localshortcut')
 
@@ -395,7 +395,6 @@ function createWindow() {
                 mainWindow,
                 infoPlayerProvider.getAllInfo()
             )
-            ipcMain.emit('play-pause', infoPlayerProvider.getTrackInfo())
         } catch {}
     })
 
@@ -407,7 +406,6 @@ function createWindow() {
             }
 
             global.sharedObj.paused = true
-            ipcMain.emit('play-pause', infoPlayerProvider.getTrackInfo())
             mediaControl.createThumbar(
                 mainWindow,
                 infoPlayerProvider.getAllInfo()
@@ -1026,7 +1024,17 @@ if (!gotTheLock) {
     })
 
     app.whenReady().then(function() {
-        checkBounds()
+        checkWindowPosition(settingsProvider.get('window-position')).then(
+            visiblePosition => {
+                settingsProvider.set('window-position', visiblePosition)
+            }
+        )
+
+        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
+            visiblePosition => {
+                settingsProvider.set('lyrics-position', visiblePosition)
+            }
+        )
 
         createWindow()
 
