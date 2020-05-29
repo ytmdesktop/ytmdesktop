@@ -56,7 +56,7 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
-//mprisProvider.start()
+mprisProvider.start()
 
 let renderer_for_status_bar = null
 global.sharedObj = { title: 'N/A', paused: true }
@@ -291,7 +291,7 @@ function createWindow() {
     view.webContents.on('media-started-playing', function() {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            //mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
         }
 
         if (isMac()) {
@@ -337,7 +337,7 @@ function createWindow() {
 
         discordRPC.setActivity(getAll())
         rainmeterNowPlaying.setActivity(getAll())
-        //mprisProvider.setActivity(getAll())
+        mprisProvider.setActivity(getAll())
 
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
