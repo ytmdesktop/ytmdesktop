@@ -18,9 +18,7 @@ const lyricProviders = [
 
 const elementLyric = document.getElementById('lyric')
 
-let lastId
-let target
-let toggled
+let lastId, target, toggled
 
 loadi18n()
 
@@ -66,6 +64,17 @@ function getLyric(artist, song, id) {
                 'settings-lyrics-provider'
             )
             providerSelected = parseInt(providerSelected) - 1
+
+            retrieveOVHData(artist, song)
+                .then(
+                    success => {
+                        console.log(success)
+                    },
+                    error => {
+                        console.log(error)
+                    }
+                )
+                .catch(rejected => console.log(rejected))
 
             request(
                 urlReplace(
@@ -211,3 +220,27 @@ function urlReplace(url, artist, music) {
 
     return urlReturn
 }
+
+function retrieveOVHData(artist, track) {
+    return new Promise((resolve, reject) => {
+        request(
+            `https://api.lyrics.ovh/v1/${removeAccents(artist)}/${removeAccents(
+                track
+            )}`,
+            { json: true },
+            function(err, res, body) {
+                if (err) {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+                if (body && body.lyrics) {
+                    resolve(body.lyrics)
+                } else {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+                // document.getElementById('content').scrollTop = 0
+            }
+        )
+    })
+}
+
+function retrieveVagalumeData(artist, track) {}

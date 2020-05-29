@@ -21,6 +21,7 @@ var track = {
     id: '',
     isVideo: false,
     isAdvertisement: false,
+    lyrics: '',
 }
 
 function init(view) {
@@ -299,6 +300,10 @@ function setSeekbar(webContents, time) {
         .catch(_ => console.log('error changeSeekbar'))
 }
 
+function setLyrics(lyrics) {
+    track.lyrics = lyrics
+}
+
 function convertToHuman(time) {
     var _aux = time
     var _minutes = 0
@@ -352,4 +357,5 @@ module.exports = {
     firstPlay: firstPlay,
     setVolume: setVolume,
     setSeekbar: setSeekbar,
+    setLyrics: setLyrics,
 }

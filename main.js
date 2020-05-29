@@ -366,8 +366,11 @@ function createWindow() {
                 scrobblerProvider.updateTrackInfo(title, author, album)
             }
 
-            if (!mainWindow.isFocused()) {
-                tray.balloon(title, author, cover)
+            if (
+                !mainWindow.isFocused() &&
+                settingsProvider.get('settings-show-notifications')
+            ) {
+                tray.balloon(title, author, cover, icon)
             }
         }
 
