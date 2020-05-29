@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initElement('settings-miniplayer-always-show-controls', 'click')
     initElement('settings-miniplayer-paint-controls', 'click')
     initElement('settings-miniplayer-size', 'change')
+    initElement('settings-enable-taskbar-progressbar', 'click')
 
     mInit()
 

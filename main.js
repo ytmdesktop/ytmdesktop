@@ -342,7 +342,9 @@ function createWindow() {
 
         mediaControl.setProgress(
             mainWindow,
-            trackInfo.statePercent,
+            settingsProvider.get('settings-enable-taskbar-progressbar')
+                ? trackInfo.statePercent
+                : -1,
             playerInfo.isPaused
         )
 
@@ -1198,8 +1200,3 @@ const analytics = require('./providers/analyticsProvider')
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
 analytics.setScreen('main')
-
-settingsProvider.setInitialValue(
-    'settings-enable-double-tapping-show-hide',
-    true
-)

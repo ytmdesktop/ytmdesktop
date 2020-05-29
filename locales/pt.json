@@ -60,5 +60,6 @@
     "LABEL_SETTINGS_TAB_GENERAL_SELECT_LYRICS_PROVIDER": "Provedor de letra da música",
     "LABEL_SETTINGS_TAB_GENERAL_START_MINIMIZED": "Iniciar minimizado",
     "LABEL_SETTINGS_TAB_GENERAL_SELECT_AUDIO_OUTPUT": "Saída de áudio",
-    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "Proteger controle com senha"
+    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "Proteger controle com senha",
+    "LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR": "Mostrar o progresso da faixa na barra de tarefas"
 }

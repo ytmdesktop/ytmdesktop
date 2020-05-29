@@ -20,12 +20,20 @@ settingsProvider.setInitialValue('settings-miniplayer-size', '2') // Normal size
 
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
-settingsProvider.setInitialValue('settings-companion-server-protect', true)
+settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
 
 settingsProvider.setInitialValue(
+    // Random token
     'settings-companion-server-token',
     Math.random()
         .toString(36)
         .substr(2, 5)
         .toUpperCase()
 )
+
+settingsProvider.setInitialValue(
+    'settings-enable-double-tapping-show-hide',
+    true
+) // Yes
+
+settingsProvider.setInitialValue('settings-enable-taskbar-progressbar', true) // Yes
