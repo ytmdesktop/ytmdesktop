@@ -40,35 +40,31 @@ ipc.on('window-is-maximized', function(_, value) {
     }
 })
 
-document.addEventListener(
-    'DOMContentLoaded',
-    function() {
-        checkUrlParams()
+document.addEventListener('DOMContentLoaded', function() {
+    checkUrlParams()
 
-        document
-            .getElementById('btn-minimize')
-            .addEventListener('click', function() {
-                currentWindow.minimize()
-            })
+    document
+        .getElementById('btn-minimize')
+        .addEventListener('click', function() {
+            currentWindow.minimize()
+        })
 
-        document
-            .getElementById('btn-maximize')
-            .addEventListener('click', function() {
-                if (!currentWindow.isMaximized()) {
-                    currentWindow.maximize()
-                } else {
-                    currentWindow.unmaximize()
-                }
-            })
+    document
+        .getElementById('btn-maximize')
+        .addEventListener('click', function() {
+            if (!currentWindow.isMaximized()) {
+                currentWindow.maximize()
+            } else {
+                currentWindow.unmaximize()
+            }
+        })
 
-        document
-            .getElementById('btn-close')
-            .addEventListener('click', function() {
-                currentWindow.close()
-            })
-    },
-    false
-)
+    document.getElementById('btn-close').addEventListener('click', function() {
+        currentWindow.close()
+    })
+
+    document.getElementById('loading').classList.add('hide')
+})
 
 // ENABLE FOR DEBUG
 // webview.addEventListener("did-start-loading", () => { webview.openDevTools(); });

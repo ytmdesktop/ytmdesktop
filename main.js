@@ -22,11 +22,6 @@ const { calcYTViewSize } = require('./utils/calcYTViewSize')
 const { isWindows, isMac } = require('./utils/systemInfo')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
-const {
-    companionUrl,
-    companionWindowTitle,
-    companionWindowSettings,
-} = require('./server.config')
 const settingsProvider = require('./providers/settingsProvider')
 const infoPlayerProvider = require('./providers/infoPlayerProvider')
 const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
@@ -507,12 +502,20 @@ function createWindow() {
         mediaControl.playPauseTrack(view)
     })
 
+    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
+        mediaControl.nextTrack(view)
+    })
+
     globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
         mediaControl.previousTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
-        mediaControl.nextTrack(view)
+    globalShortcut.register('CmdOrCtrl+Shift+numadd', function() {
+        mediaControl.upVote(view)
+    })
+
+    globalShortcut.register('CmdOrCtrl+Shift+numsub', function() {
+        mediaControl.downVote(view)
     })
 
     ipcMain.on('restore-main-window', function() {
@@ -702,7 +705,6 @@ function createWindow() {
                 },
             })
 
-            // settings.loadFile(path.join(app.getAppPath(), "/pages/settings/settings.html"));
             settings.loadFile(
                 path.join(
                     __dirname,
@@ -713,7 +715,6 @@ function createWindow() {
                         'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize',
                 }
             )
-            // settings.webContents.openDevTools();
         }
 
         settings.on('closed', function() {
@@ -799,8 +800,6 @@ function createWindow() {
             miniplayer.hide()
             mainWindow.show()
         })
-
-        // miniplayer.webContents.openDevTools();
     })
 
     ipcMain.on('show-last-fm-login', function() {
@@ -825,7 +824,6 @@ function createWindow() {
             },
         })
 
-        // lastfm.loadFile(path.join(app.getAppPath(), "/pages/settings/last-fm-login.html"));
         lastfm.loadFile(
             path.join(
                 __dirname,
@@ -836,7 +834,6 @@ function createWindow() {
                     'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
             }
         )
-        // lastfm.webContents.openDevTools();
     })
 
     ipcMain.on('switch-clipboard-watcher', () => {
@@ -872,7 +869,6 @@ function createWindow() {
             },
         })
 
-        // editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
         editor.loadFile(
             path.join(
                 __dirname,
@@ -883,7 +879,6 @@ function createWindow() {
                     'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
-        // editor.webContents.openDevTools();
     })
 
     ipcMain.on('update-custom-theme', function() {
@@ -1164,14 +1159,14 @@ ipcMain.on('show-companion', function() {
         resizable: false,
         backgroundColor: '#232323',
         width: 800,
-        title: companionWindowTitle,
+        title: 'companionWindowTitle',
         webPreferences: {
             nodeIntegration: false,
         },
         icon: path.join(__dirname, icon),
         autoHideMenuBar: true,
     })
-    settings.loadURL(companionUrl)
+    settings.loadURL('companionUrl')
 })
 
 function logDebug(data) {

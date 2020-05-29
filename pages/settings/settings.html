@@ -522,6 +522,7 @@
                                         <td class="right">
                                             <div class="switch">
                                                 <span
+                                                    class="blue-text"
                                                     id="label-settings-companion-server-token"
                                                 ></span>
                                                 <label>
@@ -620,18 +621,8 @@
 
                         <div id="tab-shortcut" class="tab-content">
                             <div class="row">
-                                <div class="col s6">
+                                <div class="col s12">
                                     <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_LABEL_SETTINGS_TAB_SHORTCUTS_LOCAL"
-                                                    ></span>
-                                                </td>
-                                                <td></td>
-                                            </tr>
-                                        </thead>
                                         <tbody>
                                             <tr>
                                                 <td>
@@ -640,11 +631,17 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    Space
+                                                    <i
+                                                        class="material-icons media-icons"
+                                                        >play_arrow</i
+                                                    >/<i
+                                                        class="material-icons media-icons"
+                                                        >pause</i
+                                                    >
                                                     <span class="shortcut-or"
                                                         >or</span
                                                     >
-                                                    ;
+                                                    CmdOrCtrl + Shift + Space
                                                 </th>
                                             </tr>
                                             <tr>
@@ -654,11 +651,14 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    J
+                                                    <i
+                                                        class="material-icons media-icons"
+                                                        >skip_next</i
+                                                    >
                                                     <span class="shortcut-or"
                                                         >or</span
                                                     >
-                                                    SHIFT + N
+                                                    CmdOrCtrl + Shift + PageUp
                                                 </th>
                                             </tr>
                                             <tr>
@@ -668,20 +668,15 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    K
+                                                    <i
+                                                        class="material-icons media-icons"
+                                                        >skip_previous</i
+                                                    >
                                                     <span class="shortcut-or"
                                                         >or</span
                                                     >
-                                                    SHIFT + P
+                                                    CmdOrCtrl + Shift + PageDown
                                                 </th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_MUTE_UNMUTE"
-                                                    ></span>
-                                                </td>
-                                                <th>M</th>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -689,7 +684,9 @@
                                                         i18n="i18n_MEDIA_CONTROL_THUMBS_UP"
                                                     ></span>
                                                 </td>
-                                                <th>+</th>
+                                                <th>
+                                                    CmdOrCtrl + Shift + numadd
+                                                </th>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -697,112 +694,8 @@
                                                         i18n="i18n_MEDIA_CONTROL_THUMBS_DOWN"
                                                     ></span>
                                                 </td>
-                                                <th>-</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_REPEAT"
-                                                    ></span>
-                                                </td>
-                                                <th>R</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_SHUFFLE"
-                                                    ></span>
-                                                </td>
-                                                <th>S</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_SEARCH"
-                                                    ></span>
-                                                </td>
-                                                <th>K</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_QUEUE_OPEN_CLOSE"
-                                                    ></span>
-                                                </td>
                                                 <th>
-                                                    Q
-                                                    <span class="shortcut-or"
-                                                        >or</span
-                                                    >
-                                                    ESC
-                                                </th>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="col s6">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_LABEL_SETTINGS_TAB_SHORTCUTS_GLOBAL"
-                                                    ></span>
-                                                </td>
-                                                <td></td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_PLAY_PAUSE"
-                                                    ></span>
-                                                </td>
-                                                <th>
-                                                    CmdOrCtrl + Shift + Space
-                                                    <span class="shortcut-or"
-                                                        >or</span
-                                                    ><i
-                                                        class="material-icons media-icons"
-                                                        >play_arrow</i
-                                                    >/<i
-                                                        class="material-icons media-icons"
-                                                        >pause</i
-                                                    >
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_NEXT"
-                                                    ></span>
-                                                </td>
-                                                <th>
-                                                    CmdOrCtrl + Shift + PageUp
-                                                    <span class="shortcut-or"
-                                                        >or</span
-                                                    ><i
-                                                        class="material-icons media-icons"
-                                                        >skip_next</i
-                                                    >
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span
-                                                        i18n="i18n_MEDIA_CONTROL_PREVIOUS"
-                                                    ></span>
-                                                </td>
-                                                <th>
-                                                    CmdOrCtrl + Shift + PageDown
-                                                    <span class="shortcut-or"
-                                                        >or</span
-                                                    ><i
-                                                        class="material-icons media-icons"
-                                                        >skip_previous</i
-                                                    >
+                                                    CmdOrCtrl + Shift + numsub
                                                 </th>
                                             </tr>
                                             <tr>
@@ -810,6 +703,17 @@
                                                     <span
                                                         i18n="i18n_LABEL_SETTINGS_SHOW_HIDE_WINDOW"
                                                     ></span>
+                                                </td>
+                                                <th>
+                                                    <span class="shortcut-or"
+                                                        >2x</span
+                                                    ><i
+                                                        class="material-icons media-icons"
+                                                        >play_arrow</i
+                                                    >/<i
+                                                        class="material-icons media-icons"
+                                                        >pause</i
+                                                    >
                                                     <div
                                                         class="switch"
                                                         style="display: inline;"
@@ -824,17 +728,6 @@
                                                             ></span>
                                                         </label>
                                                     </div>
-                                                </td>
-                                                <th>
-                                                    <span class="shortcut-or"
-                                                        >TWICE</span
-                                                    ><i
-                                                        class="material-icons media-icons"
-                                                        >play_arrow</i
-                                                    >/<i
-                                                        class="material-icons media-icons"
-                                                        >pause</i
-                                                    >
                                                 </th>
                                             </tr>
                                         </tbody>

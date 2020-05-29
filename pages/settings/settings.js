@@ -4,12 +4,6 @@ const __ = require('../../providers/translateProvider')
 const { isLinux } = require('../../utils/systemInfo')
 const fs = require('fs')
 
-const {
-    companionUrl,
-    companionWindowTitle,
-    companionWindowSettings,
-} = require('../../server.config')
-
 const elementSettingsCompanionApp = document.getElementById(
     'COMPANION_SERVER_INFO'
 )
@@ -113,11 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('content').classList.remove('hide')
 })
 
-if (elementSettingsCompanionApp) {
+/*if (elementSettingsCompanionApp) {
     elementSettingsCompanionApp.addEventListener('click', function() {
         window.open(companionUrl, companionWindowTitle, companionWindowSettings)
     })
-}
+}*/
 
 if (elementRangeZoom) {
     elementRangeZoom.addEventListener('input', function() {
