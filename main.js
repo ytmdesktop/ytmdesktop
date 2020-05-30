@@ -14,7 +14,6 @@ const {
     shell,
 } = require('electron')
 const path = require('path')
-const fs = require('fs')
 const scrobblerProvider = require('./providers/scrobblerProvider')
 const __ = require('./providers/translateProvider')
 const { statusBarMenu } = require('./providers/templateProvider')
@@ -30,14 +29,13 @@ const discordRPC = require('./providers/discordRpcProvider')
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 const mprisProvider = require('./providers/mprisProvider')
 const { checkWindowPosition, doBehavior } = require('./utils/window')
+const fileSystem = require('./utils/fileSystem')
 
 const electronLocalshortcut = require('electron-localshortcut')
 
-const themePath = path.join(app.getAppPath(), '/assets/custom-theme.css')
-
-if (!themePath) {
-    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`, { flag: 'w+' })
-}
+createDocumentsAppDir()
+createCustomThemeSubDir()
+createCustomThemeFile()
 
 if (settingsProvider.get('settings-companion-server')) {
     companionServer.start()
@@ -939,13 +937,18 @@ function createWindow() {
     }
 
     function loadCustomTheme() {
+        const customThemeFile = path.join(
+            fileSystem.getAppDocumentsPath(app),
+            '/custom-theme/styles.css'
+        )
+
         if (settingsProvider.get('settings-custom-theme')) {
-            if (fs.existsSync(themePath)) {
+            if (fileSystem.checkIfExists(customThemeFile)) {
                 if (customThemeCSSKey) {
                     removeCustomTheme()
                 }
                 view.webContents
-                    .insertCSS(fs.readFileSync(themePath).toString())
+                    .insertCSS(fileSystem.readFile(customThemeFile).toString())
                     .then(key => {
                         customThemeCSSKey = key
                     })
@@ -1195,6 +1198,34 @@ function bytesToSize(bytes) {
     if (bytes == 0) return '0 Byte'
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
+}
+
+function createDocumentsAppDir() {
+    if (!fileSystem.checkIfExists(fileSystem.getAppDocumentsPath(app))) {
+        fileSystem.createDir(fileSystem.getAppDocumentsPath(app))
+    }
+}
+
+function createCustomThemeSubDir() {
+    const dirCustomTheme = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        '/custom-theme'
+    )
+
+    if (!fileSystem.checkIfExists(dirCustomTheme)) {
+        fileSystem.createDir(dirCustomTheme, { recursive: true })
+    }
+}
+
+function createCustomThemeFile() {
+    const customThemeFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        '/custom-theme/styles.css'
+    )
+
+    if (!fileSystem.checkIfExists(customThemeFile)) {
+        fileSystem.writeFile(customThemeFile, `/** \n * Custom Theme \n */`)
+    }
 }
 
 // In this file you can include the rest of your app's specific main process

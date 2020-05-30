@@ -60,7 +60,7 @@
         "ws": "^7.2.1"
     },
     "optionalDependencies": {
-        "@nodert-win10/windows.media.playback": "^0.2.95",
+        "@nodert-win10/windows.media.playback": "^0.2.96",
         "mpris-service": "^2.1.0"
     }
 }
