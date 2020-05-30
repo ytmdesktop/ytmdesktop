@@ -22,24 +22,21 @@ const { calcYTViewSize } = require('./utils/calcYTViewSize')
 const { isWindows, isMac } = require('./utils/systemInfo')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
-const {
-    companionUrl,
-    companionWindowTitle,
-    companionWindowSettings,
-} = require('./server.config')
 const settingsProvider = require('./providers/settingsProvider')
-const infoPlayer = require('./utils/injectGetInfoPlayer')
+const infoPlayerProvider = require('./providers/infoPlayerProvider')
 const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
 const companionServer = require('./providers/companionServer')
 const discordRPC = require('./providers/discordRpcProvider')
+app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 const mprisProvider = require('./providers/mprisProvider')
-const { checkBounds, doBehavior } = require('./utils/window')
+const { checkWindowPosition, doBehavior } = require('./utils/window')
 
 const electronLocalshortcut = require('electron-localshortcut')
 
 const themePath = path.join(app.getAppPath(), '/assets/custom-theme.css')
+
 if (!themePath) {
-    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`)
+    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`, { flag: 'w+' })
 }
 
 if (settingsProvider.get('settings-companion-server')) {
@@ -62,8 +59,10 @@ global.sharedObj = { title: 'N/A', paused: true }
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, view, miniplayer, lyrics, settings
 
+const defaultUrl = 'https://music.youtube.com'
+
 let mainWindowParams = {
-    url: 'https://music.youtube.com',
+    url: defaultUrl,
     width: 1500,
     height: 800,
 }
@@ -189,11 +188,11 @@ function createWindow() {
     view = new BrowserView({
         webPreferences: {
             nodeIntegration: true,
+            webviewTag: true,
             preload: path.join(app.getAppPath(), '/utils/injectControls.js'),
         },
     })
 
-    // mainWindow.loadFile(path.join(app.getAppPath(), "/pages/home/home.html"));
     mainWindow.loadFile(
         path.join(
             __dirname,
@@ -201,7 +200,8 @@ function createWindow() {
         ),
         { search: 'page=home/home&title=YouTube Music' }
     )
-    mainWindow.setBrowserView(view)
+
+    mainWindow.addBrowserView(view)
 
     view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
 
@@ -216,13 +216,9 @@ function createWindow() {
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    // view.webContents.openDevTools({ mode: 'detach' });
+    // view.webContents.openDevTools({ mode: 'detach' })
 
-    mediaControl.createThumbar(
-        mainWindow,
-        infoPlayer.getPlayerInfo().isPaused,
-        infoPlayer.getPlayerInfo().likeStatus
-    )
+    mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
     if (windowMaximized) {
         setTimeout(function() {
@@ -237,6 +233,10 @@ function createWindow() {
         }
     }
 
+    mainWindow.on('ready-to-show', () => {
+        console.log('show')
+    })
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
         // Dereference the window object, usually you would store windows
@@ -248,12 +248,7 @@ function createWindow() {
     mainWindow.on('show', function() {
         globalShortcut.unregister('CmdOrCtrl+M')
 
-        logDebug('show')
-        mediaControl.createThumbar(
-            mainWindow,
-            infoPlayer.getPlayerInfo().isPaused,
-            infoPlayer.getPlayerInfo().likeStatus
-        )
+        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
     view.webContents.on('new-window', function(event, url) {
@@ -289,8 +284,9 @@ function createWindow() {
     })
 
     view.webContents.on('media-started-playing', function() {
-        if (!infoPlayer.hasInitialized()) {
-            infoPlayer.init(view)
+        if (!infoPlayerProvider.hasInitialized()) {
+            infoPlayerProvider.init(view)
+            mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
         }
 
         if (isMac()) {
@@ -300,26 +296,31 @@ function createWindow() {
 
         if (infoPlayerInterval === undefined) {
             infoPlayerInterval = setInterval(() => {
-                updateActivity()
+                if (global.on_the_road) {
+                    updateActivity()
+                }
             }, 800)
         }
     })
 
     view.webContents.on('did-start-navigation', function(_) {
-        loadCustomTheme()
-
         view.webContents.executeJavaScript('window.location').then(location => {
             if (location.hostname != 'music.youtube.com') {
                 mainWindow.send('off-the-road')
+                global.on_the_road = false
             } else {
                 mainWindow.send('on-the-road')
+                global.on_the_road = true
+
+                loadAudioOutput()
+                loadCustomTheme()
             }
         })
     })
 
     function updateActivity() {
-        var trackInfo = infoPlayer.getTrackInfo()
-        var playerInfo = infoPlayer.getPlayerInfo()
+        var trackInfo = infoPlayerProvider.getTrackInfo()
+        var playerInfo = infoPlayerProvider.getPlayerInfo()
 
         var title = trackInfo.title
         var author = trackInfo.author
@@ -333,15 +334,13 @@ function createWindow() {
         rainmeterNowPlaying.setActivity(getAll())
         mprisProvider.setActivity(getAll())
 
-        mediaControl.createThumbar(
-            mainWindow,
-            playerInfo.isPaused,
-            playerInfo.likeStatus
-        )
+        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
         mediaControl.setProgress(
             mainWindow,
-            trackInfo.statePercent,
+            settingsProvider.get('settings-enable-taskbar-progressbar')
+                ? trackInfo.statePercent
+                : -1,
             playerInfo.isPaused
         )
 
@@ -362,8 +361,11 @@ function createWindow() {
                 scrobblerProvider.updateTrackInfo(title, author, album)
             }
 
-            if (!mainWindow.isFocused()) {
-                tray.balloon(title, author, cover)
+            if (
+                !mainWindow.isFocused() &&
+                settingsProvider.get('settings-show-notifications')
+            ) {
+                tray.balloon(title, author, cover, icon)
             }
         }
 
@@ -386,10 +388,8 @@ function createWindow() {
             global.sharedObj.paused = false
             mediaControl.createThumbar(
                 mainWindow,
-                playerInfo()['isPaused'],
-                playerInfo()['likeStatus']
+                infoPlayerProvider.getAllInfo()
             )
-            ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
         } catch {}
     })
 
@@ -401,11 +401,9 @@ function createWindow() {
             }
 
             global.sharedObj.paused = true
-            ipcMain.emit('play-pause', infoPlayer.getTrackInfo())
             mediaControl.createThumbar(
                 mainWindow,
-                playerInfo()['isPaused'],
-                playerInfo()['likeStatus']
+                infoPlayerProvider.getAllInfo()
             )
         } catch {}
     })
@@ -469,8 +467,8 @@ function createWindow() {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
-                if (infoPlayer.getTrackInfo().id == '') {
-                    infoPlayer.firstPlay(view.webContents)
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
                 }
 
                 doublePressPlayPause = true
@@ -488,10 +486,6 @@ function createWindow() {
         }
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
-        mediaControl.playPauseTrack(view)
-    })
-
     globalShortcut.register('MediaStop', function() {
         mediaControl.stopTrack(view)
     })
@@ -499,15 +493,29 @@ function createWindow() {
     globalShortcut.register('MediaPreviousTrack', function() {
         mediaControl.previousTrack(view)
     })
-    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
-        mediaControl.previousTrack(view)
-    })
 
     globalShortcut.register('MediaNextTrack', function() {
         mediaControl.nextTrack(view)
     })
+
+    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
+        mediaControl.playPauseTrack(view)
+    })
+
     globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
         mediaControl.nextTrack(view)
+    })
+
+    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
+        mediaControl.previousTrack(view)
+    })
+
+    globalShortcut.register('CmdOrCtrl+Shift+numadd', function() {
+        mediaControl.upVote(view)
+    })
+
+    globalShortcut.register('CmdOrCtrl+Shift+numsub', function() {
+        mediaControl.downVote(view)
     })
 
     ipcMain.on('restore-main-window', function() {
@@ -518,15 +526,18 @@ function createWindow() {
         view.webContents.setZoomFactor(value / 100)
     })
 
-    ipcMain.on('what-is-song-playing-now', function(e, _) {
+    ipcMain.on('retrieve-player-info', function(e, _) {
         // IPCRenderer
         if (e !== undefined) {
-            e.sender.send('song-playing-now-is', infoPlayer.getAllInfo())
+            e.sender.send(
+                'song-playing-now-is',
+                infoPlayerProvider.getAllInfo()
+            )
         }
 
         // IPCMain
-        if (infoPlayer.hasInitialized()) {
-            ipcMain.emit('song-playing-now-is', infoPlayer.getAllInfo())
+        if (infoPlayerProvider.hasInitialized()) {
+            ipcMain.emit('song-playing-now-is', infoPlayerProvider.getAllInfo())
         }
     })
 
@@ -574,35 +585,52 @@ function createWindow() {
         }
     })
 
-    ipcMain.on('media-play-pause', () => {
-        mediaControl.playPauseTrack(view)
-    })
-    ipcMain.on('media-next-track', () => {
-        mediaControl.nextTrack(view)
-    })
-    ipcMain.on('media-previous-track', () => {
-        mediaControl.previousTrack(view)
-    })
-    ipcMain.on('media-up-vote', () => {
-        mediaControl.upVote(view)
-    })
-    ipcMain.on('media-down-vote', () => {
-        mediaControl.downVote(view)
-    })
-    ipcMain.on('media-volume-up', () => {
-        mediaControl.volumeUp(view)
-    })
-    ipcMain.on('media-volume-down', () => {
-        mediaControl.volumeDown(view)
-    })
-    ipcMain.on('media-forward-X-seconds', () => {
-        mediaControl.mediaForwardXSeconds(view)
-    })
-    ipcMain.on('media-rewind-X-seconds', () => {
-        mediaControl.mediaRewindXSeconds(view)
-    })
-    ipcMain.on('media-change-seekbar', value => {
-        mediaControl.changeSeekbar(view, value)
+    ipcMain.on('media-command', data => {
+        switch (data.command) {
+            case 'media-play-pause':
+                mediaControl.playPauseTrack(view)
+                break
+
+            case 'media-track-next':
+                mediaControl.nextTrack(view)
+                break
+
+            case 'media-track-previous':
+                mediaControl.previousTrack(view)
+                break
+
+            case 'media-vote-up':
+                mediaControl.upVote(view)
+                break
+
+            case 'media-vote-down':
+                mediaControl.downVote(view)
+                break
+
+            case 'media-volume-up':
+                mediaControl.volumeUp(view)
+                break
+
+            case 'media-volume-down':
+                mediaControl.volumeDown(view)
+                break
+
+            case 'media-seekbar-forward':
+                mediaControl.mediaForwardTenSeconds(view)
+                break
+
+            case 'media-seekbar-rewind':
+                mediaControl.mediaRewindTenSeconds(view)
+                break
+
+            case 'media-seekbar-set':
+                mediaControl.changeSeekbar(view, data.value)
+                break
+
+            case 'media-volume-set':
+                mediaControl.changeVolume(view, data.value)
+                break
+        }
     })
 
     ipcMain.on('register-renderer', (event, arg) => {
@@ -677,7 +705,6 @@ function createWindow() {
                 },
             })
 
-            // settings.loadFile(path.join(app.getAppPath(), "/pages/settings/settings.html"));
             settings.loadFile(
                 path.join(
                     __dirname,
@@ -688,7 +715,6 @@ function createWindow() {
                         'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize',
                 }
             )
-            // settings.webContents.openDevTools();
         }
 
         settings.on('closed', function() {
@@ -715,7 +741,10 @@ function createWindow() {
             },
         })
 
-        // Small => 170 | Medium => 200 | Large => 230
+        miniplayer.loadFile(
+            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
+        )
+
         switch (settingsProvider.get('settings-miniplayer-size')) {
             case '1':
                 miniplayer.setSize(170, 170)
@@ -729,6 +758,18 @@ function createWindow() {
                 miniplayer.setSize(230, 230)
                 break
 
+            case '4':
+                miniplayer.setSize(260, 260)
+                break
+
+            case '5':
+                miniplayer.setSize(290, 290)
+                break
+
+            case '6':
+                miniplayer.setSize(320, 320)
+                break
+
             default:
                 miniplayer.setSize(200, 200)
                 break
@@ -739,12 +780,8 @@ function createWindow() {
             miniplayer.setPosition(miniplayerPosition.x, miniplayerPosition.y)
         }
 
-        miniplayer.loadFile(
-            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
-        )
-
+        let storeMiniplayerPositionTimer
         miniplayer.on('move', function(e) {
-            let storeMiniplayerPositionTimer
             let position = miniplayer.getPosition()
             if (storeMiniplayerPositionTimer) {
                 clearTimeout(storeMiniplayerPositionTimer)
@@ -763,8 +800,6 @@ function createWindow() {
             miniplayer.hide()
             mainWindow.show()
         })
-
-        // miniplayer.webContents.openDevTools();
     })
 
     ipcMain.on('show-last-fm-login', function() {
@@ -789,7 +824,6 @@ function createWindow() {
             },
         })
 
-        // lastfm.loadFile(path.join(app.getAppPath(), "/pages/settings/last-fm-login.html"));
         lastfm.loadFile(
             path.join(
                 __dirname,
@@ -800,7 +834,6 @@ function createWindow() {
                     'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
             }
         )
-        // lastfm.webContents.openDevTools();
     })
 
     ipcMain.on('switch-clipboard-watcher', () => {
@@ -812,7 +845,10 @@ function createWindow() {
     })
 
     ipcMain.on('reset-url', () => {
-        mainWindow.getBrowserView().webContents.loadURL(mainWindowParams.url)
+        mainWindowParams.url = defaultUrl
+
+        const options = { extraHeaders: 'pragma: no-cache\n' }
+        view.webContents.loadURL(mainWindowParams.url, options)
     })
 
     ipcMain.on('show-editor-theme', function() {
@@ -833,7 +869,6 @@ function createWindow() {
             },
         })
 
-        // editor.loadFile(path.join(app.getAppPath(), "/pages/editor/editor.html"));
         editor.loadFile(
             path.join(
                 __dirname,
@@ -844,7 +879,6 @@ function createWindow() {
                     'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
-        // editor.webContents.openDevTools();
     })
 
     ipcMain.on('update-custom-theme', function() {
@@ -873,6 +907,36 @@ function createWindow() {
             `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
         )
     })
+
+    ipcMain.on('change-audio-output', (event, data) => {
+        setAudioOutput(data)
+    })
+
+    function setAudioOutput(audioLabel) {
+        view.webContents
+            .executeJavaScript(
+                `
+            navigator
+            .mediaDevices
+            .enumerateDevices()
+            .then( devices => {
+                var audioDevices = devices.filter(device => device.kind === 'audiooutput');
+                var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
+                if(result.length) {
+                    document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+                }
+            });
+        `
+            )
+            .then(_ => {})
+            .catch(_ => console.log('error setAudioOutput'))
+    }
+
+    function loadAudioOutput() {
+        if (settingsProvider.get('settings-app-audio-output')) {
+            setAudioOutput(settingsProvider.get('settings-app-audio-output'))
+        }
+    }
 
     function loadCustomTheme() {
         if (settingsProvider.get('settings-custom-theme')) {
@@ -954,8 +1018,18 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('ready', function(ev) {
-        checkBounds()
+    app.whenReady().then(function() {
+        checkWindowPosition(settingsProvider.get('window-position')).then(
+            visiblePosition => {
+                settingsProvider.set('window-position', visiblePosition)
+            }
+        )
+
+        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
+            visiblePosition => {
+                settingsProvider.set('lyrics-position', visiblePosition)
+            }
+        )
 
         createWindow()
 
@@ -974,6 +1048,10 @@ if (!gotTheLock) {
         }
         ipcMain.emit('ready', app)
     })
+
+    /*app.on('ready', function(ev) {
+        
+    })*/
 
     app.on('browser-window-created', function(e, window) {
         window.removeMenu()
@@ -1045,8 +1123,8 @@ ipcMain.on('show-lyrics', function() {
             }
         )
 
+        let storeLyricsPositionTimer
         lyrics.on('move', function(e) {
-            let storeLyricsPositionTimer
             let position = lyrics.getPosition()
             if (storeLyricsPositionTimer) {
                 clearTimeout(storeLyricsPositionTimer)
@@ -1059,12 +1137,12 @@ ipcMain.on('show-lyrics', function() {
             }, 500)
         })
 
+        lyrics.on('closed', function() {
+            lyrics = null
+        })
+
         // lyrics.webContents.openDevTools();
     }
-
-    lyrics.on('closed', function() {
-        lyrics = null
-    })
 })
 
 ipcMain.on('show-companion', function() {
@@ -1081,14 +1159,14 @@ ipcMain.on('show-companion', function() {
         resizable: false,
         backgroundColor: '#232323',
         width: 800,
-        title: companionWindowTitle,
+        title: 'companionWindowTitle',
         webPreferences: {
             nodeIntegration: false,
         },
         icon: path.join(__dirname, icon),
         autoHideMenuBar: true,
     })
-    settings.loadURL(companionUrl)
+    settings.loadURL('companionUrl')
 })
 
 function logDebug(data) {
@@ -1098,11 +1176,11 @@ function logDebug(data) {
 }
 
 function songInfo() {
-    return infoPlayer.getTrackInfo()
+    return infoPlayerProvider.getTrackInfo()
 }
 
 function playerInfo() {
-    return infoPlayer.getPlayerInfo()
+    return infoPlayerProvider.getPlayerInfo()
 }
 
 function getAll() {
@@ -1129,8 +1207,3 @@ const analytics = require('./providers/analyticsProvider')
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
 analytics.setScreen('main')
-
-settingsProvider.setInitialValue(
-    'settings-enable-double-tapping-show-hide',
-    true
-)

@@ -1,61 +1,68 @@
-const { isLinux, isMac } = require("./systemInfo");
+const { isLinux, isMac } = require('./systemInfo')
 
-const PADDING = 1;
-const PADDING_MAXIMIZED = 16;
-const PADDING_LINUX = 0;
+const PADDING = 1
+const PADDING_MAXIMIZED = 16
+const PADDING_LINUX = 0
 
-const TITLE_BAR_HEIGHT = 28;
+const TITLE_BAR_HEIGHT = 28
 
-const TITLE_BAR_HEIGHT_MAC = 21;
+const TITLE_BAR_HEIGHT_MAC = 21
 
 /**
  * @param {settingsProvider} store
  * @param {Array.<width: Number, height: Number, isMac: Boolean, isMaximized: Boolean>} sizes
  */
 function calculateYoutubeViewSize(store, window) {
-  const windowSize = window.getSize();
-  const isMaximized = window.isMaximized();
-  const isNiceTitleBarDisabled = store.get("titlebar-type", "nice") !== "nice";
-  const x = PADDING;
+    const windowSize = window.getSize()
+    const isMaximized = window.isMaximized()
+    const isNiceTitleBarDisabled = store.get('titlebar-type', 'nice') !== 'nice'
+    const titlebarType = store.get('titlebar-type')
 
-  if (isMac()) {
-    const y = isNiceTitleBarDisabled
-      ? PADDING + TITLE_BAR_HEIGHT_MAC
-      : PADDING + TITLE_BAR_HEIGHT;
+    const x = PADDING
 
-    return {
-      x,
-      y,
-      width: windowSize[0] - x - PADDING,
-      height: windowSize[1] - y - PADDING
-    };
-  } else if (isLinux()) {
-    const y = PADDING_LINUX;
+    if (isMac()) {
+        // IS MAC
+        const y = isNiceTitleBarDisabled
+            ? PADDING + TITLE_BAR_HEIGHT_MAC
+            : PADDING + TITLE_BAR_HEIGHT
 
-    return {
-      x,
-      y,
-      width: windowSize[0] - x,
-      height: windowSize[1] - y
-    };
-  } else {
-    const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT;
+        return {
+            x,
+            y,
+            width: windowSize[0] - x - PADDING,
+            height: windowSize[1] - y - PADDING,
+        }
+    } else if (isLinux()) {
+        // IS LINUX
+        const y = PADDING_LINUX
 
-    return {
-      x,
-      y,
-      width: isMaximized
-        ? windowSize[0] - x - PADDING_MAXIMIZED
-        : windowSize[0] - x - PADDING,
-      height:
-        windowSize[1] -
-        y -
-        (isMaximized ? PADDING_MAXIMIZED : PADDING) -
-        (isNiceTitleBarDisabled ? (isMaximized ? 24 : 40) : 0)
-    };
-  }
+        return {
+            x,
+            y,
+            width: windowSize[0] - x,
+            height: windowSize[1] - y,
+        }
+    } else {
+        // IS WINDOWS
+        const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT
+
+        return {
+            x,
+            y,
+            width: isMaximized
+                ? windowSize[0] - x - PADDING_MAXIMIZED
+                : windowSize[0] - x - PADDING,
+            height:
+                titlebarType === 'none'
+                    ? windowSize[1]
+                    : windowSize[1] -
+                      y -
+                      (isMaximized ? PADDING_MAXIMIZED : PADDING) -
+                      (isNiceTitleBarDisabled ? (isMaximized ? 24 : 40) : 0),
+        }
+    }
 }
 
 module.exports = {
-  calcYTViewSize: calculateYoutubeViewSize
-};
+    calcYTViewSize: calculateYoutubeViewSize,
+}

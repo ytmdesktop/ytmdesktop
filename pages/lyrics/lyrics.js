@@ -1,26 +1,10 @@
 const { ipcRenderer } = require('electron')
 const request = require('request')
 const __ = require('../../providers/translateProvider')
-const settingsProvider = require('../../providers/settingsProvider')
-
-const lyricProviders = [
-    {
-        name: 'lyrics.ovh',
-        url: 'https://api.lyrics.ovh/v1/:artist/:music',
-        response: 'body.lyrics',
-    },
-    {
-        name: 'vagalume',
-        url: 'https://api.vagalume.com.br/search.php?art=:artist&mus=:music',
-        response: 'body.mus[0].text',
-    },
-]
 
 const elementLyric = document.getElementById('lyric')
 
-let lastId
-let target
-let toggled
+let lastId, target, toggled
 
 loadi18n()
 
@@ -44,8 +28,8 @@ document.getElementById('content').addEventListener('scroll', function(e) {
 })
 
 setInterval(function() {
-    ipcRenderer.send('what-is-song-playing-now')
-}, 1000)
+    ipcRenderer.send('retrieve-player-info')
+}, 3 * 1000)
 
 ipcRenderer.on('song-playing-now-is', function(e, data) {
     var scrollHeight = document.getElementById('content').scrollHeight
@@ -62,47 +46,26 @@ function getLyric(artist, song, id) {
         if (lastId !== id) {
             lastId = id
             toggled = true
-            let providerSelected = settingsProvider.get(
-                'settings-lyrics-provider'
-            )
-            providerSelected = parseInt(providerSelected) - 1
 
-            request(
-                urlReplace(
-                    lyricProviders[providerSelected].url,
-                    removeAccents(artist),
-                    removeAccents(song)
-                ),
-                { json: true },
-                function(err, res, body) {
-                    if (err) {
-                        console.log('LYRICS ERRO')
-                        elementLyric.innerText = __.trans(
-                            'LABEL_LYRICS_NOT_FOUND'
-                        )
-                        return
-                    }
-
-                    if (body) {
-                        try {
-                            eval(lyricProviders[providerSelected].response)
-                            elementLyric.innerText = eval(
-                                lyricProviders[providerSelected].response
-                            )
-                        } catch (e) {
-                            elementLyric.innerText = __.trans(
-                                'LABEL_LYRICS_NOT_FOUND'
-                            )
-                        }
-                    } else {
-                        elementLyric.innerText = __.trans(
-                            'LABEL_LYRICS_NOT_FOUND'
-                        )
-                    }
-
+            retrieveOVHData(artist, song)
+                .then(success => {
+                    elementLyric.innerText = success
                     document.getElementById('content').scrollTop = 0
-                }
-            )
+                })
+                .catch(_ => {
+                    retrieveVagalumeData(artist, song)
+                        .then(
+                            success_ => {
+                                console.log('sucesso vagalume')
+                                elementLyric.innerText = success_
+                                document.getElementById('content').scrollTop = 0
+                            },
+                            error_ => {
+                                elementLyric.innerText = error_
+                            }
+                        )
+                        .catch(rejected => console.log(rejected))
+                })
         }
     } else {
         elementLyric.innerText = __.trans('LABEL_PLAY_MUSIC')
@@ -210,4 +173,46 @@ function urlReplace(url, artist, music) {
     }
 
     return urlReturn
+}
+
+function retrieveOVHData(artist, track) {
+    return new Promise((resolve, reject) => {
+        request(
+            `https://api.lyrics.ovh/v1/${removeAccents(artist)}/${removeAccents(
+                track
+            )}`,
+            { json: true },
+            function(err, res, body) {
+                if (err) {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+                if (body && body.lyrics) {
+                    resolve(body.lyrics)
+                } else {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+            }
+        )
+    })
+}
+
+function retrieveVagalumeData(artist, track) {
+    return new Promise((resolve, reject) => {
+        request(
+            `https://api.vagalume.com.br/search.php?art=${removeAccents(
+                artist
+            )}&mus=${removeAccents(track)}`,
+            { json: true },
+            function(err, res, body) {
+                if (err) {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+                if (body && body.mus) {
+                    resolve(body.mus[0].text)
+                } else {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+            }
+        )
+    })
 }

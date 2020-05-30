@@ -1,3 +1,4 @@
+const { remote, shell } = require('electron')
 const scribble = require('scribble')
 const settingsProvider = require('./settingsProvider')
 const http = require('http')
@@ -81,10 +82,13 @@ function updateTrackInfo(title, author, album) {
 }
 
 function authorize(token) {
-    var authorize = window.open(
-        `https://www.last.fm/api/auth?api_key=${apiKey}&token=${token}`,
-        'Authorize App',
-        'frame=true'
+    let winAuthorize = new remote.BrowserWindow({
+        title: 'Last.FM Authorization',
+        width: 900,
+        height: 500,
+    })
+    winAuthorize.loadURL(
+        `https://www.last.fm/api/auth?api_key=${apiKey}&token=${token}`
     )
 }
 
