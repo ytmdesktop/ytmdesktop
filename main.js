@@ -1224,7 +1224,10 @@ function createCustomThemeFile() {
     )
 
     if (!fileSystem.checkIfExists(customThemeFile)) {
-        fileSystem.writeFile(customThemeFile, `/** \n * Custom Theme \n */`)
+        fileSystem.writeFile(
+            customThemeFile,
+            `/** \n * Custom Theme \n*/\n\nhtml, body { background: red !important; }`
+        )
     }
 }
 
