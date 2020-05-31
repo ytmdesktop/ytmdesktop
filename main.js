@@ -1,5 +1,4 @@
 require('./utils/defaultSettings')
-const assetsProvider = require('./providers/assetsProvider')
 
 const {
     app,
@@ -14,24 +13,61 @@ const {
     shell,
 } = require('electron')
 const path = require('path')
-const scrobblerProvider = require('./providers/scrobblerProvider')
 const __ = require('./providers/translateProvider')
-const { statusBarMenu } = require('./providers/templateProvider')
-const { calcYTViewSize } = require('./utils/calcYTViewSize')
-const { isWindows, isMac } = require('./utils/systemInfo')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
+const electronLocalshortcut = require('electron-localshortcut')
+
+const assetsProvider = require('./providers/assetsProvider')
+const scrobblerProvider = require('./providers/scrobblerProvider')
+const { statusBarMenu } = require('./providers/templateProvider')
 const settingsProvider = require('./providers/settingsProvider')
 const infoPlayerProvider = require('./providers/infoPlayerProvider')
 const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
 const companionServer = require('./providers/companionServer')
 const discordRPC = require('./providers/discordRpcProvider')
-app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 const mprisProvider = require('./providers/mprisProvider')
+
+const { calcYTViewSize } = require('./utils/calcYTViewSize')
+const { isWindows, isMac, isLinux } = require('./utils/systemInfo')
 const { checkWindowPosition, doBehavior } = require('./utils/window')
 const fileSystem = require('./utils/fileSystem')
 
-const electronLocalshortcut = require('electron-localshortcut')
+/* Variables =========================================================================== */
+let mainWindow,
+    view,
+    miniplayer,
+    lyrics,
+    settings,
+    infoPlayerInterval,
+    customCSSAppKey,
+    customCSSPageKey,
+    lastTrackId,
+    doublePressPlayPause
+
+let isFirstTime = (isClipboardWatcherRunning = false)
+
+let renderer_for_status_bar = (clipboardWatcher = null)
+
+const defaultUrl = 'https://music.youtube.com'
+
+let mainWindowParams = {
+    url: defaultUrl,
+    width: 1500,
+    height: 800,
+}
+
+let windowConfig = {
+    frame: false,
+    titleBarStyle: '',
+}
+
+global.sharedObj = { title: 'N/A', paused: true }
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+
+/* First checks ========================================================================= */
+app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 
 createDocumentsAppDir()
 
@@ -50,39 +86,11 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
-mprisProvider.start()
-
-let renderer_for_status_bar = null
-global.sharedObj = { title: 'N/A', paused: true }
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, view, miniplayer, lyrics, settings
-
-const defaultUrl = 'https://music.youtube.com'
-
-let mainWindowParams = {
-    url: defaultUrl,
-    width: 1500,
-    height: 800,
+if (isLinux()) {
+    mprisProvider.start()
 }
 
-let infoPlayerInterval
-let customCSSAppKey, customCSSPageKey
-let lastTrackId
-let doublePressPlayPause
-let isClipboardWatcherRunning = false
-let clipboardWatcher = null
-
-let windowConfig = {
-    frame: false,
-    titleBarStyle: '',
-}
-
-let icon = 'assets/favicon.png'
-if (isWindows()) {
-    icon = 'assets/favicon.ico'
-} else if (isMac()) {
-    icon = 'assets/favicon.16x16.png'
+if (isMac()) {
     settingsProvider.set(
         'settings-shiny-tray-dark',
         nativeTheme.shouldUseDarkColors
@@ -102,6 +110,7 @@ if (isWindows()) {
     Menu.setApplicationMenu(menu)
 }
 
+/* Functions ============================================================================= */
 function createWindow() {
     if (isMac() || isWindows()) {
         const execApp = path.basename(process.execPath)
@@ -136,7 +145,7 @@ function createWindow() {
     }
 
     browserWindowConfig = {
-        icon: icon,
+        icon: assetsProvider.getIcon('favicon'),
         width: mainWindowParams.width,
         height: mainWindowParams.height,
         minWidth: 300,
@@ -364,7 +373,12 @@ function createWindow() {
                 !mainWindow.isFocused() &&
                 settingsProvider.get('settings-show-notifications')
             ) {
-                tray.balloon(title, author, cover, icon)
+                tray.balloon(
+                    title,
+                    author,
+                    cover,
+                    assetsProvider.getIcon('favicon')
+                )
             }
         }
 
@@ -522,7 +536,7 @@ function createWindow() {
     })
 
     ipcMain.on('settings-changed-zoom', function(e, value) {
-        view.webContents.setZoomFactor(value / 100)
+        view.webContents.zoomFactor = value / 100
     })
 
     ipcMain.on('retrieve-player-info', function(e, _) {
@@ -670,7 +684,7 @@ function createWindow() {
 
     ipcMain.on('show-guest-mode', function() {
         const incognitoWindow = new BrowserWindow({
-            icon: icon,
+            icon: assetsProvider.getIcon('favicon'),
             width: mainWindowParams.width,
             height: mainWindowParams.height,
             minWidth: 300,
@@ -703,7 +717,7 @@ function createWindow() {
         } else {
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
-                icon: icon,
+                icon: assetsProvider.getIcon('favicon'),
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
@@ -719,6 +733,7 @@ function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
+                    //reload: path.join(app.getAppPath(), '/pages/settings/settings.js'),
                 },
             })
 
@@ -742,7 +757,7 @@ function createWindow() {
     ipcMain.on('show-miniplayer', function() {
         miniplayer = new BrowserWindow({
             title: __.trans('LABEL_MINIPLAYER'),
-            icon: icon,
+            icon: assetsProvider.getIcon('favicon'),
             modal: false,
             frame: false,
             center: false,
@@ -755,6 +770,7 @@ function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
+                //preload: path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.js'),
             },
         })
 
@@ -822,7 +838,7 @@ function createWindow() {
     ipcMain.on('show-last-fm-login', function() {
         const lastfm = new BrowserWindow({
             //parent: mainWindow,
-            icon: icon,
+            icon: assetsProvider.getIcon('favicon'),
             modal: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -870,7 +886,7 @@ function createWindow() {
 
     ipcMain.on('show-editor-theme', function() {
         const editor = new BrowserWindow({
-            icon: path.join(__dirname, icon),
+            icon: assetsProvider.getIcon('favicon'),
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
             center: true,
@@ -1082,7 +1098,7 @@ if (!gotTheLock) {
 
         createWindow()
 
-        tray.createTray(mainWindow, icon)
+        tray.createTray(mainWindow, assetsProvider.getIcon('favicon'))
 
         ipcMain.on('updated-tray-image', function(event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
@@ -1149,7 +1165,7 @@ ipcMain.on('show-lyrics', function() {
             backgroundColor: '#232323',
             width: 700,
             height: 800,
-            icon: path.join(__dirname, icon),
+            icon: assetsProvider.getIcon('favicon'),
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
@@ -1212,7 +1228,7 @@ ipcMain.on('show-companion', function() {
         webPreferences: {
             nodeIntegration: false,
         },
-        icon: path.join(__dirname, icon),
+        icon: assetsProvider.getIcon('favicon'),
         autoHideMenuBar: true,
     })
     settings.loadURL('companionUrl')
@@ -1248,7 +1264,10 @@ function bytesToSize(bytes) {
 
 function createDocumentsAppDir() {
     if (!fileSystem.checkIfExists(fileSystem.getAppDocumentsPath(app))) {
+        isFirstTime = true
         fileSystem.createDir(fileSystem.getAppDocumentsPath(app))
+    } else {
+        isFirstTime = false
     }
 }
 

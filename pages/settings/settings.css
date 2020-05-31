@@ -1,5 +1,5 @@
 body {
-    background-color: #131313;
+    background-color: #1D1D1D;
 }
 
 label {
@@ -210,7 +210,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     padding: 5px;
     bottom: 0;
     width: 100%;
-    background-color: #131313;
+    background-color: #1D1D1D;
     text-transform: none;
 }
 
@@ -224,4 +224,8 @@ input[type="range"]::-webkit-slider-runnable-track {
     padding: 0 2px;
     height: auto;
     line-height: normal;
+}
+
+input[type=range]+.thumb {
+    display: none;
 }

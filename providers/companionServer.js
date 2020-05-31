@@ -13,24 +13,47 @@ const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
+let serverInterfaces = []
+
+fetchNetworkInterfaces()
+
+function infoServer() {
+    return {
+        listen: serverInterfaces,
+        port: port,
+        isProtected:
+            settingsProvider.get('settings-companion-server-protect') || false,
+        connections: totalConnections,
+    }
+}
+
+function fetchNetworkInterfaces() {
+    Object.keys(networkInterfaces).forEach((v, k) => {
+        if (!pattIgnoreInterface.test(v)) {
+            networkInterfaces[v].forEach((vv, kk) => {
+                if (vv.family == 'IPv4' && vv.internal == false) {
+                    let data = {
+                        name: v,
+                        ip: vv.address,
+                    }
+
+                    serverInterfaces.push(data)
+                }
+            })
+        }
+    })
+}
 
 var serverFunction = function(req, res) {
     if (req.url === '/') {
         var collection = ''
 
-        Object.keys(networkInterfaces).forEach((v, k) => {
-            if (!pattIgnoreInterface.test(v)) {
-                networkInterfaces[v].forEach((vv, kk) => {
-                    if (vv.family == 'IPv4' && vv.internal == false) {
-                        var qr = qrcode(0, 'M')
-                        qr.addData(
-                            `{ "name": "${os.hostname()}", "ip":"${
-                                vv.address
-                            }" }`
-                        )
-                        qr.make()
+        serverInterfaces.forEach(value => {
+            var qr = qrcode(0, 'M')
+            qr.addData(value)
+            qr.make()
 
-                        collection += `
+            collection += `
                           <div class="row" style="margin-top: 10px;">
                               <div class="col s12">
                                   <div class="card transparent z-depth-0">
@@ -42,9 +65,9 @@ var serverFunction = function(req, res) {
                                                   )}" width="180" />
                                               </div>
                                               <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
-                                                  <h3>${v}</h3> 
+                                                  <h3>${value.name}</h3> 
                                                   <h5 style="font-weight: 100 !important;">${
-                                                      vv.address
+                                                      value.ip
                                                   }</h5> 
                                               </div>
                                           </div>
@@ -53,9 +76,6 @@ var serverFunction = function(req, res) {
                               </div>
                           </div>
                       `
-                    }
-                })
-            }
         })
 
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
@@ -134,7 +154,11 @@ var serverFunction = function(req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
 
         if (req.method === 'GET') {
-            res.write(JSON.stringify(infoPlayerProvider.getAllInfo()))
+            let data = {
+                player: infoPlayerProvider.getPlayerInfo(),
+                track: infoPlayerProvider.getTrackInfo(),
+            }
+            res.write(JSON.stringify(data))
             res.end()
         }
 
@@ -189,6 +213,16 @@ var serverFunction = function(req, res) {
                     )
                 }
             })
+        }
+    }
+
+    if (req.url === '/server') {
+        res.setHeader('Content-Type', 'text/json; charset=utf-8')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoServer()))
+            res.end()
         }
     }
 }

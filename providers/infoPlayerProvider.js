@@ -16,7 +16,7 @@ var track = {
     cover: '',
     duration: 0,
     durationHuman: '0:00',
-    statePercent: 0,
+    statePercent: 0.0,
     url: '',
     id: '',
     isVideo: false,

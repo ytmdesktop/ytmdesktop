@@ -1,6 +1,5 @@
 const { ipcMain } = require('electron')
 const mpris = require('mpris-service')
-const { isLinux } = require('../utils/systemInfo')
 
 class Mpris {
     constructor() {
@@ -10,19 +9,17 @@ class Mpris {
     }
 
     start() {
-        if (isLinux()) {
-            this.player = new mpris({
-                name: 'youtubemusic',
-                identity: 'Youtube Music',
-                supportedUriSchemes: ['file'],
-                supportedMimeTypes: ['audio/mpeg', 'application/ogg'],
-                supportedInterfaces: ['player'],
-            })
+        this.player = new mpris({
+            name: 'youtubemusic',
+            identity: 'Youtube Music',
+            supportedUriSchemes: ['file'],
+            supportedMimeTypes: ['audio/mpeg', 'application/ogg'],
+            supportedInterfaces: ['player'],
+        })
 
-            this._setInitialEvents()
+        this._setInitialEvents()
 
-            this._isInitialized = true
-        }
+        this._isInitialized = true
     }
 
     setRealPlayer(infoPlayer) {
