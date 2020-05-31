@@ -583,8 +583,18 @@ function createWindow() {
         }
     })
 
-    ipcMain.on('media-command', data => {
-        switch (data.command) {
+    ipcMain.on('media-command', (dataMain, dataRenderer) => {
+        let command, value
+
+        if (dataMain.command !== undefined) {
+            command = dataMain.command
+            value = dataMain.value
+        } else {
+            command = dataRenderer.command
+            value = dataRenderer.value
+        }
+
+        switch (command) {
             case 'media-play-pause':
                 mediaControl.playPauseTrack(view)
                 break
@@ -622,11 +632,11 @@ function createWindow() {
                 break
 
             case 'media-seekbar-set':
-                mediaControl.changeSeekbar(view, data.value)
+                mediaControl.changeSeekbar(view, value)
                 break
 
             case 'media-volume-set':
-                mediaControl.changeVolume(view, data.value)
+                mediaControl.changeVolume(view, value)
                 break
         }
     })

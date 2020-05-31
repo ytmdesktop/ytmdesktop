@@ -1,6 +1,5 @@
 const { ipcRenderer } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
-
 const Vibrant = require('node-vibrant')
 
 const body = document.getElementsByTagName('body')[0]
@@ -30,24 +29,24 @@ btnOnTop.addEventListener('click', () => {
 })
 
 btnDislike.addEventListener('click', () => {
-    ipcRenderer.send('media-down-vote', true)
+    ipcRenderer.send('media-command', { command: 'media-vote-down' })
 })
 
 btnPrevious.addEventListener('click', () => {
-    ipcRenderer.send('media-previous-track', true)
+    ipcRenderer.send('media-command', { command: 'media-track-previous' })
 })
 
 btnPlayPause.addEventListener('click', () => {
-    ipcRenderer.send('media-play-pause', true)
+    ipcRenderer.send('media-command', { command: 'media-play-pause' })
     body.classList.toggle('showinfo')
 })
 
 btnNext.addEventListener('click', () => {
-    ipcRenderer.send('media-next-track', true)
+    ipcRenderer.send('media-command', { command: 'media-track-next' })
 })
 
 btnLike.addEventListener('click', () => {
-    ipcRenderer.send('media-up-vote', true)
+    ipcRenderer.send('media-command', { command: 'media-vote-up' })
 })
 
 init()
