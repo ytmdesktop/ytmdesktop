@@ -5,11 +5,11 @@ const path = require('electron').remote.require('path')
 const __ = require('../../providers/translateProvider')
 const fileSystem = require('../../utils/fileSystem')
 
-const themePath = path.join(
+const customCssDir = path.join(
     fileSystem.getAppDocumentsPath(app),
-    '/custom-theme'
+    '/custom/css'
 )
-const file = path.join(themePath, 'styles.css')
+const filePage = path.join(customCssDir, 'page.css')
 
 const textEditor = document.getElementById('editor')
 const btnSave = document.getElementById('btn-save')
@@ -18,15 +18,15 @@ var editor
 
 __.loadi18n()
 
-if (fileSystem.checkIfExists(themePath)) {
-    textEditor.innerHTML = fileSystem.readFile(file).toString()
+if (fileSystem.checkIfExists(customCssDir)) {
+    textEditor.innerHTML = fileSystem.readFile(filePage).toString()
 }
 
 if (btnSave) {
     btnSave.addEventListener('click', function() {
         var code = editor.getValue()
-        fileSystem.writeFile(file, code)
-        ipcRenderer.send('update-custom-theme')
+        fileSystem.writeFile(filePage, code)
+        ipcRenderer.send('update-custom-css-page')
     })
 }
 

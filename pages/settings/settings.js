@@ -9,7 +9,9 @@ const elementSettingsCompanionApp = document.getElementById(
 )
 const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
-const elementBtnOpenEditor = document.getElementById('btn-editor-custom-theme')
+const elementBtnOpenPageEditor = document.getElementById(
+    'btn-editor-custom-css-page'
+)
 const elementBtnLastFmLogin = document.getElementById('btn-last-fm-login')
 const elementBtnOpenCompanionServer = document.getElementById(
     'btn-open-companion-server'
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ipc.send('switch-clipboard-watcher')
     })
     initElement('titlebar-type', 'change', showRelaunchButton)
-    initElement('settings-custom-theme', 'click')
+    initElement('settings-custom-css-page', 'click')
     initElement('settings-last-fm-scrobbler', 'click', () => {
         var login = settingsProvider.get('last-fm-login')
         if (login.username == '') {
@@ -121,8 +123,8 @@ if (elementRangeZoom) {
     })
 }
 
-if (elementBtnOpenEditor) {
-    elementBtnOpenEditor.addEventListener('click', function() {
+if (elementBtnOpenPageEditor) {
+    elementBtnOpenPageEditor.addEventListener('click', function() {
         ipc.send('show-editor-theme')
     })
 }

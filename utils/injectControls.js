@@ -264,8 +264,6 @@ function createOffTheRoadContent() {
         elementBack.addEventListener('click', function() { ipcRenderer.send('reset-url') } )
         
         body.prepend(elementBack);
-
-
         `
     )
 }

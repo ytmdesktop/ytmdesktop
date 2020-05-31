@@ -34,8 +34,9 @@ const fileSystem = require('./utils/fileSystem')
 const electronLocalshortcut = require('electron-localshortcut')
 
 createDocumentsAppDir()
-createCustomThemeSubDir()
-createCustomThemeFile()
+
+createCustomCSSDir()
+createCustomCSSPageFile()
 
 if (settingsProvider.get('settings-companion-server')) {
     companionServer.start()
@@ -66,7 +67,7 @@ let mainWindowParams = {
 }
 
 let infoPlayerInterval
-let customThemeCSSKey
+let customCSSAppKey, customCSSPageKey
 let lastTrackId
 let doublePressPlayPause
 let isClipboardWatcherRunning = false
@@ -311,7 +312,7 @@ function createWindow() {
                 global.on_the_road = true
 
                 loadAudioOutput()
-                loadCustomTheme()
+                loadCustomCSSPage()
             }
         })
     })
@@ -573,11 +574,19 @@ function createWindow() {
                 }
                 break
 
-            case 'settings-custom-theme':
+            case 'settings-custom-css-app':
                 if (data.value) {
-                    loadCustomTheme()
+                    loadCustomCSSApp()
                 } else {
-                    removeCustomTheme()
+                    removeCustomCSSApp()
+                }
+                break
+
+            case 'settings-custom-css-page':
+                if (data.value) {
+                    loadCustomCSSPage()
+                } else {
+                    removeCustomCSSPage()
                 }
                 break
         }
@@ -889,8 +898,8 @@ function createWindow() {
         )
     })
 
-    ipcMain.on('update-custom-theme', function() {
-        loadCustomTheme()
+    ipcMain.on('update-custom-css-page', function() {
+        loadCustomCSSPage()
     })
 
     ipcMain.on('debug', (event, message) => {
@@ -946,28 +955,52 @@ function createWindow() {
         }
     }
 
-    function loadCustomTheme() {
+    function loadCustomCSSApp() {
         const customThemeFile = path.join(
             fileSystem.getAppDocumentsPath(app),
-            '/custom-theme/styles.css'
+            '/custom/css/app.css'
         )
 
-        if (settingsProvider.get('settings-custom-theme')) {
+        if (settingsProvider.get('settings-custom-css-app')) {
             if (fileSystem.checkIfExists(customThemeFile)) {
-                if (customThemeCSSKey) {
-                    removeCustomTheme()
+                if (customCSSAppKey) {
+                    removeCustomCssApp()
                 }
                 view.webContents
                     .insertCSS(fileSystem.readFile(customThemeFile).toString())
                     .then(key => {
-                        customThemeCSSKey = key
+                        customCSSAppKey = key
                     })
             }
         }
     }
 
-    function removeCustomTheme() {
-        view.webContents.removeInsertedCSS(customThemeCSSKey)
+    function removeCustomCSSApp() {
+        view.webContents.removeInsertedCSS(customCSSAppKey)
+    }
+
+    function loadCustomCSSPage() {
+        const customThemeFile = path.join(
+            fileSystem.getAppDocumentsPath(app),
+            '/custom/css/page.css'
+        )
+
+        if (settingsProvider.get('settings-custom-css-page')) {
+            if (fileSystem.checkIfExists(customThemeFile)) {
+                if (customCSSPageKey) {
+                    removeCustomCSSPage()
+                }
+                view.webContents
+                    .insertCSS(fileSystem.readFile(customThemeFile).toString())
+                    .then(key => {
+                        customCSSPageKey = key
+                    })
+            }
+        }
+    }
+
+    function removeCustomCSSPage() {
+        view.webContents.removeInsertedCSS(customCSSPageKey)
     }
 
     function switchClipboardWatcher() {
@@ -1008,6 +1041,9 @@ function createWindow() {
     setTimeout(function() {
         ipcMain.emit('switch-clipboard-watcher')
     }, 1000)
+
+    loadCustomAppScript()
+    loadCustomPageScript()
 }
 
 // This method will be called when Electron has finished
@@ -1216,10 +1252,10 @@ function createDocumentsAppDir() {
     }
 }
 
-function createCustomThemeSubDir() {
+function createCustomCSSDir() {
     const dirCustomTheme = path.join(
         fileSystem.getAppDocumentsPath(app),
-        '/custom-theme'
+        '/custom/css'
     )
 
     if (!fileSystem.checkIfExists(dirCustomTheme)) {
@@ -1227,17 +1263,47 @@ function createCustomThemeSubDir() {
     }
 }
 
-function createCustomThemeFile() {
+function createCustomCSSPageFile() {
     const customThemeFile = path.join(
         fileSystem.getAppDocumentsPath(app),
-        '/custom-theme/styles.css'
+        '/custom/css/page.css'
     )
 
     if (!fileSystem.checkIfExists(customThemeFile)) {
         fileSystem.writeFile(
             customThemeFile,
-            `/** \n * Custom Theme \n*/\n\nhtml, body { background: red !important; }`
+            `/** \n * Custom css for page \n*/\n\nhtml, body { background: #1D1D1D !important; }`
         )
+    }
+}
+
+function loadCustomAppScript() {
+    const customAppScriptFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        'custom/js/app.js'
+    )
+
+    if (fileSystem.checkIfExists(customAppScriptFile)) {
+        try {
+            require(customAppScriptFile)
+        } catch {}
+    }
+}
+
+function loadCustomPageScript() {
+    const customPageScriptFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        'custom/js/page.js'
+    )
+
+    if (fileSystem.checkIfExists(customPageScriptFile)) {
+        try {
+            view.webContents.executeJavaScript(
+                fileSystem.readFile(customPageScriptFile).toString()
+            )
+        } catch {
+            console.log('Failed to execute page.js')
+        }
     }
 }
 
