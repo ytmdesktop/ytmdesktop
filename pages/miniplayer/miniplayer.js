@@ -49,17 +49,27 @@ btnLike.addEventListener('click', () => {
     ipcRenderer.send('media-command', { command: 'media-vote-up' })
 })
 
-init()
+ipcRenderer.on('song-playing-now-is', (e, data) => {
+    setPlayerInfo(data)
+})
 
-function init() {
+document.addEventListener('DOMContentLoaded', () => {
+    ipcRenderer.send('retrieve-player-info')
+
     setInterval(() => {
         ipcRenderer.send('retrieve-player-info')
     }, 500)
+})
 
-    ipcRenderer.on('song-playing-now-is', (e, data) => {
-        setPlayerInfo(data)
-    })
-}
+document.addEventListener('dblclick', ev => {
+    if (ev.clientX >= 100) {
+        ipcRenderer.send('media-seekbar-forward', true)
+        showDbClickAnimation('right')
+    } else {
+        ipcRenderer.send('media-seekbar-rewind', true)
+        showDbClickAnimation('left')
+    }
+})
 
 function setPlayerInfo(data) {
     document.title = `${data.track.title} - ${data.track.author}`
@@ -117,13 +127,3 @@ function showDbClickAnimation(side) {
         secondsEffect.classList.remove(side)
     }, 200)
 }
-
-document.addEventListener('dblclick', ev => {
-    if (ev.clientX >= 100) {
-        ipcRenderer.send('media-forward-X-seconds', true)
-        showDbClickAnimation('right')
-    } else {
-        ipcRenderer.send('media-rewind-X-seconds', true)
-        showDbClickAnimation('left')
-    }
-})
