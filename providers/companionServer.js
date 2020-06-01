@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron')
+const { ipcMain, app } = require('electron')
 const http = require('http')
 const os = require('os')
 const networkInterfaces = os.networkInterfaces()
@@ -17,6 +17,11 @@ let serverInterfaces = []
 
 fetchNetworkInterfaces()
 
+function infoApp() {
+    return {
+        version: app.getVersion(),
+    }
+}
 function infoServer() {
     return {
         listen: serverInterfaces,
@@ -216,12 +221,16 @@ var serverFunction = function(req, res) {
         }
     }
 
-    if (req.url === '/server') {
+    if (req.url === '/info') {
         res.setHeader('Content-Type', 'text/json; charset=utf-8')
         res.setHeader('Access-Control-Allow-Origin', '*')
 
         if (req.method === 'GET') {
-            res.write(JSON.stringify(infoServer()))
+            var result = {
+                app: infoApp(),
+                server: infoServer(),
+            }
+            res.write(JSON.stringify(result))
             res.end()
         }
     }
