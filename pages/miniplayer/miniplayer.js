@@ -63,10 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('dblclick', ev => {
     if (ev.clientX >= 100) {
-        ipcRenderer.send('media-seekbar-forward', true)
+        ipcRenderer.send('media-command', { command: 'media-seekbar-forward' })
         showDbClickAnimation('right')
     } else {
-        ipcRenderer.send('media-seekbar-rewind', true)
+        ipcRenderer.send('media-command', { command: 'media-seekbar-rewind' })
         showDbClickAnimation('left')
     }
 })
