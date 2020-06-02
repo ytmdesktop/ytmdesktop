@@ -241,9 +241,9 @@ function playerBarScrollToChangeVolume() {
             ev.preventDefault();
             
             if ( ev.deltaY < 0) {
-                ipcRenderer.send('media-volume-up');
+                ipcRenderer.send('media-command', { command: 'media-volume-up' });
             } else {
-                ipcRenderer.send('media-volume-down');
+                ipcRenderer.send('media-command', { command: 'media-volume-down' });
             }
         });
     `)

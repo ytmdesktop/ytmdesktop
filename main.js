@@ -384,9 +384,19 @@ function createWindow() {
 
         if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
             if (playerInfo.isPaused) {
-                tray.updateTrayIcon(assetsProvider.getIcon('favicon_pause'))
+                tray.updateTrayIcon(
+                    path.join(
+                        app.getAppPath(),
+                        assetsProvider.getIcon('favicon_pause')
+                    )
+                )
             } else {
-                tray.updateTrayIcon(assetsProvider.getIcon('favicon_play'))
+                tray.updateTrayIcon(
+                    path.join(
+                        app.getAppPath(),
+                        assetsProvider.getIcon('favicon_play')
+                    )
+                )
             }
         }
     }
