@@ -22,15 +22,21 @@ content.addListener('dom-ready', function() {
 })
 
 function createContextMenu() {
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var materialIcons = document.createElement('link');
         materialIcons.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons');
         materialIcons.setAttribute('rel', 'stylesheet');
 
         document.body.prepend(materialIcons);
-    `)
+    `
+        )
+        .catch(_ => ipcRenderer.send('debug', 'error on createContextMenu'))
 
-    content.insertCSS(`
+    content
+        .insertCSS(
+            `
         #ytmd-menu {
             visibility: hidden;
             opacity: 0;
@@ -97,19 +103,31 @@ function createContextMenu() {
         .text-red {
             color: red !important;
         }
-    `)
+    `
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on createContextMenu insertCSS')
+        )
 
     var menu = `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> <a id="ytmd-menu-bug-report"><i class="material-icons text-red">bug_report</i></a>`
 
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var menuDiv = document.createElement("div");
         menuDiv.setAttribute('id', 'ytmd-menu');
         menuDiv.innerHTML = '${menu}';
         document.body.prepend(menuDiv);
-    `)
+    `
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on createContextMenu prepend')
+        )
 
     // LISTENERS FOR MENU OPTIONS
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var menuElement = document.getElementById("ytmd-menu").style;
 
         var buttonOpenCompanion = document.getElementById('ytmd-menu-companion-server');
@@ -132,19 +150,19 @@ function createContextMenu() {
         }, false);
         
         if (buttonOpenCompanion) {
-            buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('show-companion'); } );
+            buttonOpenCompanion.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-companion'}); } );
         }
 
         if (buttonOpenLyrics) {
-            buttonOpenLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics'); } );
+            buttonOpenLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } );
         }
 
         if (buttonOpenMiniplayer) {
-            buttonOpenMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer'); } );
+            buttonOpenMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } );
         }
 
         if (buttonPageOpenMiniplayer) {
-            buttonPageOpenMiniplayer.addEventListener('click', function(e) { /* Temporary fix */ document.getElementsByClassName('player-maximize-button ytmusic-player')[0].click(); ipcRenderer.send('show-miniplayer'); } );
+            buttonPageOpenMiniplayer.addEventListener('click', function(e) { /* Temporary fix */ document.getElementsByClassName('player-maximize-button ytmusic-player')[0].click(); ipcRenderer.send('window', { command: 'show-miniplayer' }); } );
         }
         
         if (buttonOpenBugReport) {
@@ -156,11 +174,17 @@ function createContextMenu() {
             menuElement.left = x + "px";
             menuElement.visibility = "visible";
             menuElement.opacity = "1";
-        }`)
+        }`
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on createContextMenu listeners')
+        )
 }
 
 function createMiddleContent() {
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var center_content = document.getElementsByTagName('ytmusic-pivot-bar-renderer')[0];
 
         // HISTORY BACK
@@ -173,12 +197,16 @@ function createMiddleContent() {
         element.addEventListener('click', function() { history.go(-1); } )
         
         center_content.prepend(element);
-    `)
+    `
+        )
+        .catch(_ => ipcRenderer.send('debug', 'error on createMiddleContent'))
 }
 
 function createRightContent() {
     // ADD BUTTONS TO RIGHT CONTENT (side to the photo)
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var right_content = document.getElementById('right-content');
 
         // SETTINGS
@@ -188,7 +216,7 @@ function createRightContent() {
         elementSettings.style.color = '#909090';
         elementSettings.innerText = 'settings';
 
-        elementSettings.addEventListener('click', function() { ipcRenderer.send('show-settings', true); } )
+        elementSettings.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-settings' }); } )
         
         right_content.prepend(elementSettings);
 
@@ -205,11 +233,15 @@ function createRightContent() {
 
         ipcRenderer.on('downloaded-new-update', function(e, data) {
             document.getElementById("ytmd_update").classList.remove("hide");
-        } );`)
+        } );`
+        )
+        .catch(_ => ipcRenderer.send('debug', 'error on createRightContent'))
 }
 
 function createPlayerBarContent() {
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var playerBarRightControls = document.getElementsByClassName('right-controls-buttons style-scope ytmusic-player-bar')[0];
 
         // LYRICS
@@ -218,7 +250,7 @@ function createPlayerBarContent() {
         elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
         elementLyrics.innerText = 'music_note';
 
-        elementLyrics.addEventListener('click', function() { ipcRenderer.send('show-lyrics', true); } )
+        elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
         
         playerBarRightControls.append(elementLyrics);
 
@@ -228,13 +260,19 @@ function createPlayerBarContent() {
         elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
         elementMiniplayer.innerText = 'picture_in_picture_alt';
 
-        elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('show-miniplayer', true); } )
+        elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
         playerBarRightControls.append(elementMiniplayer);
-    `)
+    `
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on createPlayerBarContent')
+        )
 }
 
 function playerBarScrollToChangeVolume() {
-    content.executeJavaScript(`
+    content
+        .executeJavaScript(
+            `
         var playerBar = document.getElementsByTagName('ytmusic-player-bar')[0];
 
         playerBar.addEventListener('wheel', function(ev) {
@@ -246,12 +284,17 @@ function playerBarScrollToChangeVolume() {
                 ipcRenderer.send('media-command', { command: 'media-volume-down' });
             }
         });
-    `)
+    `
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on playerBarScrollToChangeVolume')
+        )
 }
 
 function createOffTheRoadContent() {
-    content.executeJavaScript(
-        `
+    content
+        .executeJavaScript(
+            `
         var body = document.getElementsByTagName('body')[0];
 
         var elementBack = document.createElement('i');
@@ -265,5 +308,8 @@ function createOffTheRoadContent() {
         
         body.prepend(elementBack);
         `
-    )
+        )
+        .catch(_ =>
+            ipcRenderer.send('debug', 'error on createOffTheRoadContent')
+        )
 }

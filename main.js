@@ -311,19 +311,22 @@ function createWindow() {
         }
     })
 
-    view.webContents.on('did-start-navigation', function(_) {
-        view.webContents.executeJavaScript('window.location').then(location => {
-            if (location.hostname != 'music.youtube.com') {
-                mainWindow.send('off-the-road')
-                global.on_the_road = false
-            } else {
-                mainWindow.send('on-the-road')
-                global.on_the_road = true
+    view.webContents.on('did-start-navigation', _ => {
+        view.webContents
+            .executeJavaScript('window.location')
+            .then(location => {
+                if (location.hostname != 'music.youtube.com') {
+                    mainWindow.send('off-the-road')
+                    global.on_the_road = false
+                } else {
+                    mainWindow.send('on-the-road')
+                    global.on_the_road = true
 
-                loadAudioOutput()
-                loadCustomCSSPage()
-            }
-        })
+                    loadAudioOutput()
+                    loadCustomCSSPage()
+                }
+            })
+            .catch(_ => console.log(`error did-start-navigation ${_}`))
     })
 
     function updateActivity() {
@@ -478,11 +481,11 @@ function createWindow() {
 
     // LOCAL
     electronLocalshortcut.register(view, 'CmdOrCtrl+S', () => {
-        ipcMain.emit('show-settings')
+        ipcMain.emit('window', { command: 'show-settings' })
     })
 
     electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
-        ipcMain.emit('show-miniplayer')
+        ipcMain.emit('window', { command: 'show-miniplayer' })
     })
 
     // GLOBAL
@@ -545,10 +548,6 @@ function createWindow() {
         mainWindow.show()
     })
 
-    ipcMain.on('settings-changed-zoom', function(e, value) {
-        view.webContents.zoomFactor = value / 100
-    })
-
     ipcMain.on('retrieve-player-info', function(e, _) {
         // IPCRenderer
         if (e !== undefined) {
@@ -563,14 +562,6 @@ function createWindow() {
             ipcMain.emit('song-playing-now-is', infoPlayerProvider.getAllInfo())
         }
     })
-
-    /*ipcMain.on("will-close-mainwindow", function() {
-    if (settingsProvider.get("settings-keep-background")) {
-      mainWindow.hide();
-    } else {
-      app.exit();
-    }
-  });*/
 
     ipcMain.on('settings-value-changed', (e, data) => {
         switch (data.key) {
@@ -612,6 +603,10 @@ function createWindow() {
                 } else {
                     removeCustomCSSPage()
                 }
+                break
+
+            case 'settings-changed-zoom':
+                view.webContents.zoomFactor = data.value / 100
                 break
         }
     })
@@ -692,36 +687,49 @@ function createWindow() {
         updater.quitAndInstall()
     })
 
-    ipcMain.on('show-guest-mode', function() {
-        const incognitoWindow = new BrowserWindow({
-            icon: assetsProvider.getIcon('favicon'),
-            width: mainWindowParams.width,
-            height: mainWindowParams.height,
-            minWidth: 300,
-            minHeight: 300,
-            show: true,
-            autoHideMenuBar: true,
-            backgroundColor: '#232323',
-            center: true,
-            closable: true,
-            skipTaskbar: false,
-            resize: true,
-            maximizable: true,
-            frame: true,
-            webPreferences: {
-                nodeIntegration: true,
-                partition: `guest-mode-${Date.now()}`,
-            },
-        })
+    ipcMain.on('window', (dataMain, dataRenderer) => {
+        let command, value
 
-        incognitoWindow.webContents.session.setUserAgent(
-            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
-        )
+        if (dataMain.command !== undefined) {
+            command = dataMain.command
+            value = dataMain.value
+        } else {
+            command = dataRenderer.command
+            value = dataRenderer.value
+        }
 
-        incognitoWindow.webContents.loadURL(mainWindowParams.url)
+        switch (command) {
+            case 'show-settings':
+                windowSettings()
+                break
+
+            case 'show-miniplayer':
+                windowMiniplayer()
+                break
+
+            case 'show-last-fm-login':
+                windowLastFmLogin()
+                break
+
+            case 'show-editor-theme':
+                windowThemeEditor()
+                break
+
+            case 'show-lyrics':
+                windowLyrics()
+                break
+
+            case 'show-companion':
+                windowCompanion()
+                break
+
+            case 'show-guest-mode':
+                windowGuest()
+                break
+        }
     })
 
-    ipcMain.on('show-settings', function() {
+    function windowSettings() {
         if (settings) {
             settings.show()
         } else {
@@ -762,9 +770,9 @@ function createWindow() {
         settings.on('closed', function() {
             settings = null
         })
-    })
+    }
 
-    ipcMain.on('show-miniplayer', function() {
+    function windowMiniplayer() {
         miniplayer = new BrowserWindow({
             title: __.trans('LABEL_MINIPLAYER'),
             icon: assetsProvider.getIcon('favicon'),
@@ -843,9 +851,9 @@ function createWindow() {
             miniplayer.hide()
             mainWindow.show()
         })
-    })
+    }
 
-    ipcMain.on('show-last-fm-login', function() {
+    function windowLastFmLogin() {
         const lastfm = new BrowserWindow({
             //parent: mainWindow,
             icon: assetsProvider.getIcon('favicon'),
@@ -877,24 +885,9 @@ function createWindow() {
                     'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
             }
         )
-    })
+    }
 
-    ipcMain.on('switch-clipboard-watcher', () => {
-        switchClipboardWatcher()
-    })
-
-    ipcMain.on('miniplayer-toggle-ontop', function() {
-        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
-    })
-
-    ipcMain.on('reset-url', () => {
-        mainWindowParams.url = defaultUrl
-
-        const options = { extraHeaders: 'pragma: no-cache\n' }
-        view.webContents.loadURL(mainWindowParams.url, options)
-    })
-
-    ipcMain.on('show-editor-theme', function() {
+    function windowThemeEditor() {
         const editor = new BrowserWindow({
             icon: assetsProvider.getIcon('favicon'),
             frame: windowConfig.frame,
@@ -922,6 +915,131 @@ function createWindow() {
                     'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
+    }
+
+    function windowLyrics() {
+        if (lyrics) {
+            lyrics.show()
+        } else {
+            lyrics = new BrowserWindow({
+                frame: windowConfig.frame,
+                titleBarStyle: windowConfig.titleBarStyle,
+                center: true,
+                resizable: true,
+                backgroundColor: '#232323',
+                width: 700,
+                height: 800,
+                icon: assetsProvider.getIcon('favicon'),
+                webPreferences: {
+                    nodeIntegration: true,
+                    webviewTag: true,
+                },
+            })
+
+            let lyricsPosition = settingsProvider.get('lyrics-position')
+            if (lyricsPosition != undefined) {
+                lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
+            }
+
+            lyrics.loadFile(
+                path.join(
+                    __dirname,
+                    './pages/shared/window-buttons/window-buttons.html'
+                ),
+                {
+                    search:
+                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
+                }
+            )
+
+            let storeLyricsPositionTimer
+            lyrics.on('move', function(e) {
+                let position = lyrics.getPosition()
+                if (storeLyricsPositionTimer) {
+                    clearTimeout(storeLyricsPositionTimer)
+                }
+                storeLyricsPositionTimer = setTimeout(() => {
+                    settingsProvider.set('lyrics-position', {
+                        x: position[0],
+                        y: position[1],
+                    })
+                }, 500)
+            })
+
+            lyrics.on('closed', function() {
+                lyrics = null
+            })
+
+            // lyrics.webContents.openDevTools();
+        }
+    }
+
+    function windowCompanion() {
+        const x = mainWindow.getPosition()[0]
+        const y = mainWindow.getPosition()[1]
+        const width = 800
+        const settings = new BrowserWindow({
+            // parent: mainWindow,
+            skipTaskbar: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            x: x + width / 2,
+            y,
+            resizable: false,
+            backgroundColor: '#232323',
+            width: 800,
+            title: 'companionWindowTitle',
+            webPreferences: {
+                nodeIntegration: false,
+            },
+            icon: assetsProvider.getIcon('favicon'),
+            autoHideMenuBar: true,
+        })
+        settings.loadURL('companionUrl')
+    }
+
+    function windowGuest() {
+        const incognitoWindow = new BrowserWindow({
+            icon: assetsProvider.getIcon('favicon'),
+            width: mainWindowParams.width,
+            height: mainWindowParams.height,
+            minWidth: 300,
+            minHeight: 300,
+            show: true,
+            autoHideMenuBar: true,
+            backgroundColor: '#232323',
+            center: true,
+            closable: true,
+            skipTaskbar: false,
+            resize: true,
+            maximizable: true,
+            frame: true,
+            webPreferences: {
+                nodeIntegration: true,
+                partition: `guest-mode-${Date.now()}`,
+            },
+        })
+
+        incognitoWindow.webContents.session.setUserAgent(
+            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+        )
+
+        incognitoWindow.webContents.loadURL(mainWindowParams.url)
+    }
+
+    ipcMain.on('switch-clipboard-watcher', () => {
+        switchClipboardWatcher()
+    })
+
+    ipcMain.on('miniplayer-toggle-ontop', function() {
+        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
+    })
+
+    ipcMain.on('reset-url', () => {
+        mainWindowParams.url = defaultUrl
+
+        const options = { extraHeaders: 'pragma: no-cache\n' }
+        view.webContents.loadURL(mainWindowParams.url, options)
     })
 
     ipcMain.on('update-custom-css-page', function() {
@@ -1119,14 +1237,10 @@ if (!gotTheLock) {
 
             setInterval(function() {
                 updater.checkUpdate(mainWindow, view)
-            }, 1 * 60 * 60 * 1000)
+            }, 6 * 60 * 60 * 1000)
         }
         ipcMain.emit('ready', app)
     })
-
-    /*app.on('ready', function(ev) {
-        
-    })*/
 
     app.on('browser-window-created', function(e, window) {
         window.removeMenu()
@@ -1162,87 +1276,6 @@ if (!gotTheLock) {
         tray.quit()
     })
 }
-
-ipcMain.on('show-lyrics', function() {
-    if (lyrics) {
-        lyrics.show()
-    } else {
-        lyrics = new BrowserWindow({
-            frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
-            center: true,
-            resizable: true,
-            backgroundColor: '#232323',
-            width: 700,
-            height: 800,
-            icon: assetsProvider.getIcon('favicon'),
-            webPreferences: {
-                nodeIntegration: true,
-                webviewTag: true,
-            },
-        })
-
-        let lyricsPosition = settingsProvider.get('lyrics-position')
-        if (lyricsPosition != undefined) {
-            lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
-        }
-
-        lyrics.loadFile(
-            path.join(
-                __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
-            }
-        )
-
-        let storeLyricsPositionTimer
-        lyrics.on('move', function(e) {
-            let position = lyrics.getPosition()
-            if (storeLyricsPositionTimer) {
-                clearTimeout(storeLyricsPositionTimer)
-            }
-            storeLyricsPositionTimer = setTimeout(() => {
-                settingsProvider.set('lyrics-position', {
-                    x: position[0],
-                    y: position[1],
-                })
-            }, 500)
-        })
-
-        lyrics.on('closed', function() {
-            lyrics = null
-        })
-
-        // lyrics.webContents.openDevTools();
-    }
-})
-
-ipcMain.on('show-companion', function() {
-    const x = mainWindow.getPosition()[0]
-    const y = mainWindow.getPosition()[1]
-    const width = 800
-    const settings = new BrowserWindow({
-        // parent: mainWindow,
-        skipTaskbar: false,
-        frame: windowConfig.frame,
-        titleBarStyle: windowConfig.titleBarStyle,
-        x: x + width / 2,
-        y,
-        resizable: false,
-        backgroundColor: '#232323',
-        width: 800,
-        title: 'companionWindowTitle',
-        webPreferences: {
-            nodeIntegration: false,
-        },
-        icon: assetsProvider.getIcon('favicon'),
-        autoHideMenuBar: true,
-    })
-    settings.loadURL('companionUrl')
-})
 
 function logDebug(data) {
     if (false) {

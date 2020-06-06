@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initElement('settings-last-fm-scrobbler', 'click', () => {
         var login = settingsProvider.get('last-fm-login')
         if (login.username == '') {
-            ipc.send('show-last-fm-login')
+            ipc.send('window', { command: 'show-last-fm-login' })
         }
     })
     initElement('settings-rainmeter-web-now-playing', 'click')
@@ -119,19 +119,22 @@ if (elementRangeZoom) {
     elementRangeZoom.addEventListener('input', function() {
         document.getElementById('range-zoom-value').innerText = this.value
         settingsProvider.set('settings-page-zoom', this.value)
-        ipc.send('settings-changed-zoom', this.value)
+        ipc.send('settings-value-changed', {
+            key: 'settings-changed-zoom',
+            value: this.value,
+        })
     })
 }
 
 if (elementBtnOpenPageEditor) {
     elementBtnOpenPageEditor.addEventListener('click', function() {
-        ipc.send('show-editor-theme')
+        ipc.send('window', { command: 'show-editor-theme' })
     })
 }
 
 if (elementBtnLastFmLogin) {
     elementBtnLastFmLogin.addEventListener('click', function() {
-        ipc.send('show-last-fm-login')
+        ipc.send('window', { command: 'show-last-fm-login' })
     })
 }
 

@@ -6,7 +6,7 @@ const elementLyric = document.getElementById('lyric')
 
 let lastId, target, toggled
 
-loadi18n()
+loadingLyrics()
 
 document.getElementById('content').addEventListener('dblclick', function(e) {
     this.scrollTo(0, target)
@@ -46,6 +46,7 @@ function getLyric(artist, song, id) {
         if (lastId !== id) {
             lastId = id
             toggled = true
+            loadingLyrics()
 
             retrieveOVHData(artist, song)
                 .then(success => {
@@ -72,10 +73,8 @@ function getLyric(artist, song, id) {
     }
 }
 
-function loadi18n() {
-    document.getElementById('i18n_LABEL_LOADING').innerText = __.trans(
-        'LABEL_LOADING'
-    )
+function loadingLyrics() {
+    elementLyric.innerText = __.trans('LABEL_LOADING')
 }
 
 function removeAccents(strAccents) {
