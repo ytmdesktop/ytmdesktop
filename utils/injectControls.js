@@ -7,9 +7,9 @@ content.addListener('dom-ready', function() {
     createContextMenu()
 
     content
-        .executeJavaScript('window.location')
-        .then(location => {
-            if (location.hostname == 'music.youtube.com') {
+        .executeJavaScript('window.location.hostname')
+        .then(hostname => {
+            if (hostname == 'music.youtube.com') {
                 createMiddleContent()
                 createRightContent()
                 playerBarScrollToChangeVolume()

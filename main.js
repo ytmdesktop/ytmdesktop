@@ -45,7 +45,9 @@ let mainWindow,
     lastTrackId,
     doublePressPlayPause
 
-let isFirstTime = (isClipboardWatcherRunning = false)
+let isFirstTime = false
+
+let isClipboardWatcherRunning = false
 
 let renderer_for_status_bar = (clipboardWatcher = null)
 
@@ -313,9 +315,9 @@ function createWindow() {
 
     view.webContents.on('did-start-navigation', _ => {
         view.webContents
-            .executeJavaScript('window.location')
-            .then(location => {
-                if (location.hostname != 'music.youtube.com') {
+            .executeJavaScript('window.location.hostname')
+            .then(hostname => {
+                if (hostname != 'music.youtube.com') {
                     mainWindow.send('off-the-road')
                     global.on_the_road = false
                 } else {
@@ -673,7 +675,6 @@ function createWindow() {
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
         event.sender.send('is-dev', isDev)
-        event.sender.send('register-renderer', app)
     })
 
     ipcMain.on('update-tray', () => {
