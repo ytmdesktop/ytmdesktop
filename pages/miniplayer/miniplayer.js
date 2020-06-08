@@ -20,7 +20,7 @@ const btnNext = document.getElementById('btn-next')
 const btnLike = document.getElementById('btn-like')
 
 btnClose.addEventListener('click', () => {
-    ipcRenderer.send('restore-main-window')
+    ipcRenderer.send('window', { command: 'restore-main-window' })
     window.close()
 })
 

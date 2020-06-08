@@ -716,6 +716,10 @@ function createWindow() {
             case 'show-guest-mode':
                 windowGuest()
                 break
+
+            case 'restore-main-window':
+                mainWindow.show()
+                break
         }
     })
 

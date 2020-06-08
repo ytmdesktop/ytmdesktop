@@ -248,7 +248,7 @@ function start() {
         if (totalConnections) {
             io.emit('query', infoPlayerProvider.getAllInfo())
         }
-    }, 800)
+    }, 600)
 
     io.on('connection', socket => {
         socket.on('media-commands', (cmd, value) => {
