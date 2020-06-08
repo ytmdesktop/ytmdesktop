@@ -27,11 +27,11 @@ document.getElementById('content').addEventListener('scroll', function(e) {
     }
 })
 
-setInterval(function() {
-    ipcRenderer.send('retrieve-player-info')
-}, 3 * 1000)
+setInterval(async () => {
+    setData(await retrieveAllInfo())
+}, 1 * 1000)
 
-ipcRenderer.on('song-playing-now-is', function(e, data) {
+async function setData(data) {
     var scrollHeight = document.getElementById('content').scrollHeight
     target = (scrollHeight * data.track.statePercent) / 1.4
     if (toggled) {
@@ -39,7 +39,16 @@ ipcRenderer.on('song-playing-now-is', function(e, data) {
     }
 
     getLyric(data.track.author, data.track.title, data.track.id)
-})
+}
+
+async function retrieveAllInfo() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer
+            .invoke('invoke-all-info')
+            .then(result => resolve(result))
+            .catch(_ => reject(false))
+    })
+}
 
 function getLyric(artist, song, id) {
     if (artist != undefined && song != undefined) {

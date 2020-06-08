@@ -49,17 +49,22 @@ btnLike.addEventListener('click', () => {
     ipcRenderer.send('media-command', { command: 'media-vote-up' })
 })
 
-ipcRenderer.on('song-playing-now-is', (e, data) => {
-    setPlayerInfo(data)
-})
+document.addEventListener('DOMContentLoaded', async () => {
+    setPlayerInfo(await retrieveAllInfo())
 
-document.addEventListener('DOMContentLoaded', () => {
-    ipcRenderer.send('retrieve-player-info')
-
-    setInterval(() => {
-        ipcRenderer.send('retrieve-player-info')
+    setInterval(async () => {
+        setPlayerInfo(await retrieveAllInfo())
     }, 500)
 })
+
+async function retrieveAllInfo() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer
+            .invoke('invoke-all-info')
+            .then(result => resolve(result))
+            .catch(_ => reject(false))
+    })
+}
 
 document.addEventListener('dblclick', ev => {
     if (ev.clientX >= 100) {

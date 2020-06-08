@@ -550,19 +550,8 @@ function createWindow() {
         mainWindow.show()
     })
 
-    ipcMain.on('retrieve-player-info', function(e, _) {
-        // IPCRenderer
-        if (e !== undefined) {
-            e.sender.send(
-                'song-playing-now-is',
-                infoPlayerProvider.getAllInfo()
-            )
-        }
-
-        // IPCMain
-        if (infoPlayerProvider.hasInitialized()) {
-            ipcMain.emit('song-playing-now-is', infoPlayerProvider.getAllInfo())
-        }
+    ipcMain.handle('invoke-all-info', async (event, args) => {
+        return infoPlayerProvider.getAllInfo()
     })
 
     ipcMain.on('settings-value-changed', (e, data) => {
@@ -849,7 +838,7 @@ function createWindow() {
         mainWindow.hide()
 
         globalShortcut.register('CmdOrCtrl+M', function() {
-            miniplayer.hide()
+            miniplayer.close()
             mainWindow.show()
         })
     }
