@@ -219,7 +219,7 @@ const popUpMenu = (
 ) => {
     return [
         {
-            label: 'YouTube Musci Desktop',
+            label: 'YouTube Music Desktop',
             type: 'normal',
             click: function() {
                 doBehavior(saved_mainWindow)
