@@ -391,9 +391,9 @@ function createWindow() {
 
         if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
             if (playerInfo.isPaused) {
-                tray.updateTrayIcon(path.join(app.getAppPath(), iconPause))
+                tray.updateTrayIcon(iconPause)
             } else {
-                tray.updateTrayIcon(path.join(app.getAppPath(), iconPlay))
+                tray.updateTrayIcon(iconPlay)
             }
         }
     }
