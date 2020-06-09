@@ -13,6 +13,10 @@ files:
   - '!package-lock.json'
   - '!.cache'
 
+protocols:
+  name: YouTube Music Desktop
+  schemes: [ytmd]
+
 electronDownload:
   arch: x64
   cache: '.cache/electron-builder/'

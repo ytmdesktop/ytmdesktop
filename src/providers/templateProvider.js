@@ -93,7 +93,7 @@ let statusBarMenu = [
         label: 'History',
         submenu: [
             {
-                label: 'Home(YTMusic)',
+                label: 'Home(YouTube Music)',
                 accelerator: 'CmdOrCtrl+H',
                 click(item, focusedWindow) {
                     if (focusedWindow)
@@ -176,7 +176,7 @@ let statusBarMenu = [
     },
 ]
 statusBarMenu.unshift({
-    label: 'YTMDesktop',
+    label: 'YouTube Music Desktop',
     submenu: [
         {
             role: 'about',
@@ -219,7 +219,7 @@ const popUpMenu = (
 ) => {
     return [
         {
-            label: 'YTMD App',
+            label: 'YouTube Musci Desktop',
             type: 'normal',
             click: function() {
                 doBehavior(saved_mainWindow)
