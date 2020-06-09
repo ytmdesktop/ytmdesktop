@@ -8,11 +8,11 @@ const systemInfo = require('../utils/systemInfo')
  * @param {*} asset
  */
 function getLocal(asset) {
-    return path.join('assets', `${asset}`)
+    return path.join(app.getAppPath(), 'src/assets', `${asset}`)
 }
 
 function getIcon(assetPath) {
-    let localAsset = path.join('assets', `${assetPath}`)
+    let localAsset = path.join(app.getAppPath(), 'src/assets', `${assetPath}`)
 
     if (systemInfo.isWindows()) {
         return `${localAsset}.ico`

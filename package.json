@@ -7,10 +7,10 @@
         "start": "npx electron .",
         "pack": "npx electron-builder --dir",
         "pack:x64": "npm run pack -- --x64 --config electron-builder64.yml",
-        "dist": "npx electron-builder",
+        "dist": "npx electron-builder --dir",
         "dist:x64": "npm run dist -- --x64 --config electron-builder64.yml",
-        "publish:win": "build --win -p always --config electron-builder64.yml",
-        "publish:mac": "build --mac -p always --config electron-builder64.yml",
+        "publish:win": "electron-builder --win -p always --config electron-builder64.yml",
+        "publish:mac": "electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "electron-builder --linux -p always --config electron-builder64.yml"
     },
     "repository": "https://github.com/ytmdesktop/ytmdesktop",
@@ -34,7 +34,6 @@
     },
     "dependencies": {
         "ace-builds": "^1.4.8",
-        "bufferutil": "^4.0.1",
         "discord-rpc": "^3.1.0",
         "electron-canvas-to-buffer": "^2.0.0",
         "electron-clipboard-watcher": "^1.0.1",
@@ -47,7 +46,6 @@
         "i18n": "^0.8.5",
         "image-to-base64": "^2.1.0",
         "js-base64": "^2.5.1",
-        "materialize-css": "^1.0.0",
         "node-vibrant": "^3.1.5",
         "npx": "^10.2.2",
         "prettier": "^1.19.1",
@@ -56,11 +54,12 @@
         "request": "^2.88.0",
         "scribble": "0.0.5",
         "socket.io": "^2.3.0",
-        "utf-8-validate": "^5.0.2",
         "ws": "^7.2.1"
     },
     "optionalDependencies": {
         "@nodert-win10/windows.media.playback": "^0.2.96",
-        "mpris-service": "^2.1.0"
+        "bufferutil": "^4.0.1",
+        "mpris-service": "^2.1.0",
+        "utf-8-validate": "^5.0.2"
     }
 }

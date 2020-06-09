@@ -1,4 +1,4 @@
-require('./utils/defaultSettings')
+require('./src/utils/defaultSettings')
 
 const {
     app,
@@ -13,25 +13,25 @@ const {
     shell,
 } = require('electron')
 const path = require('path')
-const __ = require('./providers/translateProvider')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
 const electronLocalshortcut = require('electron-localshortcut')
 
-const assetsProvider = require('./providers/assetsProvider')
-const scrobblerProvider = require('./providers/scrobblerProvider')
-const { statusBarMenu } = require('./providers/templateProvider')
-const settingsProvider = require('./providers/settingsProvider')
-const infoPlayerProvider = require('./providers/infoPlayerProvider')
-const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
-const companionServer = require('./providers/companionServer')
-const discordRPC = require('./providers/discordRpcProvider')
-const mprisProvider = require('./providers/mprisProvider')
+const __ = require('./src/providers/translateProvider')
+const assetsProvider = require('./src/providers/assetsProvider')
+const scrobblerProvider = require('./src/providers/scrobblerProvider')
+const { statusBarMenu } = require('./src/providers/templateProvider')
+const settingsProvider = require('./src/providers/settingsProvider')
+const infoPlayerProvider = require('./src/providers/infoPlayerProvider')
+const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
+const companionServer = require('./src/providers/companionServer')
+const discordRPC = require('./src/providers/discordRpcProvider')
+const mprisProvider = require('./src/providers/mprisProvider')
 
-const { calcYTViewSize } = require('./utils/calcYTViewSize')
-const { isWindows, isMac, isLinux } = require('./utils/systemInfo')
-const { checkWindowPosition, doBehavior } = require('./utils/window')
-const fileSystem = require('./utils/fileSystem')
+const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
+const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
+const { checkWindowPosition, doBehavior } = require('./src/utils/window')
+const fileSystem = require('./src/utils/fileSystem')
 
 /* Variables =========================================================================== */
 let mainWindow,
@@ -65,6 +65,10 @@ let windowConfig = {
 }
 
 global.sharedObj = { title: 'N/A', paused: true }
+
+let iconDefault = assetsProvider.getIcon('favicon')
+let iconPlay = assetsProvider.getIcon('favicon_play')
+let iconPause = assetsProvider.getIcon('favicon_pause')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
@@ -147,7 +151,7 @@ function createWindow() {
     }
 
     browserWindowConfig = {
-        icon: assetsProvider.getIcon('favicon'),
+        icon: iconDefault,
         width: mainWindowParams.width,
         height: mainWindowParams.height,
         minWidth: 300,
@@ -199,14 +203,17 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
-            preload: path.join(app.getAppPath(), '/utils/injectControls.js'),
+            preload: path.join(
+                app.getAppPath(),
+                '/src/utils/injectControls.js'
+            ),
         },
     })
 
     mainWindow.loadFile(
         path.join(
-            __dirname,
-            './pages/shared/window-buttons/window-buttons.html'
+            app.getAppPath(),
+            '/src/pages/shared/window-buttons/window-buttons.html'
         ),
         { search: 'page=home/home&title=YouTube Music' }
     )
@@ -378,30 +385,15 @@ function createWindow() {
                 !mainWindow.isFocused() &&
                 settingsProvider.get('settings-show-notifications')
             ) {
-                tray.balloon(
-                    title,
-                    author,
-                    cover,
-                    assetsProvider.getIcon('favicon')
-                )
+                tray.balloon(title, author, cover, iconDefault)
             }
         }
 
         if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
             if (playerInfo.isPaused) {
-                tray.updateTrayIcon(
-                    path.join(
-                        app.getAppPath(),
-                        assetsProvider.getIcon('favicon_pause')
-                    )
-                )
+                tray.updateTrayIcon(path.join(app.getAppPath(), iconPause))
             } else {
-                tray.updateTrayIcon(
-                    path.join(
-                        app.getAppPath(),
-                        assetsProvider.getIcon('favicon_play')
-                    )
-                )
+                tray.updateTrayIcon(path.join(app.getAppPath(), iconPlay))
             }
         }
     }
@@ -729,7 +721,7 @@ function createWindow() {
         } else {
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
-                icon: assetsProvider.getIcon('favicon'),
+                icon: iconDefault,
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
@@ -751,8 +743,8 @@ function createWindow() {
 
             settings.loadFile(
                 path.join(
-                    __dirname,
-                    './pages/shared/window-buttons/window-buttons.html'
+                    app.getAppPath(),
+                    '/src/pages/shared/window-buttons/window-buttons.html'
                 ),
                 {
                     search:
@@ -769,7 +761,7 @@ function createWindow() {
     function windowMiniplayer() {
         miniplayer = new BrowserWindow({
             title: __.trans('LABEL_MINIPLAYER'),
-            icon: assetsProvider.getIcon('favicon'),
+            icon: iconDefault,
             modal: false,
             frame: false,
             center: false,
@@ -787,7 +779,7 @@ function createWindow() {
         })
 
         miniplayer.loadFile(
-            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
+            path.join(app.getAppPath(), '/src/pages/miniplayer/miniplayer.html')
         )
 
         switch (settingsProvider.get('settings-miniplayer-size')) {
@@ -850,7 +842,7 @@ function createWindow() {
     function windowLastFmLogin() {
         const lastfm = new BrowserWindow({
             //parent: mainWindow,
-            icon: assetsProvider.getIcon('favicon'),
+            icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -872,7 +864,7 @@ function createWindow() {
         lastfm.loadFile(
             path.join(
                 __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
+                './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
@@ -883,7 +875,7 @@ function createWindow() {
 
     function windowThemeEditor() {
         const editor = new BrowserWindow({
-            icon: assetsProvider.getIcon('favicon'),
+            icon: iconDefault,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
             center: true,
@@ -902,7 +894,7 @@ function createWindow() {
         editor.loadFile(
             path.join(
                 __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
+                './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
@@ -916,6 +908,7 @@ function createWindow() {
             lyrics.show()
         } else {
             lyrics = new BrowserWindow({
+                icon: iconDefault,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
                 center: true,
@@ -923,7 +916,6 @@ function createWindow() {
                 backgroundColor: '#232323',
                 width: 700,
                 height: 800,
-                icon: assetsProvider.getIcon('favicon'),
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
@@ -938,7 +930,7 @@ function createWindow() {
             lyrics.loadFile(
                 path.join(
                     __dirname,
-                    './pages/shared/window-buttons/window-buttons.html'
+                    './src/pages/shared/window-buttons/window-buttons.html'
                 ),
                 {
                     search:
@@ -974,6 +966,7 @@ function createWindow() {
         const width = 800
         const settings = new BrowserWindow({
             // parent: mainWindow,
+            icon: iconDefault,
             skipTaskbar: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -986,7 +979,6 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: false,
             },
-            icon: assetsProvider.getIcon('favicon'),
             autoHideMenuBar: true,
         })
         settings.loadURL('companionUrl')
@@ -994,7 +986,7 @@ function createWindow() {
 
     function windowGuest() {
         const incognitoWindow = new BrowserWindow({
-            icon: assetsProvider.getIcon('favicon'),
+            icon: iconDefault,
             width: mainWindowParams.width,
             height: mainWindowParams.height,
             minWidth: 300,
@@ -1220,7 +1212,7 @@ if (!gotTheLock) {
 
         createWindow()
 
-        tray.createTray(mainWindow, assetsProvider.getIcon('favicon'))
+        tray.createTray(mainWindow, iconDefault)
 
         ipcMain.on('updated-tray-image', function(event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
@@ -1365,10 +1357,10 @@ function loadCustomPageScript() {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const mediaControl = require('./providers/mediaProvider')
-const tray = require('./providers/trayProvider')
-const updater = require('./providers/updateProvider')
-const analytics = require('./providers/analyticsProvider')
+const mediaControl = require('./src/providers/mediaProvider')
+const tray = require('./src/providers/trayProvider')
+const updater = require('./src/providers/updateProvider')
+const analytics = require('./src/providers/analyticsProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)

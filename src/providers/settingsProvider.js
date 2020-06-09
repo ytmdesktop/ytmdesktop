@@ -1,12 +1,12 @@
-const electronStore = require("electron-store");
-const store = new electronStore();
+const electronStore = require('electron-store')
+const store = new electronStore()
 
 /**
  * Get setting value
  * @param {string} settingName
  */
 function get(settingName) {
-  return store.get(settingName);
+    return store.get(settingName)
 }
 
 /**
@@ -15,7 +15,7 @@ function get(settingName) {
  * @param {*} value
  */
 function set(settingName, value) {
-  store.set(settingName, value);
+    store.set(settingName, value)
 }
 
 /**
@@ -24,13 +24,13 @@ function set(settingName, value) {
  * @param {*} initialValue
  */
 function setInitialValue(settingName, initialValue) {
-  if (get(settingName) === undefined) {
-    set(settingName, initialValue);
-  }
+    if (get(settingName) === undefined) {
+        set(settingName, initialValue)
+    }
 }
 
 module.exports = {
-  get: get,
-  set: set,
-  setInitialValue: setInitialValue
-};
+    get: get,
+    set: set,
+    setInitialValue: setInitialValue,
+}

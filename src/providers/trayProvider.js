@@ -6,7 +6,6 @@ const settingsProvider = require('./settingsProvider')
 const __ = require('./translateProvider')
 const Notification = require('electron-native-notification')
 const { doBehavior } = require('../utils/window')
-// const base64Img = require("base64-img");
 const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
 
@@ -39,8 +38,7 @@ let init_tray = () => {
 let popUpMenu = null
 
 function createTray(mainWindow, icon) {
-    saved_icon = path.join(__dirname, `../${icon}`)
-    let nativeImageIcon = nativeImage.createFromPath(saved_icon)
+    let nativeImageIcon = nativeImage.createFromPath(icon)
     tray = new Tray(nativeImageIcon)
 
     saved_mainWindow = mainWindow
@@ -63,21 +61,6 @@ function updateTrayIcon(icon) {
     }
     tray.setImage(nativeImageIcon)
 }
-
-/*function balloon(title, content, cover, icon) {
-  if (title && content && cover) {
-
-    base64Img.requestBase64(cover, function (err, res, body) {
-      let image = nativeImage.createFromPath(icon)
-
-      if (!err && body !== undefined) { 
-        image = nativeImage.createFromDataURL(body);
-      }
-
-      _doNotification(title, content, image)
-    });
-  }
-}*/
 
 function balloon(title, content, cover, icon) {
     if (title && content && cover) {
