@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron')
-const request = require('request')
+const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
 
 const elementLyric = document.getElementById('lyric')
@@ -8,11 +8,11 @@ let lastId, target, toggled
 
 loadingLyrics()
 
-document.getElementById('content').addEventListener('dblclick', function(e) {
+document.getElementById('content').addEventListener('dblclick', function (e) {
     this.scrollTo(0, target)
 })
 
-document.getElementById('content').addEventListener('scroll', function(e) {
+document.getElementById('content').addEventListener('scroll', function (e) {
     var scrollTop = document.getElementById('content').scrollTop
     var differential =
         target > scrollTop ? target - scrollTop : scrollTop - target
@@ -45,8 +45,8 @@ async function retrieveAllInfo() {
     return new Promise((resolve, reject) => {
         ipcRenderer
             .invoke('invoke-all-info')
-            .then(result => resolve(result))
-            .catch(_ => reject(false))
+            .then((result) => resolve(result))
+            .catch((_) => reject(false))
     })
 }
 
@@ -58,23 +58,22 @@ function getLyric(artist, song, id) {
             loadingLyrics()
 
             retrieveOVHData(artist, song)
-                .then(success => {
+                .then((success) => {
                     elementLyric.innerText = success
                     document.getElementById('content').scrollTop = 0
                 })
-                .catch(_ => {
+                .catch((_) => {
                     retrieveVagalumeData(artist, song)
                         .then(
-                            success_ => {
-                                console.log('sucesso vagalume')
+                            (success_) => {
                                 elementLyric.innerText = success_
                                 document.getElementById('content').scrollTop = 0
                             },
-                            error_ => {
+                            (error_) => {
                                 elementLyric.innerText = error_
                             }
                         )
-                        .catch(rejected => console.log(rejected))
+                        .catch((rejected) => console.log(rejected))
                 })
         }
     } else {
@@ -169,58 +168,40 @@ function removeAccents(strAccents) {
     return strAccentsOut
 }
 
-function urlReplace(url, artist, music) {
-    let urlReturn = url
-
-    if (url.indexOf(':artist') !== -1) {
-        urlReturn = urlReturn.replace(':artist', artist)
-    }
-
-    if (url.indexOf(':music') !== -1) {
-        urlReturn = urlReturn.replace(':music', music)
-    }
-
-    return urlReturn
-}
-
 function retrieveOVHData(artist, track) {
     return new Promise((resolve, reject) => {
-        request(
+        fetch(
             `https://api.lyrics.ovh/v1/${removeAccents(artist)}/${removeAccents(
                 track
-            )}`,
-            { json: true },
-            function(err, res, body) {
-                if (err) {
-                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
-                }
-                if (body && body.lyrics) {
-                    resolve(body.lyrics)
+            )}`
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.lyrics) {
+                    resolve(json.lyrics)
                 } else {
                     reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
                 }
-            }
-        )
+            })
+            .catch((_) => reject(__.trans('LABEL_LYRICS_NOT_FOUND')))
     })
 }
 
 function retrieveVagalumeData(artist, track) {
     return new Promise((resolve, reject) => {
-        request(
+        fetch(
             `https://api.vagalume.com.br/search.php?art=${removeAccents(
                 artist
-            )}&mus=${removeAccents(track)}`,
-            { json: true },
-            function(err, res, body) {
-                if (err) {
-                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
-                }
-                if (body && body.mus) {
-                    resolve(body.mus[0].text)
+            )}&mus=${removeAccents(track)}`
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.mus) {
+                    resolve(json.mus[0].text)
                 } else {
                     reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
                 }
-            }
-        )
+            })
+            .catch((_) => reject(__.trans('LABEL_LYRICS_NOT_FOUND')))
     })
 }
