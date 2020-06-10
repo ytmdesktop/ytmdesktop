@@ -30,7 +30,7 @@ if (store.get('titlebar-type', 'nice') !== 'nice') {
     document.getElementById('content').style.marginTop = '29px'
 }
 
-ipc.on('window-is-maximized', function(_, value) {
+ipc.on('window-is-maximized', function (_, value) {
     if (value) {
         document.getElementById('icon_maximize').classList.add('hide')
         document.getElementById('icon_restore').classList.remove('hide')
@@ -40,18 +40,18 @@ ipc.on('window-is-maximized', function(_, value) {
     }
 })
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     checkUrlParams()
 
     document
         .getElementById('btn-minimize')
-        .addEventListener('click', function() {
+        .addEventListener('click', function () {
             currentWindow.minimize()
         })
 
     document
         .getElementById('btn-maximize')
-        .addEventListener('click', function() {
+        .addEventListener('click', function () {
             if (!currentWindow.isMaximized()) {
                 currentWindow.maximize()
             } else {
@@ -59,11 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
 
-    document.getElementById('btn-close').addEventListener('click', function() {
+    document.getElementById('btn-close').addEventListener('click', function () {
         currentWindow.close()
     })
 
     document.getElementById('loading').classList.add('hide')
+
+    //ipc.send(`debug`, `webview ${webview.title}`)
 })
 
 // ENABLE FOR DEBUG
@@ -84,15 +86,15 @@ function checkUrlParams() {
     if (icon) {
         document.getElementById('icon').innerText = icon
     }
-
     if (title) {
-        // document.getElementById('music-title').innerText = title
+        document.title = title
+        document.getElementById('window-title').innerText = title
     }
 
     if (hide) {
         hide = hide.split(',')
 
-        hide.forEach(element => {
+        hide.forEach((element) => {
             document.getElementById(element).classList.add('hide')
         })
     }

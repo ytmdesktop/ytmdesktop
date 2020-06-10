@@ -22,28 +22,21 @@ body {
     width: 6px;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #232323;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #555;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #f44336;
+#tips {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: lightgreen
 }
 
 #content {
     overflow: auto;
     width: 100%;
-    height: 94%;
-    margin-top: 34px; 
+    height: 98%;
+    /*margin-top: 34px; */
     padding: 40% 5px 5px 5px;
     transition: .5s ease-in-out all;
+    scroll-behavior: smooth;
 }
 
 #lyric {
@@ -51,14 +44,12 @@ body {
     text-align: center;
 }
 
-input {
-    color: #fff;
+#lyric-source {
+    font-size: 80%;
+    padding: 0 0 0 6px;
+    color: #AAA
 }
 
 .hide {
     display: none;
-}
-
-#div_search_lyric {
-    margin-top: 20%;
 }

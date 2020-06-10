@@ -215,7 +215,7 @@ function createWindow() {
             app.getAppPath(),
             '/src/pages/shared/window-buttons/window-buttons.html'
         ),
-        { search: 'page=home/home&title=YouTube Music' }
+        { search: 'page=home/home' }
     )
 
     mainWindow.addBrowserView(view)
@@ -238,7 +238,7 @@ function createWindow() {
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
     if (windowMaximized) {
-        setTimeout(function() {
+        setTimeout(function () {
             mainWindow.send('window-is-maximized', true)
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
@@ -255,26 +255,26 @@ function createWindow() {
     })
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null
     })
 
-    mainWindow.on('show', function() {
+    mainWindow.on('show', function () {
         globalShortcut.unregister('CmdOrCtrl+M')
 
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
-    view.webContents.on('new-window', function(event, url) {
+    view.webContents.on('new-window', function (event, url) {
         event.preventDefault()
         shell.openExternal(url)
     })
 
     // view.webContents.openDevTools({ mode: 'detach' });
-    view.webContents.on('did-navigate-in-page', function() {
+    view.webContents.on('did-navigate-in-page', function () {
         initialized = true
         settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
@@ -300,7 +300,7 @@ function createWindow() {
         `)
     })
 
-    view.webContents.on('media-started-playing', function() {
+    view.webContents.on('media-started-playing', function () {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
             mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
@@ -320,10 +320,10 @@ function createWindow() {
         }
     })
 
-    view.webContents.on('did-start-navigation', _ => {
+    view.webContents.on('did-start-navigation', (_) => {
         view.webContents
             .executeJavaScript('window.location.hostname')
-            .then(hostname => {
+            .then((hostname) => {
                 if (hostname != 'music.youtube.com') {
                     mainWindow.send('off-the-road')
                     global.on_the_road = false
@@ -335,7 +335,7 @@ function createWindow() {
                     loadCustomCSSPage()
                 }
             })
-            .catch(_ => console.log(`error did-start-navigation ${_}`))
+            .catch((_) => console.log(`error did-start-navigation ${_}`))
     })
 
     function updateActivity() {
@@ -398,7 +398,7 @@ function createWindow() {
         }
     }
 
-    view.webContents.on('media-started-playing', function() {
+    view.webContents.on('media-started-playing', function () {
         logDebug('Playing')
         try {
             if (isMac()) {
@@ -413,7 +413,7 @@ function createWindow() {
         } catch {}
     })
 
-    view.webContents.on('media-paused', function() {
+    view.webContents.on('media-paused', function () {
         logDebug('Paused')
         try {
             if (isMac()) {
@@ -428,7 +428,7 @@ function createWindow() {
         } catch {}
     })
 
-    mainWindow.on('resize', function() {
+    mainWindow.on('resize', function () {
         let windowSize = mainWindow.getSize()
         setTimeout(() => {
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
@@ -446,7 +446,7 @@ function createWindow() {
     })
 
     let storePositionTimer
-    mainWindow.on('move', function(e) {
+    mainWindow.on('move', function (e) {
         let position = mainWindow.getPosition()
         if (storePositionTimer) {
             clearTimeout(storePositionTimer)
@@ -463,7 +463,7 @@ function createWindow() {
         view.webContents.focus()
     })
 
-    mainWindow.on('close', function(e) {
+    mainWindow.on('close', function (e) {
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
             mainWindow.hide()
@@ -483,7 +483,7 @@ function createWindow() {
     })
 
     // GLOBAL
-    globalShortcut.register('MediaPlayPause', function() {
+    globalShortcut.register('MediaPlayPause', function () {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
@@ -506,39 +506,39 @@ function createWindow() {
         }
     })
 
-    globalShortcut.register('MediaStop', function() {
+    globalShortcut.register('MediaStop', function () {
         mediaControl.stopTrack(view)
     })
 
-    globalShortcut.register('MediaPreviousTrack', function() {
+    globalShortcut.register('MediaPreviousTrack', function () {
         mediaControl.previousTrack(view)
     })
 
-    globalShortcut.register('MediaNextTrack', function() {
+    globalShortcut.register('MediaNextTrack', function () {
         mediaControl.nextTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+Space', function () {
         mediaControl.playPauseTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function () {
         mediaControl.nextTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function () {
         mediaControl.previousTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+numadd', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+numadd', function () {
         mediaControl.upVote(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+numsub', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+numsub', function () {
         mediaControl.downVote(view)
     })
 
-    ipcMain.on('restore-main-window', function() {
+    ipcMain.on('restore-main-window', function () {
         mainWindow.show()
     })
 
@@ -737,7 +737,6 @@ function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
-                    //reload: path.join(app.getAppPath(), '/pages/settings/settings.js'),
                 },
             })
 
@@ -753,7 +752,7 @@ function createWindow() {
             )
         }
 
-        settings.on('closed', function() {
+        settings.on('closed', function () {
             settings = null
         })
     }
@@ -818,7 +817,7 @@ function createWindow() {
         }
 
         let storeMiniplayerPositionTimer
-        miniplayer.on('move', function(e) {
+        miniplayer.on('move', function (e) {
             let position = miniplayer.getPosition()
             if (storeMiniplayerPositionTimer) {
                 clearTimeout(storeMiniplayerPositionTimer)
@@ -833,7 +832,7 @@ function createWindow() {
 
         mainWindow.hide()
 
-        globalShortcut.register('CmdOrCtrl+M', function() {
+        globalShortcut.register('CmdOrCtrl+M', function () {
             miniplayer.close()
             mainWindow.show()
         })
@@ -939,7 +938,7 @@ function createWindow() {
             )
 
             let storeLyricsPositionTimer
-            lyrics.on('move', function(e) {
+            lyrics.on('move', function (e) {
                 let position = lyrics.getPosition()
                 if (storeLyricsPositionTimer) {
                     clearTimeout(storeLyricsPositionTimer)
@@ -952,7 +951,7 @@ function createWindow() {
                 }, 500)
             })
 
-            lyrics.on('closed', function() {
+            lyrics.on('closed', function () {
                 lyrics = null
             })
 
@@ -1017,7 +1016,7 @@ function createWindow() {
         switchClipboardWatcher()
     })
 
-    ipcMain.on('miniplayer-toggle-ontop', function() {
+    ipcMain.on('miniplayer-toggle-ontop', function () {
         miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
     })
 
@@ -1028,7 +1027,7 @@ function createWindow() {
         view.webContents.loadURL(mainWindowParams.url, options)
     })
 
-    ipcMain.on('update-custom-css-page', function() {
+    ipcMain.on('update-custom-css-page', function () {
         loadCustomCSSPage()
     })
 
@@ -1075,8 +1074,8 @@ function createWindow() {
             });
         `
             )
-            .then(_ => {})
-            .catch(_ => console.log('error setAudioOutput'))
+            .then((_) => {})
+            .catch((_) => console.log('error setAudioOutput'))
     }
 
     function loadAudioOutput() {
@@ -1098,7 +1097,7 @@ function createWindow() {
                 }
                 view.webContents
                     .insertCSS(fileSystem.readFile(customThemeFile).toString())
-                    .then(key => {
+                    .then((key) => {
                         customCSSAppKey = key
                     })
             }
@@ -1122,7 +1121,7 @@ function createWindow() {
                 }
                 view.webContents
                     .insertCSS(fileSystem.readFile(customThemeFile).toString())
-                    .then(key => {
+                    .then((key) => {
                         customCSSPageKey = key
                     })
             }
@@ -1147,8 +1146,8 @@ function createWindow() {
             if (settingsProvider.get('settings-clipboard-read')) {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
-                    onImageChange: function(nativeImage) {},
-                    onTextChange: function(text) {
+                    onImageChange: function (nativeImage) {},
+                    onTextChange: function (text) {
                         let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
                         let match = text.match(regExp)
                         if (match && match[2].length == 11) {
@@ -1168,7 +1167,7 @@ function createWindow() {
         view.webContents.loadURL('https://music.youtube.com/watch?v=' + videoId)
     }
 
-    setTimeout(function() {
+    setTimeout(function () {
         ipcMain.emit('switch-clipboard-watcher')
     }, 1000)
 
@@ -1197,15 +1196,15 @@ if (!gotTheLock) {
         }
     })
 
-    app.whenReady().then(function() {
+    app.whenReady().then(function () {
         checkWindowPosition(settingsProvider.get('window-position')).then(
-            visiblePosition => {
+            (visiblePosition) => {
                 settingsProvider.set('window-position', visiblePosition)
             }
         )
 
         checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            visiblePosition => {
+            (visiblePosition) => {
                 settingsProvider.set('lyrics-position', visiblePosition)
             }
         )
@@ -1214,26 +1213,26 @@ if (!gotTheLock) {
 
         tray.createTray(mainWindow, iconDefault)
 
-        ipcMain.on('updated-tray-image', function(event, payload) {
+        ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
                 tray.updateImage(payload)
         })
         if (!isDev) {
             updater.checkUpdate(mainWindow, view)
 
-            setInterval(function() {
+            setInterval(function () {
                 updater.checkUpdate(mainWindow, view)
             }, 6 * 60 * 60 * 1000)
         }
         ipcMain.emit('ready', app)
     })
 
-    app.on('browser-window-created', function(e, window) {
+    app.on('browser-window-created', function (e, window) {
         window.removeMenu()
     })
 
     // Quit when all windows are closed.
-    app.on('window-all-closed', function() {
+    app.on('window-all-closed', function () {
         // On OS X it is common for applications and their menu bar
         // to stay active until the user quits explicitly with Cmd + Q
         if (!isMac()) {
@@ -1241,7 +1240,7 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('activate', function() {
+    app.on('activate', function () {
         // On OS X it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (mainWindow === null) {
@@ -1251,14 +1250,14 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('before-quit', function(e) {
+    app.on('before-quit', function (e) {
         if (isMac()) {
             app.exit()
         }
         tray.quit()
     })
 
-    app.on('quit', function() {
+    app.on('quit', function () {
         tray.quit()
     })
 }

@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
 
 const elementLyric = document.getElementById('lyric')
+const elementLyricSource = document.getElementById('lyric-source')
 
 let lastId, target, toggled
 
@@ -59,21 +60,22 @@ function getLyric(artist, song, id) {
 
             retrieveOVHData(artist, song)
                 .then((success) => {
-                    elementLyric.innerText = success
-                    document.getElementById('content').scrollTop = 0
+                    setLyrics('OVH', success)
                 })
                 .catch((_) => {
                     retrieveVagalumeData(artist, song)
-                        .then(
-                            (success_) => {
-                                elementLyric.innerText = success_
-                                document.getElementById('content').scrollTop = 0
-                            },
-                            (error_) => {
-                                elementLyric.innerText = error_
-                            }
-                        )
-                        .catch((rejected) => console.log(rejected))
+                        .then((success_) => {
+                            setLyrics('Vagalume', success_)
+                        })
+                        .catch((_) => {
+                            retrieveKsoftData(artist, song)
+                                .then((success) => {
+                                    setLyrics('KSoft', success)
+                                })
+                                .catch((error) => {
+                                    elementLyric.innerText = error
+                                })
+                        })
                 })
         }
     } else {
@@ -81,7 +83,14 @@ function getLyric(artist, song, id) {
     }
 }
 
+function setLyrics(source, lyrics) {
+    elementLyricSource.innerText = `Lyrics provided by ${source}`
+    elementLyric.innerText = lyrics
+    document.getElementById('content').scrollTop = 0
+}
+
 function loadingLyrics() {
+    elementLyricSource.innerText = ''
     elementLyric.innerText = __.trans('LABEL_LOADING')
 }
 
@@ -166,6 +175,29 @@ function removeAccents(strAccents) {
     strAccentsOut = strAccentsOut.join('')
 
     return strAccentsOut
+}
+
+function retrieveKsoftData(artist, track) {
+    return new Promise((resolve, reject) => {
+        fetch(
+            `https://ytmd-lyrics.herokuapp.com/?q=${removeAccents(
+                artist
+            )} - ${removeAccents(track)}`
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                if (!json.error) {
+                    ipcRenderer.send(
+                        'debug',
+                        `Query = ${json.query} | Result = ${json.result.name} - ${json.result.artist.name}`
+                    )
+                    resolve(json.result.lyrics)
+                } else {
+                    reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                }
+            })
+            .catch((_) => reject(__.trans('LABEL_LYRICS_NOT_FOUND')))
+    })
 }
 
 function retrieveOVHData(artist, track) {
