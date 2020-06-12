@@ -22,6 +22,8 @@
 | `settings-companion-server-token`          | String  | `String token`               | GENERATED_TOKEN              | Token to prevent anonymous control of the player               |
 | `settings-enable-double-tapping-show-hide` | Boolean | `true` or `false`            | `true`                       | Enable or disable double-tapping to show/hide main window      |
 | `settings-app-audio-output`                | String  | `Audio devices`              | DEFAULT_AUDIO_DEVICE         | Define default audio output                                    |
+| `settings-custom-css-app`                  | Boolean | `true` or `false`            | `false`                      | Custom css for main app                                        |
+| `settings-custom-css-page`                 | Boolean | `true` or `false`            | `false`                      | Custom css for web page                                        |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |

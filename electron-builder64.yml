@@ -4,23 +4,32 @@ appId: app.ytmd
 files:
   - '**/*'
   - '!LICENSE.md'
+  - '!CODE_OF_CONDUCT.md'
+  - '!CONTRIBUTING.md'
+  - '!README.md'
+  - '!STORE_VARIABLES.md'
+  - '!.prettierrc.json'
   - '!package.json'
   - '!package-lock.json'
   - '!.cache'
+
+protocols:
+  name: YouTube Music Desktop
+  schemes: [ytmd]
 
 electronDownload:
   arch: x64
   cache: '.cache/electron-builder/'
 
 win:
-  icon: assets
+  icon: src/assets
   publish:
     provider: generic
     url: 'https://dl.ytmdesktop.app/win'
     channel: latest
 
 mac:
-  icon: assets
+  icon: src/assets
   category: public.app-category.music
   darkModeSupport: true
   target:
@@ -31,7 +40,7 @@ mac:
     channel: latest
 
 linux:
-  icon: assets
+  icon: src/assets
   category: AudioVideo
   publish:
     provider: generic

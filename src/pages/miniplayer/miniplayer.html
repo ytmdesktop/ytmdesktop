@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>YouTube Music</title>
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link
+            href="../../../src/assets/css/material_icons.css"
+            rel="stylesheet"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/styles.css"
+        />
+        <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
+    </head>
+
+    <body>
+        <div class="hide-on-play">
+            <div class="cmd-bar">
+                <div class="drag cmd-btn left" id="btn-drag">
+                    <i class="material-icons">drag_indicator</i>
+                </div>
+                <div class="pointer cmd-btn left hide" id="btn-pin">
+                    <i class="material-icons">layers</i>
+                </div>
+                <div class="pointer cmd-btn right" id="btn-close">
+                    <i class="material-icons">launch</i>
+                </div>
+            </div>
+
+            <div class="title center">
+                <span id="title">Title</span>
+            </div>
+
+            <div class="author center">
+                <span id="author">Author</span>
+            </div>
+
+            <div class="duration center">
+                <span id="current">0:00</span> / <span id="duration">0:00</span>
+            </div>
+
+            <div class="controls">
+                <div class="pointer ctrl-btn" id="btn-dislike">
+                    <i class="material-icons outlined">thumb_down</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-previous">
+                    <i class="material-icons">skip_previous</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-play-pause">
+                    <i class="material-icons">play_arrow</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-next">
+                    <i class="material-icons">skip_next</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-like">
+                    <i class="material-icons outlined">thumb_up</i>
+                </div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div id="progress"></div>
+        </div>
+
+        <div id="secondsEffect"></div>
+        <div class="hover-top"></div>
+        <div class="hover-left"></div>
+        <div class="hover-right"></div>
+        <div class="hover-bottom"></div>
+    </body>
+
+    <script src="./miniplayer.js"></script>
+</html>

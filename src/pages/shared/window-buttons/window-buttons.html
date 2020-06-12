@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <title>YouTube Music</title>
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            href="../../../../src/assets/css/material_icons.css"
+            rel="stylesheet"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../../src/assets/css/styles.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../../src/assets/css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link type="text/css" rel="stylesheet" href="./window-buttons.css" />
+
+        <link rel="icon" href="../../../../src/assets/img/favicon.png" />
+    </head>
+
+    <body>
+        <div id="nice-titlebar" class="bar drag">
+            <div id="mac" class="hide">
+                <span id="window-title" class="hide"></span>
+                <!-- <div class="col s6 center">
+          <div class="title">
+            <i class="material-icons tiny" id="icon"></i>
+          </div>
+        </div> -->
+            </div>
+
+            <div id="win" class="hide">
+                <div class="row">
+                    <div class="col s9 left-align">
+                        <div class="title">
+                            <i class="material-icons tiny" id="icon"></i>
+                            <span id="window-title"></span>
+                        </div>
+                    </div>
+
+                    <div class="col s3 right-align">
+                        <div class="no-drag pointer cmd-btn" id="btn-minimize">
+                            <i class="material-icons tiny" title="Minimize"
+                                >remove</i
+                            >
+                        </div>
+                        <div class="no-drag pointer cmd-btn" id="btn-maximize">
+                            <i
+                                id="icon_maximize"
+                                class="material-icons tiny"
+                                title="Maximize"
+                                >crop_square</i
+                            >
+                            <i
+                                id="icon_restore"
+                                class="material-icons tiny hide"
+                                title="Restaure"
+                                style="transform: rotate(180deg);"
+                                >filter_none</i
+                            >
+                        </div>
+                        <div
+                            class="no-drag pointer cmd-btn hover-red"
+                            id="btn-close"
+                        >
+                            <i class="material-icons tiny" title="Close"
+                                >close</i
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content" class="content">
+            <div class="center-flex" id="loading">
+                <div id="center-loading" class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <webview
+                id="webview"
+                style="width: 100vw;"
+                nodeintegration
+            ></webview>
+        </div>
+
+        <script src="../../../../src/assets/js/materialize.min.js"></script>
+        <script>
+            require('./window-buttons.js')
+        </script>
+    </body>
+</html>

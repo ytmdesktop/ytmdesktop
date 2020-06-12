@@ -1,16 +1,16 @@
 {
     "name": "youtube-music-desktop-app",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "YouTube Music Desktop App",
     "main": "main.js",
     "scripts": {
         "start": "npx electron .",
         "pack": "npx electron-builder --dir",
         "pack:x64": "npm run pack -- --x64 --config electron-builder64.yml",
-        "dist": "npx electron-builder",
+        "dist": "npx electron-builder --dir",
         "dist:x64": "npm run dist -- --x64 --config electron-builder64.yml",
-        "publish:win": "build --win -p always --config electron-builder64.yml",
-        "publish:mac": "build --mac -p always --config electron-builder64.yml",
+        "publish:win": "electron-builder --win -p always --config electron-builder64.yml",
+        "publish:mac": "electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "electron-builder --linux -p always --config electron-builder64.yml"
     },
     "repository": "https://github.com/ytmdesktop/ytmdesktop",
@@ -27,14 +27,14 @@
         }
     },
     "devDependencies": {
-        "electron": "^7.2.4",
-        "electron-builder": "^21.2.0",
+        "electron": "^9.0.2",
+        "electron-builder": "^22.7.0",
         "husky": "^3.1.0",
+        "prettier": "^2.0.5",
         "pretty-quick": "^1.11.1"
     },
     "dependencies": {
         "ace-builds": "^1.4.8",
-        "bufferutil": "^4.0.1",
         "discord-rpc": "^3.1.0",
         "electron-canvas-to-buffer": "^2.0.0",
         "electron-clipboard-watcher": "^1.0.1",
@@ -42,25 +42,24 @@
         "electron-is-dev": "^1.1.0",
         "electron-localshortcut": "^3.2.1",
         "electron-native-notification": "^1.2.1",
-        "electron-store": "^5.1.0",
+        "electron-store": "^5.2.0",
         "electron-updater": "^4.2.0",
-        "i18n": "^0.8.5",
+        "i18n": "^0.10.0",
         "image-to-base64": "^2.1.0",
-        "js-base64": "^2.5.1",
-        "materialize-css": "^1.0.0",
+        "js-base64": "^2.5.2",
+        "node-fetch": "^2.6.0",
         "node-vibrant": "^3.1.5",
         "npx": "^10.2.2",
-        "prettier": "^1.19.1",
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
-        "request": "^2.88.0",
         "scribble": "0.0.5",
         "socket.io": "^2.3.0",
-        "utf-8-validate": "^5.0.2",
-        "ws": "^7.2.1"
+        "ws": "^7.3.0"
     },
     "optionalDependencies": {
-        "@nodert-win10/windows.media.playback": "^0.2.95",
-        "mpris-service": "^2.1.0"
+        "@nodert-win10/windows.media.playback": "^0.2.96",
+        "bufferutil": "^4.0.1",
+        "mpris-service": "^2.1.0",
+        "utf-8-validate": "^5.0.2"
     }
 }

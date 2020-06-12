@@ -1,5 +1,4 @@
-require('./utils/defaultSettings')
-const assetsProvider = require('./providers/assetsProvider')
+require('./src/utils/defaultSettings')
 
 const {
     app,
@@ -14,30 +13,72 @@ const {
     shell,
 } = require('electron')
 const path = require('path')
-const fs = require('fs')
-const scrobblerProvider = require('./providers/scrobblerProvider')
-const __ = require('./providers/translateProvider')
-const { statusBarMenu } = require('./providers/templateProvider')
-const { calcYTViewSize } = require('./utils/calcYTViewSize')
-const { isWindows, isMac } = require('./utils/systemInfo')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
-const settingsProvider = require('./providers/settingsProvider')
-const infoPlayerProvider = require('./providers/infoPlayerProvider')
-const rainmeterNowPlaying = require('./providers/rainmeterNowPlaying')
-const companionServer = require('./providers/companionServer')
-const discordRPC = require('./providers/discordRpcProvider')
-app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
-const mprisProvider = require('./providers/mprisProvider')
-const { checkWindowPosition, doBehavior } = require('./utils/window')
-
 const electronLocalshortcut = require('electron-localshortcut')
 
-const themePath = path.join(app.getAppPath(), '/assets/custom-theme.css')
+const __ = require('./src/providers/translateProvider')
+const assetsProvider = require('./src/providers/assetsProvider')
+const scrobblerProvider = require('./src/providers/scrobblerProvider')
+const { statusBarMenu } = require('./src/providers/templateProvider')
+const settingsProvider = require('./src/providers/settingsProvider')
+const infoPlayerProvider = require('./src/providers/infoPlayerProvider')
+const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
+const companionServer = require('./src/providers/companionServer')
+const discordRPC = require('./src/providers/discordRpcProvider')
+const mprisProvider = require('./src/providers/mprisProvider')
 
-if (!themePath) {
-    fs.writeFileSync(themePath, `/** \n * Custom Theme \n */`, { flag: 'w+' })
+const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
+const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
+const { checkWindowPosition, doBehavior } = require('./src/utils/window')
+const fileSystem = require('./src/utils/fileSystem')
+
+/* Variables =========================================================================== */
+let mainWindow,
+    view,
+    miniplayer,
+    lyrics,
+    settings,
+    infoPlayerInterval,
+    customCSSAppKey,
+    customCSSPageKey,
+    lastTrackId,
+    doublePressPlayPause
+
+let isFirstTime = false
+
+let isClipboardWatcherRunning = false
+
+let renderer_for_status_bar = (clipboardWatcher = null)
+
+const defaultUrl = 'https://music.youtube.com'
+
+let mainWindowParams = {
+    url: defaultUrl,
+    width: 1500,
+    height: 800,
 }
+
+let windowConfig = {
+    frame: false,
+    titleBarStyle: '',
+}
+
+global.sharedObj = { title: 'N/A', paused: true }
+
+let iconDefault = assetsProvider.getIcon('favicon')
+let iconPlay = assetsProvider.getIcon('favicon_play')
+let iconPause = assetsProvider.getIcon('favicon_pause')
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+
+/* First checks ========================================================================= */
+app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
+
+createDocumentsAppDir()
+
+createCustomCSSDir()
+createCustomCSSPageFile()
 
 if (settingsProvider.get('settings-companion-server')) {
     companionServer.start()
@@ -51,39 +92,11 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
-mprisProvider.start()
-
-let renderer_for_status_bar = null
-global.sharedObj = { title: 'N/A', paused: true }
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, view, miniplayer, lyrics, settings
-
-const defaultUrl = 'https://music.youtube.com'
-
-let mainWindowParams = {
-    url: defaultUrl,
-    width: 1500,
-    height: 800,
+if (isLinux()) {
+    mprisProvider.start()
 }
 
-let infoPlayerInterval
-let customThemeCSSKey
-let lastTrackId
-let doublePressPlayPause
-let isClipboardWatcherRunning = false
-let clipboardWatcher = null
-
-let windowConfig = {
-    frame: false,
-    titleBarStyle: '',
-}
-
-let icon = 'assets/favicon.png'
-if (isWindows()) {
-    icon = 'assets/favicon.ico'
-} else if (isMac()) {
-    icon = 'assets/favicon.16x16.png'
+if (isMac()) {
     settingsProvider.set(
         'settings-shiny-tray-dark',
         nativeTheme.shouldUseDarkColors
@@ -103,6 +116,7 @@ if (isWindows()) {
     Menu.setApplicationMenu(menu)
 }
 
+/* Functions ============================================================================= */
 function createWindow() {
     if (isMac() || isWindows()) {
         const execApp = path.basename(process.execPath)
@@ -137,7 +151,7 @@ function createWindow() {
     }
 
     browserWindowConfig = {
-        icon: icon,
+        icon: iconDefault,
         width: mainWindowParams.width,
         height: mainWindowParams.height,
         minWidth: 300,
@@ -189,16 +203,19 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
-            preload: path.join(app.getAppPath(), '/utils/injectControls.js'),
+            preload: path.join(
+                app.getAppPath(),
+                '/src/utils/injectControls.js'
+            ),
         },
     })
 
     mainWindow.loadFile(
         path.join(
-            __dirname,
-            './pages/shared/window-buttons/window-buttons.html'
+            app.getAppPath(),
+            '/src/pages/shared/window-buttons/window-buttons.html'
         ),
-        { search: 'page=home/home&title=YouTube Music' }
+        { search: 'page=home/home' }
     )
 
     mainWindow.addBrowserView(view)
@@ -221,7 +238,7 @@ function createWindow() {
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
     if (windowMaximized) {
-        setTimeout(function() {
+        setTimeout(function () {
             mainWindow.send('window-is-maximized', true)
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
@@ -238,26 +255,26 @@ function createWindow() {
     })
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         mainWindow = null
     })
 
-    mainWindow.on('show', function() {
+    mainWindow.on('show', function () {
         globalShortcut.unregister('CmdOrCtrl+M')
 
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
-    view.webContents.on('new-window', function(event, url) {
+    view.webContents.on('new-window', function (event, url) {
         event.preventDefault()
         shell.openExternal(url)
     })
 
     // view.webContents.openDevTools({ mode: 'detach' });
-    view.webContents.on('did-navigate-in-page', function() {
+    view.webContents.on('did-navigate-in-page', function () {
         initialized = true
         settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
@@ -283,7 +300,7 @@ function createWindow() {
         `)
     })
 
-    view.webContents.on('media-started-playing', function() {
+    view.webContents.on('media-started-playing', function () {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
             mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
@@ -303,19 +320,22 @@ function createWindow() {
         }
     })
 
-    view.webContents.on('did-start-navigation', function(_) {
-        view.webContents.executeJavaScript('window.location').then(location => {
-            if (location.hostname != 'music.youtube.com') {
-                mainWindow.send('off-the-road')
-                global.on_the_road = false
-            } else {
-                mainWindow.send('on-the-road')
-                global.on_the_road = true
+    view.webContents.on('did-start-navigation', (_) => {
+        view.webContents
+            .executeJavaScript('window.location.hostname')
+            .then((hostname) => {
+                if (hostname != 'music.youtube.com') {
+                    mainWindow.send('off-the-road')
+                    global.on_the_road = false
+                } else {
+                    mainWindow.send('on-the-road')
+                    global.on_the_road = true
 
-                loadAudioOutput()
-                loadCustomTheme()
-            }
-        })
+                    loadAudioOutput()
+                    loadCustomCSSPage()
+                }
+            })
+            .catch((_) => console.log(`error did-start-navigation ${_}`))
     })
 
     function updateActivity() {
@@ -365,20 +385,20 @@ function createWindow() {
                 !mainWindow.isFocused() &&
                 settingsProvider.get('settings-show-notifications')
             ) {
-                tray.balloon(title, author, cover, icon)
+                tray.balloon(title, author, cover, iconDefault)
             }
         }
 
         if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
             if (playerInfo.isPaused) {
-                tray.updateTrayIcon(assetsProvider.getIcon('favicon_pause'))
+                tray.updateTrayIcon(iconPause)
             } else {
-                tray.updateTrayIcon(assetsProvider.getIcon('favicon_play'))
+                tray.updateTrayIcon(iconPlay)
             }
         }
     }
 
-    view.webContents.on('media-started-playing', function() {
+    view.webContents.on('media-started-playing', function () {
         logDebug('Playing')
         try {
             if (isMac()) {
@@ -393,7 +413,7 @@ function createWindow() {
         } catch {}
     })
 
-    view.webContents.on('media-paused', function() {
+    view.webContents.on('media-paused', function () {
         logDebug('Paused')
         try {
             if (isMac()) {
@@ -408,7 +428,7 @@ function createWindow() {
         } catch {}
     })
 
-    mainWindow.on('resize', function() {
+    mainWindow.on('resize', function () {
         let windowSize = mainWindow.getSize()
         setTimeout(() => {
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
@@ -426,7 +446,7 @@ function createWindow() {
     })
 
     let storePositionTimer
-    mainWindow.on('move', function(e) {
+    mainWindow.on('move', function (e) {
         let position = mainWindow.getPosition()
         if (storePositionTimer) {
             clearTimeout(storePositionTimer)
@@ -443,7 +463,7 @@ function createWindow() {
         view.webContents.focus()
     })
 
-    mainWindow.on('close', function(e) {
+    mainWindow.on('close', function (e) {
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
             mainWindow.hide()
@@ -455,15 +475,15 @@ function createWindow() {
 
     // LOCAL
     electronLocalshortcut.register(view, 'CmdOrCtrl+S', () => {
-        ipcMain.emit('show-settings')
+        ipcMain.emit('window', { command: 'show-settings' })
     })
 
     electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
-        ipcMain.emit('show-miniplayer')
+        ipcMain.emit('window', { command: 'show-miniplayer' })
     })
 
     // GLOBAL
-    globalShortcut.register('MediaPlayPause', function() {
+    globalShortcut.register('MediaPlayPause', function () {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
@@ -486,68 +506,45 @@ function createWindow() {
         }
     })
 
-    globalShortcut.register('MediaStop', function() {
+    globalShortcut.register('MediaStop', function () {
         mediaControl.stopTrack(view)
     })
 
-    globalShortcut.register('MediaPreviousTrack', function() {
+    globalShortcut.register('MediaPreviousTrack', function () {
         mediaControl.previousTrack(view)
     })
 
-    globalShortcut.register('MediaNextTrack', function() {
+    globalShortcut.register('MediaNextTrack', function () {
         mediaControl.nextTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+Space', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+Space', function () {
         mediaControl.playPauseTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+PageUp', function () {
         mediaControl.nextTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+PageDown', function () {
         mediaControl.previousTrack(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+numadd', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+numadd', function () {
         mediaControl.upVote(view)
     })
 
-    globalShortcut.register('CmdOrCtrl+Shift+numsub', function() {
+    globalShortcut.register('CmdOrCtrl+Shift+numsub', function () {
         mediaControl.downVote(view)
     })
 
-    ipcMain.on('restore-main-window', function() {
+    ipcMain.on('restore-main-window', function () {
         mainWindow.show()
     })
 
-    ipcMain.on('settings-changed-zoom', function(e, value) {
-        view.webContents.setZoomFactor(value / 100)
+    ipcMain.handle('invoke-all-info', async (event, args) => {
+        return infoPlayerProvider.getAllInfo()
     })
-
-    ipcMain.on('retrieve-player-info', function(e, _) {
-        // IPCRenderer
-        if (e !== undefined) {
-            e.sender.send(
-                'song-playing-now-is',
-                infoPlayerProvider.getAllInfo()
-            )
-        }
-
-        // IPCMain
-        if (infoPlayerProvider.hasInitialized()) {
-            ipcMain.emit('song-playing-now-is', infoPlayerProvider.getAllInfo())
-        }
-    })
-
-    /*ipcMain.on("will-close-mainwindow", function() {
-    if (settingsProvider.get("settings-keep-background")) {
-      mainWindow.hide();
-    } else {
-      app.exit();
-    }
-  });*/
 
     ipcMain.on('settings-value-changed', (e, data) => {
         switch (data.key) {
@@ -575,18 +572,40 @@ function createWindow() {
                 }
                 break
 
-            case 'settings-custom-theme':
+            case 'settings-custom-css-app':
                 if (data.value) {
-                    loadCustomTheme()
+                    loadCustomCSSApp()
                 } else {
-                    removeCustomTheme()
+                    removeCustomCSSApp()
                 }
+                break
+
+            case 'settings-custom-css-page':
+                if (data.value) {
+                    loadCustomCSSPage()
+                } else {
+                    removeCustomCSSPage()
+                }
+                break
+
+            case 'settings-changed-zoom':
+                view.webContents.zoomFactor = data.value / 100
                 break
         }
     })
 
-    ipcMain.on('media-command', data => {
-        switch (data.command) {
+    ipcMain.on('media-command', (dataMain, dataRenderer) => {
+        let command, value
+
+        if (dataMain.command !== undefined) {
+            command = dataMain.command
+            value = dataMain.value
+        } else {
+            command = dataRenderer.command
+            value = dataRenderer.value
+        }
+
+        switch (command) {
             case 'media-play-pause':
                 mediaControl.playPauseTrack(view)
                 break
@@ -624,11 +643,11 @@ function createWindow() {
                 break
 
             case 'media-seekbar-set':
-                mediaControl.changeSeekbar(view, data.value)
+                mediaControl.changeSeekbar(view, value)
                 break
 
             case 'media-volume-set':
-                mediaControl.changeVolume(view, data.value)
+                mediaControl.changeVolume(view, value)
                 break
         }
     })
@@ -637,7 +656,6 @@ function createWindow() {
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
         event.sender.send('is-dev', isDev)
-        event.sender.send('register-renderer', app)
     })
 
     ipcMain.on('update-tray', () => {
@@ -651,42 +669,59 @@ function createWindow() {
         updater.quitAndInstall()
     })
 
-    ipcMain.on('show-guest-mode', function() {
-        const incognitoWindow = new BrowserWindow({
-            icon: icon,
-            width: mainWindowParams.width,
-            height: mainWindowParams.height,
-            minWidth: 300,
-            minHeight: 300,
-            show: true,
-            autoHideMenuBar: true,
-            backgroundColor: '#232323',
-            center: true,
-            closable: true,
-            skipTaskbar: false,
-            resize: true,
-            maximizable: true,
-            frame: true,
-            webPreferences: {
-                nodeIntegration: true,
-                partition: `guest-mode-${Date.now()}`,
-            },
-        })
+    ipcMain.on('window', (dataMain, dataRenderer) => {
+        let command, value
 
-        incognitoWindow.webContents.session.setUserAgent(
-            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
-        )
+        if (dataMain.command !== undefined) {
+            command = dataMain.command
+            value = dataMain.value
+        } else {
+            command = dataRenderer.command
+            value = dataRenderer.value
+        }
 
-        incognitoWindow.webContents.loadURL(mainWindowParams.url)
+        switch (command) {
+            case 'show-settings':
+                windowSettings()
+                break
+
+            case 'show-miniplayer':
+                windowMiniplayer()
+                break
+
+            case 'show-last-fm-login':
+                windowLastFmLogin()
+                break
+
+            case 'show-editor-theme':
+                windowThemeEditor()
+                break
+
+            case 'show-lyrics':
+                windowLyrics()
+                break
+
+            case 'show-companion':
+                windowCompanion()
+                break
+
+            case 'show-guest-mode':
+                windowGuest()
+                break
+
+            case 'restore-main-window':
+                mainWindow.show()
+                break
+        }
     })
 
-    ipcMain.on('show-settings', function() {
+    function windowSettings() {
         if (settings) {
             settings.show()
         } else {
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
-                icon: icon,
+                icon: iconDefault,
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
@@ -707,8 +742,8 @@ function createWindow() {
 
             settings.loadFile(
                 path.join(
-                    __dirname,
-                    './pages/shared/window-buttons/window-buttons.html'
+                    app.getAppPath(),
+                    '/src/pages/shared/window-buttons/window-buttons.html'
                 ),
                 {
                     search:
@@ -717,15 +752,15 @@ function createWindow() {
             )
         }
 
-        settings.on('closed', function() {
+        settings.on('closed', function () {
             settings = null
         })
-    })
+    }
 
-    ipcMain.on('show-miniplayer', function() {
+    function windowMiniplayer() {
         miniplayer = new BrowserWindow({
             title: __.trans('LABEL_MINIPLAYER'),
-            icon: icon,
+            icon: iconDefault,
             modal: false,
             frame: false,
             center: false,
@@ -738,11 +773,12 @@ function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
+                //preload: path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.js'),
             },
         })
 
         miniplayer.loadFile(
-            path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.html')
+            path.join(app.getAppPath(), '/src/pages/miniplayer/miniplayer.html')
         )
 
         switch (settingsProvider.get('settings-miniplayer-size')) {
@@ -781,7 +817,7 @@ function createWindow() {
         }
 
         let storeMiniplayerPositionTimer
-        miniplayer.on('move', function(e) {
+        miniplayer.on('move', function (e) {
             let position = miniplayer.getPosition()
             if (storeMiniplayerPositionTimer) {
                 clearTimeout(storeMiniplayerPositionTimer)
@@ -796,16 +832,16 @@ function createWindow() {
 
         mainWindow.hide()
 
-        globalShortcut.register('CmdOrCtrl+M', function() {
-            miniplayer.hide()
+        globalShortcut.register('CmdOrCtrl+M', function () {
+            miniplayer.close()
             mainWindow.show()
         })
-    })
+    }
 
-    ipcMain.on('show-last-fm-login', function() {
+    function windowLastFmLogin() {
         const lastfm = new BrowserWindow({
             //parent: mainWindow,
-            icon: icon,
+            icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -827,33 +863,18 @@ function createWindow() {
         lastfm.loadFile(
             path.join(
                 __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
+                './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
                     'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
             }
         )
-    })
+    }
 
-    ipcMain.on('switch-clipboard-watcher', () => {
-        switchClipboardWatcher()
-    })
-
-    ipcMain.on('miniplayer-toggle-ontop', function() {
-        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
-    })
-
-    ipcMain.on('reset-url', () => {
-        mainWindowParams.url = defaultUrl
-
-        const options = { extraHeaders: 'pragma: no-cache\n' }
-        view.webContents.loadURL(mainWindowParams.url, options)
-    })
-
-    ipcMain.on('show-editor-theme', function() {
+    function windowThemeEditor() {
         const editor = new BrowserWindow({
-            icon: path.join(__dirname, icon),
+            icon: iconDefault,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
             center: true,
@@ -872,17 +893,142 @@ function createWindow() {
         editor.loadFile(
             path.join(
                 __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
+                './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
                     'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
+    }
+
+    function windowLyrics() {
+        if (lyrics) {
+            lyrics.show()
+        } else {
+            lyrics = new BrowserWindow({
+                icon: iconDefault,
+                frame: windowConfig.frame,
+                titleBarStyle: windowConfig.titleBarStyle,
+                center: true,
+                resizable: true,
+                backgroundColor: '#232323',
+                width: 700,
+                height: 800,
+                webPreferences: {
+                    nodeIntegration: true,
+                    webviewTag: true,
+                },
+            })
+
+            let lyricsPosition = settingsProvider.get('lyrics-position')
+            if (lyricsPosition != undefined) {
+                lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
+            }
+
+            lyrics.loadFile(
+                path.join(
+                    __dirname,
+                    './src/pages/shared/window-buttons/window-buttons.html'
+                ),
+                {
+                    search:
+                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
+                }
+            )
+
+            let storeLyricsPositionTimer
+            lyrics.on('move', function (e) {
+                let position = lyrics.getPosition()
+                if (storeLyricsPositionTimer) {
+                    clearTimeout(storeLyricsPositionTimer)
+                }
+                storeLyricsPositionTimer = setTimeout(() => {
+                    settingsProvider.set('lyrics-position', {
+                        x: position[0],
+                        y: position[1],
+                    })
+                }, 500)
+            })
+
+            lyrics.on('closed', function () {
+                lyrics = null
+            })
+
+            // lyrics.webContents.openDevTools();
+        }
+    }
+
+    function windowCompanion() {
+        const x = mainWindow.getPosition()[0]
+        const y = mainWindow.getPosition()[1]
+        const width = 800
+        const settings = new BrowserWindow({
+            // parent: mainWindow,
+            icon: iconDefault,
+            skipTaskbar: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            x: x + width / 2,
+            y,
+            resizable: false,
+            backgroundColor: '#232323',
+            width: 800,
+            title: 'companionWindowTitle',
+            webPreferences: {
+                nodeIntegration: false,
+            },
+            autoHideMenuBar: true,
+        })
+        settings.loadURL('companionUrl')
+    }
+
+    function windowGuest() {
+        const incognitoWindow = new BrowserWindow({
+            icon: iconDefault,
+            width: mainWindowParams.width,
+            height: mainWindowParams.height,
+            minWidth: 300,
+            minHeight: 300,
+            show: true,
+            autoHideMenuBar: true,
+            backgroundColor: '#232323',
+            center: true,
+            closable: true,
+            skipTaskbar: false,
+            resize: true,
+            maximizable: true,
+            frame: true,
+            webPreferences: {
+                nodeIntegration: true,
+                partition: `guest-mode-${Date.now()}`,
+            },
+        })
+
+        incognitoWindow.webContents.session.setUserAgent(
+            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+        )
+
+        incognitoWindow.webContents.loadURL(mainWindowParams.url)
+    }
+
+    ipcMain.on('switch-clipboard-watcher', () => {
+        switchClipboardWatcher()
     })
 
-    ipcMain.on('update-custom-theme', function() {
-        loadCustomTheme()
+    ipcMain.on('miniplayer-toggle-ontop', function () {
+        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
+    })
+
+    ipcMain.on('reset-url', () => {
+        mainWindowParams.url = defaultUrl
+
+        const options = { extraHeaders: 'pragma: no-cache\n' }
+        view.webContents.loadURL(mainWindowParams.url, options)
+    })
+
+    ipcMain.on('update-custom-css-page', function () {
+        loadCustomCSSPage()
     })
 
     ipcMain.on('debug', (event, message) => {
@@ -928,8 +1074,8 @@ function createWindow() {
             });
         `
             )
-            .then(_ => {})
-            .catch(_ => console.log('error setAudioOutput'))
+            .then((_) => {})
+            .catch((_) => console.log('error setAudioOutput'))
     }
 
     function loadAudioOutput() {
@@ -938,23 +1084,52 @@ function createWindow() {
         }
     }
 
-    function loadCustomTheme() {
-        if (settingsProvider.get('settings-custom-theme')) {
-            if (fs.existsSync(themePath)) {
-                if (customThemeCSSKey) {
-                    removeCustomTheme()
+    function loadCustomCSSApp() {
+        const customThemeFile = path.join(
+            fileSystem.getAppDocumentsPath(app),
+            '/custom/css/app.css'
+        )
+
+        if (settingsProvider.get('settings-custom-css-app')) {
+            if (fileSystem.checkIfExists(customThemeFile)) {
+                if (customCSSAppKey) {
+                    removeCustomCssApp()
                 }
                 view.webContents
-                    .insertCSS(fs.readFileSync(themePath).toString())
-                    .then(key => {
-                        customThemeCSSKey = key
+                    .insertCSS(fileSystem.readFile(customThemeFile).toString())
+                    .then((key) => {
+                        customCSSAppKey = key
                     })
             }
         }
     }
 
-    function removeCustomTheme() {
-        view.webContents.removeInsertedCSS(customThemeCSSKey)
+    function removeCustomCSSApp() {
+        view.webContents.removeInsertedCSS(customCSSAppKey)
+    }
+
+    function loadCustomCSSPage() {
+        const customThemeFile = path.join(
+            fileSystem.getAppDocumentsPath(app),
+            '/custom/css/page.css'
+        )
+
+        if (settingsProvider.get('settings-custom-css-page')) {
+            if (fileSystem.checkIfExists(customThemeFile)) {
+                if (customCSSPageKey) {
+                    removeCustomCSSPage()
+                }
+                view.webContents
+                    .insertCSS(fileSystem.readFile(customThemeFile).toString())
+                    .then((key) => {
+                        customCSSPageKey = key
+                    })
+            }
+        }
+    }
+
+    function removeCustomCSSPage() {
+        view.webContents.removeInsertedCSS(customCSSPageKey)
     }
 
     function switchClipboardWatcher() {
@@ -971,8 +1146,8 @@ function createWindow() {
             if (settingsProvider.get('settings-clipboard-read')) {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
-                    onImageChange: function(nativeImage) {},
-                    onTextChange: function(text) {
+                    onImageChange: function (nativeImage) {},
+                    onTextChange: function (text) {
                         let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
                         let match = text.match(regExp)
                         if (match && match[2].length == 11) {
@@ -992,9 +1167,12 @@ function createWindow() {
         view.webContents.loadURL('https://music.youtube.com/watch?v=' + videoId)
     }
 
-    setTimeout(function() {
+    setTimeout(function () {
         ipcMain.emit('switch-clipboard-watcher')
     }, 1000)
+
+    loadCustomAppScript()
+    loadCustomPageScript()
 }
 
 // This method will be called when Electron has finished
@@ -1018,47 +1196,43 @@ if (!gotTheLock) {
         }
     })
 
-    app.whenReady().then(function() {
+    app.whenReady().then(function () {
         checkWindowPosition(settingsProvider.get('window-position')).then(
-            visiblePosition => {
+            (visiblePosition) => {
                 settingsProvider.set('window-position', visiblePosition)
             }
         )
 
         checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            visiblePosition => {
+            (visiblePosition) => {
                 settingsProvider.set('lyrics-position', visiblePosition)
             }
         )
 
         createWindow()
 
-        tray.createTray(mainWindow, icon)
+        tray.createTray(mainWindow, iconDefault)
 
-        ipcMain.on('updated-tray-image', function(event, payload) {
+        ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
                 tray.updateImage(payload)
         })
         if (!isDev) {
             updater.checkUpdate(mainWindow, view)
 
-            setInterval(function() {
+            setInterval(function () {
                 updater.checkUpdate(mainWindow, view)
-            }, 1 * 60 * 60 * 1000)
+            }, 6 * 60 * 60 * 1000)
         }
         ipcMain.emit('ready', app)
     })
 
-    /*app.on('ready', function(ev) {
-        
-    })*/
-
-    app.on('browser-window-created', function(e, window) {
+    app.on('browser-window-created', function (e, window) {
         window.removeMenu()
     })
 
     // Quit when all windows are closed.
-    app.on('window-all-closed', function() {
+    app.on('window-all-closed', function () {
         // On OS X it is common for applications and their menu bar
         // to stay active until the user quits explicitly with Cmd + Q
         if (!isMac()) {
@@ -1066,7 +1240,7 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('activate', function() {
+    app.on('activate', function () {
         // On OS X it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (mainWindow === null) {
@@ -1076,98 +1250,17 @@ if (!gotTheLock) {
         }
     })
 
-    app.on('before-quit', function(e) {
+    app.on('before-quit', function (e) {
         if (isMac()) {
             app.exit()
         }
         tray.quit()
     })
 
-    app.on('quit', function() {
+    app.on('quit', function () {
         tray.quit()
     })
 }
-
-ipcMain.on('show-lyrics', function() {
-    if (lyrics) {
-        lyrics.show()
-    } else {
-        lyrics = new BrowserWindow({
-            frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
-            center: true,
-            resizable: true,
-            backgroundColor: '#232323',
-            width: 700,
-            height: 800,
-            icon: path.join(__dirname, icon),
-            webPreferences: {
-                nodeIntegration: true,
-                webviewTag: true,
-            },
-        })
-
-        let lyricsPosition = settingsProvider.get('lyrics-position')
-        if (lyricsPosition != undefined) {
-            lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
-        }
-
-        lyrics.loadFile(
-            path.join(
-                __dirname,
-                './pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
-            }
-        )
-
-        let storeLyricsPositionTimer
-        lyrics.on('move', function(e) {
-            let position = lyrics.getPosition()
-            if (storeLyricsPositionTimer) {
-                clearTimeout(storeLyricsPositionTimer)
-            }
-            storeLyricsPositionTimer = setTimeout(() => {
-                settingsProvider.set('lyrics-position', {
-                    x: position[0],
-                    y: position[1],
-                })
-            }, 500)
-        })
-
-        lyrics.on('closed', function() {
-            lyrics = null
-        })
-
-        // lyrics.webContents.openDevTools();
-    }
-})
-
-ipcMain.on('show-companion', function() {
-    const x = mainWindow.getPosition()[0]
-    const y = mainWindow.getPosition()[1]
-    const width = 800
-    const settings = new BrowserWindow({
-        // parent: mainWindow,
-        skipTaskbar: false,
-        frame: windowConfig.frame,
-        titleBarStyle: windowConfig.titleBarStyle,
-        x: x + width / 2,
-        y,
-        resizable: false,
-        backgroundColor: '#232323',
-        width: 800,
-        title: 'companionWindowTitle',
-        webPreferences: {
-            nodeIntegration: false,
-        },
-        icon: path.join(__dirname, icon),
-        autoHideMenuBar: true,
-    })
-    settings.loadURL('companionUrl')
-})
 
 function logDebug(data) {
     if (false) {
@@ -1197,12 +1290,76 @@ function bytesToSize(bytes) {
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
+function createDocumentsAppDir() {
+    if (!fileSystem.checkIfExists(fileSystem.getAppDocumentsPath(app))) {
+        isFirstTime = true
+        fileSystem.createDir(fileSystem.getAppDocumentsPath(app))
+    } else {
+        isFirstTime = false
+    }
+}
+
+function createCustomCSSDir() {
+    const dirCustomTheme = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        '/custom/css'
+    )
+
+    if (!fileSystem.checkIfExists(dirCustomTheme)) {
+        fileSystem.createDir(dirCustomTheme, { recursive: true })
+    }
+}
+
+function createCustomCSSPageFile() {
+    const customThemeFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        '/custom/css/page.css'
+    )
+
+    if (!fileSystem.checkIfExists(customThemeFile)) {
+        fileSystem.writeFile(
+            customThemeFile,
+            `/** \n * Custom css for page \n*/\n\nhtml, body { background: #1D1D1D !important; }`
+        )
+    }
+}
+
+function loadCustomAppScript() {
+    const customAppScriptFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        'custom/js/app.js'
+    )
+
+    if (fileSystem.checkIfExists(customAppScriptFile)) {
+        try {
+            require(customAppScriptFile)
+        } catch {}
+    }
+}
+
+function loadCustomPageScript() {
+    const customPageScriptFile = path.join(
+        fileSystem.getAppDocumentsPath(app),
+        'custom/js/page.js'
+    )
+
+    if (fileSystem.checkIfExists(customPageScriptFile)) {
+        try {
+            view.webContents.executeJavaScript(
+                fileSystem.readFile(customPageScriptFile).toString()
+            )
+        } catch {
+            console.log('Failed to execute page.js')
+        }
+    }
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const mediaControl = require('./providers/mediaProvider')
-const tray = require('./providers/trayProvider')
-const updater = require('./providers/updateProvider')
-const analytics = require('./providers/analyticsProvider')
+const mediaControl = require('./src/providers/mediaProvider')
+const tray = require('./src/providers/trayProvider')
+const updater = require('./src/providers/updateProvider')
+const analytics = require('./src/providers/analyticsProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
