@@ -1246,7 +1246,9 @@ if (!gotTheLock) {
         if (mainWindow === null) {
             createWindow()
         } else {
-            mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+            mainWindow.isVisible() && !isMac()
+                ? mainWindow.hide()
+                : mainWindow.show()
         }
     })
 
