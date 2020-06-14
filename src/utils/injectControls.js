@@ -3,12 +3,12 @@ const { remote, ipcRenderer } = require('electron')
 window.ipcRenderer = ipcRenderer
 var content = remote.getCurrentWebContents()
 
-content.addListener('dom-ready', function() {
+content.addListener('dom-ready', function () {
     createContextMenu()
 
     content
         .executeJavaScript('window.location.hostname')
-        .then(hostname => {
+        .then((hostname) => {
             if (hostname == 'music.youtube.com') {
                 createMiddleContent()
                 createRightContent()
@@ -18,7 +18,7 @@ content.addListener('dom-ready', function() {
                 createOffTheRoadContent()
             }
         })
-        .catch(_ => ipcRenderer.send('debug', 'error on inject'))
+        .catch((_) => ipcRenderer.send('debug', 'error on inject'))
 })
 
 function createContextMenu() {
@@ -32,7 +32,7 @@ function createContextMenu() {
         document.body.prepend(materialIcons);
     `
         )
-        .catch(_ => ipcRenderer.send('debug', 'error on createContextMenu'))
+        .catch((_) => ipcRenderer.send('debug', 'error on createContextMenu'))
 
     content
         .insertCSS(
@@ -105,7 +105,7 @@ function createContextMenu() {
         }
     `
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on createContextMenu insertCSS')
         )
 
@@ -120,7 +120,7 @@ function createContextMenu() {
         document.body.prepend(menuDiv);
     `
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on createContextMenu prepend')
         )
 
@@ -176,7 +176,7 @@ function createContextMenu() {
             menuElement.opacity = "1";
         }`
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on createContextMenu listeners')
         )
 }
@@ -199,7 +199,7 @@ function createMiddleContent() {
         center_content.prepend(element);
     `
         )
-        .catch(_ => ipcRenderer.send('debug', 'error on createMiddleContent'))
+        .catch((_) => ipcRenderer.send('debug', 'error on createMiddleContent'))
 }
 
 function createRightContent() {
@@ -235,7 +235,7 @@ function createRightContent() {
             document.getElementById("ytmd_update").classList.remove("hide");
         } );`
         )
-        .catch(_ => ipcRenderer.send('debug', 'error on createRightContent'))
+        .catch((_) => ipcRenderer.send('debug', 'error on createRightContent'))
 }
 
 function createPlayerBarContent() {
@@ -264,7 +264,7 @@ function createPlayerBarContent() {
         playerBarRightControls.append(elementMiniplayer);
     `
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on createPlayerBarContent')
         )
 }
@@ -286,7 +286,7 @@ function playerBarScrollToChangeVolume() {
         });
     `
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on playerBarScrollToChangeVolume')
         )
 }
@@ -300,8 +300,14 @@ function createOffTheRoadContent() {
         var elementBack = document.createElement('i');
         elementBack.id = 'ytmd_lyrics';
         elementBack.classList.add('material-icons');
-        elementBack.style.cssFloat = "left";
         elementBack.style.cursor = "pointer";
+        elementBack.style.fontSize = '42px';
+        elementBack.style.zIndex = '9999999';
+        elementBack.style.position = 'fixed';
+        elementBack.style.cssFloat = 'left';
+        elementBack.style.boxShadow = "0 0 2px #111"
+        elementBack.style.background = "#1D1D1D"
+        elementBack.style.color = "#FFF"
         elementBack.innerText = 'arrow_back';
 
         elementBack.addEventListener('click', function() { ipcRenderer.send('reset-url') } )
@@ -309,7 +315,7 @@ function createOffTheRoadContent() {
         body.prepend(elementBack);
         `
         )
-        .catch(_ =>
+        .catch((_) =>
             ipcRenderer.send('debug', 'error on createOffTheRoadContent')
         )
 }
