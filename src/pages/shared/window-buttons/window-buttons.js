@@ -86,6 +86,7 @@ function checkUrlParams() {
     if (icon) {
         document.getElementById('icon').innerText = icon
     }
+
     if (title) {
         document.title = title
         document.getElementById('window-title').innerText = title

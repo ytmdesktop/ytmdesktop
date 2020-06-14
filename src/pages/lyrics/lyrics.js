@@ -100,7 +100,7 @@ function removeAccents(strAccents) {
     strAccentsLen = strAccents.length
 
     var accents =
-        'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž'
+        'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž?&='
     var accentsOut = [
         'A',
         'A',
@@ -164,6 +164,9 @@ function removeAccents(strAccents) {
         'y',
         'Z',
         'z',
+        '%3F',
+        '%26',
+        '%3D',
     ]
 
     for (var y = 0; y < strAccentsLen; y++) {
@@ -187,10 +190,10 @@ function retrieveKsoftData(artist, track) {
             .then((res) => res.json())
             .then((json) => {
                 if (!json.error) {
-                    ipcRenderer.send(
+                    /*ipcRenderer.send(
                         'debug',
                         `Query = ${json.query} | Result = ${json.result.name} - ${json.result.artist.name}`
-                    )
+                    )*/
                     resolve(json.result.lyrics)
                 } else {
                     reject(__.trans('LABEL_LYRICS_NOT_FOUND'))

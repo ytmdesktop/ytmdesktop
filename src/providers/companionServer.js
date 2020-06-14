@@ -1,4 +1,4 @@
-const { ipcMain, app } = require('electron')
+const { ipcMain, app, ipcRenderer } = require('electron')
 const http = require('http')
 const os = require('os')
 const networkInterfaces = os.networkInterfaces()
@@ -49,13 +49,13 @@ function fetchNetworkInterfaces() {
     })
 }
 
-var serverFunction = function(req, res) {
+var serverFunction = function (req, res) {
     if (req.url === '/') {
         var collection = ''
 
-        serverInterfaces.forEach(value => {
-            var qr = qrcode(0, 'M')
-            qr.addData(value)
+        serverInterfaces.forEach((value) => {
+            let qr = qrcode(6, 'H')
+            qr.addData(JSON.stringify(value))
             qr.make()
 
             collection += `
@@ -170,7 +170,7 @@ var serverFunction = function(req, res) {
         if (req.method === 'POST') {
             let body = []
 
-            req.on('data', chunk => {
+            req.on('data', (chunk) => {
                 body.push(chunk)
             }).on('end', () => {
                 try {
@@ -250,7 +250,7 @@ function start() {
         }
     }, 600)
 
-    io.on('connection', socket => {
+    io.on('connection', (socket) => {
         socket.on('media-commands', (cmd, value) => {
             execCmd(cmd, value)
         })
