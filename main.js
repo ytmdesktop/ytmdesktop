@@ -34,6 +34,8 @@ const { checkWindowPosition, doBehavior } = require('./src/utils/window')
 const fileSystem = require('./src/utils/fileSystem')
 
 /* Variables =========================================================================== */
+const defaultUrl = 'https://music.youtube.com'
+
 let mainWindow,
     view,
     miniplayer,
@@ -50,8 +52,6 @@ let isFirstTime = false
 let isClipboardWatcherRunning = false
 
 let renderer_for_status_bar = (clipboardWatcher = null)
-
-const defaultUrl = 'https://music.youtube.com'
 
 let mainWindowParams = {
     url: defaultUrl,
@@ -74,6 +74,8 @@ let iconPause = assetsProvider.getIcon('favicon_pause')
 
 /* First checks ========================================================================= */
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
+
+app.setAsDefaultProtocolClient('ytmd', process.execPath)
 
 createDocumentsAppDir()
 
@@ -1173,6 +1175,20 @@ function createWindow() {
 
     loadCustomAppScript()
     loadCustomPageScript()
+
+    if (isWindows()) {
+        handleOpenUrl(process.argv.slice(1))
+    }
+}
+
+function handleOpenUrl(url) {
+    let cmd = url.toString().split('://')[1]
+
+    switch (cmd) {
+        case 'settings/':
+            ipcMain.emit('window', { command: 'show-settings' })
+            break
+    }
 }
 
 // This method will be called when Electron has finished
@@ -1183,7 +1199,10 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
     app.quit()
 } else {
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
+    app.on('second-instance', (event, argv, workingDirectory) => {
+        if (isWindows()) {
+            handleOpenUrl(argv.slice(3))
+        }
         if (mainWindow) {
             if (mainWindow.isVisible()) {
                 if (mainWindow.isMinimized()) {
@@ -1225,6 +1244,11 @@ if (!gotTheLock) {
             }, 6 * 60 * 60 * 1000)
         }
         ipcMain.emit('ready', app)
+    })
+
+    app.on('open-url', function (event, url) {
+        event.preventDefault()
+        handleOpenUrl(url)
     })
 
     app.on('browser-window-created', function (e, window) {
