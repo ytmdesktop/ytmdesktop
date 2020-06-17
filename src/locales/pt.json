@@ -33,6 +33,7 @@
     "LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS": "Mostrar notificações",
     "LABEL_SETTINGS_TAB_GENERAL_START_MINIMIZED": "Iniciar minimizado",
     "LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "Iniciar com o sistema (Mac/Win)",
+    "LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND": "Nenhum dispositivo encontrado",
     "LABEL_SETTINGS_TAB_INTEGRATION": "Integração",
     "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
     "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "Salvar e autorizar",

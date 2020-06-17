@@ -32,24 +32,37 @@ function loadAudioOutputList() {
     return navigator.mediaDevices.enumerateDevices()
 }
 
-loadAudioOutputList().then(devices => {
-    audioDevices = devices.filter(device => device.kind === 'audiooutput')
+loadAudioOutputList().then((devices) => {
+    audioDevices = devices.filter((device) => device.kind === 'audiooutput')
 
-    audioDevices.forEach(deviceInfo => {
+    if (audioDevices.length) {
+        audioDevices.forEach((deviceInfo) => {
+            let option = document.createElement('option')
+            option.text =
+                deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`
+            option.value = deviceInfo.label
+            audioOutputSelect.appendChild(option)
+        })
+
+        initElement('settings-app-audio-output', 'change', function () {
+            ipc.send('change-audio-output', audioOutputSelect.value)
+        })
+
+        const defaultOuput = audioDevices.find(
+            (audio) => audio.deviceId == 'default'
+        )
+        if (!audioOutputSelect.value.length) {
+            audioOutputSelect.value = defaultOuput.label
+        }
+    } else {
         let option = document.createElement('option')
-        option.text =
-            deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`
-        option.value = deviceInfo.label
+        option.text = __.trans(
+            'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+        )
+        option.value = 0
         audioOutputSelect.appendChild(option)
-    })
 
-    initElement('settings-app-audio-output', 'change', function() {
-        ipc.send('change-audio-output', audioOutputSelect.value)
-    })
-
-    const defaultOuput = audioDevices.find(audio => audio.deviceId == 'default')
-    if (!audioOutputSelect.value.length) {
-        audioOutputSelect.value = defaultOuput.label
+        document.getElementById('settings-app-audio-output').disabled = true
     }
 
     mInit()
@@ -69,7 +82,7 @@ function checkCompanionStatus() {
 
 checkCompanionStatus()
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-keep-background', 'click')
     initElement('settings-show-notifications', 'click')
     initElement('settings-start-on-boot', 'click')
@@ -116,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }*/
 
 if (elementRangeZoom) {
-    elementRangeZoom.addEventListener('input', function() {
+    elementRangeZoom.addEventListener('input', function () {
         document.getElementById('range-zoom-value').innerText = this.value
         settingsProvider.set('settings-page-zoom', this.value)
         ipc.send('settings-value-changed', {
@@ -127,25 +140,25 @@ if (elementRangeZoom) {
 }
 
 if (elementBtnOpenPageEditor) {
-    elementBtnOpenPageEditor.addEventListener('click', function() {
+    elementBtnOpenPageEditor.addEventListener('click', function () {
         ipc.send('window', { command: 'show-editor-theme' })
     })
 }
 
 if (elementBtnLastFmLogin) {
-    elementBtnLastFmLogin.addEventListener('click', function() {
+    elementBtnLastFmLogin.addEventListener('click', function () {
         ipc.send('window', { command: 'show-last-fm-login' })
     })
 }
 
 if (elementBtnOpenCompanionServer) {
-    elementBtnOpenCompanionServer.addEventListener('click', function() {
+    elementBtnOpenCompanionServer.addEventListener('click', function () {
         shell.openExternal(`https://find.ytmdesktop.app`)
     })
 }
 
 if (elementBtnAppRelaunch) {
-    elementBtnAppRelaunch.addEventListener('click', function() {
+    elementBtnAppRelaunch.addEventListener('click', function () {
         relaunch()
     })
 }
@@ -190,7 +203,7 @@ function initElement(elementName, eventType, fn) {
  * @param {*} fn
  */
 function createListener(element, settingsName, eventType, fn) {
-    element.addEventListener(eventType, function() {
+    element.addEventListener(eventType, function () {
         switch (eventType) {
             case 'click':
                 settingsProvider.set(settingsName, this.checked)
@@ -275,7 +288,7 @@ function preventSpecialKeys(e) {
     return !(e.key == 'Control' || e.key == 'Alt' || e.key == 'Shift')
 }
 
-document.addEventListener('keyup', function(e) {
+document.addEventListener('keyup', function (e) {
     if (preventSpecialKeys(e)) {
         let keyBindings = ''
 

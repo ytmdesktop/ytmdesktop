@@ -52,6 +52,11 @@ a {
     color: #fff !important;
 }
 
+:disabled {
+    color: #666 !important;
+    border: none !important;
+}
+
 .select-dropdown.dropdown-content {
     background-color: black !important;
     max-height: 300px !important;
