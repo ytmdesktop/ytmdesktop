@@ -91,7 +91,7 @@ function balloon(title, content, cover, icon) {
 
 function _doNotification(title, content, image) {
     if (title && content) {
-        if (process.platform == 'win32') {
+        if (systemInfo.isWindows()) {
             tray.displayBalloon({
                 icon: image,
                 title: title,
@@ -111,10 +111,7 @@ function quit() {
 }
 
 function setShinyTray() {
-    if (
-        settingsProvider.get('settings-shiny-tray') &&
-        process.platform === 'darwin'
-    ) {
+    if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
         // Shiny tray enabled
         tray.setContextMenu(null)
         tray.removeAllListeners()
