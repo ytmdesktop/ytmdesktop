@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (btnMaximize) {
-        btnMinimize.addEventListener('click', function () {
+        btnMaximize.addEventListener('click', function () {
             if (!currentWindow.isMaximized()) {
                 currentWindow.maximize()
             } else {
