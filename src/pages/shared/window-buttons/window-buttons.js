@@ -43,25 +43,31 @@ ipc.on('window-is-maximized', function (_, value) {
 document.addEventListener('DOMContentLoaded', function () {
     checkUrlParams()
 
-    document
-        .getElementById('btn-minimize')
-        .addEventListener('click', function () {
+    let btnMinimize = document.getElementById('btn-minimize')
+    let btnMaximize = document.getElementById('btn-maximize')
+    let btnClose = document.getElementById('btn-close')
+
+    if (btnMinimize) {
+        btnMinimize.addEventListener('click', function () {
             currentWindow.minimize()
         })
+    }
 
-    document
-        .getElementById('btn-maximize')
-        .addEventListener('click', function () {
+    if (btnMaximize) {
+        btnMinimize.addEventListener('click', function () {
             if (!currentWindow.isMaximized()) {
                 currentWindow.maximize()
             } else {
                 currentWindow.unmaximize()
             }
         })
+    }
 
-    document.getElementById('btn-close').addEventListener('click', function () {
-        currentWindow.close()
-    })
+    if (btnClose) {
+        btnClose.addEventListener('click', function () {
+            currentWindow.close()
+        })
+    }
 
     document.getElementById('loading').classList.add('hide')
 
@@ -84,19 +90,28 @@ function checkUrlParams() {
     }
 
     if (icon) {
-        document.getElementById('icon').innerText = icon
+        let elIcon = document.getElementById('icon')
+        if (elIcon) {
+            elIcon.innerText = icon
+        }
     }
 
     if (title) {
+        let elTitle = document.getElementById('window-title')
+        if (elTitle) {
+            elTitle.innerText = title
+        }
         document.title = title
-        document.getElementById('window-title').innerText = title
     }
 
     if (hide) {
         hide = hide.split(',')
 
         hide.forEach((element) => {
-            document.getElementById(element).classList.add('hide')
+            let elHide = document.getElementById(element)
+            if (elHide) {
+                elHide.classList.add('hide')
+            }
         })
     }
 }
