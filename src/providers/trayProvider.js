@@ -70,24 +70,15 @@ function buildTrayIcon(icon) {
 function balloon(title, content, cover, icon) {
     if (title && content && cover) {
         imageToBase64(cover)
-            .then(
-                (response) => {
-                    _doNotification(
-                        title,
-                        content,
-                        nativeImage.createFromDataURL(
-                            `data:image/jpeg;base64,${response}`
-                        )
+            .then((response) => {
+                _doNotification(
+                    title,
+                    content,
+                    nativeImage.createFromDataURL(
+                        `data:image/jpeg;base64,${response}`
                     )
-                },
-                (_) => {
-                    _doNotification(
-                        title,
-                        content,
-                        nativeImage.createFromPath(icon)
-                    )
-                }
-            )
+                )
+            })
             .catch((_) => {
                 _doNotification(
                     title,
