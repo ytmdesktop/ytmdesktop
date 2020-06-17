@@ -65,11 +65,11 @@ function getTrackInfo() {
 function isPaused(webContents) {
     webContents
         .executeJavaScript(`document.getElementsByTagName('video')[0].paused;`)
-        .then(isPaused => {
+        .then((isPaused) => {
             debug(`Is paused: ${isPaused}`)
             player.isPaused = isPaused
         })
-        .catch(_ => console.log('error isPaused'))
+        .catch((_) => console.log('error isPaused'))
 }
 
 function getTitle(webContents) {
@@ -77,11 +77,11 @@ function getTitle(webContents) {
         .executeJavaScript(
             `document.getElementsByClassName('title ytmusic-player-bar')[0].innerText;`
         )
-        .then(title => {
+        .then((title) => {
             debug(`Title is: ${title}`)
             track.title = title
         })
-        .catch(_ => console.log('error getTitle'))
+        .catch((_) => console.log('error getTitle'))
 }
 
 function getDuration(webContents) {
@@ -89,12 +89,12 @@ function getDuration(webContents) {
         .executeJavaScript(
             `document.getElementById('progress-bar').getAttribute('aria-valuemax');`
         )
-        .then(duration => {
+        .then((duration) => {
             debug(`Duration is: ${parseInt(duration)}`)
             track.duration = parseInt(duration)
             track.durationHuman = convertToHuman(parseInt(duration))
         })
-        .catch(_ => console.log('error getDuration'))
+        .catch((_) => console.log('error getDuration'))
 }
 
 /**
@@ -107,11 +107,11 @@ function getLikeStatus(webContents) {
         .executeJavaScript(
             `document.getElementById('like-button-renderer').getAttribute('like-status');`
         )
-        .then(likeStatus => {
+        .then((likeStatus) => {
             debug(`Like status is: ${likeStatus}`)
             player.likeStatus = likeStatus
         })
-        .catch(_ => console.log('error getLikeStatus'))
+        .catch((_) => console.log('error getLikeStatus'))
 }
 
 /**
@@ -123,14 +123,14 @@ function getSeekbarPosition(webContents) {
         .executeJavaScript(
             `document.getElementById('progress-bar').getAttribute('aria-valuenow');`
         )
-        .then(position => {
+        .then((position) => {
             debug(`Seekbar position is: ${parseInt(position)}`)
             player.seekbarCurrentPosition = parseInt(position)
             player.seekbarCurrentPositionHuman = convertToHuman(
                 parseInt(position)
             )
         })
-        .catch(_ => console.log('error getSeekbarPosition'))
+        .catch((_) => console.log('error getSeekbarPosition'))
 }
 
 function getVolume(webContents) {
@@ -138,11 +138,11 @@ function getVolume(webContents) {
         .executeJavaScript(
             `document.getElementsByClassName('volume-slider style-scope ytmusic-player-bar')[0].getAttribute('value');`
         )
-        .then(volume => {
+        .then((volume) => {
             debug(`Volume % is: ${parseInt(volume)}`)
             player.volumePercent = parseInt(volume)
         })
-        .catch(_ => console.log('error getVolume'))
+        .catch((_) => console.log('error getVolume'))
 }
 
 function getAuthor(webContents) {
@@ -159,11 +159,11 @@ function getAuthor(webContents) {
     title;
             `
         )
-        .then(author => {
+        .then((author) => {
             debug(`Author is: ${author}`)
             track.author = author
         })
-        .catch(_ => console.log('error getAuthor'))
+        .catch((_) => console.log('error getAuthor'))
 }
 
 function getAlbum(webContents) {
@@ -184,11 +184,11 @@ function getAlbum(webContents) {
       album
       `
         )
-        .then(album => {
+        .then((album) => {
             debug(`Album is: ${album}`)
             track.album = album
         })
-        .catch(_ => console.log('error getAlbum'))
+        .catch((_) => console.log('error getAlbum'))
 }
 
 function getCover(webContents) {
@@ -209,11 +209,11 @@ function getCover(webContents) {
         cover;
       `
         )
-        .then(cover => {
+        .then((cover) => {
             debug(`Cover is: ${cover}`)
             track.cover = cover
         })
-        .catch(_ => console.log('error getCover'))
+        .catch((_) => console.log('error getCover'))
 }
 
 function getRepeatType(webContents) {
@@ -221,11 +221,11 @@ function getRepeatType(webContents) {
         .executeJavaScript(
             `document.getElementsByTagName("ytmusic-player-bar")[0].getAttribute("repeat-mode_");`
         )
-        .then(repeatType => {
+        .then((repeatType) => {
             debug(`Repeat type is: ${repeatType}`)
             player.repatType = repeatType
         })
-        .catch(_ => console.log('error getRepeatType'))
+        .catch((_) => console.log('error getRepeatType'))
 }
 
 function getUrl(webContents) {
@@ -233,7 +233,7 @@ function getUrl(webContents) {
         .executeJavaScript(
             `document.getElementsByClassName('ytp-title-link yt-uix-sessionlink')[0].href`
         )
-        .then(url => {
+        .then((url) => {
             if (url) {
                 track.url = url
 
@@ -245,19 +245,19 @@ function getUrl(webContents) {
                 debug(`Track id: ${track.id}`)
             }
         })
-        .catch(_ => console.log('error getUrl'))
+        .catch((_) => console.log('error getUrl'))
 }
 
 function isVideo(webContents) {
     webContents
         .executeJavaScript(
-            `document.getElementById('player').attributes['video-mode_']`
+            `document.getElementById('player').hasAttribute('video-mode_')`
         )
-        .then(isVideo => {
+        .then((isVideo) => {
             track.isVideo = !!isVideo
             debug(`Is video: ${track.isVideo}`)
         })
-        .catch(_ => console.log('error isVideo'))
+        .catch((_) => console.log('error isVideo ' + _))
 }
 
 function isAdvertisement(webContents) {
@@ -265,11 +265,11 @@ function isAdvertisement(webContents) {
         .executeJavaScript(
             `document.getElementsByClassName('advertisement ')[0].hasAttribute('hidden')`
         )
-        .then(isAdvertisement => {
+        .then((isAdvertisement) => {
             track.isAdvertisement = !isAdvertisement
             debug(`Is advertisement: ${track.isAdvertisement}`)
         })
-        .catch(_ => console.log('error isAdvertisement'))
+        .catch((_) => console.log('error isAdvertisement'))
 }
 
 function setVolume(webContents, time) {
@@ -281,7 +281,7 @@ function setVolume(webContents, time) {
         `
         )
         .then()
-        .catch(_ => console.log('error changeVolume'))
+        .catch((_) => console.log('error changeVolume'))
 }
 
 function setSeekbar(webContents, time) {
@@ -297,7 +297,7 @@ function setSeekbar(webContents, time) {
         `
         )
         .then()
-        .catch(_ => console.log('error changeSeekbar'))
+        .catch((_) => console.log('error changeSeekbar'))
 }
 
 function setLyrics(lyrics) {
@@ -341,7 +341,7 @@ function firstPlay(webContents) {
       playButton.click();`
         )
         .then()
-        .catch(_ => console.log('error firstPlay'))
+        .catch((_) => console.log('error firstPlay'))
 }
 
 function debug(data) {
