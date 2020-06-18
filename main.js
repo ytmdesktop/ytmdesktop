@@ -477,9 +477,13 @@ function createWindow() {
     })
 
     // LOCAL
-    electronLocalshortcut.register(view, 'CmdOrCtrl+S', () => {
-        ipcMain.emit('window', { command: 'show-settings' })
-    })
+    electronLocalshortcut.register(
+        view,
+        isMac() ? 'Cmd+,' : 'CmdOrCtrl+S',
+        () => {
+            ipcMain.emit('window', { command: 'show-settings' })
+        }
+    )
 
     electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
         ipcMain.emit('window', { command: 'show-miniplayer' })
