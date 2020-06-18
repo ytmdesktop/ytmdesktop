@@ -57,13 +57,6 @@ function updateTrayIcon(icon) {
 
 function buildTrayIcon(icon) {
     let nativeImageIcon = nativeImage.createFromPath(icon)
-    if (systemInfo.isMac()) {
-        nativeImageIcon = nativeImageIcon.resize({
-            height: 18,
-            width: 18,
-            quality: 'best',
-        })
-    }
     return nativeImageIcon
 }
 

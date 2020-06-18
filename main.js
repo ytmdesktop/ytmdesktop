@@ -67,6 +67,7 @@ let windowConfig = {
 global.sharedObj = { title: 'N/A', paused: true }
 
 let iconDefault = assetsProvider.getIcon('favicon')
+let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
 let iconPause = assetsProvider.getIcon('favicon_pause')
 // Keep a global reference of the window object, if you don't, the window will
@@ -476,9 +477,13 @@ function createWindow() {
     })
 
     // LOCAL
-    electronLocalshortcut.register(view, 'CmdOrCtrl+S', () => {
-        ipcMain.emit('window', { command: 'show-settings' })
-    })
+    electronLocalshortcut.register(
+        view,
+        isMac() ? 'Cmd+,' : 'CmdOrCtrl+S',
+        () => {
+            ipcMain.emit('window', { command: 'show-settings' })
+        }
+    )
 
     electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
         ipcMain.emit('window', { command: 'show-miniplayer' })
@@ -1230,7 +1235,7 @@ if (!gotTheLock) {
 
         createWindow()
 
-        tray.createTray(mainWindow, iconDefault)
+        tray.createTray(mainWindow, iconTray)
 
         ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
