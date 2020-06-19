@@ -100,7 +100,7 @@ if (settingsProvider.get('has-updated')) {
         console.log('has-updated')
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
-    // settingsProvider.set('has-updated', false)
+    settingsProvider.set('has-updated', false)
 }
 
 if (isLinux()) {
