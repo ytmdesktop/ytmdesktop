@@ -43,6 +43,7 @@
         "i18n": "^0.10.0",
         "image-to-base64": "^2.1.0",
         "js-base64": "^2.5.2",
+        "markdown": "^0.5.0",
         "node-fetch": "^2.6.0",
         "node-vibrant": "^3.1.5",
         "npx": "^10.2.2",

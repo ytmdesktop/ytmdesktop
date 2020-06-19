@@ -25,10 +25,7 @@ settingsProvider.setInitialValue('settings-companion-server-protect', true) // Y
 settingsProvider.setInitialValue(
     // Random token
     'settings-companion-server-token',
-    Math.random()
-        .toString(36)
-        .substr(2, 5)
-        .toUpperCase()
+    Math.random().toString(36).substr(2, 5).toUpperCase()
 )
 
 settingsProvider.setInitialValue(
@@ -45,3 +42,5 @@ settingsProvider.setInitialValue('settings-accelerators', {
     'media-track-like': 'CmdOrCtrl+Shift+numadd',
     'media-track-dislike': 'CmdOrCtrl+Shift+numsub',
 })
+
+settingsProvider.setInitialValue('has-updated', false)

@@ -62,5 +62,6 @@
     "MEDIA_CONTROL_SEARCH": "Search",
     "MEDIA_CONTROL_SHUFFLE": "Shuffle",
     "MEDIA_CONTROL_THUMBS_DOWN": "Thumbs Down",
-    "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up"
+    "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
+    "LABEL_CHANGELOG": "What's new"
 }

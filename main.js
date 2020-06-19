@@ -95,6 +95,14 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
+if (settingsProvider.get('has-updated')) {
+    setTimeout(() => {
+        console.log('has-updated')
+        ipcMain.emit('window', { command: 'show-changelog' })
+    }, 2000)
+    // settingsProvider.set('has-updated', false)
+}
+
 if (isLinux()) {
     mprisProvider.start()
 }
@@ -716,6 +724,10 @@ function createWindow() {
                 windowGuest()
                 break
 
+            case 'show-changelog':
+                windowChangelog()
+                break
+
             case 'restore-main-window':
                 mainWindow.show()
                 break
@@ -1019,6 +1031,39 @@ function createWindow() {
         incognitoWindow.webContents.loadURL(mainWindowParams.url)
     }
 
+    function windowChangelog() {
+        let changelog = new BrowserWindow({
+            title: __.trans('LABEL_CHANGELOG'),
+            icon: iconDefault,
+            modal: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            center: true,
+            resizable: false,
+            backgroundColor: '#232323',
+            width: 460,
+            height: 650,
+            autoHideMenuBar: false,
+            skipTaskbar: false,
+            webPreferences: {
+                nodeIntegration: true,
+                webviewTag: true,
+            },
+        })
+
+        changelog.loadFile(
+            path.join(
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
+            ),
+            {
+                search: `title=${__.trans(
+                    'LABEL_CHANGELOG'
+                )}&page=changelog/changelog&hide=btn-minimize,btn-maximize`,
+            }
+        )
+    }
+
     ipcMain.on('switch-clipboard-watcher', () => {
         switchClipboardWatcher()
     })
@@ -1241,6 +1286,7 @@ if (!gotTheLock) {
             if (settingsProvider.get('settings-shiny-tray'))
                 tray.updateImage(payload)
         })
+
         if (!isDev) {
             updater.checkUpdate(mainWindow, view)
 
@@ -1248,6 +1294,7 @@ if (!gotTheLock) {
                 updater.checkUpdate(mainWindow, view)
             }, 6 * 60 * 60 * 1000)
         }
+
         ipcMain.emit('ready', app)
     })
 
