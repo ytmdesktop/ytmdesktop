@@ -8,21 +8,17 @@ const Notification = require('electron-native-notification')
 const { doBehavior } = require('../utils/window')
 const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
+const { popUpMenu } = require('./templateProvider')
 
 let tray = null
-let saved_icon = null
 let saved_mainWindow = null
+let contextMenu = null
 
 function setTooltip(tooltip) {
     tray.setToolTip(tooltip)
 }
 
 let init_tray = () => {
-    const { popUpMenu } = require('./templateProvider')
-    const contextMenu = Menu.buildFromTemplate(
-        popUpMenu(__, saved_mainWindow, mediaControl, BrowserWindow, path, app)
-    )
-
     setTooltip('YouTube Music Desktop App')
     tray.setContextMenu(contextMenu)
 
@@ -35,13 +31,15 @@ let init_tray = () => {
     })
 }
 
-let popUpMenu = null
-
 function createTray(mainWindow, icon) {
     nativeImageIcon = buildTrayIcon(icon)
     tray = new Tray(nativeImageIcon)
 
     saved_mainWindow = mainWindow
+
+    contextMenu = Menu.buildFromTemplate(
+        popUpMenu(__, saved_mainWindow, mediaControl, BrowserWindow, path, app)
+    )
     if (!systemInfo.isMac()) {
         init_tray()
     } else {
@@ -105,44 +103,17 @@ function quit() {
 
 function setShinyTray() {
     if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
-        // Shiny tray enabled
         tray.setContextMenu(null)
         tray.removeAllListeners()
         tray.on('right-click', (event, bound, position) => {
-            // console.log('right_clicked', bound);
-            if (!popUpMenu.isVisible()) {
-                popUpMenu.setPosition(bound.x, bound.y + bound.height + 1)
-                popUpMenu.show()
-            } else {
-                popUpMenu.hide()
-            }
+            tray.popUpContextMenu(contextMenu)
         })
         tray.on('click', (event, bound, position) => {
-            // console.log(position);
             if (position.x < 32) {
-                doBehavior(saved_mainWindow)
+                saved_mainWindow.show()
             } else if (position.x > 130) {
                 mediaControl.playPauseTrack(saved_mainWindow.getBrowserView())
             }
-        })
-        popUpMenu = new BrowserWindow({
-            frame: false,
-            center: true,
-            alwaysOnTop: true,
-            autoHideMenuBar: true,
-            resizable: false,
-            backgroundColor: '#232323',
-            width: 160,
-            height: 277,
-            webPreferences: { nodeIntegration: true },
-        })
-        popUpMenu.loadFile(
-            path.join(__dirname, '../pages/settings/mac_shiny.html')
-        )
-        popUpMenu.setVisibleOnAllWorkspaces(true)
-        popUpMenu.hide()
-        popUpMenu.on('blur', () => {
-            popUpMenu.hide()
         })
     } else {
         // Shiny tray disabled ||| on onther platform
