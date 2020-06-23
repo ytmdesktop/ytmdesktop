@@ -7,6 +7,11 @@ var player = {
     seekbarCurrentPositionHuman: '0:00',
     likeStatus: 'INDIFFERENT',
     repatType: 'NONE',
+    queue: {
+        currentIndex: 0,
+        size: 0,
+        data: [],
+    },
 }
 
 var track = {
@@ -43,6 +48,7 @@ function getPlayerInfo() {
         getSeekbarPosition(webContents)
         getLikeStatus(webContents)
         getRepeatType(webContents)
+        getQueue(webContents)
     }
     return player
 }
@@ -246,6 +252,42 @@ function getUrl(webContents) {
             }
         })
         .catch((_) => console.log('error getUrl'))
+}
+
+function getQueue(webContents) {
+    webContents
+        .executeJavaScript(
+            `
+            var element = document.querySelector('ytmusic-player-queue #contents')
+            var children = element.children
+
+            var arrChildren = Array.from(children)
+            
+            var queue = { currentIndex: 0, size: 0, data: [] };
+
+            arrChildren.forEach( (el, key) => { 
+                var songElement = el.querySelector('.song-info')
+                var songTitle = songElement.querySelector('.song-title').getAttribute('title')
+                var songAuthor = songElement.querySelector('.byline').getAttribute('title')
+                
+                if(el.hasAttribute('selected')) {
+                    queue.currentIndex = key;
+                }
+                text = songTitle + " - " + songAuthor
+                queue.data.push(text)
+            } )
+
+            queue.size = arrChildren.length
+            queue
+            `
+        )
+        .then((queue) => {
+            if (queue) {
+                player.queue = queue
+                debug(`Player Queue: ${player.queue}`)
+            }
+        })
+        .catch((_) => console.log('error getQueue'))
 }
 
 function isVideo(webContents) {

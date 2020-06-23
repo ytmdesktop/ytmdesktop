@@ -45,7 +45,8 @@ let mainWindow,
     customCSSAppKey,
     customCSSPageKey,
     lastTrackId,
-    doublePressPlayPause
+    doublePressPlayPause,
+    updateTrackInfoTimeout
 
 let isFirstTime = false
 
@@ -327,7 +328,7 @@ function createWindow() {
                 if (global.on_the_road) {
                     updateActivity()
                 }
-            }, 800)
+            }, 500)
         }
     })
 
@@ -358,53 +359,66 @@ function createWindow() {
         var album = trackInfo.album
         var cover = trackInfo.cover
         var nowPlaying = `${title} - ${author}`
-
         logDebug(nowPlaying)
 
-        discordRPC.setActivity(getAll())
-        rainmeterNowPlaying.setActivity(getAll())
-        mprisProvider.setActivity(getAll())
+        if (title && author) {
+            discordRPC.setActivity(getAll())
+            rainmeterNowPlaying.setActivity(getAll())
+            mprisProvider.setActivity(getAll())
 
-        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+            mediaControl.createThumbar(
+                mainWindow,
+                infoPlayerProvider.getAllInfo()
+            )
 
-        mediaControl.setProgress(
-            mainWindow,
-            settingsProvider.get('settings-enable-taskbar-progressbar')
-                ? trackInfo.statePercent
-                : -1,
-            playerInfo.isPaused
-        )
+            mediaControl.setProgress(
+                mainWindow,
+                settingsProvider.get('settings-enable-taskbar-progressbar')
+                    ? trackInfo.statePercent
+                    : -1,
+                playerInfo.isPaused
+            )
 
-        /**
-         * Update only when change track
-         */
-        if (lastTrackId !== trackInfo.id) {
-            lastTrackId = trackInfo.id
+            /**
+             * Update only when change track
+             */
+            if (lastTrackId !== trackInfo.id) {
+                lastTrackId = trackInfo.id
 
-            if (isMac()) {
-                global.sharedObj.title = nowPlaying
-                renderer_for_status_bar.send('update-status-bar')
+                if (isMac()) {
+                    global.sharedObj.title = nowPlaying
+                    renderer_for_status_bar.send('update-status-bar')
+                }
+
+                mainWindow.setTitle(nowPlaying)
+                tray.setTooltip(nowPlaying)
+                if (!trackInfo.isAdvertisement) {
+                    if (settingsProvider.get('settings-last-fm-scrobbler')) {
+                        clearInterval(updateTrackInfoTimeout)
+                        updateTrackInfoTimeout = setTimeout(() => {
+                            scrobblerProvider.updateTrackInfo(
+                                title,
+                                author,
+                                album
+                            )
+                        }, 10 * 2000)
+                    }
+                }
+
+                if (
+                    !mainWindow.isFocused() &&
+                    settingsProvider.get('settings-show-notifications')
+                ) {
+                    tray.balloon(title, author, cover, iconDefault)
+                }
             }
 
-            mainWindow.setTitle(nowPlaying)
-            tray.setTooltip(nowPlaying)
-            if (!trackInfo.isAdvertisement) {
-                scrobblerProvider.updateTrackInfo(title, author, album)
-            }
-
-            if (
-                !mainWindow.isFocused() &&
-                settingsProvider.get('settings-show-notifications')
-            ) {
-                tray.balloon(title, author, cover, iconDefault)
-            }
-        }
-
-        if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
-            if (playerInfo.isPaused) {
-                tray.updateTrayIcon(iconPause)
-            } else {
-                tray.updateTrayIcon(iconPlay)
+            if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
+                if (playerInfo.isPaused) {
+                    tray.updateTrayIcon(iconPause)
+                } else {
+                    tray.updateTrayIcon(iconPlay)
+                }
             }
         }
     }
