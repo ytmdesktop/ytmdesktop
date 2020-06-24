@@ -87,10 +87,12 @@ function _doNotification(title, content, image) {
                 icon: image,
                 title: title,
                 content: content,
+                noSound = true,
             })
         } else {
             new Notification(title, {
                 body: content,
+                silent = true,
                 icon: image,
             })
         }
