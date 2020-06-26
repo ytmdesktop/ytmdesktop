@@ -71,6 +71,10 @@ function mediaChangeVolume(mainWindow, time) {
     infoPlayerProvider.setVolume(mainWindow.webContents, time)
 }
 
+function mediaSelectQueueItem(mainWindow, index) {
+    infoPlayerProvider.setQueueItem(mainWindow.webContents, index)
+}
+
 function createThumbar(mainWindow, mediaInfo) {
     let isPaused = mediaInfo.player.isPaused
     let likeStatus = mediaInfo.player.likeStatus
@@ -103,7 +107,7 @@ function createThumbar(mainWindow, mediaInfo) {
     playOrPause = {
         tooltip: __.trans('MEDIA_CONTROL_PLAY'),
         icon: path.join(__dirname, '../assets/img/controls/play-button.png'),
-        click: function() {
+        click: function () {
             mediaPlayPauseTrack(mainWindow.getBrowserView())
         },
     }
@@ -121,7 +125,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: __.trans('MEDIA_CONTROL_THUMBS_DOWN'),
                 icon: path.join(__dirname, thumbsDown),
-                click: function() {
+                click: function () {
                     mediaDownVote(
                         mainWindow.getBrowserView(),
                         createThumbar(mainWindow, mediaInfo)
@@ -139,7 +143,7 @@ function createThumbar(mainWindow, mediaInfo) {
                     __dirname,
                     '../assets/img/controls/play-previous-button.png'
                 ),
-                click: function() {
+                click: function () {
                     mediaPreviousTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -147,7 +151,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: playOrPause.tooltip,
                 icon: playOrPause.icon,
-                click: function() {
+                click: function () {
                     mediaPlayPauseTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -158,7 +162,7 @@ function createThumbar(mainWindow, mediaInfo) {
                     __dirname,
                     '../assets/img/controls/play-next-button.png'
                 ),
-                click: function() {
+                click: function () {
                     mediaNextTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -170,7 +174,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: __.trans('MEDIA_CONTROL_THUMBS_UP'),
                 icon: path.join(__dirname, thumbsUp),
-                click: function() {
+                click: function () {
                     mediaUpVote(
                         mainWindow.getBrowserView(),
                         createThumbar(mainWindow, mediaInfo)
@@ -206,18 +210,19 @@ const guarder = (mainWindow, f) => {
     if (mainWindow && mainWindow.webContents) f(mainWindow)
 }
 
-exports.playPauseTrack = v => guarder(v, mediaPlayPauseTrack)
-exports.stopTrack = v => guarder(v, mediaStopTrack)
-exports.nextTrack = v => guarder(v, mediaNextTrack)
-exports.previousTrack = v => guarder(v, mediaPreviousTrack)
-exports.upVote = v => guarder(v, mediaUpVote)
-exports.downVote = v => guarder(v, mediaDownVote)
-exports.volumeUp = v => guarder(v, mediaVolumeUp)
-exports.volumeDown = v => guarder(v, mediaVolumeDown)
-exports.mediaForwardTenSeconds = v => guarder(v, mediaForwardTenSeconds)
-exports.mediaRewindTenSeconds = v => guarder(v, mediaRewindTenSeconds)
+exports.playPauseTrack = (v) => guarder(v, mediaPlayPauseTrack)
+exports.stopTrack = (v) => guarder(v, mediaStopTrack)
+exports.nextTrack = (v) => guarder(v, mediaNextTrack)
+exports.previousTrack = (v) => guarder(v, mediaPreviousTrack)
+exports.upVote = (v) => guarder(v, mediaUpVote)
+exports.downVote = (v) => guarder(v, mediaDownVote)
+exports.volumeUp = (v) => guarder(v, mediaVolumeUp)
+exports.volumeDown = (v) => guarder(v, mediaVolumeDown)
+exports.mediaForwardTenSeconds = (v) => guarder(v, mediaForwardTenSeconds)
+exports.mediaRewindTenSeconds = (v) => guarder(v, mediaRewindTenSeconds)
 exports.changeSeekbar = mediaChangeSeekbar
 exports.changeVolume = mediaChangeVolume
+exports.selectQueueItem = mediaSelectQueueItem
 exports.repeat = mediaRepeat
 exports.shuffle = mediaShuffle
 

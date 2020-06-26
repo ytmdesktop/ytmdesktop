@@ -263,21 +263,23 @@ function getQueue(webContents) {
 
             var arrChildren = Array.from(children)
             
-            var queue = { currentIndex: 0, size: 0, data: [] };
+            var queue = { automix: false, currentIndex: 0, data: [] };
 
             arrChildren.forEach( (el, key) => { 
                 var songElement = el.querySelector('.song-info')
+
+                var songCover = songElement.parentElement.querySelector('.yt-img-shadow').getAttribute('src')
                 var songTitle = songElement.querySelector('.song-title').getAttribute('title')
                 var songAuthor = songElement.querySelector('.byline').getAttribute('title')
                 
                 if(el.hasAttribute('selected')) {
                     queue.currentIndex = key;
                 }
-                text = songTitle + " - " + songAuthor
+                text = { cover: songCover, title: songTitle, author: songAuthor }
                 queue.data.push(text)
             } )
 
-            queue.size = arrChildren.length
+            queue.automix = document.querySelector('#automix').getAttribute('aria-pressed') == 'true'
             queue
             `
         )
@@ -288,6 +290,14 @@ function getQueue(webContents) {
             }
         })
         .catch((_) => console.log('error getQueue'))
+}
+
+function setQueueItem(webContents, index) {
+    webContents.executeJavaScript(
+        `
+        var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()
+        `
+    )
 }
 
 function isVideo(webContents) {
@@ -400,4 +410,5 @@ module.exports = {
     setVolume: setVolume,
     setSeekbar: setSeekbar,
     setLyrics: setLyrics,
+    setQueueItem: setQueueItem,
 }

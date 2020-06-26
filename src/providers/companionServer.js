@@ -352,6 +352,13 @@ function execCmd(cmd, value) {
                 value: value,
             })
             break
+
+        case 'player-set-queue':
+            ipcMain.emit('media-command', {
+                command: 'media-queue-set',
+                value: value,
+            })
+            break
     }
 }
 

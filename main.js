@@ -678,6 +678,10 @@ function createWindow() {
             case 'media-volume-set':
                 mediaControl.changeVolume(view, value)
                 break
+
+            case 'media-queue-set':
+                mediaControl.selectQueueItem(view, value)
+                break
         }
     })
 
