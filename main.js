@@ -45,6 +45,7 @@ let mainWindow,
     customCSSAppKey,
     customCSSPageKey,
     lastTrackId,
+    lastTrackProgress,
     doublePressPlayPause,
     updateTrackInfoTimeout
 
@@ -353,10 +354,12 @@ function createWindow() {
     function updateActivity() {
         var trackInfo = infoPlayerProvider.getTrackInfo()
         var playerInfo = infoPlayerProvider.getPlayerInfo()
-
+        var trackId = trackInfo.id
         var title = trackInfo.title
         var author = trackInfo.author
         var album = trackInfo.album
+        var duration = trackInfo.duration
+        var progress = trackInfo.statePercent
         var cover = trackInfo.cover
         var nowPlaying = `${title} - ${author}`
         logDebug(nowPlaying)
@@ -380,10 +383,37 @@ function createWindow() {
             )
 
             /**
+             * Srobble when track changes or when current track starts from the beginning
+             */
+            if (settingsProvider.get('settings-last-fm-scrobbler')) {
+                if (
+                    lastTrackId !== trackId ||
+                    (lastTrackProgress > progress && progress < 0.01)
+                ) {
+                    if (!trackInfo.isAdvertisement) {
+                        clearInterval(updateTrackInfoTimeout)
+                        updateTrackInfoTimeout = setTimeout(() => {
+                            scrobblerProvider.updateTrackInfo(
+                                title,
+                                author,
+                                album
+                            )
+                        }, 20 * 1000)
+                        scrobblerProvider.updateNowPlaying(
+                            title,
+                            author,
+                            album,
+                            duration
+                        )
+                    }
+                }
+            }
+
+            /**
              * Update only when change track
              */
-            if (lastTrackId !== trackInfo.id) {
-                lastTrackId = trackInfo.id
+            if (lastTrackId !== trackId) {
+                lastTrackId = trackId
 
                 if (isMac()) {
                     global.sharedObj.title = nowPlaying
@@ -392,18 +422,6 @@ function createWindow() {
 
                 mainWindow.setTitle(nowPlaying)
                 tray.setTooltip(nowPlaying)
-                if (!trackInfo.isAdvertisement) {
-                    if (settingsProvider.get('settings-last-fm-scrobbler')) {
-                        clearInterval(updateTrackInfoTimeout)
-                        updateTrackInfoTimeout = setTimeout(() => {
-                            scrobblerProvider.updateTrackInfo(
-                                title,
-                                author,
-                                album
-                            )
-                        }, 10 * 2000)
-                    }
-                }
 
                 if (
                     !mainWindow.isFocused() &&
@@ -420,6 +438,8 @@ function createWindow() {
                     tray.updateTrayIcon(iconPlay)
                 }
             }
+
+            lastTrackProgress = progress
         }
     }
 
