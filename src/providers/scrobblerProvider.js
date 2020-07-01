@@ -74,6 +74,20 @@ function updateTrackInfo(title, author, album) {
     Scrobbler.Scrobble(track, function (_) {})
 }
 
+function updateNowPlaying(title, author, album, duration) {
+    if (Scrobbler === undefined) {
+        signIn()
+    }
+
+    var track = {
+        artist: author,
+        track: title,
+        album: album,
+        duration: duration,
+    }
+    Scrobbler.NowPlaying(track, function (_) {})
+}
+
 function authorize(token) {
     let winAuthorize = new remote.BrowserWindow({
         title: 'Last.FM Authorization',
@@ -88,6 +102,7 @@ function authorize(token) {
 module.exports = {
     getToken: getToken,
     updateTrackInfo: updateTrackInfo,
+    updateNowPlaying: updateNowPlaying,
     getLogin: getLogin,
     setLogin: setLogin,
     authorize: authorize,
