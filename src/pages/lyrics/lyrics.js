@@ -1,6 +1,9 @@
 const { ipcRenderer } = require('electron')
 const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
+const infoPlayerProvider = require('electron').remote.require(
+    './src/providers/infoPlayerProvider'
+)
 
 const elementLyric = document.getElementById('lyric')
 const elementLyricSource = document.getElementById('lyric-source')
@@ -74,6 +77,7 @@ function getLyric(artist, song, id) {
                                 })
                                 .catch((error) => {
                                     elementLyric.innerText = error
+                                    setLyrics('-', error)
                                 })
                         })
                 })
@@ -87,11 +91,13 @@ function setLyrics(source, lyrics) {
     elementLyricSource.innerText = `Lyrics provided by ${source}`
     elementLyric.innerText = lyrics
     document.getElementById('content').scrollTop = 0
+    infoPlayerProvider.setLyrics(source, lyrics)
 }
 
 function loadingLyrics() {
     elementLyricSource.innerText = ''
     elementLyric.innerText = __.trans('LABEL_LOADING')
+    infoPlayerProvider.setLyrics('', __.trans('LABEL_LOADING'))
 }
 
 function removeAccents(strAccents) {

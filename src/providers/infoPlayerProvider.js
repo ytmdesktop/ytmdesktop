@@ -26,7 +26,10 @@ var track = {
     id: '',
     isVideo: false,
     isAdvertisement: false,
-    lyrics: '',
+    lyrics: {
+        provider: '',
+        data: '',
+    },
 }
 
 function init(view) {
@@ -352,8 +355,9 @@ function setSeekbar(webContents, time) {
         .catch((_) => console.log('error changeSeekbar'))
 }
 
-function setLyrics(lyrics) {
-    track.lyrics = lyrics
+function setLyrics(provider, lyrics) {
+    track.lyrics.provider = provider
+    track.lyrics.data = lyrics
 }
 
 function convertToHuman(time) {

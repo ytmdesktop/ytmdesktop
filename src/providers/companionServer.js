@@ -8,14 +8,13 @@ const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
 const port = 9863
+const hostname = os.hostname()
 
 const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
 let serverInterfaces = []
-
-fetchNetworkInterfaces()
 
 function infoApp() {
     return {
@@ -24,6 +23,7 @@ function infoApp() {
 }
 function infoServer() {
     return {
+        name: hostname,
         listen: serverInterfaces,
         port: port,
         isProtected:
@@ -37,11 +37,10 @@ function fetchNetworkInterfaces() {
         if (!pattIgnoreInterface.test(v)) {
             networkInterfaces[v].forEach((vv, kk) => {
                 if (vv.family == 'IPv4' && vv.internal == false) {
-                    let data = {
+                    var data = {
                         name: v,
                         ip: vv.address,
                     }
-
                     serverInterfaces.push(data)
                 }
             })
@@ -55,6 +54,7 @@ var serverFunction = function (req, res) {
 
         serverInterfaces.forEach((value) => {
             let qr = qrcode(6, 'H')
+            value['h'] = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
@@ -138,7 +138,7 @@ var serverFunction = function (req, res) {
               </div>
   
               <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  ${os.hostname()} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${totalConnections}</a>
+                  ${hostname} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${totalConnections}</a>
               </div>
   
           </body>
@@ -256,6 +256,8 @@ function start() {
         })
     })
 
+    fetchNetworkInterfaces()
+
     console.log('Companion Server listening on port ' + port)
 }
 
@@ -358,6 +360,10 @@ function execCmd(cmd, value) {
                 command: 'media-queue-set',
                 value: value,
             })
+            break
+
+        case 'show-lyrics-hidden':
+            ipcMain.emit('window', { command: 'show-lyrics-hidden' })
             break
     }
 }

@@ -754,6 +754,11 @@ function createWindow() {
                 windowLyrics()
                 break
 
+            case 'show-lyrics-hidden':
+                windowLyrics()
+                lyrics.hide()
+                break
+
             case 'show-companion':
                 windowCompanion()
                 break
