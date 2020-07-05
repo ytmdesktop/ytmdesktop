@@ -238,6 +238,21 @@ var serverFunction = function (req, res) {
 
 var server = http.createServer(serverFunction)
 
+function canConnect(socket) {
+    let clientPassword = socket.handshake.headers['password'] || ''
+    let clientHost = socket.handshake['address']
+    let clientIsLocalhost = clientHost.indexOf('127.0.0.1') != -1
+
+    let serverPassword = settingsProvider.get('settings-companion-server-token')
+
+    if (infoServer().isProtected) {
+        if (clientIsLocalhost == false && clientPassword != serverPassword) {
+            return false
+        }
+    }
+    return true
+}
+
 function start() {
     server.listen(port, ip)
     const io = require('socket.io')(server)
@@ -251,6 +266,10 @@ function start() {
     }, 600)
 
     io.on('connection', (socket) => {
+        if (!canConnect(socket)) {
+            socket.disconnect()
+        }
+
         socket.on('media-commands', (cmd, value) => {
             execCmd(cmd, value)
         })
