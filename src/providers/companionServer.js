@@ -241,7 +241,7 @@ var server = http.createServer(serverFunction)
 function canConnect(socket) {
     let clientPassword = socket.handshake.headers['password'] || ''
     let clientHost = socket.handshake['address']
-    let clientIsLocalhost = clientHost.indexOf('127.0.0.1') != -1
+    let clientIsLocalhost = clientHost == '127.0.0.1'
 
     let serverPassword = settingsProvider.get('settings-companion-server-token')
 
