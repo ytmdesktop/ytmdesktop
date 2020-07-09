@@ -273,6 +273,13 @@ function start() {
         socket.on('media-commands', (cmd, value) => {
             execCmd(cmd, value)
         })
+
+        socket.on('retrieve-info', () => {
+            socket.emit('info', {
+                app: infoApp(),
+                server: infoServer(),
+            })
+        })
     })
 
     fetchNetworkInterfaces()
