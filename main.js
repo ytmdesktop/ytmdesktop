@@ -656,6 +656,9 @@ function createWindow() {
 
         switch (command) {
             case 'media-play-pause':
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
+                }
                 mediaControl.playPauseTrack(view)
                 break
 

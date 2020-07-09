@@ -5,62 +5,50 @@ const path = require('path')
 
 function mediaPlayPauseTrack(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
-    console.log('mediaPlayPause')
 }
 
 function mediaStopTrack(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
-    console.log('mediaStop')
 }
 
 function mediaNextTrack(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'j' })
-    console.log('mediaNext')
 }
 
 function mediaPreviousTrack(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'k' })
-    console.log('mediaPrevious')
 }
 
 function mediaUpVote(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '+' })
-    console.log('mediaUpVote')
 }
 
 function mediaDownVote(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '_' })
-    console.log('mediaDownVote')
 }
 
 function mediaVolumeUp(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
-    console.log('mediaVolumeUp')
 }
 
 function mediaVolumeDown(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
-    console.log('mediaVolumeDown')
 }
 
 function mediaForwardTenSeconds(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'l' })
-    console.log('mediaForward10Seconds')
 }
 
 function mediaRewindTenSeconds(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'h' })
-    console.log('mediaRewindXSeconds')
 }
 
 function mediaRepeat(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 'r' })
-    console.log('mediaRepeat')
 }
 
 function mediaShuffle(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: 's' })
-    console.log('mediaShuffle')
 }
 
 function mediaChangeSeekbar(mainWindow, time) {
