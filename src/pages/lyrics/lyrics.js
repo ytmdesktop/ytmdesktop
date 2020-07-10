@@ -191,15 +191,12 @@ function retrieveKsoftData(artist, track) {
         fetch(
             `https://ytmd-lyrics.herokuapp.com/?q=${removeAccents(
                 artist
-            )} - ${removeAccents(track)}`
+            )} - ${removeAccents(track)}`,
+            { timeout: 3000 }
         )
             .then((res) => res.json())
             .then((json) => {
                 if (!json.error) {
-                    /*ipcRenderer.send(
-                        'debug',
-                        `Query = ${json.query} | Result = ${json.result.name} - ${json.result.artist.name}`
-                    )*/
                     resolve(json.result.lyrics)
                 } else {
                     reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
@@ -214,7 +211,8 @@ function retrieveOVHData(artist, track) {
         fetch(
             `https://api.lyrics.ovh/v1/${removeAccents(artist)}/${removeAccents(
                 track
-            )}`
+            )}`,
+            { timeout: 3000 }
         )
             .then((res) => res.json())
             .then((json) => {
@@ -233,7 +231,8 @@ function retrieveVagalumeData(artist, track) {
         fetch(
             `https://api.vagalume.com.br/search.php?art=${removeAccents(
                 artist
-            )}&mus=${removeAccents(track)}`
+            )}&mus=${removeAccents(track)}`,
+            { timeout: 3000 }
         )
             .then((res) => res.json())
             .then((json) => {

@@ -138,7 +138,7 @@ var serverFunction = function (req, res) {
               </div>
   
               <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  ${hostname} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${totalConnections}</a>
+                  ${hostname} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
   
           </body>
