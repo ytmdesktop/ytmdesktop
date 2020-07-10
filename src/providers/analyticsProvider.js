@@ -1,7 +1,7 @@
 const { app } = require('electron')
 const Analytics = require('electron-google-analytics')
 const analytics = new Analytics.default('UA-127400126-1')
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid')
 const settingsProvider = require('./settingsProvider')
 let userId = settingsProvider.get('uuid')
 
@@ -18,7 +18,7 @@ function setAnalyticsEvent(from, action, label, value) {
             clientID: userId,
         })
         .then()
-        .catch(err => {
+        .catch((err) => {
             console.log('error setAnalyticsEvent')
         })
 }
@@ -34,7 +34,7 @@ function setAnalyticsScreen(from) {
             userId
         )
         .then()
-        .catch(err => {
+        .catch((err) => {
             console.log('error setAnalyticsScreen')
         })
 }

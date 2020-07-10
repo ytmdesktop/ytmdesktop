@@ -23,35 +23,35 @@
         }
     },
     "devDependencies": {
-        "electron": "^9.0.5",
+        "electron": "^9.1.0",
         "electron-builder": "^22.7.0",
-        "husky": "^3.1.0",
+        "husky": "^4.2.5",
         "prettier": "^2.0.5",
-        "pretty-quick": "^1.11.1"
+        "pretty-quick": "^2.0.1"
     },
     "dependencies": {
-        "ace-builds": "^1.4.8",
-        "discord-rpc": "^3.1.0",
+        "ace-builds": "^1.4.12",
+        "discord-rpc": "^3.1.1",
         "electron-canvas-to-buffer": "^2.0.0",
         "electron-clipboard-watcher": "^1.0.1",
-        "electron-google-analytics": "^0.1.0",
-        "electron-is-dev": "^1.1.0",
+        "electron-google-analytics": "^1.0.0",
+        "electron-is-dev": "^1.2.0",
         "electron-localshortcut": "^3.2.1",
         "electron-native-notification": "^1.2.1",
         "electron-store": "^5.2.0",
-        "electron-updater": "^4.2.0",
+        "electron-updater": "^4.3.1",
         "i18n": "^0.10.0",
         "image-to-base64": "^2.1.0",
-        "js-base64": "^2.5.2",
+        "js-base64": "^2.5.3",
         "markdown": "^0.5.0",
         "node-fetch": "^2.6.0",
         "node-vibrant": "^3.1.5",
-        "npx": "^10.2.2",
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
         "scribble": "0.0.5",
         "socket.io": "^2.3.0",
-        "ws": "^7.3.0"
+        "uuid": "^8.2.0",
+        "ws": "^7.3.1"
     },
     "optionalDependencies": {
         "@nodert-win10/windows.media.playback": "^0.2.96",
