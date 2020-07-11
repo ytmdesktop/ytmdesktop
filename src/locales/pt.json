@@ -62,5 +62,6 @@
     "MEDIA_CONTROL_SEARCH": "Pesquisar",
     "MEDIA_CONTROL_SHUFFLE": "Misturar",
     "MEDIA_CONTROL_THUMBS_DOWN": "Descurtir",
-    "MEDIA_CONTROL_THUMBS_UP": "Curtir"
+    "MEDIA_CONTROL_THUMBS_UP": "Curtir",
+    "LABEL_CHANGELOG": "O que há de novo"
 }

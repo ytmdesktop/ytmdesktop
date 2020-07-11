@@ -7,6 +7,11 @@ var player = {
     seekbarCurrentPositionHuman: '0:00',
     likeStatus: 'INDIFFERENT',
     repatType: 'NONE',
+    queue: {
+        currentIndex: 0,
+        size: 0,
+        data: [],
+    },
 }
 
 var track = {
@@ -21,7 +26,10 @@ var track = {
     id: '',
     isVideo: false,
     isAdvertisement: false,
-    lyrics: '',
+    lyrics: {
+        provider: '',
+        data: '',
+    },
 }
 
 function init(view) {
@@ -43,6 +51,7 @@ function getPlayerInfo() {
         getSeekbarPosition(webContents)
         getLikeStatus(webContents)
         getRepeatType(webContents)
+        getQueue(webContents)
     }
     return player
 }
@@ -248,6 +257,52 @@ function getUrl(webContents) {
         .catch((_) => console.log('error getUrl'))
 }
 
+function getQueue(webContents) {
+    webContents
+        .executeJavaScript(
+            `
+            var element = document.querySelector('ytmusic-player-queue #contents')
+            var children = element.children
+
+            var arrChildren = Array.from(children)
+            
+            var queue = { automix: false, currentIndex: 0, data: [] };
+
+            arrChildren.forEach( (el, key) => { 
+                var songElement = el.querySelector('.song-info')
+
+                var songCover = songElement.parentElement.querySelector('.yt-img-shadow').getAttribute('src')
+                var songTitle = songElement.querySelector('.song-title').getAttribute('title')
+                var songAuthor = songElement.querySelector('.byline').getAttribute('title')
+                
+                if(el.hasAttribute('selected')) {
+                    queue.currentIndex = key;
+                }
+                text = { cover: songCover, title: songTitle, author: songAuthor }
+                queue.data.push(text)
+            } )
+
+            queue.automix = document.querySelector('#automix').getAttribute('aria-pressed') == 'true'
+            queue
+            `
+        )
+        .then((queue) => {
+            if (queue) {
+                player.queue = queue
+                debug(`Player Queue: ${player.queue}`)
+            }
+        })
+        .catch((_) => console.log('error getQueue'))
+}
+
+function setQueueItem(webContents, index) {
+    webContents.executeJavaScript(
+        `
+        var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()
+        `
+    )
+}
+
 function isVideo(webContents) {
     webContents
         .executeJavaScript(
@@ -300,8 +355,9 @@ function setSeekbar(webContents, time) {
         .catch((_) => console.log('error changeSeekbar'))
 }
 
-function setLyrics(lyrics) {
-    track.lyrics = lyrics
+function setLyrics(provider, lyrics) {
+    track.lyrics.provider = provider
+    track.lyrics.data = lyrics
 }
 
 function convertToHuman(time) {
@@ -358,4 +414,5 @@ module.exports = {
     setVolume: setVolume,
     setSeekbar: setSeekbar,
     setLyrics: setLyrics,
+    setQueueItem: setQueueItem,
 }

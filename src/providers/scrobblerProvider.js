@@ -10,7 +10,6 @@ const apiSecret = '9d8830c167627e65dac63786be101964'
 var Scrobbler
 
 var userLogin
-var updateTrackInfoTimeout
 
 function signIn() {
     userLogin = getLogin()
@@ -44,9 +43,9 @@ function getLogin() {
 function getToken() {
     http.get(
         `http://ws.audioscrobbler.com/2.0/?method=auth.gettoken&api_key=${apiKey}&format=json`,
-        function(res) {
+        function (res) {
             let rawData = ''
-            res.on('data', chunk => {
+            res.on('data', (chunk) => {
                 rawData += chunk
             })
             res.on('end', () => {
@@ -62,23 +61,31 @@ function getToken() {
 }
 
 function updateTrackInfo(title, author, album) {
-    if (settingsProvider.get('settings-last-fm-scrobbler')) {
-        if (updateTrackInfoTimeout) {
-            clearInterval(updateTrackInfoTimeout)
-        }
-        updateTrackInfoTimeout = setTimeout(() => {
-            if (Scrobbler === undefined) {
-                signIn()
-            }
-
-            var track = {
-                artist: author,
-                track: title,
-                album: album,
-            }
-            Scrobbler.Scrobble(track, function(_) {})
-        }, 10 * 2000)
+    if (Scrobbler === undefined) {
+        signIn()
     }
+
+    var track = {
+        artist: author,
+        track: title,
+        album: album,
+    }
+
+    Scrobbler.Scrobble(track, function (_) {})
+}
+
+function updateNowPlaying(title, author, album, duration) {
+    if (Scrobbler === undefined) {
+        signIn()
+    }
+
+    var track = {
+        artist: author,
+        track: title,
+        album: album,
+        duration: duration,
+    }
+    Scrobbler.NowPlaying(track, function (_) {})
 }
 
 function authorize(token) {
@@ -95,6 +102,7 @@ function authorize(token) {
 module.exports = {
     getToken: getToken,
     updateTrackInfo: updateTrackInfo,
+    updateNowPlaying: updateNowPlaying,
     getLogin: getLogin,
     setLogin: setLogin,
     authorize: authorize,

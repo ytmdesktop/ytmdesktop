@@ -38,8 +38,9 @@ function start() {
     })
 
     ws.on('close', () => {
+        stop()
         reconnect = setTimeout(() => {
-            if (isStarted()) {
+            if (!isStarted()) {
                 start()
             }
         }, 5000)

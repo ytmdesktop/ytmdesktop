@@ -57,16 +57,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 500)
 })
 
+document.addEventListener('wheel', function (ev) {
+    ev.preventDefault()
+    if (ev.deltaY < 0) {
+        ipcRenderer.send('media-command', { command: 'media-volume-up' })
+    } else {
+        ipcRenderer.send('media-command', { command: 'media-volume-down' })
+    }
+})
+
 async function retrieveAllInfo() {
     return new Promise((resolve, reject) => {
         ipcRenderer
             .invoke('invoke-all-info')
-            .then(result => resolve(result))
-            .catch(_ => reject(false))
+            .then((result) => resolve(result))
+            .catch((_) => reject(false))
     })
 }
 
-document.addEventListener('dblclick', ev => {
+document.addEventListener('dblclick', (ev) => {
     if (ev.clientX >= 100) {
         ipcRenderer.send('media-command', { command: 'media-seekbar-forward' })
         showDbClickAnimation('right')
@@ -114,7 +123,7 @@ function setPlayerInfo(data) {
     if (settingsProvider.get('settings-miniplayer-paint-controls')) {
         Vibrant.from(data.track.cover)
             .getPalette()
-            .then(palette => {
+            .then((palette) => {
                 body.style.color = palette.LightVibrant.hex
             })
     } else {

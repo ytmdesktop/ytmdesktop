@@ -24,6 +24,7 @@
 
 ## Mac
 
+- Brew: ```brew cask install ytmdesktop-youtube-music```
 - Binaries: https://github.com/ytmdesktop/ytmdesktop/releases
 
 # To Contribute

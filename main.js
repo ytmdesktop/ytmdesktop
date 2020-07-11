@@ -45,7 +45,9 @@ let mainWindow,
     customCSSAppKey,
     customCSSPageKey,
     lastTrackId,
-    doublePressPlayPause
+    lastTrackProgress,
+    doublePressPlayPause,
+    updateTrackInfoTimeout
 
 let isFirstTime = false
 
@@ -67,6 +69,7 @@ let windowConfig = {
 global.sharedObj = { title: 'N/A', paused: true }
 
 let iconDefault = assetsProvider.getIcon('favicon')
+let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
 let iconPause = assetsProvider.getIcon('favicon_pause')
 // Keep a global reference of the window object, if you don't, the window will
@@ -92,6 +95,14 @@ if (settingsProvider.get('settings-rainmeter-web-now-playing')) {
 
 if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
+}
+
+if (settingsProvider.get('has-updated')) {
+    setTimeout(() => {
+        console.log('has-updated')
+        ipcMain.emit('window', { command: 'show-changelog' })
+    }, 2000)
+    settingsProvider.set('has-updated', false)
 }
 
 if (isLinux()) {
@@ -318,7 +329,7 @@ function createWindow() {
                 if (global.on_the_road) {
                     updateActivity()
                 }
-            }, 800)
+            }, 500)
         }
     })
 
@@ -343,60 +354,92 @@ function createWindow() {
     function updateActivity() {
         var trackInfo = infoPlayerProvider.getTrackInfo()
         var playerInfo = infoPlayerProvider.getPlayerInfo()
-
+        var trackId = trackInfo.id
         var title = trackInfo.title
         var author = trackInfo.author
         var album = trackInfo.album
+        var duration = trackInfo.duration
+        var progress = trackInfo.statePercent
         var cover = trackInfo.cover
         var nowPlaying = `${title} - ${author}`
-
         logDebug(nowPlaying)
 
-        discordRPC.setActivity(getAll())
-        rainmeterNowPlaying.setActivity(getAll())
-        mprisProvider.setActivity(getAll())
+        if (title && author) {
+            discordRPC.setActivity(getAll())
+            rainmeterNowPlaying.setActivity(getAll())
+            mprisProvider.setActivity(getAll())
 
-        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+            mediaControl.createThumbar(
+                mainWindow,
+                infoPlayerProvider.getAllInfo()
+            )
 
-        mediaControl.setProgress(
-            mainWindow,
-            settingsProvider.get('settings-enable-taskbar-progressbar')
-                ? trackInfo.statePercent
-                : -1,
-            playerInfo.isPaused
-        )
+            mediaControl.setProgress(
+                mainWindow,
+                settingsProvider.get('settings-enable-taskbar-progressbar')
+                    ? trackInfo.statePercent
+                    : -1,
+                playerInfo.isPaused
+            )
 
-        /**
-         * Update only when change track
-         */
-        if (lastTrackId !== trackInfo.id) {
-            lastTrackId = trackInfo.id
-
-            if (isMac()) {
-                global.sharedObj.title = nowPlaying
-                renderer_for_status_bar.send('update-status-bar')
+            /**
+             * Srobble when track changes or when current track starts from the beginning
+             */
+            if (settingsProvider.get('settings-last-fm-scrobbler')) {
+                if (
+                    lastTrackId !== trackId ||
+                    (lastTrackProgress > progress && progress < 0.01)
+                ) {
+                    if (!trackInfo.isAdvertisement) {
+                        clearInterval(updateTrackInfoTimeout)
+                        updateTrackInfoTimeout = setTimeout(() => {
+                            scrobblerProvider.updateTrackInfo(
+                                title,
+                                author,
+                                album
+                            )
+                        }, 20 * 1000)
+                        scrobblerProvider.updateNowPlaying(
+                            title,
+                            author,
+                            album,
+                            duration
+                        )
+                    }
+                }
             }
 
-            mainWindow.setTitle(nowPlaying)
-            tray.setTooltip(nowPlaying)
-            if (!trackInfo.isAdvertisement) {
-                scrobblerProvider.updateTrackInfo(title, author, album)
+            /**
+             * Update only when change track
+             */
+            if (lastTrackId !== trackId) {
+                lastTrackId = trackId
+
+                if (isMac()) {
+                    global.sharedObj.title = nowPlaying
+                    renderer_for_status_bar.send('update-status-bar')
+                }
+
+                mainWindow.setTitle(nowPlaying)
+                tray.setTooltip(nowPlaying)
+
+                if (
+                    !mainWindow.isFocused() &&
+                    settingsProvider.get('settings-show-notifications')
+                ) {
+                    tray.balloon(title, author, cover, iconDefault)
+                }
             }
 
-            if (
-                !mainWindow.isFocused() &&
-                settingsProvider.get('settings-show-notifications')
-            ) {
-                tray.balloon(title, author, cover, iconDefault)
+            if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
+                if (playerInfo.isPaused) {
+                    tray.updateTrayIcon(iconPause)
+                } else {
+                    tray.updateTrayIcon(iconPlay)
+                }
             }
-        }
 
-        if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
-            if (playerInfo.isPaused) {
-                tray.updateTrayIcon(iconPause)
-            } else {
-                tray.updateTrayIcon(iconPlay)
-            }
+            lastTrackProgress = progress
         }
     }
 
@@ -476,9 +519,13 @@ function createWindow() {
     })
 
     // LOCAL
-    electronLocalshortcut.register(view, 'CmdOrCtrl+S', () => {
-        ipcMain.emit('window', { command: 'show-settings' })
-    })
+    electronLocalshortcut.register(
+        view,
+        isMac() ? 'Cmd+,' : 'CmdOrCtrl+S',
+        () => {
+            ipcMain.emit('window', { command: 'show-settings' })
+        }
+    )
 
     electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
         ipcMain.emit('window', { command: 'show-miniplayer' })
@@ -609,6 +656,9 @@ function createWindow() {
 
         switch (command) {
             case 'media-play-pause':
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
+                }
                 mediaControl.playPauseTrack(view)
                 break
 
@@ -650,6 +700,10 @@ function createWindow() {
 
             case 'media-volume-set':
                 mediaControl.changeVolume(view, value)
+                break
+
+            case 'media-queue-set':
+                mediaControl.selectQueueItem(view, value)
                 break
         }
     })
@@ -703,12 +757,21 @@ function createWindow() {
                 windowLyrics()
                 break
 
+            case 'show-lyrics-hidden':
+                windowLyrics()
+                lyrics.hide()
+                break
+
             case 'show-companion':
                 windowCompanion()
                 break
 
             case 'show-guest-mode':
                 windowGuest()
+                break
+
+            case 'show-changelog':
+                windowChangelog()
                 break
 
             case 'restore-main-window':
@@ -1054,6 +1117,39 @@ function createWindow() {
         )
     }
 
+    function windowChangelog() {
+        let changelog = new BrowserWindow({
+            title: __.trans('LABEL_CHANGELOG'),
+            icon: iconDefault,
+            modal: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            center: true,
+            resizable: false,
+            backgroundColor: '#232323',
+            width: 460,
+            height: 650,
+            autoHideMenuBar: false,
+            skipTaskbar: false,
+            webPreferences: {
+                nodeIntegration: true,
+                webviewTag: true,
+            },
+        })
+
+        changelog.loadFile(
+            path.join(
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
+            ),
+            {
+                search: `title=${__.trans(
+                    'LABEL_CHANGELOG'
+                )}&page=changelog/changelog&hide=btn-minimize,btn-maximize`,
+            }
+        )
+    }
+
     ipcMain.on('switch-clipboard-watcher', () => {
         switchClipboardWatcher()
     })
@@ -1270,12 +1366,13 @@ if (!gotTheLock) {
 
         createWindow()
 
-        tray.createTray(mainWindow, iconDefault)
+        tray.createTray(mainWindow, iconTray)
 
         ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
                 tray.updateImage(payload)
         })
+
         if (!isDev) {
             updater.checkUpdate(mainWindow, view)
 
@@ -1283,6 +1380,7 @@ if (!gotTheLock) {
                 updater.checkUpdate(mainWindow, view)
             }, 6 * 60 * 60 * 1000)
         }
+
         ipcMain.emit('ready', app)
     })
 

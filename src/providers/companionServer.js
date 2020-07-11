@@ -8,14 +8,13 @@ const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
 const port = 9863
+const hostname = os.hostname()
 
 const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
 let serverInterfaces = []
-
-fetchNetworkInterfaces()
 
 function infoApp() {
     return {
@@ -24,6 +23,7 @@ function infoApp() {
 }
 function infoServer() {
     return {
+        name: hostname,
         listen: serverInterfaces,
         port: port,
         isProtected:
@@ -37,11 +37,10 @@ function fetchNetworkInterfaces() {
         if (!pattIgnoreInterface.test(v)) {
             networkInterfaces[v].forEach((vv, kk) => {
                 if (vv.family == 'IPv4' && vv.internal == false) {
-                    let data = {
+                    var data = {
                         name: v,
                         ip: vv.address,
                     }
-
                     serverInterfaces.push(data)
                 }
             })
@@ -55,6 +54,7 @@ var serverFunction = function (req, res) {
 
         serverInterfaces.forEach((value) => {
             let qr = qrcode(6, 'H')
+            value['h'] = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
@@ -138,7 +138,7 @@ var serverFunction = function (req, res) {
               </div>
   
               <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  ${os.hostname()} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices</i>${totalConnections}</a>
+                  ${hostname} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
   
           </body>
@@ -238,6 +238,21 @@ var serverFunction = function (req, res) {
 
 var server = http.createServer(serverFunction)
 
+function canConnect(socket) {
+    let clientPassword = socket.handshake.headers['password'] || ''
+    let clientHost = socket.handshake['address']
+    let clientIsLocalhost = clientHost == '127.0.0.1'
+
+    let serverPassword = settingsProvider.get('settings-companion-server-token')
+
+    if (infoServer().isProtected) {
+        if (clientIsLocalhost == false && clientPassword != serverPassword) {
+            return false
+        }
+    }
+    return true
+}
+
 function start() {
     server.listen(port, ip)
     const io = require('socket.io')(server)
@@ -251,10 +266,23 @@ function start() {
     }, 600)
 
     io.on('connection', (socket) => {
+        if (!canConnect(socket)) {
+            socket.disconnect()
+        }
+
         socket.on('media-commands', (cmd, value) => {
             execCmd(cmd, value)
         })
+
+        socket.on('retrieve-info', () => {
+            socket.emit('info', {
+                app: infoApp(),
+                server: infoServer(),
+            })
+        })
     })
+
+    fetchNetworkInterfaces()
 
     console.log('Companion Server listening on port ' + port)
 }
@@ -351,6 +379,17 @@ function execCmd(cmd, value) {
                 command: 'media-volume-set',
                 value: value,
             })
+            break
+
+        case 'player-set-queue':
+            ipcMain.emit('media-command', {
+                command: 'media-queue-set',
+                value: value,
+            })
+            break
+
+        case 'show-lyrics-hidden':
+            ipcMain.emit('window', { command: 'show-lyrics-hidden' })
             break
     }
 }
