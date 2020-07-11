@@ -827,84 +827,96 @@ function createWindow() {
     }
 
     function windowMiniplayer() {
-        miniplayer = new BrowserWindow({
-            title: __.trans('LABEL_MINIPLAYER'),
-            icon: iconDefault,
-            modal: false,
-            frame: false,
-            center: false,
-            resizable: false,
-            alwaysOnTop: settingsProvider.get('settings-miniplayer-always-top'),
-            backgroundColor: '#000000',
-            minWidth: 100,
-            minHeight: 100,
-            autoHideMenuBar: true,
-            skipTaskbar: false,
-            webPreferences: {
-                nodeIntegration: true,
-                //preload: path.join(app.getAppPath(), '/pages/miniplayer/miniplayer.js'),
-            },
-        })
+        if (miniplayer) {
+            miniplayer.show()
+        } else {
+            miniplayer = new BrowserWindow({
+                title: __.trans('LABEL_MINIPLAYER'),
+                icon: iconDefault,
+                modal: false,
+                frame: false,
+                center: false,
+                resizable: false,
+                alwaysOnTop: settingsProvider.get(
+                    'settings-miniplayer-always-top'
+                ),
+                backgroundColor: '#000000',
+                minWidth: 100,
+                minHeight: 100,
+                autoHideMenuBar: true,
+                skipTaskbar: false,
+                webPreferences: {
+                    nodeIntegration: true,
+                },
+            })
 
-        miniplayer.loadFile(
-            path.join(app.getAppPath(), '/src/pages/miniplayer/miniplayer.html')
-        )
+            miniplayer.loadFile(
+                path.join(
+                    app.getAppPath(),
+                    '/src/pages/miniplayer/miniplayer.html'
+                )
+            )
 
-        switch (settingsProvider.get('settings-miniplayer-size')) {
-            case '1':
-                miniplayer.setSize(170, 170)
-                break
+            switch (settingsProvider.get('settings-miniplayer-size')) {
+                case '1':
+                    miniplayer.setSize(170, 170)
+                    break
 
-            case '2':
-                miniplayer.setSize(200, 200)
-                break
+                case '2':
+                    miniplayer.setSize(200, 200)
+                    break
 
-            case '3':
-                miniplayer.setSize(230, 230)
-                break
+                case '3':
+                    miniplayer.setSize(230, 230)
+                    break
 
-            case '4':
-                miniplayer.setSize(260, 260)
-                break
+                case '4':
+                    miniplayer.setSize(260, 260)
+                    break
 
-            case '5':
-                miniplayer.setSize(290, 290)
-                break
+                case '5':
+                    miniplayer.setSize(290, 290)
+                    break
 
-            case '6':
-                miniplayer.setSize(320, 320)
-                break
+                case '6':
+                    miniplayer.setSize(320, 320)
+                    break
 
-            default:
-                miniplayer.setSize(200, 200)
-                break
-        }
-
-        let miniplayerPosition = settingsProvider.get('miniplayer-position')
-        if (miniplayerPosition != undefined) {
-            miniplayer.setPosition(miniplayerPosition.x, miniplayerPosition.y)
-        }
-
-        let storeMiniplayerPositionTimer
-        miniplayer.on('move', function (e) {
-            let position = miniplayer.getPosition()
-            if (storeMiniplayerPositionTimer) {
-                clearTimeout(storeMiniplayerPositionTimer)
+                default:
+                    miniplayer.setSize(200, 200)
+                    break
             }
-            storeMiniplayerPositionTimer = setTimeout(() => {
-                settingsProvider.set('miniplayer-position', {
-                    x: position[0],
-                    y: position[1],
-                })
-            }, 1000)
-        })
 
-        mainWindow.hide()
+            let miniplayerPosition = settingsProvider.get('miniplayer-position')
+            if (miniplayerPosition != undefined) {
+                miniplayer.setPosition(
+                    miniplayerPosition.x,
+                    miniplayerPosition.y
+                )
+            }
 
-        globalShortcut.register('CmdOrCtrl+M', function () {
-            miniplayer.close()
-            mainWindow.show()
-        })
+            let storeMiniplayerPositionTimer
+            miniplayer.on('move', function (e) {
+                let position = miniplayer.getPosition()
+                if (storeMiniplayerPositionTimer) {
+                    clearTimeout(storeMiniplayerPositionTimer)
+                }
+                storeMiniplayerPositionTimer = setTimeout(() => {
+                    settingsProvider.set('miniplayer-position', {
+                        x: position[0],
+                        y: position[1],
+                    })
+                }, 1000)
+            })
+
+            mainWindow.hide()
+
+            globalShortcut.register('CmdOrCtrl+M', function () {
+                miniplayer.close()
+                miniplayer = null
+                mainWindow.show()
+            })
+        }
     }
 
     function windowLastFmLogin() {
