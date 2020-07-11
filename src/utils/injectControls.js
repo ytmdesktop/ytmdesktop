@@ -42,7 +42,6 @@ function createContextMenu() {
             opacity: 0;
             position: fixed;
             background: #232323;
-            /*color: #AAA;*/
             font-family: sans-serif;
 
             -webkit-transition: opacity .2s ease-in-out;

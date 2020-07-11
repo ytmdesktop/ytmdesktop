@@ -1,6 +1,8 @@
 {
     "DOUBLE_CLICK_TO_RESET_POSITION": "Double Click to Reset Position",
     "LABEL_EXIT": "Exit",
+    "LABEL_SAVE": "Save",
+    "LABEL_SAVED": "Saved",
     "LABEL_GUEST": "Guest",
     "LABEL_LOADING": "Loading...",
     "LABEL_LYRICS": "Lyrics",
@@ -8,6 +10,11 @@
     "LABEL_MINIPLAYER": "Miniplayer",
     "LABEL_PLAY_MUSIC": "Play music",
     "LABEL_SETTINGS": "Settings",
+    "LABEL_SETTINGS_DISCORD": "Discord settings",
+    "LABEL_SETTINGS_DISCORD_SHOW_TITLE": "Show title",
+    "LABEL_SETTINGS_DISCORD_SHOW_ARTIST": "Show artist",
+    "LABEL_SETTINGS_DISCORD_SHOW_TIME": "Show track time",
+    "LABEL_SETTINGS_DISCORD_SHOW_IDLE": "Show track when playback is paused",
     "LABEL_SETTINGS_RELAUNCH": "Apply and restart",
     "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Show/Hide Main Window",
     "LABEL_SETTINGS_TAB_ABOUT": "About",
@@ -62,5 +69,6 @@
     "MEDIA_CONTROL_SEARCH": "Search",
     "MEDIA_CONTROL_SHUFFLE": "Shuffle",
     "MEDIA_CONTROL_THUMBS_DOWN": "Thumbs Down",
-    "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up"
+    "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
+    "LABEL_CHANGELOG": "What's new"
 }
