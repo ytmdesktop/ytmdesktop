@@ -1,6 +1,8 @@
 {
     "DOUBLE_CLICK_TO_RESET_POSITION": "Double Click to Reset Position",
     "LABEL_EXIT": "Exit",
+    "LABEL_SAVE": "Save",
+    "LABEL_SAVED": "Saved",
     "LABEL_GUEST": "Guest",
     "LABEL_LOADING": "Loading...",
     "LABEL_LYRICS": "Lyrics",
@@ -19,9 +21,9 @@
     "LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR": "Show track progress on taskbar",
     "LABEL_SETTINGS_TAB_APPEARENCE": "Appearance",
     "LABEL_SETTINGS_TAB_GENERAL": "General",
-    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "Companion Server",
+    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "Remote Control",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "Click here and scan QR Code",
-    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "Protect companion with password",
+    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "Protect remote control with password",
     "LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF": "Continue where you left off",
     "LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME": "Custom theme",
     "LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE": "Discord Rich Presence",
@@ -68,5 +70,6 @@
     "MEDIA_CONTROL_SHUFFLE": "Shuffle",
     "MEDIA_CONTROL_THUMBS_DOWN": "Thumbs Down",
     "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
-    "LABEL_CHANGELOG": "What's new"
+    "LABEL_CHANGELOG": "What's new",
+    "i18n_LABEL_SAVE": "i18n_LABEL_SAVE"
 }

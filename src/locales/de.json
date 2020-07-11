@@ -1,6 +1,8 @@
 {
     "DOUBLE_CLICK_TO_RESET_POSITION": "Doppelklicken um Position zurückzusetzen",
     "LABEL_EXIT": "Beenden",
+    "LABEL_SAVE": "Speichern",
+    "LABEL_SAVED": "Gerettet",
     "LABEL_GUEST": "Gast",
     "LABEL_LOADING": "Wird geladen...",
     "LABEL_LYRICS": "Songtext",

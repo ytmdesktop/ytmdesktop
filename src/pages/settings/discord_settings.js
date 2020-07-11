@@ -4,6 +4,7 @@ const __ = require('../../providers/translateProvider')
 
 //var, because we have to re-assign the variable
 var discordSettings = null
+let buttonSave = document.getElementById('btn-save')
 
 __.loadi18n()
 
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 })
 
-document.getElementById('btn-save').addEventListener('click', function () {
+buttonSave.addEventListener('click', function () {
     settingsProvider.set('discord-presence-settings', {
         details: document.getElementById('settings-discord-show-title').checked,
         state: document.getElementById('settings-discord-show-artist').checked,
@@ -39,4 +40,5 @@ document.getElementById('btn-save').addEventListener('click', function () {
         hideIdle: document.getElementById('settings-discord-show-idle').checked,
     })
     loadSettings()
+    buttonSave.innerText = __.trans('LABEL_SAVED')
 })
