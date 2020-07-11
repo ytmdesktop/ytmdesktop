@@ -20,6 +20,7 @@ function loadSettings() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    loadSettings()
     if (discordSettings === undefined) {
         settingsProvider.setInitialValue('discord-presence-settings', {
             details: true,
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
             hideIdle: false,
         })
     }
-    loadSettings()
 })
 
 document.getElementById('btn-save').addEventListener('click', function () {
