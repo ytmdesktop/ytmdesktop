@@ -66,7 +66,6 @@ function setActivity(info) {
             : 'discordrpc-play'
         activity.instance = false
 
-        console.log('hideidle: ' + discordSettings.hideIdle)
         if (!discordSettings.hideIdle && info.player.isPaused) {
             client.clearActivity()
         } else {
