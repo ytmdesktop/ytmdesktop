@@ -1,6 +1,7 @@
 const clientId = '495666957501071390'
 const RPC = require('discord-rpc')
-const startTimestamp = new Date()
+const settingsProvider = require('./settingsProvider')
+
 var client
 
 var _isStarted
@@ -22,7 +23,7 @@ function start() {
 
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
-            setTimeout(function() {
+            setTimeout(function () {
                 // console.log('trying to connect')
                 start()
             }, 10000)
@@ -43,24 +44,35 @@ function stop() {
 function setActivity(info) {
     if (isStarted() && info.track.title) {
         var now = Date.now()
-        client
-            .setActivity({
-                details: info.track.title,
-                state: info.track.author,
-                startTimestamp: now + info.player.seekbarCurrentPosition * 1000,
-                endTimestamp:
-                    now +
-                    (info.track.duration - info.player.seekbarCurrentPosition) *
-                        1000,
-                largeImageKey: 'ytm_logo_512',
-                smallImageKey: info.player.isPaused
-                    ? 'discordrpc-pause'
-                    : 'discordrpc-play',
-                instance: false,
-            })
-            .catch(err => {
+        var activity = {}
+        var discordSettings = settingsProvider.get('discord-presence-settings')
+
+        if (discordSettings.details) activity.details = info.track.title
+
+        if (discordSettings.state) activity.state = info.track.author
+
+        if (discordSettings.time) {
+            activity.startTimestamp =
+                now + info.player.seekbarCurrentPosition * 1000
+            activity.endTimestamp =
+                now +
+                (info.track.duration - info.player.seekbarCurrentPosition) *
+                    1000
+        }
+
+        activity.largeImageKey = 'ytm_logo_512'
+        activity.smallImageKey = info.player.isPaused
+            ? 'discordrpc-pause'
+            : 'discordrpc-play'
+        activity.instance = false
+
+        if (!discordSettings.hideIdle && info.player.isPaused) {
+            client.clearActivity()
+        } else {
+            client.setActivity(activity).catch((err) => {
                 console.log(err)
             })
+        }
     }
 }
 

@@ -777,6 +777,10 @@ function createWindow() {
             case 'restore-main-window':
                 mainWindow.show()
                 break
+
+            case 'show-discord-settings':
+                windowDiscordSettings()
+                break
         }
     })
 
@@ -1075,6 +1079,42 @@ function createWindow() {
         )
 
         incognitoWindow.webContents.loadURL(mainWindowParams.url)
+    }
+
+    function windowDiscordSettings() {
+        const discord = new BrowserWindow({
+            //parent: mainWindow,
+            icon: iconDefault,
+            modal: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            center: true,
+            resizable: true,
+            backgroundColor: '#232323',
+            width: 600,
+            minWidth: 600,
+            height: 300,
+            minHeight: 300,
+            autoHideMenuBar: false,
+            skipTaskbar: false,
+            webPreferences: {
+                nodeIntegration: true,
+                webviewTag: true,
+            },
+        })
+
+        discord.loadFile(
+            path.join(
+                __dirname,
+                './src/pages/shared/window-buttons/window-buttons.html'
+            ),
+            {
+                search:
+                    'page=settings/discord_settings&icon=settings&title=' +
+                    __.trans('LABEL_SETTINGS_DISCORD') +
+                    '&hide=btn-minimize,btn-maximize',
+            }
+        )
     }
 
     function windowChangelog() {

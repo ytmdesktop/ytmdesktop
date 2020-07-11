@@ -16,6 +16,7 @@ const elementBtnLastFmLogin = document.getElementById('btn-last-fm-login')
 const elementBtnOpenCompanionServer = document.getElementById(
     'btn-open-companion-server'
 )
+const elementBtnDiscordSettings = document.getElementById('btn-discord-setting')
 
 if (isLinux()) {
     document
@@ -148,6 +149,12 @@ if (elementBtnOpenPageEditor) {
 if (elementBtnLastFmLogin) {
     elementBtnLastFmLogin.addEventListener('click', function () {
         ipc.send('window', { command: 'show-last-fm-login' })
+    })
+}
+
+if (elementBtnDiscordSettings) {
+    elementBtnDiscordSettings.addEventListener('click', function () {
+        ipc.send('window', { command: 'show-discord-settings' })
     })
 }
 
