@@ -44,3 +44,10 @@ settingsProvider.setInitialValue('settings-accelerators', {
 })
 
 settingsProvider.setInitialValue('has-updated', false)
+
+settingsProvider.setInitialValue('discord-presence-settings', {
+    details: true,
+    state: true,
+    time: true,
+    hideIdle: true,
+})
