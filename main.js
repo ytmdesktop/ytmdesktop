@@ -705,6 +705,14 @@ function createWindow() {
             case 'media-queue-set':
                 mediaControl.selectQueueItem(view, value)
                 break
+
+            case 'media-repeat':
+                mediaControl.repeat(view)
+                break
+
+            case 'media-shuffle':
+                mediaControl.shuffle(view)
+                break
         }
     })
 

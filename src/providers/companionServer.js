@@ -388,6 +388,20 @@ function execCmd(cmd, value) {
             })
             break
 
+        case 'player-repeat':
+            ipcMain.emit('media-command', {
+                command: 'media-repeat',
+                value: value,
+            })
+            break
+
+        case 'player-shuffle':
+            ipcMain.emit('media-command', {
+                command: 'media-shuffle',
+                value: value,
+            })
+            break
+
         case 'show-lyrics-hidden':
             ipcMain.emit('window', { command: 'show-lyrics-hidden' })
             break

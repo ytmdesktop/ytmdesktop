@@ -6,7 +6,7 @@ var player = {
     seekbarCurrentPosition: 0,
     seekbarCurrentPositionHuman: '0:00',
     likeStatus: 'INDIFFERENT',
-    repatType: 'NONE',
+    repeatType: 'NONE',
     queue: {
         currentIndex: 0,
         size: 0,
@@ -232,7 +232,7 @@ function getRepeatType(webContents) {
         )
         .then((repeatType) => {
             debug(`Repeat type is: ${repeatType}`)
-            player.repatType = repeatType
+            player.repeatType = repeatType
         })
         .catch((_) => console.log('error getRepeatType'))
 }
