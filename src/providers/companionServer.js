@@ -54,7 +54,7 @@ var serverFunction = function (req, res) {
 
         serverInterfaces.forEach((value) => {
             let qr = qrcode(6, 'H')
-            value['h'] = hostname
+            value['isProtected'] = infoServer().isProtected
             qr.addData(JSON.stringify(value))
             qr.make()
 
@@ -87,6 +87,7 @@ var serverFunction = function (req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
+        let isProtected = infoServer().isProtected
         res.write(`<html>
           <head>
               <title>YouTube Music Desktop Companion</title>
@@ -107,7 +108,7 @@ var serverFunction = function (req, res) {
               </style>
           </head>
           <body>              
-              <h3 class="red-text">YouTube Music Desktop</h3>
+              <h3 class="red-text">YouTube Music Remote Control</h3>
               
               <div class="row" style="height: 0; visibility: ${
                   infoPlayerProvider.getTrackInfo().id ? 'visible' : 'hidden'
@@ -138,7 +139,15 @@ var serverFunction = function (req, res) {
               </div>
   
               <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  ${hostname} <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
+                  <a class="${
+                      isProtected ? 'white-text' : 'orange-text'
+                  } btn-flat tooltipped" data-position="top" data-tooltip="${
+            isProtected ? 'Protected' : 'Not protected'
+        } with password"><i class="material-icons tiny">${
+            isProtected ? 'lock' : 'lock_open'
+        }</i></a>
+                  ${hostname} 
+                  <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
   
           </body>
@@ -399,6 +408,13 @@ function execCmd(cmd, value) {
             ipcMain.emit('media-command', {
                 command: 'media-shuffle',
                 value: value,
+            })
+            break
+
+        case 'player-add-library':
+            ipcMain.emit('media-command', {
+                command: 'media-add-library',
+                value: true,
             })
             break
 

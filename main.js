@@ -713,6 +713,10 @@ function createWindow() {
             case 'media-shuffle':
                 mediaControl.shuffle(view)
                 break
+
+            case 'media-add-library':
+                mediaControl.addToLibrary(view)
+                break
         }
     })
 

@@ -12,6 +12,7 @@ var player = {
         size: 0,
         data: [],
     },
+    inLibrary: false,
 }
 
 var track = {
@@ -52,6 +53,7 @@ function getPlayerInfo() {
         getLikeStatus(webContents)
         getRepeatType(webContents)
         getQueue(webContents)
+        inLibrary(webContents)
     }
     return player
 }
@@ -303,6 +305,31 @@ function setQueueItem(webContents, index) {
     )
 }
 
+function addToLibary(webContents) {
+    webContents
+        .executeJavaScript(
+            `
+            var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+            if (popup == null) {
+                var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+                var dots = middleControlsButtons.children[1]
+
+                var action = dots.querySelector('#button')
+
+                action.click()
+                action.click()
+            }
+
+            setTimeout( ()=> {
+                var addLibrary = popup.children[3];
+                addLibrary.click()
+            }, 100)
+            `
+        )
+        .then()
+        .catch((_) => console.log('error addToLibary ' + _))
+}
+
 function isVideo(webContents) {
     webContents
         .executeJavaScript(
@@ -360,6 +387,36 @@ function setLyrics(provider, lyrics) {
     track.lyrics.data = lyrics
 }
 
+function inLibrary(webContents) {
+    webContents
+        .executeJavaScript(
+            `
+            var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+            if (popup == null) {
+                var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+                var dots = middleControlsButtons.children[1]
+
+                var action = dots.querySelector('#button')
+
+                action.click()
+                action.click()
+            }
+
+            var addLibrary = popup.children[3];
+            var _g = addLibrary.querySelector('g')
+            var _path = _g.querySelectorAll('path')[1];
+            var _d = _path.getAttribute('d')
+
+            _d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
+            `
+        )
+        .then((inLibrary) => {
+            player.inLibrary = inLibrary
+            debug(`In Library: ${player.inLibrary}`)
+        })
+        .catch((_) => console.log('error inLibrary'))
+}
+
 function convertToHuman(time) {
     var _aux = time
     var _minutes = 0
@@ -411,8 +468,11 @@ module.exports = {
     getTrackInfo: getTrackInfo,
     hasInitialized: hasInitialized,
     firstPlay: firstPlay,
+
     setVolume: setVolume,
     setSeekbar: setSeekbar,
     setLyrics: setLyrics,
     setQueueItem: setQueueItem,
+
+    addToLibary: addToLibary,
 }
