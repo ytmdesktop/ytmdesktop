@@ -20,17 +20,19 @@ function loadSettings() {
         discordSettings.hideIdle
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    loadSettings()
-})
-
-buttonSave.addEventListener('click', function () {
+function save() {
     settingsProvider.set('discord-presence-settings', {
         details: document.getElementById('settings-discord-show-title').checked,
         state: document.getElementById('settings-discord-show-artist').checked,
         time: document.getElementById('settings-discord-show-time').checked,
         hideIdle: document.getElementById('settings-discord-show-idle').checked,
     })
+}
+
+document.addEventListener('DOMContentLoaded', function () {
     loadSettings()
-    buttonSave.innerText = __.trans('LABEL_SAVED')
+})
+
+document.querySelectorAll('input').forEach((input) => {
+    input.addEventListener('click', () => save())
 })
