@@ -1,18 +1,14 @@
 var webContents, initialized
 
 var player = {
+    hasSong: false,
     isPaused: true,
     volumePercent: 0,
     seekbarCurrentPosition: 0,
     seekbarCurrentPositionHuman: '0:00',
+    statePercent: 0.0,
     likeStatus: 'INDIFFERENT',
     repeatType: 'NONE',
-    queue: {
-        currentIndex: 0,
-        size: 0,
-        data: [],
-    },
-    inLibrary: false,
 }
 
 var track = {
@@ -22,15 +18,27 @@ var track = {
     cover: '',
     duration: 0,
     durationHuman: '0:00',
-    statePercent: 0.0,
     url: '',
     id: '',
     isVideo: false,
     isAdvertisement: false,
-    lyrics: {
-        provider: '',
-        data: '',
-    },
+    inLibrary: false,
+}
+
+var _queue = {
+    automix: false,
+    currentIndex: 0,
+    list: [],
+}
+
+var _playlist = {
+    list: [],
+}
+
+var _lyrics = {
+    provider: '',
+    data: '',
+    hasLoaded: false,
 }
 
 function init(view) {
@@ -47,13 +55,12 @@ function getAllInfo() {
 
 function getPlayerInfo() {
     if (webContents !== undefined) {
+        hasSong()
         isPaused(webContents)
         getVolume(webContents)
         getSeekbarPosition(webContents)
         getLikeStatus(webContents)
         getRepeatType(webContents)
-        getQueue(webContents)
-        inLibrary(webContents)
     }
     return player
 }
@@ -71,6 +78,34 @@ function getTrackInfo() {
         isAdvertisement(webContents)
     }
     return track
+}
+
+function getQueueInfo() {
+    return _queue
+}
+
+function updateQueueInfo() {
+    if (webContents !== undefined) {
+        getQueue(webContents)
+    }
+}
+
+function getPlaylistInfo() {
+    return _playlist
+}
+
+function updatePlaylistInfo() {
+    if (webContents !== undefined) {
+        getPlaylist(webContents)
+    }
+}
+
+function getLyricsInfo() {
+    return _lyrics
+}
+
+function hasSong() {
+    player.hasSong = track.id != ''
 }
 
 function isPaused(webContents) {
@@ -268,7 +303,7 @@ function getQueue(webContents) {
 
             var arrChildren = Array.from(children)
             
-            var queue = { automix: false, currentIndex: 0, data: [] };
+            var queue = { automix: false, currentIndex: 0, list: [] };
 
             arrChildren.forEach( (el, key) => { 
                 var songElement = el.querySelector('.song-info')
@@ -276,12 +311,13 @@ function getQueue(webContents) {
                 var songCover = songElement.parentElement.querySelector('.yt-img-shadow').getAttribute('src')
                 var songTitle = songElement.querySelector('.song-title').getAttribute('title')
                 var songAuthor = songElement.querySelector('.byline').getAttribute('title')
+                var duration = el.querySelector('.duration').getAttribute('title')
                 
                 if(el.hasAttribute('selected')) {
                     queue.currentIndex = key;
                 }
-                text = { cover: songCover, title: songTitle, author: songAuthor }
-                queue.data.push(text)
+                text = { cover: songCover, title: songTitle, author: songAuthor, duration: duration }
+                queue.list.push(text)
             } )
 
             queue.automix = document.querySelector('#automix').getAttribute('aria-pressed') == 'true'
@@ -290,8 +326,8 @@ function getQueue(webContents) {
         )
         .then((queue) => {
             if (queue) {
-                player.queue = queue
-                debug(`Player Queue: ${player.queue}`)
+                _queue = queue
+                debug(`Player Queue: ${_queue}`)
             }
         })
         .catch((_) => console.log('error getQueue'))
@@ -326,8 +362,53 @@ function addToLibary(webContents) {
             }, 100)
             `
         )
-        .then()
+        .then(() => setTimeout(isInLibrary, 500))
         .catch((_) => console.log('error addToLibary ' + _))
+}
+
+function getPlaylist(webContents) {
+    webContents
+        .executeJavaScript(
+            `
+            var data = { list: [] };
+
+            new Promise( (resolve, reject) => {
+                var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+                var dots = middleControlsButtons.children[1]
+            
+                var action = dots.querySelector('#button')
+            
+                action.click()
+                action.click()
+                setTimeout( resolve, 500)
+            } )
+            .then((_) => { 
+                return new Promise( (resolve, reject) => {
+                    var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                    var addPlaylist = popup.children[5].querySelector('a');
+                    addPlaylist.click()
+                    addPlaylist.click()
+            
+                    setTimeout( resolve, 3000);
+                } ).then( (_) => {
+                    var popupPlaylist = document.querySelector('ytmusic-add-to-playlist-renderer');
+                    var playlists = popupPlaylist.querySelector('#playlists')
+        
+                    var titleList = playlists.querySelectorAll('#title')
+        
+                    titleList.forEach( (element, index) => {
+                        data.list.push(element.textContent)
+                    } )
+                    return data;
+                })
+            })
+            `
+        )
+        .then((playlist) => {
+            _playlist = playlist
+            debug(`getPlaylist: ${playlist}`)
+        })
+        .catch((_) => console.log('error getPlaylist ' + _))
 }
 
 function isVideo(webContents) {
@@ -382,39 +463,65 @@ function setSeekbar(webContents, time) {
         .catch((_) => console.log('error changeSeekbar'))
 }
 
-function setLyrics(provider, lyrics) {
-    track.lyrics.provider = provider
-    track.lyrics.data = lyrics
+function updateLyrics(provider, lyrics, hasLoaded) {
+    _lyrics.provider = provider
+    _lyrics.data = lyrics
+    _lyrics.hasLoaded = hasLoaded
 }
 
-function inLibrary(webContents) {
+function isInLibrary() {
     webContents
         .executeJavaScript(
             `
-            var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-            if (popup == null) {
+            new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
                 var dots = middleControlsButtons.children[1]
-
+            
                 var action = dots.querySelector('#button')
-
+            
                 action.click()
                 action.click()
-            }
-
-            var addLibrary = popup.children[3];
-            var _g = addLibrary.querySelector('g')
-            var _path = _g.querySelectorAll('path')[1];
-            var _d = _path.getAttribute('d')
-
-            _d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
+                setTimeout( resolve, 500)
+            } )
+            .then((_) => {
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addLibrary = popup.children[3];
+                var _g = addLibrary.querySelector('g')
+                var _path = _g.querySelectorAll('path')[1];
+                var _d = _path.getAttribute('d')
+            
+                return _d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
+            })
             `
         )
         .then((inLibrary) => {
-            player.inLibrary = inLibrary
-            debug(`In Library: ${player.inLibrary}`)
+            track.inLibrary = inLibrary
+            debug(`In Library: ${track.inLibrary}`)
         })
         .catch((_) => console.log('error inLibrary'))
+}
+
+function addToPlaylist(webContents, index) {
+    webContents
+        .executeJavaScript(
+            `
+            new Promise( (resolve, reject) => {
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addPlaylist = popup.children[5].querySelector('a');
+                addPlaylist.click()
+                addPlaylist.click()
+        
+                setTimeout( resolve, 500);
+            } ).then( (_) => {
+                var popupPlaylist = document.querySelector('ytmusic-add-to-playlist-renderer');
+                var playlists = popupPlaylist.querySelectorAll('#playlists ytmusic-playlist-add-to-option-renderer button');
+        
+                playlists[${index}].click()
+            })
+            `
+        )
+        .then()
+        .catch((_) => console.log('error getPlaylist ' + _))
 }
 
 function convertToHuman(time) {
@@ -436,7 +543,7 @@ function convertToHuman(time) {
 }
 
 function setPercent(px, ptotal) {
-    track.statePercent = px / ptotal
+    player.statePercent = px / ptotal
 }
 
 function hasInitialized() {
@@ -469,11 +576,20 @@ module.exports = {
     getTrackInfo: getTrackInfo,
     hasInitialized: hasInitialized,
     firstPlay: firstPlay,
+    isInLibrary: isInLibrary,
+
+    getQueueInfo: getQueueInfo,
+    getPlaylistInfo: getPlaylistInfo,
+    getLyricsInfo: getLyricsInfo,
 
     setVolume: setVolume,
     setSeekbar: setSeekbar,
-    setLyrics: setLyrics,
     setQueueItem: setQueueItem,
 
+    updatePlaylistInfo: updatePlaylistInfo,
+    updateQueueInfo: updateQueueInfo,
+    updateLyrics: updateLyrics,
+
     addToLibary: addToLibary,
+    addToPlaylist: addToPlaylist,
 }

@@ -352,17 +352,18 @@ function createWindow() {
     })
 
     function updateActivity() {
-        var trackInfo = infoPlayerProvider.getTrackInfo()
         var playerInfo = infoPlayerProvider.getPlayerInfo()
+        var trackInfo = infoPlayerProvider.getTrackInfo()
+
+        var progress = playerInfo.statePercent
         var trackId = trackInfo.id
         var title = trackInfo.title
         var author = trackInfo.author
         var album = trackInfo.album
         var duration = trackInfo.duration
-        var progress = trackInfo.statePercent
         var cover = trackInfo.cover
         var nowPlaying = `${title} - ${author}`
-        logDebug(nowPlaying)
+        // logDebug(nowPlaying)
 
         if (title && author) {
             discordRPC.setActivity(getAll())
@@ -377,7 +378,7 @@ function createWindow() {
             mediaControl.setProgress(
                 mainWindow,
                 settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? trackInfo.statePercent
+                    ? progress
                     : -1,
                 playerInfo.isPaused
             )
@@ -414,6 +415,10 @@ function createWindow() {
              */
             if (lastTrackId !== trackId) {
                 lastTrackId = trackId
+
+                infoPlayerProvider.updateQueueInfo()
+                infoPlayerProvider.updatePlaylistInfo()
+                infoPlayerProvider.isInLibrary()
 
                 if (isMac()) {
                     global.sharedObj.title = nowPlaying
@@ -716,6 +721,10 @@ function createWindow() {
 
             case 'media-add-library':
                 mediaControl.addToLibrary(view)
+                break
+
+            case 'media-add-playlist':
+                mediaControl.addToPlaylist(view, value)
                 break
         }
     })
@@ -1204,7 +1213,7 @@ function createWindow() {
 
         var ytmdesktop_version = app.getVersion() || '-'
 
-        var template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment (please complete the following information):%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
+        var template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment:%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
         shell.openExternal(
             `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
         )

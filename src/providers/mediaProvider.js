@@ -67,6 +67,10 @@ function mediaAddToLibrary(mainWindow) {
     infoPlayerProvider.addToLibary(mainWindow.webContents)
 }
 
+function mediaAddToPlaylist(mainWindow, index) {
+    infoPlayerProvider.addToPlaylist(mainWindow.webContents, index)
+}
+
 function createThumbar(mainWindow, mediaInfo) {
     let isPaused = mediaInfo.player.isPaused
     let likeStatus = mediaInfo.player.likeStatus
@@ -218,6 +222,7 @@ exports.selectQueueItem = mediaSelectQueueItem
 exports.repeat = mediaRepeat
 exports.shuffle = mediaShuffle
 exports.addToLibrary = mediaAddToLibrary
+exports.addToPlaylist = mediaAddToPlaylist
 
 // For Windows
 exports.createThumbar = createThumbar

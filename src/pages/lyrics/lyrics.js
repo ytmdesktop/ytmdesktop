@@ -63,21 +63,21 @@ function getLyric(artist, song, id) {
 
             retrieveOVHData(artist, song)
                 .then((success) => {
-                    setLyrics('OVH', success)
+                    setLyrics('OVH', success, true)
                 })
                 .catch((_) => {
                     retrieveVagalumeData(artist, song)
                         .then((success_) => {
-                            setLyrics('Vagalume', success_)
+                            setLyrics('Vagalume', success_, true)
                         })
                         .catch((_) => {
                             retrieveKsoftData(artist, song)
                                 .then((success) => {
-                                    setLyrics('KSoft', success)
+                                    setLyrics('KSoft', success, true)
                                 })
                                 .catch((error) => {
                                     elementLyric.innerText = error
-                                    setLyrics('-', error)
+                                    setLyrics('-', error, true)
                                 })
                         })
                 })
@@ -87,17 +87,17 @@ function getLyric(artist, song, id) {
     }
 }
 
-function setLyrics(source, lyrics) {
+function setLyrics(source, lyrics, hasLoaded) {
     elementLyricSource.innerText = `Lyrics provided by ${source}`
     elementLyric.innerText = lyrics
     document.getElementById('content').scrollTop = 0
-    infoPlayerProvider.setLyrics(source, lyrics)
+    infoPlayerProvider.updateLyrics(source, lyrics, hasLoaded)
 }
 
 function loadingLyrics() {
     elementLyricSource.innerText = ''
     elementLyric.innerText = __.trans('LABEL_LOADING')
-    infoPlayerProvider.setLyrics('', __.trans('LABEL_LOADING'))
+    infoPlayerProvider.updateLyrics('', __.trans('LABEL_LOADING'), false)
 }
 
 function removeAccents(strAccents) {

@@ -5,6 +5,7 @@ const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
 const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
+const zeroconf = require('zeroconf')()
 
 const ip = '0.0.0.0'
 const port = 9863
@@ -90,7 +91,7 @@ var serverFunction = function (req, res) {
         let isProtected = infoServer().isProtected
         res.write(`<html>
           <head>
-              <title>YouTube Music Desktop Companion</title>
+              <title>YTMDesktop Remote Control</title>
               <meta http-equiv="refresh" content="60">
               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
               <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -101,6 +102,7 @@ var serverFunction = function (req, res) {
                       padding: 0;
                       text-align: center;
                       background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
+                      font-family: sans-serif;
                   }
                   h5 {
                       margin: 1rem 0 1rem 0 !important;
@@ -108,7 +110,7 @@ var serverFunction = function (req, res) {
               </style>
           </head>
           <body>              
-              <h3 class="red-text">YouTube Music Remote Control</h3>
+              <h3 class="red-text">YTMDesktop Remote Control</h3>
               
               <div class="row" style="height: 0; visibility: ${
                   infoPlayerProvider.getTrackInfo().id ? 'visible' : 'hidden'
@@ -149,7 +151,12 @@ var serverFunction = function (req, res) {
                   ${hostname} 
                   <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
-  
+
+              <!--div>
+                <a href='https://play.google.com/store/apps/details?id=app.ytmdesktop.remote&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+                    <img width="200" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
+                </a>
+              </div-->
           </body>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
           <script>
@@ -161,16 +168,19 @@ var serverFunction = function (req, res) {
       </html>`)
 
         res.end()
+    } else {
+        res.setHeader('Content-Type', 'text/json; charset=utf-8')
+        res.setHeader('Access-Control-Allow-Origin', '*')
     }
 
     if (req.url === '/query') {
-        res.setHeader('Content-Type', 'text/json; charset=utf-8')
-        res.setHeader('Access-Control-Allow-Origin', '*')
-
         if (req.method === 'GET') {
             let data = {
                 player: infoPlayerProvider.getPlayerInfo(),
                 track: infoPlayerProvider.getTrackInfo(),
+                /*queue: infoPlayerProvider.getQueueInfo(),
+                playlist: infoPlayerProvider.getPlaylistInfo(),
+                lyrics: infoPlayerProvider.getLyricsInfo(),*/
             }
             res.write(JSON.stringify(data))
             res.end()
@@ -230,10 +240,42 @@ var serverFunction = function (req, res) {
         }
     }
 
-    if (req.url === '/info') {
-        res.setHeader('Content-Type', 'text/json; charset=utf-8')
-        res.setHeader('Access-Control-Allow-Origin', '*')
+    if (req.url === '/query/player') {
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayerProvider.getPlayerInfo()))
+            res.end()
+        }
+    }
 
+    if (req.url === '/query/track') {
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayerProvider.getTrackInfo()))
+            res.end()
+        }
+    }
+
+    if (req.url === '/query/queue') {
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayerProvider.getQueueInfo()))
+            res.end()
+        }
+    }
+
+    if (req.url === '/query/playlist') {
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayerProvider.getPlaylistInfo()))
+            res.end()
+        }
+    }
+
+    if (req.url === '/query/lyrics') {
+        if (req.method === 'GET') {
+            res.write(JSON.stringify(infoPlayerProvider.getLyricsInfo()))
+            res.end()
+        }
+    }
+
+    if (req.url === '/info') {
         if (req.method === 'GET') {
             var result = {
                 app: infoApp(),
@@ -263,6 +305,19 @@ function canConnect(socket) {
 }
 
 function start() {
+    zeroconf.publish({
+        type: 'http',
+        protocol: 'tcp',
+        port: port,
+        name: 'ytmdesktop',
+    })
+    zeroconf.publish({
+        type: 'ws',
+        protocol: 'tcp',
+        port: port,
+        name: 'ytmdesktop',
+    })
+
     server.listen(port, ip)
     const io = require('socket.io')(server)
 
@@ -270,7 +325,7 @@ function start() {
         totalConnections = Object.keys(io.sockets.sockets).length
 
         if (totalConnections) {
-            io.emit('query', infoPlayerProvider.getAllInfo())
+            io.emit('tick', infoPlayerProvider.getAllInfo())
         }
     }, 600)
 
@@ -279,16 +334,31 @@ function start() {
             socket.disconnect()
         }
 
-        socket.on('media-commands', (cmd, value) => {
-            execCmd(cmd, value)
-        })
+        socket.on('media-commands', (cmd, value) => execCmd(cmd, value))
 
-        socket.on('retrieve-info', () => {
-            socket.emit('info', {
-                app: infoApp(),
-                server: infoServer(),
-            })
-        })
+        socket.on('retrieve-info', () =>
+            socket.emit('info', { app: infoApp(), server: infoServer() })
+        )
+
+        socket.on('query-player', () =>
+            socket.emit('player', infoPlayerProvider.getPlayerInfo())
+        )
+
+        socket.on('query-track', () =>
+            socket.emit('track', infoPlayerProvider.getTrackInfo())
+        )
+
+        socket.on('query-queue', () =>
+            socket.emit('queue', infoPlayerProvider.getQueueInfo())
+        )
+
+        socket.on('query-playlist', () =>
+            socket.emit('playlist', infoPlayerProvider.getPlaylistInfo())
+        )
+
+        socket.on('query-lyrics', () =>
+            socket.emit('lyrics', infoPlayerProvider.getLyricsInfo())
+        )
     })
 
     fetchNetworkInterfaces()
@@ -415,6 +485,13 @@ function execCmd(cmd, value) {
             ipcMain.emit('media-command', {
                 command: 'media-add-library',
                 value: true,
+            })
+            break
+
+        case 'player-add-playlist':
+            ipcMain.emit('media-command', {
+                command: 'media-add-playlist',
+                value: value,
             })
             break
 

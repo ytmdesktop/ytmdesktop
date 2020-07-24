@@ -23,7 +23,7 @@
         }
     },
     "devDependencies": {
-        "electron": "^9.1.0",
+        "electron": "^9.1.1",
         "electron-builder": "^22.7.0",
         "husky": "^4.2.5",
         "prettier": "^2.0.5",
@@ -51,7 +51,8 @@
         "scribble": "0.0.5",
         "socket.io": "^2.3.0",
         "uuid": "^8.2.0",
-        "ws": "^7.3.1"
+        "ws": "^7.3.1",
+        "zeroconf": "^0.1.4"
     },
     "optionalDependencies": {
         "@nodert-win10/windows.media.playback": "^0.2.96",
