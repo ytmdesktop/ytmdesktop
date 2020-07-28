@@ -5,7 +5,6 @@ const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
 const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
-const zeroconf = require('zeroconf')()
 
 const ip = '0.0.0.0'
 const port = 9863
@@ -305,19 +304,6 @@ function canConnect(socket) {
 }
 
 function start() {
-    zeroconf.publish({
-        type: 'http',
-        protocol: 'tcp',
-        port: port,
-        name: 'ytmdesktop',
-    })
-    zeroconf.publish({
-        type: 'ws',
-        protocol: 'tcp',
-        port: port,
-        name: 'ytmdesktop',
-    })
-
     server.listen(port, ip)
     const io = require('socket.io')(server)
 

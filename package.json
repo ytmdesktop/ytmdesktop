@@ -51,8 +51,7 @@
         "scribble": "0.0.5",
         "socket.io": "^2.3.0",
         "uuid": "^8.2.0",
-        "ws": "^7.3.1",
-        "zeroconf": "^0.1.4"
+        "ws": "^7.3.1"
     },
     "optionalDependencies": {
         "@nodert-win10/windows.media.playback": "^0.2.96",
