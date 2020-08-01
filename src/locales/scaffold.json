@@ -70,5 +70,7 @@
     "MEDIA_CONTROL_SHUFFLE": "Shuffle",
     "MEDIA_CONTROL_THUMBS_DOWN": "Thumbs Down",
     "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
-    "LABEL_CHANGELOG": "What's new"
+    "LABEL_CHANGELOG": "What's new",
+    "MEDIA_CONTROL_VOLUME_UP": "Increase volume",
+    "MEDIA_CONTROL_VOLUME_DOWN": "Decrease volume"
 }

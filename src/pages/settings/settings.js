@@ -1,7 +1,7 @@
 const { remote, ipcRenderer: ipc, shell, ipcMain } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
-const { isLinux } = require('../../utils/systemInfo')
+const { isLinux, isMac } = require('../../utils/systemInfo')
 const fs = require('fs')
 
 const elementSettingsCompanionApp = document.getElementById(
@@ -30,7 +30,7 @@ const audioOutputSelect = document.querySelector('#settings-app-audio-output')
 
 let settingsAccelerators = settingsProvider.get('settings-accelerators')
 
-let audioDevices, typeAcceleratorSelected
+let audioDevices, typeAcceleratorSelected, keyBindings
 
 function loadAudioOutputList() {
     return navigator.mediaDevices.enumerateDevices()
@@ -163,7 +163,7 @@ if (elementBtnDiscordSettings) {
 
 if (elementBtnOpenCompanionServer) {
     elementBtnOpenCompanionServer.addEventListener('click', function () {
-        shell.openExternal(`https://find.ytmdesktop.app`)
+        shell.openExternal(`http://localhost:9863`)
     })
 }
 
@@ -293,10 +293,32 @@ function mInit() {
     M.Modal.init(elems, {})
 }
 
+function replaceAcceleratorText(text) {
+    text = text.replace(/\+/g, ' + ')
+
+    if (text.indexOf('CmdOrCtrl') != -1) {
+        if (isMac()) {
+            text = text.replace('CmdOrCtrl', 'Cmd')
+        } else {
+            text = text.replace('CmdOrCtrl', 'Ctrl')
+        }
+    }
+
+    return text
+}
+
 function validateKey(e) {
     if (e.key == ' ') return 'Space'
 
     if (e.code == 'NumpadEnter') return 'Enter'
+
+    if (e.code == 'ArrowUp') return 'Up'
+
+    if (e.code == 'ArrowDown') return 'Down'
+
+    if (e.code == 'ArrowLeft') return 'Left'
+
+    if (e.code == 'ArrowRight') return 'Right'
 
     if (e.keyCode >= 65 && e.keyCode <= 90) {
         return e.key.toUpperCase()
@@ -310,7 +332,8 @@ function preventSpecialKeys(e) {
         e.key == 'Command' ||
         e.key == 'Control' ||
         e.key == 'Alt' ||
-        e.key == 'Shift'
+        e.key == 'Shift' ||
+        e.key == 'AltGraph'
     )
 }
 
@@ -318,7 +341,7 @@ document
     .querySelector('#modalEditAccelerator')
     .addEventListener('keyup', function (e) {
         if (preventSpecialKeys(e)) {
-            let keyBindings = ''
+            keyBindings = ''
 
             if (e.ctrlKey) {
                 keyBindings += 'CmdOrCtrl+'
@@ -335,26 +358,47 @@ document
             keyBindings += validateKey(e)
             document.querySelector(
                 '#modalEditAcceleratorKeys'
-            ).innerText = keyBindings
+            ).innerText = replaceAcceleratorText(keyBindings)
         }
     })
 
 function loadCustomKeys() {
     document.querySelector(
         '#settings-accelerators_media-play-pause'
-    ).innerText = settingsAccelerators['media-play-pause']
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-play-pause']
+    )
     document.querySelector(
         '#settings-accelerators_media-track-next'
-    ).innerText = settingsAccelerators['media-track-next']
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-next']
+    )
     document.querySelector(
         '#settings-accelerators_media-track-previous'
-    ).innerText = settingsAccelerators['media-track-previous']
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-previous']
+    )
     document.querySelector(
         '#settings-accelerators_media-track-like'
-    ).innerText = settingsAccelerators['media-track-like']
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-like']
+    )
     document.querySelector(
         '#settings-accelerators_media-track-dislike'
-    ).innerText = settingsAccelerators['media-track-dislike']
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-dislike']
+    )
+
+    document.querySelector(
+        '#settings-accelerators_media-volume-up'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-volume-up'] || 'CmdOrCtrl+Shift+Up'
+    )
+    document.querySelector(
+        '#settings-accelerators_media-volume-down'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-volume-down'] || 'CmdOrCtrl+Shift+Down'
+    )
 }
 
 function resetAcceleratorsText() {
@@ -397,16 +441,28 @@ document
         resetAcceleratorsText()
     })
 
+document
+    .querySelector('#btn-accelerator-media-volume-up')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-volume-up'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-media-volume-down')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-volume-down'
+        resetAcceleratorsText()
+    })
+
 document.querySelector('#saveAccelerator').addEventListener('click', () => {
     ipc.send('change-accelerator', {
         type: typeAcceleratorSelected,
         oldValue: settingsAccelerators[typeAcceleratorSelected],
-        newValue: document.querySelector('#modalEditAcceleratorKeys').innerText,
+        newValue: keyBindings,
     })
 
-    settingsAccelerators[typeAcceleratorSelected] = document.querySelector(
-        '#modalEditAcceleratorKeys'
-    ).innerText
+    settingsAccelerators[typeAcceleratorSelected] = keyBindings
 
     settingsProvider.set('settings-accelerators', settingsAccelerators)
 

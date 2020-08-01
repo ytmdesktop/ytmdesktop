@@ -620,7 +620,9 @@ function createWindow() {
     )
 
     ipcMain.on('change-accelerator', (event, args) => {
-        globalShortcut.unregister(args.oldValue)
+        try {
+            globalShortcut.unregister(args.oldValue)
+        } catch (_) {}
 
         switch (args.type) {
             case 'media-play-pause':
@@ -650,6 +652,18 @@ function createWindow() {
             case 'media-track-unlike':
                 globalShortcut.register(args.newValue, () => {
                     mediaControl.downVote(view)
+                })
+                break
+
+            case 'media-volume-up':
+                globalShortcut.register(args.newValue, () => {
+                    mediaControl.volumeUp(view)
+                })
+                break
+
+            case 'media-volume-down':
+                globalShortcut.register(args.newValue, () => {
+                    mediaControl.volumeDown(view)
                 })
                 break
         }

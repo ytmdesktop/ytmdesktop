@@ -70,5 +70,7 @@
     "MEDIA_CONTROL_SHUFFLE": "Misturar",
     "MEDIA_CONTROL_THUMBS_DOWN": "Descurtir",
     "MEDIA_CONTROL_THUMBS_UP": "Curtir",
-    "LABEL_CHANGELOG": "O que há de novo"
+    "LABEL_CHANGELOG": "O que há de novo",
+    "MEDIA_CONTROL_VOLUME_UP": "Aumentar volume",
+    "MEDIA_CONTROL_VOLUME_DOWN": "Diminuir volume"
 }
