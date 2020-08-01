@@ -99,7 +99,7 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
-if (settingsProvider.get('has-updated')) {
+if (settingsProvider.get('has-updated') == true) {
     setTimeout(() => {
         console.log('has-updated')
         ipcMain.emit('window', { command: 'show-changelog' })

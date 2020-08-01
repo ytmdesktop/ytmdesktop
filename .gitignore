@@ -7,3 +7,5 @@ dist
 /youtube-music-desktop-app-*.tgz
 /.cache
 assets/custom-theme.css
+app-update.yml
+dev-app-update.yml
