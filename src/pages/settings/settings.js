@@ -1,4 +1,4 @@
-const { remote, ipcRenderer: ipc, shell } = require('electron')
+const { remote, ipcRenderer: ipc, shell, ipcMain } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const { isLinux } = require('../../utils/systemInfo')
@@ -27,7 +27,10 @@ if (isLinux()) {
 }
 
 const audioOutputSelect = document.querySelector('#settings-app-audio-output')
-let audioDevices
+
+let settingsAccelerators = settingsProvider.get('settings-accelerators')
+
+let audioDevices, typeAcceleratorSelected
 
 function loadAudioOutputList() {
     return navigator.mediaDevices.enumerateDevices()
@@ -179,6 +182,7 @@ if (process.platform !== 'darwin') {
 
 loadSettings()
 __.loadi18n()
+loadCustomKeys()
 
 function showRelaunchButton() {
     elementBtnAppRelaunch.classList.remove('hide')
@@ -284,34 +288,127 @@ function readLocales() {
 function mInit() {
     M.FormSelect.init(document.querySelectorAll('select'), {})
     M.Tabs.init(document.getElementsByClassName('tabs')[0], {})
+
+    var elems = document.querySelectorAll('.modal')
+    M.Modal.init(elems, {})
 }
 
 function validateKey(e) {
     if (e.key == ' ') return 'Space'
+
+    if (e.code == 'NumpadEnter') return 'Enter'
+
+    if (e.keyCode >= 65 && e.keyCode <= 90) {
+        return e.key.toUpperCase()
+    }
+
     return e.key
 }
 
 function preventSpecialKeys(e) {
-    return !(e.key == 'Control' || e.key == 'Alt' || e.key == 'Shift')
+    return !(
+        e.key == 'Command' ||
+        e.key == 'Control' ||
+        e.key == 'Alt' ||
+        e.key == 'Shift'
+    )
 }
 
-document.addEventListener('keyup', function (e) {
-    if (preventSpecialKeys(e)) {
-        let keyBindings = ''
+document
+    .querySelector('#modalEditAccelerator')
+    .addEventListener('keyup', function (e) {
+        if (preventSpecialKeys(e)) {
+            let keyBindings = ''
 
-        if (e.ctrlKey) {
-            keyBindings += 'CmdOrCtrl+'
+            if (e.ctrlKey) {
+                keyBindings += 'CmdOrCtrl+'
+            }
+
+            if (e.altKey) {
+                keyBindings += 'Alt+'
+            }
+
+            if (e.shiftKey) {
+                keyBindings += 'Shift+'
+            }
+
+            keyBindings += validateKey(e)
+            document.querySelector(
+                '#modalEditAcceleratorKeys'
+            ).innerText = keyBindings
         }
+    })
 
-        if (e.altKey) {
-            keyBindings += 'Alt+'
-        }
+function loadCustomKeys() {
+    document.querySelector(
+        '#settings-accelerators_media-play-pause'
+    ).innerText = settingsAccelerators['media-play-pause']
+    document.querySelector(
+        '#settings-accelerators_media-track-next'
+    ).innerText = settingsAccelerators['media-track-next']
+    document.querySelector(
+        '#settings-accelerators_media-track-previous'
+    ).innerText = settingsAccelerators['media-track-previous']
+    document.querySelector(
+        '#settings-accelerators_media-track-like'
+    ).innerText = settingsAccelerators['media-track-like']
+    document.querySelector(
+        '#settings-accelerators_media-track-dislike'
+    ).innerText = settingsAccelerators['media-track-dislike']
+}
 
-        if (e.shiftKey) {
-            keyBindings += 'Shift+'
-        }
+function resetAcceleratorsText() {
+    document.querySelector('#modalEditAcceleratorKeys').innerText =
+        'Press any keys...'
+}
 
-        keyBindings += validateKey(e)
-        console.log(keyBindings)
-    }
+document
+    .querySelector('#btn-accelerator-media-play-pause')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-play-pause'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-media-track-next')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-next'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-media-track-previous')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-previous'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-media-track-like')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-like'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-media-track-dislike')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-dislike'
+        resetAcceleratorsText()
+    })
+
+document.querySelector('#saveAccelerator').addEventListener('click', () => {
+    ipc.send('change-accelerator', {
+        type: typeAcceleratorSelected,
+        oldValue: settingsAccelerators[typeAcceleratorSelected],
+        newValue: document.querySelector('#modalEditAcceleratorKeys').innerText,
+    })
+
+    settingsAccelerators[typeAcceleratorSelected] = document.querySelector(
+        '#modalEditAcceleratorKeys'
+    ).innerText
+
+    settingsProvider.set('settings-accelerators', settingsAccelerators)
+
+    loadCustomKeys()
 })

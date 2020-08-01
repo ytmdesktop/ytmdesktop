@@ -10,7 +10,7 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch)\w*/gim
+const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch|VMware|Adapter)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -40,6 +40,7 @@ function fetchNetworkInterfaces() {
                     var data = {
                         name: v,
                         ip: vv.address,
+                        //isProtected: infoServer().isProtected
                     }
                     serverInterfaces.push(data)
                 }
@@ -54,7 +55,6 @@ var serverFunction = function (req, res) {
 
         serverInterfaces.forEach((value) => {
             let qr = qrcode(6, 'H')
-            value['isProtected'] = infoServer().isProtected
             qr.addData(JSON.stringify(value))
             qr.make()
 

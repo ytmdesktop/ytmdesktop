@@ -71,7 +71,7 @@ html, body {
 }
 
 .shortcut-or {
-    color: #AAA;
+    color: #888;
 }
 
 .center-flex {
@@ -111,4 +111,8 @@ html, body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #f44336;
+}
+
+.text-initial {
+    text-transform: initial;
 }

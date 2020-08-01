@@ -652,6 +652,30 @@
                         </div>
 
                         <div id="tab-shortcut" class="tab-content">
+                            <div
+                                id="modalEditAccelerator"
+                                class="modal black-text"
+                            >
+                                <div class="modal-content">
+                                    <h5
+                                        class="center-align"
+                                        id="modalEditAcceleratorKeys"
+                                    ></h5>
+                                </div>
+                                <div class="modal-footer black-text">
+                                    <a
+                                        id="cancelAccelerator"
+                                        class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
+                                        >Cancel</a
+                                    >
+                                    <a
+                                        id="saveAccelerator"
+                                        class="modal-close waves-effect waves-green btn-flat btn-sm red"
+                                        >Save</a
+                                    >
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col s12">
                                     <table class="table">
@@ -671,9 +695,21 @@
                                                         >pause</i
                                                     >
                                                     <span class="shortcut-or"
-                                                        >or</span
+                                                        >or&nbsp;</span
                                                     >
-                                                    CmdOrCtrl + Shift + Space
+                                                    <button
+                                                        id="btn-accelerator-media-play-pause"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_media-play-pause"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons right"
+                                                            >edit</i
+                                                        >
+                                                    </button>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -688,9 +724,21 @@
                                                         >skip_next</i
                                                     >
                                                     <span class="shortcut-or"
-                                                        >or</span
+                                                        >or&nbsp;</span
                                                     >
-                                                    CmdOrCtrl + Shift + PageUp
+                                                    <button
+                                                        id="btn-accelerator-media-track-next"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_media-track-next"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons right"
+                                                            >edit</i
+                                                        >
+                                                    </button>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -705,9 +753,21 @@
                                                         >skip_previous</i
                                                     >
                                                     <span class="shortcut-or"
-                                                        >or</span
+                                                        >or&nbsp;</span
                                                     >
-                                                    CmdOrCtrl + Shift + PageDown
+                                                    <button
+                                                        id="btn-accelerator-media-track-previous"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_media-track-previous"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons right"
+                                                            >edit</i
+                                                        >
+                                                    </button>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -717,7 +777,19 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    CmdOrCtrl + Shift + numadd
+                                                    <button
+                                                        id="btn-accelerator-media-track-like"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_media-track-like"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons right"
+                                                            >edit</i
+                                                        >
+                                                    </button>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -727,7 +799,19 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    CmdOrCtrl + Shift + numsub
+                                                    <button
+                                                        id="btn-accelerator-media-track-dislike"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_media-track-dislike"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons right"
+                                                            >edit</i
+                                                        >
+                                                    </button>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -738,7 +822,7 @@
                                                 </td>
                                                 <th>
                                                     <span class="shortcut-or"
-                                                        >2x</span
+                                                        >2x&nbsp;</span
                                                     ><i
                                                         class="material-icons media-icons"
                                                         >play_arrow</i
