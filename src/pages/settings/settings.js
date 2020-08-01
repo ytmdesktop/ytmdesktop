@@ -304,13 +304,33 @@ function replaceAcceleratorText(text) {
         }
     }
 
+    text = text.replace('numadd', '+')
+
+    text = text.replace('numsub', '-')
+
+    text = text.replace('nummult', '*')
+
+    text = text.replace('numdiv', '/')
+
     return text
 }
 
 function validateKey(e) {
+    console.log(e)
+
     if (e.key == ' ') return 'Space'
 
     if (e.code == 'NumpadEnter') return 'Enter'
+
+    if (e.code == 'NumpadAdd') return 'numadd'
+
+    if (e.code == 'NumpadSubtract') return 'numsub'
+
+    if (e.code == 'NumpadDecimal') return 'numdec'
+
+    if (e.code == 'NumpadMultiply') return 'nummult'
+
+    if (e.code == 'NumpadDivide') return 'numdiv'
 
     if (e.code == 'ArrowUp') return 'Up'
 
