@@ -53,3 +53,8 @@ settingsProvider.setInitialValue('discord-presence-settings', {
     time: true,
     hideIdle: true,
 })
+
+settingsProvider.setInitialValue(
+    'settings-disable-hardware-acceleration',
+    false
+)

@@ -131,6 +131,10 @@ if (isMac()) {
     Menu.setApplicationMenu(menu)
 }
 
+if (settingsProvider.get('settings-disable-hardware-acceleration')) {
+    app.disableHardwareAcceleration()
+}
+
 /* Functions ============================================================================= */
 function createWindow() {
     if (isMac() || isWindows()) {
