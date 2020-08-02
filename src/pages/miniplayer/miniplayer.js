@@ -21,7 +21,6 @@ const btnLike = document.getElementById('btn-like')
 
 btnClose.addEventListener('click', () => {
     ipcRenderer.send('window', { command: 'restore-main-window' })
-    window.close()
 })
 
 btnOnTop.addEventListener('click', () => {

@@ -669,10 +669,6 @@ function createWindow() {
         }
     })
 
-    ipcMain.on('restore-main-window', function () {
-        mainWindow.show()
-    })
-
     ipcMain.handle('invoke-all-info', async (event, args) => {
         return infoPlayerProvider.getAllInfo()
     })
@@ -873,6 +869,8 @@ function createWindow() {
                 break
 
             case 'restore-main-window':
+                miniplayer.close()
+                miniplayer = undefined
                 mainWindow.show()
                 break
 
@@ -1011,7 +1009,7 @@ function createWindow() {
 
             globalShortcut.register('CmdOrCtrl+M', function () {
                 miniplayer.close()
-                miniplayer = null
+                miniplayer = undefined
                 mainWindow.show()
             })
         }
