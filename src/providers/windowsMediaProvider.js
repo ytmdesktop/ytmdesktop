@@ -23,14 +23,15 @@ class windowsMediaProvider {
         this._controls.isChannelDownEnabled = false
         this._controls.isChannelUpEnabled = false
         this._controls.isFastForwardEnabled = false
+        this._controls.isRecordEnabled = false
+        this._controls.isRewindEnabled = false
+
+        this._controls.isEnabled = true
         this._controls.isNextEnabled = true
         this._controls.isPauseEnabled = true
         this._controls.isPlayEnabled = true
         this._controls.isPreviousEnabled = true
-        this._controls.isRecordEnabled = false
-        this._controls.isRewindEnabled = false
-        this._controls.isStopEnabled = true
-        this._controls.isEnabled = true
+
         this._controls.playbackStatus = MediaPlaybackStatus.closed
         this._controls.displayUpdater.type = MediaPlaybackType.music
 
@@ -44,9 +45,6 @@ class windowsMediaProvider {
                     mediaControl.playPauseTrack(this._webContents)
                     break
                 case SystemMediaTransportControlsButton.pause:
-                    mediaControl.playPauseTrack(this._webContents)
-                    break
-                case SystemMediaTransportControlsButton.stop:
                     mediaControl.playPauseTrack(this._webContents)
                     break
                 case SystemMediaTransportControlsButton.next:
