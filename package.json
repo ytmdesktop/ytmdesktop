@@ -6,9 +6,13 @@
     "scripts": {
         "start": "npx electron .",
         "rebuild": "electron-rebuild -f",
+        "postinstall": "npx electron-builder install-app-deps",
         "publish:win": "npx electron-builder --win -p always --config electron-builder64.yml",
         "publish:mac": "npx electron-builder --mac -p always --config electron-builder64.yml",
-        "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml"
+        "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml",
+        "publish:win:deploy": "npx electron-builder --win -p always --config electron-builder-deploy64.yml",
+        "publish:mac:deploy": "npx electron-builder --mac -p always --config electron-builder-deploy64.yml",
+        "publish:lin:deploy": "npx electron-builder --linux -p always --config electron-builder-deploy64.yml"
     },
     "repository": "https://github.com/ytmdesktop/ytmdesktop",
     "keywords": [
@@ -44,7 +48,7 @@
         "electron-updater": "^4.3.4",
         "i18n": "^0.10.0",
         "image-to-base64": "^2.1.1",
-        "js-base64": "^3.3.3",
+        "js-base64": "^3.4.3",
         "markdown": "^0.5.0",
         "node-fetch": "^2.6.0",
         "node-vibrant": "^3.1.5",
