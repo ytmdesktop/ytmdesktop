@@ -32,9 +32,6 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
-if (isWindows()) {
-    const windowsMediaProvider = require('./src/providers/windowsMediaProvider')
-}
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -51,7 +48,8 @@ let mainWindow,
     doublePressPlayPause,
     updateTrackInfoTimeout,
     activityIsPaused,
-    activityLikeStatus
+    activityLikeStatus,
+    windowsMediaProvider
 
 let isFirstTime = false
 
@@ -107,6 +105,10 @@ if (settingsProvider.get('has-updated') == true) {
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
     settingsProvider.set('has-updated', false)
+}
+
+if (isWindows()) {
+    windowsMediaProvider = require('./src/providers/windowsMediaProvider')
 }
 
 if (isLinux()) {
@@ -327,9 +329,10 @@ function createWindow() {
             if (isLinux()) {
                 mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
             }
-            if (isWindows()) {
-                windowsMediaProvider.init(view)
-            }
+        }
+
+        if (isWindows()) {
+            windowsMediaProvider.init(view)
         }
 
         if (isMac()) {
@@ -1672,7 +1675,6 @@ const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
 const { player } = require('./src/providers/mprisProvider')
-const { listen } = require('socket.io')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
