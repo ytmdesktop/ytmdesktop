@@ -418,12 +418,12 @@ function loadCustomKeys() {
     document.querySelector(
         '#settings-accelerators_media-volume-up'
     ).innerText = replaceAcceleratorText(
-        settingsAccelerators['media-volume-up'] || 'CmdOrCtrl+Shift+Up'
+        settingsAccelerators['media-volume-up']
     )
     document.querySelector(
         '#settings-accelerators_media-volume-down'
     ).innerText = replaceAcceleratorText(
-        settingsAccelerators['media-volume-down'] || 'CmdOrCtrl+Shift+Down'
+        settingsAccelerators['media-volume-down']
     )
 }
 

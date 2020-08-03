@@ -49,6 +49,20 @@ settingsProvider.setInitialValue('settings-accelerators', {
     'media-volume-down': 'CmdOrCtrl+Shift+Down',
 })
 
+let accelerators = settingsProvider.get('settings-accelerators')
+if (!accelerators['media-volume-up']) {
+    settingsProvider.set('settings-accelerators', {
+        'media-play-pause': 'CmdOrCtrl+Shift+Space',
+        'media-track-next': 'CmdOrCtrl+Shift+PageUp',
+        'media-track-previous': 'CmdOrCtrl+Shift+PageDown',
+        'media-track-like': 'CmdOrCtrl+Shift+L',
+        'media-track-dislike': 'CmdOrCtrl+Shift+D',
+        'media-volume-up': 'CmdOrCtrl+Shift+Up',
+        'media-volume-down': 'CmdOrCtrl+Shift+Down',
+    })
+} else {
+}
+
 settingsProvider.setInitialValue('has-updated', false)
 
 settingsProvider.setInitialValue('discord-presence-settings', {
