@@ -17,6 +17,11 @@ const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
 const electronLocalshortcut = require('electron-localshortcut')
 
+const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
+const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
+const { checkWindowPosition, doBehavior } = require('./src/utils/window')
+const fileSystem = require('./src/utils/fileSystem')
+
 const __ = require('./src/providers/translateProvider')
 const assetsProvider = require('./src/providers/assetsProvider')
 const scrobblerProvider = require('./src/providers/scrobblerProvider')
@@ -27,13 +32,9 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
-const windowsMediaProvider = require('./src/providers/windowsMediaProvider')
-
-const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
-const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
-const { checkWindowPosition, doBehavior } = require('./src/utils/window')
-const fileSystem = require('./src/utils/fileSystem')
-
+if (isWindows()) {
+    const windowsMediaProvider = require('./src/providers/windowsMediaProvider')
+}
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -393,7 +394,9 @@ function createWindow() {
                 activityIsPaused = playerInfo.isPaused
                 activityLikeStatus = playerInfo.likeStatus
 
-                windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
+                if (isWindows()) {
+                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
+                }
             }
 
             mediaControl.setProgress(
@@ -456,12 +459,14 @@ function createWindow() {
                     tray.balloon(title, author, cover, iconDefault)
                 }
 
-                windowsMediaProvider.setPlaybackData(
-                    title,
-                    author,
-                    cover,
-                    album
-                )
+                if (isWindows()) {
+                    windowsMediaProvider.setPlaybackData(
+                        title,
+                        author,
+                        cover,
+                        album
+                    )
+                }
             }
 
             if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
