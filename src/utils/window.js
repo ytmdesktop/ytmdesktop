@@ -1,3 +1,5 @@
+const { screen, ipcMain } = require('electron')
+
 function create() {
     // for create window
 }
@@ -5,16 +7,15 @@ function create() {
 function checkWindowPosition(windowPosition) {
     return new Promise((resolve, reject) => {
         try {
-            const { screen } = require('electron')
+            //const {  } = require('electron')
 
             let displays = screen.getAllDisplays()
-            let externalDisplay = displays.find(display => {
+            let externalDisplay = displays.find((display) => {
                 return display.bounds.x !== 0 || display.bounds.y !== 0
             })
 
             if (externalDisplay === undefined) {
                 primaryDisplayPosition = displays[0].bounds
-                // windowPosition = settingsProvider.get('window-position')
 
                 if (
                     windowPosition &&
@@ -24,7 +25,6 @@ function checkWindowPosition(windowPosition) {
                         x: windowPosition.x - primaryDisplayPosition.width,
                         y: windowPosition.y,
                     }
-                    // settingsProvider.set('window-position', position)
                     resolve(position)
                 }
             }
@@ -44,9 +44,9 @@ function doBehavior(mainWindow) {
         }
     } else {
         if (mainWindow.isFocused()) {
-            mainWindow.show()
+            ipcMain.emit('window', { command: 'restore-main-window' })
         } else {
-            mainWindow.show()
+            ipcMain.emit('window', { command: 'restore-main-window' })
         }
     }
 }

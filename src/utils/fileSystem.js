@@ -25,6 +25,10 @@ function _getAppDocumentsPath(app) {
     return path.join(app.getPath('documents'), app.name)
 }
 
+function _getAppDataPath(app) {
+    return path.join(app.getPath('appData'), app.name)
+}
+
 module.exports = {
     createDir: _createDir,
     getDir: _getDir,
@@ -32,4 +36,5 @@ module.exports = {
     readFile: _readFile,
     checkIfExists: _checkIfExists,
     getAppDocumentsPath: _getAppDocumentsPath,
+    getAppDataPath: _getAppDataPath,
 }

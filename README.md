@@ -14,6 +14,7 @@
 ## Windows
 
 - Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
+- Chocolatey: ```choco install ytmdesktop```
 - Binaries: https://github.com/ytmdesktop/ytmdesktop/releases
 
 ## Linux

@@ -16,6 +16,7 @@ const path = require('path')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
 const electronLocalshortcut = require('electron-localshortcut')
+const electronLog = require('electron-log')
 
 const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
@@ -82,26 +83,14 @@ app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This k
 
 app.setAsDefaultProtocolClient('ytmd', process.execPath)
 
-createDocumentsAppDir()
+createCustomAppDir()
 
 createCustomCSSDir()
 createCustomCSSPageFile()
 
-if (settingsProvider.get('settings-companion-server')) {
-    companionServer.start()
-}
-
-if (settingsProvider.get('settings-rainmeter-web-now-playing')) {
-    rainmeterNowPlaying.start()
-}
-
-if (settingsProvider.get('settings-discord-rich-presence')) {
-    discordRPC.start()
-}
-
 if (settingsProvider.get('has-updated') == true) {
     setTimeout(() => {
-        console.log('has-updated')
+        writeLog({ type: 'info', data: 'YTMDesktop updated' })
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
     settingsProvider.set('has-updated', false)
@@ -273,15 +262,7 @@ function createWindow() {
         }
     }
 
-    mainWindow.on('ready-to-show', () => {
-        console.log('show')
-    })
-
-    // Emitted when the window is closed.
     mainWindow.on('closed', function () {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
         mainWindow = null
     })
 
@@ -470,6 +451,8 @@ function createWindow() {
                         album
                     )
                 }
+
+                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
             }
 
             if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
@@ -646,6 +629,20 @@ function createWindow() {
         }
     )
 
+    globalShortcut.register(
+        settingsAccelerator['media-volume-up'],
+        function () {
+            mediaControl.volumeUp(view)
+        }
+    )
+
+    globalShortcut.register(
+        settingsAccelerator['media-volume-down'],
+        function () {
+            mediaControl.volumeDown(view)
+        }
+    )
+
     ipcMain.on('change-accelerator', (event, args) => {
         try {
             globalShortcut.unregister(args.oldValue)
@@ -676,7 +673,7 @@ function createWindow() {
                 })
                 break
 
-            case 'media-track-unlike':
+            case 'media-track-dislike':
                 globalShortcut.register(args.newValue, () => {
                     mediaControl.downVote(view)
                 })
@@ -1365,7 +1362,9 @@ function createWindow() {
         `
             )
             .then((_) => {})
-            .catch((_) => console.log('error setAudioOutput'))
+            .catch((_) =>
+                writeLog({ type: 'warn', data: 'error setAudioOutput' })
+            )
     }
 
     function loadAudioOutput() {
@@ -1376,7 +1375,7 @@ function createWindow() {
 
     function loadCustomCSSApp() {
         const customThemeFile = path.join(
-            fileSystem.getAppDocumentsPath(app),
+            fileSystem.getAppDataPath(app),
             '/custom/css/app.css'
         )
 
@@ -1400,7 +1399,7 @@ function createWindow() {
 
     function loadCustomCSSPage() {
         const customThemeFile = path.join(
-            fileSystem.getAppDocumentsPath(app),
+            fileSystem.getAppDataPath(app),
             '/custom/css/page.css'
         )
 
@@ -1606,10 +1605,10 @@ function bytesToSize(bytes) {
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
-function createDocumentsAppDir() {
-    if (!fileSystem.checkIfExists(fileSystem.getAppDocumentsPath(app))) {
+function createCustomAppDir() {
+    if (!fileSystem.checkIfExists(fileSystem.getAppDataPath(app))) {
         isFirstTime = true
-        fileSystem.createDir(fileSystem.getAppDocumentsPath(app))
+        fileSystem.createDir(fileSystem.getAppDataPath(app))
     } else {
         isFirstTime = false
     }
@@ -1617,7 +1616,7 @@ function createDocumentsAppDir() {
 
 function createCustomCSSDir() {
     const dirCustomTheme = path.join(
-        fileSystem.getAppDocumentsPath(app),
+        fileSystem.getAppDataPath(app),
         '/custom/css'
     )
 
@@ -1627,22 +1626,34 @@ function createCustomCSSDir() {
 }
 
 function createCustomCSSPageFile() {
-    const customThemeFile = path.join(
+    const oldCustomThemeFile = path.join(
         fileSystem.getAppDocumentsPath(app),
         '/custom/css/page.css'
     )
 
+    const customThemeFile = path.join(
+        fileSystem.getAppDataPath(app),
+        '/custom/css/page.css'
+    )
+
     if (!fileSystem.checkIfExists(customThemeFile)) {
-        fileSystem.writeFile(
-            customThemeFile,
-            `/** \n * Custom css for page \n*/\n\nhtml, body { background: #1D1D1D !important; }`
-        )
+        if (fileSystem.checkIfExists(oldCustomThemeFile)) {
+            fileSystem.writeFile(
+                customThemeFile,
+                fileSystem.readFile(oldCustomThemeFile)
+            )
+        } else {
+            fileSystem.writeFile(
+                customThemeFile,
+                `/** \n * Custom css for page \n*/\n\nhtml, body { background: #1D1D1D !important; }`
+            )
+        }
     }
 }
 
 function loadCustomAppScript() {
     const customAppScriptFile = path.join(
-        fileSystem.getAppDocumentsPath(app),
+        fileSystem.getAppDataPath(app),
         'custom/js/app.js'
     )
 
@@ -1655,7 +1666,7 @@ function loadCustomAppScript() {
 
 function loadCustomPageScript() {
     const customPageScriptFile = path.join(
-        fileSystem.getAppDocumentsPath(app),
+        fileSystem.getAppDataPath(app),
         'custom/js/page.js'
     )
 
@@ -1665,9 +1676,41 @@ function loadCustomPageScript() {
                 fileSystem.readFile(customPageScriptFile).toString()
             )
         } catch {
-            console.log('Failed to execute page.js')
+            writeLog({ type: 'warn', data: 'Failed to execute page.js' })
         }
     }
+}
+
+ipcMain.on('log', (dataMain, dataRenderer) => {
+    if (dataMain.type !== undefined) {
+        writeLog(dataMain)
+    } else {
+        writeLog(dataRenderer)
+    }
+})
+
+function writeLog(log) {
+    switch (log.type) {
+        case 'info':
+            electronLog.info(log.data)
+            break
+
+        case 'warn':
+            electronLog.warn(log.data)
+            break
+    }
+}
+
+if (settingsProvider.get('settings-companion-server')) {
+    companionServer.start()
+}
+
+if (settingsProvider.get('settings-rainmeter-web-now-playing')) {
+    rainmeterNowPlaying.start()
+}
+
+if (settingsProvider.get('settings-discord-rich-presence')) {
+    discordRPC.start()
 }
 
 // In this file you can include the rest of your app's specific main process

@@ -1,4 +1,4 @@
-const { ipcMain, app, ipcRenderer } = require('electron')
+const { ipcMain, app } = require('electron')
 const http = require('http')
 const os = require('os')
 const networkInterfaces = os.networkInterfaces()
@@ -349,7 +349,10 @@ function start() {
 
     fetchNetworkInterfaces()
 
-    console.log('Companion Server listening on port ' + port)
+    ipcMain.emit('log', {
+        type: 'info',
+        data: `Companion Server listening on port ${port}`,
+    })
 }
 
 function stop() {
