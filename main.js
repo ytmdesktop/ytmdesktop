@@ -967,11 +967,13 @@ function createWindow() {
                 ),
                 width: settingsProvider.get('settings-miniplayer-size'),
                 height: settingsProvider.get('settings-miniplayer-size'),
-                backgroundColor: '#000000',
+                backgroundColor: '#232323',
                 minWidth: 100,
                 minHeight: 100,
                 autoHideMenuBar: true,
-                skipTaskbar: false,
+                skipTaskbar: !settingsProvider.get(
+                    'settings-miniplayer-show-task'
+                ),
                 webPreferences: {
                     nodeIntegration: true,
                 },

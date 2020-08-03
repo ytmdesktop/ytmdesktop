@@ -82,6 +82,7 @@ document.addEventListener('dblclick', (ev) => {
 
 function setPlayerInfo(data) {
     document.title = `${data.track.title} - ${data.track.author}`
+    body.style.backgroundImage = `url(${data.track.cover})`
     background.style.backgroundImage = `url(${data.track.cover})`
     title.innerHTML = data.track.title || 'Title'
     author.innerHTML = data.track.author || 'Author'

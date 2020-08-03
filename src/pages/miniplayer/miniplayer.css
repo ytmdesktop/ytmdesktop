@@ -1,3 +1,8 @@
+body {
+    background-repeat: no-repeat;
+    background-size: 100vmin;
+}
+
 body:hover .player-info,
 body:hover .cmd-btn,
 body.showinfo .player-info,
@@ -18,12 +23,12 @@ body.showinfo #background {
 
 .player-info {
     filter: opacity(0);
-    height: 78vmin
+    height: 78vmin;
 }
 
 .cmd-bar {
     margin: 4px 4px 0;
-    height: 10vmin
+    height: 10vmin;
 }
 
 #btn-drag {
@@ -108,7 +113,7 @@ body.showinfo #background {
 .progress-bar {
     margin-top: 1.4vmin;
     height: 0.6vmin;
-    width: 100vw;
+    width: 100vmin;
 }
 
 #progress {
