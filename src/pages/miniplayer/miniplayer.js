@@ -3,6 +3,7 @@ const settingsProvider = require('../../providers/settingsProvider')
 const Vibrant = require('node-vibrant')
 
 const body = document.getElementsByTagName('body')[0]
+const background = document.getElementById('background')
 const title = document.getElementById('title')
 const author = document.getElementById('author')
 
@@ -12,7 +13,6 @@ const progress = document.getElementById('progress')
 const secondsEffect = document.getElementById('secondsEffect')
 
 const btnClose = document.getElementById('btn-close')
-const btnOnTop = document.getElementById('btn-pin')
 const btnDislike = document.getElementById('btn-dislike')
 const btnPrevious = document.getElementById('btn-previous')
 const btnPlayPause = document.getElementById('btn-play-pause')
@@ -21,10 +21,6 @@ const btnLike = document.getElementById('btn-like')
 
 btnClose.addEventListener('click', () => {
     ipcRenderer.send('window', { command: 'restore-main-window' })
-})
-
-btnOnTop.addEventListener('click', () => {
-    ipcRenderer.send('miniplayer-toggle-ontop', true)
 })
 
 btnDislike.addEventListener('click', () => {
@@ -86,14 +82,12 @@ document.addEventListener('dblclick', (ev) => {
 
 function setPlayerInfo(data) {
     document.title = `${data.track.title} - ${data.track.author}`
-    body.style.backgroundImage = `url(${data.track.cover})`
-    body.style.textShadow = '0 0 3px #000'
+    background.style.backgroundImage = `url(${data.track.cover})`
     title.innerHTML = data.track.title || 'Title'
     author.innerHTML = data.track.author || 'Author'
     current.innerHTML = data.player.seekbarCurrentPositionHuman || '0:00'
     duration.innerHTML = data.track.durationHuman || '0:00'
-    progress.style.width = data.track.statePercent * 100 + 'vw'
-
+    progress.style.width = data.player.statePercent * 100 + '%'
     if (data.player.isPaused) {
         btnPlayPause.children[0].innerHTML = 'play_arrow'
         body.classList.add('showinfo')
@@ -124,9 +118,9 @@ function setPlayerInfo(data) {
             .getPalette()
             .then((palette) => {
                 body.style.color = palette.LightVibrant.hex
+                progress.style.background = palette.LightVibrant.hex
+                secondsEffect.style.background = `linear-gradient(to right, ${palette.LightVibrant.hex}, transparent)`
             })
-    } else {
-        body.style.color = '#FFF'
     }
 
     if (settingsProvider.get('settings-miniplayer-always-show-controls')) {

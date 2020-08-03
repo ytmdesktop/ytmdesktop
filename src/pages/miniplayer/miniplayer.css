@@ -1,32 +1,40 @@
-body {
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
+body:hover .player-info,
+body:hover .cmd-btn,
+body.showinfo .player-info,
+body.showinfo .cmd-btn {
+    filter: none;
 }
 
-body:hover,
-body.showinfo {
-    backdrop-filter: blur(3px) brightness(0.7);
+body:hover .progress-bar,
+body.showinfo .progress-bar {
+    margin-top: 0;
+    height: 2vmin;
 }
 
-.hide-on-play {
+body:hover #background,
+body.showinfo #background {
+    filter: blur(3px) brightness(0.7);
+}
+
+.player-info {
     filter: opacity(0);
-    height: 98vmin;
-}
-
-body:hover .hide-on-play,
-body.showinfo .hide-on-play {
-    filter: opacity(1);
+    height: 78vmin
 }
 
 .cmd-bar {
-    height: 10vmin;
+    margin: 4px 4px 0;
+    height: 10vmin
+}
+
+#btn-drag {
+    filter: none !important;
 }
 
 .cmd-btn {
     width: 10vmin;
-    height: 10vmin;
+    height: 100%;
     padding: 1.5vmin;
+    filter: opacity(0);
 }
 
 .cmd-btn i {
@@ -40,7 +48,7 @@ body.showinfo .hide-on-play {
     font-weight: bold;
     font-size: 8.5vmin;
     padding: 0 2.5vmin;
-    margin-top: 10vmin;
+    margin-top: calc(10vmin - 4px);
 }
 
 .author {
@@ -99,73 +107,57 @@ body.showinfo .hide-on-play {
 
 .progress-bar {
     margin-top: 1.4vmin;
-    height: .6vmin;
+    height: 0.6vmin;
     width: 100vw;
-    background: rgba(255, 255, 255, 0.2);
-    transition: .2s ease-out;
-}
-
-body:hover .progress-bar,
-body.showinfo .progress-bar {
-    margin-top: 0;
-    height: 2vmin;
 }
 
 #progress {
     height: 100%;
     width: 0;
-    background: #FF0000;
+    background: #fff;
+}
+
+#content,
+#background,
+#secondsEffect {
+    position: absolute;
+    top: 0;
+    width: 100vmin;
+    height: 100vmin;
+    z-index: 1;
+}
+
+#content {
+    text-shadow: 0 0 3 #000;
+}
+
+#background {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
 }
 
 #secondsEffect {
-    z-index: -1;
-    position: absolute;
-    top: 0;
-    width: 60vmin;
-    height: 100vmin;
+    display: none;
 }
 
 #secondsEffect.left {
-    left: 0;
-    background: linear-gradient(to right, rgba(255, 255, 255, .5), transparent);
+    left: -40vmin;
+    display: block;
 }
 
 #secondsEffect.right {
-    right: 0;
-    background: linear-gradient(to left, rgba(255, 255, 255, .5), transparent);
-}
-
-/* Hover hack for windows */
-.hover-top,
-.hover-left,
-.hover-right,
-.hover-bottom {
-    -webkit-app-region: drag;
-    position: absolute;
-    height: 2vh;
-    width: 100vw;
-    top: 0;
-    left: 0;
-}
-
-.hover-bottom {
-    top: 98vh;
-}
-
-.hover-left {
-    height: 100vh;
-    width: 2vw;
-}
-
-.hover-right {
-    height: 100vh;
-    width: 2vw;
-    left: 98vw;
+    right: -40vmin;
+    transform: rotate(180deg);
+    display: block;
 }
 
 /* transitions */
-body,
-.hide-on-play,
+.player-info,
+.cmd-btn,
 .progress-bar {
-    /* transition: .1s ease-out; */
+    transition: filter, margin-top, height;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
 }

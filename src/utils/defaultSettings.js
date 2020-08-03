@@ -16,7 +16,9 @@ settingsProvider.setInitialValue('last-fm-login', {
 
 settingsProvider.setInitialValue('settings-app-language', 'en') // English
 
-settingsProvider.setInitialValue('settings-miniplayer-size', '2') // Normal size
+settingsProvider.setInitialValue('settings-miniplayer-size', '200') // Normal size
+
+settingsProvider.setInitialValue('settings-miniplayer-resizable', true) // Normal size
 
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 

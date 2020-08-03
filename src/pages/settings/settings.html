@@ -379,26 +379,19 @@
                                     <tr>
                                         <td>
                                             <span
-                                                i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER_SELECT_SIZE"
+                                                i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER_RESIZABLE"
                                             ></span>
                                         </td>
-                                        <td>
-                                            <select
-                                                id="settings-miniplayer-size"
-                                            >
-                                                <option value="1"> ■ </option>
-                                                <option value="2"> ■■ </option>
-                                                <option value="3"> ■■■ </option>
-                                                <option value="4">
-                                                    ■■■■
-                                                </option>
-                                                <option value="5">
-                                                    ■■■■■
-                                                </option>
-                                                <option value="6">
-                                                    ■■■■■■
-                                                </option>
-                                            </select>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-miniplayer-resizable"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
