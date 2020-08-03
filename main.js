@@ -27,6 +27,7 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
+const windowsMediaProvider = require('./src/providers/windowsMediaProvider')
 
 const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
@@ -322,7 +323,12 @@ function createWindow() {
     view.webContents.on('media-started-playing', function () {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            if (isLinux()) {
+                mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            }
+            if (isWindows()) {
+                windowsMediaProvider.init(view)
+            }
         }
 
         if (isMac()) {
@@ -386,6 +392,8 @@ function createWindow() {
 
                 activityIsPaused = playerInfo.isPaused
                 activityLikeStatus = playerInfo.likeStatus
+
+                windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
             }
 
             mediaControl.setProgress(
@@ -447,6 +455,13 @@ function createWindow() {
                 ) {
                     tray.balloon(title, author, cover, iconDefault)
                 }
+
+                windowsMediaProvider.setPlaybackData(
+                    title,
+                    author,
+                    cover,
+                    album
+                )
             }
 
             if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {

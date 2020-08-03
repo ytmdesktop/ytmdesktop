@@ -71,7 +71,7 @@ class Mpris {
                 this.player.on(event, action)
             }
         }
-        this.player.on('position', args => {
+        this.player.on('position', (args) => {
             // the position event sends through {trackId : ###, position : ###}
             ipcMain.emit('media-command', {
                 command: 'media-seekbar-set',
@@ -79,7 +79,7 @@ class Mpris {
             })
         })
 
-        this.player.on('seek', offset => {
+        this.player.on('seek', (offset) => {
             // the seek event sends through the difference from where we should be in microseconds, positive forward, negative backward
             ipcMain.emit('media-command', {
                 command: 'media-seekbar-set',

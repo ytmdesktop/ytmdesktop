@@ -5,6 +5,7 @@
     "main": "main.js",
     "scripts": {
         "start": "npx electron .",
+        "rebuild": "electron-rebuild -f",
         "publish:win": "npx electron-builder --win -p always --config electron-builder64.yml",
         "publish:mac": "npx electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml"
@@ -25,6 +26,7 @@
     "devDependencies": {
         "electron": "^9.1.1",
         "electron-builder": "^22.7.0",
+        "electron-rebuild": "^1.11.0",
         "husky": "^4.2.5",
         "prettier": "^2.0.5",
         "pretty-quick": "^2.0.1"
@@ -54,7 +56,10 @@
         "ws": "^7.3.1"
     },
     "optionalDependencies": {
+        "@nodert-win10/windows.media": "^0.2.96",
         "@nodert-win10/windows.media.playback": "^0.2.96",
+        "@nodert-win10/windows.storage.streams": "^0.2.96",
+        "@nodert-win10/windows.foundation": "^0.2.96",
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
         "utf-8-validate": "^5.0.2"
