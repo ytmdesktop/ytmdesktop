@@ -893,9 +893,11 @@ function createWindow() {
                 break
 
             case 'restore-main-window':
-                miniplayer.close()
-                miniplayer = undefined
                 mainWindow.show()
+                try {
+                    miniplayer.close()
+                    miniplayer = undefined
+                } catch {}
                 break
 
             case 'show-discord-settings':

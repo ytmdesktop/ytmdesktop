@@ -1,4 +1,4 @@
-const { remote, ipcRenderer: ipc, shell, ipcMain } = require('electron')
+const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const { isLinux, isMac } = require('../../utils/systemInfo')
@@ -493,4 +493,8 @@ document.querySelector('#saveAccelerator').addEventListener('click', () => {
     settingsProvider.set('settings-accelerators', settingsAccelerators)
 
     loadCustomKeys()
+})
+
+document.querySelector('#release-notes').addEventListener('click', () => {
+    ipc.send('window', { command: 'show-changelog' })
 })
