@@ -76,3 +76,5 @@ settingsProvider.setInitialValue(
     'settings-disable-hardware-acceleration',
     false
 )
+
+settingsProvider.setInitialValue('settings-windows10-media-service', true)

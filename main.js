@@ -17,6 +17,7 @@ const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
 const electronLocalshortcut = require('electron-localshortcut')
 const electronLog = require('electron-log')
+const os = require('os')
 
 const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
@@ -96,8 +97,14 @@ if (settingsProvider.get('has-updated') == true) {
     settingsProvider.set('has-updated', false)
 }
 
-if (isWindows()) {
-    windowsMediaProvider = require('./src/providers/windowsMediaProvider')
+if (
+    isWindows() &&
+    os.release().startsWith('10.') &&
+    settingsProvider.get('settings-windows10-media-service')
+) {
+    try {
+        windowsMediaProvider = require('./src/providers/windowsMediaProvider')
+    } catch {}
 }
 
 if (isLinux()) {
@@ -312,7 +319,12 @@ function createWindow() {
             }
         }
 
-        if (isWindows()) {
+        if (
+            isWindows() &&
+            os.release().startsWith('10.') &&
+            settingsProvider.get('settings-windows10-media-service') &&
+            windowsMediaProvider != undefined
+        ) {
             windowsMediaProvider.init(view)
         }
 
@@ -378,7 +390,12 @@ function createWindow() {
                 activityIsPaused = playerInfo.isPaused
                 activityLikeStatus = playerInfo.likeStatus
 
-                if (isWindows()) {
+                if (
+                    isWindows() &&
+                    os.release().startsWith('10.') &&
+                    settingsProvider.get('settings-windows10-media-service') &&
+                    windowsMediaProvider != undefined
+                ) {
                     windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
                 }
             }
@@ -418,6 +435,23 @@ function createWindow() {
                 }
             }
 
+            // Experimental
+            if (isWindows() && view.webContents.getURL().indexOf('v=') != -1) {
+                mainWindow.setThumbnailClip({
+                    x: 230,
+                    y: 150,
+                    width: 676,
+                    height: 676,
+                })
+            } else {
+                mainWindow.setThumbnailClip({
+                    x: 0,
+                    y: 0,
+                    width: mainWindow.getSize()[0],
+                    height: mainWindow.getSize()[1],
+                })
+            }
+
             /**
              * Update only when change track
              */
@@ -434,6 +468,7 @@ function createWindow() {
                 }
 
                 mainWindow.setTitle(nowPlaying)
+
                 tray.setTooltip(nowPlaying)
 
                 if (
@@ -443,7 +478,12 @@ function createWindow() {
                     tray.balloon(title, author, cover, iconDefault)
                 }
 
-                if (isWindows()) {
+                if (
+                    isWindows() &&
+                    os.release().startsWith('10.') &&
+                    settingsProvider.get('settings-windows10-media-service') &&
+                    windowsMediaProvider != undefined
+                ) {
                     windowsMediaProvider.setPlaybackData(
                         title,
                         author,

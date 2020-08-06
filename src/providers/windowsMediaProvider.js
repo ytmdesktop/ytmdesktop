@@ -12,6 +12,7 @@ const {
 const { Uri } = require('@nodert-win10/windows.foundation')
 
 const mediaControl = require('../providers/mediaProvider')
+const settingsProvider = require('./settingsProvider')
 
 class windowsMediaProvider {
     constructor() {
@@ -20,13 +21,17 @@ class windowsMediaProvider {
         this._controls =
             BackgroundMediaPlayer.current.systemMediaTransportControls
 
+        if (
+            !settingsProvider.get('settings-windows10-media-service-show-info')
+        ) {
+            this._controls.isEnabled = false
+        }
+
         this._controls.isChannelDownEnabled = false
         this._controls.isChannelUpEnabled = false
         this._controls.isFastForwardEnabled = false
         this._controls.isRecordEnabled = false
         this._controls.isRewindEnabled = false
-
-        this._controls.isEnabled = true
         this._controls.isNextEnabled = true
         this._controls.isPauseEnabled = true
         this._controls.isPlayEnabled = true
@@ -36,7 +41,11 @@ class windowsMediaProvider {
         this._controls.displayUpdater.type = MediaPlaybackType.music
 
         this._controls.displayUpdater.musicProperties.title = 'YouTube Music'
-        this._controls.displayUpdater.musicProperties.artist = '-'
+        this._controls.displayUpdater.musicProperties.artist = ''
+        this._controls.displayUpdater.thumbnail = RandomAccessStreamReference.createFromUri(
+            new Uri('https://avatars1.githubusercontent.com/u/48072485?s=500')
+        )
+
         this._controls.displayUpdater.update()
 
         this._controls.on('buttonpressed', (sender, eventArgs) => {

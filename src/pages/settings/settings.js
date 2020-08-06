@@ -1,7 +1,7 @@
 const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
-const { isLinux, isMac } = require('../../utils/systemInfo')
+const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
 const fs = require('fs')
 
 const elementSettingsCompanionApp = document.getElementById(
@@ -84,7 +84,16 @@ function checkCompanionStatus() {
     }
 }
 
+function checkWindows10ServiceStatus() {
+    if (settingsProvider.get('settings-windows10-media-service')) {
+        document.getElementById('windows-10-show-info').classList.remove('hide')
+    } else {
+        document.getElementById('windows-10-show-info').classList.add('hide')
+    }
+}
+
 checkCompanionStatus()
+checkWindows10ServiceStatus()
 
 document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-keep-background', 'click')
@@ -96,6 +105,10 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     initElement('settings-companion-server-protect', 'click')
     initElement('settings-continue-where-left-of', 'click')
+    initElement('settings-windows10-media-service', 'click', () => {
+        checkWindows10ServiceStatus()
+    })
+    initElement('settings-windows10-media-service-show-info', 'click')
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
@@ -179,10 +192,31 @@ if (elementBtnAppRelaunch) {
     })
 }
 
-if (process.platform !== 'darwin') {
+if (!isMac()) {
     const macSpecificNodes = document.getElementsByClassName('macos-specific')
     for (let i = 0; i < macSpecificNodes.length; i++) {
         macSpecificNodes.item(i).classList.add('hide')
+    }
+}
+
+if (!isWindows()) {
+    const windowsSpecificNodes = document.getElementsByClassName(
+        'windows-specific'
+    )
+    for (let i = 0; i < windowsSpecificNodes.length; i++) {
+        windowsSpecificNodes.item(i).classList.add('hide')
+    }
+}
+
+if (isWindows()) {
+    const os = require('os')
+    if (!os.release().startsWith('10.')) {
+        const windows10SpecificNodes = document.getElementsByClassName(
+            'windows10-specific'
+        )
+        for (let i = 0; i < windows10SpecificNodes.length; i++) {
+            windows10SpecificNodes.item(i).classList.add('hide')
+        }
     }
 }
 
