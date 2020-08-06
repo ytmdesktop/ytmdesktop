@@ -166,3 +166,12 @@ body.showinfo #background {
     transition-duration: 0.15s;
     transition-timing-function: ease-out;
 }
+
+#loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+}
