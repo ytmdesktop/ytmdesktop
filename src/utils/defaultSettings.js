@@ -77,4 +77,9 @@ settingsProvider.setInitialValue(
     false
 )
 
-settingsProvider.setInitialValue('settings-windows10-media-service', true)
+settingsProvider.setInitialValue('settings-windows10-media-service', false)
+
+settingsProvider.setInitialValue(
+    'settings-windows10-media-service-show-info',
+    false
+)
