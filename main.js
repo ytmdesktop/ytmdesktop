@@ -436,7 +436,7 @@ function createWindow() {
             }
 
             // Experimental
-            if (isWindows() && view.webContents.getURL().indexOf('v=') != -1) {
+            /*if (isWindows() && view.webContents.getURL().indexOf('v=') != -1) {
                 mainWindow.setThumbnailClip({
                     x: 230,
                     y: 150,
@@ -450,7 +450,7 @@ function createWindow() {
                     width: mainWindow.getSize()[0],
                     height: mainWindow.getSize()[1],
                 })
-            }
+            }*/
 
             /**
              * Update only when change track
@@ -492,15 +492,15 @@ function createWindow() {
                     )
                 }
 
-                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
-            }
-
-            if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
-                if (playerInfo.isPaused) {
-                    tray.updateTrayIcon(iconPause)
-                } else {
-                    tray.updateTrayIcon(iconPlay)
+                if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
+                    if (playerInfo.isPaused) {
+                        tray.updateTrayIcon(iconPause)
+                    } else {
+                        tray.updateTrayIcon(iconPlay)
+                    }
                 }
+
+                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
             }
 
             lastTrackProgress = progress

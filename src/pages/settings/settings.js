@@ -106,9 +106,11 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-companion-server-protect', 'click')
     initElement('settings-continue-where-left-of', 'click')
     initElement('settings-windows10-media-service', 'click', () => {
-        checkWindows10ServiceStatus()
+        checkWindows10ServiceStatus(), showRelaunchButton()
     })
-    initElement('settings-windows10-media-service-show-info', 'click')
+    initElement('settings-windows10-media-service-show-info', 'click', () => {
+        showRelaunchButton()
+    })
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
