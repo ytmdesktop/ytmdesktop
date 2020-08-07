@@ -148,23 +148,24 @@ var serverFunction = function (req, res) {
   
               </div>
   
-              <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  <a class="${
-                      isProtected ? 'white-text' : 'orange-text'
-                  } btn-flat tooltipped" data-position="top" data-tooltip="${
+              <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%; padding: 0;">
+                <div>
+                    <a href='https://play.google.com/store/apps/details?id=app.ytmdesktop.remote&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1' target="_blank">
+                        <img width="200" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
+                    </a>
+                </div>
+
+                <a class="${
+                    isProtected ? 'white-text' : 'orange-text'
+                } btn-flat tooltipped" data-position="top" data-tooltip="${
             isProtected ? 'Protected' : 'Not protected'
         } with password"><i class="material-icons tiny">${
             isProtected ? 'lock' : 'lock_open'
-        }</i></a>
+        }</i>
+                </a>
                   ${hostname} 
                   <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
-
-              <!--div>
-                <a href='https://play.google.com/store/apps/details?id=app.ytmdesktop.remote&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
-                    <img width="200" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
-                </a>
-              </div-->
           </body>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
           <script>
