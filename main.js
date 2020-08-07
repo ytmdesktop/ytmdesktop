@@ -270,6 +270,7 @@ function createWindow() {
     }
 
     mainWindow.on('closed', function () {
+        view = null
         mainWindow = null
     })
 
