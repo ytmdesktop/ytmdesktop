@@ -12,7 +12,9 @@ files:
   - '!package.json'
   - '!package-lock.json'
   - '!.cache'
-
+  - '!app-update.yml'
+  - '!dev-app-update.yml'
+  
 protocols:
   name: YouTube Music Desktop
   schemes: [ytmd]

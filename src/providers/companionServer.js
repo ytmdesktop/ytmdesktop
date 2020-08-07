@@ -59,7 +59,7 @@ var serverFunction = function (req, res) {
             qr.make()
 
             collection += `
-                          <div class="row" style="margin-top: 10px;">
+                          <div class="center row" >
                               <div class="col s12">
                                   <div class="card transparent z-depth-0">
                                       <div class="card-content">
@@ -96,7 +96,7 @@ var serverFunction = function (req, res) {
               <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
               <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
               <style>
-                  html, body {
+                  html {
                       margin: 0;
                       padding: 0;
                       text-align: center;
@@ -106,10 +106,19 @@ var serverFunction = function (req, res) {
                   h5 {
                       margin: 1rem 0 1rem 0 !important;
                   }
+
+                  .center {
+                    width: 68%;
+                    /*height: 400px;*/
+                    position: absolute;
+                    left: 50%;
+                    top: 48%;
+                    transform: translate(-50%, -50%);
+                  }
               </style>
           </head>
           <body>              
-              <h3 class="red-text">YTMDesktop Remote Control</h3>
+              <h4 class="white-text">YTMDesktop Remote Control</h4>
               
               <div class="row" style="height: 0; visibility: ${
                   infoPlayerProvider.getTrackInfo().id ? 'visible' : 'hidden'

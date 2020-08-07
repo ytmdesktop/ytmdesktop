@@ -6,8 +6,8 @@
 
 # YouTube Music Desktop App
 
-<img alt="window" src="https://ytmdesktop.app/img/product/main_3.png" width="500px">
-<img alt="settings" src="https://ytmdesktop.app/img/product/settings.png" width="430px">
+<img alt="window" src="https://ytmdesktop.app/img/product/main_5.png">
+&nbsp;
 
 # Available for
 
