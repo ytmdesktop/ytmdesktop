@@ -1612,6 +1612,8 @@ if (!gotTheLock) {
     })
 
     app.on('before-quit', function (e) {
+        mainWindow = null
+        view = null
         if (isMac()) {
             app.exit()
         }
@@ -1619,6 +1621,8 @@ if (!gotTheLock) {
     })
 
     app.on('quit', function () {
+        mainWindow = null
+        view = null
         tray.quit()
     })
 }

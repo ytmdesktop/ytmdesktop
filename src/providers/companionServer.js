@@ -5,13 +5,12 @@ const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
 const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
-const { deprecate } = require('util')
 
 const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch|VMware|Adapter)\w*/gim
+const pattIgnoreInterface = /(Loopback|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -34,7 +33,20 @@ function infoServer() {
 }
 
 function fetchNetworkInterfaces() {
-    Object.keys(networkInterfaces).forEach((v, k) => {
+    serverInterfaces = Object.entries(networkInterfaces)
+        .filter(([interfaces]) => !pattIgnoreInterface.test(interfaces))
+        .map(([name, value]) => {
+            value = value.filter((data) => {
+                return data.family == 'IPv4' && data.internal == false
+            })
+            return {
+                name: name,
+                ip: value[0].address,
+                isProtected: infoServer().isProtected,
+            }
+        })
+
+    /*Object.keys(networkInterfaces).forEach((v, k) => {
         if (!pattIgnoreInterface.test(v)) {
             networkInterfaces[v].forEach((vv, kk) => {
                 if (vv.family == 'IPv4' && vv.internal == false) {
@@ -47,15 +59,17 @@ function fetchNetworkInterfaces() {
                 }
             })
         }
-    })
+    })*/
 }
 
 var serverFunction = function (req, res) {
     if (req.url === '/') {
-        var collection = ''
+        let collection = ''
+        let isProtected = infoServer().isProtected
 
         serverInterfaces.forEach((value) => {
-            let qr = qrcode(6, 'H')
+            let qr = qrcode(0, 'H')
+            value['hostname'] = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
@@ -88,7 +102,6 @@ var serverFunction = function (req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
-        let isProtected = infoServer().isProtected
         res.write(`<html>
           <head>
               <title>YTMDesktop Remote Control</title>
