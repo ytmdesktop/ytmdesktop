@@ -1,8 +1,3 @@
-body {
-    background-repeat: no-repeat;
-    background-size: 100vmin;
-}
-
 body:hover .player-info,
 body:hover .cmd-btn,
 body.showinfo .player-info,
@@ -123,7 +118,6 @@ body.showinfo #background {
 }
 
 #content,
-#background,
 #secondsEffect {
     position: absolute;
     top: 0;
@@ -140,7 +134,21 @@ body.showinfo #background {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    position: absolute;
+    top: -1vmin;
+    left: -1vmin;
+    width: 102vmin;
+    height: 102vmin;
     z-index: 0;
+}
+
+#loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
 }
 
 #secondsEffect {
@@ -165,13 +173,4 @@ body.showinfo #background {
     transition: filter, margin-top, height;
     transition-duration: 0.15s;
     transition-timing-function: ease-out;
-}
-
-#loading {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    text-align: center;
 }
