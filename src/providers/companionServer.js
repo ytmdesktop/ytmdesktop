@@ -5,6 +5,7 @@ const networkInterfaces = os.networkInterfaces()
 const qrcode = require('qrcode-generator')
 const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
+const { deprecate } = require('util')
 
 const ip = '0.0.0.0'
 const port = 9863
@@ -212,10 +213,12 @@ var serverFunction = function (req, res) {
                     ) {
                         try {
                             let headerAuth = req.headers.authorization
-                            let auth = headerAuth.split(' ')[1]
+                            let authToken = headerAuth
+                                .split(' ')[1]
+                                .toUpperCase()
 
                             if (
-                                auth ==
+                                authToken ==
                                 settingsProvider.get(
                                     'settings-companion-server-token'
                                 )
@@ -375,14 +378,7 @@ function execCmd(cmd, value) {
     value = value || true
 
     switch (cmd) {
-        case 'track-play':
-            ipcMain.emit('media-command', {
-                command: 'media-play-pause',
-                value: true,
-            })
-            break
-
-        case 'track-pause':
+        case 'track-play-pause':
             ipcMain.emit('media-command', {
                 command: 'media-play-pause',
                 value: true,
@@ -469,14 +465,14 @@ function execCmd(cmd, value) {
         case 'player-repeat':
             ipcMain.emit('media-command', {
                 command: 'media-repeat',
-                value: value,
+                value: true,
             })
             break
 
         case 'player-shuffle':
             ipcMain.emit('media-command', {
                 command: 'media-shuffle',
-                value: value,
+                value: true,
             })
             break
 
