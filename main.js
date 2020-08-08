@@ -47,9 +47,10 @@ let mainWindow,
     customCSSPageKey,
     lastTrackId,
     lastTrackProgress,
+    lastIsPaused,
+    lastSeekbarCurrentPosition,
     doublePressPlayPause,
     updateTrackInfoTimeout,
-    activityIsPaused,
     activityLikeStatus,
     windowsMediaProvider
 
@@ -366,6 +367,7 @@ function createWindow() {
         var trackInfo = infoPlayerProvider.getTrackInfo()
 
         var progress = playerInfo.statePercent
+        var seekbarCurrentPosition = playerInfo.seekbarCurrentPosition
         var trackId = trackInfo.id
         var title = trackInfo.title
         var author = trackInfo.author
@@ -375,31 +377,8 @@ function createWindow() {
         var nowPlaying = `${title} - ${author}`
 
         if (title && author) {
-            discordRPC.setActivity(getAll())
             rainmeterNowPlaying.setActivity(getAll())
             mprisProvider.setActivity(getAll())
-
-            if (
-                playerInfo.isPaused != activityIsPaused ||
-                playerInfo.likeStatus != activityLikeStatus
-            ) {
-                mediaControl.createThumbar(
-                    mainWindow,
-                    infoPlayerProvider.getAllInfo()
-                )
-
-                activityIsPaused = playerInfo.isPaused
-                activityLikeStatus = playerInfo.likeStatus
-
-                if (
-                    isWindows() &&
-                    os.release().startsWith('10.') &&
-                    settingsProvider.get('settings-windows10-media-service') &&
-                    windowsMediaProvider != undefined
-                ) {
-                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
-                }
-            }
 
             mediaControl.setProgress(
                 mainWindow,
@@ -436,22 +415,15 @@ function createWindow() {
                 }
             }
 
-            // Experimental
-            /*if (isWindows() && view.webContents.getURL().indexOf('v=') != -1) {
-                mainWindow.setThumbnailClip({
-                    x: 230,
-                    y: 150,
-                    width: 676,
-                    height: 676,
-                })
-            } else {
-                mainWindow.setThumbnailClip({
-                    x: 0,
-                    y: 0,
-                    width: mainWindow.getSize()[0],
-                    height: mainWindow.getSize()[1],
-                })
-            }*/
+            /**
+             * Update only when change seekbar
+             */
+            if (
+                lastSeekbarCurrentPosition - seekbarCurrentPosition > 2 ||
+                lastSeekbarCurrentPosition - seekbarCurrentPosition < -2
+            ) {
+                discordRPC.setActivity(getAll())
+            }
 
             /**
              * Update only when change track
@@ -493,18 +465,49 @@ function createWindow() {
                     )
                 }
 
+                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
+                discordRPC.setActivity(getAll())
+            }
+
+            /**
+             * Update only when change state play/pause
+             */
+            if (lastIsPaused != playerInfo.isPaused) {
+                lastIsPaused = playerInfo.isPaused
+
+                discordRPC.setActivity(getAll())
+
                 if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
-                    if (playerInfo.isPaused) {
-                        tray.updateTrayIcon(iconPause)
-                    } else {
-                        tray.updateTrayIcon(iconPlay)
-                    }
+                    tray.updateTrayIcon(
+                        playerInfo.isPaused ? iconPause : iconPlay
+                    )
                 }
 
-                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
+                mediaControl.createThumbar(
+                    mainWindow,
+                    infoPlayerProvider.getAllInfo()
+                )
+
+                if (
+                    isWindows() &&
+                    os.release().startsWith('10.') &&
+                    settingsProvider.get('settings-windows10-media-service') &&
+                    windowsMediaProvider != undefined
+                ) {
+                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
+                }
+            }
+
+            if (activityLikeStatus != playerInfo.likeStatus) {
+                mediaControl.createThumbar(
+                    mainWindow,
+                    infoPlayerProvider.getAllInfo()
+                )
+                activityLikeStatus = playerInfo.likeStatus
             }
 
             lastTrackProgress = progress
+            lastSeekbarCurrentPosition = seekbarCurrentPosition
         }
     }
 
