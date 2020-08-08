@@ -41,7 +41,7 @@ function fetchNetworkInterfaces() {
             })
             return {
                 name: name,
-                ip: value[0].address,
+                ip: value.length ? value[0].address : '',
                 isProtected: infoServer().isProtected,
             }
         })
@@ -74,7 +74,7 @@ var serverFunction = function (req, res) {
             qr.make()
 
             collection += `
-                          <div class="center row" >
+                          <div class="row" >
                               <div class="col s12">
                                   <div class="card transparent z-depth-0">
                                       <div class="card-content">
@@ -115,6 +115,7 @@ var serverFunction = function (req, res) {
                       padding: 0;
                       text-align: center;
                       background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
+                      background-attachment: fixed;
                       font-family: sans-serif;
                   }
                   h5 {
@@ -123,7 +124,6 @@ var serverFunction = function (req, res) {
 
                   .center {
                     width: 68%;
-                    /*height: 400px;*/
                     position: absolute;
                     left: 50%;
                     top: 48%;
@@ -156,7 +156,7 @@ var serverFunction = function (req, res) {
                 </div>
               </div>
   
-              <div class="container" style="margin-top: 13%;">
+              <div class="container" style="margin: 13% auto 5% auto;">
   
                   ${collection}
   
