@@ -659,19 +659,17 @@ function createWindow() {
         }
     )
 
-    globalShortcut.register(
-        settingsAccelerator['media-track-like'],
-        function () {
+    globalShortcut.register(settingsAccelerator['media-track-like'], () => {
+        if (infoPlayerProvider.getPlayerInfo().likeStatus != 'LIKE') {
             mediaControl.upVote(view)
         }
-    )
+    })
 
-    globalShortcut.register(
-        settingsAccelerator['media-track-dislike'],
-        function () {
+    globalShortcut.register(settingsAccelerator['media-track-dislike'], () => {
+        if (infoPlayerProvider.getPlayerInfo().likeStatus != 'DISLIKE') {
             mediaControl.downVote(view)
         }
-    )
+    })
 
     globalShortcut.register(
         settingsAccelerator['media-volume-up'],
