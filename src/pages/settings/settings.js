@@ -531,6 +531,20 @@ document.querySelector('#saveAccelerator').addEventListener('click', () => {
     loadCustomKeys()
 })
 
+document.querySelector('#disableAccelerator').addEventListener('click', () => {
+    ipc.send('change-accelerator', {
+        type: typeAcceleratorSelected,
+        oldValue: settingsAccelerators[typeAcceleratorSelected],
+        newValue: 'disabled',
+    })
+
+    settingsAccelerators[typeAcceleratorSelected] = 'disabled'
+
+    settingsProvider.set('settings-accelerators', settingsAccelerators)
+
+    loadCustomKeys()
+})
+
 document.querySelector('#release-notes').addEventListener('click', () => {
     ipc.send('window', { command: 'show-changelog' })
 })

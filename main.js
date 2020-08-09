@@ -623,6 +623,109 @@ function createWindow() {
         }
     })
 
+    ipcMain.on('change-accelerator', (dataMain, dataRenderer) => {
+        if (dataMain.type != undefined) {
+            args = dataMain
+        } else {
+            args = dataRenderer
+        }
+
+        try {
+            globalShortcut.unregister(args.oldValue)
+        } catch (_) {}
+
+        switch (args.type) {
+            case 'media-play-pause':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.playPauseTrack(view)
+                })
+                break
+
+            case 'media-track-next':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.nextTrack(view)
+                })
+                break
+
+            case 'media-track-previous':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.previousTrack(view)
+                })
+                break
+
+            case 'media-track-like':
+                registerGlobalShortcut(args.newValue, () => {
+                    if (
+                        infoPlayerProvider.getPlayerInfo().likeStatus != 'LIKE'
+                    ) {
+                        mediaControl.upVote(view)
+                    }
+                })
+                break
+
+            case 'media-track-dislike':
+                registerGlobalShortcut(args.newValue, () => {
+                    if (
+                        infoPlayerProvider.getPlayerInfo().likeStatus !=
+                        'DISLIKE'
+                    ) {
+                        mediaControl.downVote(view)
+                    }
+                })
+                break
+
+            case 'media-volume-up':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.volumeUp(view)
+                })
+                break
+
+            case 'media-volume-down':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.volumeDown(view)
+                })
+                break
+        }
+    })
+
+    // Custom accelerators
+    let settingsAccelerator = settingsProvider.get('settings-accelerators')
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-play-pause',
+        newValue: settingsAccelerator['media-play-pause'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-next',
+        newValue: settingsAccelerator['media-track-next'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-previous',
+        newValue: settingsAccelerator['media-track-previous'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-like',
+        newValue: settingsAccelerator['media-track-like'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-dislike',
+        newValue: settingsAccelerator['media-track-dislike'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-volume-up',
+        newValue: settingsAccelerator['media-volume-up'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-volume-down',
+        newValue: settingsAccelerator['media-volume-down'],
+    })
+
     globalShortcut.register('MediaStop', function () {
         mediaControl.stopTrack(view)
     })
@@ -633,106 +736,6 @@ function createWindow() {
 
     globalShortcut.register('MediaNextTrack', function () {
         mediaControl.nextTrack(view)
-    })
-
-    // Custom accelerators
-    let settingsAccelerator = settingsProvider.get('settings-accelerators')
-
-    globalShortcut.register(
-        settingsAccelerator['media-play-pause'],
-        function () {
-            mediaControl.playPauseTrack(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-next'],
-        function () {
-            mediaControl.nextTrack(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-previous'],
-        function () {
-            mediaControl.previousTrack(view)
-        }
-    )
-
-    globalShortcut.register(settingsAccelerator['media-track-like'], () => {
-        if (infoPlayerProvider.getPlayerInfo().likeStatus != 'LIKE') {
-            mediaControl.upVote(view)
-        }
-    })
-
-    globalShortcut.register(settingsAccelerator['media-track-dislike'], () => {
-        if (infoPlayerProvider.getPlayerInfo().likeStatus != 'DISLIKE') {
-            mediaControl.downVote(view)
-        }
-    })
-
-    globalShortcut.register(
-        settingsAccelerator['media-volume-up'],
-        function () {
-            mediaControl.volumeUp(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-volume-down'],
-        function () {
-            mediaControl.volumeDown(view)
-        }
-    )
-
-    ipcMain.on('change-accelerator', (event, args) => {
-        try {
-            globalShortcut.unregister(args.oldValue)
-        } catch (_) {}
-
-        switch (args.type) {
-            case 'media-play-pause':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.playPauseTrack(view)
-                })
-                break
-
-            case 'media-track-next':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.nextTrack(view)
-                })
-                break
-
-            case 'media-track-previous':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.previousTrack(view)
-                })
-                break
-
-            case 'media-track-like':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.upVote(view)
-                })
-                break
-
-            case 'media-track-dislike':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.downVote(view)
-                })
-                break
-
-            case 'media-volume-up':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.volumeUp(view)
-                })
-                break
-
-            case 'media-volume-down':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.volumeDown(view)
-                })
-                break
-        }
     })
 
     ipcMain.handle('invoke-all-info', async (event, args) => {
@@ -1729,13 +1732,11 @@ function loadCustomPageScript() {
     }
 }
 
-ipcMain.on('log', (dataMain, dataRenderer) => {
-    if (dataMain.type !== undefined) {
-        writeLog(dataMain)
-    } else {
-        writeLog(dataRenderer)
+function registerGlobalShortcut(value, fn) {
+    if (value != 'disabled') {
+        globalShortcut.register(`${value}`, fn)
     }
-})
+}
 
 function writeLog(log) {
     switch (log.type) {
@@ -1748,6 +1749,14 @@ function writeLog(log) {
             break
     }
 }
+
+ipcMain.on('log', (dataMain, dataRenderer) => {
+    if (dataMain.type !== undefined) {
+        writeLog(dataMain)
+    } else {
+        writeLog(dataRenderer)
+    }
+})
 
 if (settingsProvider.get('settings-companion-server')) {
     companionServer.start()

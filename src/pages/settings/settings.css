@@ -239,3 +239,8 @@ input[type=range]+.thumb {
     color: #666;
     content: '└ ';
 }
+
+.text-disabled {
+    text-decoration: line-through;
+    text-transform: capitalize;
+}
