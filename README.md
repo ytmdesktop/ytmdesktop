@@ -34,7 +34,7 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-git clone https://github.com/adlerluiz/ytmdesktop
+git clone https://github.com/ytmdesktop/ytmdesktop
 # Go into the repository
 cd ytmdesktop
 # Install dependencies
