@@ -3,7 +3,6 @@ const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
 var client
-
 var _isStarted
 
 function isStarted() {
@@ -24,7 +23,6 @@ function start() {
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
             setTimeout(function () {
-                // console.log('trying to connect')
                 start()
             }, 10000)
         }
@@ -52,18 +50,25 @@ function setActivity(info) {
         if (discordSettings.state) activity.state = info.track.author
 
         if (discordSettings.time) {
-            activity.startTimestamp =
-                now + info.player.seekbarCurrentPosition * 1000
-            activity.endTimestamp =
-                now +
-                (info.track.duration - info.player.seekbarCurrentPosition) *
-                    1000
+            if (info.player.isPaused) {
+                delete activity.startTimestamp
+                delete activity.endTimestamp
+            } else {
+                activity.startTimestamp =
+                    now + info.player.seekbarCurrentPosition * 1000
+                activity.endTimestamp =
+                    now +
+                    (info.track.duration - info.player.seekbarCurrentPosition) *
+                        1000
+            }
         }
 
         activity.largeImageKey = 'ytm_logo_512'
         activity.smallImageKey = info.player.isPaused
             ? 'discordrpc-pause'
             : 'discordrpc-play'
+        activity.largeImageText = 'YouTube Music'
+        activity.smallImageText = info.player.isPaused ? 'Paused' : 'Playing'
         activity.instance = false
 
         if (!discordSettings.hideIdle && info.player.isPaused) {

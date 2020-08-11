@@ -21,6 +21,8 @@ content.addListener('dom-ready', function () {
         .catch((_) =>
             ipcRenderer.send('log', { type: 'error', data: 'error on inject' })
         )
+
+    // injectCast()
 })
 
 function createContextMenu() {
@@ -352,4 +354,19 @@ function createOffTheRoadContent() {
                 data: 'error on createOffTheRoadContent',
             })
         )
+}
+
+function injectCast() {
+    content
+        .executeJavaScript(
+            `
+        // Todo
+        `
+        )
+        .then((data) => {
+            console.log(data)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 }

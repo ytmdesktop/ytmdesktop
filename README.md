@@ -6,8 +6,8 @@
 
 # YouTube Music Desktop App
 
-<img alt="window" src="https://ytmdesktop.app/img/product/main_3.png" width="500px">
-<img alt="settings" src="https://ytmdesktop.app/img/product/settings.png" width="430px">
+<img alt="window" src="https://ytmdesktop.app/img/product/main_5.png">
+&nbsp;
 
 # Available for
 
@@ -34,7 +34,7 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-git clone https://github.com/adlerluiz/ytmdesktop
+git clone https://github.com/ytmdesktop/ytmdesktop
 # Go into the repository
 cd ytmdesktop
 # Install dependencies

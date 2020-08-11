@@ -234,3 +234,13 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type=range]+.thumb {
     display: none;
 }
+
+.settings-item-child::before {
+    color: #666;
+    content: '└ ';
+}
+
+.text-disabled {
+    text-decoration: line-through;
+    text-transform: capitalize;
+}

@@ -565,6 +565,9 @@
                                     <tr id="companion-server-protect">
                                         <td>
                                             <span
+                                                class="settings-item-child"
+                                            ></span>
+                                            <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT"
                                             ></span>
                                             <span
@@ -677,6 +680,48 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr class="windows10-specific">
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-windows10-media-service"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr
+                                        id="windows-10-show-info"
+                                        class="windows10-specific"
+                                    >
+                                        <td>
+                                            <span
+                                                class="settings-item-child"
+                                            ></span>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-windows10-media-service-show-info"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </thead>
                             </table>
                         </div>
@@ -694,13 +739,18 @@
                                 </div>
                                 <div class="modal-footer black-text">
                                     <a
+                                        id="disableAccelerator"
+                                        class="modal-close waves-effect waves-red btn-flat btn-sm orange"
+                                        >Disable</a
+                                    >
+                                    <a
                                         id="cancelAccelerator"
-                                        class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
+                                        class="modal-close waves-effect waves-red btn-flat btn-sm black-text"
                                         >Cancel</a
                                     >
                                     <a
                                         id="saveAccelerator"
-                                        class="modal-close waves-effect waves-green btn-flat btn-sm red"
+                                        class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
                                         >Save</a
                                     >
                                 </div>

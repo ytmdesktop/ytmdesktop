@@ -114,5 +114,5 @@ html, body {
 }
 
 .text-initial {
-    text-transform: initial;
+    text-transform: capitalize;
 }

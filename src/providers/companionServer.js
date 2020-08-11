@@ -10,7 +10,7 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch|VMware|Adapter)\w*/gim
+const pattIgnoreInterface = /(Loopback|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -33,7 +33,20 @@ function infoServer() {
 }
 
 function fetchNetworkInterfaces() {
-    Object.keys(networkInterfaces).forEach((v, k) => {
+    serverInterfaces = Object.entries(networkInterfaces)
+        .filter(([interfaces]) => !pattIgnoreInterface.test(interfaces))
+        .map(([name, value]) => {
+            value = value.filter((data) => {
+                return data.family == 'IPv4' && data.internal == false
+            })
+            return {
+                name: name,
+                ip: value.length ? value[0].address : '',
+                isProtected: infoServer().isProtected,
+            }
+        })
+
+    /*Object.keys(networkInterfaces).forEach((v, k) => {
         if (!pattIgnoreInterface.test(v)) {
             networkInterfaces[v].forEach((vv, kk) => {
                 if (vv.family == 'IPv4' && vv.internal == false) {
@@ -46,20 +59,22 @@ function fetchNetworkInterfaces() {
                 }
             })
         }
-    })
+    })*/
 }
 
 var serverFunction = function (req, res) {
     if (req.url === '/') {
-        var collection = ''
+        let collection = ''
+        let isProtected = infoServer().isProtected
 
         serverInterfaces.forEach((value) => {
-            let qr = qrcode(6, 'H')
+            let qr = qrcode(0, 'H')
+            value['hostname'] = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
             collection += `
-                          <div class="row" style="margin-top: 10px;">
+                          <div class="row" >
                               <div class="col s12">
                                   <div class="card transparent z-depth-0">
                                       <div class="card-content">
@@ -87,7 +102,6 @@ var serverFunction = function (req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
-        let isProtected = infoServer().isProtected
         res.write(`<html>
           <head>
               <title>YTMDesktop Remote Control</title>
@@ -96,20 +110,29 @@ var serverFunction = function (req, res) {
               <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
               <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
               <style>
-                  html, body {
+                  html {
                       margin: 0;
                       padding: 0;
                       text-align: center;
                       background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
+                      background-attachment: fixed;
                       font-family: sans-serif;
                   }
                   h5 {
                       margin: 1rem 0 1rem 0 !important;
                   }
+
+                  .center {
+                    width: 68%;
+                    position: absolute;
+                    left: 50%;
+                    top: 48%;
+                    transform: translate(-50%, -50%);
+                  }
               </style>
           </head>
           <body>              
-              <h3 class="red-text">YTMDesktop Remote Control</h3>
+              <h4 class="white-text">YTMDesktop Remote Control</h4>
               
               <div class="row" style="height: 0; visibility: ${
                   infoPlayerProvider.getTrackInfo().id ? 'visible' : 'hidden'
@@ -133,29 +156,30 @@ var serverFunction = function (req, res) {
                 </div>
               </div>
   
-              <div class="container" style="margin-top: 13%;">
+              <div class="container" style="margin: 13% auto 5% auto;">
   
                   ${collection}
   
               </div>
   
-              <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%;">
-                  <a class="${
-                      isProtected ? 'white-text' : 'orange-text'
-                  } btn-flat tooltipped" data-position="top" data-tooltip="${
+              <div class="card-panel transparent z-depth-0 white-text" style="position: fixed; bottom: 0; text-align: center; width: 100%; padding: 0;">
+                <div>
+                    <a href='https://play.google.com/store/apps/details?id=app.ytmdesktop.remote&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1' target="_blank">
+                        <img width="200" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
+                    </a>
+                </div>
+
+                <a class="${
+                    isProtected ? 'white-text' : 'orange-text'
+                } btn-flat tooltipped" data-position="top" data-tooltip="${
             isProtected ? 'Protected' : 'Not protected'
         } with password"><i class="material-icons tiny">${
             isProtected ? 'lock' : 'lock_open'
-        }</i></a>
+        }</i>
+                </a>
                   ${hostname} 
                   <a class="white-text btn-flat tooltipped" data-position="top" data-tooltip="Devices Connected"><i class="material-icons left">devices_other</i>${totalConnections}</a>
               </div>
-
-              <!--div>
-                <a href='https://play.google.com/store/apps/details?id=app.ytmdesktop.remote&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
-                    <img width="200" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
-                </a>
-              </div-->
           </body>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
           <script>
@@ -202,10 +226,12 @@ var serverFunction = function (req, res) {
                     ) {
                         try {
                             let headerAuth = req.headers.authorization
-                            let auth = headerAuth.split(' ')[1]
+                            let authToken = headerAuth
+                                .split(' ')[1]
+                                .toUpperCase()
 
                             if (
-                                auth ==
+                                authToken ==
                                 settingsProvider.get(
                                     'settings-companion-server-token'
                                 )
@@ -365,14 +391,7 @@ function execCmd(cmd, value) {
     value = value || true
 
     switch (cmd) {
-        case 'track-play':
-            ipcMain.emit('media-command', {
-                command: 'media-play-pause',
-                value: true,
-            })
-            break
-
-        case 'track-pause':
+        case 'track-play-pause':
             ipcMain.emit('media-command', {
                 command: 'media-play-pause',
                 value: true,
@@ -459,14 +478,14 @@ function execCmd(cmd, value) {
         case 'player-repeat':
             ipcMain.emit('media-command', {
                 command: 'media-repeat',
-                value: value,
+                value: true,
             })
             break
 
         case 'player-shuffle':
             ipcMain.emit('media-command', {
                 command: 'media-shuffle',
-                value: value,
+                value: true,
             })
             break
 

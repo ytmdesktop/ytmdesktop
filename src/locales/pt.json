@@ -71,5 +71,7 @@
     "MEDIA_CONTROL_THUMBS_DOWN": "Descurtir",
     "MEDIA_CONTROL_THUMBS_UP": "Curtir",
     "MEDIA_CONTROL_VOLUME_DOWN": "Diminuir volume",
-    "MEDIA_CONTROL_VOLUME_UP": "Aumentar volume"
+    "MEDIA_CONTROL_VOLUME_UP": "Aumentar volume",
+    "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE": "Habilitar serviço de mídia do Windows 10",
+    "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO": "Mostrar informação da faixa ao lado da barra de volume do Windows 10"
 }

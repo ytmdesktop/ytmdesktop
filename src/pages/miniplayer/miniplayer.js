@@ -1,16 +1,5 @@
 const { ipcRenderer } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
-const Vibrant = require('node-vibrant')
-
-const body = document.getElementsByTagName('body')[0]
-const background = document.getElementById('background')
-const title = document.getElementById('title')
-const author = document.getElementById('author')
-
-const current = document.getElementById('current')
-const duration = document.getElementById('duration')
-const progress = document.getElementById('progress')
-const secondsEffect = document.getElementById('secondsEffect')
 
 const btnClose = document.getElementById('btn-close')
 const btnDislike = document.getElementById('btn-dislike')
@@ -19,30 +8,15 @@ const btnPlayPause = document.getElementById('btn-play-pause')
 const btnNext = document.getElementById('btn-next')
 const btnLike = document.getElementById('btn-like')
 
-btnClose.addEventListener('click', () => {
-    ipcRenderer.send('window', { command: 'restore-main-window' })
-})
+let body = document.getElementsByTagName('body')[0]
+let background = document.getElementById('background')
+let title = document.getElementById('title')
+let author = document.getElementById('author')
 
-btnDislike.addEventListener('click', () => {
-    ipcRenderer.send('media-command', { command: 'media-vote-down' })
-})
-
-btnPrevious.addEventListener('click', () => {
-    ipcRenderer.send('media-command', { command: 'media-track-previous' })
-})
-
-btnPlayPause.addEventListener('click', () => {
-    ipcRenderer.send('media-command', { command: 'media-play-pause' })
-    body.classList.toggle('showinfo')
-})
-
-btnNext.addEventListener('click', () => {
-    ipcRenderer.send('media-command', { command: 'media-track-next' })
-})
-
-btnLike.addEventListener('click', () => {
-    ipcRenderer.send('media-command', { command: 'media-vote-up' })
-})
+let current = document.getElementById('current')
+let duration = document.getElementById('duration')
+let progress = document.getElementById('progress')
+let secondsEffect = document.getElementById('secondsEffect')
 
 document.addEventListener('DOMContentLoaded', async () => {
     setPlayerInfo(await retrieveAllInfo())
@@ -50,15 +24,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(async () => {
         setPlayerInfo(await retrieveAllInfo())
     }, 500)
-})
 
-document.addEventListener('wheel', function (ev) {
-    ev.preventDefault()
-    if (ev.deltaY < 0) {
-        ipcRenderer.send('media-command', { command: 'media-volume-up' })
-    } else {
-        ipcRenderer.send('media-command', { command: 'media-volume-down' })
-    }
+    document.addEventListener('wheel', function (ev) {
+        ev.preventDefault()
+        if (ev.deltaY < 0) {
+            ipcRenderer.send('media-command', { command: 'media-volume-up' })
+        } else {
+            ipcRenderer.send('media-command', { command: 'media-volume-down' })
+        }
+    })
+
+    document.addEventListener('dblclick', (ev) => {
+        if (ev.clientX >= 100) {
+            ipcRenderer.send('media-command', {
+                command: 'media-seekbar-forward',
+            })
+            showDbClickAnimation('right')
+        } else {
+            ipcRenderer.send('media-command', {
+                command: 'media-seekbar-rewind',
+            })
+            showDbClickAnimation('left')
+        }
+    })
+
+    btnClose.addEventListener('click', () => {
+        ipcRenderer.send('window', { command: 'restore-main-window' })
+    })
+
+    btnDislike.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-vote-down' })
+    })
+
+    btnPrevious.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-track-previous' })
+    })
+
+    btnPlayPause.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-play-pause' })
+        body.classList.toggle('showinfo')
+    })
+
+    btnNext.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-track-next' })
+    })
+
+    btnLike.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-vote-up' })
+    })
 })
 
 async function retrieveAllInfo() {
@@ -70,19 +83,8 @@ async function retrieveAllInfo() {
     })
 }
 
-document.addEventListener('dblclick', (ev) => {
-    if (ev.clientX >= 100) {
-        ipcRenderer.send('media-command', { command: 'media-seekbar-forward' })
-        showDbClickAnimation('right')
-    } else {
-        ipcRenderer.send('media-command', { command: 'media-seekbar-rewind' })
-        showDbClickAnimation('left')
-    }
-})
-
 function setPlayerInfo(data) {
     document.title = `${data.track.title} - ${data.track.author}`
-    body.style.backgroundImage = `url(${data.track.cover})`
     background.style.backgroundImage = `url(${data.track.cover})`
     title.innerHTML = data.track.title || 'Title'
     author.innerHTML = data.track.author || 'Author'
@@ -90,31 +92,33 @@ function setPlayerInfo(data) {
     duration.innerHTML = data.track.durationHuman || '0:00'
     progress.style.width = data.player.statePercent * 100 + '%'
     if (data.player.isPaused) {
-        btnPlayPause.children[0].innerHTML = 'play_arrow'
+        btnPlayPause.children.item(0).innerHTML = 'play_arrow'
         body.classList.add('showinfo')
     } else {
-        btnPlayPause.children[0].innerHTML = 'pause'
+        btnPlayPause.children.item(0).innerHTML = 'pause'
         body.classList.remove('showinfo')
     }
 
     switch (data.player.likeStatus) {
         case 'LIKE':
-            btnLike.children[0].classList.remove('outlined')
-            btnDislike.children[0].classList.add('outlined')
+            btnLike.children.item(0).classList.remove('outlined')
+            btnDislike.children.item(0).classList.add('outlined')
             break
 
         case 'DISLIKE':
-            btnLike.children[0].classList.add('outlined')
-            btnDislike.children[0].classList.remove('outlined')
+            btnLike.children.item(0).classList.add('outlined')
+            btnDislike.children.item(0).classList.remove('outlined')
             break
 
         case 'INDIFFERENT':
-            btnLike.children[0].classList.add('outlined')
-            btnDislike.children[0].classList.add('outlined')
+            btnLike.children.item(0).classList.add('outlined')
+            btnDislike.children.item(0).classList.add('outlined')
             break
     }
 
     if (settingsProvider.get('settings-miniplayer-paint-controls')) {
+        const Vibrant = require('node-vibrant')
+
         Vibrant.from(data.track.cover)
             .getPalette()
             .then((palette) => {
@@ -126,6 +130,11 @@ function setPlayerInfo(data) {
 
     if (settingsProvider.get('settings-miniplayer-always-show-controls')) {
         body.classList.add('showinfo')
+    }
+
+    if (data.track.id) {
+        document.querySelector('#loading').classList.add('hide')
+        document.querySelector('#content').classList.remove('hide')
     }
 }
 
