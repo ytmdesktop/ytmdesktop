@@ -398,6 +398,20 @@ function execCmd(cmd, value) {
             })
             break
 
+        case 'track-play':
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
+            break
+
+        case 'track-pause':
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
+            break
+
         case 'track-next':
             ipcMain.emit('media-command', {
                 command: 'media-track-next',

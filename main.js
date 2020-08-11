@@ -340,7 +340,7 @@ function createWindow() {
                 if (global.on_the_road) {
                     updateActivity()
                 }
-            }, 500)
+            }, 100)
         }
     })
 
