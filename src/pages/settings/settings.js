@@ -395,7 +395,11 @@ function preventSpecialKeys(e) {
         e.key == 'Control' ||
         e.key == 'Alt' ||
         e.key == 'Shift' ||
-        e.key == 'AltGraph'
+        e.key == 'AltGraph' ||
+        e.key == 'MediaPlayPause' ||
+        e.key == 'MediaTrackPrevious' ||
+        e.key == 'MediaTrackNext' ||
+        e.key == 'MediaStop'
     )
 }
 

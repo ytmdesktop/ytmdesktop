@@ -4,7 +4,6 @@ const mediaControl = require('./mediaProvider')
 const nativeImage = require('electron').nativeImage
 const settingsProvider = require('./settingsProvider')
 const __ = require('./translateProvider')
-const Notification = require('electron-native-notification')
 const { doBehavior } = require('../utils/window')
 const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
@@ -100,21 +99,27 @@ function balloon(title, content, cover, icon) {
     }
 }
 
-function _doNotification(title, content, image) {
+function balloonEvents(data) {
+    _doNotification(data.title, data.content, data.icon)
+}
+
+function _doNotification(title, content, icon) {
     try {
         if (title && content) {
             if (systemInfo.isWindows()) {
                 tray.displayBalloon({
-                    icon: image,
+                    icon: icon,
                     title: title,
                     content: content,
                     noSound: true,
                 })
             } else {
+                let Notification = require('electron-native-notification')
+
                 new Notification(title, {
                     body: content,
                     silent: true,
-                    icon: image,
+                    icon: icon,
                 })
             }
         }
@@ -180,6 +185,7 @@ module.exports = {
     setTooltip: setTooltip,
     createTray: createTray,
     balloon: balloon,
+    balloonEvents: balloonEvents,
     quit: quit,
     setShinyTray: setShinyTray,
     updateImage: updateImage,

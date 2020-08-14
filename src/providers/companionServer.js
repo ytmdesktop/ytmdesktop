@@ -339,7 +339,7 @@ function start() {
         if (totalConnections) {
             io.emit('tick', infoPlayerProvider.getAllInfo())
         }
-    }, 600)
+    }, 500)
 
     io.on('connection', (socket) => {
         if (!canConnect(socket)) {

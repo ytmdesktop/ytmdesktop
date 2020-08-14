@@ -340,7 +340,7 @@ function createWindow() {
                 if (global.on_the_road) {
                     updateActivity()
                 }
-            }, 100)
+            }, 300)
         }
     })
 
@@ -600,29 +600,6 @@ function createWindow() {
     })
 
     // GLOBAL
-    globalShortcut.register('MediaPlayPause', function () {
-        if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
-            if (!doublePressPlayPause) {
-                // The first press
-                if (infoPlayerProvider.getTrackInfo().id == '') {
-                    infoPlayerProvider.firstPlay(view.webContents)
-                }
-
-                doublePressPlayPause = true
-                setTimeout(() => {
-                    if (doublePressPlayPause) mediaControl.playPauseTrack(view)
-                    doublePressPlayPause = false
-                }, 200)
-            } else {
-                // The second press
-                doublePressPlayPause = false
-                doBehavior(mainWindow)
-            }
-        } else {
-            mediaControl.playPauseTrack(view)
-        }
-    })
-
     ipcMain.on('change-accelerator', (dataMain, dataRenderer) => {
         if (dataMain.type != undefined) {
             args = dataMain
@@ -637,7 +614,7 @@ function createWindow() {
         switch (args.type) {
             case 'media-play-pause':
                 registerGlobalShortcut(args.newValue, () => {
-                    mediaControl.playPauseTrack(view)
+                    checkDoubleTapPlayPause()
                 })
                 break
 
@@ -659,6 +636,19 @@ function createWindow() {
                         infoPlayerProvider.getPlayerInfo().likeStatus != 'LIKE'
                     ) {
                         mediaControl.upVote(view)
+                        if (
+                            settingsProvider.get('settings-show-notifications')
+                        ) {
+                            tray.balloonEvents({
+                                title: `${songInfo().title} - ${
+                                    songInfo().author
+                                }`,
+                                content: __.trans('LABEL_NOTIFICATION_LIKED'),
+                                icon: assetsProvider.getLocal(
+                                    'img/notification-thumbs-up.png'
+                                ),
+                            })
+                        }
                     }
                 })
                 break
@@ -670,6 +660,21 @@ function createWindow() {
                         'DISLIKE'
                     ) {
                         mediaControl.downVote(view)
+                        if (
+                            settingsProvider.get('settings-show-notifications')
+                        ) {
+                            tray.balloonEvents({
+                                title: `${songInfo().title} - ${
+                                    songInfo().author
+                                }`,
+                                content: __.trans(
+                                    'LABEL_NOTIFICATION_DISLIKED'
+                                ),
+                                icon: assetsProvider.getLocal(
+                                    'img/notification-thumbs-down.png'
+                                ),
+                            })
+                        }
                     }
                 })
                 break
@@ -724,6 +729,10 @@ function createWindow() {
     ipcMain.emit('change-accelerator', {
         type: 'media-volume-down',
         newValue: settingsAccelerator['media-volume-down'],
+    })
+
+    globalShortcut.register('MediaPlayPause', function () {
+        checkDoubleTapPlayPause()
     })
 
     globalShortcut.register('MediaStop', function () {
@@ -950,6 +959,29 @@ function createWindow() {
                 break
         }
     })
+
+    function checkDoubleTapPlayPause() {
+        if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
+            if (!doublePressPlayPause) {
+                // The first press
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
+                }
+
+                doublePressPlayPause = true
+                setTimeout(() => {
+                    if (doublePressPlayPause) mediaControl.playPauseTrack(view)
+                    doublePressPlayPause = false
+                }, 200)
+            } else {
+                // The second press
+                doublePressPlayPause = false
+                doBehavior(mainWindow)
+            }
+        } else {
+            mediaControl.playPauseTrack(view)
+        }
+    }
 
     function windowSettings() {
         if (settings) {
@@ -1552,12 +1584,14 @@ if (!gotTheLock) {
     app.whenReady().then(function () {
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {
+                console.log(visiblePosition)
                 settingsProvider.set('window-position', visiblePosition)
             }
         )
 
         checkWindowPosition(settingsProvider.get('lyrics-position')).then(
             (visiblePosition) => {
+                console.log(visiblePosition)
                 settingsProvider.set('lyrics-position', visiblePosition)
             }
         )

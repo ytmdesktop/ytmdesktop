@@ -73,5 +73,7 @@
     "MEDIA_CONTROL_VOLUME_DOWN": "Decrease volume",
     "MEDIA_CONTROL_VOLUME_UP": "Increase volume",
     "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE": "Enable Windows 10 media service",
-    "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO": "Show track information next to the Windows 10 volume bar"
+    "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO": "Show track information next to the Windows 10 volume bar",
+    "LABEL_NOTIFICATION_LIKED": "You liked this song",
+    "LABEL_NOTIFICATION_DISLIKED": "You disliked this song"
 }
