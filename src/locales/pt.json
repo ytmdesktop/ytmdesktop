@@ -75,5 +75,6 @@
     "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE": "Habilitar serviço de mídia do Windows 10",
     "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO": "Mostrar informação da faixa ao lado da barra de volume do Windows 10",
     "LABEL_NOTIFICATION_LIKED": "Você gostou desta música",
-    "LABEL_NOTIFICATION_DISLIKED": "Você não gostou desta música"
+    "LABEL_NOTIFICATION_DISLIKED": "Você não gostou desta música",
+    "LABEL_AUDIO": "Áudio"
 }

@@ -23,6 +23,7 @@ content.addListener('dom-ready', function () {
         )
 
     // injectCast()
+    loadAudioOutputList()
 })
 
 function createContextMenu() {
@@ -369,4 +370,15 @@ function injectCast() {
         .catch((err) => {
             console.log(err)
         })
+}
+
+function loadAudioOutputList() {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+        audioDevices = devices.filter((device) => device.kind === 'audiooutput')
+
+        ipcRenderer.send(
+            'set-audio-output-list',
+            audioDevices.length ? JSON.stringify(audioDevices) : []
+        )
+    })
 }

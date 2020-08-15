@@ -52,7 +52,8 @@ let mainWindow,
     doublePressPlayPause,
     updateTrackInfoTimeout,
     activityLikeStatus,
-    windowsMediaProvider
+    windowsMediaProvider,
+    audioDevices
 
 let isFirstTime = false
 
@@ -1420,8 +1421,8 @@ function createWindow() {
         )
     })
 
-    ipcMain.on('change-audio-output', (event, data) => {
-        setAudioOutput(data)
+    ipcMain.on('change-audio-output', (dataMain, dataRenderer) => {
+        setAudioOutput(dataRenderer !== undefined ? dataRenderer : dataMain)
     })
 
     function setAudioOutput(audioLabel) {
@@ -1440,7 +1441,10 @@ function createWindow() {
             });
         `
             )
-            .then((_) => {})
+            .then((_) => {
+                settingsProvider.set('settings-app-audio-output', audioLabel)
+                updateTrayAudioOutputs(audioDevices)
+            })
             .catch((_) =>
                 writeLog({ type: 'warn', data: 'error setAudioOutput' })
             )
@@ -1772,6 +1776,35 @@ function registerGlobalShortcut(value, fn) {
     }
 }
 
+function updateTrayAudioOutputs(data) {
+    let audioOutputs = JSON.parse(data)
+    let selectedAudio = settingsProvider.get('settings-app-audio-output')
+    let result = [
+        {
+            label: __.trans(
+                'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+            ),
+            enabled: false,
+        },
+    ]
+
+    if (audioOutputs.length) {
+        audioOutputs.forEach((value, index) => {
+            audioOutputs[index] = {
+                label: value.label,
+                type: 'radio',
+                checked: value.label == selectedAudio ? true : false,
+                click: function () {
+                    ipcMain.emit('change-audio-output', value.label)
+                },
+            }
+        })
+        result = audioOutputs
+    }
+
+    tray.updateTray({ type: 'audioOutputs', data: result })
+}
+
 function writeLog(log) {
     switch (log.type) {
         case 'info':
@@ -1804,13 +1837,21 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
+ipcMain.on('set-audio-output-list', (_, data) => {
+    updateTrayAudioOutputs(data)
+    audioDevices = data
+})
+
+ipcMain.handle('get-audio-output-list', (event, someArgument) => {
+    return audioDevices
+})
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
-const { player } = require('./src/providers/mprisProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)

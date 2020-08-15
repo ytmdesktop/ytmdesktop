@@ -83,14 +83,19 @@ html, body {
     font-size: 20px;
 }
 
-.is-offline {
+.div-center {
     width: 100%;
-    text-align: center;
-    color: #EEE;
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
 }
 
-.content {
-    /*margin-top: 29px;*/
+.is-offline {
+    width: 100%;
+    min-height: 10%;
+    text-align: center;
+    color: #EEE;
 }
 
 /* width */

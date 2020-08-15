@@ -209,14 +209,7 @@ statusBarMenu.unshift({
     ],
 })
 
-const popUpMenu = (
-    __,
-    saved_mainWindow,
-    mediaControl,
-    BrowserWindow,
-    path,
-    app
-) => {
+const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
     return [
         {
             label: 'YouTube Music Desktop',
@@ -289,22 +282,17 @@ const popUpMenu = (
         },
 
         {
-            label: 'audio',
-            type: 'submenu',
-            submenu: [
-                { label: 'Item1', type: 'radio' },
-                { label: 'Item2', type: 'radio' },
-                { label: 'Item3', type: 'radio', checked: true },
-                { label: 'Item4', type: 'radio' },
-            ],
-        },
-
-        {
             label: __.trans('LABEL_SETTINGS'),
             type: 'normal',
             click: function () {
                 ipcMain.emit('window', { command: 'show-settings' })
             },
+        },
+
+        {
+            label: __.trans('LABEL_SETTINGS_TAB_GENERAL_SELECT_AUDIO_OUTPUT'),
+            type: 'submenu',
+            submenu: [],
         },
 
         { type: 'separator' },

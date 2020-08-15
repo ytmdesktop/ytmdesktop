@@ -47,17 +47,29 @@ let init_tray = () => {
 function createTray(mainWindow, icon) {
     nativeImageIcon = buildTrayIcon(icon)
     tray = new Tray(nativeImageIcon)
-
     saved_mainWindow = mainWindow
 
     contextMenu = Menu.buildFromTemplate(
-        popUpMenu(__, saved_mainWindow, mediaControl, BrowserWindow, path, app)
+        popUpMenu(__, saved_mainWindow, mediaControl, app)
     )
+
     if (!systemInfo.isMac()) {
         init_tray()
     } else {
         setShinyTray()
     }
+}
+
+function updateTray(data) {
+    var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
+
+    if (data.type == 'audioOutputs') {
+        template[12]['submenu'] = data.data
+    }
+
+    contextMenu = Menu.buildFromTemplate(template)
+
+    tray.setContextMenu(contextMenu)
 }
 
 function updateTrayIcon(icon) {
@@ -184,6 +196,7 @@ function updateImage(payload) {
 module.exports = {
     setTooltip: setTooltip,
     createTray: createTray,
+    updateTray: updateTray,
     balloon: balloon,
     balloonEvents: balloonEvents,
     quit: quit,

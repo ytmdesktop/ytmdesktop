@@ -6,22 +6,12 @@ const icons = require('../../icons_for_shiny_tray')
 
 let icon_set = icons.bright
 
-ipc.on('is-online', function(_, isOnline) {
-    if (isOnline) {
-        document.getElementById('is-offline').classList.add('hide')
-        document.getElementById('center-loading').classList.remove('hide')
-    } else {
-        document.getElementById('is-offline').classList.remove('hide')
-        document.getElementById('center-loading').classList.add('hide')
-    }
-})
-
 const canvas = document.createElement('canvas')
 canvas.height = 32
 canvas.width = 150
 const ctx = canvas.getContext('2d')
 
-ipc.on('update-status-bar', function(event, arg) {
+ipc.on('update-status-bar', function (event, arg) {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.font = '14px Arial'
     if (store.get('settings-shiny-tray-dark', false)) {
@@ -45,7 +35,7 @@ ipc.on('update-status-bar', function(event, arg) {
 
 ipc.send('register-renderer')
 
-ipc.on('is-dev', function(event, args) {
+ipc.on('is-dev', function (event, args) {
     if (args) {
         document.title = document.title + ' DEV'
     }
@@ -88,3 +78,20 @@ function getStrLength(str) {
     }
     return realLength
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    let isOnline = navigator.onLine
+
+    if (isOnline) {
+        document.querySelector('#is-offline').classList.add('hide')
+        document.querySelector('#center-loading').classList.remove('hide')
+    } else {
+        document.querySelector('#is-offline').classList.remove('hide')
+        document.querySelector('#center-loading').classList.add('hide')
+    }
+})
+
+/*document.querySelector('#btn-reload')
+    .addEventListener('click', () => {
+        window.location.reload()
+    })*/

@@ -30,17 +30,13 @@ const audioOutputSelect = document.querySelector('#settings-app-audio-output')
 
 let settingsAccelerators = settingsProvider.get('settings-accelerators')
 
-let audioDevices, typeAcceleratorSelected, keyBindings
+let typeAcceleratorSelected, keyBindings
 
-function loadAudioOutputList() {
-    return navigator.mediaDevices.enumerateDevices()
-}
+ipc.invoke('get-audio-output-list').then((devices) => {
+    devices = JSON.parse(devices)
 
-loadAudioOutputList().then((devices) => {
-    audioDevices = devices.filter((device) => device.kind === 'audiooutput')
-
-    if (audioDevices.length) {
-        audioDevices.forEach((deviceInfo) => {
+    if (devices.length) {
+        devices.forEach((deviceInfo) => {
             let option = document.createElement('option')
             option.text =
                 deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`
@@ -52,7 +48,7 @@ loadAudioOutputList().then((devices) => {
             ipc.send('change-audio-output', audioOutputSelect.value)
         })
 
-        const defaultOuput = audioDevices.find(
+        const defaultOuput = devices.find(
             (audio) => audio.deviceId == 'default'
         )
         if (!audioOutputSelect.value.length) {
@@ -65,8 +61,7 @@ loadAudioOutputList().then((devices) => {
         )
         option.value = 0
         audioOutputSelect.appendChild(option)
-
-        document.getElementById('settings-app-audio-output').disabled = true
+        audioOutputSelect.disabled = true
     }
 
     mInit()
