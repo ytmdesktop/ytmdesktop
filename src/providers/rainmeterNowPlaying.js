@@ -12,39 +12,43 @@ function _setIsStarted(value) {
 }
 
 function start() {
-    ws = new WebSocket(url, {
-        perMessageDeflate: false,
-    })
+    try {
+        ws = new WebSocket(url, {
+            perMessageDeflate: false,
+        })
 
-    ws.on('open', function open() {
-        _setIsStarted(true)
-    })
+        ws.on('open', function open() {
+            _setIsStarted(true)
+        })
 
-    ws.on('message', function incoming(data) {
-        var versionNumber = data.toLowerCase().split(':')
-        if (versionNumber[0].includes('version')) {
-            //Check that version number is the same major version
-        }
-        try {
-            doAction(data)
-        } catch (e) {
-            ws.send('Error:' + e)
-            throw e
-        }
-    })
-
-    ws.on('error', function error(_) {
-        console.log('Failed to connect rainmeter WS')
-    })
-
-    ws.on('close', () => {
-        stop()
-        reconnect = setTimeout(() => {
-            if (!isStarted()) {
-                start()
+        ws.on('message', function incoming(data) {
+            var versionNumber = data.toLowerCase().split(':')
+            if (versionNumber[0].includes('version')) {
+                //Check that version number is the same major version
             }
-        }, 5000)
-    })
+            try {
+                doAction(data)
+            } catch (e) {
+                ws.send('Error:' + e)
+                throw e
+            }
+        })
+
+        ws.on('error', function error(_) {
+            console.log('Failed to connect rainmeter WebNowPlaying WS')
+        })
+
+        ws.on('close', () => {
+            stop()
+            reconnect = setTimeout(() => {
+                if (!isStarted()) {
+                    start()
+                }
+            }, 5000)
+        })
+    } catch {
+        console.log('error')
+    }
 }
 
 function stop() {

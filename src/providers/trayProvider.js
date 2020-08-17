@@ -64,7 +64,7 @@ function updateTray(data) {
     var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
 
     if (data.type == 'audioOutputs') {
-        template[12]['submenu'] = data.data
+        template[11]['submenu'] = data.data
     }
 
     contextMenu = Menu.buildFromTemplate(template)

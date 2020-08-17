@@ -282,17 +282,17 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         },
 
         {
+            label: __.trans('LABEL_SETTINGS_TAB_GENERAL_SELECT_AUDIO_OUTPUT'),
+            type: 'submenu',
+            submenu: [],
+        },
+
+        {
             label: __.trans('LABEL_SETTINGS'),
             type: 'normal',
             click: function () {
                 ipcMain.emit('window', { command: 'show-settings' })
             },
-        },
-
-        {
-            label: __.trans('LABEL_SETTINGS_TAB_GENERAL_SELECT_AUDIO_OUTPUT'),
-            type: 'submenu',
-            submenu: [],
         },
 
         { type: 'separator' },

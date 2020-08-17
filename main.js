@@ -96,7 +96,7 @@ if (settingsProvider.get('has-updated') == true) {
         writeLog({ type: 'info', data: 'YTMDesktop updated' })
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
-    settingsProvider.set('has-updated', false)
+    // settingsProvider.set('has-updated', false)
 }
 
 if (
