@@ -125,8 +125,7 @@ if (isMac()) {
                 'settings-shiny-tray-dark',
                 nativeTheme.shouldUseDarkColors
             )
-            if (renderer_for_status_bar)
-                renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
         }
     )
     const menu = Menu.buildFromTemplate(statusBarMenu)
@@ -333,7 +332,7 @@ function createWindow() {
 
         if (isMac()) {
             global.sharedObj.paused = false
-            renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
         }
 
         if (infoPlayerInterval === undefined) {
@@ -438,7 +437,7 @@ function createWindow() {
 
                 if (isMac()) {
                     global.sharedObj.title = nowPlaying
-                    renderer_for_status_bar.send('update-status-bar')
+                    updateStatusBar()
                 }
 
                 mainWindow.setTitle(nowPlaying)
@@ -516,7 +515,7 @@ function createWindow() {
         logDebug('Playing')
         try {
             if (isMac()) {
-                renderer_for_status_bar.send('update-status-bar')
+                updateStatusBar()
             }
 
             global.sharedObj.paused = false
@@ -531,7 +530,7 @@ function createWindow() {
         logDebug('Paused')
         try {
             if (isMac()) {
-                renderer_for_status_bar.send('update-status-bar')
+                updateStatusBar()
             }
 
             global.sharedObj.paused = true
@@ -889,7 +888,7 @@ function createWindow() {
 
     ipcMain.on('update-tray', () => {
         if (isMac()) {
-            renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
             tray.setShinyTray()
         }
     })
@@ -1803,6 +1802,12 @@ function updateTrayAudioOutputs(data) {
     }
 
     tray.updateTray({ type: 'audioOutputs', data: result })
+}
+
+function updateStatusBar() {
+    if (renderer_for_status_bar != null) {
+        renderer_for_status_bar.send('update-status-bar')
+    }
 }
 
 function writeLog(log) {
