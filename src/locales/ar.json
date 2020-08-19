@@ -1,5 +1,6 @@
 {
     "DOUBLE_CLICK_TO_RESET_POSITION": "اضغط مرتين لأعادة تعيين المكان",
+    "LABEL_CHANGELOG": "ما الجديد!",
     "LABEL_EXIT": "إغلاق",
     "LABEL_GUEST": "ضيف",
     "LABEL_LOADING": "جاري التحميل...",
@@ -14,6 +15,7 @@
     "LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR": "إظهار التقدم في شريط المهام",
     "LABEL_SETTINGS_TAB_APPEARENCE": "المظهر",
     "LABEL_SETTINGS_TAB_GENERAL": "عام",
+    "LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND": "لا توجد اجهزة",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "خادم مرافق",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "إضغط هنا لمسح QR Code",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "إحمي المرافق بكلمة سر",
@@ -33,7 +35,6 @@
     "LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS": "إظهار الإشعارات",
     "LABEL_SETTINGS_TAB_GENERAL_START_MINIMIZED": "بدأ الرنامج مصغّر",
     "LABEL_SETTINGS_TAB_GENERAL_START_ON_BOOT": "(Mac/Win) بدأ البرنامج عند التشغيل",
-    "LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND": "لا توجد اجهزة",
     "LABEL_SETTINGS_TAB_INTEGRATION": "دمج",
     "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER": "Last FM (Scrobbler)",
     "LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE": "حفظ و إعطاء سلطة",
@@ -62,6 +63,5 @@
     "MEDIA_CONTROL_SEARCH": "بحث",
     "MEDIA_CONTROL_SHUFFLE": "خلط",
     "MEDIA_CONTROL_THUMBS_DOWN": "عدم إعجاب",
-    "MEDIA_CONTROL_THUMBS_UP": "إعجاب",
-    "LABEL_CHANGELOG": "ما الجديد!"
+    "MEDIA_CONTROL_THUMBS_UP": "إعجاب"
 }
