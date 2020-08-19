@@ -70,10 +70,6 @@ html, body {
     background: red;
 }
 
-.shortcut-or {
-    color: #888;
-}
-
 .center-flex {
     width: 100vw; 
     min-height: 100vh; 

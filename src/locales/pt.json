@@ -68,13 +68,17 @@
     "MEDIA_CONTROL_REPEAT": "Repetir",
     "MEDIA_CONTROL_SEARCH": "Pesquisar",
     "MEDIA_CONTROL_SHUFFLE": "Misturar",
-    "MEDIA_CONTROL_THUMBS_DOWN": "Descurtir",
-    "MEDIA_CONTROL_THUMBS_UP": "Curtir",
+    "MEDIA_CONTROL_THUMBS_DOWN": "Não gostei",
+    "MEDIA_CONTROL_THUMBS_UP": "Gostei",
     "MEDIA_CONTROL_VOLUME_DOWN": "Diminuir volume",
     "MEDIA_CONTROL_VOLUME_UP": "Aumentar volume",
     "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE": "Habilitar serviço de mídia do Windows 10",
     "LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO": "Mostrar informação da faixa ao lado da barra de volume do Windows 10",
     "LABEL_NOTIFICATION_LIKED": "Você gostou desta música",
     "LABEL_NOTIFICATION_DISLIKED": "Você não gostou desta música",
-    "LABEL_AUDIO": "Áudio"
+    "LABEL_AUDIO": "Áudio",
+    "LABEL_ALSO": "Também",
+    "LABEL_DISABLE": "Desabilitar",
+    "LABEL_CANCEL": "Cancelar",
+    "LABEL_SETTINGS_TAB_SHORTCUTS_PRESS_ANY_KEYS": "Pressione qualquer tecla"
 }

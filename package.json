@@ -28,7 +28,7 @@
         }
     },
     "devDependencies": {
-        "electron": "^9.1.2",
+        "electron": "^9.2.1",
         "electron-builder": "^22.8.0",
         "electron-rebuild": "^1.11.0",
         "husky": "^4.2.5",

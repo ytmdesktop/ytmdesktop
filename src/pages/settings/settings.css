@@ -244,3 +244,13 @@ input[type=range]+.thumb {
     text-decoration: line-through;
     text-transform: capitalize;
 }
+
+.shortcut-text {
+    color: #888;
+    text-transform: lowercase;
+    padding: 0 7px;
+}
+
+.normalize {
+    min-width: 70px;
+}

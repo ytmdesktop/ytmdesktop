@@ -276,7 +276,7 @@ function createWindow() {
     })
 
     mainWindow.on('show', function () {
-        globalShortcut.unregister('CmdOrCtrl+M')
+        //globalShortcut.unregister('CmdOrCtrl+M')
 
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
@@ -1133,11 +1133,11 @@ function createWindow() {
 
             mainWindow.hide()
 
-            globalShortcut.register('CmdOrCtrl+M', function () {
+            /*globalShortcut.register('CmdOrCtrl+M', function () {
                 miniplayer.close()
                 miniplayer = undefined
                 mainWindow.show()
-            })
+            })*/
         }
     }
 

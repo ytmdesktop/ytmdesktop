@@ -463,8 +463,9 @@ function loadCustomKeys() {
 }
 
 function resetAcceleratorsText() {
-    document.querySelector('#modalEditAcceleratorKeys').innerText =
-        'Press any keys...'
+    document.querySelector('#modalEditAcceleratorKeys').innerText = `${__.trans(
+        'LABEL_SETTINGS_TAB_SHORTCUTS_PRESS_ANY_KEYS'
+    )}...`
 }
 
 document
