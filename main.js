@@ -276,8 +276,6 @@ function createWindow() {
     })
 
     mainWindow.on('show', function () {
-        //globalShortcut.unregister('CmdOrCtrl+M')
-
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
@@ -595,10 +593,6 @@ function createWindow() {
         }
     )
 
-    electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
-        ipcMain.emit('window', { command: 'show-miniplayer' })
-    })
-
     // GLOBAL
     ipcMain.on('change-accelerator', (dataMain, dataRenderer) => {
         if (dataMain.type != undefined) {
@@ -690,6 +684,27 @@ function createWindow() {
                     mediaControl.volumeDown(view)
                 })
                 break
+
+            case 'miniplayer-open-close':
+                registerGlobalShortcut(args.newValue, () => {
+                    try {
+                        if (miniplayer) {
+                            miniplayer.close()
+                            miniplayer = undefined
+                            mainWindow.show()
+                        } else {
+                            ipcMain.emit('window', {
+                                command: 'show-miniplayer',
+                            })
+                        }
+                    } catch {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error on try open/close miniplayer',
+                        })
+                    }
+                })
+                break
         }
     })
 
@@ -729,6 +744,11 @@ function createWindow() {
     ipcMain.emit('change-accelerator', {
         type: 'media-volume-down',
         newValue: settingsAccelerator['media-volume-down'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'miniplayer-open-close',
+        newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
     globalShortcut.register('MediaPlayPause', function () {
@@ -1132,12 +1152,6 @@ function createWindow() {
             })
 
             mainWindow.hide()
-
-            /*globalShortcut.register('CmdOrCtrl+M', function () {
-                miniplayer.close()
-                miniplayer = undefined
-                mainWindow.show()
-            })*/
         }
     }
 

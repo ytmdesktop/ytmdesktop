@@ -251,6 +251,6 @@ input[type=range]+.thumb {
     padding: 0 7px;
 }
 
-.normalize {
+.btn-normalize {
     min-width: 70px;
 }

@@ -460,6 +460,11 @@ function loadCustomKeys() {
     ).innerText = replaceAcceleratorText(
         settingsAccelerators['media-volume-down']
     )
+    document.querySelector(
+        '#settings-accelerators_miniplayer-open-close'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['miniplayer-open-close']
+    )
 }
 
 function resetAcceleratorsText() {
@@ -514,6 +519,13 @@ document
     .querySelector('#btn-accelerator-media-volume-down')
     .addEventListener('click', () => {
         typeAcceleratorSelected = 'media-volume-down'
+        resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-accelerator-miniplayer-open-close')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'miniplayer-open-close'
         resetAcceleratorsText()
     })
 
