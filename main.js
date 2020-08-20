@@ -1035,7 +1035,8 @@ function createWindow() {
                 ),
                 {
                     search:
-                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize',
+                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize&title=' +
+                        __.trans('LABEL_SETTINGS'),
                 }
             )
         }
@@ -1184,7 +1185,7 @@ function createWindow() {
             ),
             {
                 search:
-                    'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
+                    'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1250,7 +1251,8 @@ function createWindow() {
                 ),
                 {
                     search:
-                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
+                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize&title=' +
+                        __.trans('LABEL_LYRICS'),
                 }
             )
 
