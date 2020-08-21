@@ -98,7 +98,7 @@ function createContextMenu() {
         }
 
         .ytmd-icons-middle {
-            margin: 0 25px 0 0 !important;
+            margin: 0 30px 0 0 !important;
         }
 
         .pointer:hover {

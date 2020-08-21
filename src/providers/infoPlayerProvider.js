@@ -554,10 +554,7 @@ function firstPlay(webContents) {
     webContents
         .executeJavaScript(
             `
-            var carousel = document.querySelector('.carousel');
-            var firstChild = carousel.querySelector('#items').children[0];
-            var playButton = firstChild.querySelector('#play-button')
-            
+            var playButton = document.querySelector('.icon.ytmusic-play-button-renderer');
             playButton.click();
             `
         )
