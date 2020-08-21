@@ -341,7 +341,7 @@ function setQueueItem(webContents, index) {
     )
 }
 
-function addToLibary(webContents) {
+function addToLibrary(webContents) {
     webContents
         .executeJavaScript(
             `
@@ -363,7 +363,7 @@ function addToLibary(webContents) {
             `
         )
         .then(() => setTimeout(isInLibrary, 500))
-        .catch((_) => console.log('error addToLibary ' + _))
+        .catch((_) => console.log('error addToLibrary ' + _))
 }
 
 function getPlaylist(webContents) {
@@ -590,6 +590,6 @@ module.exports = {
     updateQueueInfo: updateQueueInfo,
     updateLyrics: updateLyrics,
 
-    addToLibary: addToLibary,
+    addToLibrary: addToLibrary,
     addToPlaylist: addToPlaylist,
 }

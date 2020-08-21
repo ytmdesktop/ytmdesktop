@@ -10,7 +10,7 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(Loopback|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
+const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections

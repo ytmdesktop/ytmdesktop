@@ -97,6 +97,10 @@ function createContextMenu() {
             margin: 0 18px 0 2px !important;
         }
 
+        .ytmd-icons-middle {
+            margin: 0 25px 0 0 !important;
+        }
+
         .pointer:hover {
             color: #FFF !important;
         }
@@ -203,19 +207,19 @@ function createMiddleContent() {
     content
         .executeJavaScript(
             `
-        var center_content = document.getElementsByTagName('ytmusic-pivot-bar-renderer')[0];
+                var center_content = document.getElementsByTagName('ytmusic-pivot-bar-renderer')[0];
 
-        // HISTORY BACK
-        var element = document.createElement('i');
-        element.id = 'ytmd_history_back';
-        element.classList.add('material-icons', 'pointer', 'ytmd-icons', 'center-content');
-        element.style.color = '#666';
-        element.innerText = 'keyboard_backspace';
+                // HISTORY BACK
+                var element = document.createElement('i');
+                element.id = 'ytmd_history_back';
+                element.classList.add('material-icons', 'pointer', 'ytmd-icons', 'center-content');
+                element.style.color = '#666';
+                element.innerText = 'keyboard_backspace';
 
-        element.addEventListener('click', function() { history.go(-1); } )
-        
-        center_content.prepend(element);
-    `
+                element.addEventListener('click', function() { history.go(-1); } )
+                
+                center_content.prepend(element);
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
@@ -270,27 +274,68 @@ function createPlayerBarContent() {
     content
         .executeJavaScript(
             `
-        var playerBarRightControls = document.getElementsByClassName('right-controls-buttons style-scope ytmusic-player-bar')[0];
+            var playerBarRightControls = document.querySelector('.right-controls-buttons.ytmusic-player-bar');
+            var playerBarMiddleControls = document.querySelector('.middle-controls-buttons.ytmusic-player-bar');
 
-        // LYRICS
-        var elementLyrics = document.createElement('i');
-        elementLyrics.id = 'ytmd_lyrics';
-        elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
-        elementLyrics.innerText = 'music_note';
+            // Right ////////////////////////////////////////////////////////////////////////////////////
+            // LYRICS
+            var elementLyrics = document.createElement('i');
+            elementLyrics.id = 'ytmd_lyrics';
+            elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
+            elementLyrics.innerText = 'music_note';
 
-        elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
-        
-        playerBarRightControls.append(elementLyrics);
+            elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
+            
+            playerBarRightControls.append(elementLyrics);
 
-        // MINIPLAYER
-        var elementMiniplayer = document.createElement('i');
-        elementMiniplayer.id = 'ytmd_miniplayer';
-        elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
-        elementMiniplayer.innerText = 'picture_in_picture_alt';
+            // MINIPLAYER
+            var elementMiniplayer = document.createElement('i');
+            elementMiniplayer.id = 'ytmd_miniplayer';
+            elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
+            elementMiniplayer.innerText = 'picture_in_picture_alt';
 
-        elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
-        playerBarRightControls.append(elementMiniplayer);
-    `
+            elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
+            playerBarRightControls.append(elementMiniplayer);
+
+            // Middle ////////////////////////////////////////////////////////////////////////////////////
+            // Add to Library
+            var elementAddToLibrary = document.createElement('i');
+            elementAddToLibrary.id = 'ytmd_add_to_library';
+            elementAddToLibrary.classList.add('material-icons', 'pointer', 'ytmd-icons-middle');
+            elementAddToLibrary.innerText = 'library_add';
+
+            elementAddToLibrary.addEventListener('click', function() { 
+                ipcRenderer.send('media-command', { command: 'media-add-library' }); 
+            } )
+
+            setInterval( () => {
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addLibrary = popup.children[3];
+                var _g = addLibrary.querySelector('g')
+                var _path = _g.querySelectorAll('path')[1];
+                var _d = _path.getAttribute('d')
+                
+                if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
+                    document.querySelector('#ytmd_add_to_library').innerText = 'check'
+                } else {
+                    document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
+                }
+            }, 1000)
+            playerBarMiddleControls.append(elementAddToLibrary);
+
+            // Add to Playlist
+            var elementAddToPlaylist = document.createElement('i');
+            elementAddToPlaylist.id = 'ytmd_add_to_playlist';
+            elementAddToPlaylist.classList.add('material-icons', 'pointer', 'ytmd-icons-middle');
+            elementAddToPlaylist.innerText = 'playlist_add';
+
+            elementAddToPlaylist.addEventListener('click', function() { 
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addPlaylist = popup.children[5].querySelector('a');
+                addPlaylist.click()
+             } )
+            playerBarMiddleControls.append(elementAddToPlaylist);
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
