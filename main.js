@@ -1827,7 +1827,14 @@ function loadCustomPageScript() {
 
 function registerGlobalShortcut(value, fn) {
     if (value != 'disabled') {
-        globalShortcut.register(`${value}`, fn)
+        try {
+            globalShortcut.register(`${value}`, fn)
+        } catch {
+            writeLog({
+                type: 'warn',
+                data: `Failed to register global shortcut ${value}`,
+            })
+        }
     }
 }
 
