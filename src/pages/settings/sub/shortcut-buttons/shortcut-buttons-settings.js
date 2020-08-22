@@ -1,4 +1,3 @@
-const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../../../providers/settingsProvider')
 const __ = require('../../../../providers/translateProvider')
 

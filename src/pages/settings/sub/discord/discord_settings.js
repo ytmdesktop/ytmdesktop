@@ -1,10 +1,8 @@
-const { remote, ipcRenderer: ipc, shell } = require('electron')
-const settingsProvider = require('../../providers/settingsProvider')
-const __ = require('../../providers/translateProvider')
+const settingsProvider = require('../../../../providers/settingsProvider')
+const __ = require('../../../../providers/translateProvider')
 
 //var, because we have to re-assign the variable
 var discordSettings = null
-let buttonSave = document.getElementById('btn-save')
 
 __.loadi18n()
 

@@ -11,16 +11,19 @@ content.addListener('dom-ready', function () {
         .executeJavaScript('window.location.hostname')
         .then((hostname) => {
             if (hostname == 'music.youtube.com') {
-                createMiddleContent()
-                createRightContent()
+                createTopMiddleContent()
+                createTopRightContent()
+                createBottomPlayerBarContent()
                 playerBarScrollToChangeVolume()
-                createPlayerBarContent()
             } else {
                 createOffTheRoadContent()
             }
         })
         .catch((_) =>
-            ipcRenderer.send('log', { type: 'error', data: 'error on inject' })
+            ipcRenderer.send('log', {
+                type: 'error',
+                data: 'error on inject content',
+            })
         )
 
     // injectCast()
@@ -224,7 +227,7 @@ function createContextMenu() {
         )
 }
 
-function createMiddleContent() {
+function createTopMiddleContent() {
     content
         .executeJavaScript(
             `
@@ -245,12 +248,12 @@ function createMiddleContent() {
         .catch((_) =>
             ipcRenderer.send('log', {
                 type: 'warn',
-                data: 'error on createMiddleContent',
+                data: 'error on createTopMiddleContent',
             })
         )
 }
 
-function createRightContent() {
+function createTopRightContent() {
     // ADD BUTTONS TO RIGHT CONTENT (side to the photo)
     content
         .executeJavaScript(
@@ -286,12 +289,12 @@ function createRightContent() {
         .catch((_) =>
             ipcRenderer.send('log', {
                 type: 'warn',
-                data: 'error on createRightContent',
+                data: 'error on createTopRightContent',
             })
         )
 }
 
-function createPlayerBarContent() {
+function createBottomPlayerBarContent() {
     var canInjectButtons = settingsProvider.get(
         'settings-enable-shortcut-buttons'
     )
@@ -300,17 +303,14 @@ function createPlayerBarContent() {
     content
         .executeJavaScript(
             `
-            new Promise( (resolve, reject) => {
-                var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
+            var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+            var dots = middleControlsButtons.querySelector('.dropdown-trigger')
             
+            setTimeout( () => {
                 dots.click()
                 dots.click()
-                resolve(true)
-            } )
-            .then((_) => { 
-                console.log('foi') 
-            })
+            }, 1000)
+                
             var playerBarRightControls = document.querySelector('.right-controls-buttons.ytmusic-player-bar');
             var playerBarMiddleControls = document.querySelector('.middle-controls-buttons.ytmusic-player-bar');
 
@@ -393,7 +393,7 @@ function createPlayerBarContent() {
         .catch((_) =>
             ipcRenderer.send('log', {
                 type: 'warn',
-                data: 'error on createPlayerBarContent',
+                data: 'error on createBottomPlayerBarContent',
             })
         )
 }

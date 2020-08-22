@@ -1189,7 +1189,7 @@ function createWindow() {
             ),
             {
                 search:
-                    'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
+                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1364,7 +1364,7 @@ function createWindow() {
             ),
             {
                 search:
-                    'page=settings/discord_settings&icon=settings&title=' +
+                    'page=settings/sub/discord/discord_settings&icon=settings&title=' +
                     __.trans('LABEL_SETTINGS_DISCORD') +
                     '&hide=btn-minimize,btn-maximize',
             }
