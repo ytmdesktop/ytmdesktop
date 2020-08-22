@@ -25,8 +25,8 @@
     "LABEL_SETTINGS_RELAUNCH": "Apply and restart",
     "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Show/Hide Main Window",
     "LABEL_SETTINGS_TAB_ABOUT": "About",
-    "LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR": "Show track progress on taskbar",
     "LABEL_SETTINGS_TAB_APPEARENCE": "Appearance",
+    "LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR": "Show track progress on taskbar",
     "LABEL_SETTINGS_TAB_GENERAL": "General",
     "LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND": "No devices found",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "Companion Server",
@@ -81,5 +81,10 @@
     "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
     "MEDIA_CONTROL_VOLUME_DOWN": "Decrease volume",
     "MEDIA_CONTROL_VOLUME_UP": "Increase volume",
-    "MEDIA_CONTROL_MINIPLAYER": "Open/Close Miniplayer"
+    "MEDIA_CONTROL_MINIPLAYER": "Open/Close Miniplayer",
+    "SHORTCUT_BUTTONS": "Shortcut buttons",
+    "SHOW_MINIPLAYER": "Show miniplayer",
+    "SHOW_LYRICS": "Show Lyrics",
+    "SHOW_ADD_TO_LIBRARY": "Show Add to library",
+    "SHOW_ADD_TO_PLAYLIST": "Show Add to playlist"
 }

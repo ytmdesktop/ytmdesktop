@@ -18,6 +18,10 @@ const elementBtnOpenCompanionServer = document.getElementById(
 )
 const elementBtnDiscordSettings = document.getElementById('btn-discord-setting')
 
+const elementBtnShortcutButtonsSettings = document.getElementById(
+    'btn-shortcut-buttons-setting'
+)
+
 if (isLinux()) {
     document
         .getElementById(
@@ -137,6 +141,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-miniplayer-paint-controls', 'click')
     initElement('settings-enable-taskbar-progressbar', 'click')
 
+    initElement('settings-enable-shortcut-buttons', 'click')
+
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -174,6 +180,12 @@ if (elementBtnLastFmLogin) {
 if (elementBtnDiscordSettings) {
     elementBtnDiscordSettings.addEventListener('click', function () {
         ipc.send('window', { command: 'show-discord-settings' })
+    })
+}
+
+if (elementBtnShortcutButtonsSettings) {
+    elementBtnShortcutButtonsSettings.addEventListener('click', function () {
+        ipc.send('window', { command: 'show-shortcut-buttons-settings' })
     })
 }
 

@@ -45,21 +45,6 @@ function fetchNetworkInterfaces() {
                 isProtected: infoServer().isProtected,
             }
         })
-
-    /*Object.keys(networkInterfaces).forEach((v, k) => {
-        if (!pattIgnoreInterface.test(v)) {
-            networkInterfaces[v].forEach((vv, kk) => {
-                if (vv.family == 'IPv4' && vv.internal == false) {
-                    var data = {
-                        name: v,
-                        ip: vv.address,
-                        //isProtected: infoServer().isProtected
-                    }
-                    serverInterfaces.push(data)
-                }
-            })
-        }
-    })*/
 }
 
 var serverFunction = function (req, res) {

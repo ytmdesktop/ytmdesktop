@@ -81,5 +81,9 @@
     "MEDIA_CONTROL_THUMBS_UP": "Gostei",
     "MEDIA_CONTROL_VOLUME_DOWN": "Diminuir volume",
     "MEDIA_CONTROL_VOLUME_UP": "Aumentar volume",
-    "MEDIA_CONTROL_MINIPLAYER": "Abrir/Fechar Miniplayer"
+    "MEDIA_CONTROL_MINIPLAYER": "Abrir/Fechar Miniplayer",
+    "SHOW_MINIPLAYER": "Exibir miniplayer",
+    "SHOW_LYRICS": "Exibir letras de músicas",
+    "SHOW_ADD_TO_LIBRARY": "Exibir Adicionar à biblioteca",
+    "SHOW_ADD_TO_PLAYLIST": "Exibir Adicionar à playlist"
 }

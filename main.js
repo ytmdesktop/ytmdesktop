@@ -977,6 +977,10 @@ function createWindow() {
             case 'show-discord-settings':
                 windowDiscordSettings()
                 break
+
+            case 'show-shortcut-buttons-settings':
+                windowShortcutButtonsSettings()
+                break
         }
     })
 
@@ -1362,6 +1366,42 @@ function createWindow() {
                 search:
                     'page=settings/discord_settings&icon=settings&title=' +
                     __.trans('LABEL_SETTINGS_DISCORD') +
+                    '&hide=btn-minimize,btn-maximize',
+            }
+        )
+    }
+
+    function windowShortcutButtonsSettings() {
+        const discord = new BrowserWindow({
+            //parent: mainWindow,
+            icon: iconDefault,
+            modal: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            center: true,
+            resizable: true,
+            backgroundColor: '#232323',
+            width: 600,
+            minWidth: 600,
+            height: 220,
+            minHeight: 220,
+            autoHideMenuBar: false,
+            skipTaskbar: false,
+            webPreferences: {
+                nodeIntegration: true,
+                webviewTag: true,
+            },
+        })
+
+        discord.loadFile(
+            path.join(
+                __dirname,
+                './src/pages/shared/window-buttons/window-buttons.html'
+            ),
+            {
+                search:
+                    'page=settings/sub/shortcut-buttons/shortcut-buttons-settings&icon=settings&title=' +
+                    __.trans('SHORTCUT_BUTTONS') +
                     '&hide=btn-minimize,btn-maximize',
             }
         )

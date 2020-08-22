@@ -81,3 +81,12 @@ settingsProvider.setInitialValue(
     'settings-windows10-media-service-show-info',
     false
 )
+
+settingsProvider.setInitialValue('settings-enable-shortcut-buttons', true)
+
+settingsProvider.setInitialValue('settings-shortcut-buttons', {
+    miniplayer: true,
+    lyrics: true,
+    'add-to-library': true,
+    'add-to-playlist': true,
+})

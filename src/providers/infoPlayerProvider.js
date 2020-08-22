@@ -348,12 +348,10 @@ function addToLibrary(webContents) {
             var popup = document.querySelector('.ytmusic-menu-popup-renderer');
             if (popup == null) {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
 
-                var action = dots.querySelector('#button')
-
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
             }
 
             setTimeout( ()=> {
@@ -374,12 +372,10 @@ function getPlaylist(webContents) {
 
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
             
-                var action = dots.querySelector('#button')
-            
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
                 setTimeout( resolve, 500)
             } )
             .then((_) => { 
@@ -475,12 +471,10 @@ function isInLibrary() {
             `
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
             
-                var action = dots.querySelector('#button')
-            
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
                 setTimeout( resolve, 500)
             } )
             .then((_) => {

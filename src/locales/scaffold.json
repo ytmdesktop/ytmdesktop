@@ -81,5 +81,9 @@
     "MEDIA_CONTROL_THUMBS_UP": "Thumbs Up",
     "MEDIA_CONTROL_VOLUME_DOWN": "Decrease volume",
     "MEDIA_CONTROL_VOLUME_UP": "Increase volume",
-    "MEDIA_CONTROL_MINIPLAYER": "Open/Close Miniplayer"
+    "MEDIA_CONTROL_MINIPLAYER": "Open/Close Miniplayer",
+    "SHOW_MINIPLAYER": "Show miniplayer",
+    "SHOW_LYRICS": "Show Lyrics",
+    "SHOW_ADD_TO_LIBRARY": "Show Add to library",
+    "SHOW_ADD_TO_PLAYLIST": "Show Add to playlist"
 }

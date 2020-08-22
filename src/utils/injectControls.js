@@ -1,4 +1,5 @@
 const { remote, ipcRenderer } = require('electron')
+const settingsProvider = require('../providers/settingsProvider')
 
 window.ipcRenderer = ipcRenderer
 var content = remote.getCurrentWebContents()
@@ -47,76 +48,96 @@ function createContextMenu() {
     content
         .insertCSS(
             `
-        #ytmd-menu {
-            visibility: hidden;
-            opacity: 0;
-            position: fixed;
-            background: #232323;
-            font-family: sans-serif;
+                #ytmd-menu {
+                    visibility: hidden;
+                    opacity: 0;
+                    position: fixed;
+                    background: #232323;
+                    font-family: sans-serif;
 
-            -webkit-transition: opacity .2s ease-in-out;
-            transition: opacity .2s ease-in-out;
+                    -webkit-transition: opacity .2s ease-in-out;
+                    transition: opacity .2s ease-in-out;
+                    
+                    padding: 0 !important;
+                    
+                    border: 1px solid rgba(255, 255, 255, .08) !important;
+                    border-radius: 2px !important;
+
+                    z-index: 999999 !important;
+
+                    width: 150px;
+                }
             
-            padding: 0 !important;
-            
-            border: 1px solid rgba(255, 255, 255, .08) !important;
-            border-radius: 2px !important;
+                #ytmd-menu a {
+                    color: #AAA;
+                    display: inline-block;
+                    cursor: pointer;
 
-            z-index: 999999 !important;
+                    padding: 10px 12px 6px 12px;
+                }
 
-            min-width: 99px;
-        }
-    
-        #ytmd-menu a {
-            color: #AAA;
-            display: inline-block;
-            cursor: pointer;
+                #ytmd-menu a:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
 
-            padding: 10px 12px 6px 12px;
-        }
+                .divider {
+                    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                    height: 21px;
+                    display: inline-block;
+                }
 
-        #ytmd-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+                .hide {
+                    visibility: hidden;
+                }
 
-        .divider {
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            height: 21px;
-            display: inline-block;
-        }
+                .pointer {
+                    cursor: pointer;
+                }
 
-        .hide {
-            visibility: hidden;
-        }
+                .shine:hover {
+                    color: #FFF !important;
+                }
 
-        .pointer {
-            cursor: pointer;
-        }
+                .ytmd-icons {
+                    margin: 0 18px 0 2px !important;
+                }
 
-        .ytmd-icons {
-            margin: 0 18px 0 2px !important;
-        }
+                .ytmd-button-rounded {
+                    margin: 0 0 0 10px;
 
-        .ytmd-icons-middle {
-            margin: 0 30px 0 0 !important;
-        }
+                    width: 40px;
+                    height: 40px;
 
-        .pointer:hover {
-            color: #FFF !important;
-        }
+                    padding: 6px;
 
-        .center-content {
-            padding-top: 12px;
-        }
+                    border: 0;
 
-        .btn-disabled {
-            color: #000 !important;
-        }
+                    color: #999;
 
-        .text-red {
-            color: red !important;
-        }
-    `
+                    background: rgba(255, 255, 255, 0);
+                    border-radius: 50%;
+                }
+
+                .ytmd-button-rounded:hover {
+                    background: rgba(255, 255, 255, .1);
+                }
+
+                .ytmd-icons-middle {
+                    margin: 0 10px 0 18px !important;
+                }
+
+                .center-content {
+                    padding-top: 12px;
+                }
+
+                .btn-disabled {
+                    color: #000 !important;
+                }
+
+                .text-red {
+                    color: red !important;
+                }
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
@@ -130,11 +151,11 @@ function createContextMenu() {
     content
         .executeJavaScript(
             `
-        var menuDiv = document.createElement("div");
-        menuDiv.setAttribute('id', 'ytmd-menu');
-        menuDiv.innerHTML = '${menu}';
-        document.body.prepend(menuDiv);
-    `
+                var menuDiv = document.createElement("div");
+                menuDiv.setAttribute('id', 'ytmd-menu');
+                menuDiv.innerHTML = '${menu}';
+                document.body.prepend(menuDiv);
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
@@ -212,7 +233,7 @@ function createMiddleContent() {
                 // HISTORY BACK
                 var element = document.createElement('i');
                 element.id = 'ytmd_history_back';
-                element.classList.add('material-icons', 'pointer', 'ytmd-icons', 'center-content');
+                element.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons', 'center-content');
                 element.style.color = '#666';
                 element.innerText = 'keyboard_backspace';
 
@@ -239,7 +260,7 @@ function createRightContent() {
         // SETTINGS
         var elementSettings = document.createElement('i');
         elementSettings.id = 'ytmd_settings';
-        elementSettings.classList.add('material-icons', 'pointer', 'ytmd-icons');
+        elementSettings.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons');
         elementSettings.style.color = '#909090';
         elementSettings.innerText = 'settings';
 
@@ -250,7 +271,7 @@ function createRightContent() {
         // UPDATE
         var element = document.createElement('i');
         element.id = 'ytmd_update';
-        element.classList.add('material-icons', 'green-text', 'pointer', 'ytmd-icons', 'hide');
+        element.classList.add('material-icons', 'green-text', 'pointer', 'shine', 'ytmd-icons', 'hide');
         element.style.color = '#4CAF50';
         element.innerText = 'arrow_downward';
 
@@ -271,70 +292,102 @@ function createRightContent() {
 }
 
 function createPlayerBarContent() {
+    var canInjectButtons = settingsProvider.get(
+        'settings-enable-shortcut-buttons'
+    )
+    var shortcutButtons = settingsProvider.get('settings-shortcut-buttons')
+
     content
         .executeJavaScript(
             `
+            new Promise( (resolve, reject) => {
+                var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
+            
+                dots.click()
+                dots.click()
+                resolve(true)
+            } )
+            .then((_) => { 
+                console.log('foi') 
+            })
             var playerBarRightControls = document.querySelector('.right-controls-buttons.ytmusic-player-bar');
             var playerBarMiddleControls = document.querySelector('.middle-controls-buttons.ytmusic-player-bar');
 
-            // Right ////////////////////////////////////////////////////////////////////////////////////
-            // LYRICS
-            var elementLyrics = document.createElement('i');
-            elementLyrics.id = 'ytmd_lyrics';
-            elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
-            elementLyrics.innerText = 'music_note';
-
-            elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
-            
-            playerBarRightControls.append(elementLyrics);
-
-            // MINIPLAYER
-            var elementMiniplayer = document.createElement('i');
-            elementMiniplayer.id = 'ytmd_miniplayer';
-            elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
-            elementMiniplayer.innerText = 'picture_in_picture_alt';
-
-            elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
-            playerBarRightControls.append(elementMiniplayer);
-
             // Middle ////////////////////////////////////////////////////////////////////////////////////
-            // Add to Library
-            var elementAddToLibrary = document.createElement('i');
-            elementAddToLibrary.id = 'ytmd_add_to_library';
-            elementAddToLibrary.classList.add('material-icons', 'pointer', 'ytmd-icons-middle');
-            elementAddToLibrary.innerText = 'library_add';
-
-            elementAddToLibrary.addEventListener('click', function() { 
-                ipcRenderer.send('media-command', { command: 'media-add-library' }); 
-            } )
-
-            setInterval( () => {
-                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addLibrary = popup.children[3];
-                var _g = addLibrary.querySelector('g')
-                var _path = _g.querySelectorAll('path')[1];
-                var _d = _path.getAttribute('d')
-                
-                if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
-                    document.querySelector('#ytmd_add_to_library').innerText = 'check'
-                } else {
-                    document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
-                }
-            }, 1000)
-            playerBarMiddleControls.append(elementAddToLibrary);
-
             // Add to Playlist
-            var elementAddToPlaylist = document.createElement('i');
-            elementAddToPlaylist.id = 'ytmd_add_to_playlist';
-            elementAddToPlaylist.classList.add('material-icons', 'pointer', 'ytmd-icons-middle');
-            elementAddToPlaylist.innerText = 'playlist_add';
+            if (${canInjectButtons && shortcutButtons['add-to-playlist']}) {
+                var elementAddToPlaylistIcon = document.createElement('i')
+                var elementAddToPlaylistButton = document.createElement('button')
+                
+                elementAddToPlaylistIcon.id = 'ytmd_add_to_playlist';
+                elementAddToPlaylistIcon.classList.add('material-icons');
+                elementAddToPlaylistIcon.innerText = 'playlist_add';
 
-            elementAddToPlaylist.addEventListener('click', function() { 
-                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addPlaylist = popup.children[5].querySelector('a');
-                addPlaylist.click()
-             } )
-            playerBarMiddleControls.append(elementAddToPlaylist);
+                elementAddToPlaylistButton.classList.add('ytmd-button-rounded');
+                elementAddToPlaylistButton.append(elementAddToPlaylistIcon);
+
+                elementAddToPlaylistButton.addEventListener('click', function() { 
+                    var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                    var addPlaylist = popup.children[5].querySelector('a');
+                    addPlaylist.click()
+                } )
+                playerBarMiddleControls.insertBefore(elementAddToPlaylistButton, playerBarMiddleControls.children[1]);
+            }
+
+            // Add to Library
+            if (${canInjectButtons && shortcutButtons['add-to-library']}) {
+                var elementAddToLibraryIcon = document.createElement('i')
+                var elementAddToLibraryButton = document.createElement('button')
+                
+                elementAddToLibraryIcon.id = 'ytmd_add_to_library';
+                elementAddToLibraryIcon.classList.add('material-icons');
+                elementAddToLibraryIcon.innerText = 'library_add';
+                elementAddToLibraryButton.classList.add('ytmd-button-rounded');
+                elementAddToLibraryButton.append(elementAddToLibraryIcon);
+
+                elementAddToLibraryButton.addEventListener('click', function() { 
+                    ipcRenderer.send('media-command', { command: 'media-add-library' }); 
+                } )
+
+                setInterval( () => {
+                    var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                    var addLibrary = popup.children.item(3);
+                    var _g = addLibrary.querySelector('g')
+                    var _path = _g.querySelectorAll('path')[1];
+                    var _d = _path.getAttribute('d')
+                    
+                    if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
+                        document.querySelector('#ytmd_add_to_library').innerText = 'check'
+                    } else {
+                        document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
+                    }
+                }, 800)
+                playerBarMiddleControls.insertBefore(elementAddToLibraryButton, playerBarMiddleControls.children[1]);
+            }
+
+            // Right ////////////////////////////////////////////////////////////////////////////////////
+            // Lyrics
+            if(${canInjectButtons && shortcutButtons['lyrics']}) {
+                var elementLyrics = document.createElement('i');
+                elementLyrics.id = 'ytmd_lyrics';
+                elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
+                elementLyrics.innerText = 'music_note';
+
+                elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
+                playerBarRightControls.append(elementLyrics);
+            }
+
+            // Miniplayer
+            if(${canInjectButtons && shortcutButtons['miniplayer']}) {
+                var elementMiniplayer = document.createElement('i');
+                elementMiniplayer.id = 'ytmd_miniplayer';
+                elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
+                elementMiniplayer.innerText = 'picture_in_picture_alt';
+
+                elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
+                playerBarRightControls.append(elementMiniplayer);
+            }
             `
         )
         .catch((_) =>
