@@ -44,6 +44,10 @@ var _lyrics = {
 function init(view) {
     webContents = view.webContents
     initialized = true
+    toggleMoreActions(webContents)
+    setTimeout(() => {
+        toggleMoreActions(webContents)
+    }, 100)
 }
 
 function getAllInfo() {
@@ -355,7 +359,7 @@ function addToLibrary(webContents) {
             }
 
             setTimeout( ()=> {
-                var addLibrary = popup.children[3];
+                var addLibrary = Array.from(popup.children).filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
                 addLibrary.click()
             }, 100)
             `
@@ -376,12 +380,14 @@ function getPlaylist(webContents) {
             
                 dots.click()
                 dots.click()
+                
                 setTimeout( resolve, 500)
             } )
             .then((_) => { 
                 return new Promise( (resolve, reject) => {
                     var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                    var addPlaylist = popup.children[5].querySelector('a');
+                    var addPlaylist = Array.from(popup.children)
+                        .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                     addPlaylist.click()
                     addPlaylist.click()
             
@@ -475,11 +481,12 @@ function isInLibrary() {
             
                 dots.click()
                 dots.click()
+                
                 setTimeout( resolve, 500)
             } )
             .then((_) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addLibrary = popup.children[3];
+                var addLibrary = popup.children.item(3);
                 var _g = addLibrary.querySelector('g')
                 var _path = _g.querySelectorAll('path')[1];
                 var _d = _path.getAttribute('d')
@@ -501,7 +508,8 @@ function addToPlaylist(webContents, index) {
             `
             new Promise( (resolve, reject) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addPlaylist = popup.children[5].querySelector('a');
+                var addPlaylist = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                 addPlaylist.click()
                 addPlaylist.click()
         
@@ -554,6 +562,18 @@ function firstPlay(webContents) {
         )
         .then()
         .catch((_) => console.log('error firstPlay'))
+}
+
+function toggleMoreActions(webContents) {
+    webContents.executeJavaScript(
+        `
+            var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+            var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')
+            
+            moreActions.click()
+            `,
+        true
+    )
 }
 
 function debug(data) {
