@@ -429,6 +429,27 @@ function createWindow() {
             if (lastTrackId !== trackId) {
                 lastTrackId = trackId
 
+                setTimeout(() => {
+                    if (
+                        settingsProvider.get('settings-skip-track-disliked') &&
+                        infoPlayerProvider.getPlayerInfo().likeStatus ==
+                            'DISLIKE'
+                    ) {
+                        mediaControl.nextTrack(view)
+                    }
+
+                    if (
+                        infoPlayerProvider.getTrackInfo().duration <
+                        parseInt(
+                            settingsProvider.get(
+                                'settings-skip-track-shorter-than'
+                            )
+                        )
+                    ) {
+                        mediaControl.nextTrack(view)
+                    }
+                }, 1000)
+
                 infoPlayerProvider.updateQueueInfo()
                 infoPlayerProvider.updatePlaylistInfo()
                 infoPlayerProvider.isInLibrary()

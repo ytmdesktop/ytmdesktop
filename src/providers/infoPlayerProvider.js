@@ -486,12 +486,9 @@ function isInLibrary() {
             } )
             .then((_) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addLibrary = popup.children.item(3);
-                var _g = addLibrary.querySelector('g')
-                var _path = _g.querySelectorAll('path')[1];
-                var _d = _path.getAttribute('d')
-            
-                return _d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
+                var addLibrary = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" )
+                return (addLibrary.length == 1)
             })
             `
         )

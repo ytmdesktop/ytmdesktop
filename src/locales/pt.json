@@ -61,6 +61,7 @@
     "LABEL_SETTINGS_TAB_MINIPLAYER_PAINT_CONTROLS": "Colorir os controles com as cores do álbum",
     "LABEL_SETTINGS_TAB_MINIPLAYER_RESIZABLE": "Permitir redimensionar",
     "LABEL_SETTINGS_TAB_MINIPLAYER_SHOW_TASK": "Mostrar na barra de tarefas",
+    "LABEL_SETTINGS_TAB_PLAYBACK": "Reprodução",
     "LABEL_SETTINGS_TAB_RAINMETER_WEB_NOW_PLAYING": "Rainmeter (WebNowPlaying)",
     "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Leia a área de transferência para obter links do Youtube",
     "LABEL_SETTINGS_TAB_SHORTCUTS": "Atalhos",
@@ -85,5 +86,8 @@
     "SHOW_MINIPLAYER": "Exibir miniplayer",
     "SHOW_LYRICS": "Exibir letras de músicas",
     "SHOW_ADD_TO_LIBRARY": "Exibir Adicionar à biblioteca",
-    "SHOW_ADD_TO_PLAYLIST": "Exibir Adicionar à playlist"
+    "SHOW_ADD_TO_PLAYLIST": "Exibir Adicionar à playlist",
+    "SKIP_TRACK_MARKED_DISLIKED": "Pular faixas marcadas como 'Não gostei'",
+    "SKIP_TRACK_SHORTER_THAN": "Pular faixas mais curtas que",
+    "SHORTCUT_BUTTONS": "SHORTCUT_BUTTONS"
 }

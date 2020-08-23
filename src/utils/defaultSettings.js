@@ -90,3 +90,7 @@ settingsProvider.setInitialValue('settings-shortcut-buttons', {
     'add-to-library': true,
     'add-to-playlist': true,
 })
+
+settingsProvider.setInitialValue('settings-skip-track-disliked', false)
+
+settingsProvider.setInitialValue('settings-skip-track-shorter-than', '0')

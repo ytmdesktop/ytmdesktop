@@ -22,6 +22,10 @@ const elementBtnShortcutButtonsSettings = document.getElementById(
     'btn-shortcut-buttons-setting'
 )
 
+const elementRangeSkipTrackShorterThan = document.getElementById(
+    'range-skip-track-shorter-than'
+)
+
 if (isLinux()) {
     document
         .getElementById(
@@ -103,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         checkCompanionStatus()
     })
     initElement('settings-companion-server-protect', 'click')
-    initElement('settings-continue-where-left-of', 'click')
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus(), showRelaunchButton()
     })
@@ -143,6 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initElement('settings-enable-shortcut-buttons', 'click')
 
+    initElement('settings-continue-where-left-of', 'click')
+    initElement('settings-skip-track-disliked', 'click')
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -162,6 +167,15 @@ if (elementRangeZoom) {
             key: 'settings-changed-zoom',
             value: this.value,
         })
+    })
+}
+
+if (elementRangeSkipTrackShorterThan) {
+    elementRangeSkipTrackShorterThan.addEventListener('input', function () {
+        document.getElementById(
+            'range-skip-track-shorter-than-value'
+        ).innerText = this.value
+        settingsProvider.set('settings-skip-track-shorter-than', this.value)
     })
 }
 
@@ -300,13 +314,22 @@ function loadValue(element, settingsName, eventType) {
 function loadSettings() {
     // readLocales();
 
-    if (settingsProvider.get('settings-page-zoom')) {
-        document.getElementById('range-zoom').value = settingsProvider.get(
-            'settings-page-zoom'
-        )
+    var settingsZoom = settingsProvider.get('settings-page-zoom')
+    if (settingsZoom) {
+        document.getElementById('range-zoom').value = settingsZoom
+        document.getElementById('range-zoom-value').innerText = settingsZoom
+    }
+
+    var settingsSkipTrackShorterThan = settingsProvider.get(
+        'settings-skip-track-shorter-than'
+    )
+    if (settingsSkipTrackShorterThan) {
         document.getElementById(
-            'range-zoom-value'
-        ).innerText = settingsProvider.get('settings-page-zoom')
+            'range-skip-track-shorter-than'
+        ).value = settingsSkipTrackShorterThan
+        document.getElementById(
+            'range-skip-track-shorter-than-value'
+        ).innerText = settingsSkipTrackShorterThan
     }
 
     document.getElementById('app-version').innerText = remote.app.getVersion()

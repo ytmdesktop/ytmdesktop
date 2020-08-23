@@ -40,6 +40,16 @@
                             <li class="tab">
                                 <a
                                     class="waves-effect waves-cyan"
+                                    href="#tab-playback"
+                                >
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK"
+                                    ></span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a
+                                    class="waves-effect waves-cyan"
                                     href="#tab-miniplayer"
                                 >
                                     <span
@@ -126,24 +136,6 @@
                                                     <input
                                                         type="checkbox"
                                                         id="settings-show-notifications"
-                                                    />
-                                                    <span class="lever"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span
-                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF"
-                                            ></span>
-                                        </td>
-                                        <td class="right">
-                                            <div class="switch">
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="settings-continue-where-left-of"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>
@@ -325,6 +317,74 @@
                             </table>
                         </div>
 
+                        <div id="tab-playback" class="tab-content">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-continue-where-left-of"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_SKIP_TRACK_MARKED_DISLIKED"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-skip-track-disliked"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_SKIP_TRACK_SHORTER_THAN"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <span
+                                                class="left"
+                                                id="range-skip-track-shorter-than-value"
+                                                >0</span
+                                            >s
+                                            <p
+                                                style="margin: -7px 13px 0 8px;"
+                                                class="right range-field"
+                                            >
+                                                <input
+                                                    id="range-skip-track-shorter-than"
+                                                    type="range"
+                                                    min="0"
+                                                    max="120"
+                                                />
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div id="tab-miniplayer" class="tab-content">
                             <table class="table">
                                 <tbody>
@@ -431,21 +491,15 @@
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM"
                                             ></span>
                                         </td>
-                                        <td
-                                            class="right"
-                                            style="color: #f44336;"
-                                        >
+                                        <td class="right">
                                             <span
-                                                style="float: left;"
+                                                class="left"
                                                 id="range-zoom-value"
                                                 >100</span
                                             >%
                                             <p
-                                                style="
-                                                    float: right;
-                                                    margin: -7px 13px 0 8px;
-                                                "
-                                                class="range-field"
+                                                style="margin: -7px 13px 0 8px;"
+                                                class="right range-field"
                                             >
                                                 <input
                                                     id="range-zoom"

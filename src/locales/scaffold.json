@@ -61,6 +61,7 @@
     "LABEL_SETTINGS_TAB_MINIPLAYER_PAINT_CONTROLS": "Paint controls with album color",
     "LABEL_SETTINGS_TAB_MINIPLAYER_RESIZABLE": "Allow resizing",
     "LABEL_SETTINGS_TAB_MINIPLAYER_SHOW_TASK": "Show on taskbar",
+    "LABEL_SETTINGS_TAB_PLAYBACK": "Playback",
     "LABEL_SETTINGS_TAB_RAINMETER_WEB_NOW_PLAYING": "Rainmeter (WebNowPlaying)",
     "LABEL_SETTINGS_TAB_READ_CLIPBOARD": "Read clipboard for youtube links",
     "LABEL_SETTINGS_TAB_SHORTCUTS": "Shortcuts",
@@ -85,5 +86,7 @@
     "SHOW_MINIPLAYER": "Show miniplayer",
     "SHOW_LYRICS": "Show Lyrics",
     "SHOW_ADD_TO_LIBRARY": "Show Add to library",
-    "SHOW_ADD_TO_PLAYLIST": "Show Add to playlist"
+    "SHOW_ADD_TO_PLAYLIST": "Show Add to playlist",
+    "SKIP_TRACK_MARKED_DISLIKED": "Skip tracks marked as 'Disliked'",
+    "SKIP_TRACK_SHORTER_THAN": "Skip tracks shorter than"
 }
