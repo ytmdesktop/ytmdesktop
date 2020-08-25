@@ -395,14 +395,18 @@ function createBottomPlayerBarContent() {
 
             playerBarMiddleControls.insertBefore(elementAddToLibraryButton, playerBarMiddleControls.children.item(1));
 
+            var showAddToLibrary = false;
             if(${shortcutButtons['add-to-library']}) {
                 document.querySelector("#btn_ytmd_add_to_library").classList.remove("hide");
+                showAddToLibrary = true;
             }
-
+            
             settingsProvider.onDidChange('settings-shortcut-buttons.add-to-library', data => {
                 if (data.newValue) {
+                    showAddToLibrary = true;
                     document.querySelector("#btn_ytmd_add_to_library").classList.remove("hide");
                 } else {
+                    showAddToLibrary = false;
                     document.querySelector("#btn_ytmd_add_to_library").classList.add("hide");
                 }
             })
@@ -411,13 +415,18 @@ function createBottomPlayerBarContent() {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
                 var addLibrary = Array.from(popup.children)
                     .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
-
-                var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
                 
-                if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
-                    document.querySelector('#ytmd_add_to_library').innerText = 'check'
+                if(addLibrary != undefined && showAddToLibrary) {
+                    var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
+
+                    if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
+                        document.querySelector('#ytmd_add_to_library').innerText = 'check'
+                    } else {
+                        document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
+                    }
+                    document.querySelector('#btn_ytmd_add_to_library').classList.remove('hide');
                 } else {
-                    document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
+                    document.querySelector('#btn_ytmd_add_to_library').classList.add('hide');
                 }
             }, 800)
 
