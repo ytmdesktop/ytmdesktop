@@ -111,6 +111,7 @@ function createContextMenu() {
 
                 .ytmd-icons {
                     margin: 0 18px 0 2px !important;
+                    color: rgba(255, 255, 255, 0.5) !important;
                 }
 
                 .ytmd-button-rounded {
@@ -248,7 +249,6 @@ function createTopMiddleContent() {
                 var element = document.createElement('i');
                 element.id = 'ytmd_history_back';
                 element.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons', 'center-content');
-                element.style.color = '#666';
                 element.innerText = 'keyboard_backspace';
 
                 element.addEventListener('click', function() { history.go(-1); } )
@@ -278,7 +278,6 @@ function createTopRightContent() {
                 elementSettings.id = 'ytmd_settings';
                 elementSettings.title = __.trans('LABEL_SETTINGS');
                 elementSettings.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons');
-                elementSettings.style.color = '#909090';
                 elementSettings.innerText = 'settings';
 
                 elementSettings.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-settings' }); } )
@@ -290,7 +289,6 @@ function createTopRightContent() {
                 elementRemoteServer.id = 'ytmd_remote_server';
                 elementRemoteServer.title = __.trans('LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER');
                 elementRemoteServer.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons', 'hide');
-                elementRemoteServer.style.color = '#909090';
                 elementRemoteServer.innerText = 'devices_other';
 
                 elementRemoteServer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-companion' }); } )

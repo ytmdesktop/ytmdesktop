@@ -116,16 +116,16 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-show-notifications', 'click')
     initElement('settings-start-on-boot', 'click')
     initElement('settings-start-minimized', 'click')
-    initElement('settings-companion-server', 'click', () => {
-        checkCompanionStatus()
-    })
+    initElement('settings-companion-server', 'click', checkCompanionStatus)
     initElement('settings-companion-server-protect', 'click')
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus(), showRelaunchButton()
     })
-    initElement('settings-windows10-media-service-show-info', 'click', () => {
-        showRelaunchButton()
-    })
+    initElement(
+        'settings-windows10-media-service-show-info',
+        'click',
+        showRelaunchButton
+    )
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-skip-track-disliked', 'click')
 
     initElement('settings-clipboard-always-ask-read', 'click')
+    initElement('settings-tray-icon', 'click', showRelaunchButton)
     mInit()
 
     document.getElementById('content').classList.remove('hide')

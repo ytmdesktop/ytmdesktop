@@ -496,17 +496,16 @@ function isInLibrary() {
                         return false;
                     }
                 } else {
-                    return true;
+                    return false;
                 }
-                //return (addLibrary.length == 1)
             })
             `
         )
         .then((inLibrary) => {
             track.inLibrary = inLibrary
-            debug(`In Library: ${track.inLibrary}`)
+            debug(`Is in Library: ${track.inLibrary}`)
         })
-        .catch((_) => console.log('error inLibrary'))
+        .catch((_) => console.log('error isInLibrary'))
 }
 
 function addToPlaylist(webContents, index) {

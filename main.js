@@ -218,7 +218,7 @@ function createWindow() {
 
     mainWindow = new BrowserWindow(browserWindowConfig)
     mainWindow.webContents.session.setUserAgent(
-        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+        `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
     )
     view = new BrowserView({
         webPreferences: {
@@ -599,7 +599,11 @@ function createWindow() {
     mainWindow.on('close', function (e) {
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
-            mainWindow.hide()
+            if (settingsProvider.get('settings-tray-icon')) {
+                mainWindow.hide()
+            } else {
+                mainWindow.minimize()
+            }
         } else {
             app.exit()
         }
@@ -1032,7 +1036,11 @@ function createWindow() {
         if (settings) {
             settings.show()
         } else {
-            let mainWindowPosition = mainWindow.getPosition()
+            var mainWindowPosition = mainWindow.getPosition()
+            var mainWindowSize = mainWindow.getSize()
+
+            var xPos = mainWindowPosition[0] + mainWindowSize[0] / 4
+            var yPos = mainWindowPosition[1] + 200
 
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
@@ -1040,15 +1048,13 @@ function createWindow() {
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                //center: true,
                 resizable: true,
-                backgroundColor: '#232323',
                 width: 900,
                 minWidth: 900,
                 height: 550,
                 minHeight: 550,
-                x: mainWindowPosition[0] + 450,
-                y: mainWindowPosition[1] + 220,
+                x: xPos,
+                y: yPos,
                 autoHideMenuBar: false,
                 skipTaskbar: false,
                 webPreferences: {
@@ -1358,7 +1364,7 @@ function createWindow() {
         })
 
         incognitoWindow.webContents.session.setUserAgent(
-            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+            `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
         )
 
         incognitoWindow.webContents.loadURL(mainWindowParams.url)
@@ -1603,10 +1609,10 @@ function createWindow() {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
                     onTextChange: (text) => {
-                        let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+                        let regExp = /^.*(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
                         let match = text.match(regExp)
-                        if (match && match[2].length == 11) {
-                            let videoId = match[2]
+                        if (match) {
+                            let videoUrl = match[0]
 
                             if (
                                 settingsProvider.get(
@@ -1625,15 +1631,16 @@ function createWindow() {
                                     .showMessageBox(mainWindow, options)
                                     .then((success) => {
                                         if (success.response == 0) {
-                                            loadMusicByVideoId(videoId)
+                                            view.webContents.loadURL(videoUrl)
                                         }
                                     })
                             } else {
-                                loadMusicByVideoId(videoId)
+                                view.webContents.loadURL(videoUrl)
                             }
                             writeLog({
                                 type: 'info',
-                                data: 'Video readed from clipboard: ' + videoId,
+                                data:
+                                    'Video readed from clipboard: ' + videoUrl,
                             })
                         }
                     },
@@ -1716,7 +1723,7 @@ if (!gotTheLock) {
 
         createWindow()
 
-        tray.createTray(mainWindow, iconTray)
+        tray.createTray(mainWindow)
 
         ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))

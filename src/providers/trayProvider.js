@@ -1,5 +1,4 @@
 const { app, Menu, Tray, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
 const mediaControl = require('./mediaProvider')
 const nativeImage = require('electron').nativeImage
 const settingsProvider = require('./settingsProvider')
@@ -8,14 +7,18 @@ const { doBehavior } = require('../utils/window')
 const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
 const { popUpMenu } = require('./templateProvider')
+const assetsProvider = require('./assetsProvider')
 
 let tray = null
 let saved_mainWindow = null
 let contextMenu = null
+let iconTray = assetsProvider.getIcon('trayTemplate')
 
 function setTooltip(tooltip) {
     try {
-        tray.setToolTip(tooltip)
+        if (tray) {
+            tray.setToolTip(tooltip)
+        }
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
@@ -44,33 +47,40 @@ let init_tray = () => {
     }
 }
 
-function createTray(mainWindow, icon) {
-    nativeImageIcon = buildTrayIcon(icon)
-    tray = new Tray(nativeImageIcon)
-    saved_mainWindow = mainWindow
+function createTray(mainWindow) {
+    if (settingsProvider.get('settings-tray-icon')) {
+        nativeImageIcon = buildTrayIcon(iconTray)
+        tray = new Tray(nativeImageIcon)
 
-    contextMenu = Menu.buildFromTemplate(
-        popUpMenu(__, saved_mainWindow, mediaControl, app)
-    )
+        if (mainWindow) {
+            saved_mainWindow = mainWindow
 
-    if (!systemInfo.isMac()) {
-        init_tray()
-    } else {
-        setShinyTray()
+            contextMenu = Menu.buildFromTemplate(
+                popUpMenu(__, saved_mainWindow, mediaControl, app)
+            )
+        }
+
+        if (!systemInfo.isMac()) {
+            init_tray()
+        } else {
+            setShinyTray()
+        }
     }
 }
 
 function updateTray(data) {
     try {
-        var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
+        if (tray) {
+            var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
 
-        if (data.type == 'audioOutputs') {
-            template[11]['submenu'] = data.data
+            if (data.type == 'audioOutputs') {
+                template[11]['submenu'] = data.data
+            }
+
+            contextMenu = Menu.buildFromTemplate(template)
+
+            tray.setContextMenu(contextMenu)
         }
-
-        contextMenu = Menu.buildFromTemplate(template)
-
-        tray.setContextMenu(contextMenu)
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
@@ -81,8 +91,10 @@ function updateTray(data) {
 
 function updateTrayIcon(icon) {
     try {
-        nativeImageIcon = buildTrayIcon(icon)
-        tray.setImage(nativeImageIcon)
+        if (tray) {
+            nativeImageIcon = buildTrayIcon(icon)
+            tray.setImage(nativeImageIcon)
+        }
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
@@ -126,12 +138,21 @@ function _doNotification(title, content, icon) {
     try {
         if (title && content) {
             if (systemInfo.isWindows()) {
+                if (!settingsProvider.get('settings-tray-icon')) {
+                    nativeImageIcon = buildTrayIcon(iconTray)
+                    tray = new Tray(nativeImageIcon)
+                }
                 tray.displayBalloon({
                     icon: icon,
                     title: title,
                     content: content,
                     noSound: true,
                 })
+                if (!settingsProvider.get('settings-tray-icon')) {
+                    setTimeout(() => {
+                        quit()
+                    }, 7 * 1000)
+                }
             } else {
                 let Notification = require('electron-native-notification')
 
