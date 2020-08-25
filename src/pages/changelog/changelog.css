@@ -3,28 +3,28 @@ body {
     background-color: #1D1D1D;
     color: #fff;
 
-    /* padding: 5px; */
-    padding: 0;
+    padding: 5px;
 
-    width: 100%;
-    height: 100%;
-
-    font-family: sans-serif;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: .95em;
-}
 
-#content {
-    overflow: auto;
-    width: 99%;
-    height: 100%;
-    padding: 4px;
-    scroll-behavior: smooth;
+    line-height: 1.3em;
 }
 
 #version {
     width: 100%;
+    margin: -15px 0 -15px 0;
     text-align: center;
     font-size: 1.5em;
+}
+
+#content {
+    overflow: auto;
+    width: 100%;
+    padding: 2px;
+    height: 100%;
+    
+    scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {

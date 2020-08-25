@@ -1452,8 +1452,8 @@ function createWindow() {
             center: true,
             resizable: false,
             backgroundColor: '#232323',
-            width: 460,
-            height: 650,
+            width: 600,
+            height: 580,
             autoHideMenuBar: false,
             skipTaskbar: false,
             webPreferences: {
