@@ -1,7 +1,11 @@
 const { remote, ipcRenderer } = require('electron')
 const settingsProvider = require('../providers/settingsProvider')
+const __ = require('../providers/translateProvider')
 
 window.ipcRenderer = ipcRenderer
+window.settingsProvider = settingsProvider
+window.__ = __
+
 var content = remote.getCurrentWebContents()
 
 content.addListener('dom-ready', function () {
@@ -34,12 +38,12 @@ function createContextMenu() {
     content
         .executeJavaScript(
             `
-        var materialIcons = document.createElement('link');
-        materialIcons.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons');
-        materialIcons.setAttribute('rel', 'stylesheet');
+                var materialIcons = document.createElement('link');
+                materialIcons.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons');
+                materialIcons.setAttribute('rel', 'stylesheet');
 
-        document.body.prepend(materialIcons);
-    `
+                document.body.prepend(materialIcons);
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
@@ -68,7 +72,7 @@ function createContextMenu() {
 
                     z-index: 999999 !important;
 
-                    width: 150px;
+                    width: 144px;
                 }
             
                 #ytmd-menu a {
@@ -91,6 +95,10 @@ function createContextMenu() {
 
                 .hide {
                     visibility: hidden;
+                    width: 0 !important;
+                    height: 0 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
 
                 .pointer {
@@ -149,14 +157,17 @@ function createContextMenu() {
             })
         )
 
-    var menu = `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a> <a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a> <a id="ytmd-menu-bug-report"><i class="material-icons text-red">bug_report</i></a>`
+    let quickShortcuts = ''
+    quickShortcuts += `<a id="ytmd-menu-lyrics"><i class="material-icons">music_note</i></a>`
+    quickShortcuts += `<a id="ytmd-menu-miniplayer"><i class="material-icons">picture_in_picture_alt</i></a>`
+    quickShortcuts += `<a id="ytmd-menu-bug-report"><i class="material-icons text-red">bug_report</i></a>`
 
     content
         .executeJavaScript(
             `
                 var menuDiv = document.createElement("div");
                 menuDiv.setAttribute('id', 'ytmd-menu');
-                menuDiv.innerHTML = '${menu}';
+                menuDiv.innerHTML = '${quickShortcuts}';
                 document.body.prepend(menuDiv);
             `
         )
@@ -254,37 +265,65 @@ function createTopMiddleContent() {
 }
 
 function createTopRightContent() {
+    var settingsRemoteServer = settingsProvider.get('settings-companion-server')
+
     // ADD BUTTONS TO RIGHT CONTENT (side to the photo)
     content
         .executeJavaScript(
             `
-        var right_content = document.getElementById('right-content');
+                var right_content = document.getElementById('right-content');
 
-        // SETTINGS
-        var elementSettings = document.createElement('i');
-        elementSettings.id = 'ytmd_settings';
-        elementSettings.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons');
-        elementSettings.style.color = '#909090';
-        elementSettings.innerText = 'settings';
+                // SETTINGS
+                var elementSettings = document.createElement('i');
+                elementSettings.id = 'ytmd_settings';
+                elementSettings.title = __.trans('LABEL_SETTINGS');
+                elementSettings.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons');
+                elementSettings.style.color = '#909090';
+                elementSettings.innerText = 'settings';
 
-        elementSettings.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-settings' }); } )
-        
-        right_content.prepend(elementSettings);
+                elementSettings.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-settings' }); } )
+                
+                right_content.prepend(elementSettings);
 
-        // UPDATE
-        var element = document.createElement('i');
-        element.id = 'ytmd_update';
-        element.classList.add('material-icons', 'green-text', 'pointer', 'shine', 'ytmd-icons', 'hide');
-        element.style.color = '#4CAF50';
-        element.innerText = 'arrow_downward';
+                // REMOTE SERVER
+                var elementRemoteServer = document.createElement('i');
+                elementRemoteServer.id = 'ytmd_remote_server';
+                elementRemoteServer.title = __.trans('LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER');
+                elementRemoteServer.classList.add('material-icons', 'pointer', 'shine', 'ytmd-icons', 'hide');
+                elementRemoteServer.style.color = '#909090';
+                elementRemoteServer.innerText = 'devices_other';
 
-        element.addEventListener('click', function() { ipcRenderer.send('btn-update-clicked', true); } )
+                elementRemoteServer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-companion' }); } )
+            
+                right_content.prepend(elementRemoteServer);
+            
+                if(${settingsRemoteServer}) {
+                    document.getElementById("ytmd_remote_server").classList.remove("hide");
+                }
 
-        right_content.prepend(element);
+                settingsProvider.onDidChange('settings-companion-server', data => { 
+                    if (data.newValue) {
+                        document.getElementById("ytmd_remote_server").classList.remove("hide");
+                    } else {
+                        document.getElementById("ytmd_remote_server").classList.add("hide");
+                    }
+                })
 
-        ipcRenderer.on('downloaded-new-update', function(e, data) {
-            document.getElementById("ytmd_update").classList.remove("hide");
-        } );`
+                // UPDATE
+                var elementUpdate = document.createElement('i');
+                elementUpdate.id = 'ytmd_update';
+                elementUpdate.classList.add('material-icons', 'green-text', 'pointer', 'shine', 'ytmd-icons', 'hide');
+                elementUpdate.style.color = '#4CAF50';
+                elementUpdate.innerText = 'arrow_downward';
+
+                elementUpdate.addEventListener('click', function() { ipcRenderer.send('btn-update-clicked', true); } )
+
+                right_content.prepend(elementUpdate);
+
+                ipcRenderer.on('downloaded-new-update', function(e, data) {
+                    document.getElementById("ytmd_update").classList.remove("hide");
+                } );
+            `
         )
         .catch((_) =>
             ipcRenderer.send('log', {
@@ -295,93 +334,141 @@ function createTopRightContent() {
 }
 
 function createBottomPlayerBarContent() {
-    var canInjectButtons = settingsProvider.get(
-        'settings-enable-shortcut-buttons'
-    )
     var shortcutButtons = settingsProvider.get('settings-shortcut-buttons')
 
     content
         .executeJavaScript(
-            `        
+            `
             var playerBarRightControls = document.querySelector('.right-controls-buttons.ytmusic-player-bar');
             var playerBarMiddleControls = document.querySelector('.middle-controls-buttons.ytmusic-player-bar');
 
             // Middle ////////////////////////////////////////////////////////////////////////////////////
             // Add to Playlist
-            if (${canInjectButtons && shortcutButtons['add-to-playlist']}) {
-                var elementAddToPlaylistIcon = document.createElement('i')
-                var elementAddToPlaylistButton = document.createElement('button')
-                
-                elementAddToPlaylistIcon.id = 'ytmd_add_to_playlist';
-                elementAddToPlaylistIcon.classList.add('material-icons');
-                elementAddToPlaylistIcon.innerText = 'playlist_add';
+            var elementAddToPlaylistIcon = document.createElement('i')
+            var elementAddToPlaylistButton = document.createElement('button')
+            
+            elementAddToPlaylistIcon.id = 'ytmd_add_to_playlist';
+            elementAddToPlaylistIcon.title = __.trans('ADD_TO_PLAYLIST');
+            elementAddToPlaylistIcon.classList.add('material-icons');
+            elementAddToPlaylistIcon.innerText = 'playlist_add';
+            
+            elementAddToPlaylistButton.id = 'btn_ytmd_add_to_playlist';
+            elementAddToPlaylistButton.classList.add('ytmd-button-rounded', 'hide');
+            elementAddToPlaylistButton.append(elementAddToPlaylistIcon);
 
-                elementAddToPlaylistButton.classList.add('ytmd-button-rounded');
-                elementAddToPlaylistButton.append(elementAddToPlaylistIcon);
+            elementAddToPlaylistButton.addEventListener('click', function() { 
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addPlaylist = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
+                addPlaylist.click()
+            })
 
-                elementAddToPlaylistButton.addEventListener('click', function() { 
-                    var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                    var addPlaylist = Array.from(popup.children)
-                        .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
-                    addPlaylist.click()
-                } )
-                playerBarMiddleControls.insertBefore(elementAddToPlaylistButton, playerBarMiddleControls.children[1]);
+            playerBarMiddleControls.insertBefore(elementAddToPlaylistButton, playerBarMiddleControls.children.item(1));
+
+            if(${shortcutButtons['add-to-playlist']}) {
+                document.querySelector("#btn_ytmd_add_to_playlist").classList.remove('hide');
             }
+
+            settingsProvider.onDidChange('settings-shortcut-buttons.add-to-playlist', data => {
+                if (data.newValue) {
+                    document.querySelector("#btn_ytmd_add_to_playlist").classList.remove("hide");
+                } else {
+                    document.querySelector("#btn_ytmd_add_to_playlist").classList.add("hide");
+                }
+            })
 
             // Add to Library
-            if (${canInjectButtons && shortcutButtons['add-to-library']}) {
-                var elementAddToLibraryIcon = document.createElement('i')
-                var elementAddToLibraryButton = document.createElement('button')
-                
-                elementAddToLibraryIcon.id = 'ytmd_add_to_library';
-                elementAddToLibraryIcon.classList.add('material-icons');
-                elementAddToLibraryIcon.innerText = 'library_add';
-                elementAddToLibraryButton.classList.add('ytmd-button-rounded');
-                elementAddToLibraryButton.append(elementAddToLibraryIcon);
+            var elementAddToLibraryIcon = document.createElement('i')
+            var elementAddToLibraryButton = document.createElement('button')
+            
+            elementAddToLibraryIcon.id = 'ytmd_add_to_library';
+            elementAddToLibraryIcon.title = __.trans('ADD_TO_LIBRARY');
+            elementAddToLibraryIcon.classList.add('material-icons');
+            elementAddToLibraryIcon.innerText = 'library_add';
+            elementAddToLibraryButton.id = 'btn_ytmd_add_to_library';
+            elementAddToLibraryButton.classList.add('ytmd-button-rounded', 'hide');
+            elementAddToLibraryButton.append(elementAddToLibraryIcon);
 
-                elementAddToLibraryButton.addEventListener('click', function() { 
-                    ipcRenderer.send('media-command', { command: 'media-add-library' }); 
-                } )
+            elementAddToLibraryButton.addEventListener('click', function() { 
+                ipcRenderer.send('media-command', { command: 'media-add-library' }); 
+            })
 
-                playerBarMiddleControls.insertBefore(elementAddToLibraryButton, playerBarMiddleControls.children[1]);
+            playerBarMiddleControls.insertBefore(elementAddToLibraryButton, playerBarMiddleControls.children.item(1));
 
-                setInterval( () => {
-                    var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                    var addLibrary = Array.from(popup.children)
-                        .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
-
-                    var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
-                    
-                    if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
-                        document.querySelector('#ytmd_add_to_library').innerText = 'check'
-                    } else {
-                        document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
-                    }
-                }, 800)
+            if(${shortcutButtons['add-to-library']}) {
+                document.querySelector("#btn_ytmd_add_to_library").classList.remove("hide");
             }
+
+            settingsProvider.onDidChange('settings-shortcut-buttons.add-to-library', data => {
+                if (data.newValue) {
+                    document.querySelector("#btn_ytmd_add_to_library").classList.remove("hide");
+                } else {
+                    document.querySelector("#btn_ytmd_add_to_library").classList.add("hide");
+                }
+            })
+
+            setInterval( () => {
+                var popup = document.querySelector('.ytmusic-menu-popup-renderer');
+                var addLibrary = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
+
+                var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
+                
+                if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
+                    document.querySelector('#ytmd_add_to_library').innerText = 'check'
+                } else {
+                    document.querySelector('#ytmd_add_to_library').innerText = 'library_add'
+                }
+            }, 800)
 
             // Right ////////////////////////////////////////////////////////////////////////////////////
             // Lyrics
-            if(${canInjectButtons && shortcutButtons['lyrics']}) {
-                var elementLyrics = document.createElement('i');
-                elementLyrics.id = 'ytmd_lyrics';
-                elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons');
-                elementLyrics.innerText = 'music_note';
+            var elementLyrics = document.createElement('i');
+            elementLyrics.id = 'ytmd_lyrics';
+            elementLyrics.title = __.trans('LYRICS');
+            elementLyrics.classList.add('material-icons', 'pointer', 'ytmd-icons', 'hide');
+            elementLyrics.innerText = 'music_note';
 
-                elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics'}); } )
-                playerBarRightControls.append(elementLyrics);
+            elementLyrics.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-lyrics' }); } )
+            playerBarRightControls.append(elementLyrics);
+
+            if(${shortcutButtons['lyrics']}) {
+                document.querySelector("#ytmd_lyrics").classList.remove("hide");
             }
+
+            settingsProvider.onDidChange('settings-shortcut-buttons.lyrics', data => {
+                if (data.newValue) {
+                    document.querySelector("#ytmd_lyrics").classList.remove("hide");
+                    document.querySelector("#ytmd_lyrics").classList.add("ytmd-icons");
+                } else {
+                    document.querySelector("#ytmd_lyrics").classList.add("hide");
+                    document.querySelector("#ytmd_lyrics").classList.remove("ytmd-icons");
+                }
+            })
 
             // Miniplayer
-            if(${canInjectButtons && shortcutButtons['miniplayer']}) {
-                var elementMiniplayer = document.createElement('i');
-                elementMiniplayer.id = 'ytmd_miniplayer';
-                elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons');
-                elementMiniplayer.innerText = 'picture_in_picture_alt';
+            var elementMiniplayer = document.createElement('i');
+            elementMiniplayer.id = 'ytmd_miniplayer';
+            elementMiniplayer.title = __.trans('MINIPLAYER');
+            elementMiniplayer.classList.add('material-icons', 'pointer', 'ytmd-icons', 'hide');
+            elementMiniplayer.innerText = 'picture_in_picture_alt';
 
-                elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
-                playerBarRightControls.append(elementMiniplayer);
+            elementMiniplayer.addEventListener('click', function() { ipcRenderer.send('window', { command: 'show-miniplayer' }); } )
+            playerBarRightControls.append(elementMiniplayer);
+
+            if(${shortcutButtons['miniplayer']}) {
+                document.querySelector("#ytmd_miniplayer").classList.remove("hide");
             }
+
+            settingsProvider.onDidChange('settings-shortcut-buttons.miniplayer', data => {
+                if (data.newValue) {
+                    document.querySelector("#ytmd_miniplayer").classList.remove("hide");
+                    document.querySelector("#ytmd_miniplayer").classList.add("ytmd-icons");
+                } else {
+                    document.querySelector("#ytmd_miniplayer").classList.add("hide");
+                    document.querySelector("#ytmd_miniplayer").classList.remove("ytmd-icons");
+                }
+            })
             `
         )
         .catch((_) =>

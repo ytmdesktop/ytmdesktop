@@ -45,9 +45,7 @@ function init(view) {
     webContents = view.webContents
     initialized = true
     toggleMoreActions(webContents)
-    setTimeout(() => {
-        toggleMoreActions(webContents)
-    }, 100)
+    toggleMoreActions(webContents)
 }
 
 function getAllInfo() {

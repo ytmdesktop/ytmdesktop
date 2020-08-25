@@ -1,5 +1,5 @@
 const electronStore = require('electron-store')
-const store = new electronStore()
+const store = new electronStore({ watch: true })
 
 /**
  * Get setting value
@@ -24,12 +24,19 @@ function set(settingName, value) {
  * @param {*} initialValue
  */
 function setInitialValue(settingName, initialValue) {
-    if (get(settingName) === undefined) {
+    if (!store.has(settingName)) {
         set(settingName, initialValue)
     }
 }
 
+function onDidChange(key, callback) {
+    store.onDidChange(key, (newValue, oldValue) => {
+        callback({ newValue: newValue, oldValue: oldValue })
+    })
+}
+
 module.exports = {
+    onDidChange: onDidChange,
     get: get,
     set: set,
     setInitialValue: setInitialValue,

@@ -82,8 +82,6 @@ settingsProvider.setInitialValue(
     false
 )
 
-settingsProvider.setInitialValue('settings-enable-shortcut-buttons', true)
-
 settingsProvider.setInitialValue('settings-shortcut-buttons', {
     miniplayer: true,
     lyrics: true,

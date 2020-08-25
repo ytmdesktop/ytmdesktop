@@ -61,15 +61,22 @@ function createTray(mainWindow, icon) {
 }
 
 function updateTray(data) {
-    var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
+    try {
+        var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
 
-    if (data.type == 'audioOutputs') {
-        template[11]['submenu'] = data.data
+        if (data.type == 'audioOutputs') {
+            template[11]['submenu'] = data.data
+        }
+
+        contextMenu = Menu.buildFromTemplate(template)
+
+        tray.setContextMenu(contextMenu)
+    } catch (error) {
+        ipcMain.emit('log', {
+            type: 'warn',
+            data: `Failed to updateTray: ${error}`,
+        })
     }
-
-    contextMenu = Menu.buildFromTemplate(template)
-
-    tray.setContextMenu(contextMenu)
 }
 
 function updateTrayIcon(icon) {

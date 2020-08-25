@@ -792,52 +792,51 @@ function createWindow() {
         return infoPlayerProvider.getAllInfo()
     })
 
-    ipcMain.on('settings-value-changed', (e, data) => {
-        switch (data.key) {
-            case 'settings-rainmeter-web-now-playing':
-                if (data.value) {
-                    rainmeterNowPlaying.start()
-                } else {
-                    rainmeterNowPlaying.stop()
-                }
-                break
-
-            case 'settings-companion-server':
-                if (data.value) {
-                    companionServer.start()
-                } else {
-                    companionServer.stop()
-                }
-                break
-
-            case 'settings-discord-rich-presence':
-                if (data.value) {
-                    discordRPC.start()
-                } else {
-                    discordRPC.stop()
-                }
-                break
-
-            case 'settings-custom-css-app':
-                if (data.value) {
-                    loadCustomCSSApp()
-                } else {
-                    removeCustomCSSApp()
-                }
-                break
-
-            case 'settings-custom-css-page':
-                if (data.value) {
-                    loadCustomCSSPage()
-                } else {
-                    removeCustomCSSPage()
-                }
-                break
-
-            case 'settings-changed-zoom':
-                view.webContents.zoomFactor = data.value / 100
-                break
+    settingsProvider.onDidChange(
+        'settings-rainmeter-web-now-playing',
+        (data) => {
+            if (data.newValue) {
+                rainmeterNowPlaying.start()
+            } else {
+                rainmeterNowPlaying.stop()
+            }
         }
+    )
+
+    settingsProvider.onDidChange('settings-companion-server', (data) => {
+        if (data.newValue) {
+            companionServer.start()
+        } else {
+            companionServer.stop()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-discord-rich-presence', (data) => {
+        if (data.newValue) {
+            discordRPC.start()
+        } else {
+            discordRPC.stop()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-custom-css-app', (data) => {
+        if (data.newValue) {
+            loadCustomCSSApp()
+        } else {
+            removeCustomCSSApp()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-custom-css-page', (data) => {
+        if (data.newValue) {
+            loadCustomCSSPage()
+        } else {
+            removeCustomCSSPage()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-page-zoom', (data) => {
+        view.webContents.zoomFactor = data.newValue / 100
     })
 
     ipcMain.on('media-command', (dataMain, dataRenderer) => {
@@ -1032,19 +1031,23 @@ function createWindow() {
         if (settings) {
             settings.show()
         } else {
+            let mainWindowPosition = mainWindow.getPosition()
+
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
                 icon: iconDefault,
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                center: true,
+                //center: true,
                 resizable: true,
                 backgroundColor: '#232323',
                 width: 900,
                 minWidth: 900,
                 height: 550,
                 minHeight: 550,
+                x: mainWindowPosition[0] + 450,
+                y: mainWindowPosition[1] + 220,
                 autoHideMenuBar: false,
                 skipTaskbar: false,
                 webPreferences: {
@@ -1304,27 +1307,31 @@ function createWindow() {
     }
 
     function windowCompanion() {
-        const x = mainWindow.getPosition()[0]
-        const y = mainWindow.getPosition()[1]
-        const width = 800
+        shell.openExternal(`http://localhost:9863`)
+        return
+        //const x = mainWindow.getPosition()[0]
+        //const y = mainWindow.getPosition()[1]
+
+        let size = screen.getPrimaryDisplay().workAreaSize
+
         const settings = new BrowserWindow({
             // parent: mainWindow,
             icon: iconDefault,
             skipTaskbar: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
-            x: x + width / 2,
-            y,
             resizable: false,
             backgroundColor: '#232323',
-            width: 800,
+            width: size.width - 450,
+            height: size.height - 450,
+            center: true,
             title: 'companionWindowTitle',
             webPreferences: {
                 nodeIntegration: false,
             },
             autoHideMenuBar: true,
         })
-        settings.loadURL('companionUrl')
+        settings.loadURL('http://localhost:9863')
     }
 
     function windowGuest() {
@@ -1630,10 +1637,15 @@ function createWindow() {
 function handleOpenUrl(url) {
     let cmd = url.toString().split('://')[1]
 
-    switch (cmd) {
-        case 'settings/':
+    if (cmd) {
+        if (cmd.includes('settings/')) {
             ipcMain.emit('window', { command: 'show-settings' })
-            break
+        }
+
+        if (cmd.includes('play/')) {
+            loadMusicByVideoId(cmd.split('/')[1])
+            writeLog({ type: 'info', data: JSON.stringify(cmd) })
+        }
     }
 }
 

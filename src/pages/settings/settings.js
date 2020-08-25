@@ -4,9 +4,9 @@ const __ = require('../../providers/translateProvider')
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
 const fs = require('fs')
 
-const elementSettingsCompanionApp = document.getElementById(
+/*const elementSettingsCompanionApp = document.getElementById(
     'COMPANION_SERVER_INFO'
-)
+)*/
 const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
 const elementBtnOpenPageEditor = document.getElementById(
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-miniplayer-paint-controls', 'click')
     initElement('settings-enable-taskbar-progressbar', 'click')
 
-    initElement('settings-enable-shortcut-buttons', 'click')
+    // initElement('settings-enable-shortcut-buttons', 'click')
 
     initElement('settings-continue-where-left-of', 'click')
     initElement('settings-skip-track-disliked', 'click')
@@ -163,10 +163,6 @@ if (elementRangeZoom) {
     elementRangeZoom.addEventListener('input', function () {
         document.getElementById('range-zoom-value').innerText = this.value
         settingsProvider.set('settings-page-zoom', this.value)
-        ipc.send('settings-value-changed', {
-            key: 'settings-changed-zoom',
-            value: this.value,
-        })
     })
 }
 
@@ -281,18 +277,18 @@ function createListener(element, settingsName, eventType, fn) {
         switch (eventType) {
             case 'click':
                 settingsProvider.set(settingsName, this.checked)
-                ipc.send('settings-value-changed', {
+                /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.checked,
-                })
+                })*/
                 break
 
             case 'change':
                 settingsProvider.set(settingsName, this.value)
-                ipc.send('settings-value-changed', {
+                /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.value,
-                })
+                })*/
                 break
         }
         fn()

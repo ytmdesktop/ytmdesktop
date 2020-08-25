@@ -32,6 +32,14 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-general"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize hide"
+                                        >dashboard</i
+                                    >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >blur_on</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_GENERAL"
                                     ></span>
@@ -40,8 +48,26 @@
                             <li class="tab">
                                 <a
                                     class="waves-effect waves-cyan"
+                                    href="#tab-appearance"
+                                >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >personal_video</i
+                                    >
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_APPEARENCE"
+                                    ></span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a
+                                    class="waves-effect waves-cyan"
                                     href="#tab-playback"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >music_note</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK"
                                     ></span>
@@ -52,6 +78,10 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-miniplayer"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >picture_in_picture_alt</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER"
                                     ></span>
@@ -60,20 +90,18 @@
                             <li class="tab">
                                 <a
                                     class="waves-effect waves-cyan"
-                                    href="#tab-appearance"
-                                >
-                                    <span
-                                        i18n="i18n_LABEL_SETTINGS_TAB_APPEARENCE"
-                                    ></span>
-                                </a>
-                            </li>
-                            <li class="tab">
-                                <a
-                                    class="waves-effect waves-cyan"
                                     href="#tab-integration"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >wifi_tethering</i
+                                    >
+                                    <i
+                                        class="material-icons left icon-normalize hide"
+                                        >linear_scale</i
+                                    >
                                     <span
-                                        i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION"
+                                        i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATIONS"
                                     ></span>
                                 </a>
                             </li>
@@ -82,6 +110,10 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-shortcut"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >keyboard</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_SHORTCUTS"
                                     ></span>
@@ -92,6 +124,10 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-about"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >info_outline</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_ABOUT"
                                     ></span>
@@ -341,6 +377,24 @@
                                     <tr>
                                         <td>
                                             <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-enable-taskbar-progressbar"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
                                                 i18n="i18n_SKIP_TRACK_MARKED_DISLIKED"
                                             ></span>
                                         </td>
@@ -569,29 +623,14 @@
                                     <tr>
                                         <td>
                                             <span
-                                                i18n="i18n_LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR"
-                                            ></span>
-                                        </td>
-                                        <td class="right">
-                                            <div class="switch">
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="settings-enable-taskbar-progressbar"
-                                                    />
-                                                    <span class="lever"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span
                                                 i18n="i18n_SHORTCUT_BUTTONS"
                                             ></span>
                                         </td>
                                         <td class="right">
-                                            <div class="switch">
+                                            <div
+                                                class="switch"
+                                                style="margin-right: 12px;"
+                                            >
                                                 <button
                                                     class="waves-effect waves-light btn-flat white-text btn-tiny"
                                                     id="btn-shortcut-buttons-setting"
@@ -600,13 +639,13 @@
                                                         >settings</i
                                                     >
                                                 </button>
-                                                <label>
+                                                <!--label>
                                                     <input
                                                         type="checkbox"
                                                         id="settings-enable-shortcut-buttons"
                                                     />
                                                     <span class="lever"></span>
-                                                </label>
+                                                </label-->
                                             </div>
                                         </td>
                                     </tr>

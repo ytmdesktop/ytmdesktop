@@ -170,13 +170,14 @@ input[type="range"]::-webkit-slider-runnable-track {
     -webkit-transition: border-color .5s ease;
     transition: border-color .5s ease;
     border-left: 3px solid #d32f2f;
-    color: #3f51b5;
+    color: #FFF !important;
     background-color: rgba(255,255,255,0.1) !important;
 }
 
 .tabs-vertical .tab a {
     border-left: 3px solid transparent;
-    color: #3f51b5;
+    /*color: #3f51b5;*/
+    color: #CCC !important;
     display: block;
     width: 100%;
     height: 100%;
@@ -190,7 +191,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 .tabs-vertical .tab a:hover {
-    color: #8591d5;
+    color: #FFF !important;
 }
 
 .tabs-vertical .tab.disabled a {
@@ -253,4 +254,8 @@ input[type=range]+.thumb {
 
 .btn-normalize {
     min-width: 70px;
+}
+
+.icon-normalize {
+    margin-top: 12px;
 }

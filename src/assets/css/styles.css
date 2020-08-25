@@ -117,3 +117,23 @@ html, body {
 .text-initial {
     text-transform: capitalize;
 }
+
+.text-disabled {
+    text-decoration: line-through;
+}
+
+.mt-1 {
+    margin-top: 0.7rem;
+}
+
+.mt-2 {
+    margin-top: 0.9rem;
+}
+
+.ml-1 {
+    margin-left: 0.7rem;
+}
+
+.ml-2 {
+    margin-left: 0.9rem;
+}
