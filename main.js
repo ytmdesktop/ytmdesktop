@@ -1872,32 +1872,39 @@ function registerGlobalShortcut(value, fn) {
 }
 
 function updateTrayAudioOutputs(data) {
-    let audioOutputs = JSON.parse(data)
-    let selectedAudio = settingsProvider.get('settings-app-audio-output')
-    let result = [
-        {
-            label: __.trans(
-                'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
-            ),
-            enabled: false,
-        },
-    ]
+    try {
+        let audioOutputs = JSON.parse(data)
+        let selectedAudio = settingsProvider.get('settings-app-audio-output')
+        let result = [
+            {
+                label: __.trans(
+                    'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+                ),
+                enabled: false,
+            },
+        ]
 
-    if (audioOutputs.length) {
-        audioOutputs.forEach((value, index) => {
-            audioOutputs[index] = {
-                label: value.label,
-                type: 'radio',
-                checked: value.label == selectedAudio ? true : false,
-                click: function () {
-                    ipcMain.emit('change-audio-output', value.label)
-                },
-            }
+        if (audioOutputs.length) {
+            audioOutputs.forEach((value, index) => {
+                audioOutputs[index] = {
+                    label: value.label,
+                    type: 'radio',
+                    checked: value.label == selectedAudio ? true : false,
+                    click: function () {
+                        ipcMain.emit('change-audio-output', value.label)
+                    },
+                }
+            })
+            result = audioOutputs
+        }
+
+        tray.updateTray({ type: 'audioOutputs', data: result })
+    } catch (error) {
+        writeLog({
+            type: 'warn',
+            data: 'Failed to updateTrayAudioOutputs ' + error,
         })
-        result = audioOutputs
     }
-
-    tray.updateTray({ type: 'audioOutputs', data: result })
 }
 
 function updateStatusBar() {
