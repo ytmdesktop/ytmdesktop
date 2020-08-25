@@ -1,4 +1,5 @@
 {
+    "ALWAYS_ASK_WHEN_READ_LINK": "Always ask when read link",
     "DOUBLE_CLICK_TO_RESET_POSITION": "Double Click to Reset Position",
     "LABEL_ALSO": "Also",
     "LABEL_AUDIO": "Audio",
@@ -92,5 +93,6 @@
     "ADD_TO_LIBRARY": "Add to library",
     "ADD_TO_PLAYLIST": "Add to playlist",
     "SKIP_TRACK_MARKED_DISLIKED": "Skip tracks marked as 'Disliked'",
-    "SKIP_TRACK_SHORTER_THAN": "Skip tracks shorter than"
+    "SKIP_TRACK_SHORTER_THAN": "Skip tracks shorter than",
+    "WANT_PLAY_THIS_LINK": "Want to play this link?"
 }

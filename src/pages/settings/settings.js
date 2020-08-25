@@ -87,6 +87,18 @@ function checkCompanionStatus() {
     }
 }
 
+function checkClipboardWatcherStatus() {
+    if (settingsProvider.get('settings-clipboard-read')) {
+        document
+            .getElementById('clipboard-always-ask-read')
+            .classList.remove('hide')
+    } else {
+        document
+            .getElementById('clipboard-always-ask-read')
+            .classList.add('hide')
+    }
+}
+
 function checkWindows10ServiceStatus() {
     if (settingsProvider.get('settings-windows10-media-service')) {
         document.getElementById('windows-10-show-info').classList.remove('hide')
@@ -96,6 +108,7 @@ function checkWindows10ServiceStatus() {
 }
 
 checkCompanionStatus()
+checkClipboardWatcherStatus()
 checkWindows10ServiceStatus()
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -120,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-app-language', 'change', showRelaunchButton)
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
+        checkClipboardWatcherStatus()
     })
     initElement('titlebar-type', 'change', showRelaunchButton)
     initElement('settings-custom-css-page', 'click')
@@ -148,6 +162,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initElement('settings-continue-where-left-of', 'click')
     initElement('settings-skip-track-disliked', 'click')
+
+    initElement('settings-clipboard-always-ask-read', 'click')
     mInit()
 
     document.getElementById('content').classList.remove('hide')

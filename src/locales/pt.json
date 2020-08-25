@@ -1,4 +1,5 @@
 {
+    "ALWAYS_ASK_WHEN_READ_LINK": "Sempre perguntar ao ler link",
     "DOUBLE_CLICK_TO_RESET_POSITION": "Clique duplo para resetar a posição",
     "LABEL_ALSO": "Também",
     "LABEL_AUDIO": "Áudio",
@@ -92,5 +93,6 @@
     "ADD_TO_LIBRARY": "Adicionar à biblioteca",
     "ADD_TO_PLAYLIST": "Adicionar à playlist",
     "SKIP_TRACK_MARKED_DISLIKED": "Pular faixas marcadas como 'Não gostei'",
-    "SKIP_TRACK_SHORTER_THAN": "Pular faixas mais curtas que"
+    "SKIP_TRACK_SHORTER_THAN": "Pular faixas mais curtas que",
+    "WANT_PLAY_THIS_LINK": "Deseja executar este link?"
 }

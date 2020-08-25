@@ -92,3 +92,5 @@ settingsProvider.setInitialValue('settings-shortcut-buttons', {
 settingsProvider.setInitialValue('settings-skip-track-disliked', false)
 
 settingsProvider.setInitialValue('settings-skip-track-shorter-than', '0')
+
+settingsProvider.setInitialValue('settings-clipboard-always-ask-read', true)

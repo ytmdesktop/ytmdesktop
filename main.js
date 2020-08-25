@@ -11,6 +11,7 @@ const {
     nativeTheme,
     screen,
     shell,
+    dialog,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -1601,14 +1602,39 @@ function createWindow() {
             if (settingsProvider.get('settings-clipboard-read')) {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
-                    onImageChange: function (nativeImage) {},
-                    onTextChange: function (text) {
+                    onTextChange: (text) => {
                         let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
                         let match = text.match(regExp)
                         if (match && match[2].length == 11) {
                             let videoId = match[2]
-                            logDebug('Video readed from clipboard: ' + videoId)
-                            loadMusicByVideoId(videoId)
+
+                            if (
+                                settingsProvider.get(
+                                    'settings-clipboard-always-ask-read'
+                                )
+                            ) {
+                                let options = {
+                                    type: 'question',
+                                    buttons: ['Yes', 'No'],
+                                    defaultId: 0,
+                                    title: 'YouTube Music Desktop',
+                                    message: `Want to play this link?\n\n${text}`,
+                                }
+
+                                dialog
+                                    .showMessageBox(mainWindow, options)
+                                    .then((success) => {
+                                        if (success.response == 0) {
+                                            loadMusicByVideoId(videoId)
+                                        }
+                                    })
+                            } else {
+                                loadMusicByVideoId(videoId)
+                            }
+                            writeLog({
+                                type: 'info',
+                                data: 'Video readed from clipboard: ' + videoId,
+                            })
                         }
                     },
                 })
