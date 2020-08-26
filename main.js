@@ -97,7 +97,6 @@ if (settingsProvider.get('has-updated') == true) {
         writeLog({ type: 'info', data: 'YTMDesktop updated' })
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
-    // settingsProvider.set('has-updated', false)
 }
 
 if (
@@ -107,7 +106,9 @@ if (
 ) {
     try {
         windowsMediaProvider = require('./src/providers/windowsMediaProvider')
-    } catch {}
+    } catch (error) {
+        console.log('error windowsMediaProvider > ' + error)
+    }
 }
 
 if (isLinux()) {
@@ -188,6 +189,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
+            enableRemoteModule: true,
         },
     }
 
@@ -239,6 +241,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
+            enableRemoteModule: true,
             preload: path.join(
                 app.getAppPath(),
                 '/src/utils/injectControls.js'
@@ -1075,6 +1078,7 @@ function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -1123,6 +1127,7 @@ function createWindow() {
                 ),
                 webPreferences: {
                     nodeIntegration: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -1225,6 +1230,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1255,6 +1261,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1286,6 +1293,7 @@ function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -1350,6 +1358,7 @@ function createWindow() {
             title: 'companionWindowTitle',
             webPreferences: {
                 nodeIntegration: false,
+                enableRemoteModule: true,
             },
             autoHideMenuBar: true,
         })
@@ -1374,6 +1383,7 @@ function createWindow() {
             frame: true,
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true,
                 partition: `guest-mode-${Date.now()}`,
             },
         })
@@ -1404,6 +1414,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1440,6 +1451,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1474,6 +1486,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1534,17 +1547,17 @@ function createWindow() {
         view.webContents
             .executeJavaScript(
                 `
-            navigator
-            .mediaDevices
-            .enumerateDevices()
-            .then( devices => {
-                var audioDevices = devices.filter(device => device.kind === 'audiooutput');
-                var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
-                if(result.length) {
-                    document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
-                }
-            });
-        `
+                    navigator
+                    .mediaDevices
+                    .enumerateDevices()
+                    .then( devices => {
+                        var audioDevices = devices.filter(device => device.kind === 'audiooutput');
+                        var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
+                        if(result.length) {
+                            document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+                        }
+                    });
+                `
             )
             .then((_) => {
                 settingsProvider.set('settings-app-audio-output', audioLabel)
