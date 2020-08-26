@@ -217,9 +217,24 @@ function createWindow() {
     }
 
     mainWindow = new BrowserWindow(browserWindowConfig)
-    mainWindow.webContents.session.setUserAgent(
-        `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
+
+    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        {
+            urls: ['https://accounts.google.com/*'],
+        },
+        (details, callback) => {
+            const newRequestHeaders = Object.assign(
+                {},
+                details.requestHeaders || {},
+                {
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+                }
+            )
+            callback({ requestHeaders: newRequestHeaders })
+        }
     )
+
     view = new BrowserView({
         webPreferences: {
             nodeIntegration: true,
