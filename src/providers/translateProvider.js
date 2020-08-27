@@ -1,3 +1,4 @@
+const { ipcMain } = require('electron')
 const i18n = require('i18n')
 const settingsProvider = require('./settingsProvider')
 
@@ -49,6 +50,12 @@ function translateHelper() {
 function loadi18n() {
     translateHelper().forEach(([i18n, element]) => {
         element.innerHTML = trans(i18n)
+    })
+}
+
+if (ipcMain) {
+    ipcMain.on('I18N_TRANSLATE', (e, id, params) => {
+        e.returnValue = trans(id, params)
     })
 }
 

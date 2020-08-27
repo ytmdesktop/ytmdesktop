@@ -239,9 +239,12 @@ function createWindow() {
 
     view = new BrowserView({
         webPreferences: {
-            nodeIntegration: true,
-            webviewTag: true,
-            enableRemoteModule: true,
+            nodeIntegration: false,
+            webviewTag: false,
+            enableRemoteModule: false,
+            contextIsolation: true,
+            sandbox: true,
+            nativeWindowOpen: true,
             preload: path.join(
                 app.getAppPath(),
                 '/src/utils/injectControls.js'
@@ -1582,9 +1585,7 @@ function createWindow() {
 
         if (settingsProvider.get('settings-custom-css-app')) {
             if (fileSystem.checkIfExists(customThemeFile)) {
-                if (customCSSAppKey) {
-                    removeCustomCssApp()
-                }
+                removeCustomCssApp()
                 view.webContents
                     .insertCSS(fileSystem.readFile(customThemeFile).toString())
                     .then((key) => {
@@ -1595,7 +1596,7 @@ function createWindow() {
     }
 
     function removeCustomCSSApp() {
-        view.webContents.removeInsertedCSS(customCSSAppKey)
+        if (customCSSAppKey) view.webContents.removeInsertedCSS(customCSSAppKey)
     }
 
     function loadCustomCSSPage() {
