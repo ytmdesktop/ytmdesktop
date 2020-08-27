@@ -9,25 +9,26 @@ const macElement = document.getElementById('mac')
 
 const webview = document.querySelector('webview')
 
-if (isMac()) {
-    winElement.remove()
-    macElement.classList.remove('hide')
-} else if (isWindows()) {
-    macElement.remove()
-    winElement.classList.remove('hide')
-} else if (isLinux()) {
-    winElement.remove()
-    macElement.remove()
-}
-
 if (store.get('titlebar-type', 'nice') !== 'nice') {
-    document.getElementById('nice-titlebar').style.display = 'none'
-    document.getElementById('nice-titlebar').style.height = 0
+    document.getElementById('nice-titlebar').style.height = '15px'
+    document
+        .getElementById('nice-titlebar')
+        .removeChild(document.getElementById('nice-titlebar').firstChild)
 
     document.getElementById('webview').style.height = '100vh'
 } else {
+    if (isMac()) {
+        winElement.remove()
+        macElement.classList.remove('hide')
+    } else if (isWindows()) {
+        macElement.remove()
+        winElement.classList.remove('hide')
+    } else if (isLinux()) {
+        winElement.remove()
+        macElement.remove()
+    }
     document.getElementById('webview').style.height = '95vh'
-    document.getElementById('content').style.marginTop = '29px'
+    document.getElementById('content').style.marginTop = '5vh'
 }
 
 ipc.on('window-is-maximized', function (_, value) {
