@@ -32,6 +32,14 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-general"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize hide"
+                                        >dashboard</i
+                                    >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >blur_on</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_GENERAL"
                                     ></span>
@@ -40,18 +48,12 @@
                             <li class="tab">
                                 <a
                                     class="waves-effect waves-cyan"
-                                    href="#tab-miniplayer"
-                                >
-                                    <span
-                                        i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER"
-                                    ></span>
-                                </a>
-                            </li>
-                            <li class="tab">
-                                <a
-                                    class="waves-effect waves-cyan"
                                     href="#tab-appearance"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >personal_video</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_APPEARENCE"
                                     ></span>
@@ -60,10 +62,46 @@
                             <li class="tab">
                                 <a
                                     class="waves-effect waves-cyan"
+                                    href="#tab-playback"
+                                >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >music_note</i
+                                    >
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK"
+                                    ></span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a
+                                    class="waves-effect waves-cyan"
+                                    href="#tab-miniplayer"
+                                >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >picture_in_picture_alt</i
+                                    >
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER"
+                                    ></span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a
+                                    class="waves-effect waves-cyan"
                                     href="#tab-integration"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >wifi_tethering</i
+                                    >
+                                    <i
+                                        class="material-icons left icon-normalize hide"
+                                        >linear_scale</i
+                                    >
                                     <span
-                                        i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION"
+                                        i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATIONS"
                                     ></span>
                                 </a>
                             </li>
@@ -72,6 +110,10 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-shortcut"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >keyboard</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_SHORTCUTS"
                                     ></span>
@@ -82,6 +124,10 @@
                                     class="waves-effect waves-cyan"
                                     href="#tab-about"
                                 >
+                                    <i
+                                        class="material-icons left icon-normalize"
+                                        >info_outline</i
+                                    >
                                     <span
                                         i18n="i18n_LABEL_SETTINGS_TAB_ABOUT"
                                     ></span>
@@ -116,6 +162,23 @@
                                     </tr>
                                     <tr>
                                         <td>
+                                            <span i18n="i18n_SHOW"></span>
+                                            <span i18n="i18n_TRAY_ICON"></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-tray-icon"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SHOW_NOTIFICATIONS"
                                             ></span>
@@ -126,24 +189,6 @@
                                                     <input
                                                         type="checkbox"
                                                         id="settings-show-notifications"
-                                                    />
-                                                    <span class="lever"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span
-                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF"
-                                            ></span>
-                                        </td>
-                                        <td class="right">
-                                            <div class="switch">
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="settings-continue-where-left-of"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>
@@ -194,6 +239,12 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_DISABLE_HARDWARE_ACCELERATION"
                                             ></span>
+                                            <sub
+                                                ><i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                ></sub
+                                            >
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -319,6 +370,92 @@
                             </table>
                         </div>
 
+                        <div id="tab-playback" class="tab-content">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-continue-where-left-of"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-enable-taskbar-progressbar"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_SKIP_TRACK_MARKED_DISLIKED"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-skip-track-disliked"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_SKIP_TRACK_SHORTER_THAN"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <span
+                                                class="left"
+                                                id="range-skip-track-shorter-than-value"
+                                                >0</span
+                                            >s
+                                            <p
+                                                style="margin: -7px 13px 0 8px;"
+                                                class="right range-field"
+                                            >
+                                                <input
+                                                    id="range-skip-track-shorter-than"
+                                                    type="range"
+                                                    min="0"
+                                                    max="120"
+                                                />
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div id="tab-miniplayer" class="tab-content">
                             <table class="table">
                                 <tbody>
@@ -425,21 +562,15 @@
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_PAGE_ZOOM"
                                             ></span>
                                         </td>
-                                        <td
-                                            class="right"
-                                            style="color: #f44336;"
-                                        >
+                                        <td class="right">
                                             <span
-                                                style="float: left;"
+                                                class="left"
                                                 id="range-zoom-value"
                                                 >100</span
                                             >%
                                             <p
-                                                style="
-                                                    float: right;
-                                                    margin: -7px 13px 0 8px;
-                                                "
-                                                class="range-field"
+                                                style="margin: -7px 13px 0 8px;"
+                                                class="right range-field"
                                             >
                                                 <input
                                                     id="range-zoom"
@@ -509,18 +640,29 @@
                                     <tr>
                                         <td>
                                             <span
-                                                i18n="i18n_LABEL_SETTINGS_TAB_APPEARANCE_TASKBAR_PROGRESSBAR"
+                                                i18n="i18n_SHORTCUT_BUTTONS"
                                             ></span>
                                         </td>
                                         <td class="right">
-                                            <div class="switch">
-                                                <label>
+                                            <div
+                                                class="switch"
+                                                style="margin-right: 12px;"
+                                            >
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-shortcut-buttons-setting"
+                                                >
+                                                    <i class="material-icons"
+                                                        >settings</i
+                                                    >
+                                                </button>
+                                                <!--label>
                                                     <input
                                                         type="checkbox"
-                                                        id="settings-enable-taskbar-progressbar"
+                                                        id="settings-enable-shortcut-buttons"
                                                     />
                                                     <span class="lever"></span>
-                                                </label>
+                                                </label-->
                                             </div>
                                         </td>
                                     </tr>
@@ -636,6 +778,27 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr id="clipboard-always-ask-read">
+                                        <td>
+                                            <span
+                                                class="settings-item-child"
+                                            ></span>
+                                            <span
+                                                i18n="i18n_ALWAYS_ASK_WHEN_READ_LINK"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-clipboard-always-ask-read"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td>
                                             <span
@@ -680,11 +843,19 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr class="windows10-specific">
+                                    <tr
+                                        class="windows-specific windows10-specific"
+                                    >
                                         <td>
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE"
                                             ></span>
+                                            <sub
+                                                ><i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                ></sub
+                                            >
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -700,7 +871,7 @@
                                     </tr>
                                     <tr
                                         id="windows-10-show-info"
-                                        class="windows10-specific"
+                                        class="windows-specific windows10-specific"
                                     >
                                         <td>
                                             <span
@@ -709,6 +880,12 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO"
                                             ></span>
+                                            <sub
+                                                ><i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                ></sub
+                                            >
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -739,15 +916,20 @@
                                 </div>
                                 <div class="modal-footer black-text">
                                     <a
+                                        id="disableAccelerator"
+                                        class="modal-close waves-effect waves-red btn-flat btn-sm red left"
+                                        ><span i18n="i18n_LABEL_DISABLE"></span
+                                    ></a>
+                                    <a
                                         id="cancelAccelerator"
-                                        class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
-                                        >Cancel</a
-                                    >
+                                        class="modal-close waves-effect waves-red btn-flat btn-sm black-text"
+                                        ><span i18n="i18n_LABEL_CANCEL"></span
+                                    ></a>
                                     <a
                                         id="saveAccelerator"
-                                        class="modal-close waves-effect waves-green btn-flat btn-sm red"
-                                        >Save</a
-                                    >
+                                        class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
+                                        ><span i18n="i18n_LABEL_SAVE"></span
+                                    ></a>
                                 </div>
                             </div>
 
@@ -762,29 +944,34 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    <i
-                                                        class="material-icons media-icons"
-                                                        >play_arrow</i
-                                                    >/<i
-                                                        class="material-icons media-icons"
-                                                        >pause</i
-                                                    >
-                                                    <span class="shortcut-or"
-                                                        >or&nbsp;</span
-                                                    >
                                                     <button
                                                         id="btn-accelerator-media-play-pause"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-play-pause"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
+                                                    <span
+                                                        class="shortcut-text"
+                                                        i18n="i18n_LABEL_ALSO"
+                                                    ></span>
+                                                    <a
+                                                        class="btn btn-small white black-text disable btn-normalize"
+                                                    >
+                                                        <i
+                                                            class="material-icons media-icons"
+                                                            >play_arrow</i
+                                                        >/<i
+                                                            class="material-icons media-icons"
+                                                            >pause</i
+                                                        >
+                                                    </a>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -794,26 +981,31 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    <i
-                                                        class="material-icons media-icons"
-                                                        >skip_next</i
-                                                    >
-                                                    <span class="shortcut-or"
-                                                        >or&nbsp;</span
-                                                    >
                                                     <button
                                                         id="btn-accelerator-media-track-next"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-track-next"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
+                                                    <span
+                                                        class="shortcut-text"
+                                                        i18n="i18n_LABEL_ALSO"
+                                                    ></span>
+                                                    <a
+                                                        class="btn btn-small white black-text disable btn-normalize"
+                                                    >
+                                                        <i
+                                                            class="material-icons media-icons"
+                                                            >skip_next</i
+                                                        >
+                                                    </a>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -823,26 +1015,31 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    <i
-                                                        class="material-icons media-icons"
-                                                        >skip_previous</i
-                                                    >
-                                                    <span class="shortcut-or"
-                                                        >or&nbsp;</span
-                                                    >
                                                     <button
                                                         id="btn-accelerator-media-track-previous"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-track-previous"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
+                                                    <span
+                                                        class="shortcut-text"
+                                                        i18n="i18n_LABEL_ALSO"
+                                                    ></span>
+                                                    <a
+                                                        class="btn btn-small white black-text disable btn-normalize"
+                                                    >
+                                                        <i
+                                                            class="material-icons media-icons"
+                                                            >skip_previous</i
+                                                        >
+                                                    </a>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -855,13 +1052,13 @@
                                                     <button
                                                         id="btn-accelerator-media-track-like"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-track-like"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
@@ -877,13 +1074,13 @@
                                                     <button
                                                         id="btn-accelerator-media-track-dislike"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-track-dislike"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
@@ -899,13 +1096,13 @@
                                                     <button
                                                         id="btn-accelerator-media-volume-up"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-volume-up"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
@@ -921,13 +1118,35 @@
                                                     <button
                                                         id="btn-accelerator-media-volume-down"
                                                         data-target="modalEditAccelerator"
-                                                        class="modal-trigger waves-effect waves-light btn-small text-initial red"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
                                                     >
                                                         <span
                                                             id="settings-accelerators_media-volume-down"
                                                         ></span>
                                                         <i
-                                                            class="tiny material-icons right"
+                                                            class="tiny material-icons left"
+                                                            >edit</i
+                                                        >
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span
+                                                        i18n="i18n_MEDIA_CONTROL_MINIPLAYER"
+                                                    ></span>
+                                                </td>
+                                                <th>
+                                                    <button
+                                                        id="btn-accelerator-miniplayer-open-close"
+                                                        data-target="modalEditAccelerator"
+                                                        class="modal-trigger waves-effect waves-light btn-small text-initial black-text white"
+                                                    >
+                                                        <span
+                                                            id="settings-accelerators_miniplayer-open-close"
+                                                        ></span>
+                                                        <i
+                                                            class="tiny material-icons left"
                                                             >edit</i
                                                         >
                                                     </button>
@@ -940,14 +1159,11 @@
                                                     ></span>
                                                 </td>
                                                 <th>
-                                                    <span class="shortcut-or"
-                                                        >2x&nbsp;</span
-                                                    ><i
-                                                        class="material-icons media-icons"
-                                                        >play_arrow</i
-                                                    >/<i
-                                                        class="material-icons media-icons"
-                                                        >pause</i
+                                                    <span
+                                                        i18n="i18n_MEDIA_CONTROL_PLAY_PAUSE"
+                                                    ></span>
+                                                    <span class="shortcut-text"
+                                                        >2x</span
                                                     >
                                                     <div
                                                         class="switch"

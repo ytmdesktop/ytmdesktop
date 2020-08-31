@@ -3,7 +3,7 @@ const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
 var client
-var _isStarted, _lastTrackId, _lastState
+var _isStarted
 
 function isStarted() {
     return _isStarted
@@ -40,11 +40,7 @@ function stop() {
 }
 
 function setActivity(info) {
-    if (
-        isStarted() &&
-        info.track.title &&
-        (_lastTrackId != info.track.id || _lastState != info.player.isPaused)
-    ) {
+    if (isStarted() && info.track.title) {
         var now = Date.now()
         var activity = {}
         var discordSettings = settingsProvider.get('discord-presence-settings')
@@ -82,9 +78,6 @@ function setActivity(info) {
                 console.log(err)
             })
         }
-
-        _lastTrackId = info.track.id
-        _lastState = info.player.isPaused
     }
 }
 

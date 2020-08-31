@@ -1,7 +1,7 @@
 const { app } = require('electron').remote
-const { ipcRenderer } = require('electron')
 const markdown = require('markdown').markdown
 const fetch = require('node-fetch')
+const settingsProvider = require('../../providers/settingsProvider')
 
 fetch(`https://api.github.com/repos/ytmdesktop/ytmdesktop/releases`)
     .then((res) => res.json())
@@ -15,4 +15,6 @@ fetch(`https://api.github.com/repos/ytmdesktop/ytmdesktop/releases`)
 
         document.getElementById('version').innerHTML = markdown.toHTML(tag)
         document.getElementById('changelog').innerHTML = markdown.toHTML(body)
+
+        settingsProvider.set('has-updated', false)
     })

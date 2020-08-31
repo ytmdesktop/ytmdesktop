@@ -44,6 +44,8 @@ var _lyrics = {
 function init(view) {
     webContents = view.webContents
     initialized = true
+    toggleMoreActions(webContents)
+    toggleMoreActions(webContents)
 }
 
 function getAllInfo() {
@@ -341,29 +343,27 @@ function setQueueItem(webContents, index) {
     )
 }
 
-function addToLibary(webContents) {
+function addToLibrary(webContents) {
     webContents
         .executeJavaScript(
             `
             var popup = document.querySelector('.ytmusic-menu-popup-renderer');
             if (popup == null) {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
 
-                var action = dots.querySelector('#button')
-
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
             }
 
             setTimeout( ()=> {
-                var addLibrary = popup.children[3];
+                var addLibrary = Array.from(popup.children).filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
                 addLibrary.click()
             }, 100)
             `
         )
         .then(() => setTimeout(isInLibrary, 500))
-        .catch((_) => console.log('error addToLibary ' + _))
+        .catch((_) => console.log('error addToLibrary ' + _))
 }
 
 function getPlaylist(webContents) {
@@ -374,18 +374,18 @@ function getPlaylist(webContents) {
 
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
             
-                var action = dots.querySelector('#button')
-            
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
+                
                 setTimeout( resolve, 500)
             } )
             .then((_) => { 
                 return new Promise( (resolve, reject) => {
                     var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                    var addPlaylist = popup.children[5].querySelector('a');
+                    var addPlaylist = Array.from(popup.children)
+                        .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                     addPlaylist.click()
                     addPlaylist.click()
             
@@ -475,30 +475,37 @@ function isInLibrary() {
             `
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-                var dots = middleControlsButtons.children[1]
+                var dots = middleControlsButtons.querySelector('.dropdown-trigger')
             
-                var action = dots.querySelector('#button')
-            
-                action.click()
-                action.click()
+                dots.click()
+                dots.click()
+                
                 setTimeout( resolve, 500)
             } )
             .then((_) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addLibrary = popup.children[3];
-                var _g = addLibrary.querySelector('g')
-                var _path = _g.querySelectorAll('path')[1];
-                var _d = _path.getAttribute('d')
-            
-                return _d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
+                var addLibrary = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
+                
+                if(addLibrary != undefined) {
+                    var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
+
+                    if(_d == 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             })
             `
         )
         .then((inLibrary) => {
             track.inLibrary = inLibrary
-            debug(`In Library: ${track.inLibrary}`)
+            debug(`Is in Library: ${track.inLibrary}`)
         })
-        .catch((_) => console.log('error inLibrary'))
+        .catch((_) => console.log('error isInLibrary'))
 }
 
 function addToPlaylist(webContents, index) {
@@ -507,7 +514,8 @@ function addToPlaylist(webContents, index) {
             `
             new Promise( (resolve, reject) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
-                var addPlaylist = popup.children[5].querySelector('a');
+                var addPlaylist = Array.from(popup.children)
+                    .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                 addPlaylist.click()
                 addPlaylist.click()
         
@@ -554,15 +562,24 @@ function firstPlay(webContents) {
     webContents
         .executeJavaScript(
             `
-            var carousel = document.querySelector('.carousel');
-            var firstChild = carousel.querySelector('#items').children[0];
-            var playButton = firstChild.querySelector('#play-button')
-            
+            var playButton = document.querySelector('.icon.ytmusic-play-button-renderer');
             playButton.click();
             `
         )
         .then()
         .catch((_) => console.log('error firstPlay'))
+}
+
+function toggleMoreActions(webContents) {
+    webContents.executeJavaScript(
+        `
+            var middleControlsButtons = document.querySelector('.middle-controls-buttons');
+            var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')
+            
+            moreActions.click()
+            `,
+        true
+    )
 }
 
 function debug(data) {
@@ -590,6 +607,6 @@ module.exports = {
     updateQueueInfo: updateQueueInfo,
     updateLyrics: updateLyrics,
 
-    addToLibary: addToLibary,
+    addToLibrary: addToLibrary,
     addToPlaylist: addToPlaylist,
 }

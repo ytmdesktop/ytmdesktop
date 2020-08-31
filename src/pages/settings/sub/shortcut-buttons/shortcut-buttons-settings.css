@@ -170,14 +170,13 @@ input[type="range"]::-webkit-slider-runnable-track {
     -webkit-transition: border-color .5s ease;
     transition: border-color .5s ease;
     border-left: 3px solid #d32f2f;
-    color: #FFF !important;
+    color: #3f51b5;
     background-color: rgba(255,255,255,0.1) !important;
 }
 
 .tabs-vertical .tab a {
     border-left: 3px solid transparent;
-    /*color: #3f51b5;*/
-    color: #CCC !important;
+    color: #3f51b5;
     display: block;
     width: 100%;
     height: 100%;
@@ -191,7 +190,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 .tabs-vertical .tab a:hover {
-    color: #FFF !important;
+    color: #8591d5;
 }
 
 .tabs-vertical .tab.disabled a {
@@ -213,11 +212,8 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 .bottom {
     position: absolute;
-    padding: 5px;
-    bottom: 0;
-    width: 100%;
-    background-color: #1D1D1D;
-    text-transform: none;
+    bottom: 16px;
+    right: 12px
 }
 
 
@@ -234,28 +230,4 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 input[type=range]+.thumb {
     display: none;
-}
-
-.settings-item-child::before {
-    color: #666;
-    content: '└ ';
-}
-
-.text-disabled {
-    text-decoration: line-through;
-    text-transform: capitalize;
-}
-
-.shortcut-text {
-    color: #888;
-    text-transform: lowercase;
-    padding: 0 7px;
-}
-
-.btn-normalize {
-    min-width: 70px;
-}
-
-.icon-normalize {
-    margin-top: 12px;
 }

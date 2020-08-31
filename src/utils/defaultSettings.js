@@ -51,16 +51,14 @@ settingsProvider.setInitialValue('settings-accelerators', {
 
 let accelerators = settingsProvider.get('settings-accelerators')
 if (!accelerators['media-volume-up']) {
-    settingsProvider.set('settings-accelerators', {
-        'media-play-pause': 'CmdOrCtrl+Shift+Space',
-        'media-track-next': 'CmdOrCtrl+Shift+PageUp',
-        'media-track-previous': 'CmdOrCtrl+Shift+PageDown',
-        'media-track-like': 'CmdOrCtrl+Shift+L',
-        'media-track-dislike': 'CmdOrCtrl+Shift+D',
-        'media-volume-up': 'CmdOrCtrl+Shift+Up',
-        'media-volume-down': 'CmdOrCtrl+Shift+Down',
-    })
-} else {
+    accelerators['media-volume-up'] = 'CmdOrCtrl+Shift+Up'
+    accelerators['media-volume-down'] = 'CmdOrCtrl+Shift+Down'
+    settingsProvider.set('settings-accelerators', accelerators)
+}
+
+if (!accelerators['miniplayer-open-close']) {
+    accelerators['miniplayer-open-close'] = 'CmdOrCtrl+Shift+M'
+    settingsProvider.set('settings-accelerators', accelerators)
 }
 
 settingsProvider.setInitialValue('has-updated', false)
@@ -83,3 +81,18 @@ settingsProvider.setInitialValue(
     'settings-windows10-media-service-show-info',
     false
 )
+
+settingsProvider.setInitialValue('settings-shortcut-buttons', {
+    miniplayer: true,
+    lyrics: true,
+    'add-to-library': true,
+    'add-to-playlist': true,
+})
+
+settingsProvider.setInitialValue('settings-skip-track-disliked', false)
+
+settingsProvider.setInitialValue('settings-skip-track-shorter-than', '0')
+
+settingsProvider.setInitialValue('settings-clipboard-always-ask-read', true)
+
+settingsProvider.setInitialValue('settings-tray-icon', true)

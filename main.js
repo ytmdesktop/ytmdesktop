@@ -11,6 +11,7 @@ const {
     nativeTheme,
     screen,
     shell,
+    dialog,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -47,11 +48,13 @@ let mainWindow,
     customCSSPageKey,
     lastTrackId,
     lastTrackProgress,
+    lastIsPaused,
+    lastSeekbarCurrentPosition,
     doublePressPlayPause,
     updateTrackInfoTimeout,
-    activityIsPaused,
     activityLikeStatus,
-    windowsMediaProvider
+    windowsMediaProvider,
+    audioDevices
 
 let isFirstTime = false
 
@@ -94,7 +97,6 @@ if (settingsProvider.get('has-updated') == true) {
         writeLog({ type: 'info', data: 'YTMDesktop updated' })
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
-    settingsProvider.set('has-updated', false)
 }
 
 if (
@@ -104,7 +106,9 @@ if (
 ) {
     try {
         windowsMediaProvider = require('./src/providers/windowsMediaProvider')
-    } catch {}
+    } catch (error) {
+        console.log('error windowsMediaProvider > ' + error)
+    }
 }
 
 if (isLinux()) {
@@ -123,8 +127,7 @@ if (isMac()) {
                 'settings-shiny-tray-dark',
                 nativeTheme.shouldUseDarkColors
             )
-            if (renderer_for_status_bar)
-                renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
         }
     )
     const menu = Menu.buildFromTemplate(statusBarMenu)
@@ -186,6 +189,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             webviewTag: true,
+            enableRemoteModule: true,
         },
     }
 
@@ -215,13 +219,32 @@ function createWindow() {
     }
 
     mainWindow = new BrowserWindow(browserWindowConfig)
-    mainWindow.webContents.session.setUserAgent(
-        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+
+    mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        {
+            urls: ['https://accounts.google.com/*'],
+        },
+        (details, callback) => {
+            const newRequestHeaders = Object.assign(
+                {},
+                details.requestHeaders || {},
+                {
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+                }
+            )
+            callback({ requestHeaders: newRequestHeaders })
+        }
     )
+
     view = new BrowserView({
         webPreferences: {
-            nodeIntegration: true,
-            webviewTag: true,
+            nodeIntegration: false,
+            webviewTag: false,
+            enableRemoteModule: false,
+            contextIsolation: true,
+            sandbox: true,
+            nativeWindowOpen: true,
             preload: path.join(
                 app.getAppPath(),
                 '/src/utils/injectControls.js'
@@ -275,8 +298,6 @@ function createWindow() {
     })
 
     mainWindow.on('show', function () {
-        globalShortcut.unregister('CmdOrCtrl+M')
-
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
@@ -331,7 +352,7 @@ function createWindow() {
 
         if (isMac()) {
             global.sharedObj.paused = false
-            renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
         }
 
         if (infoPlayerInterval === undefined) {
@@ -339,7 +360,7 @@ function createWindow() {
                 if (global.on_the_road) {
                     updateActivity()
                 }
-            }, 500)
+            }, 300)
         }
     })
 
@@ -366,6 +387,7 @@ function createWindow() {
         var trackInfo = infoPlayerProvider.getTrackInfo()
 
         var progress = playerInfo.statePercent
+        var seekbarCurrentPosition = playerInfo.seekbarCurrentPosition
         var trackId = trackInfo.id
         var title = trackInfo.title
         var author = trackInfo.author
@@ -375,31 +397,8 @@ function createWindow() {
         var nowPlaying = `${title} - ${author}`
 
         if (title && author) {
-            discordRPC.setActivity(getAll())
             rainmeterNowPlaying.setActivity(getAll())
             mprisProvider.setActivity(getAll())
-
-            if (
-                playerInfo.isPaused != activityIsPaused ||
-                playerInfo.likeStatus != activityLikeStatus
-            ) {
-                mediaControl.createThumbar(
-                    mainWindow,
-                    infoPlayerProvider.getAllInfo()
-                )
-
-                activityIsPaused = playerInfo.isPaused
-                activityLikeStatus = playerInfo.likeStatus
-
-                if (
-                    isWindows() &&
-                    os.release().startsWith('10.') &&
-                    settingsProvider.get('settings-windows10-media-service') &&
-                    windowsMediaProvider != undefined
-                ) {
-                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
-                }
-            }
 
             mediaControl.setProgress(
                 mainWindow,
@@ -436,22 +435,15 @@ function createWindow() {
                 }
             }
 
-            // Experimental
-            /*if (isWindows() && view.webContents.getURL().indexOf('v=') != -1) {
-                mainWindow.setThumbnailClip({
-                    x: 230,
-                    y: 150,
-                    width: 676,
-                    height: 676,
-                })
-            } else {
-                mainWindow.setThumbnailClip({
-                    x: 0,
-                    y: 0,
-                    width: mainWindow.getSize()[0],
-                    height: mainWindow.getSize()[1],
-                })
-            }*/
+            /**
+             * Update only when change seekbar
+             */
+            if (
+                lastSeekbarCurrentPosition - seekbarCurrentPosition > 2 ||
+                lastSeekbarCurrentPosition - seekbarCurrentPosition < -2
+            ) {
+                discordRPC.setActivity(getAll())
+            }
 
             /**
              * Update only when change track
@@ -459,13 +451,34 @@ function createWindow() {
             if (lastTrackId !== trackId) {
                 lastTrackId = trackId
 
+                setTimeout(() => {
+                    if (
+                        settingsProvider.get('settings-skip-track-disliked') &&
+                        infoPlayerProvider.getPlayerInfo().likeStatus ==
+                            'DISLIKE'
+                    ) {
+                        mediaControl.nextTrack(view)
+                    }
+
+                    if (
+                        infoPlayerProvider.getTrackInfo().duration <
+                        parseInt(
+                            settingsProvider.get(
+                                'settings-skip-track-shorter-than'
+                            )
+                        )
+                    ) {
+                        mediaControl.nextTrack(view)
+                    }
+                }, 1000)
+
                 infoPlayerProvider.updateQueueInfo()
                 infoPlayerProvider.updatePlaylistInfo()
                 infoPlayerProvider.isInLibrary()
 
                 if (isMac()) {
                     global.sharedObj.title = nowPlaying
-                    renderer_for_status_bar.send('update-status-bar')
+                    updateStatusBar()
                 }
 
                 mainWindow.setTitle(nowPlaying)
@@ -493,18 +506,49 @@ function createWindow() {
                     )
                 }
 
+                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
+                discordRPC.setActivity(getAll())
+            }
+
+            /**
+             * Update only when change state play/pause
+             */
+            if (lastIsPaused != playerInfo.isPaused) {
+                lastIsPaused = playerInfo.isPaused
+
+                discordRPC.setActivity(getAll())
+
                 if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
-                    if (playerInfo.isPaused) {
-                        tray.updateTrayIcon(iconPause)
-                    } else {
-                        tray.updateTrayIcon(iconPlay)
-                    }
+                    tray.updateTrayIcon(
+                        playerInfo.isPaused ? iconPause : iconPlay
+                    )
                 }
 
-                writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
+                mediaControl.createThumbar(
+                    mainWindow,
+                    infoPlayerProvider.getAllInfo()
+                )
+
+                if (
+                    isWindows() &&
+                    os.release().startsWith('10.') &&
+                    settingsProvider.get('settings-windows10-media-service') &&
+                    windowsMediaProvider != undefined
+                ) {
+                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
+                }
+            }
+
+            if (activityLikeStatus != playerInfo.likeStatus) {
+                mediaControl.createThumbar(
+                    mainWindow,
+                    infoPlayerProvider.getAllInfo()
+                )
+                activityLikeStatus = playerInfo.likeStatus
             }
 
             lastTrackProgress = progress
+            lastSeekbarCurrentPosition = seekbarCurrentPosition
         }
     }
 
@@ -512,7 +556,7 @@ function createWindow() {
         logDebug('Playing')
         try {
             if (isMac()) {
-                renderer_for_status_bar.send('update-status-bar')
+                updateStatusBar()
             }
 
             global.sharedObj.paused = false
@@ -527,7 +571,7 @@ function createWindow() {
         logDebug('Paused')
         try {
             if (isMac()) {
-                renderer_for_status_bar.send('update-status-bar')
+                updateStatusBar()
             }
 
             global.sharedObj.paused = true
@@ -576,7 +620,11 @@ function createWindow() {
     mainWindow.on('close', function (e) {
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
-            mainWindow.hide()
+            if (settingsProvider.get('settings-tray-icon')) {
+                mainWindow.hide()
+            } else {
+                mainWindow.minimize()
+            }
         } else {
             app.exit()
         }
@@ -592,32 +640,166 @@ function createWindow() {
         }
     )
 
-    electronLocalshortcut.register(view, 'CmdOrCtrl+M', () => {
-        ipcMain.emit('window', { command: 'show-miniplayer' })
+    // GLOBAL
+    ipcMain.on('change-accelerator', (dataMain, dataRenderer) => {
+        if (dataMain.type != undefined) {
+            args = dataMain
+        } else {
+            args = dataRenderer
+        }
+
+        try {
+            globalShortcut.unregister(args.oldValue)
+        } catch (_) {}
+
+        switch (args.type) {
+            case 'media-play-pause':
+                registerGlobalShortcut(args.newValue, () => {
+                    checkDoubleTapPlayPause()
+                })
+                break
+
+            case 'media-track-next':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.nextTrack(view)
+                })
+                break
+
+            case 'media-track-previous':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.previousTrack(view)
+                })
+                break
+
+            case 'media-track-like':
+                registerGlobalShortcut(args.newValue, () => {
+                    if (
+                        infoPlayerProvider.getPlayerInfo().likeStatus != 'LIKE'
+                    ) {
+                        mediaControl.upVote(view)
+                        if (
+                            settingsProvider.get('settings-show-notifications')
+                        ) {
+                            tray.balloonEvents({
+                                title: `${songInfo().title} - ${
+                                    songInfo().author
+                                }`,
+                                content: __.trans('LABEL_NOTIFICATION_LIKED'),
+                                icon: assetsProvider.getLocal(
+                                    'img/notification-thumbs-up.png'
+                                ),
+                            })
+                        }
+                    }
+                })
+                break
+
+            case 'media-track-dislike':
+                registerGlobalShortcut(args.newValue, () => {
+                    if (
+                        infoPlayerProvider.getPlayerInfo().likeStatus !=
+                        'DISLIKE'
+                    ) {
+                        mediaControl.downVote(view)
+                        if (
+                            settingsProvider.get('settings-show-notifications')
+                        ) {
+                            tray.balloonEvents({
+                                title: `${songInfo().title} - ${
+                                    songInfo().author
+                                }`,
+                                content: __.trans(
+                                    'LABEL_NOTIFICATION_DISLIKED'
+                                ),
+                                icon: assetsProvider.getLocal(
+                                    'img/notification-thumbs-down.png'
+                                ),
+                            })
+                        }
+                    }
+                })
+                break
+
+            case 'media-volume-up':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.volumeUp(view)
+                })
+                break
+
+            case 'media-volume-down':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.volumeDown(view)
+                })
+                break
+
+            case 'miniplayer-open-close':
+                registerGlobalShortcut(args.newValue, () => {
+                    try {
+                        if (miniplayer) {
+                            miniplayer.close()
+                            miniplayer = undefined
+                            mainWindow.show()
+                        } else {
+                            ipcMain.emit('window', {
+                                command: 'show-miniplayer',
+                            })
+                        }
+                    } catch {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error on try open/close miniplayer',
+                        })
+                    }
+                })
+                break
+        }
     })
 
-    // GLOBAL
-    globalShortcut.register('MediaPlayPause', function () {
-        if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
-            if (!doublePressPlayPause) {
-                // The first press
-                if (infoPlayerProvider.getTrackInfo().id == '') {
-                    infoPlayerProvider.firstPlay(view.webContents)
-                }
+    // Custom accelerators
+    let settingsAccelerator = settingsProvider.get('settings-accelerators')
 
-                doublePressPlayPause = true
-                setTimeout(() => {
-                    if (doublePressPlayPause) mediaControl.playPauseTrack(view)
-                    doublePressPlayPause = false
-                }, 200)
-            } else {
-                // The second press
-                doublePressPlayPause = false
-                doBehavior(mainWindow)
-            }
-        } else {
-            mediaControl.playPauseTrack(view)
-        }
+    ipcMain.emit('change-accelerator', {
+        type: 'media-play-pause',
+        newValue: settingsAccelerator['media-play-pause'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-next',
+        newValue: settingsAccelerator['media-track-next'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-previous',
+        newValue: settingsAccelerator['media-track-previous'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-like',
+        newValue: settingsAccelerator['media-track-like'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-dislike',
+        newValue: settingsAccelerator['media-track-dislike'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-volume-up',
+        newValue: settingsAccelerator['media-volume-up'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-volume-down',
+        newValue: settingsAccelerator['media-volume-down'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'miniplayer-open-close',
+        newValue: settingsAccelerator['miniplayer-open-close'],
+    })
+
+    globalShortcut.register('MediaPlayPause', function () {
+        checkDoubleTapPlayPause()
     })
 
     globalShortcut.register('MediaStop', function () {
@@ -632,158 +814,55 @@ function createWindow() {
         mediaControl.nextTrack(view)
     })
 
-    // Custom accelerators
-    let settingsAccelerator = settingsProvider.get('settings-accelerators')
-
-    globalShortcut.register(
-        settingsAccelerator['media-play-pause'],
-        function () {
-            mediaControl.playPauseTrack(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-next'],
-        function () {
-            mediaControl.nextTrack(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-previous'],
-        function () {
-            mediaControl.previousTrack(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-like'],
-        function () {
-            mediaControl.upVote(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-track-dislike'],
-        function () {
-            mediaControl.downVote(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-volume-up'],
-        function () {
-            mediaControl.volumeUp(view)
-        }
-    )
-
-    globalShortcut.register(
-        settingsAccelerator['media-volume-down'],
-        function () {
-            mediaControl.volumeDown(view)
-        }
-    )
-
-    ipcMain.on('change-accelerator', (event, args) => {
-        try {
-            globalShortcut.unregister(args.oldValue)
-        } catch (_) {}
-
-        switch (args.type) {
-            case 'media-play-pause':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.playPauseTrack(view)
-                })
-                break
-
-            case 'media-track-next':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.nextTrack(view)
-                })
-                break
-
-            case 'media-track-previous':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.previousTrack(view)
-                })
-                break
-
-            case 'media-track-like':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.upVote(view)
-                })
-                break
-
-            case 'media-track-dislike':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.downVote(view)
-                })
-                break
-
-            case 'media-volume-up':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.volumeUp(view)
-                })
-                break
-
-            case 'media-volume-down':
-                globalShortcut.register(args.newValue, () => {
-                    mediaControl.volumeDown(view)
-                })
-                break
-        }
-    })
-
     ipcMain.handle('invoke-all-info', async (event, args) => {
         return infoPlayerProvider.getAllInfo()
     })
 
-    ipcMain.on('settings-value-changed', (e, data) => {
-        switch (data.key) {
-            case 'settings-rainmeter-web-now-playing':
-                if (data.value) {
-                    rainmeterNowPlaying.start()
-                } else {
-                    rainmeterNowPlaying.stop()
-                }
-                break
-
-            case 'settings-companion-server':
-                if (data.value) {
-                    companionServer.start()
-                } else {
-                    companionServer.stop()
-                }
-                break
-
-            case 'settings-discord-rich-presence':
-                if (data.value) {
-                    discordRPC.start()
-                } else {
-                    discordRPC.stop()
-                }
-                break
-
-            case 'settings-custom-css-app':
-                if (data.value) {
-                    loadCustomCSSApp()
-                } else {
-                    removeCustomCSSApp()
-                }
-                break
-
-            case 'settings-custom-css-page':
-                if (data.value) {
-                    loadCustomCSSPage()
-                } else {
-                    removeCustomCSSPage()
-                }
-                break
-
-            case 'settings-changed-zoom':
-                view.webContents.zoomFactor = data.value / 100
-                break
+    settingsProvider.onDidChange(
+        'settings-rainmeter-web-now-playing',
+        (data) => {
+            if (data.newValue) {
+                rainmeterNowPlaying.start()
+            } else {
+                rainmeterNowPlaying.stop()
+            }
         }
+    )
+
+    settingsProvider.onDidChange('settings-companion-server', (data) => {
+        if (data.newValue) {
+            companionServer.start()
+        } else {
+            companionServer.stop()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-discord-rich-presence', (data) => {
+        if (data.newValue) {
+            discordRPC.start()
+        } else {
+            discordRPC.stop()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-custom-css-app', (data) => {
+        if (data.newValue) {
+            loadCustomCSSApp()
+        } else {
+            removeCustomCSSApp()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-custom-css-page', (data) => {
+        if (data.newValue) {
+            loadCustomCSSPage()
+        } else {
+            removeCustomCSSPage()
+        }
+    })
+
+    settingsProvider.onDidChange('settings-page-zoom', (data) => {
+        view.webContents.zoomFactor = data.newValue / 100
     })
 
     ipcMain.on('media-command', (dataMain, dataRenderer) => {
@@ -875,7 +954,7 @@ function createWindow() {
 
     ipcMain.on('update-tray', () => {
         if (isMac()) {
-            renderer_for_status_bar.send('update-status-bar')
+            updateStatusBar()
             tray.setShinyTray()
         }
     })
@@ -944,31 +1023,65 @@ function createWindow() {
             case 'show-discord-settings':
                 windowDiscordSettings()
                 break
+
+            case 'show-shortcut-buttons-settings':
+                windowShortcutButtonsSettings()
+                break
         }
     })
+
+    function checkDoubleTapPlayPause() {
+        if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
+            if (!doublePressPlayPause) {
+                // The first press
+                if (infoPlayerProvider.getTrackInfo().id == '') {
+                    infoPlayerProvider.firstPlay(view.webContents)
+                }
+
+                doublePressPlayPause = true
+                setTimeout(() => {
+                    if (doublePressPlayPause) mediaControl.playPauseTrack(view)
+                    doublePressPlayPause = false
+                }, 200)
+            } else {
+                // The second press
+                doublePressPlayPause = false
+                doBehavior(mainWindow)
+            }
+        } else {
+            mediaControl.playPauseTrack(view)
+        }
+    }
 
     function windowSettings() {
         if (settings) {
             settings.show()
         } else {
+            var mainWindowPosition = mainWindow.getPosition()
+            var mainWindowSize = mainWindow.getSize()
+
+            var xPos = mainWindowPosition[0] + mainWindowSize[0] / 4
+            var yPos = mainWindowPosition[1] + 200
+
             settings = new BrowserWindow({
                 title: __.trans('LABEL_SETTINGS'),
                 icon: iconDefault,
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                center: true,
                 resizable: true,
-                backgroundColor: '#232323',
                 width: 900,
                 minWidth: 900,
                 height: 550,
                 minHeight: 550,
+                x: xPos,
+                y: yPos,
                 autoHideMenuBar: false,
                 skipTaskbar: false,
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -979,7 +1092,8 @@ function createWindow() {
                 ),
                 {
                     search:
-                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize',
+                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize&title=' +
+                        __.trans('LABEL_SETTINGS'),
                 }
             )
         }
@@ -1016,6 +1130,7 @@ function createWindow() {
                 ),
                 webPreferences: {
                     nodeIntegration: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -1096,12 +1211,6 @@ function createWindow() {
             })
 
             mainWindow.hide()
-
-            globalShortcut.register('CmdOrCtrl+M', function () {
-                miniplayer.close()
-                miniplayer = undefined
-                mainWindow.show()
-            })
         }
     }
 
@@ -1124,6 +1233,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1134,7 +1244,7 @@ function createWindow() {
             ),
             {
                 search:
-                    'page=settings/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize',
+                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1154,6 +1264,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1185,6 +1296,7 @@ function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
+                    enableRemoteModule: true,
                 },
             })
 
@@ -1200,7 +1312,8 @@ function createWindow() {
                 ),
                 {
                     search:
-                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize',
+                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize&title=' +
+                        __.trans('LABEL_LYRICS'),
                 }
             )
 
@@ -1227,27 +1340,32 @@ function createWindow() {
     }
 
     function windowCompanion() {
-        const x = mainWindow.getPosition()[0]
-        const y = mainWindow.getPosition()[1]
-        const width = 800
+        shell.openExternal(`http://localhost:9863`)
+        return
+        //const x = mainWindow.getPosition()[0]
+        //const y = mainWindow.getPosition()[1]
+
+        let size = screen.getPrimaryDisplay().workAreaSize
+
         const settings = new BrowserWindow({
             // parent: mainWindow,
             icon: iconDefault,
             skipTaskbar: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
-            x: x + width / 2,
-            y,
             resizable: false,
             backgroundColor: '#232323',
-            width: 800,
+            width: size.width - 450,
+            height: size.height - 450,
+            center: true,
             title: 'companionWindowTitle',
             webPreferences: {
                 nodeIntegration: false,
+                enableRemoteModule: true,
             },
             autoHideMenuBar: true,
         })
-        settings.loadURL('companionUrl')
+        settings.loadURL('http://localhost:9863')
     }
 
     function windowGuest() {
@@ -1268,12 +1386,13 @@ function createWindow() {
             frame: true,
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true,
                 partition: `guest-mode-${Date.now()}`,
             },
         })
 
         incognitoWindow.webContents.session.setUserAgent(
-            'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/71.0'
+            `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
         )
 
         incognitoWindow.webContents.loadURL(mainWindowParams.url)
@@ -1298,6 +1417,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1308,8 +1428,45 @@ function createWindow() {
             ),
             {
                 search:
-                    'page=settings/discord_settings&icon=settings&title=' +
+                    'page=settings/sub/discord/discord_settings&icon=settings&title=' +
                     __.trans('LABEL_SETTINGS_DISCORD') +
+                    '&hide=btn-minimize,btn-maximize',
+            }
+        )
+    }
+
+    function windowShortcutButtonsSettings() {
+        const discord = new BrowserWindow({
+            //parent: mainWindow,
+            icon: iconDefault,
+            modal: false,
+            frame: windowConfig.frame,
+            titleBarStyle: windowConfig.titleBarStyle,
+            center: true,
+            resizable: true,
+            backgroundColor: '#232323',
+            width: 600,
+            minWidth: 600,
+            height: 220,
+            minHeight: 220,
+            autoHideMenuBar: false,
+            skipTaskbar: false,
+            webPreferences: {
+                nodeIntegration: true,
+                webviewTag: true,
+                enableRemoteModule: true,
+            },
+        })
+
+        discord.loadFile(
+            path.join(
+                __dirname,
+                './src/pages/shared/window-buttons/window-buttons.html'
+            ),
+            {
+                search:
+                    'page=settings/sub/shortcut-buttons/shortcut-buttons-settings&icon=settings&title=' +
+                    __.trans('SHORTCUT_BUTTONS') +
                     '&hide=btn-minimize,btn-maximize',
             }
         )
@@ -1325,13 +1482,14 @@ function createWindow() {
             center: true,
             resizable: false,
             backgroundColor: '#232323',
-            width: 460,
-            height: 650,
+            width: 600,
+            height: 580,
             autoHideMenuBar: false,
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
                 webviewTag: true,
+                enableRemoteModule: true,
             },
         })
 
@@ -1384,27 +1542,30 @@ function createWindow() {
         )
     })
 
-    ipcMain.on('change-audio-output', (event, data) => {
-        setAudioOutput(data)
+    ipcMain.on('change-audio-output', (dataMain, dataRenderer) => {
+        setAudioOutput(dataRenderer !== undefined ? dataRenderer : dataMain)
     })
 
     function setAudioOutput(audioLabel) {
         view.webContents
             .executeJavaScript(
                 `
-            navigator
-            .mediaDevices
-            .enumerateDevices()
-            .then( devices => {
-                var audioDevices = devices.filter(device => device.kind === 'audiooutput');
-                var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
-                if(result.length) {
-                    document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
-                }
-            });
-        `
+                    navigator
+                    .mediaDevices
+                    .enumerateDevices()
+                    .then( devices => {
+                        var audioDevices = devices.filter(device => device.kind === 'audiooutput');
+                        var result = audioDevices.filter(deviceInfo => deviceInfo.label == "${audioLabel}");
+                        if(result.length) {
+                            document.querySelector('.video-stream,.html5-main-video').setSinkId(result[0].deviceId);
+                        }
+                    });
+                `
             )
-            .then((_) => {})
+            .then((_) => {
+                settingsProvider.set('settings-app-audio-output', audioLabel)
+                updateTrayAudioOutputs(audioDevices)
+            })
             .catch((_) =>
                 writeLog({ type: 'warn', data: 'error setAudioOutput' })
             )
@@ -1424,9 +1585,7 @@ function createWindow() {
 
         if (settingsProvider.get('settings-custom-css-app')) {
             if (fileSystem.checkIfExists(customThemeFile)) {
-                if (customCSSAppKey) {
-                    removeCustomCssApp()
-                }
+                removeCustomCssApp()
                 view.webContents
                     .insertCSS(fileSystem.readFile(customThemeFile).toString())
                     .then((key) => {
@@ -1437,7 +1596,7 @@ function createWindow() {
     }
 
     function removeCustomCSSApp() {
-        view.webContents.removeInsertedCSS(customCSSAppKey)
+        if (customCSSAppKey) view.webContents.removeInsertedCSS(customCSSAppKey)
     }
 
     function loadCustomCSSPage() {
@@ -1478,14 +1637,40 @@ function createWindow() {
             if (settingsProvider.get('settings-clipboard-read')) {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
-                    onImageChange: function (nativeImage) {},
-                    onTextChange: function (text) {
-                        let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+                    onTextChange: (text) => {
+                        let regExp = /^.*(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
                         let match = text.match(regExp)
-                        if (match && match[2].length == 11) {
-                            let videoId = match[2]
-                            logDebug('Video readed from clipboard: ' + videoId)
-                            loadMusicByVideoId(videoId)
+                        if (match) {
+                            let videoUrl = match[0]
+
+                            if (
+                                settingsProvider.get(
+                                    'settings-clipboard-always-ask-read'
+                                )
+                            ) {
+                                let options = {
+                                    type: 'question',
+                                    buttons: ['Yes', 'No'],
+                                    defaultId: 0,
+                                    title: 'YouTube Music Desktop',
+                                    message: `Want to play this link?\n\n${text}`,
+                                }
+
+                                dialog
+                                    .showMessageBox(mainWindow, options)
+                                    .then((success) => {
+                                        if (success.response == 0) {
+                                            view.webContents.loadURL(videoUrl)
+                                        }
+                                    })
+                            } else {
+                                view.webContents.loadURL(videoUrl)
+                            }
+                            writeLog({
+                                type: 'info',
+                                data:
+                                    'Video readed from clipboard: ' + videoUrl,
+                            })
                         }
                     },
                 })
@@ -1514,10 +1699,15 @@ function createWindow() {
 function handleOpenUrl(url) {
     let cmd = url.toString().split('://')[1]
 
-    switch (cmd) {
-        case 'settings/':
+    if (cmd) {
+        if (cmd.includes('settings/')) {
             ipcMain.emit('window', { command: 'show-settings' })
-            break
+        }
+
+        if (cmd.includes('play/')) {
+            loadMusicByVideoId(cmd.split('/')[1])
+            writeLog({ type: 'info', data: JSON.stringify(cmd) })
+        }
     }
 }
 
@@ -1548,19 +1738,21 @@ if (!gotTheLock) {
     app.whenReady().then(function () {
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {
+                console.log(visiblePosition)
                 settingsProvider.set('window-position', visiblePosition)
             }
         )
 
         checkWindowPosition(settingsProvider.get('lyrics-position')).then(
             (visiblePosition) => {
+                console.log(visiblePosition)
                 settingsProvider.set('lyrics-position', visiblePosition)
             }
         )
 
         createWindow()
 
-        tray.createTray(mainWindow, iconTray)
+        tray.createTray(mainWindow)
 
         ipcMain.on('updated-tray-image', function (event, payload) {
             if (settingsProvider.get('settings-shiny-tray'))
@@ -1609,6 +1801,8 @@ if (!gotTheLock) {
     })
 
     app.on('before-quit', function (e) {
+        mainWindow = null
+        view = null
         if (isMac()) {
             app.exit()
         }
@@ -1616,6 +1810,8 @@ if (!gotTheLock) {
     })
 
     app.on('quit', function () {
+        mainWindow = null
+        view = null
         tray.quit()
     })
 }
@@ -1724,13 +1920,60 @@ function loadCustomPageScript() {
     }
 }
 
-ipcMain.on('log', (dataMain, dataRenderer) => {
-    if (dataMain.type !== undefined) {
-        writeLog(dataMain)
-    } else {
-        writeLog(dataRenderer)
+function registerGlobalShortcut(value, fn) {
+    if (value != 'disabled') {
+        try {
+            globalShortcut.register(`${value}`, fn)
+        } catch {
+            writeLog({
+                type: 'warn',
+                data: `Failed to register global shortcut ${value}`,
+            })
+        }
     }
-})
+}
+
+function updateTrayAudioOutputs(data) {
+    try {
+        let audioOutputs = JSON.parse(data)
+        let selectedAudio = settingsProvider.get('settings-app-audio-output')
+        let result = [
+            {
+                label: __.trans(
+                    'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+                ),
+                enabled: false,
+            },
+        ]
+
+        if (audioOutputs.length) {
+            audioOutputs.forEach((value, index) => {
+                audioOutputs[index] = {
+                    label: value.label,
+                    type: 'radio',
+                    checked: value.label == selectedAudio ? true : false,
+                    click: function () {
+                        ipcMain.emit('change-audio-output', value.label)
+                    },
+                }
+            })
+            result = audioOutputs
+        }
+
+        tray.updateTray({ type: 'audioOutputs', data: result })
+    } catch (error) {
+        writeLog({
+            type: 'warn',
+            data: 'Failed to updateTrayAudioOutputs ' + error,
+        })
+    }
+}
+
+function updateStatusBar() {
+    if (renderer_for_status_bar != null) {
+        renderer_for_status_bar.send('update-status-bar')
+    }
+}
 
 function writeLog(log) {
     switch (log.type) {
@@ -1744,6 +1987,14 @@ function writeLog(log) {
     }
 }
 
+ipcMain.on('log', (dataMain, dataRenderer) => {
+    if (dataMain.type !== undefined) {
+        writeLog(dataMain)
+    } else {
+        writeLog(dataRenderer)
+    }
+})
+
 if (settingsProvider.get('settings-companion-server')) {
     companionServer.start()
 }
@@ -1756,13 +2007,21 @@ if (settingsProvider.get('settings-discord-rich-presence')) {
     discordRPC.start()
 }
 
+ipcMain.on('set-audio-output-list', (_, data) => {
+    updateTrayAudioOutputs(data)
+    audioDevices = data
+})
+
+ipcMain.handle('get-audio-output-list', (event, someArgument) => {
+    return audioDevices
+})
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
-const { player } = require('./src/providers/mprisProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)

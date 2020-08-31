@@ -7,9 +7,9 @@
         "start": "electron .",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
-        "deploy:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
-        "deploy:mac": "npx electron-builder --mac --config electron-builder-deploy64.yml",
-        "deploy:lin": "npx electron-builder --linux --config electron-builder-deploy64.yml",
+        "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
+        "build:mac": "npx electron-builder --mac --config electron-builder-deploy64.yml",
+        "build:lin": "npx electron-builder --linux --config electron-builder-deploy64.yml",
         "publish:win": "npx electron-builder --win -p always --config electron-builder64.yml",
         "publish:mac": "npx electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml"
@@ -28,9 +28,9 @@
         }
     },
     "devDependencies": {
-        "electron": "^9.1.2",
+        "electron": "^10.0.0",
         "electron-builder": "^22.8.0",
-        "electron-rebuild": "^1.11.0",
+        "electron-rebuild": "^2.0.1",
         "husky": "^4.2.5",
         "prettier": "^2.0.5",
         "pretty-quick": "^2.0.1"

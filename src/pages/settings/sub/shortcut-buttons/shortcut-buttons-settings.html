@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Shortcut buttons</title>
+        <link
+            href="../../../../../src/assets/css/materialize.min.css"
+            media="screen,projection"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../src/assets/css/material_icons.css"
+            rel="stylesheet"
+        />
+        <link
+            href="../../../../../src/assets/css/styles.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="./shortcut-buttons-settings.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+    </head>
+
+    <body>
+        <div id="content" class="ml-1">
+            <div class="row">
+                <div class="col s12 mt-1">
+                    <div class="row">
+                        <div class="tab-content" id="tab-general">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span i18n="i18n_SHOW"></span>
+                                            <span i18n="i18n_MINIPLAYER"></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        id="settings-shortcut-show-miniplayer"
+                                                        type="checkbox"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span i18n="i18n_SHOW"></span>
+                                            <span i18n="i18n_LYRICS"></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        id="settings-shortcut-show-lyrics"
+                                                        type="checkbox"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span i18n="i18n_SHOW"></span>
+                                            <span
+                                                i18n="i18n_ADD_TO_LIBRARY"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        id="settings-shortcut-show-add-to-library"
+                                                        type="checkbox"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span i18n="i18n_SHOW"></span>
+                                            <span
+                                                i18n="i18n_ADD_TO_PLAYLIST"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        id="settings-shortcut-show-add-to-playlist"
+                                                        type="checkbox"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../../../../../src/assets/js/materialize.min.js"></script>
+        <script>
+            require('./shortcut-buttons-settings.js')
+        </script>
+    </body>
+</html>

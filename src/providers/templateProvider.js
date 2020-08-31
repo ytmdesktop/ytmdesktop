@@ -209,19 +209,12 @@ statusBarMenu.unshift({
     ],
 })
 
-const popUpMenu = (
-    __,
-    saved_mainWindow,
-    mediaControl,
-    BrowserWindow,
-    path,
-    app
-) => {
+const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
     return [
         {
             label: 'YouTube Music Desktop',
             type: 'normal',
-            click: function() {
+            click: function () {
                 doBehavior(saved_mainWindow)
             },
         },
@@ -231,7 +224,7 @@ const popUpMenu = (
         {
             label: __.trans('MEDIA_CONTROL_PLAY_PAUSE'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 mediaControl.playPauseTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -239,7 +232,7 @@ const popUpMenu = (
         {
             label: __.trans('MEDIA_CONTROL_PREVIOUS'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 mediaControl.previousTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -247,7 +240,7 @@ const popUpMenu = (
         {
             label: __.trans('MEDIA_CONTROL_NEXT'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 mediaControl.nextTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -257,7 +250,7 @@ const popUpMenu = (
         {
             label: __.trans('MEDIA_CONTROL_THUMBS_UP'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 mediaControl.upVote(saved_mainWindow.getBrowserView())
             },
         },
@@ -265,7 +258,7 @@ const popUpMenu = (
         {
             label: __.trans('MEDIA_CONTROL_THUMBS_DOWN'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 mediaControl.downVote(saved_mainWindow.getBrowserView())
             },
         },
@@ -275,7 +268,7 @@ const popUpMenu = (
         {
             label: __.trans('LABEL_MINIPLAYER'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 ipcMain.emit('window', { command: 'show-miniplayer' })
             },
         },
@@ -283,15 +276,21 @@ const popUpMenu = (
         {
             label: __.trans('LABEL_LYRICS'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 ipcMain.emit('window', { command: 'show-lyrics' })
             },
         },
 
         {
+            label: __.trans('LABEL_SETTINGS_TAB_GENERAL_SELECT_AUDIO_OUTPUT'),
+            type: 'submenu',
+            submenu: [],
+        },
+
+        {
             label: __.trans('LABEL_SETTINGS'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 ipcMain.emit('window', { command: 'show-settings' })
             },
         },
@@ -311,7 +310,7 @@ const popUpMenu = (
         {
             label: __.trans('LABEL_EXIT'),
             type: 'normal',
-            click: function() {
+            click: function () {
                 app.exit()
             },
         },

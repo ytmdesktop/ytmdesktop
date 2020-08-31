@@ -64,7 +64,7 @@ function mediaSelectQueueItem(mainWindow, index) {
 }
 
 function mediaAddToLibrary(mainWindow) {
-    infoPlayerProvider.addToLibary(mainWindow.webContents)
+    infoPlayerProvider.addToLibrary(mainWindow.webContents)
 }
 
 function mediaAddToPlaylist(mainWindow, index) {

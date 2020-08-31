@@ -7,8 +7,6 @@ function create() {
 function checkWindowPosition(windowPosition) {
     return new Promise((resolve, reject) => {
         try {
-            //const {  } = require('electron')
-
             let displays = screen.getAllDisplays()
             let externalDisplay = displays.find((display) => {
                 return display.bounds.x !== 0 || display.bounds.y !== 0

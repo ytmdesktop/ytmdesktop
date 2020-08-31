@@ -4,9 +4,9 @@ const __ = require('../../providers/translateProvider')
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
 const fs = require('fs')
 
-const elementSettingsCompanionApp = document.getElementById(
+/*const elementSettingsCompanionApp = document.getElementById(
     'COMPANION_SERVER_INFO'
-)
+)*/
 const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
 const elementBtnOpenPageEditor = document.getElementById(
@@ -17,6 +17,14 @@ const elementBtnOpenCompanionServer = document.getElementById(
     'btn-open-companion-server'
 )
 const elementBtnDiscordSettings = document.getElementById('btn-discord-setting')
+
+const elementBtnShortcutButtonsSettings = document.getElementById(
+    'btn-shortcut-buttons-setting'
+)
+
+const elementRangeSkipTrackShorterThan = document.getElementById(
+    'range-skip-track-shorter-than'
+)
 
 if (isLinux()) {
     document
@@ -30,17 +38,13 @@ const audioOutputSelect = document.querySelector('#settings-app-audio-output')
 
 let settingsAccelerators = settingsProvider.get('settings-accelerators')
 
-let audioDevices, typeAcceleratorSelected, keyBindings
+let typeAcceleratorSelected, keyBindings
 
-function loadAudioOutputList() {
-    return navigator.mediaDevices.enumerateDevices()
-}
+ipc.invoke('get-audio-output-list').then((devices) => {
+    devices = JSON.parse(devices)
 
-loadAudioOutputList().then((devices) => {
-    audioDevices = devices.filter((device) => device.kind === 'audiooutput')
-
-    if (audioDevices.length) {
-        audioDevices.forEach((deviceInfo) => {
+    if (devices.length) {
+        devices.forEach((deviceInfo) => {
             let option = document.createElement('option')
             option.text =
                 deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`
@@ -52,7 +56,7 @@ loadAudioOutputList().then((devices) => {
             ipc.send('change-audio-output', audioOutputSelect.value)
         })
 
-        const defaultOuput = audioDevices.find(
+        const defaultOuput = devices.find(
             (audio) => audio.deviceId == 'default'
         )
         if (!audioOutputSelect.value.length) {
@@ -65,8 +69,7 @@ loadAudioOutputList().then((devices) => {
         )
         option.value = 0
         audioOutputSelect.appendChild(option)
-
-        document.getElementById('settings-app-audio-output').disabled = true
+        audioOutputSelect.disabled = true
     }
 
     mInit()
@@ -84,6 +87,18 @@ function checkCompanionStatus() {
     }
 }
 
+function checkClipboardWatcherStatus() {
+    if (settingsProvider.get('settings-clipboard-read')) {
+        document
+            .getElementById('clipboard-always-ask-read')
+            .classList.remove('hide')
+    } else {
+        document
+            .getElementById('clipboard-always-ask-read')
+            .classList.add('hide')
+    }
+}
+
 function checkWindows10ServiceStatus() {
     if (settingsProvider.get('settings-windows10-media-service')) {
         document.getElementById('windows-10-show-info').classList.remove('hide')
@@ -93,6 +108,7 @@ function checkWindows10ServiceStatus() {
 }
 
 checkCompanionStatus()
+checkClipboardWatcherStatus()
 checkWindows10ServiceStatus()
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -100,17 +116,16 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-show-notifications', 'click')
     initElement('settings-start-on-boot', 'click')
     initElement('settings-start-minimized', 'click')
-    initElement('settings-companion-server', 'click', () => {
-        checkCompanionStatus()
-    })
+    initElement('settings-companion-server', 'click', checkCompanionStatus)
     initElement('settings-companion-server-protect', 'click')
-    initElement('settings-continue-where-left-of', 'click')
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus(), showRelaunchButton()
     })
-    initElement('settings-windows10-media-service-show-info', 'click', () => {
-        showRelaunchButton()
-    })
+    initElement(
+        'settings-windows10-media-service-show-info',
+        'click',
+        showRelaunchButton
+    )
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
@@ -118,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-app-language', 'change', showRelaunchButton)
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
+        checkClipboardWatcherStatus()
     })
     initElement('titlebar-type', 'change', showRelaunchButton)
     initElement('settings-custom-css-page', 'click')
@@ -142,6 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-miniplayer-paint-controls', 'click')
     initElement('settings-enable-taskbar-progressbar', 'click')
 
+    // initElement('settings-enable-shortcut-buttons', 'click')
+
+    initElement('settings-continue-where-left-of', 'click')
+    initElement('settings-skip-track-disliked', 'click')
+
+    initElement('settings-clipboard-always-ask-read', 'click')
+    initElement('settings-tray-icon', 'click', showRelaunchButton)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -157,10 +180,15 @@ if (elementRangeZoom) {
     elementRangeZoom.addEventListener('input', function () {
         document.getElementById('range-zoom-value').innerText = this.value
         settingsProvider.set('settings-page-zoom', this.value)
-        ipc.send('settings-value-changed', {
-            key: 'settings-changed-zoom',
-            value: this.value,
-        })
+    })
+}
+
+if (elementRangeSkipTrackShorterThan) {
+    elementRangeSkipTrackShorterThan.addEventListener('input', function () {
+        document.getElementById(
+            'range-skip-track-shorter-than-value'
+        ).innerText = this.value
+        settingsProvider.set('settings-skip-track-shorter-than', this.value)
     })
 }
 
@@ -179,6 +207,12 @@ if (elementBtnLastFmLogin) {
 if (elementBtnDiscordSettings) {
     elementBtnDiscordSettings.addEventListener('click', function () {
         ipc.send('window', { command: 'show-discord-settings' })
+    })
+}
+
+if (elementBtnShortcutButtonsSettings) {
+    elementBtnShortcutButtonsSettings.addEventListener('click', function () {
+        ipc.send('window', { command: 'show-shortcut-buttons-settings' })
     })
 }
 
@@ -260,18 +294,18 @@ function createListener(element, settingsName, eventType, fn) {
         switch (eventType) {
             case 'click':
                 settingsProvider.set(settingsName, this.checked)
-                ipc.send('settings-value-changed', {
+                /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.checked,
-                })
+                })*/
                 break
 
             case 'change':
                 settingsProvider.set(settingsName, this.value)
-                ipc.send('settings-value-changed', {
+                /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.value,
-                })
+                })*/
                 break
         }
         fn()
@@ -293,13 +327,22 @@ function loadValue(element, settingsName, eventType) {
 function loadSettings() {
     // readLocales();
 
-    if (settingsProvider.get('settings-page-zoom')) {
-        document.getElementById('range-zoom').value = settingsProvider.get(
-            'settings-page-zoom'
-        )
+    var settingsZoom = settingsProvider.get('settings-page-zoom')
+    if (settingsZoom) {
+        document.getElementById('range-zoom').value = settingsZoom
+        document.getElementById('range-zoom-value').innerText = settingsZoom
+    }
+
+    var settingsSkipTrackShorterThan = settingsProvider.get(
+        'settings-skip-track-shorter-than'
+    )
+    if (settingsSkipTrackShorterThan) {
         document.getElementById(
-            'range-zoom-value'
-        ).innerText = settingsProvider.get('settings-page-zoom')
+            'range-skip-track-shorter-than'
+        ).value = settingsSkipTrackShorterThan
+        document.getElementById(
+            'range-skip-track-shorter-than-value'
+        ).innerText = settingsSkipTrackShorterThan
     }
 
     document.getElementById('app-version').innerText = remote.app.getVersion()
@@ -395,7 +438,11 @@ function preventSpecialKeys(e) {
         e.key == 'Control' ||
         e.key == 'Alt' ||
         e.key == 'Shift' ||
-        e.key == 'AltGraph'
+        e.key == 'AltGraph' ||
+        e.key == 'MediaPlayPause' ||
+        e.key == 'MediaTrackPrevious' ||
+        e.key == 'MediaTrackNext' ||
+        e.key == 'MediaStop'
     )
 }
 
@@ -461,11 +508,17 @@ function loadCustomKeys() {
     ).innerText = replaceAcceleratorText(
         settingsAccelerators['media-volume-down']
     )
+    document.querySelector(
+        '#settings-accelerators_miniplayer-open-close'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['miniplayer-open-close']
+    )
 }
 
 function resetAcceleratorsText() {
-    document.querySelector('#modalEditAcceleratorKeys').innerText =
-        'Press any keys...'
+    document.querySelector('#modalEditAcceleratorKeys').innerText = `${__.trans(
+        'LABEL_SETTINGS_TAB_SHORTCUTS_PRESS_ANY_KEYS'
+    )}...`
 }
 
 document
@@ -517,6 +570,13 @@ document
         resetAcceleratorsText()
     })
 
+document
+    .querySelector('#btn-accelerator-miniplayer-open-close')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'miniplayer-open-close'
+        resetAcceleratorsText()
+    })
+
 document.querySelector('#saveAccelerator').addEventListener('click', () => {
     ipc.send('change-accelerator', {
         type: typeAcceleratorSelected,
@@ -525,6 +585,20 @@ document.querySelector('#saveAccelerator').addEventListener('click', () => {
     })
 
     settingsAccelerators[typeAcceleratorSelected] = keyBindings
+
+    settingsProvider.set('settings-accelerators', settingsAccelerators)
+
+    loadCustomKeys()
+})
+
+document.querySelector('#disableAccelerator').addEventListener('click', () => {
+    ipc.send('change-accelerator', {
+        type: typeAcceleratorSelected,
+        oldValue: settingsAccelerators[typeAcceleratorSelected],
+        newValue: 'disabled',
+    })
+
+    settingsAccelerators[typeAcceleratorSelected] = 'disabled'
 
     settingsProvider.set('settings-accelerators', settingsAccelerators)
 

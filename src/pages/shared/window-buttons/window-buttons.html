@@ -24,25 +24,24 @@
     </head>
 
     <body>
-        <div
-            style="height: 15px; width: 90vw; z-index: 9999; position: fixed;"
-            class="drag"
-        ></div>
         <div id="nice-titlebar" class="bar drag">
-            <div id="mac" class="hide">
+            <div id="mac" class="hide no-drag">
                 <span id="window-title" class="hide"></span>
                 <!-- <div class="col s6 center">
-          <div class="title">
-            <i class="material-icons tiny" id="icon"></i>
-          </div>
-        </div> -->
+                    <div class="title">
+                        <i class="material-icons tiny" id="icon"></i>
+                    </div>
+                </div> -->
             </div>
 
             <div id="win" class="hide">
                 <div class="row">
                     <div class="col s9 left-align">
                         <div class="title">
-                            <i class="material-icons tiny" id="icon"></i>
+                            <i
+                                class="material-icons tiny tiny-margin left"
+                                id="icon"
+                            ></i>
                             <span id="window-title"></span>
                         </div>
                     </div>
@@ -64,7 +63,10 @@
                                 id="icon_restore"
                                 class="material-icons tiny hide"
                                 title="Restore"
-                                style="transform: rotate(180deg);"
+                                style="
+                                    transform: rotate(180deg);
+                                    font-size: 13px;
+                                "
                                 >filter_none</i
                             >
                         </div>
@@ -84,7 +86,7 @@
         <div id="content" class="content">
             <div class="center-flex" id="loading">
                 <div id="center-loading" class="preloader-wrapper big active">
-                    <div class="spinner-layer spinner-blue-only">
+                    <div class="spinner-layer spinner-red-only">
                         <div class="circle-clipper left">
                             <div class="circle"></div>
                         </div>
@@ -102,6 +104,7 @@
                 id="webview"
                 style="width: 100vw;"
                 nodeintegration
+                enableRemoteModule
             ></webview>
         </div>
 

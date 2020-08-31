@@ -3,3 +3,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.tiny-margin {
+  margin-right: 6px !important;
+}

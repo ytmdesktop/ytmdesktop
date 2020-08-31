@@ -10,7 +10,7 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(virtual|wsl|vEthernet|Default Switch|VMware|Adapter)\w*/gim
+const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -33,33 +33,33 @@ function infoServer() {
 }
 
 function fetchNetworkInterfaces() {
-    Object.keys(networkInterfaces).forEach((v, k) => {
-        if (!pattIgnoreInterface.test(v)) {
-            networkInterfaces[v].forEach((vv, kk) => {
-                if (vv.family == 'IPv4' && vv.internal == false) {
-                    var data = {
-                        name: v,
-                        ip: vv.address,
-                        //isProtected: infoServer().isProtected
-                    }
-                    serverInterfaces.push(data)
-                }
+    serverInterfaces = Object.entries(networkInterfaces)
+        .filter(([interfaces]) => !pattIgnoreInterface.test(interfaces))
+        .map(([name, value]) => {
+            value = value.filter((data) => {
+                return data.family == 'IPv4' && data.internal == false
             })
-        }
-    })
+            return {
+                name: name,
+                ip: value.length ? value[0].address : '',
+                isProtected: infoServer().isProtected,
+            }
+        })
 }
 
 var serverFunction = function (req, res) {
     if (req.url === '/') {
-        var collection = ''
+        let collection = ''
+        let isProtected = infoServer().isProtected
 
         serverInterfaces.forEach((value) => {
-            let qr = qrcode(6, 'H')
+            let qr = qrcode(0, 'H')
+            value['hostname'] = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
             collection += `
-                          <div class="center row" >
+                          <div class="row" >
                               <div class="col s12">
                                   <div class="card transparent z-depth-0">
                                       <div class="card-content">
@@ -87,7 +87,6 @@ var serverFunction = function (req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
-        let isProtected = infoServer().isProtected
         res.write(`<html>
           <head>
               <title>YTMDesktop Remote Control</title>
@@ -101,6 +100,7 @@ var serverFunction = function (req, res) {
                       padding: 0;
                       text-align: center;
                       background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
+                      background-attachment: fixed;
                       font-family: sans-serif;
                   }
                   h5 {
@@ -109,7 +109,6 @@ var serverFunction = function (req, res) {
 
                   .center {
                     width: 68%;
-                    /*height: 400px;*/
                     position: absolute;
                     left: 50%;
                     top: 48%;
@@ -142,7 +141,7 @@ var serverFunction = function (req, res) {
                 </div>
               </div>
   
-              <div class="container" style="margin-top: 13%;">
+              <div class="container" style="margin: 13% auto 5% auto;">
   
                   ${collection}
   
@@ -212,10 +211,12 @@ var serverFunction = function (req, res) {
                     ) {
                         try {
                             let headerAuth = req.headers.authorization
-                            let auth = headerAuth.split(' ')[1]
+                            let authToken = headerAuth
+                                .split(' ')[1]
+                                .toUpperCase()
 
                             if (
-                                auth ==
+                                authToken ==
                                 settingsProvider.get(
                                     'settings-companion-server-token'
                                 )
@@ -314,55 +315,62 @@ function canConnect(socket) {
 }
 
 function start() {
-    server.listen(port, ip)
-    const io = require('socket.io')(server)
+    try {
+        server.listen(port, ip)
+        const io = require('socket.io')(server)
 
-    timerTotalConections = setInterval(() => {
-        totalConnections = Object.keys(io.sockets.sockets).length
+        timerTotalConections = setInterval(() => {
+            totalConnections = Object.keys(io.sockets.sockets).length
 
-        if (totalConnections) {
-            io.emit('tick', infoPlayerProvider.getAllInfo())
-        }
-    }, 600)
+            if (totalConnections) {
+                io.emit('tick', infoPlayerProvider.getAllInfo())
+            }
+        }, 500)
 
-    io.on('connection', (socket) => {
-        if (!canConnect(socket)) {
-            socket.disconnect()
-        }
+        io.on('connection', (socket) => {
+            if (!canConnect(socket)) {
+                socket.disconnect()
+            }
 
-        socket.on('media-commands', (cmd, value) => execCmd(cmd, value))
+            socket.on('media-commands', (cmd, value) => execCmd(cmd, value))
 
-        socket.on('retrieve-info', () =>
-            socket.emit('info', { app: infoApp(), server: infoServer() })
-        )
+            socket.on('retrieve-info', () =>
+                socket.emit('info', { app: infoApp(), server: infoServer() })
+            )
 
-        socket.on('query-player', () =>
-            socket.emit('player', infoPlayerProvider.getPlayerInfo())
-        )
+            socket.on('query-player', () =>
+                socket.emit('player', infoPlayerProvider.getPlayerInfo())
+            )
 
-        socket.on('query-track', () =>
-            socket.emit('track', infoPlayerProvider.getTrackInfo())
-        )
+            socket.on('query-track', () =>
+                socket.emit('track', infoPlayerProvider.getTrackInfo())
+            )
 
-        socket.on('query-queue', () =>
-            socket.emit('queue', infoPlayerProvider.getQueueInfo())
-        )
+            socket.on('query-queue', () =>
+                socket.emit('queue', infoPlayerProvider.getQueueInfo())
+            )
 
-        socket.on('query-playlist', () =>
-            socket.emit('playlist', infoPlayerProvider.getPlaylistInfo())
-        )
+            socket.on('query-playlist', () =>
+                socket.emit('playlist', infoPlayerProvider.getPlaylistInfo())
+            )
 
-        socket.on('query-lyrics', () =>
-            socket.emit('lyrics', infoPlayerProvider.getLyricsInfo())
-        )
-    })
+            socket.on('query-lyrics', () =>
+                socket.emit('lyrics', infoPlayerProvider.getLyricsInfo())
+            )
+        })
 
-    fetchNetworkInterfaces()
+        fetchNetworkInterfaces()
 
-    ipcMain.emit('log', {
-        type: 'info',
-        data: `Companion Server listening on port ${port}`,
-    })
+        ipcMain.emit('log', {
+            type: 'info',
+            data: `Companion Server listening on port ${port}`,
+        })
+    } catch {
+        ipcMain.emit('log', {
+            type: 'warn',
+            data: `Error to start server on port ${port}`,
+        })
+    }
 }
 
 function stop() {
@@ -375,6 +383,13 @@ function execCmd(cmd, value) {
     value = value || true
 
     switch (cmd) {
+        case 'track-play-pause':
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
+            break
+
         case 'track-play':
             ipcMain.emit('media-command', {
                 command: 'media-play-pause',
@@ -469,14 +484,14 @@ function execCmd(cmd, value) {
         case 'player-repeat':
             ipcMain.emit('media-command', {
                 command: 'media-repeat',
-                value: value,
+                value: true,
             })
             break
 
         case 'player-shuffle':
             ipcMain.emit('media-command', {
                 command: 'media-shuffle',
-                value: value,
+                value: true,
             })
             break
 

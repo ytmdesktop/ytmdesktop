@@ -37,7 +37,7 @@ setInterval(async () => {
 
 async function setData(data) {
     var scrollHeight = document.getElementById('content').scrollHeight
-    target = (scrollHeight * data.track.statePercent) / 1.4
+    target = (scrollHeight * data.player.statePercent) / 1.4
     if (toggled) {
         document.getElementById('content').scrollTo(0, target)
     }
