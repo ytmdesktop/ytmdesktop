@@ -1610,7 +1610,7 @@ function createWindow() {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
                     onTextChange: (text) => {
-                        let regExp = /^.*(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+                        let regExp = /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
                         let match = text.match(regExp)
                         if (match) {
                             let videoUrl = match[0]
@@ -1632,11 +1632,11 @@ function createWindow() {
                                     .showMessageBox(mainWindow, options)
                                     .then((success) => {
                                         if (success.response == 0) {
-                                            view.webContents.loadURL(videoUrl)
+                                            loadMusicByUrl(videoUrl)
                                         }
                                     })
                             } else {
-                                view.webContents.loadURL(videoUrl)
+                                loadMusicByUrl(videoUrl)
                             }
                             writeLog({
                                 type: 'info',
@@ -1652,8 +1652,16 @@ function createWindow() {
         }
     }
 
-    function loadMusicByVideoId(videoId) {
-        view.webContents.loadURL('https://music.youtube.com/watch?v=' + videoId)
+    function loadMusicByUrl(videoUrl) {
+        if (videoUrl.includes('music.youtube')) {
+            view.webContents.loadUrl(videoUrl)
+        } else {
+            let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+            let match = videoUrl.match(regExpYoutube)
+            view.webContents.loadURL(
+                'https://music.youtube.com/watch?v=' + match[4]
+            )
+        }
     }
 
     setTimeout(function () {
