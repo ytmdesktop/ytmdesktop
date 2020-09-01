@@ -187,7 +187,7 @@ if (elementRangeSkipTrackShorterThan) {
     elementRangeSkipTrackShorterThan.addEventListener('input', function () {
         document.getElementById(
             'range-skip-track-shorter-than-value'
-        ).innerText = this.value
+        ).innerText = this.value == 0 ? `(Disabled) ${this.value}` : this.value
         settingsProvider.set('settings-skip-track-shorter-than', this.value)
     })
 }
@@ -342,7 +342,10 @@ function loadSettings() {
         ).value = settingsSkipTrackShorterThan
         document.getElementById(
             'range-skip-track-shorter-than-value'
-        ).innerText = settingsSkipTrackShorterThan
+        ).innerText =
+            settingsSkipTrackShorterThan == 0
+                ? `(Disabled) ${settingsSkipTrackShorterThan}`
+                : settingsSkipTrackShorterThan
     }
 
     document.getElementById('app-version').innerText = remote.app.getVersion()

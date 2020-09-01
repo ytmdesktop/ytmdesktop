@@ -1141,38 +1141,6 @@ function createWindow() {
                 )
             )
 
-            switch (settingsProvider.get('settings-miniplayer-size')) {
-                case '1':
-                    miniplayer.setSize(170, 170)
-                    settingsProvider.set('settings-miniplayer-size', 170)
-                    break
-
-                case '2':
-                    miniplayer.setSize(200, 200)
-                    settingsProvider.set('settings-miniplayer-size', 200)
-                    break
-
-                case '3':
-                    miniplayer.setSize(230, 230)
-                    settingsProvider.set('settings-miniplayer-size', 230)
-                    break
-
-                case '4':
-                    miniplayer.setSize(260, 260)
-                    settingsProvider.set('settings-miniplayer-size', 260)
-                    break
-
-                case '5':
-                    miniplayer.setSize(290, 290)
-                    settingsProvider.set('settings-miniplayer-size', 290)
-                    break
-
-                case '6':
-                    miniplayer.setSize(320, 320)
-                    settingsProvider.set('settings-miniplayer-size', 320)
-                    break
-            }
-
             let miniplayerPosition = settingsProvider.get('miniplayer-position')
             if (miniplayerPosition != undefined) {
                 miniplayer.setPosition(
@@ -1197,17 +1165,21 @@ function createWindow() {
 
             let storeMiniplayerSizeTimer
             miniplayer.on('resize', function (e) {
-                let size = miniplayer.getSize()
-                if (storeMiniplayerSizeTimer) {
-                    clearTimeout(storeMiniplayerSizeTimer)
+                try {
+                    let size = miniplayer.getSize()
+                    if (storeMiniplayerSizeTimer) {
+                        clearTimeout(storeMiniplayerSizeTimer)
+                    }
+                    storeMiniplayerSizeTimer = setTimeout(() => {
+                        settingsProvider.set(
+                            'settings-miniplayer-size',
+                            Math.min(...size)
+                        )
+                        miniplayer.setSize(Math.min(...size), Math.min(...size))
+                    }, 500)
+                } catch {
+                    writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
-                storeMiniplayerSizeTimer = setTimeout(() => {
-                    settingsProvider.set(
-                        'settings-miniplayer-size',
-                        Math.min(...size)
-                    )
-                    miniplayer.setSize(Math.min(...size), Math.min(...size))
-                }, 500)
             })
 
             mainWindow.hide()

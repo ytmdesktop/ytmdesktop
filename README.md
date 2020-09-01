@@ -11,6 +11,8 @@
 
 # Available for
 
+<a href="https://repology.org/project/ytmdesktop/versions"><img src="https://repology.org/badge/vertical-allrepos/ytmdesktop.svg" alt="Packaging status" align="right"></a>
+
 ## Windows
 
 - Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
