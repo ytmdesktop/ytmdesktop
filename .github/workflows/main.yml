@@ -1,0 +1,12 @@
+name: Autocloser
+on: [issues]
+jobs:
+  autoclose:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Autoclose issues that did not follow issue template
+      uses: roots/issue-closer@v1.1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-close-message: "@${issue.user.login} this issue was automatically closed because it did not follow any of the available issue templates"
+        issue-pattern: (I understand that \*\*YTMDesktop have NO affiliation with Google or YouTube)|(I verified that there is no open issue for the same subject.)
