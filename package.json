@@ -1,6 +1,6 @@
 {
     "name": "youtube-music-desktop-app",
-    "version": "1.12.1",
+    "version": "1.13.0",
     "description": "YouTube Music Desktop App",
     "main": "main.js",
     "scripts": {
@@ -28,7 +28,7 @@
         }
     },
     "devDependencies": {
-        "electron": "^10.0.0",
+        "electron": "^10.1.1",
         "electron-builder": "^22.8.0",
         "electron-rebuild": "^2.0.1",
         "husky": "^4.2.5",
