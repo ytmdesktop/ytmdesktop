@@ -530,9 +530,15 @@ function createBottomPlayerBarContent() {
                 ) {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'check'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('REMOVE_FROM_LIBRARY')
                 } else {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'library_add'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('ADD_TO_LIBRARY')
                 }
                 document
                     .querySelector('#btn_ytmd_add_to_library')
