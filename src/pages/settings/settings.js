@@ -145,6 +145,21 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     initElement('settings-rainmeter-web-now-playing', 'click')
     initElement('settings-enable-double-tapping-show-hide', 'click')
+    initElement('settings-volume-media-keys', 'click', () => {
+        let enableVolumeMediaKeys = settingsProvider.get(
+            'settings-volume-media-keys'
+        )
+        ipc.send('change-accelerator', {
+            type: 'media-volume-up',
+            oldValue: enableVolumeMediaKeys ? 'disabled' : 'VolumeUp',
+            newValue: enableVolumeMediaKeys ? 'VolumeUp' : 'disabled',
+        })
+        ipc.send('change-accelerator', {
+            type: 'media-volume-down',
+            oldValue: enableVolumeMediaKeys ? 'disabled' : 'VolumeDown',
+            newValue: enableVolumeMediaKeys ? 'VolumeDown' : 'disabled',
+        })
+    })
     initElement(
         'settings-disable-hardware-acceleration',
         'click',

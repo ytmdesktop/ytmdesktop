@@ -28,11 +28,19 @@ function mediaDownVote(mainWindow) {
 }
 
 function mediaVolumeUp(mainWindow) {
-    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
+    let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+    infoPlayerProvider.setVolume(
+        mainWindow.webContents,
+        decibelToPercent(percentToDecibel(percent) + 1.5)
+    )
 }
 
 function mediaVolumeDown(mainWindow) {
-    mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
+    let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+    infoPlayerProvider.setVolume(
+        mainWindow.webContents,
+        decibelToPercent(percentToDecibel(percent) - 1.5)
+    )
 }
 
 function mediaForwardTenSeconds(mainWindow) {
@@ -183,6 +191,17 @@ function createThumbar(mainWindow, mediaInfo) {
     } catch (e) {
         //console.log(e);
     }
+}
+
+function percentToDecibel(percent) {
+    return Math.min(Math.max(20.0 * Math.log10(percent / 100.0), -100.0), 0.0)
+}
+
+function decibelToPercent(decibel) {
+    return Math.min(
+        Math.max(Math.pow(10.0, decibel / 20.0) * 100.0, 0.0),
+        100.0
+    )
 }
 
 function setProgress(mainWindow, progress, isPaused) {
