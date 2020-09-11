@@ -2,6 +2,7 @@ const __ = require('./translateProvider')
 const systemInfo = require('../utils/systemInfo')
 const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const path = require('path')
+const settingsProvider = require('./settingsProvider')
 
 function mediaPlayPauseTrack(mainWindow) {
     mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
@@ -28,19 +29,27 @@ function mediaDownVote(mainWindow) {
 }
 
 function mediaVolumeUp(mainWindow) {
-    let percent = infoPlayerProvider.getPlayerInfo().volumePercent
-    infoPlayerProvider.setVolume(
-        mainWindow.webContents,
-        decibelToPercent(percentToDecibel(percent) + 1.5)
-    )
+    if (settingsProvider.get('settings-decibel-volume')) {
+        let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+        infoPlayerProvider.setVolume(
+            mainWindow.webContents,
+            decibelToPercent(percentToDecibel(percent) + 1.5)
+        )
+    } else {
+        mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
+    }
 }
 
 function mediaVolumeDown(mainWindow) {
-    let percent = infoPlayerProvider.getPlayerInfo().volumePercent
-    infoPlayerProvider.setVolume(
-        mainWindow.webContents,
-        decibelToPercent(percentToDecibel(percent) - 1.5)
-    )
+    if (settingsProvider.get('settings-decibel-volume')) {
+        let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+        infoPlayerProvider.setVolume(
+            mainWindow.webContents,
+            decibelToPercent(percentToDecibel(percent) - 1.5)
+        )
+    } else {
+        mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
+    }
 }
 
 function mediaForwardTenSeconds(mainWindow) {

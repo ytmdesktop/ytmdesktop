@@ -26,6 +26,7 @@
 | `settings-custom-css-page`                 | Boolean | `true` or `false`            | `false`                      | Custom css for web page                                        |
 | `settings-volume`                          | String  | `0` ~ `100`                  | `100`                        | Playback volume                                                |
 | `settings-volume-media-keys`               | Boolean | `true` or `false`            | `false`                      | Enable media volume keys for the playback volume               |
+| `settings-decibel-volume`                  | Boolean | `true` or `false`            | `true`                       | Replace the volume control with a decibel based system         |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |

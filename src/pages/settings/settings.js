@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
             newValue: enableVolumeMediaKeys ? 'VolumeDown' : 'disabled',
         })
     })
+    initElement('settings-decibel-volume', 'click')
     initElement(
         'settings-disable-hardware-acceleration',
         'click',

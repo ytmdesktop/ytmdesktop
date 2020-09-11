@@ -99,7 +99,6 @@ settingsProvider.setInitialValue('settings-tray-icon', true)
 
 settingsProvider.setInitialValue('settings-volume', 100)
 
-settingsProvider.setInitialValue(
-    'settings-enable-double-tapping-show-hide',
-    false
-)
+settingsProvider.setInitialValue('settings-volume-media-keys', false)
+
+settingsProvider.setInitialValue('settings-decibel-volume', true)
