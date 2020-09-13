@@ -622,6 +622,17 @@ function createBottomPlayerBarContent() {
                     .classList.remove('ytmd-icons')
             }
         })
+
+        // Volume slider
+        document.querySelector('#volume-slider').setAttribute('step', 0)
+        document.querySelector('#expand-volume-slider').setAttribute('step', 0)
+        document
+            .querySelector('#volume-slider')
+            .addEventListener('value-change', function (e) {
+                ipcRenderer.send('change-volume', {
+                    volume: e.target.getAttribute('value'),
+                })
+            })
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {
