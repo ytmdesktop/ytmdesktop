@@ -96,3 +96,9 @@ settingsProvider.setInitialValue('settings-skip-track-shorter-than', '0')
 settingsProvider.setInitialValue('settings-clipboard-always-ask-read', true)
 
 settingsProvider.setInitialValue('settings-tray-icon', true)
+
+settingsProvider.setInitialValue('settings-volume', 100)
+
+settingsProvider.setInitialValue('settings-volume-media-keys', false)
+
+settingsProvider.setInitialValue('settings-decibel-volume', true)

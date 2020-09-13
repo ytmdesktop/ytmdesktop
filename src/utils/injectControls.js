@@ -530,9 +530,15 @@ function createBottomPlayerBarContent() {
                 ) {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'check'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('REMOVE_FROM_LIBRARY')
                 } else {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'library_add'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('ADD_TO_LIBRARY')
                 }
                 document
                     .querySelector('#btn_ytmd_add_to_library')
@@ -616,6 +622,17 @@ function createBottomPlayerBarContent() {
                     .classList.remove('ytmd-icons')
             }
         })
+
+        // Volume slider
+        document.querySelector('#volume-slider').setAttribute('step', 0)
+        document.querySelector('#expand-volume-slider').setAttribute('step', 0)
+        document
+            .querySelector('#volume-slider')
+            .addEventListener('value-change', function (e) {
+                ipcRenderer.send('change-volume', {
+                    volume: e.target.getAttribute('value'),
+                })
+            })
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {

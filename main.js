@@ -814,6 +814,16 @@ function createWindow() {
         mediaControl.nextTrack(view)
     })
 
+    if (settingsProvider.get('settings-volume-media-keys')) {
+        globalShortcut.register('VolumeUp', function () {
+            mediaControl.volumeUp(view)
+        })
+
+        globalShortcut.register('VolumeDown', function () {
+            mediaControl.volumeDown(view)
+        })
+    }
+
     ipcMain.handle('invoke-all-info', async (event, args) => {
         return infoPlayerProvider.getAllInfo()
     })
@@ -1516,6 +1526,10 @@ function createWindow() {
 
     ipcMain.on('change-audio-output', (dataMain, dataRenderer) => {
         setAudioOutput(dataRenderer !== undefined ? dataRenderer : dataMain)
+    })
+
+    ipcMain.on('change-volume', (dataMain, dataRenderer) => {
+        settingsProvider.set('settings-volume', dataRenderer.volume)
     })
 
     function setAudioOutput(audioLabel) {

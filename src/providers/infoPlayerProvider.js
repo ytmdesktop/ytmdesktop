@@ -1,3 +1,5 @@
+const settingsProvider = require('./settingsProvider')
+
 var webContents, initialized
 
 var player = {
@@ -46,6 +48,12 @@ function init(view) {
     initialized = true
     toggleMoreActions(webContents)
     toggleMoreActions(webContents)
+
+    initVolume()
+}
+
+function initVolume() {
+    setVolume(webContents, settingsProvider.get('settings-volume'))
 }
 
 function getAllInfo() {
@@ -187,8 +195,8 @@ function getVolume(webContents) {
             `document.querySelector('.volume-slider.ytmusic-player-bar').getAttribute('value');`
         )
         .then((volume) => {
-            debug(`Volume % is: ${parseInt(volume)}`)
-            player.volumePercent = parseInt(volume)
+            debug(`Volume % is: ${parseFloat(volume)}`)
+            player.volumePercent = parseFloat(volume)
         })
         .catch((_) => console.log('error getVolume'))
 }
