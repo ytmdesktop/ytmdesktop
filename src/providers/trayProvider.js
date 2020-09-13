@@ -8,6 +8,7 @@ const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
 const { popUpMenu } = require('./templateProvider')
 const assetsProvider = require('./assetsProvider')
+const { Notification } = require('electron')
 
 let tray = null
 let saved_mainWindow = null
@@ -154,13 +155,14 @@ function _doNotification(title, content, icon) {
                     }, 7 * 1000)
                 }
             } else {
-                let Notification = require('electron-native-notification')
-
-                new Notification(title, {
+                // create a system notification and send it
+                let myNotification = new Notification({
+                    title: title,
                     body: content,
                     silent: true,
                     icon: icon,
-                })
+                    urgency: 'low',
+                }).show()
             }
         }
     } catch (error) {
