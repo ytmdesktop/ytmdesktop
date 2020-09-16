@@ -24,6 +24,7 @@ const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
 const { checkWindowPosition, doBehavior } = require('./src/utils/window')
 const fileSystem = require('./src/utils/fileSystem')
+const Vibrant = require('node-vibrant')
 
 const __ = require('./src/providers/translateProvider')
 const assetsProvider = require('./src/providers/assetsProvider')
@@ -505,6 +506,22 @@ function createWindow() {
                         album
                     )
                 }
+
+                /**
+                 * Update background color for Player
+                 */
+
+                Vibrant.from(getTrackInfo().cover)
+                    .getPalette()
+                    .then((palette) => {
+                        hue = palette.DarkVibrant.getHsl()[0] * 360
+                        sat = palette.DarkVibrant.getHsl()[1] == 0 ? 0 : 70
+                        console.log('hue:', hue, 'sat:', sat)
+                        view.webContents.executeJavaScript(`
+                            document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
+                            document.documentElement.style.setProperty("--ytm-album-color-vibrant", 'hsl(${hue}, ${sat}%, 30%)');
+                        `)
+                    })
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
@@ -2006,6 +2023,18 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
+ipcMain.on('set-accent-enabled-state', () => {
+    if (settingsProvider.get('settings-enable-player-bgcolor')) {
+        view.webContents.executeJavaScript(
+            `document.body.setAttribute('accent-enabled', '')`
+        )
+    } else {
+        view.webContents.executeJavaScript(
+            `document.body.removeAttribute('accent-enabled')`
+        )
+    }
+})
+
 ipcMain.handle('get-audio-output-list', (event, someArgument) => {
     return audioDevices
 })
@@ -2016,6 +2045,7 @@ const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
+const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)

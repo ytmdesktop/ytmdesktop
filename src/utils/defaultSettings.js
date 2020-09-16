@@ -26,6 +26,8 @@ settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
 settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
 
+settingsProvider.setInitialValue('settings-enable-player-bgcolor', false)
+
 settingsProvider.setInitialValue(
     // Random token
     'settings-companion-server-token',
