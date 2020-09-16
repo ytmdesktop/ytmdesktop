@@ -140,6 +140,24 @@ if (settingsProvider.get('settings-disable-hardware-acceleration')) {
 }
 
 /* Functions ============================================================================= */
+function updateAccentColorPref() {
+    if (settingsProvider.get('settings-enable-player-bgcolor')) {
+        view.webContents.executeJavaScript(
+            `document.body.setAttribute('accent-enabled', '')`
+        )
+        mainWindow.webContents.executeJavaScript(
+            `document.body.setAttribute('accent-enabled', '')`
+        )
+    } else {
+        view.webContents.executeJavaScript(
+            `document.body.removeAttribute('accent-enabled')`
+        )
+        mainWindow.webContents.executeJavaScript(
+            `document.body.removeAttribute('accent-enabled')`
+        )
+    }
+}
+
 function createWindow() {
     if (isMac() || isWindows()) {
         const execApp = path.basename(process.execPath)
@@ -272,7 +290,9 @@ function createWindow() {
         mainWindowParams.url = settingsProvider.get('window-url')
     }
 
-    view.webContents.loadURL(mainWindowParams.url)
+    view.webContents.loadURL(mainWindowParams.url).then(() => {
+        updateAccentColorPref()
+    })
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
@@ -309,6 +329,15 @@ function createWindow() {
 
     // view.webContents.openDevTools({ mode: 'detach' });
     view.webContents.on('did-navigate-in-page', function () {
+        if (view.webContents.getURL().indexOf('watch?v=') == 26) {
+            mainWindow.webContents.executeJavaScript(`
+                document.body.setAttribute('player-open', '')
+            `)
+        } else {
+            mainWindow.webContents.executeJavaScript(`
+                document.body.removeAttribute('player-open')
+            `)
+        }
         initialized = true
         settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
@@ -516,10 +545,12 @@ function createWindow() {
                     .then((palette) => {
                         hue = palette.DarkVibrant.getHsl()[0] * 360
                         sat = palette.DarkVibrant.getHsl()[1] == 0 ? 0 : 70
-                        console.log('hue:', hue, 'sat:', sat)
                         view.webContents.executeJavaScript(`
                             document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
                             document.documentElement.style.setProperty("--ytm-album-color-vibrant", 'hsl(${hue}, ${sat}%, 30%)');
+                        `)
+                        mainWindow.webContents.executeJavaScript(`
+                            document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
                         `)
                     })
 
@@ -862,6 +893,10 @@ function createWindow() {
         } else {
             companionServer.stop()
         }
+    })
+
+    settingsProvider.onDidChange('settings-enable-player-bgcolor', () => {
+        updateAccentColorPref()
     })
 
     settingsProvider.onDidChange('settings-discord-rich-presence', (data) => {
@@ -2023,18 +2058,6 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
-ipcMain.on('set-accent-enabled-state', () => {
-    if (settingsProvider.get('settings-enable-player-bgcolor')) {
-        view.webContents.executeJavaScript(
-            `document.body.setAttribute('accent-enabled', '')`
-        )
-    } else {
-        view.webContents.executeJavaScript(
-            `document.body.removeAttribute('accent-enabled')`
-        )
-    }
-})
-
 ipcMain.handle('get-audio-output-list', (event, someArgument) => {
     return audioDevices
 })
@@ -2046,6 +2069,7 @@ const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
+const { UpdaterSignal } = require('electron-updater')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
