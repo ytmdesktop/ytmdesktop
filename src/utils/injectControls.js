@@ -414,12 +414,12 @@ function createPlayerColorRules() {
                     --ytmusic-nav-bar: #232323; /* default for collapsed player */
                 }
 
-                ytmusic-app-layout[player-page-open_]{
+                body[accent-enabled] ytmusic-app-layout[player-page-open_]{
                     --ytmusic-nav-bar: var(--ytm-album-color-muted);
                     --ytmusic-brand-background-solid: var(--ytm-album-color-vibrant);
                 }
 
-                #player-page{
+                body[accent-enabled] #player-page{
                     background: var(--ytm-album-color-muted);
                 }
                 `

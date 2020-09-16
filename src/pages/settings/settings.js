@@ -173,6 +173,9 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-miniplayer-always-show-controls', 'click')
     initElement('settings-miniplayer-paint-controls', 'click')
     initElement('settings-enable-taskbar-progressbar', 'click')
+    initElement('settings-enable-player-bgcolor', 'click', () => {
+        ipc.send('set-accent-enabled-state')
+    })
 
     // initElement('settings-enable-shortcut-buttons', 'click')
 

@@ -2023,6 +2023,18 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
+ipcMain.on('set-accent-enabled-state', () => {
+    if (settingsProvider.get('settings-enable-player-bgcolor')) {
+        view.webContents.executeJavaScript(
+            `document.body.setAttribute('accent-enabled', '')`
+        )
+    } else {
+        view.webContents.executeJavaScript(
+            `document.body.removeAttribute('accent-enabled')`
+        )
+    }
+})
+
 ipcMain.handle('get-audio-output-list', (event, someArgument) => {
     return audioDevices
 })
