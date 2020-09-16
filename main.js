@@ -24,6 +24,7 @@ const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
 const { checkWindowPosition, doBehavior } = require('./src/utils/window')
 const fileSystem = require('./src/utils/fileSystem')
+const ColorThief = require('colorthief')
 
 const __ = require('./src/providers/translateProvider')
 const assetsProvider = require('./src/providers/assetsProvider')
@@ -505,6 +506,41 @@ function createWindow() {
                         album
                     )
                 }
+
+                /**
+                 * Update background color for Player
+                 */
+
+                ColorThief.getColor(getTrackInfo().cover).then((color) => {
+                    percent = color.map((v, i, a) => {
+                        return v / 255
+                    })
+                    let hi = Math.max.apply(null, percent)
+                    let lo = Math.min.apply(null, percent)
+                    let divisor = hi - lo
+                    let hue
+                    switch (percent.indexOf(hi)) {
+                        case 0:
+                            hue = (percent[1] - percent[2]) / divisor
+                            break
+                        case 1:
+                            hue = 2 + (percent[2] - percent[0]) / divisor
+                            break
+                        case 2:
+                            hue = 4 + (percent[0] - percent[1]) / divisor
+                            break
+                        default:
+                            hue = 0
+                    }
+                    hue = hue * 60
+                    hue = hue < 0 ? hue + 360 : hue //correction for negative hue, add a full circle of degrees.
+                    sat = divisor == 0 ? 0 : 70 //fallbacks for a b+w album cover (divisor becomes zero).
+                    hue = divisor == 0 ? 0 : hue //another fallback for b+w, changes any hue to grey.
+                    view.webContents.executeJavaScript(`
+                        document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
+                        document.documentElement.style.setProperty("--ytm-album-color-vibrant", 'hsl(${hue}, ${sat}%, 30%)');
+                    `)
+                })
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
@@ -2016,6 +2052,7 @@ const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
+const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)

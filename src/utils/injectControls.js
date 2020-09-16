@@ -16,6 +16,7 @@ const settingsOnDidChange = (key, cb) => {
 
 window.addEventListener('load', () => {
     createContextMenu()
+    createPlayerColorRules()
 
     const { hostname } = window.location
     if (hostname == 'music.youtube.com') {
@@ -390,6 +391,46 @@ function createTopRightContent() {
         ipcRenderer.send('log', {
             type: 'warn',
             data: 'error on createTopRightContent',
+        })
+    }
+}
+
+function createPlayerColorRules() {
+    try {
+        const css = document.createElement('style')
+        css.appendChild(
+            document.createTextNode(
+                `
+                :root{
+                    --ytm-album-color-muted: #000000;
+                    --ytm-album-color-vibrant: #232323;
+                }
+
+                ytmusic-app-layout{
+                    --ytmusic-nav-bar: #000000; /* default for collapsed player */
+                }
+
+                ytmusic-app-layout.content-scrolled{
+                    --ytmusic-nav-bar: #232323; /* default for collapsed player */
+                }
+
+                ytmusic-app-layout[player-page-open_]{
+                    --ytmusic-nav-bar: var(--ytm-album-color-muted);
+                    --ytmusic-brand-background-solid: var(--ytm-album-color-vibrant);
+                }
+
+                #player-page{
+                    background: var(--ytm-album-color-muted);
+                }
+                `
+            )
+        )
+        document.head.appendChild(css)
+    } catch (err) {
+        console.error(err)
+        ipcRenderer.send('log', {
+            type: 'warn',
+            data: 'error on createPlayerColorRules insertCSS',
         })
     }
 }
