@@ -419,8 +419,28 @@ function createPlayerColorRules() {
                     --ytmusic-brand-background-solid: var(--ytm-album-color-vibrant);
                 }
 
+                body[accent-enabled] #progress-bar {
+                    --paper-slider-active-color: white;
+                    --paper-slider-knob-color: transparent;
+                }
+
+                body[accent-enabled] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: #232323;
+                    --yt-page-navigation-progress-color: white;
+                }
+
+                body[accent-enabled][player-open] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: var(--ytm-album-color-muted);
+                    --yt-page-navigation-progress-color: white;
+                }
+
                 body[accent-enabled] #player-page{
                     background: var(--ytm-album-color-muted);
+                }
+
+                body[accent-enabled] #progress-bar.ytmusic-player-bar[focused], 
+                body[accent-enabled] ytmusic-player-bar:hover #progress-bar.ytmusic-player-bar{
+                    --paper-slider-knob-color: white;
                 }
                 `
             )
