@@ -333,8 +333,14 @@ function createWindow() {
             mainWindow.webContents.executeJavaScript(`
                 document.body.setAttribute('player-open', '')
             `)
+            view.webContents.executeJavaScript(`
+                document.body.setAttribute('player-open', '')
+            `)
         } else {
             mainWindow.webContents.executeJavaScript(`
+                document.body.removeAttribute('player-open')
+            `)
+            view.webContents.executeJavaScript(`
                 document.body.removeAttribute('player-open')
             `)
         }

@@ -419,8 +419,28 @@ function createPlayerColorRules() {
                     --ytmusic-brand-background-solid: var(--ytm-album-color-vibrant);
                 }
 
+                body[accent-enabled] #progress-bar {
+                    --paper-slider-active-color: white;
+                    --paper-slider-knob-color: transparent;
+                }
+
+                body[accent-enabled] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: #232323;
+                    --yt-page-navigation-progress-color: white;
+                }
+
+                body[accent-enabled][player-open] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: var(--ytm-album-color-muted);
+                    --yt-page-navigation-progress-color: white;
+                }
+
                 body[accent-enabled] #player-page{
                     background: var(--ytm-album-color-muted);
+                }
+
+                body[accent-enabled] #progress-bar.ytmusic-player-bar[focused], 
+                body[accent-enabled] ytmusic-player-bar:hover #progress-bar.ytmusic-player-bar{
+                    --paper-slider-knob-color: white;
                 }
                 `
             )
@@ -548,17 +568,20 @@ function createBottomPlayerBarContent() {
 
         setInterval(() => {
             const popup = document.querySelector('.ytmusic-menu-popup-renderer')
-            const addLibrary = Array.from(popup.children).filter(
-                (value) =>
-                    value
-                        .querySelector('g path:not([fill])')
-                        .getAttribute('d') ==
-                        'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z' ||
-                    value
-                        .querySelector('g path:not([fill])')
-                        .getAttribute('d') ==
-                        'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z'
-            )[0]
+            let addLibrary
+            if (popup != undefined) {
+                addLibrary = Array.from(popup.children).filter(
+                    (value) =>
+                        value
+                            .querySelector('g path:not([fill])')
+                            .getAttribute('d') ==
+                            'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z' ||
+                        value
+                            .querySelector('g path:not([fill])')
+                            .getAttribute('d') ==
+                            'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z'
+                )[0]
+            }
 
             if (addLibrary != undefined && showAddToLibrary) {
                 const _d = addLibrary
