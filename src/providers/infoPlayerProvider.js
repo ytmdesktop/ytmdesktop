@@ -1,8 +1,8 @@
 const settingsProvider = require('./settingsProvider')
 
-var webContents, initialized
+let webContents, initialized
 
-var player = {
+const player = {
     hasSong: false,
     isPaused: true,
     volumePercent: 0,
@@ -13,7 +13,7 @@ var player = {
     repeatType: 'NONE',
 }
 
-var track = {
+const track = {
     author: '',
     title: '',
     album: '',
@@ -27,17 +27,17 @@ var track = {
     inLibrary: false,
 }
 
-var _queue = {
+let _queue = {
     automix: false,
     currentIndex: 0,
     list: [],
 }
 
-var _playlist = {
+let _playlist = {
     list: [],
 }
 
-var _lyrics = {
+const _lyrics = {
     provider: '',
     data: '',
     hasLoaded: false,
@@ -64,30 +64,28 @@ function getAllInfo() {
 }
 
 function getPlayerInfo() {
-    if (webContents !== undefined) {
-        hasSong()
-        isPaused(webContents)
-        getVolume(webContents)
-        getSeekbarPosition(webContents)
-        getLikeStatus(webContents)
-        getRepeatType(webContents)
-    }
-    return player
+    if (webContents === undefined) return player
+
+    hasSong()
+    isPaused(webContents)
+    getVolume(webContents)
+    getSeekbarPosition(webContents)
+    getLikeStatus(webContents)
+    getRepeatType(webContents)
 }
 
 function getTrackInfo() {
-    if (webContents !== undefined) {
-        getAuthor(webContents)
-        getTitle(webContents)
-        getAlbum(webContents)
-        getCover(webContents)
-        getDuration(webContents)
-        getUrl(webContents)
-        setPercent(player.seekbarCurrentPosition, track.duration)
-        isVideo(webContents)
-        isAdvertisement(webContents)
-    }
-    return track
+    if (webContents === undefined) return track
+
+    getAuthor(webContents)
+    getTitle(webContents)
+    getAlbum(webContents)
+    getCover(webContents)
+    getDuration(webContents)
+    getUrl(webContents)
+    setPercent(player.seekbarCurrentPosition, track.duration)
+    isVideo(webContents)
+    isAdvertisement(webContents)
 }
 
 function getQueueInfo() {
@@ -95,9 +93,7 @@ function getQueueInfo() {
 }
 
 function updateQueueInfo() {
-    if (webContents !== undefined) {
-        getQueue(webContents)
-    }
+    if (webContents !== undefined) getQueue(webContents)
 }
 
 function getPlaylistInfo() {
@@ -105,9 +101,7 @@ function getPlaylistInfo() {
 }
 
 function updatePlaylistInfo() {
-    if (webContents !== undefined) {
-        getPlaylist(webContents)
-    }
+    if (webContents !== undefined) getPlaylist(webContents)
 }
 
 function getLyricsInfo() {
@@ -115,7 +109,7 @@ function getLyricsInfo() {
 }
 
 function hasSong() {
-    player.hasSong = track.id != ''
+    player.hasSong = track.id !== ''
 }
 
 function isPaused(webContents) {
@@ -293,8 +287,8 @@ function getUrl(webContents) {
             if (url) {
                 track.url = url
 
-                var newUrl = new URL(url)
-                var searchParams = new URLSearchParams(newUrl.search)
+                const newUrl = new URL(url)
+                const searchParams = new URLSearchParams(newUrl.search)
 
                 track.id = searchParams.get('v')
                 debug(`Track Url: ${track.url}`)
@@ -343,11 +337,9 @@ function getQueue(webContents) {
         .catch((_) => console.log('error getQueue'))
 }
 
-function setQueueItem(webContents, index) {
-    webContents.executeJavaScript(
-        `
-        var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()
-        `
+async function setQueueItem(webContents, index) {
+    await webContents.executeJavaScript(
+        `var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()`
     )
 }
 
@@ -541,9 +533,9 @@ function addToPlaylist(webContents, index) {
 }
 
 function convertToHuman(time) {
-    var _aux = time
-    var _minutes = 0
-    var _seconds = 0
+    let _aux = time
+    let _minutes = 0
+    let _seconds
 
     while (_aux >= 60) {
         _aux = _aux - 60
@@ -578,8 +570,8 @@ function firstPlay(webContents) {
         .catch((_) => console.log('error firstPlay'))
 }
 
-function toggleMoreActions(webContents) {
-    webContents.executeJavaScript(
+async function toggleMoreActions(webContents) {
+    await webContents.executeJavaScript(
         `
             var middleControlsButtons = document.querySelector('.middle-controls-buttons');
             var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')

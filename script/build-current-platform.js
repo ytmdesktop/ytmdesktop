@@ -2,9 +2,7 @@ const cp = require('child_process')
 const path = require('path')
 
 let npm = 'npm'
-if (process.platform === 'win32') {
-    npm = 'npm.cmd'
-}
+if (process.platform === 'win32') npm = 'npm.cmd'
 
 let platform = ''
 switch (process.platform) {
