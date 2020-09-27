@@ -37,7 +37,7 @@ function fetchNetworkInterfaces() {
         .filter(([interfaces]) => !pattIgnoreInterface.test(interfaces))
         .map(([name, value]) => {
             value = value.filter((data) => {
-                return data.family == 'IPv4' && data.internal == false
+                return data.family === 'IPv4' && data.internal === false
             })
             return {
                 name: name,
@@ -47,17 +47,18 @@ function fetchNetworkInterfaces() {
         })
 }
 
-var serverFunction = function (req, res) {
+const serverFunction = (req, res) => {
     if (req.url === '/') {
         let collection = ''
         let isProtected = infoServer().isProtected
 
         serverInterfaces.forEach((value) => {
             let qr = qrcode(0, 'H')
-            value['hostname'] = hostname
+            value.hostname = hostname
             qr.addData(JSON.stringify(value))
             qr.make()
 
+            // TODO: This is quite messy
             collection += `
                           <div class="row" >
                               <div class="col s12">
@@ -67,9 +68,9 @@ var serverFunction = function (req, res) {
                                               <div class="col s6"> 
                                                   <img class="card card-content" style="padding: 10px !important;" src="${qr.createDataURL(
                                                       6
-                                                  )}" width="180" />
+                                                  )}" alt="QR Code" width="180" />
                                               </div>
-                                              <div class="col s6 white-text" style="border-left: solid 1px #222 !important; heigth: 500px; margin-top: 2.8% !important;"> 
+                                              <div class="col s6 white-text" style="border-left: solid 1px #222 !important; height: 500px; margin-top: 2.8% !important;"> 
                                                   <h3>${value.name}</h3> 
                                                   <h5 style="font-weight: 100 !important;">${
                                                       value.ip
@@ -79,15 +80,14 @@ var serverFunction = function (req, res) {
                                       </div>
                                   </div>
                               </div>
-                          </div>
-                      `
+                          </div>`
         })
 
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.writeHead(200)
 
-        res.write(`<html>
+        res.write(`<html lang="en">
           <head>
               <title>YTMDesktop Remote Control</title>
               <meta http-equiv="refresh" content="60">
@@ -99,8 +99,7 @@ var serverFunction = function (req, res) {
                       margin: 0;
                       padding: 0;
                       text-align: center;
-                      background: linear-gradient(to right top, #000 20%, #1d1d1d 80%);
-                      background-attachment: fixed;
+                      background: linear-gradient(to right top, #000 20%, #1d1d1d 80%) fixed;
                       font-family: sans-serif;
                   }
                   h5 {
@@ -127,7 +126,7 @@ var serverFunction = function (req, res) {
                       <div class="card-image" style="padding: 3px;">
                         <img src="${
                             infoPlayerProvider.getTrackInfo().cover
-                        }" style="min-width: 78px; width: 78px;">
+                        }" style="min-width: 78px; width: 78px;" alt="Track cover image">
                       </div>
                       <div class="card-stacked" style="width: 74%;">
                         <div class="card-content" style="font-size: 11px;">
@@ -169,7 +168,7 @@ var serverFunction = function (req, res) {
           <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
           <script>
               document.addEventListener('DOMContentLoaded', function() {
-                  var elems = document.querySelectorAll('.tooltipped');
+                  const elems = document.querySelectorAll('.tooltipped');
                   M.Tooltip.init(elems, {});
               });
           </script>
@@ -216,30 +215,28 @@ var serverFunction = function (req, res) {
                                 .toUpperCase()
 
                             if (
-                                authToken ==
+                                authToken ===
                                 settingsProvider.get(
                                     'settings-companion-server-token'
                                 )
-                            ) {
+                            )
                                 execCmd(command, value)
-                            } else {
+                            else {
                                 res.writeHead(401)
                                 res.end(
                                     JSON.stringify({ error: 'Unathorized' })
                                 )
                             }
-                        } catch {
+                        } catch (_) {
                             res.writeHead(400)
                             res.end(
                                 JSON.stringify({ error: 'No token provided' })
                             )
                         }
-                    } else {
-                        execCmd(command, value)
-                    }
+                    } else execCmd(command, value)
 
                     res.end(body)
-                } catch {
+                } catch (_) {
                     res.end(
                         JSON.stringify({
                             error: 'error to execute command',
@@ -250,68 +247,61 @@ var serverFunction = function (req, res) {
         }
     }
 
-    if (req.url === '/query/player') {
+    if (req.url === '/query/player')
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayerProvider.getPlayerInfo()))
             res.end()
         }
-    }
 
-    if (req.url === '/query/track') {
+    if (req.url === '/query/track')
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayerProvider.getTrackInfo()))
             res.end()
         }
-    }
 
-    if (req.url === '/query/queue') {
+    if (req.url === '/query/queue')
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayerProvider.getQueueInfo()))
             res.end()
         }
-    }
 
-    if (req.url === '/query/playlist') {
+    if (req.url === '/query/playlist')
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayerProvider.getPlaylistInfo()))
             res.end()
         }
-    }
 
-    if (req.url === '/query/lyrics') {
+    if (req.url === '/query/lyrics')
         if (req.method === 'GET') {
             res.write(JSON.stringify(infoPlayerProvider.getLyricsInfo()))
             res.end()
         }
-    }
 
-    if (req.url === '/info') {
+    if (req.url === '/info')
         if (req.method === 'GET') {
-            var result = {
+            const result = {
                 app: infoApp(),
                 server: infoServer(),
             }
             res.write(JSON.stringify(result))
             res.end()
         }
-    }
 }
 
-var server = http.createServer(serverFunction)
+const server = http.createServer(serverFunction)
 
 function canConnect(socket) {
-    let clientPassword = socket.handshake.headers['password'] || ''
-    let clientHost = socket.handshake['address']
-    let clientIsLocalhost = clientHost == '127.0.0.1'
+    let clientPassword = socket.handshake.headers.password || ''
+    let clientHost = socket.handshake.address
+    let clientIsLocalhost = clientHost === '127.0.0.1'
 
     let serverPassword = settingsProvider.get('settings-companion-server-token')
 
-    if (infoServer().isProtected) {
-        if (clientIsLocalhost == false && clientPassword != serverPassword) {
-            return false
-        }
-    }
-    return true
+    return !(
+        infoServer().isProtected &&
+        clientIsLocalhost === false &&
+        clientPassword !== serverPassword
+    )
 }
 
 function start() {
@@ -322,15 +312,12 @@ function start() {
         timerTotalConections = setInterval(() => {
             totalConnections = Object.keys(io.sockets.sockets).length
 
-            if (totalConnections) {
+            if (totalConnections)
                 io.emit('tick', infoPlayerProvider.getAllInfo())
-            }
         }, 500)
 
         io.on('connection', (socket) => {
-            if (!canConnect(socket)) {
-                socket.disconnect()
-            }
+            if (!canConnect(socket)) socket.disconnect()
 
             socket.on('media-commands', (cmd, value) => execCmd(cmd, value))
 
@@ -365,7 +352,7 @@ function start() {
             type: 'info',
             data: `Companion Server listening on port ${port}`,
         })
-    } catch {
+    } catch (_) {
         ipcMain.emit('log', {
             type: 'warn',
             data: `Error to start server on port ${port}`,

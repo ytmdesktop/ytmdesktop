@@ -60,16 +60,14 @@ class Mpris {
         }
 
         for (let [event, action] of Object.entries(events)) {
-            if (typeof action === 'string') {
+            if (typeof action === 'string')
                 this.player.on(event, () => {
                     ipcMain.emit('media-command', {
                         command: action,
                         value: true,
                     })
                 })
-            } else if (typeof action === 'function') {
-                this.player.on(event, action)
-            }
+            else if (typeof action === 'function') this.player.on(event, action)
         }
         this.player.on('position', (args) => {
             // the position event sends through {trackId : ###, position : ###}

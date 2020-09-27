@@ -16,16 +16,15 @@ const settingsOnDidChange = (key, cb) => {
 
 window.addEventListener('load', () => {
     createContextMenu()
+    createPlayerColorRules()
 
     const { hostname } = window.location
-    if (hostname == 'music.youtube.com') {
+    if (hostname === 'music.youtube.com') {
         createTopMiddleContent()
         createTopRightContent()
         createBottomPlayerBarContent()
         playerBarScrollToChangeVolume()
-    } else {
-        createOffTheRoadContent()
-    }
+    } else createOffTheRoadContent()
 
     // injectCast()
     loadAudioOutputList()
@@ -198,7 +197,7 @@ function createContextMenu() {
 
         document.addEventListener(
             'contextmenu',
-            function (e) {
+            (e) => {
                 const posX = e.clientX
                 const posY = e.clientY
                 showMenu(posX, posY)
@@ -208,50 +207,47 @@ function createContextMenu() {
         )
         document.addEventListener(
             'click',
-            function (e) {
+            (_) => {
                 menuElement.opacity = '0'
-                setTimeout(function () {
+                setTimeout(() => {
                     menuElement.visibility = 'hidden'
                 }, 501)
             },
             false
         )
 
-        if (buttonOpenCompanion) {
-            buttonOpenCompanion.addEventListener('click', function () {
+        if (buttonOpenCompanion)
+            buttonOpenCompanion.addEventListener('click', () => {
                 ipcRenderer.send('window', { command: 'show-companion' })
             })
-        }
 
-        if (buttonOpenLyrics) {
-            buttonOpenLyrics.addEventListener('click', function () {
+        if (buttonOpenLyrics)
+            buttonOpenLyrics.addEventListener('click', () => {
                 ipcRenderer.send('window', { command: 'show-lyrics' })
             })
-        }
 
-        if (buttonOpenMiniplayer) {
-            buttonOpenMiniplayer.addEventListener('click', function () {
+        if (buttonOpenMiniplayer)
+            buttonOpenMiniplayer.addEventListener('click', () => {
                 ipcRenderer.send('window', { command: 'show-miniplayer' })
             })
-        }
 
-        if (buttonPageOpenMiniplayer) {
-            buttonPageOpenMiniplayer.addEventListener('click', function (e) {
-                /* Temporary fix */ document
+        if (buttonPageOpenMiniplayer)
+            buttonPageOpenMiniplayer.addEventListener('click', (_) => {
+                /* Temporary fix */
+                document
                     .getElementsByClassName(
                         'player-maximize-button ytmusic-player'
                     )[0]
                     .click()
                 ipcRenderer.send('window', { command: 'show-miniplayer' })
             })
-        }
 
-        if (buttonOpenBugReport) {
-            buttonOpenBugReport.addEventListener('click', function () {
+        if (buttonOpenBugReport)
+            buttonOpenBugReport.addEventListener('click', () => {
                 ipcRenderer.send('bug-report')
             })
-        }
 
+        // TODO: This shouldn't be here
         function showMenu(x, y) {
             menuElement.top = y + 'px'
             menuElement.left = x + 'px'
@@ -318,7 +314,7 @@ function createTopRightContent() {
         )
         elementSettings.innerText = 'settings'
 
-        elementSettings.addEventListener('click', function () {
+        elementSettings.addEventListener('click', () => {
             ipcRenderer.send('window', { command: 'show-settings' })
         })
 
@@ -339,28 +335,26 @@ function createTopRightContent() {
         )
         elementRemoteServer.innerText = 'devices_other'
 
-        elementRemoteServer.addEventListener('click', function () {
+        elementRemoteServer.addEventListener('click', () => {
             ipcRenderer.send('window', { command: 'show-companion' })
         })
 
         right_content.prepend(elementRemoteServer)
 
-        if (settingsRemoteServer) {
+        if (settingsRemoteServer)
             document
                 .getElementById('ytmd_remote_server')
                 .classList.remove('hide')
-        }
 
         settingsOnDidChange('settings-companion-server', (data) => {
-            if (data.newValue) {
+            if (data.newValue)
                 document
                     .getElementById('ytmd_remote_server')
                     .classList.remove('hide')
-            } else {
+            else
                 document
                     .getElementById('ytmd_remote_server')
                     .classList.add('hide')
-            }
         })
 
         // UPDATE
@@ -377,19 +371,79 @@ function createTopRightContent() {
         elementUpdate.style.color = '#4CAF50'
         elementUpdate.innerText = 'arrow_downward'
 
-        elementUpdate.addEventListener('click', function () {
+        elementUpdate.addEventListener('click', () => {
             ipcRenderer.send('btn-update-clicked', true)
         })
 
         right_content.prepend(elementUpdate)
 
-        ipcRenderer.on('downloaded-new-update', function (e, data) {
+        ipcRenderer.on('downloaded-new-update', (e, data) => {
             document.getElementById('ytmd_update').classList.remove('hide')
         })
     } catch (err) {
         ipcRenderer.send('log', {
             type: 'warn',
             data: 'error on createTopRightContent',
+        })
+    }
+}
+
+function createPlayerColorRules() {
+    try {
+        const css = document.createElement('style')
+        css.appendChild(
+            document.createTextNode(
+                `
+                :root{
+                    --ytm-album-color-muted: #000000;
+                    --ytm-album-color-vibrant: #232323;
+                }
+
+                ytmusic-app-layout{
+                    --ytmusic-nav-bar: #000000; /* default for collapsed player */
+                }
+
+                ytmusic-app-layout.content-scrolled{
+                    --ytmusic-nav-bar: #232323; /* default for collapsed player */
+                }
+
+                body[accent-enabled] ytmusic-app-layout[player-page-open_]{
+                    --ytmusic-nav-bar: var(--ytm-album-color-muted);
+                    --ytmusic-brand-background-solid: var(--ytm-album-color-vibrant);
+                }
+
+                body[accent-enabled] #progress-bar {
+                    --paper-slider-active-color: white;
+                    --paper-slider-knob-color: transparent;
+                }
+
+                body[accent-enabled] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: #232323;
+                    --yt-page-navigation-progress-color: white;
+                }
+
+                body[accent-enabled][player-open] yt-page-navigation-progress{
+                    --yt-page-navigation-container-color: var(--ytm-album-color-muted);
+                    --yt-page-navigation-progress-color: white;
+                }
+
+                body[accent-enabled] #player-page{
+                    background: var(--ytm-album-color-muted);
+                }
+
+                body[accent-enabled] #progress-bar.ytmusic-player-bar[focused], 
+                body[accent-enabled] ytmusic-player-bar:hover #progress-bar.ytmusic-player-bar{
+                    --paper-slider-knob-color: white;
+                }
+                `
+            )
+        )
+        document.head.appendChild(css)
+    } catch (err) {
+        console.error(err)
+        ipcRenderer.send('log', {
+            type: 'warn',
+            data: 'error on createPlayerColorRules insertCSS',
         })
     }
 }
@@ -419,14 +473,14 @@ function createBottomPlayerBarContent() {
         elementAddToPlaylistButton.classList.add('ytmd-button-rounded', 'hide')
         elementAddToPlaylistButton.append(elementAddToPlaylistIcon)
 
-        elementAddToPlaylistButton.addEventListener('click', function () {
+        elementAddToPlaylistButton.addEventListener('click', () => {
             const popup = document.querySelector('.ytmusic-menu-popup-renderer')
             const addPlaylist = Array.from(popup.children)
                 .filter(
                     (value) =>
                         value
                             .querySelector('g path:not([fill])')
-                            .getAttribute('d') ==
+                            .getAttribute('d') ===
                         'M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z'
                 )[0]
                 .querySelector('a')
@@ -438,24 +492,22 @@ function createBottomPlayerBarContent() {
             playerBarMiddleControls.children.item(1)
         )
 
-        if (shortcutButtons['add-to-playlist']) {
+        if (shortcutButtons['add-to-playlist'])
             document
                 .querySelector('#btn_ytmd_add_to_playlist')
                 .classList.remove('hide')
-        }
 
         settingsOnDidChange(
             'settings-shortcut-buttons.add-to-playlist',
             (data) => {
-                if (data.newValue) {
+                if (data.newValue)
                     document
                         .querySelector('#btn_ytmd_add_to_playlist')
                         .classList.remove('hide')
-                } else {
+                else
                     document
                         .querySelector('#btn_ytmd_add_to_playlist')
                         .classList.add('hide')
-                }
             }
         )
 
@@ -471,7 +523,7 @@ function createBottomPlayerBarContent() {
         elementAddToLibraryButton.classList.add('ytmd-button-rounded', 'hide')
         elementAddToLibraryButton.append(elementAddToLibraryIcon)
 
-        elementAddToLibraryButton.addEventListener('click', function () {
+        elementAddToLibraryButton.addEventListener('click', () => {
             ipcRenderer.send('media-command', { command: 'media-add-library' })
         })
 
@@ -507,41 +559,49 @@ function createBottomPlayerBarContent() {
 
         setInterval(() => {
             const popup = document.querySelector('.ytmusic-menu-popup-renderer')
-            const addLibrary = Array.from(popup.children).filter(
-                (value) =>
-                    value
-                        .querySelector('g path:not([fill])')
-                        .getAttribute('d') ==
-                        'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z' ||
-                    value
-                        .querySelector('g path:not([fill])')
-                        .getAttribute('d') ==
-                        'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z'
-            )[0]
+            let addLibrary
+            if (popup !== undefined) {
+                addLibrary = Array.from(popup.children).filter(
+                    (value) =>
+                        value
+                            .querySelector('g path:not([fill])')
+                            .getAttribute('d') ===
+                            'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z' ||
+                        value
+                            .querySelector('g path:not([fill])')
+                            .getAttribute('d') ===
+                            'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z'
+                )[0]
+            }
 
-            if (addLibrary != undefined && showAddToLibrary) {
+            if (addLibrary !== undefined && showAddToLibrary) {
                 const _d = addLibrary
                     .querySelector('g path:not([fill])')
                     .getAttribute('d')
 
                 if (
-                    _d ==
+                    _d ===
                     'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'
                 ) {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'check'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('REMOVE_FROM_LIBRARY')
                 } else {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'library_add'
+                    document.querySelector(
+                        '#ytmd_add_to_library'
+                    ).title = translate('ADD_TO_LIBRARY')
                 }
                 document
                     .querySelector('#btn_ytmd_add_to_library')
                     .classList.remove('hide')
-            } else {
+            } else
                 document
                     .querySelector('#btn_ytmd_add_to_library')
                     .classList.add('hide')
-            }
         }, 800)
 
         // Right ////////////////////////////////////////////////////////////////////////////////////
@@ -557,14 +617,13 @@ function createBottomPlayerBarContent() {
         )
         elementLyrics.innerText = 'music_note'
 
-        elementLyrics.addEventListener('click', function () {
+        elementLyrics.addEventListener('click', () => {
             ipcRenderer.send('window', { command: 'show-lyrics' })
         })
         playerBarRightControls.append(elementLyrics)
 
-        if (shortcutButtons['lyrics']) {
+        if (shortcutButtons.lyrics)
             document.querySelector('#ytmd_lyrics').classList.remove('hide')
-        }
 
         settingsOnDidChange('settings-shortcut-buttons.lyrics', (data) => {
             if (data.newValue) {
@@ -592,14 +651,13 @@ function createBottomPlayerBarContent() {
         )
         elementMiniplayer.innerText = 'picture_in_picture_alt'
 
-        elementMiniplayer.addEventListener('click', function () {
+        elementMiniplayer.addEventListener('click', () => {
             ipcRenderer.send('window', { command: 'show-miniplayer' })
         })
         playerBarRightControls.append(elementMiniplayer)
 
-        if (shortcutButtons['miniplayer']) {
+        if (shortcutButtons.miniplayer)
             document.querySelector('#ytmd_miniplayer').classList.remove('hide')
-        }
 
         settingsOnDidChange('settings-shortcut-buttons.miniplayer', (data) => {
             if (data.newValue) {
@@ -616,6 +674,17 @@ function createBottomPlayerBarContent() {
                     .classList.remove('ytmd-icons')
             }
         })
+
+        // Volume slider
+        document.querySelector('#volume-slider').setAttribute('step', 0)
+        document.querySelector('#expand-volume-slider').setAttribute('step', 0)
+        document
+            .querySelector('#volume-slider')
+            .addEventListener('value-change', (e) => {
+                ipcRenderer.send('change-volume', {
+                    volume: e.target.getAttribute('value'),
+                })
+            })
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {
@@ -629,18 +698,17 @@ function playerBarScrollToChangeVolume() {
     try {
         const playerBar = document.getElementsByTagName('ytmusic-player-bar')[0]
 
-        playerBar.addEventListener('wheel', function (ev) {
+        playerBar.addEventListener('wheel', (ev) => {
             ev.preventDefault()
 
-            if (ev.deltaY < 0) {
+            if (ev.deltaY < 0)
                 ipcRenderer.send('media-command', {
                     command: 'media-volume-up',
                 })
-            } else {
+            else
                 ipcRenderer.send('media-command', {
                     command: 'media-volume-down',
                 })
-            }
         })
     } catch (err) {
         console.error(err)
@@ -668,7 +736,7 @@ function createOffTheRoadContent() {
         elementBack.style.color = '#FFF'
         elementBack.innerText = 'arrow_back'
 
-        elementBack.addEventListener('click', function () {
+        elementBack.addEventListener('click', () => {
             ipcRenderer.send('reset-url')
         })
 

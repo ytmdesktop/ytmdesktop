@@ -16,16 +16,13 @@ const settingsProvider = require('./settingsProvider')
 
 class windowsMediaProvider {
     constructor() {
-        this._webContents
+        this._webContents = null
         this._isInitialized = false
         this._controls =
             BackgroundMediaPlayer.current.systemMediaTransportControls
 
-        if (
-            !settingsProvider.get('settings-windows10-media-service-show-info')
-        ) {
+        if (!settingsProvider.get('settings-windows10-media-service-show-info'))
             this._controls.isEnabled = false
-        }
 
         this._controls.isChannelDownEnabled = false
         this._controls.isChannelUpEnabled = false
@@ -75,11 +72,10 @@ class windowsMediaProvider {
 
     setPlaybackStatus(status) {
         if (this._isInitialized) {
-            if (status) {
+            if (status)
                 this._controls.playbackStatus = MediaPlaybackStatus.paused
-            } else {
-                this._controls.playbackStatus = MediaPlaybackStatus.playing
-            }
+            else this._controls.playbackStatus = MediaPlaybackStatus.playing
+
             this._controls.displayUpdater.update()
         }
     }

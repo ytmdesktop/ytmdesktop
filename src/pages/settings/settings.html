@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <title>Settings</title>
@@ -273,60 +273,60 @@
                                         </td>
                                         <td>
                                             <select id="settings-app-language">
-                                                <option value="id"
-                                                    >Bahasa Indonesia</option
-                                                >
-                                                <option value="de"
-                                                    >Deutsch</option
-                                                >
-                                                <option value="en"
-                                                    >English</option
-                                                >
-                                                <option value="es"
-                                                    >Español</option
-                                                >
-                                                <option value="ca"
-                                                    >Català</option
-                                                >
-                                                <option value="fr"
-                                                    >Français</option
-                                                >
-                                                <option value="it"
-                                                    >Italiano</option
-                                                >
-                                                <option value="nl"
-                                                    >Nederlands</option
-                                                >
-                                                <option value="pl"
-                                                    >Polski</option
-                                                >
-                                                <option value="pt"
-                                                    >Português</option
-                                                >
-                                                <option value="tr"
-                                                    >Türkçe</option
-                                                >
-                                                <option value="ru"
-                                                    >Русский</option
-                                                >
-                                                <option value="uk"
-                                                    >Українська</option
-                                                >
-                                                <option value="ar"
-                                                    >العربية</option
-                                                >
-                                                <option value="ja"
-                                                    >日本語</option
-                                                >
-                                                <option value="zh"
-                                                    >简体中文</option
-                                                >
-                                                <option value="ko"
-                                                    >한국어</option
-                                                >
-                                                <option value="cs"
-                                                    >Čeština</option
-                                                >												
+                                                <option value="id">
+                                                    Bahasa Indonesia
+                                                </option>
+                                                <option value="de">
+                                                    Deutsch
+                                                </option>
+                                                <option value="en">
+                                                    English
+                                                </option>
+                                                <option value="es">
+                                                    Español
+                                                </option>
+                                                <option value="ca">
+                                                    Català
+                                                </option>
+                                                <option value="fr">
+                                                    Français
+                                                </option>
+                                                <option value="it">
+                                                    Italiano
+                                                </option>
+                                                <option value="nl">
+                                                    Nederlands
+                                                </option>
+                                                <option value="pl">
+                                                    Polski
+                                                </option>
+                                                <option value="pt">
+                                                    Português
+                                                </option>
+                                                <option value="tr">
+                                                    Türkçe
+                                                </option>
+                                                <option value="ru">
+                                                    Русский
+                                                </option>
+                                                <option value="uk">
+                                                    Українська
+                                                </option>
+                                                <option value="ar">
+                                                    العربية
+                                                </option>
+                                                <option value="ja">
+                                                    日本語
+                                                </option>
+                                                <option value="zh">
+                                                    简体中文
+                                                </option>
+                                                <option value="ko">
+                                                    한국어
+                                                </option>
+                                                <option value="cs">
+                                                    Čeština
+                                                </option>
                                             </select>
                                         </td>
                                     </tr>
@@ -348,7 +348,7 @@
                                         <td colspan="2">
                                             <div
                                                 class="divider"
-                                                style="margin-top: 5%;"
+                                                style="margin-top: 5%"
                                             >
                                                 &nbsp;
                                             </div>
@@ -446,7 +446,7 @@
                                                 >0</span
                                             >s
                                             <p
-                                                style="margin: -7px 13px 0 8px;"
+                                                style="margin: -7px 13px 0 8px"
                                                 class="right range-field"
                                             >
                                                 <input
@@ -456,6 +456,24 @@
                                                     max="120"
                                                 />
                                             </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK_DECIBEL_VOLUME"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-decibel-volume"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -575,7 +593,7 @@
                                                 >100</span
                                             >%
                                             <p
-                                                style="margin: -7px 13px 0 8px;"
+                                                style="margin: -7px 13px 0 8px"
                                                 class="right range-field"
                                             >
                                                 <input
@@ -591,6 +609,24 @@
                                     <tr>
                                         <td>
                                             <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_APPEARANCE_PLAYER_BACKGROUND_COLOR"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-enable-player-bgcolor"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE"
                                             ></span>
                                         </td>
@@ -600,20 +636,17 @@
                                                     id="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NICE"
                                                     value="nice"
                                                     i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NICE"
-                                                >
-                                                </option>
+                                                ></option>
                                                 <option
                                                     id="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_SYSTEM"
                                                     value="system"
                                                     i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_SYSTEM"
-                                                >
-                                                </option>
+                                                ></option>
                                                 <option
                                                     id="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NONE"
                                                     value="none"
                                                     i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NONE"
-                                                >
-                                                </option>
+                                                ></option>
                                             </select>
                                         </td>
                                     </tr>
@@ -652,7 +685,7 @@
                                         <td class="right">
                                             <div
                                                 class="switch"
-                                                style="margin-right: 12px;"
+                                                style="margin-right: 12px"
                                             >
                                                 <button
                                                     class="waves-effect waves-light btn-flat white-text btn-tiny"
@@ -1139,6 +1172,29 @@
                                             <tr>
                                                 <td>
                                                     <span
+                                                        i18n="i18n_LABEL_SETTINGS_TAB_SHORTCUTS_VOLUME_MEDIA_KEYS"
+                                                    ></span>
+                                                </td>
+                                                <th>
+                                                    <div
+                                                        class="switch"
+                                                        style="display: inline"
+                                                    >
+                                                        <label>
+                                                            <input
+                                                                type="checkbox"
+                                                                id="settings-volume-media-keys"
+                                                            />
+                                                            <span
+                                                                class="lever"
+                                                            ></span>
+                                                        </label>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span
                                                         i18n="i18n_MEDIA_CONTROL_MINIPLAYER"
                                                     ></span>
                                                 </td>
@@ -1173,7 +1229,7 @@
                                                     >
                                                     <div
                                                         class="switch"
-                                                        style="display: inline;"
+                                                        style="display: inline"
                                                     >
                                                         <label>
                                                             <input
@@ -1196,10 +1252,10 @@
                         <div
                             id="tab-about"
                             class="tab-content center-align"
-                            style="padding-top: 20%;"
+                            style="padding-top: 20%"
                         >
                             <div class="row">
-                                <span style="color: #aaa;">
+                                <span style="color: #aaa">
                                     v<span id="app-version"></span> <br /><br />
                                     <button
                                         id="release-notes"
@@ -1213,9 +1269,9 @@
                             </div>
                             <div class="row">
                                 Made with
-                                <span style="color: #f44336;">❤</span> by
+                                <span style="color: #f44336">❤</span> by
                                 adlerluiz & contributors
-                                <p style="color: #aaa;">
+                                <p style="color: #aaa">
                                     https://ytmdesktop.app
                                 </p>
                             </div>
@@ -1229,7 +1285,7 @@
             <button
                 class="btn red hide"
                 id="btn-relaunch"
-                style="text-transform: none;"
+                style="text-transform: none"
             >
                 <i class="material-icons left">autorenew</i
                 ><span i18n="i18n_LABEL_SETTINGS_RELAUNCH"></span>

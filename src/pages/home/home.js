@@ -11,7 +11,7 @@ canvas.height = 32
 canvas.width = 150
 const ctx = canvas.getContext('2d')
 
-ipc.on('update-status-bar', function (event, arg) {
+ipc.on('update-status-bar', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.font = '14px Arial'
     if (store.get('settings-shiny-tray-dark', false)) {
@@ -25,29 +25,25 @@ ipc.on('update-status-bar', function (event, arg) {
 
     // console.log(arg)
     ctx.drawImage(icon_set.icons, 8, 8, 16, 16)
-    if (status.paused) {
-        ctx.drawImage(icon_set.play, 135, 6, 20, 20)
-    } else {
-        ctx.drawImage(icon_set.pause, 135, 6, 20, 20)
-    }
+    if (status.paused) ctx.drawImage(icon_set.play, 135, 6, 20, 20)
+    else ctx.drawImage(icon_set.pause, 135, 6, 20, 20)
+
     ipc.send('updated-tray-image', canvas.toDataURL('image/png', 1))
 })
 
 ipc.send('register-renderer')
 
-ipc.on('is-dev', function (event, args) {
-    if (args) {
-        document.title = document.title + ' DEV'
-    }
+ipc.on('is-dev', (event, args) => {
+    if (args) document.title = document.title + ' DEV'
 })
 
 function cutstr(str, len) {
-    var str_length = 0
-    var str_len = 0
-    str_cut = new String()
+    let str_length = 0
+    let str_len
+    let str_cut = String()
     str_len = str.length
-    for (var i = 0; i < str_len; i++) {
-        a = str.charAt(i)
+    for (let i = 0; i < str_len; i++) {
+        const a = str.charAt(i)
         str_length++
         if (escape(a).length > 4) {
             str_length++
@@ -58,23 +54,19 @@ function cutstr(str, len) {
             return str_cut
         }
     }
-    if (str_length < len) {
-        return str
-    }
+    if (str_length < len) return str
 }
 
+// TODO: Unused function?
 function getStrLength(str) {
     // For cut str
-    var realLength = 0,
+    let realLength = 0,
         len = str.length,
         charCode = -1
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
         charCode = str.charCodeAt(i)
-        if (charCode >= 0 && charCode <= 128) {
-            realLength += 1
-        } else {
-            realLength += 2
-        }
+        if (charCode >= 0 && charCode <= 128) realLength += 1
+        else realLength += 2
     }
     return realLength
 }
