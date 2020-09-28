@@ -10,7 +10,7 @@ const TITLE_BAR_HEIGHT_MAC = 21
 
 /**
  * @param {settingsProvider} store
- * @param {Array.<width: Number, height: Number, isMac: Boolean, isMaximized: Boolean>} sizes
+ * @param window
  */
 function calculateYoutubeViewSize(store, window) {
     const windowSize = window.getSize()
@@ -20,14 +20,13 @@ function calculateYoutubeViewSize(store, window) {
 
     const x = PADDING
 
-    if (window.isFullScreen()) {
+    if (window.isFullScreen())
         return {
             x: 0,
             y: 0,
             width: windowSize[0],
             height: windowSize[1],
         }
-    }
 
     if (isMac()) {
         // IS MAC

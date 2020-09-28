@@ -31,7 +31,7 @@ if (store.get('titlebar-type', 'nice') !== 'nice') {
     document.getElementById('content').style.marginTop = '5vh'
 }
 
-ipc.on('window-is-maximized', function (_, value) {
+ipc.on('window-is-maximized', (_, value) => {
     if (value) {
         document.getElementById('icon_maximize').classList.add('hide')
         document.getElementById('icon_restore').classList.remove('hide')
@@ -41,31 +41,26 @@ ipc.on('window-is-maximized', function (_, value) {
     }
 })
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     checkUrlParams()
 
     let btnMinimize = document.getElementById('btn-minimize')
     let btnMaximize = document.getElementById('btn-maximize')
     let btnClose = document.getElementById('btn-close')
 
-    if (btnMinimize) {
-        btnMinimize.addEventListener('click', function () {
+    if (btnMinimize)
+        btnMinimize.addEventListener('click', () => {
             currentWindow.minimize()
         })
-    }
 
-    if (btnMaximize) {
-        btnMaximize.addEventListener('click', function () {
-            if (!currentWindow.isMaximized()) {
-                currentWindow.maximize()
-            } else {
-                currentWindow.unmaximize()
-            }
+    if (btnMaximize)
+        btnMaximize.addEventListener('click', () => {
+            if (!currentWindow.isMaximized()) currentWindow.maximize()
+            else currentWindow.unmaximize()
         })
-    }
 
     if (btnClose) {
-        btnClose.addEventListener('click', function () {
+        btnClose.addEventListener('click', () => {
             currentWindow.close()
         })
     }
@@ -86,22 +81,17 @@ function checkUrlParams() {
     let title = params.get('title')
     let hide = params.get('hide')
 
-    if (page) {
-        webview.src = `../../${page}.html`
-    }
+    if (page) webview.src = `../../${page}.html`
 
     if (icon) {
         let elIcon = document.getElementById('icon')
-        if (elIcon) {
-            elIcon.innerText = icon
-        }
+        if (elIcon) elIcon.innerText = icon
     }
 
     if (title) {
         let elTitle = document.getElementById('window-title')
-        if (elTitle) {
-            elTitle.innerText = title
-        }
+        if (elTitle) elTitle.innerText = title
+
         document.title = title
     }
 
@@ -110,9 +100,7 @@ function checkUrlParams() {
 
         hide.forEach((element) => {
             let elHide = document.getElementById(element)
-            if (elHide) {
-                elHide.classList.add('hide')
-            }
+            if (elHide) elHide.classList.add('hide')
         })
     }
 }

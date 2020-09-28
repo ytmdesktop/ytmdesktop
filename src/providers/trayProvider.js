@@ -1,4 +1,4 @@
-const { app, Menu, Tray, BrowserWindow, ipcMain } = require('electron')
+const { app, Menu, Tray, ipcMain } = require('electron')
 const mediaControl = require('./mediaProvider')
 const nativeImage = require('electron').nativeImage
 const settingsProvider = require('./settingsProvider')
@@ -17,9 +17,7 @@ let iconTray = assetsProvider.getIcon('trayTemplate')
 
 function setTooltip(tooltip) {
     try {
-        if (tray) {
-            tray.setToolTip(tooltip)
-        }
+        if (tray) tray.setToolTip(tooltip)
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
@@ -61,22 +59,17 @@ function createTray(mainWindow) {
             )
         }
 
-        if (!systemInfo.isMac()) {
-            init_tray()
-        } else {
-            setShinyTray()
-        }
+        if (!systemInfo.isMac()) init_tray()
+        else setShinyTray()
     }
 }
 
 function updateTray(data) {
     try {
         if (tray) {
-            var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
+            const template = popUpMenu(__, saved_mainWindow, mediaControl, app)
 
-            if (data.type == 'audioOutputs') {
-                template[11]['submenu'] = data.data
-            }
+            if (data.type === 'audioOutputs') template[11].submenu = data.data
 
             contextMenu = Menu.buildFromTemplate(template)
 
@@ -105,8 +98,7 @@ function updateTrayIcon(icon) {
 }
 
 function buildTrayIcon(icon) {
-    let nativeImageIcon = nativeImage.createFromPath(icon)
-    return nativeImageIcon
+    return nativeImage.createFromPath(icon)
 }
 
 function balloon(title, content, cover, icon) {
@@ -149,21 +141,20 @@ function _doNotification(title, content, icon) {
                     content: content,
                     noSound: true,
                 })
-                if (!settingsProvider.get('settings-tray-icon')) {
+                if (!settingsProvider.get('settings-tray-icon'))
                     setTimeout(() => {
                         quit()
                     }, 7 * 1000)
-                }
-            } else {
-                // create a system notification and send it
-                let myNotification = new Notification({
+            }
+            // create a system notification and send it
+            else
+                new Notification({
                     title: title,
                     body: content,
                     silent: true,
                     icon: icon,
                     urgency: 'low',
                 }).show()
-            }
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -182,17 +173,15 @@ function setShinyTray() {
         if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
             tray.setContextMenu(null)
             tray.removeAllListeners()
-            tray.on('right-click', (event, bound, position) => {
+            tray.on('right-click', () => {
                 tray.popUpContextMenu(contextMenu)
             })
             tray.on('click', (event, bound, position) => {
-                if (position.x < 32) {
-                    saved_mainWindow.show()
-                } else if (position.x > 130) {
+                if (position.x < 32) saved_mainWindow.show()
+                else if (position.x > 130)
                     mediaControl.playPauseTrack(
                         saved_mainWindow.getBrowserView()
                     )
-                }
             })
         } else {
             // Shiny tray disabled ||| on onther platform
@@ -210,12 +199,12 @@ function setShinyTray() {
 function updateImage(payload) {
     try {
         if (!settingsProvider.get('settings-shiny-tray')) return
-        var img =
+        const img =
             typeof nativeImage.createFromDataURL === 'function'
                 ? nativeImage.createFromDataURL(payload) // electron v0.36+
                 : nativeImage.createFromDataUrl(payload) // electron v0.30
         tray.setImage(img)
-    } catch {
+    } catch (_) {
         ipcMain.emit('log', {
             type: 'warn',
             data: `Failed to updateImage: ${error}`,

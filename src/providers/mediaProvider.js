@@ -35,9 +35,8 @@ function mediaVolumeUp(mainWindow) {
             mainWindow.webContents,
             decibelToPercent(percentToDecibel(percent) + 1.5)
         )
-    } else {
+    } else
         mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
-    }
 }
 
 function mediaVolumeDown(mainWindow) {
@@ -47,9 +46,8 @@ function mediaVolumeDown(mainWindow) {
             mainWindow.webContents,
             decibelToPercent(percentToDecibel(percent) - 1.5)
         )
-    } else {
+    } else
         mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
-    }
 }
 
 function mediaForwardTenSeconds(mainWindow) {
@@ -76,8 +74,8 @@ function mediaChangeVolume(mainWindow, time) {
     infoPlayerProvider.setVolume(mainWindow.webContents, time)
 }
 
-function mediaSelectQueueItem(mainWindow, index) {
-    infoPlayerProvider.setQueueItem(mainWindow.webContents, index)
+async function mediaSelectQueueItem(mainWindow, index) {
+    await infoPlayerProvider.setQueueItem(mainWindow.webContents, index)
 }
 
 function mediaAddToLibrary(mainWindow) {
@@ -113,19 +111,19 @@ function createThumbar(mainWindow, mediaInfo) {
         case 'INDIFFERENT':
             thumbsUp = '../assets/img/controls/thumbs-up-button-outline.png'
             thumbsDown = '../assets/img/controls/thumbs-down-button-outline.png'
-            thumbsReverse = likeStatus == 'LIKE' ? 'DISLIKE' : 'LIKE'
+            thumbsReverse = likeStatus === 'LIKE' ? 'DISLIKE' : 'LIKE'
             break
     }
 
     playOrPause = {
         tooltip: __.trans('MEDIA_CONTROL_PLAY'),
         icon: path.join(__dirname, '../assets/img/controls/play-button.png'),
-        click: function () {
+        click: () => {
             mediaPlayPauseTrack(mainWindow.getBrowserView())
         },
     }
 
-    if (isPaused == false) {
+    if (isPaused === false) {
         playOrPause.tooltip = __.trans('MEDIA_CONTROL_PAUSE')
         playOrPause.icon = path.join(
             __dirname,
@@ -138,7 +136,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: __.trans('MEDIA_CONTROL_THUMBS_DOWN'),
                 icon: path.join(__dirname, thumbsDown),
-                click: function () {
+                click: () => {
                     mediaDownVote(
                         mainWindow.getBrowserView(),
                         createThumbar(mainWindow, mediaInfo)
@@ -156,7 +154,7 @@ function createThumbar(mainWindow, mediaInfo) {
                     __dirname,
                     '../assets/img/controls/play-previous-button.png'
                 ),
-                click: function () {
+                click: () => {
                     mediaPreviousTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -164,7 +162,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: playOrPause.tooltip,
                 icon: playOrPause.icon,
-                click: function () {
+                click: () => {
                     mediaPlayPauseTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -175,7 +173,7 @@ function createThumbar(mainWindow, mediaInfo) {
                     __dirname,
                     '../assets/img/controls/play-next-button.png'
                 ),
-                click: function () {
+                click: () => {
                     mediaNextTrack(mainWindow.getBrowserView())
                 },
                 flags: !hasId ? ['disabled'] : [],
@@ -187,7 +185,7 @@ function createThumbar(mainWindow, mediaInfo) {
             {
                 tooltip: __.trans('MEDIA_CONTROL_THUMBS_UP'),
                 icon: path.join(__dirname, thumbsUp),
-                click: function () {
+                click: () => {
                     mediaUpVote(
                         mainWindow.getBrowserView(),
                         createThumbar(mainWindow, mediaInfo)
@@ -214,15 +212,12 @@ function decibelToPercent(decibel) {
 }
 
 function setProgress(mainWindow, progress, isPaused) {
-    if (mainWindow) {
-        if (systemInfo.isWindows()) {
+    if (mainWindow)
+        if (systemInfo.isWindows())
             mainWindow.setProgressBar(progress, {
                 mode: isPaused ? 'paused' : 'normal',
             })
-        } else {
-            mainWindow.setProgressBar(progress)
-        }
-    }
+        else mainWindow.setProgressBar(progress)
 }
 
 function createTouchBar(mainWindow) {
