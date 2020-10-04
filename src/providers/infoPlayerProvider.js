@@ -72,6 +72,7 @@ function getPlayerInfo() {
     getSeekbarPosition(webContents)
     getLikeStatus(webContents)
     getRepeatType(webContents)
+    return player
 }
 
 function getTrackInfo() {
@@ -86,6 +87,7 @@ function getTrackInfo() {
     setPercent(player.seekbarCurrentPosition, track.duration)
     isVideo(webContents)
     isAdvertisement(webContents)
+    return track
 }
 
 function getQueueInfo() {
