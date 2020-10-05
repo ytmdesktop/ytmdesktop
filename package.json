@@ -54,7 +54,7 @@
         "node-vibrant": "^3.1.5",
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
-        "scribble": "0.0.5",
+        "scribble": "github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43",
         "socket.io": "^2.3.0",
         "uuid": "^8.3.0",
         "ws": "^7.3.1"
