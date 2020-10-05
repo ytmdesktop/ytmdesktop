@@ -3060,10 +3060,10 @@ sax@>=0.6.0, sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-scribble@0.0.5:
+"scribble@github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43":
   version "0.0.5"
-  resolved "https://registry.yarnpkg.com/scribble/-/scribble-0.0.5.tgz#2119ab0393a577c9d4721af543e714e480fdc0db"
-  integrity sha1-IRmrA5Old8nUchr1Q+cU5ID9wNs=
+  resolved "https://codeload.github.com/dittodhole/node-scribble-js/tar.gz/a2b37f585c5382863319115db36201399477ed43"
+
 
 semver-compare@^1.0.0:
   version "1.0.0"
