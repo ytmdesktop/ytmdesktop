@@ -3,7 +3,7 @@
     "ADD_TO_PLAYLIST": "プレイリストに追加",
     "ALWAYS_ASK_WHEN_READ_LINK": "リンク読み取り時に常に尋ねる",
     "DOUBLE_CLICK_TO_RESET_POSITION": "ダブルクリックで位置を初期化",
-    "LABEL_ALSO": "Also",
+    "LABEL_ALSO": "または",
     "LABEL_AUDIO": "オーディオ",
     "LABEL_CANCEL": "中止",
     "LABEL_CHANGELOG": "新機能",
@@ -98,6 +98,8 @@
     "SKIP_TRACK_MARKED_DISLIKED": "低評価をつけたトラックをスキップ",
     "SKIP_TRACK_SHORTER_THAN": "値より短い音楽をスキップ",
     "TRAY_ICON": "トレイのアイコン",
-    "WANT_PLAY_THIS_LINK": "このリンクを再生しますか？"
+    "WANT_PLAY_THIS_LINK": "このリンクを再生しますか？",
+    "LABEL_SETTINGS_TAB_PLAYBACK_DECIBEL_VOLUME": "音量の表記を'%'から'db'に変更",
+    "LABEL_SETTINGS_TAB_APPEARANCE_PLAYER_BACKGROUND_COLOR": "背景色をアルバムの色に設定",
+    "LABEL_SETTINGS_TAB_SHORTCUTS_VOLUME_MEDIA_KEYS": "音量コントロールのショートカットをこのアプリだけに適用"
 }
-
