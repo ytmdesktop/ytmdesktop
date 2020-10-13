@@ -6,6 +6,7 @@ class Mpris {
         this._isInitialized = false
         this.player = undefined
         this._realPlayer = undefined //we'll need the infoPlayer later to be better able to track the time.
+        this._isPaused = undefined
     }
 
     start() {
@@ -47,6 +48,25 @@ class Mpris {
                 ? mpris.PLAYBACK_STATUS_PAUSED
                 : mpris.PLAYBACK_STATUS_PLAYING
         }
+        this._isPaused = info.player.isPaused
+    }
+
+    pause() {
+        if (!this._isPaused) {
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
+        }
+    }
+
+    play() {
+        if (this._isPaused) {
+            ipcMain.emit('media-command', {
+                command: 'media-play-pause',
+                value: true,
+            })
+        }
     }
 
     _setInitialEvents() {
@@ -54,8 +74,8 @@ class Mpris {
             quit: () => process.exit(0),
             previous: 'media-track-previous',
             next: 'media-track-next',
-            pause: 'media-play-pause',
-            play: 'media-play-pause',
+            pause: this.pause,
+            play: this.play,
             playpause: 'media-play-pause', //KDE Connect only sends this event it looked like.
         }
 

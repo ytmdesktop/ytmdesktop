@@ -517,6 +517,9 @@ function createWindow() {
                 lastIsPaused = playerInfo.isPaused
 
                 discordRPC.setActivity(getAll())
+                if (isLinux()) {
+                    mprisProvider.setActivity(getAll())
+                }
 
                 if (!isMac() && !settingsProvider.get('settings-shiny-tray')) {
                     tray.updateTrayIcon(
