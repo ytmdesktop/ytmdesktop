@@ -27,11 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.addEventListener('wheel', function (ev) {
         ev.preventDefault()
-        if (ev.deltaY < 0) {
+        if (ev.deltaY < 0)
             ipcRenderer.send('media-command', { command: 'media-volume-up' })
-        } else {
-            ipcRenderer.send('media-command', { command: 'media-volume-down' })
-        }
+        else ipcRenderer.send('media-command', { command: 'media-volume-down' })
     })
 
     document.addEventListener('dblclick', (ev) => {
@@ -128,9 +126,8 @@ function setPlayerInfo(data) {
             })
     }
 
-    if (settingsProvider.get('settings-miniplayer-always-show-controls')) {
+    if (settingsProvider.get('settings-miniplayer-always-show-controls'))
         body.classList.add('showinfo')
-    }
 
     if (data.track.id) {
         document.querySelector('#loading').classList.add('hide')

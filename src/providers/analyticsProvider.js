@@ -5,7 +5,7 @@ const { v4: uuid } = require('uuid')
 const settingsProvider = require('./settingsProvider')
 let userId = settingsProvider.get('uuid')
 
-if (userId == undefined) {
+if (userId === undefined) {
     userId = uuid()
     settingsProvider.set('uuid', userId)
 }
@@ -18,7 +18,7 @@ function setAnalyticsEvent(from, action, label, value) {
             clientID: userId,
         })
         .then()
-        .catch((err) => {
+        .catch((_) => {
             console.log('error setAnalyticsEvent')
         })
 }
@@ -34,7 +34,7 @@ function setAnalyticsScreen(from) {
             userId
         )
         .then()
-        .catch((err) => {
+        .catch((_) => {
             console.log('error setAnalyticsScreen')
         })
 }
