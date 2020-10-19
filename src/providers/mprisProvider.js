@@ -15,6 +15,7 @@ class Mpris {
             supportedUriSchemes: ['file'],
             supportedMimeTypes: ['audio/mpeg', 'application/ogg'],
             supportedInterfaces: ['player'],
+            canRaise: true,
         })
 
         this._setInitialEvents()
@@ -77,6 +78,10 @@ class Mpris {
                 command: 'media-seekbar-set',
                 value: args.position / (1000 * 1000),
             })
+        })
+
+        this.player.on('raise', () => {
+            ipcMain.emit('show', null)
         })
 
         this.player.on('seek', (offset) => {
