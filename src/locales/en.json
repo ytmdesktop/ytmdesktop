@@ -75,6 +75,7 @@
     "LABEL_SETTINGS_TAB_SHORTCUTS_VOLUME_MEDIA_KEYS": "Volume media keys only control app volume",
     "LABEL_SETTINGS_TAB_PLAYBACK_DECIBEL_VOLUME": "Switch volume control from '%' to 'dB'",
     "LABEL_SETTINGS": "Settings",
+    "LABEL_SHUTDOWN": "Shutdown",
     "LYRICS": "Lyrics",
     "MEDIA_CONTROL_MINIPLAYER": "Open/Close Miniplayer",
     "MEDIA_CONTROL_MUTE_UNMUTE": "Mute/Unmute",
