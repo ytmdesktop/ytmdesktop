@@ -443,6 +443,7 @@ function setVolume(webContents, time) {
             `
         var slider = document.querySelector('#volume-slider');
         slider.value = ${time};
+        document.querySelector('.video-stream').volume = ${time / 100}
         `
         )
         .then()
