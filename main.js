@@ -1198,7 +1198,12 @@ async function createWindow() {
                             'settings-miniplayer-size',
                             Math.min(...size)
                         )
-                        miniplayer.setSize(Math.min(...size), Math.min(...size))
+                        if (miniplayer) {
+                            miniplayer.setSize(
+                                Math.min(...size),
+                                Math.min(...size)
+                            )
+                        }
                     }, 500)
                 } catch (_) {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
