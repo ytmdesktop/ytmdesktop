@@ -891,7 +891,8 @@ async function createWindow() {
     })
 
     settingsProvider.onDidChange('settings-page-zoom', (data) => {
-        view.webContents.zoomFactor = data.newValue / 100
+        console.log(data)
+        view.webContents.setZoomFactor(data.newValue / 100)
     })
 
     ipcMain.on('media-command', (dataMain, dataRenderer) => {

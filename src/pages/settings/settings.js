@@ -193,8 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (elementRangeZoom) {
     elementRangeZoom.addEventListener('input', () => {
-        document.getElementById('range-zoom-value').innerText = this.value
-        settingsProvider.set('settings-page-zoom', this.value)
+        document.getElementById('range-zoom-value').innerText =
+            elementRangeZoom.value
+        settingsProvider.set('settings-page-zoom', elementRangeZoom.value)
     })
 }
 
@@ -202,8 +203,14 @@ if (elementRangeSkipTrackShorterThan)
     elementRangeSkipTrackShorterThan.addEventListener('input', () => {
         document.getElementById(
             'range-skip-track-shorter-than-value'
-        ).innerText = this.value === 0 ? `(Disabled) ${this.value}` : this.value
-        settingsProvider.set('settings-skip-track-shorter-than', this.value)
+        ).innerText =
+            elementRangeSkipTrackShorterThan.value === 0
+                ? `(Disabled) ${elementRangeSkipTrackShorterThan.value}`
+                : elementRangeSkipTrackShorterThan.value
+        settingsProvider.set(
+            'settings-skip-track-shorter-than',
+            elementRangeSkipTrackShorterThan.value
+        )
     })
 
 if (elementBtnOpenPageEditor)
