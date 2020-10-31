@@ -560,7 +560,7 @@ function createBottomPlayerBarContent() {
         setInterval(() => {
             const popup = document.querySelector('.ytmusic-menu-popup-renderer')
             let addLibrary
-            if (popup !== undefined) {
+            if (popup) {
                 addLibrary = Array.from(popup.children).filter(
                     (value) =>
                         value
