@@ -988,6 +988,10 @@ async function createWindow() {
         tray.setShinyTray()
     })
 
+    ipcMain.on('show', (_) => {
+        mainWindow.show()
+    })
+
     ipcMain.on('btn-update-clicked', () => {
         updater.quitAndInstall()
     })
