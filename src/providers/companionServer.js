@@ -378,17 +378,21 @@ function execCmd(cmd, value) {
             break
 
         case 'track-play':
-            ipcMain.emit('media-command', {
-                command: 'media-play-pause',
-                value: true,
-            })
+            if (infoPlayerProvider.getPlayerInfo().isPaused) {
+                ipcMain.emit('media-command', {
+                    command: 'media-play-pause',
+                    value: true,
+                })
+            }
             break
 
         case 'track-pause':
-            ipcMain.emit('media-command', {
-                command: 'media-play-pause',
-                value: true,
-            })
+            if (!infoPlayerProvider.getPlayerInfo().isPaused) {
+                ipcMain.emit('media-command', {
+                    command: 'media-play-pause',
+                    value: true,
+                })
+            }
             break
 
         case 'track-next':
