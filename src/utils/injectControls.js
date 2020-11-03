@@ -716,8 +716,38 @@ function playerBarScrollToChangeVolume() {
     try {
         const playerBar = document.getElementsByTagName('ytmusic-player-bar')[0]
 
+        const volumeSlider = document.getElementById('volume-slider')
+        let isVolumeSliderHovered = false
+        volumeSlider.addEventListener(
+            'mouseover',
+            () => (isVolumeSliderHovered = true)
+        )
+        volumeSlider.addEventListener(
+            'mouseout',
+            () => (isVolumeSliderHovered = false)
+        )
+
+        const expandVolumeSlider = document.getElementById(
+            'expand-volume-slider'
+        )
+        let isExpandVolumeSliderHovered = false
+        expandVolumeSlider.addEventListener(
+            'mouseover',
+            () => (isExpandVolumeSliderHovered = true)
+        )
+        expandVolumeSlider.addEventListener(
+            'mouseout',
+            () => (isExpandVolumeSliderHovered = false)
+        )
+
+        const isSliderHovered = () =>
+            isExpandVolumeSliderHovered || isVolumeSliderHovered
+
         playerBar.addEventListener('wheel', (ev) => {
             ev.preventDefault()
+            if (!settingsGet('settings-decibel-volume') && isSliderHovered()) {
+                return
+            }
 
             if (ev.deltaY < 0)
                 ipcRenderer.send('media-command', {
