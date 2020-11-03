@@ -283,8 +283,6 @@ function showRelaunchButton() {
  * @param {*} fn
  */
 function initElement(elementName, eventType, fn) {
-    if (fn === undefined) fn = () => {}
-
     const element = document.getElementById(elementName)
 
     if (element) {
@@ -301,10 +299,10 @@ function initElement(elementName, eventType, fn) {
  * @param {*} fn
  */
 function createListener(element, settingsName, eventType, fn) {
-    element.addEventListener(eventType, () => {
+    element.addEventListener(eventType, (e) => {
         switch (eventType) {
             case 'click':
-                settingsProvider.set(settingsName, this.checked)
+                settingsProvider.set(settingsName, e.target.checked)
                 /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.checked,
@@ -312,14 +310,14 @@ function createListener(element, settingsName, eventType, fn) {
                 break
 
             case 'change':
-                settingsProvider.set(settingsName, this.value)
+                settingsProvider.set(settingsName, e.target.value)
                 /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.value,
                 })*/
                 break
         }
-        fn()
+        fn && fn()
     })
 }
 
