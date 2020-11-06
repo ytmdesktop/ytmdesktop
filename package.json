@@ -28,7 +28,7 @@
         }
     },
     "devDependencies": {
-        "electron": "^10.1.1",
+        "electron": "^10.1.5",
         "electron-builder": "^22.8.1",
         "electron-rebuild": "^2.0.3",
         "husky": "^4.3.0",
@@ -52,6 +52,7 @@
         "markdown": "^0.5.0",
         "node-fetch": "^2.6.1",
         "node-vibrant": "^3.1.5",
+        "postscribe": "^2.0.8",
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
         "scribble": "github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43",

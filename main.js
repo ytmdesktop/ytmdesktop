@@ -34,6 +34,7 @@ const settingsProvider = require('./src/providers/settingsProvider')
 const infoPlayerProvider = require('./src/providers/infoPlayerProvider')
 const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
+const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
 /* Variables =========================================================================== */
@@ -871,6 +872,11 @@ async function createWindow() {
         else companionServer.stop()
     })
 
+    settingsProvider.onDidChange('settings-genius-auth-server', (data) => {
+        if (data.newValue) geniusAuthServer.start()
+        else geniusAuthServer.stop()
+    })
+
     settingsProvider.onDidChange('settings-enable-player-bgcolor', () => {
         updateAccentColorPref()
     })
@@ -994,7 +1000,7 @@ async function createWindow() {
             app.quit()
         }
     })
-  
+
     ipcMain.on('show', (_) => {
         mainWindow.show()
     })
@@ -1344,6 +1350,7 @@ async function createWindow() {
                 lyrics = null
             })
 
+            // ENABLE FOR DEBUG
             // lyrics.webContents.openDevTools();
         }
     }
@@ -1995,6 +2002,10 @@ ipcMain.on('log', (dataMain, dataRenderer) => {
 })
 
 if (settingsProvider.get('settings-companion-server')) companionServer.start()
+
+if (settingsProvider.get('settings-genius-auth-server')) {
+    geniusAuthServer.start()
+}
 
 if (settingsProvider.get('settings-rainmeter-web-now-playing'))
     rainmeterNowPlaying.start()

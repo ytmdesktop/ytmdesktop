@@ -16,6 +16,10 @@ const elementBtnLastFmLogin = document.getElementById('btn-last-fm-login')
 const elementBtnOpenCompanionServer = document.getElementById(
     'btn-open-companion-server'
 )
+const elementBtnOpenGeniusAuthServer = document.getElementById(
+    'btn-open-genius-auth-server'
+)
+
 const elementBtnDiscordSettings = document.getElementById('btn-discord-setting')
 
 const elementBtnShortcutButtonsSettings = document.getElementById(
@@ -113,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-start-on-boot', 'click', null)
     initElement('settings-start-minimized', 'click', null)
     initElement('settings-companion-server', 'click', checkCompanionStatus)
+    initElement('settings-genius-auth-server', 'click', null)
     initElement('settings-companion-server-protect', 'click', null)
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus()
@@ -236,6 +241,11 @@ if (elementBtnShortcutButtonsSettings)
 if (elementBtnOpenCompanionServer)
     elementBtnOpenCompanionServer.addEventListener('click', async () => {
         await shell.openExternal(`http://localhost:9863`)
+    })
+
+if (elementBtnOpenGeniusAuthServer)
+    elementBtnOpenGeniusAuthServer.addEventListener('click', async () => {
+        await shell.openExternal(`http://localhost:9864/login`)
     })
 
 if (elementBtnAppRelaunch)
