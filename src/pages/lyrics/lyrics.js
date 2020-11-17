@@ -4,16 +4,17 @@ const __ = require('../../providers/translateProvider')
 const infoPlayerProvider = require('electron').remote.require(
     './src/providers/infoPlayerProvider'
 )
+const settingsProvider = require('../../providers/settingsProvider')
 
 const elementLyric = document.getElementById('lyric')
 const elementLyricSource = document.getElementById('lyric-source')
 
-let lastId, target, toggled
+let lastId, target, toggled, geniusAuth
 
 loadingLyrics()
 
 document.getElementById('content').addEventListener('dblclick', (_) => {
-    this.scrollTo(0, target)
+    document.getElementById('content').scrollTo(0, target)
 })
 
 document.getElementById('content').addEventListener('scroll', (_) => {
@@ -59,33 +60,62 @@ function getLyric(artist, song, id) {
             toggled = true
             loadingLyrics()
 
-            retrieveOVHData(artist, song)
-                .then((success) => setLyrics('OVH', success, true))
-                .catch((_) => {
+            // Genius will be skipped if not enabled.
+            retrieveGeniusData(artist, song)
+                .then((success) => setLyrics('Genius', success, true))
+                .catch((_) =>
                     retrieveVagalumeData(artist, song)
                         .then((success_) =>
                             setLyrics('Vagalume', success_, true)
                         )
-                        .catch((_) => {
+                        .catch((_) =>
                             retrieveKsoftData(artist, song)
                                 .then((success) =>
                                     setLyrics('KSoft', success, true)
                                 )
-                                .catch((error) => {
-                                    elementLyric.innerText = error
-                                    setLyrics('-', error, true)
-                                })
-                        })
-                })
+                                .catch((_) =>
+                                    retrieveOVHData(artist, song)
+                                        .then((success) =>
+                                            setLyrics('OVH', success, true)
+                                        )
+                                        .catch((error) => {
+                                            elementLyric.innerText = error
+                                            setLyrics('-', error, true)
+                                        })
+                                )
+                        )
+                )
         }
     } else elementLyric.innerText = __.trans('LABEL_PLAY_MUSIC')
 }
 
 function setLyrics(source, lyrics, hasLoaded) {
+    if (source === 'Genius') {
+        // Lyrics in Genius is an object check here; https://docs.genius.com/#search-h2 "response: { hits: { result: { ..."
+        elementLyric.innerText = lyrics.full_title
+        const lyricsElementId = `rg_embed_link_${lyrics.id}`
+
+        const node = document.createElement('div')
+        node.id = 'overlay'
+        document.getElementById('content').appendChild(node)
+
+        const postscribe = require('postscribe')
+        postscribe(
+            '#lyric',
+            `<div id='${lyricsElementId}' class='rg_embed_link' data-song-id='${lyrics.id}'>Read <a href='https://genius.com${lyrics.path}'>${lyrics.full_title}</a> on Genius</div> <script crossorigin="anonymous" src='https://genius.com/songs/${lyrics.id}/embed.js'></script>`,
+            {
+                done: () =>
+                    (document.getElementsByClassName(
+                        'rg_embed music'
+                    )[0].style.color = 'black'),
+            }
+        )
+    } else {
+        elementLyric.innerText = lyrics
+        infoPlayerProvider.updateLyrics(source, lyrics, hasLoaded)
+    }
     elementLyricSource.innerText = `Lyrics provided by ${source}`
-    elementLyric.innerText = lyrics
     document.getElementById('content').scrollTop = 0
-    infoPlayerProvider.updateLyrics(source, lyrics, hasLoaded)
 }
 
 function loadingLyrics() {
@@ -229,5 +259,39 @@ function retrieveVagalumeData(artist, track) {
                 else reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
             })
             .catch((_) => reject(__.trans('LABEL_LYRICS_NOT_FOUND')))
+    })
+}
+
+function retrieveGeniusData(artist, track) {
+    geniusAuth = settingsProvider.get('genius-auth')
+
+    return new Promise(async (resolve, reject) => {
+        //first it will check if Genius is enabled and is authorized.
+        if (!settingsProvider.get('settings-genius-auth-server')) {
+            reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+        } else if (!(geniusAuth.access_token || geniusAuth.token_type)) {
+            reject(__.trans('LABEL_LYRICS_GENIUS_AUTH'))
+        } else {
+            // Documentation: https://docs.genius.com/#search-h2
+            await fetch(
+                `https://api.genius.com/search?q=${removeAccents(
+                    track
+                )} - ${removeAccents(artist)}`,
+                {
+                    timeout: 3000,
+                    headers: {
+                        Authorization: `${geniusAuth.token_type} ${geniusAuth.access_token}`,
+                    },
+                }
+            )
+                .then((res) => res.json())
+                .then((json) => {
+                    // Just get the first result, should be good for now?
+                    if (json && json.response.hits[0]) {
+                        resolve(json.response.hits[0].result)
+                    } else reject(__.trans('LABEL_LYRICS_NOT_FOUND'))
+                })
+                .catch((_) => reject(__.trans('LABEL_LYRICS_NOT_FOUND')))
+        }
     })
 }
