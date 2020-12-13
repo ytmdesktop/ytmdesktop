@@ -1231,10 +1231,10 @@ electron-updater@^4.3.4:
     lodash.isequal "^4.5.0"
     semver "^7.3.2"
 
-electron@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-10.0.0.tgz#4e777612ead76b39bc7241c7749bf6b0ece47889"
-  integrity sha512-0XX/LqYAHHCSbfLjUk9VRDPOeYjDPEzA9i7F50AqpEpFIWR2bp++0S0beRANUpPdkvtBDp+0R6vHV3iXPvuKyA==
+electron@^10.1.1:
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-10.2.0.tgz#4b00f0907b28aca4b93661bb53ce9a4f8ad32201"
+  integrity sha512-GBUyq8dwUqXPkCTkoID+eZ5Pm9GFlLUd2eSoGe8UOaHeW68SgCf5t75/uGHraQ1OIz/0qniyH5M4ebWEHGppyQ==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^12.0.12"
@@ -1837,9 +1837,9 @@ inherits@2, inherits@^2.0.3, inherits@~2.0.3:
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
 ini@^1.3.4, ini@^1.3.5, ini@~1.3.0:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
-  integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
+  integrity sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
 
 is-arguments@^1.0.4:
   version "1.0.4"
