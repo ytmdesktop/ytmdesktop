@@ -270,22 +270,40 @@ function createTopMiddleContent() {
         )[0]
 
         // HISTORY BACK
-        const element = document.createElement('i')
-        element.id = 'ytmd_history_back'
-        element.classList.add(
+        const back_element = document.createElement('i')
+        back_element.id = 'ytmd_history_back'
+        back_element.classList.add(
             'material-icons',
             'pointer',
             'shine',
             'ytmd-icons',
             'center-content'
         )
-        element.innerText = 'keyboard_backspace'
+        back_element.innerText = 'keyboard_backspace'
 
-        element.addEventListener('click', function () {
+        back_element.addEventListener('click', function () {
             history.go(-1)
         })
 
-        center_content.prepend(element)
+        // HISTORY FORWARD
+        const forward_element = document.createElement('i')
+        forward_element.id = 'ytmd_history_forward'
+        forward_element.classList.add(
+            'material-icons',
+            'pointer',
+            'shine',
+            'ytmd-icons',
+            'center-content'
+        )
+        forward_element.style.cssText = 'transform: rotate(180deg);'
+        forward_element.innerText = 'keyboard_backspace'
+
+        forward_element.addEventListener('click', function () {
+            history.forward()
+        })
+
+        center_content.prepend(forward_element)
+        center_content.prepend(back_element)
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {
