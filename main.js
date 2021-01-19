@@ -111,8 +111,6 @@ if (
         console.log('error windowsMediaProvider > ' + error)
     }
 
-if (isLinux()) mprisProvider.start()
-
 if (isMac()) {
     settingsProvider.set(
         'settings-shiny-tray-dark',
@@ -364,7 +362,12 @@ async function createWindow() {
     view.webContents.on('media-started-playing', () => {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            if (isLinux()) mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            if (isLinux()) {
+                if (!mprisProvider._isInitialized) {
+                    mprisProvider.start()
+                }
+                mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            }
         }
 
         if (
