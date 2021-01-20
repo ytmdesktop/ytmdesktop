@@ -437,12 +437,12 @@ async function createWindow() {
             )
 
             /**
-             * Srobble when track changes or when current track starts from the beginning
+             * Scrobble when track changes or when current track starts from the beginning
              */
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.01)
+                    (lastTrackProgress > progress && progress < 0.20)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
