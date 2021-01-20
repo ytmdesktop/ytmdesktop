@@ -1,11 +1,9 @@
 const settingsProvider = require('../providers/settingsProvider')
 const { isLinux } = require('./systemInfo')
 
-if (isLinux()) {
-    settingsProvider.setInitialValue('titlebar-type', 'system') // With system title bar
-} else {
-    settingsProvider.setInitialValue('titlebar-type', 'nice') // Without system title bar
-}
+if (isLinux()) settingsProvider.setInitialValue('titlebar-type', 'system')
+// With system title bar
+else settingsProvider.setInitialValue('titlebar-type', 'nice') // Without system title bar
 
 settingsProvider.setInitialValue('settings-page-zoom', 100) // 100
 
@@ -25,6 +23,8 @@ settingsProvider.setInitialValue('settings-miniplayer-show-task', false) // hide
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
 settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
+
+settingsProvider.setInitialValue('settings-enable-player-bgcolor', false)
 
 settingsProvider.setInitialValue(
     // Random token
@@ -96,3 +96,9 @@ settingsProvider.setInitialValue('settings-skip-track-shorter-than', '0')
 settingsProvider.setInitialValue('settings-clipboard-always-ask-read', true)
 
 settingsProvider.setInitialValue('settings-tray-icon', true)
+
+settingsProvider.setInitialValue('settings-volume', 100)
+
+settingsProvider.setInitialValue('settings-volume-media-keys', false)
+
+settingsProvider.setInitialValue('settings-decibel-volume', true)

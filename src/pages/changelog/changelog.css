@@ -22,7 +22,7 @@ body {
     overflow: auto;
     width: 100%;
     padding: 2px;
-    height: 100%;
+    height: 90%;
     
     scroll-behavior: smooth;
 }

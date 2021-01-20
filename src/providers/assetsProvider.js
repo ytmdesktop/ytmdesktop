@@ -14,11 +14,7 @@ function getLocal(asset) {
 function getIcon(assetPath) {
     let localAsset = path.join(app.getAppPath(), 'src/assets', `${assetPath}`)
 
-    if (systemInfo.isWindows()) {
-        return `${localAsset}.ico`
-    } else {
-        return `${localAsset}.png`
-    }
+    return systemInfo.isWindows() ? `${localAsset}.ico` : `${localAsset}.png`
 }
 
 function getExternal() {}
