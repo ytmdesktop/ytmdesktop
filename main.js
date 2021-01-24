@@ -36,7 +36,11 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
-const mprisProvider = require('./src/providers/mprisProvider')
+if (isLinux()) {
+    const mprisProvider = require('./src/providers/mprisProvider')
+} else {
+    const mprisProvider = null
+}
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -426,7 +430,9 @@ async function createWindow() {
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
-            mprisProvider.setActivity(getAll())
+            if (isLinux()) {
+                mprisProvider.setActivity(getAll())
+            }
 
             mediaControl.setProgress(
                 mainWindow,
@@ -442,7 +448,7 @@ async function createWindow() {
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.20)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
