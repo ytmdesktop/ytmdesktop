@@ -26,11 +26,13 @@ function setTooltip(tooltip) {
     }
 }
 
-let init_tray = () => {
+let initVanillaTray = () => {
     try {
         setTooltip('YouTube Music Desktop App')
+        tray.removeAllListeners()
         tray.setContextMenu(contextMenu)
-
+        nativeImageIcon = buildTrayIcon(iconTray)
+        tray.setImage(nativeImageIcon)
         tray.addListener('click', () => {
             doBehavior(saved_mainWindow)
         })
@@ -41,7 +43,7 @@ let init_tray = () => {
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
-            data: `Failed to init_tray: ${error}`,
+            data: `Failed to initVanillaTray: ${error}`,
         })
     }
 }
@@ -59,7 +61,7 @@ function createTray(mainWindow) {
             )
         }
 
-        if (!systemInfo.isMac()) init_tray()
+        if (!systemInfo.isMac()) initVanillaTray()
         else setShinyTray()
     }
 }
@@ -73,7 +75,7 @@ function updateTray(data) {
 
             contextMenu = Menu.buildFromTemplate(template)
 
-            if (!settingsProvider('settings-shiny-tray'))
+            if (!settingsProvider.get('settings-shiny-tray'))
                 tray.setContextMenu(contextMenu)
         }
     } catch (error) {
@@ -194,7 +196,8 @@ function setShinyTray() {
         } else {
             // Shiny tray disabled ||| on onther platform
             tray.removeAllListeners()
-            init_tray()
+            initVanillaTray()
+            console.log('initVanillaTray')
         }
     } catch (error) {
         ipcMain.emit('log', {
