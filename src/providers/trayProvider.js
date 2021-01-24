@@ -73,7 +73,8 @@ function updateTray(data) {
 
             contextMenu = Menu.buildFromTemplate(template)
 
-            tray.setContextMenu(contextMenu)
+            if (!settingsProvider('settings-shiny-tray'))
+                tray.setContextMenu(contextMenu)
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -170,15 +171,22 @@ function quit() {
 
 function setShinyTray() {
     try {
-        if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
+        if (systemInfo.isMac() && settingsProvider.get('settings-shiny-tray')) {
             tray.setContextMenu(null)
             tray.removeAllListeners()
             tray.on('right-click', () => {
                 tray.popUpContextMenu(contextMenu)
             })
             tray.on('click', (event, bound, position) => {
-                if (position.x < 32) saved_mainWindow.show()
-                else if (position.x > 130)
+                if (position.x < 32) {
+                    // click at icon
+                    if (!saved_mainWindow.isVisible()) {
+                        saved_mainWindow.show()
+                    } else if (!saved_mainWindow.isFocused()) {
+                        saved_mainWindow.show()
+                    } else saved_mainWindow.hide()
+                } else if (position.x > 130)
+                    // click play/pause button
                     mediaControl.playPauseTrack(
                         saved_mainWindow.getBrowserView()
                     )
