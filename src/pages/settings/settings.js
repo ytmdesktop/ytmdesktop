@@ -135,7 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ipc.send('update-tray')
     })
     initElement('settings-discord-rich-presence', 'click', null)
-    initElement('settings-app-language', 'change', showRelaunchButton)
+    initElement('settings-app-language', 'change', () => {
+        ipc.send('language-updated')
+        showRelaunchButton()
+    })
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
         checkClipboardWatcherStatus()

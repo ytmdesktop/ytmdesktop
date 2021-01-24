@@ -1,14 +1,55 @@
 const { ipcMain } = require('electron')
 const i18n = require('i18n')
+var http = require('https')
+var fs = require('fs')
 const settingsProvider = require('./settingsProvider')
 
 const defaultLocale = settingsProvider.get('settings-app-language') || 'en'
 
+// Use app.getPath('userData') will cause problem here and I could not figure out why
+// So I add a stored value `settings-localses-path` as a workaround.
+//                                                      - mingjun97
+const localesPath = settingsProvider.get('settings-locales-path') + '/locales'
+
+var updateLocaleFile = function (locale, cb) {
+    // console.log('downloading locale file for:' + locale);
+    dest = `${localesPath}/${locale}.json`
+    var file = fs.createWriteStream(dest)
+    var request = http
+        .get(
+            `https://raw.githubusercontent.com/ytmdesktop/ytmdesktop-locales/master/locales/${locale}.json`,
+            function (response) {
+                let body = ''
+                response.on('data', function (chunk) {
+                    body += chunk
+                })
+                response.on('end', function () {
+                    file.write(body)
+                    file.close()
+                })
+            }
+        )
+        .on('error', function (err) {
+            // Handle errors
+            fs.unlink(dest) // Delete the file async. (But we don't check the result)
+            if (cb) cb(err.message)
+        })
+}
+
 i18n.configure({
     locales: ['en', 'pt'],
-    directory: __dirname + '/../locales',
+    directory: localesPath,
     defaultLocale: defaultLocale,
+    autoReload: true,
 })
+
+// update locale file when launch
+// put a slight delay in case of data racing
+setTimeout(function () {
+    updateLocaleFile(defaultLocale, (a) => {
+        console.log('cb called', a)
+    })
+}, 1000)
 
 function setLocale(locale) {
     i18n.setLocale(locale)
@@ -49,10 +90,15 @@ function loadi18n() {
     })
 }
 
-if (ipcMain)
+if (ipcMain) {
     ipcMain.on('I18N_TRANSLATE', (e, id, params) => {
         e.returnValue = trans(id, params)
     })
+    // download locale file for new language
+    ipcMain.on('language-updated', (e, id, params) => {
+        updateLocaleFile(settingsProvider.get('settings-app-language'))
+    })
+}
 
 module.exports = {
     setLocale: setLocale,

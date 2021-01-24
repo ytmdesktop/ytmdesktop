@@ -1,5 +1,6 @@
 const settingsProvider = require('../providers/settingsProvider')
 const { isLinux } = require('./systemInfo')
+const { app } = require('electron')
 
 if (isLinux()) settingsProvider.setInitialValue('titlebar-type', 'system')
 // With system title bar
@@ -106,4 +107,8 @@ settingsProvider.setInitialValue('settings-decibel-volume', true)
 settingsProvider.setInitialValue(
     'settings-shiny-tray-song-title-rollable',
     true
+)
+settingsProvider.setInitialValue(
+    'settings-locales-path',
+    app.getPath('userData')
 )
