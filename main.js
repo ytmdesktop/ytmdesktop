@@ -79,7 +79,11 @@ let windowConfig = {
     titleBarStyle: '',
 }
 
-global.sharedObj = { title: 'N/A', paused: true }
+global.sharedObj = {
+    title: 'N/A',
+    paused: true,
+    rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
+}
 
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
@@ -869,6 +873,16 @@ async function createWindow() {
     )
 
     settingsProvider.onDidChange(
+        'settings-shiny-tray-song-title-rollable',
+        (data) => {
+            console.log(data.newValue)
+            global.sharedObj.rollable = data.newValue
+            if (renderer_for_status_bar)
+                renderer_for_status_bar.send('update-status-bar')
+        }
+    )
+
+    settingsProvider.onDidChange(
         'settings-rainmeter-web-now-playing',
         (data) => {
             if (data.newValue) rainmeterNowPlaying.start()
@@ -998,7 +1012,9 @@ async function createWindow() {
 
     ipcMain.on('update-tray', () => {
         if (!isMac()) return
-
+        global.sharedObj.rollable = settingsProvider.get(
+            'settings-shiny-tray-song-title-rollable'
+        )
         updateStatusBar()
         tray.setShinyTray()
     })

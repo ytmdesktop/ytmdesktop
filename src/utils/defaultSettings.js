@@ -102,3 +102,8 @@ settingsProvider.setInitialValue('settings-volume', 100)
 settingsProvider.setInitialValue('settings-volume-media-keys', false)
 
 settingsProvider.setInitialValue('settings-decibel-volume', true)
+
+settingsProvider.setInitialValue(
+    'settings-shiny-tray-song-title-rollable',
+    true
+)
