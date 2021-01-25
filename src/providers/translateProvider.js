@@ -1,4 +1,5 @@
 const { ipcMain } = require('electron')
+const isDev = require('electron-is-dev')
 const i18n = require('i18n')
 var http = require('https')
 var fs = require('fs')
@@ -11,7 +12,22 @@ const defaultLocale = settingsProvider.get('settings-app-language') || 'en'
 //                                                      - mingjun97
 const localesPath = settingsProvider.get('settings-locales-path') + '/locales'
 
-var updateLocaleFile = function (locale, cb) {
+console.log(
+    '[!] To add translation for your introduced feature, you may navigate to '
+)
+console.log('[!] ' + localesPath + ' to modify the your locale file.')
+console.log('[!] Then kindly open a PR to ytmdesktop-locales repo. :)')
+
+var updateLocaleFile = function (locale, cb, force = false) {
+    // for developer, skip auto update to prevent data loss
+    if (isDev && !force) {
+        console.log('[!]Skip i18n auto-update in development mode')
+        // updateLocaleFile(locale, cb, true)
+        console.log(
+            '[!]You may force update i18n by uncomment previous line in `src/providers/translateProvider`'
+        )
+        return
+    }
     // console.log('downloading locale file for:' + locale);
     dest = `${localesPath}/${locale}.json`
     var file = fs.createWriteStream(dest)
