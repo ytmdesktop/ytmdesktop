@@ -1,10 +1,9 @@
 const clientId = '495666957501071390'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
-const url = require('url')
 
-var client
-var _isStarted
+let client
+let _isStarted
 
 function isStarted() {
     return _isStarted
@@ -17,13 +16,11 @@ function _setIsStarted(value) {
 function start() {
     client = new RPC.Client({ transport: 'ipc' })
 
-    client.on('ready', () => {
-        _setIsStarted(true)
-    })
+    client.on('ready', () => _setIsStarted(true))
 
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
-            setTimeout(function () {
+            setTimeout(() => {
                 start()
             }, 10000)
         }
@@ -40,12 +37,7 @@ function stop() {
     _setIsStarted(false)
 }
 
-function getVideoId(trackUrl) {
-    var query = new URL(trackUrl)
-    return query.searchParams.get('v')
-}
-
-function setActivity(info) {
+async function setActivity(info) {
     if (isStarted() && info.track.title) {
         var now = Date.now()
         var activity = {}
@@ -80,18 +72,16 @@ function setActivity(info) {
             activity.buttons = [
                 {
                     label: 'Play on YouTube Music',
-                    url:
-                        'https://music.youtube.com/watch?v=' +
-                        getVideoId(info.track.url),
+                    url: 'https://music.youtube.com/watch?v=' + info.track.id,
                 },
             ]
         }
 
         if (!discordSettings.hideIdle && info.player.isPaused) {
-            client.clearActivity()
+            await client.clearActivity()
         } else {
             // As of writing this discord-rpc was not updated to support buttons with setActivity
-            client.request('SET_ACTIVITY', {
+            await client.request('SET_ACTIVITY', {
                 pid: process.pid,
                 activity: {
                     state: activity.state,
