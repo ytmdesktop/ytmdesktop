@@ -39,9 +39,9 @@ function stop() {
 
 async function setActivity(info) {
     if (isStarted() && info.track.title) {
-        var now = Date.now()
-        var activity = {}
-        var discordSettings = settingsProvider.get('discord-presence-settings')
+        const now = Date.now()
+        const activity = {}
+        const discordSettings = settingsProvider.get('discord-presence-settings')
 
         if (discordSettings.details) activity.details = info.track.title
 
