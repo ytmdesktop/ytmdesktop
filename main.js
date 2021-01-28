@@ -36,7 +36,11 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
-const mprisProvider = require('./src/providers/mprisProvider')
+if (isLinux()) {
+    const mprisProvider = require('./src/providers/mprisProvider')
+} else {
+    const mprisProvider = null
+}
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -75,7 +79,11 @@ let windowConfig = {
     titleBarStyle: '',
 }
 
-global.sharedObj = { title: 'N/A', paused: true }
+global.sharedObj = {
+    title: 'N/A',
+    paused: true,
+    rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
+}
 
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
@@ -110,8 +118,6 @@ if (
     } catch (error) {
         console.log('error windowsMediaProvider > ' + error)
     }
-
-if (isLinux()) mprisProvider.start()
 
 if (isMac()) {
     settingsProvider.set(
@@ -364,7 +370,12 @@ async function createWindow() {
     view.webContents.on('media-started-playing', () => {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            if (isLinux()) mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            if (isLinux()) {
+                if (!mprisProvider._isInitialized) {
+                    mprisProvider.start()
+                }
+                mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            }
         }
 
         if (
@@ -423,7 +434,9 @@ async function createWindow() {
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
-            mprisProvider.setActivity(getAll())
+            if (isLinux()) {
+                mprisProvider.setActivity(getAll())
+            }
 
             mediaControl.setProgress(
                 mainWindow,
@@ -434,12 +447,12 @@ async function createWindow() {
             )
 
             /**
-             * Srobble when track changes or when current track starts from the beginning
+             * Scrobble when track changes or when current track starts from the beginning
              */
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.01)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
@@ -860,6 +873,16 @@ async function createWindow() {
     )
 
     settingsProvider.onDidChange(
+        'settings-shiny-tray-song-title-rollable',
+        (data) => {
+            console.log(data.newValue)
+            global.sharedObj.rollable = data.newValue
+            if (renderer_for_status_bar)
+                renderer_for_status_bar.send('update-status-bar')
+        }
+    )
+
+    settingsProvider.onDidChange(
         'settings-rainmeter-web-now-playing',
         (data) => {
             if (data.newValue) rainmeterNowPlaying.start()
@@ -989,7 +1012,9 @@ async function createWindow() {
 
     ipcMain.on('update-tray', () => {
         if (!isMac()) return
-
+        global.sharedObj.rollable = settingsProvider.get(
+            'settings-shiny-tray-song-title-rollable'
+        )
         updateStatusBar()
         tray.setShinyTray()
     })

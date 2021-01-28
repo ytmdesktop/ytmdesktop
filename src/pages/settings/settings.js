@@ -131,8 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
+    initElement('settings-shiny-tray-song-title-rollable', 'click', () => {
+        ipc.send('update-tray')
+    })
     initElement('settings-discord-rich-presence', 'click', null)
-    initElement('settings-app-language', 'change', showRelaunchButton)
+    initElement('settings-app-language', 'change', () => {
+        ipc.send('language-updated')
+        showRelaunchButton()
+    })
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
         checkClipboardWatcherStatus()

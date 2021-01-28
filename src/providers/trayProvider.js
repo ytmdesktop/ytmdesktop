@@ -26,11 +26,13 @@ function setTooltip(tooltip) {
     }
 }
 
-let init_tray = () => {
+let initVanillaTray = () => {
     try {
         setTooltip('YouTube Music Desktop App')
+        tray.removeAllListeners()
         tray.setContextMenu(contextMenu)
-
+        nativeImageIcon = buildTrayIcon(iconTray)
+        tray.setImage(nativeImageIcon)
         tray.addListener('click', () => {
             doBehavior(saved_mainWindow)
         })
@@ -41,7 +43,7 @@ let init_tray = () => {
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
-            data: `Failed to init_tray: ${error}`,
+            data: `Failed to initVanillaTray: ${error}`,
         })
     }
 }
@@ -59,7 +61,7 @@ function createTray(mainWindow) {
             )
         }
 
-        if (!systemInfo.isMac()) init_tray()
+        if (!systemInfo.isMac()) initVanillaTray()
         else setShinyTray()
     }
 }
@@ -73,7 +75,8 @@ function updateTray(data) {
 
             contextMenu = Menu.buildFromTemplate(template)
 
-            tray.setContextMenu(contextMenu)
+            if (!settingsProvider.get('settings-shiny-tray'))
+                tray.setContextMenu(contextMenu)
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -170,15 +173,22 @@ function quit() {
 
 function setShinyTray() {
     try {
-        if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
+        if (systemInfo.isMac() && settingsProvider.get('settings-shiny-tray')) {
             tray.setContextMenu(null)
             tray.removeAllListeners()
             tray.on('right-click', () => {
                 tray.popUpContextMenu(contextMenu)
             })
             tray.on('click', (event, bound, position) => {
-                if (position.x < 32) saved_mainWindow.show()
-                else if (position.x > 130)
+                if (position.x < 32) {
+                    // click at icon
+                    if (!saved_mainWindow.isVisible()) {
+                        saved_mainWindow.show()
+                    } else if (!saved_mainWindow.isFocused()) {
+                        saved_mainWindow.show()
+                    } else saved_mainWindow.hide()
+                } else if (position.x > 130)
+                    // click play/pause button
                     mediaControl.playPauseTrack(
                         saved_mainWindow.getBrowserView()
                     )
@@ -186,7 +196,8 @@ function setShinyTray() {
         } else {
             // Shiny tray disabled ||| on onther platform
             tray.removeAllListeners()
-            init_tray()
+            initVanillaTray()
+            console.log('initVanillaTray')
         }
     } catch (error) {
         ipcMain.emit('log', {
