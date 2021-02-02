@@ -82,7 +82,7 @@ let windowConfig = {
 }
 
 global.sharedObj = {
-    title: 'N/A',
+    title: 'YTMDesktop',
     paused: true,
     rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
 }
@@ -1753,8 +1753,11 @@ function handleOpenUrl(url) {
     const loadMusicByVideoId = ([_, video_id, list_id]) => {
         let url = 'https://music.youtube.com/watch?v=' + video_id
         if (list_id) url += '&list=' + list_id
-        // FIXME: this will hurt the funcnility of 'Paint background with album color' for this time
-        view.webContents.loadURL(url)
+        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+            mediaControl.stopTrack(view)
+        view.webContents.loadURL(url).then(() => {
+            updateAccentColorPref()
+        })
     }
     let cmd = url.toString().split('://')[1]
     if (!cmd) return
