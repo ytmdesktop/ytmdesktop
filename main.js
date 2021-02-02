@@ -1750,6 +1750,12 @@ async function createWindow() {
 }
 
 function handleOpenUrl(url) {
+    const loadMusicByVideoId = ([_, video_id, list_id]) => {
+        let url = 'https://music.youtube.com/watch?v=' + video_id
+        if (list_id) url += '&list=' + list_id
+        // FIXME: this will hurt the funcnility of 'Paint background with album color' for this time
+        view.webContents.loadURL(url)
+    }
     let cmd = url.toString().split('://')[1]
     if (!cmd) return
 
@@ -1757,7 +1763,7 @@ function handleOpenUrl(url) {
         ipcMain.emit('window', { command: 'show-settings' })
 
     if (cmd.includes('play/')) {
-        loadMusicByVideoId(cmd.split('/')[1])
+        loadMusicByVideoId(cmd.split('/'))
         writeLog({ type: 'info', data: JSON.stringify(cmd) })
     }
 }
