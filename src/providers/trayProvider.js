@@ -213,7 +213,7 @@ function updateImage(payload) {
                 ? nativeImage.createFromDataURL(payload) // electron v0.36+
                 : nativeImage.createFromDataUrl(payload) // electron v0.30
         tray.setImage(img)
-    } catch {
+    } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
             data: `Failed to updateImage: ${error}`,
