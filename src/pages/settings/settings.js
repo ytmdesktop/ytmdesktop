@@ -625,3 +625,10 @@ document.querySelector('#disableAccelerator').addEventListener('click', () => {
 document.querySelector('#release-notes').addEventListener('click', () => {
     ipc.send('window', { command: 'show-changelog' })
 })
+
+document.querySelectorAll('[externalURL]').forEach((element) => {
+    var externalURL = element.getAttribute('externalURL')
+    element.addEventListener('click', () => {
+        shell.openExternal(externalURL)
+    })
+})
