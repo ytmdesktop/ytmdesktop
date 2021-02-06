@@ -36,11 +36,13 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
-if (isLinux()) {
-    const mprisProvider = require('./src/providers/mprisProvider')
-} else {
-    const mprisProvider = null
-}
+const mprisProvider = (() => {
+    if (!isLinux()) {
+        return require('./src/providers/mprisProvider')
+    } else {
+        return null
+    }
+})()
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -80,7 +82,7 @@ let windowConfig = {
 }
 
 global.sharedObj = {
-    title: 'N/A',
+    title: 'YTMDesktop',
     paused: true,
     rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
 }
@@ -1748,6 +1750,15 @@ async function createWindow() {
 }
 
 function handleOpenUrl(url) {
+    const loadMusicByVideoId = ([_, video_id, list_id]) => {
+        let url = 'https://music.youtube.com/watch?v=' + video_id
+        if (list_id) url += '&list=' + list_id
+        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+            mediaControl.stopTrack(view)
+        view.webContents.loadURL(url).then(() => {
+            updateAccentColorPref()
+        })
+    }
     let cmd = url.toString().split('://')[1]
     if (!cmd) return
 
@@ -1755,7 +1766,7 @@ function handleOpenUrl(url) {
         ipcMain.emit('window', { command: 'show-settings' })
 
     if (cmd.includes('play/')) {
-        loadMusicByVideoId(cmd.split('/')[1])
+        loadMusicByVideoId(cmd.split('/'))
         writeLog({ type: 'info', data: JSON.stringify(cmd) })
     }
 }
@@ -2026,9 +2037,10 @@ ipcMain.on('log', (dataMain, dataRenderer) => {
     else writeLog(dataRenderer)
 })
 
-if (settingsProvider.get('settings-companion-server')) companionServer.start()
+if (settingsProvider.get('settings-companion-server') && gotTheLock)
+    companionServer.start()
 
-if (settingsProvider.get('settings-genius-auth-server')) {
+if (settingsProvider.get('settings-genius-auth-server') && gotTheLock) {
     geniusAuthServer.start()
 }
 

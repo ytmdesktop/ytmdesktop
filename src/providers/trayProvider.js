@@ -209,13 +209,13 @@ function setShinyTray() {
 
 function updateImage(payload) {
     try {
-        if (!settingsProvider.get('settings-shiny-tray')) return
+        if (!settingsProvider.get('settings-shiny-tray') || !tray) return
         const img =
             typeof nativeImage.createFromDataURL === 'function'
                 ? nativeImage.createFromDataURL(payload) // electron v0.36+
                 : nativeImage.createFromDataUrl(payload) // electron v0.30
         tray.setImage(img)
-    } catch (_) {
+    } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
             data: `Failed to updateImage: ${error}`,

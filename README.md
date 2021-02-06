@@ -9,6 +9,14 @@
 <img alt="window" src="https://ytmdesktop.app/img/product/main_5.png">
 &nbsp;
 
+# New and don't know how to use it?
+
+https://github.com/ytmdesktop/ytmdesktop/wiki/How-use
+
+# FAQ
+
+https://github.com/ytmdesktop/ytmdesktop/wiki/FAQ
+
 # Available for
 
 <a href="https://repology.org/project/ytmdesktop/versions"><img src="https://repology.org/badge/vertical-allrepos/ytmdesktop.svg" alt="Packaging status" align="right"></a>
