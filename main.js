@@ -92,6 +92,11 @@ let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
 let iconPause = assetsProvider.getIcon('favicon_pause')
+let sleepTimer = {
+    mode: 0, // "time/counter/else"
+    counter: 0, // "minutes in time mode/ songs in counter mode"
+    interval: 0, // "valid in time mode"
+}
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
@@ -558,6 +563,16 @@ async function createWindow() {
                             document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
                         `)
                     })
+
+                if (sleepTimer.mode == 'counter') {
+                    sleepTimer.counter -= 1
+                    if (sleepTimer.counter <= 0) {
+                        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                            mediaControl.playPauseTrack(view)
+
+                        sleepTimer.mode = 'off'
+                    }
+                }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
@@ -2055,6 +2070,38 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
+ipcMain.on('set-sleep-timer', (_, data) => {
+    let counter = parseInt(data.value)
+    const clearSleepTimer = () => {
+        if (sleepTimer.mode == 'time') clearInterval(sleepTimer.interval)
+        sleepTimer.interval = 0
+        sleepTimer.mode = 'off'
+    }
+    if (counter == 0) {
+        clearSleepTimer()
+    } else {
+        sleepTimer.counter = counter
+        if (data.value[data.value.length - 1] == 'c') {
+            sleepTimer.mode = 'counter'
+        } else {
+            sleepTimer.mode = 'time'
+            clearInterval(sleepTimer.interval)
+            sleepTimer.interval = setInterval(() => {
+                sleepTimer.counter -= 1
+                if (sleepTimer.counter <= 0) {
+                    if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                        mediaControl.playPauseTrack(view)
+                    clearSleepTimer()
+                }
+            }, 60 * 1000)
+        }
+    }
+})
+
+ipcMain.on('retrieve-sleep-timer', (e) => {
+    e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
+})
+
 ipcMain.handle('get-audio-output-list', () => audioDevices)
 
 powerMonitor.on('suspend', () => {
@@ -2071,6 +2118,7 @@ const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
+const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
