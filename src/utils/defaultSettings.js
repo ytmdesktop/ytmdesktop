@@ -112,3 +112,5 @@ settingsProvider.setInitialValue(
     'settings-locales-path',
     app.getPath('userData')
 )
+
+settingsProvider.setInitialValue('settings-pause-on-suspend', false)
