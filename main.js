@@ -844,21 +844,23 @@ async function createWindow() {
         newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
-    globalShortcut.register('MediaPlayPause', () => {
-        checkDoubleTapPlayPause()
-    })
+    if (!settingsProvider.get('settings-windows10-media-service-show-info')) {
+        globalShortcut.register('MediaPlayPause', () => {
+            checkDoubleTapPlayPause()
+        })
 
-    globalShortcut.register('MediaStop', () => {
-        mediaControl.stopTrack(view)
-    })
+        globalShortcut.register('MediaStop', () => {
+            mediaControl.stopTrack(view)
+        })
 
-    globalShortcut.register('MediaPreviousTrack', () => {
-        mediaControl.previousTrack(view)
-    })
+        globalShortcut.register('MediaPreviousTrack', () => {
+            mediaControl.previousTrack(view)
+        })
 
-    globalShortcut.register('MediaNextTrack', () => {
-        mediaControl.nextTrack(view)
-    })
+        globalShortcut.register('MediaNextTrack', () => {
+            mediaControl.nextTrack(view)
+        })
+    }
 
     if (settingsProvider.get('settings-volume-media-keys')) {
         globalShortcut.register('VolumeUp', () => {
