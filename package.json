@@ -61,12 +61,12 @@
         "ws": "^7.4.2"
     },
     "optionalDependencies": {
-        "@nodert-win10/windows.media": "^0.2.96",
-        "@nodert-win10/windows.media.playback": "^0.2.96",
-        "@nodert-win10/windows.storage.streams": "^0.2.96",
-        "@nodert-win10/windows.foundation": "^0.2.96",
+        "@nodert-win10-rs4/windows.foundation": "^0.4.4",
+        "@nodert-win10-rs4/windows.media": "^0.4.4",
+        "@nodert-win10-rs4/windows.storage.streams": "^0.4.4",
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
-        "utf-8-validate": "^5.0.2"
+        "utf-8-validate": "^5.0.2",
+        "windows.media.playback": "git+https://github.com/NovusTheory/nodert-windows.media.playback.git"
     }
 }
