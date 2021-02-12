@@ -1789,7 +1789,7 @@ else {
                 if (mainWindow.isMinimized()) mainWindow.restore()
                 else mainWindow.show()
 
-            mainWindow.focus()
+            mainWindow.show()
         }
     })
 
