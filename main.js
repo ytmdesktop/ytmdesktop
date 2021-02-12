@@ -844,7 +844,10 @@ async function createWindow() {
         newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
-    if (!settingsProvider.get('settings-windows10-media-service-show-info')) {
+    if (
+        !settingsProvider.get('settings-windows10-media-service-show-info') ||
+        !settingsProvider.get('settings-windows10-media-service')
+    ) {
         globalShortcut.register('MediaPlayPause', () => {
             checkDoubleTapPlayPause()
         })
