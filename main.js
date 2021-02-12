@@ -1246,25 +1246,12 @@ async function createWindow() {
                 }, 1000)
             })
 
-            let storeMiniplayerSizeTimer
-            miniplayer.on('resize', () => {
+            miniplayer.on('resize', (e) => {
                 try {
-                    let size = miniplayer.getSize()
-                    if (storeMiniplayerSizeTimer)
-                        clearTimeout(storeMiniplayerSizeTimer)
-
-                    storeMiniplayerSizeTimer = setTimeout(() => {
-                        settingsProvider.set(
-                            'settings-miniplayer-size',
-                            Math.min(...size)
-                        )
-                        if (miniplayer) {
-                            miniplayer.setSize(
-                                Math.min(...size),
-                                Math.min(...size)
-                            )
-                        }
-                    }, 500)
+                    let size = Math.min(...miniplayer.getSize())
+                    miniplayer.setSize(size, size)
+                    settingsProvider.set('settings-miniplayer-size', size)
+                    e.preventDefault()
                 } catch (_) {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
