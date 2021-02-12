@@ -28,6 +28,7 @@
 | `settings-volume`                          | String  | `0` ~ `100`                  | `100`                        | Playback volume                                                |
 | `settings-volume-media-keys`               | Boolean | `true` or `false`            | `false`                      | Enable media volume keys for the playback volume               |
 | `settings-decibel-volume`                  | Boolean | `true` or `false`            | `true`                       | Replace the volume control with a decibel based system         |
+| `settings-pause-on-suspend`                | Boolean | `true` or `false`            | `false`                      | Pause media playback on `suspend` event triggered              |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |
