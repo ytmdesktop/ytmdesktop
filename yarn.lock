@@ -173,31 +173,24 @@
   dependencies:
     cross-spawn "^7.0.1"
 
-"@nodert-win10/windows.foundation@^0.2.96":
-  version "0.2.96"
-  resolved "https://registry.yarnpkg.com/@nodert-win10/windows.foundation/-/windows.foundation-0.2.96.tgz#beb20661d87fb352f9c5c7c45899bf3c24d78cd0"
-  integrity sha1-vrIGYdh/s1L5xcfEWJm/PCTXjNA=
+"@nodert-win10-rs4/windows.foundation@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.foundation/-/windows.foundation-0.4.4.tgz#9a488824b8b677ee5711347cfaf97c62592f2708"
+  integrity sha512-gA/jMwvKkEm+AFyIc9L6TZvP+DjcL54gkTOY0Izvcfmj3ctUiLFUqs1MdBJ5fjhTi0COPRhoq2eDSNl6t3IWEg==
   dependencies:
     nan latest
 
-"@nodert-win10/windows.media.playback@^0.2.96":
-  version "0.2.96"
-  resolved "https://registry.yarnpkg.com/@nodert-win10/windows.media.playback/-/windows.media.playback-0.2.96.tgz#017eebc56bb530f9b8f2a456500c3b7d1ce42f35"
-  integrity sha1-AX7rxWu1MPm48qRWUAw7fRzkLzU=
+"@nodert-win10-rs4/windows.media@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.media/-/windows.media-0.4.4.tgz#dcf358fb49e479a5a48aeb6e8e4aff45a85eb086"
+  integrity sha512-y5oGRVOBLlFVHP65LuG8YHhkfC8tR/o3USfsiAkTDyky6mXkba8wzthlVACMWpxJ7cRpFloznELpwnci75rocA==
   dependencies:
     nan latest
 
-"@nodert-win10/windows.media@^0.2.96":
-  version "0.2.96"
-  resolved "https://registry.yarnpkg.com/@nodert-win10/windows.media/-/windows.media-0.2.96.tgz#3287830f1c494a53d3d6bbb275f48489204498c5"
-  integrity sha1-MoeDDxxJSlPT1ruydfSEiSBEmMU=
-  dependencies:
-    nan latest
-
-"@nodert-win10/windows.storage.streams@^0.2.96":
-  version "0.2.96"
-  resolved "https://registry.yarnpkg.com/@nodert-win10/windows.storage.streams/-/windows.storage.streams-0.2.96.tgz#e2cf392a83c74f918ce4356d905282076a74d13c"
-  integrity sha1-4s85KoPHT5GM5DVtkFKCB2p00Tw=
+"@nodert-win10-rs4/windows.storage.streams@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.storage.streams/-/windows.storage.streams-0.4.4.tgz#edcc1b62cf94d69648de0364bddec35149ccec81"
+  integrity sha512-xoK6sTG4FxyLYfD/oW9NuElBwKiWFS6wmegQunSPaFpv+j6FYU6olfSqgvqu1/rSMzPV5aZ68JkrPu8uKqZo3Q==
   dependencies:
     nan latest
 
@@ -3988,6 +3981,12 @@ widest-line@^3.1.0:
   integrity sha512-NsmoXalsWVDMGupxZ5R08ka9flZjjiLvHVAWYOKtiKM8ujtZWr9cRffak+uSE48+Ob8ObalXpwyeUiyDD6QFgg==
   dependencies:
     string-width "^4.0.0"
+
+"windows.media.playback@git+https://github.com/NovusTheory/nodert-windows.media.playback.git":
+  version "0.1.0"
+  resolved "git+https://github.com/NovusTheory/nodert-windows.media.playback.git#855edf625b2762caa89dc7aab0b686d535b79f34"
+  dependencies:
+    nan latest
 
 wrap-ansi@^7.0.0:
   version "7.0.0"

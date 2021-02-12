@@ -2,21 +2,19 @@ const {
     MediaPlaybackStatus,
     MediaPlaybackType,
     SystemMediaTransportControlsButton,
-} = require('@nodert-win10/windows.media')
-const {
-    BackgroundMediaPlayer,
-} = require('@nodert-win10/windows.media.playback')
+} = require('@nodert-win10-rs4/windows.media')
+const { BackgroundMediaPlayer } = require('windows.media.playback')
 const {
     RandomAccessStreamReference,
-} = require('@nodert-win10/windows.storage.streams')
-const { Uri } = require('@nodert-win10/windows.foundation')
+} = require('@nodert-win10-rs4/windows.storage.streams')
+const { Uri } = require('@nodert-win10-rs4/windows.foundation')
 
 const mediaControl = require('../providers/mediaProvider')
 const settingsProvider = require('./settingsProvider')
 
 class windowsMediaProvider {
     constructor() {
-        this._webContents = null
+        this._view = null
         this._isInitialized = false
         this._controls =
             BackgroundMediaPlayer.current.systemMediaTransportControls
@@ -48,16 +46,16 @@ class windowsMediaProvider {
         this._controls.on('buttonpressed', (sender, eventArgs) => {
             switch (eventArgs.button) {
                 case SystemMediaTransportControlsButton.play:
-                    mediaControl.playPauseTrack(this._webContents)
+                    mediaControl.playPauseTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.pause:
-                    mediaControl.playPauseTrack(this._webContents)
+                    mediaControl.playPauseTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.next:
-                    mediaControl.nextTrack(this._webContents)
+                    mediaControl.nextTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.previous:
-                    mediaControl.previousTrack(this._webContents)
+                    mediaControl.previousTrack(this._view)
                     break
                 default:
                     break
@@ -66,7 +64,7 @@ class windowsMediaProvider {
     }
 
     init(view) {
-        this._webContents = view.webContents
+        this._view = view
         this._isInitialized = true
     }
 
