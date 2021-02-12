@@ -22,7 +22,7 @@ jobs:
           node-version: 12
       - run: yarn --frozen-lockfile
       - uses: jacobtomlinson/gha-find-replace@master
-          with:
+        with:
             find: "\"version\": \"([0-9\.]*)\""
             include: "package.json"
             replace: "\"version\": \"${1}-nightly\""
