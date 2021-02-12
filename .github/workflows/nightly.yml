@@ -1,9 +1,10 @@
 name: Nightly
 
 on:
-  push:
-    branches:
-      - "development"
+  - push
+  # push:
+  #   branches:
+  #     - "development"
 
 jobs:
   build:
