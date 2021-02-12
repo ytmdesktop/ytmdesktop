@@ -21,6 +21,11 @@ jobs:
         with:
           node-version: 12
       - run: yarn --frozen-lockfile
+      - uses: jacobtomlinson/gha-find-replace@master
+          with:
+            find: "\"version\": \"([0-9\.]*)\""
+            include: "package.json"
+            replace: "\"version\": \"${1}-nightly\""
       - run: node ./script/build-current-platform.js
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
