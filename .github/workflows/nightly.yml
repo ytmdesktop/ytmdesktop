@@ -1,10 +1,10 @@
 name: Nightly
 
 on:
-  - push
-  # push:
-  #   branches:
-  #     - "development"
+  # - push
+  push:
+    branches:
+      - "github-action-for-nightly-release"
 
 jobs:
   build:
@@ -23,9 +23,9 @@ jobs:
       - run: yarn --frozen-lockfile
       - uses: mingjun97/file-regex-replace@v1
         with:
-            find: '"version": "([0-9\.]*)"'
-            include: "^package.json"
-            replace: '"version": "$1-nightly"'
+          regex: '"version": "([0-9\.]*)"'
+          include: "^package.json"
+          replacement: '"version": "$1-nightly"'
       - run: node ./script/build-current-platform.js
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
