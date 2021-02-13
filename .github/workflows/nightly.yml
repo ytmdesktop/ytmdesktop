@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: 12
       - run: yarn --frozen-lockfile
-      - uses: jacobtomlinson/gha-find-replace@master
+      - uses: mingjun97/file-regex-replace@v1
         with:
-            find: '"name": "youtube-music-desktop-app",\n\s*"version": "([0-9\.]*)"'
-            include: "package.json"
-            replace: '"name": "youtube-music-desktop-app","version": "${1}-nightly"'
+            find: '"version": "([0-9\.]*)"'
+            include: "^package.json"
+            replace: '"version": "${1}-nightly"'
       - run: node ./script/build-current-platform.js
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
