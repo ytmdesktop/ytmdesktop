@@ -35,6 +35,7 @@ body.showinfo #background {
     height: 100%;
     padding: 1.5vmin;
     filter: opacity(0);
+    border-radius: 100%;
 }
 
 .cmd-btn i {
@@ -93,12 +94,14 @@ body.showinfo #background {
 #btn-like,
 #btn-dislike {
     margin: 5vmin 2.5vmin;
+    width: 100%;
 }
 
 #btn-like i,
 #btn-dislike i {
     font-size: 7vmin;
     padding: 2.5vmin;
+    position: absolute;
 }
 
 #btn-play-pause i {
@@ -115,6 +118,7 @@ body.showinfo #background {
     height: 100%;
     width: 0;
     background: #fff;
+    transition: width 0.15s ease-in;
 }
 
 #content,
@@ -169,8 +173,17 @@ body.showinfo #background {
 /* transitions */
 .player-info,
 .cmd-btn,
-.progress-bar {
-    transition: filter, margin-top, height;
+.progress-bar,
+.ctrl-btn,
+.material-icons {
+    transition: filter, margin-top, height, background-color, opacity;
     transition-duration: 0.15s;
     transition-timing-function: ease-out;
+}
+
+.show-solid {
+    opacity: 1;
+}
+.hide-solid {
+    opacity: 0;
 }

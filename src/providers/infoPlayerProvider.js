@@ -533,21 +533,27 @@ function addToPlaylist(webContents, index) {
 }
 
 function convertToHuman(time) {
-    var _aux = time
-    var _minutes = 0
-    var _seconds = 0
+    let hours = Math.floor(time / 3600)
+    time %= 3600
+    let minutes = Math.floor(time / 60)
+    let seconds = Math.floor(time % 60)
 
-    while (_aux >= 60) {
-        _aux = _aux - 60
-        _minutes++
-    }
+    let final =
+        hours.toString().padStart(2, '0') +
+        ':' +
+        minutes.toString().padStart(2, '0') +
+        ':' +
+        seconds.toString().padStart(2, '0')
 
-    _seconds = _aux
+    final.startsWith('00:0')
+        ? (final = final.slice(4))
+        : final.startsWith('00:')
+        ? (final = final.slice(3))
+        : final.startsWith('0')
+        ? (final = final.slice(1))
+        : null
 
-    if (_seconds < 10) {
-        return _minutes + ':0' + _seconds
-    }
-    return _minutes + ':' + _seconds
+    return final
 }
 
 function setPercent(px, ptotal) {

@@ -7,7 +7,6 @@ const btnPrevious = document.getElementById('btn-previous')
 const btnPlayPause = document.getElementById('btn-play-pause')
 const btnNext = document.getElementById('btn-next')
 const btnLike = document.getElementById('btn-like')
-
 let body = document.getElementsByTagName('body')[0]
 let background = document.getElementById('background')
 let title = document.getElementById('title')
@@ -91,6 +90,7 @@ function setPlayerInfo(data) {
     current.innerHTML = data.player.seekbarCurrentPositionHuman || '0:00'
     duration.innerHTML = data.track.durationHuman || '0:00'
     progress.style.width = data.player.statePercent * 100 + '%'
+
     if (data.player.isPaused) {
         btnPlayPause.children.item(0).innerHTML = 'play_arrow'
         body.classList.add('showinfo')
@@ -99,20 +99,29 @@ function setPlayerInfo(data) {
         body.classList.remove('showinfo')
     }
 
+    const btnLikeCL = btnLike.children.item(0).classList
+    const btnDislikeCL = btnDislike.children.item(0).classList
+
     switch (data.player.likeStatus) {
         case 'LIKE':
-            btnLike.children.item(0).classList.remove('outlined')
-            btnDislike.children.item(0).classList.add('outlined')
+            btnLikeCL.add('show-solid')
+            btnLikeCL.remove('hide-solid')
+            btnDislikeCL.add('hide-solid')
+            btnDislikeCL.remove('show-solid')
             break
 
         case 'DISLIKE':
-            btnLike.children.item(0).classList.add('outlined')
-            btnDislike.children.item(0).classList.remove('outlined')
+            btnLikeCL.add('hide-solid')
+            btnLikeCL.remove('show-solid')
+            btnDislikeCL.add('show-solid')
+            btnDislikeCL.remove('hide-solid')
             break
 
         case 'INDIFFERENT':
-            btnLike.children.item(0).classList.add('outlined')
-            btnDislike.children.item(0).classList.add('outlined')
+            btnDislikeCL.add('hide-solid')
+            btnDislikeCL.remove('show-solid')
+            btnLikeCL.add('hide-solid')
+            btnLikeCL.remove('show-solid')
             break
     }
 

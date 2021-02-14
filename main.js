@@ -414,7 +414,7 @@ function createWindow() {
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.20)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
@@ -1163,25 +1163,16 @@ function createWindow() {
                 }, 1000)
             })
 
-            let storeMiniplayerSizeTimer
             miniplayer.on('resize', function (e) {
-                try {
-                    let size = miniplayer.getSize()
-                    if (storeMiniplayerSizeTimer) {
-                        clearTimeout(storeMiniplayerSizeTimer)
-                    }
-                    storeMiniplayerSizeTimer = setTimeout(() => {
-                        settingsProvider.set(
-                            'settings-miniplayer-size',
-                            Math.min(...size)
-                        )
-                        miniplayer.setSize(Math.min(...size), Math.min(...size))
-                    }, 500)
-                } catch {
-                    writeLog({ type: 'warn', data: 'error miniplayer resize' })
-                }
-            })
+                // This is a much better solution since it doesn't leave the gray background when you're still dragging it,
+                // Its still a bit glitchly though visually, but hopefully this will do for now
+                // https://github.com/electron/electron/issues/8036#issuecomment-287261029
 
+                let size = miniplayer.getSize()
+                miniplayer.setSize(size[0], parseInt((size[0] * 1) / 1))
+            })
+            // Devtools
+            // miniplayer.openDevTools()
             mainWindow.hide()
         }
     }
