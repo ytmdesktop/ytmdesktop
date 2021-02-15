@@ -2,8 +2,8 @@ const clientId = '495666957501071390'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
-var client
-var _isStarted
+let client
+let _isStarted
 
 function isStarted() {
     return _isStarted
@@ -16,13 +16,11 @@ function _setIsStarted(value) {
 function start() {
     client = new RPC.Client({ transport: 'ipc' })
 
-    client.on('ready', () => {
-        _setIsStarted(true)
-    })
+    client.on('ready', () => _setIsStarted(true))
 
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
-            setTimeout(function () {
+            setTimeout(() => {
                 start()
             }, 10000)
         }
@@ -39,11 +37,13 @@ function stop() {
     _setIsStarted(false)
 }
 
-function setActivity(info) {
+async function setActivity(info) {
     if (isStarted() && info.track.title) {
-        var now = Date.now()
-        var activity = {}
-        var discordSettings = settingsProvider.get('discord-presence-settings')
+        const now = Date.now()
+        const activity = {}
+        const discordSettings = settingsProvider.get(
+            'discord-presence-settings'
+        )
 
         if (discordSettings.details) activity.details = info.track.title
 
@@ -74,7 +74,7 @@ function setActivity(info) {
             (!discordSettings.hideIdle && info.player.isPaused) ||
             info.track.isAdvertisement
         ) {
-            client.clearActivity()
+            await client.clearActivity()
         } else {
             client.setActivity(activity).catch((err) => {
                 console.log(err)

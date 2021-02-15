@@ -25,15 +25,13 @@ function set(settingName, value) {
  * @param {*} initialValue
  */
 function setInitialValue(settingName, initialValue) {
-    if (!store.has(settingName)) {
-        set(settingName, initialValue)
-    }
+    if (!store.has(settingName)) set(settingName, initialValue)
 }
 
 function onDidChange(key, callback) {
-    return store.onDidChange(key, (newValue, oldValue) => {
+    return store.onDidChange(key, (newValue, oldValue) =>
         callback({ newValue, oldValue })
-    })
+    )
 }
 
 function proxyCallbackToSender(id, key) {
@@ -60,9 +58,8 @@ if (ipcMain) {
             existingSubs = {}
             subscriptions.set(e.sender.id, existingSubs)
         }
-        if (existingSubs[settingName]) {
-            existingSubs[settingName]++
-        } else {
+        if (existingSubs[settingName]) existingSubs[settingName]++
+        else {
             existingSubs[settingName] = 1
             const unsub = onDidChange(
                 settingName,

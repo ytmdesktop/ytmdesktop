@@ -1,4 +1,4 @@
-const { app, Menu, Tray, BrowserWindow, ipcMain } = require('electron')
+const { app, Menu, Tray, ipcMain } = require('electron')
 const mediaControl = require('./mediaProvider')
 const nativeImage = require('electron').nativeImage
 const settingsProvider = require('./settingsProvider')
@@ -8,6 +8,7 @@ const systemInfo = require('../utils/systemInfo')
 const imageToBase64 = require('image-to-base64')
 const { popUpMenu } = require('./templateProvider')
 const assetsProvider = require('./assetsProvider')
+const { Notification } = require('electron')
 
 let tray = null
 let saved_mainWindow = null
@@ -16,9 +17,7 @@ let iconTray = assetsProvider.getIcon('trayTemplate')
 
 function setTooltip(tooltip) {
     try {
-        if (tray) {
-            tray.setToolTip(tooltip)
-        }
+        if (tray) tray.setToolTip(tooltip)
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
@@ -27,11 +26,13 @@ function setTooltip(tooltip) {
     }
 }
 
-let init_tray = () => {
+let initVanillaTray = () => {
     try {
         setTooltip('YouTube Music Desktop App')
+        tray.removeAllListeners()
         tray.setContextMenu(contextMenu)
-
+        nativeImageIcon = buildTrayIcon(iconTray)
+        tray.setImage(nativeImageIcon)
         tray.addListener('click', () => {
             doBehavior(saved_mainWindow)
         })
@@ -42,7 +43,7 @@ let init_tray = () => {
     } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
-            data: `Failed to init_tray: ${error}`,
+            data: `Failed to initVanillaTray: ${error}`,
         })
     }
 }
@@ -60,26 +61,22 @@ function createTray(mainWindow) {
             )
         }
 
-        if (!systemInfo.isMac()) {
-            init_tray()
-        } else {
-            setShinyTray()
-        }
+        if (!systemInfo.isMac()) initVanillaTray()
+        else setShinyTray()
     }
 }
 
 function updateTray(data) {
     try {
         if (tray) {
-            var template = popUpMenu(__, saved_mainWindow, mediaControl, app)
+            const template = popUpMenu(__, saved_mainWindow, mediaControl, app)
 
-            if (data.type == 'audioOutputs') {
-                template[11]['submenu'] = data.data
-            }
+            if (data.type === 'audioOutputs') template[11].submenu = data.data
 
             contextMenu = Menu.buildFromTemplate(template)
 
-            tray.setContextMenu(contextMenu)
+            if (!settingsProvider.get('settings-shiny-tray'))
+                tray.setContextMenu(contextMenu)
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -104,8 +101,7 @@ function updateTrayIcon(icon) {
 }
 
 function buildTrayIcon(icon) {
-    let nativeImageIcon = nativeImage.createFromPath(icon)
-    return nativeImageIcon
+    return nativeImage.createFromPath(icon)
 }
 
 function balloon(title, content, cover, icon) {
@@ -148,20 +144,20 @@ function _doNotification(title, content, icon) {
                     content: content,
                     noSound: true,
                 })
-                if (!settingsProvider.get('settings-tray-icon')) {
+                if (!settingsProvider.get('settings-tray-icon'))
                     setTimeout(() => {
                         quit()
                     }, 7 * 1000)
-                }
-            } else {
-                let Notification = require('electron-native-notification')
-
-                new Notification(title, {
+            }
+            // create a system notification and send it
+            else
+                new Notification({
+                    title: title,
                     body: content,
                     silent: true,
                     icon: icon,
-                })
-            }
+                    urgency: 'low',
+                }).show()
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -177,25 +173,31 @@ function quit() {
 
 function setShinyTray() {
     try {
-        if (settingsProvider.get('settings-shiny-tray') && systemInfo.isMac()) {
+        if (systemInfo.isMac() && settingsProvider.get('settings-shiny-tray')) {
             tray.setContextMenu(null)
             tray.removeAllListeners()
-            tray.on('right-click', (event, bound, position) => {
+            tray.on('right-click', () => {
                 tray.popUpContextMenu(contextMenu)
             })
             tray.on('click', (event, bound, position) => {
                 if (position.x < 32) {
-                    saved_mainWindow.show()
-                } else if (position.x > 130) {
+                    // click at icon
+                    if (!saved_mainWindow.isVisible()) {
+                        saved_mainWindow.show()
+                    } else if (!saved_mainWindow.isFocused()) {
+                        saved_mainWindow.show()
+                    } else saved_mainWindow.hide()
+                } else if (position.x > 130)
+                    // click play/pause button
                     mediaControl.playPauseTrack(
                         saved_mainWindow.getBrowserView()
                     )
-                }
             })
         } else {
             // Shiny tray disabled ||| on onther platform
             tray.removeAllListeners()
-            init_tray()
+            initVanillaTray()
+            console.log('initVanillaTray')
         }
     } catch (error) {
         ipcMain.emit('log', {
@@ -207,13 +209,13 @@ function setShinyTray() {
 
 function updateImage(payload) {
     try {
-        if (!settingsProvider.get('settings-shiny-tray')) return
-        var img =
+        if (!settingsProvider.get('settings-shiny-tray') || !tray) return
+        const img =
             typeof nativeImage.createFromDataURL === 'function'
                 ? nativeImage.createFromDataURL(payload) // electron v0.36+
                 : nativeImage.createFromDataUrl(payload) // electron v0.30
         tray.setImage(img)
-    } catch {
+    } catch (error) {
         ipcMain.emit('log', {
             type: 'warn',
             data: `Failed to updateImage: ${error}`,

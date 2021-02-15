@@ -1,4 +1,4 @@
-const { remote, shell } = require('electron')
+const { remote } = require('electron')
 const scribble = require('scribble')
 const settingsProvider = require('./settingsProvider')
 const http = require('http')
@@ -7,9 +7,7 @@ const Base64 = require('js-base64').Base64
 const apiKey = '9ab417e8b808ed071223a1b4b3c29642'
 const apiSecret = '9d8830c167627e65dac63786be101964'
 
-var Scrobbler
-
-var userLogin
+let Scrobbler, userLogin
 
 function signIn() {
     userLogin = getLogin()
@@ -31,8 +29,8 @@ function setLogin(username, password) {
 }
 
 function getLogin() {
-    var login = settingsProvider.get('last-fm-login')
-    if (login.username != '') {
+    const login = settingsProvider.get('last-fm-login')
+    if (login.username !== '') {
         login.password = Base64.decode(login.password)
         return login
     }
@@ -61,11 +59,9 @@ function getToken() {
 }
 
 function updateTrackInfo(title, author, album) {
-    if (Scrobbler === undefined) {
-        signIn()
-    }
+    if (Scrobbler === undefined) signIn()
 
-    var track = {
+    const track = {
         artist: author,
         track: title,
         album: album,
@@ -75,11 +71,9 @@ function updateTrackInfo(title, author, album) {
 }
 
 function updateNowPlaying(title, author, album, duration) {
-    if (Scrobbler === undefined) {
-        signIn()
-    }
+    if (Scrobbler === undefined) signIn()
 
-    var track = {
+    const track = {
         artist: author,
         track: title,
         album: album,
@@ -88,13 +82,13 @@ function updateNowPlaying(title, author, album, duration) {
     Scrobbler.NowPlaying(track, function (_) {})
 }
 
-function authorize(token) {
+async function authorize(token) {
     let winAuthorize = new remote.BrowserWindow({
         title: 'Last.FM Authorization',
         width: 900,
         height: 500,
     })
-    winAuthorize.loadURL(
+    await winAuthorize.loadURL(
         `https://www.last.fm/api/auth?api_key=${apiKey}&token=${token}`
     )
 }
