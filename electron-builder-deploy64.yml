@@ -45,3 +45,7 @@ mac:
 linux:
   icon: src/assets/favicon.png
   category: AudioVideo
+
+snap:
+  slots: 
+    - mpris

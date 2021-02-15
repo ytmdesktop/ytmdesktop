@@ -26,7 +26,7 @@ function checkWindowPosition(windowPosition) {
                     resolve(position)
                 }
             }
-        } catch {
+        } catch (_) {
             console.log('error -> checkWindowPosition')
             reject(false)
         }
@@ -34,19 +34,12 @@ function checkWindowPosition(windowPosition) {
 }
 
 function doBehavior(mainWindow) {
-    if (mainWindow.isVisible()) {
-        if (mainWindow.isFocused()) {
-            mainWindow.hide()
-        } else {
-            mainWindow.focus()
-        }
-    } else {
-        if (mainWindow.isFocused()) {
-            ipcMain.emit('window', { command: 'restore-main-window' })
-        } else {
-            ipcMain.emit('window', { command: 'restore-main-window' })
-        }
-    }
+    if (mainWindow.isVisible())
+        if (mainWindow.isFocused()) mainWindow.hide()
+        else mainWindow.show()
+    else if (mainWindow.isFocused())
+        ipcMain.emit('window', { command: 'restore-main-window' })
+    else ipcMain.emit('window', { command: 'restore-main-window' })
 }
 
 module.exports = {

@@ -11,7 +11,12 @@ canvas.height = 32
 canvas.width = 150
 const ctx = canvas.getContext('2d')
 
-ipc.on('update-status-bar', function (event, arg) {
+let saved_title = ''
+let elapsed = 0
+let textWidth = 0
+let rollInterval = null
+
+function render_tray() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.font = '14px Arial'
     if (store.get('settings-shiny-tray-dark', false)) {
@@ -21,33 +26,56 @@ ipc.on('update-status-bar', function (event, arg) {
         ctx.fillStyle = 'black'
         icon_set = icons.bright
     }
-    ctx.fillText(cutstr(status.title, 14), 30, 21)
+    if (saved_title != status.title) {
+        saved_title = status.title
+        elapsed = 0
+    }
+    textWidth = ctx.measureText(saved_title + '    ').width
+    if (status.rollable && textWidth > 105) {
+        // 105 comes from 135 - 30
+
+        elapsed += 3
+        ctx.fillText(saved_title + '    ' + saved_title, 30 - elapsed, 21)
+        ctx.clearRect(0, 0, 30, canvas.height)
+        ctx.clearRect(135, 0, canvas.width - 135, canvas.height)
+        if (elapsed > textWidth) elapsed = 0
+        if (!rollInterval) {
+            rollInterval = setInterval(() => {
+                render_tray()
+            }, 200)
+        }
+    } else {
+        if (rollInterval) clearInterval(rollInterval)
+        rollInterval = null
+        ctx.fillText(cutstr(status.title, 14), 30, 21)
+        elapsed = 0
+    }
 
     // console.log(arg)
     ctx.drawImage(icon_set.icons, 8, 8, 16, 16)
-    if (status.paused) {
-        ctx.drawImage(icon_set.play, 135, 6, 20, 20)
-    } else {
-        ctx.drawImage(icon_set.pause, 135, 6, 20, 20)
-    }
+    if (status.paused) ctx.drawImage(icon_set.play, 135, 6, 20, 20)
+    else ctx.drawImage(icon_set.pause, 135, 6, 20, 20)
+
     ipc.send('updated-tray-image', canvas.toDataURL('image/png', 1))
+}
+
+ipc.on('update-status-bar', () => {
+    render_tray()
 })
 
 ipc.send('register-renderer')
 
-ipc.on('is-dev', function (event, args) {
-    if (args) {
-        document.title = document.title + ' DEV'
-    }
+ipc.on('is-dev', (event, args) => {
+    if (args) document.title = document.title + ' DEV'
 })
 
 function cutstr(str, len) {
-    var str_length = 0
-    var str_len = 0
-    str_cut = new String()
+    let str_length = 0
+    let str_len
+    let str_cut = String()
     str_len = str.length
-    for (var i = 0; i < str_len; i++) {
-        a = str.charAt(i)
+    for (let i = 0; i < str_len; i++) {
+        const a = str.charAt(i)
         str_length++
         if (escape(a).length > 4) {
             str_length++
@@ -58,23 +86,19 @@ function cutstr(str, len) {
             return str_cut
         }
     }
-    if (str_length < len) {
-        return str
-    }
+    if (str_length < len) return str
 }
 
+// TODO: Unused function?
 function getStrLength(str) {
     // For cut str
-    var realLength = 0,
+    let realLength = 0,
         len = str.length,
         charCode = -1
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
         charCode = str.charCodeAt(i)
-        if (charCode >= 0 && charCode <= 128) {
-            realLength += 1
-        } else {
-            realLength += 2
-        }
+        if (charCode >= 0 && charCode <= 128) realLength += 1
+        else realLength += 2
     }
     return realLength
 }

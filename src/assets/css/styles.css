@@ -25,10 +25,14 @@ html, body {
     top: 0;
     left: 0;
     right: 0;
-    /*background-color: #232323;*/
+    background-color: #232323;
     width: 100%;
-    height: 28px;
-    max-height: 28px;
+    height: 30px;
+    max-height: 30px;
+}
+
+body[accent-enabled][player-open] .bar{
+    background-color: var(--ytm-album-color-muted);
 }
 
 .bar .title {

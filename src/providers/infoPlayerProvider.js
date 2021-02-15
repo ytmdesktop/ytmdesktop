@@ -1,6 +1,8 @@
-var webContents, initialized
+const settingsProvider = require('./settingsProvider')
 
-var player = {
+let webContents, initialized
+
+const player = {
     hasSong: false,
     isPaused: true,
     volumePercent: 0,
@@ -11,7 +13,7 @@ var player = {
     repeatType: 'NONE',
 }
 
-var track = {
+const track = {
     author: '',
     title: '',
     album: '',
@@ -25,17 +27,17 @@ var track = {
     inLibrary: false,
 }
 
-var _queue = {
+let _queue = {
     automix: false,
     currentIndex: 0,
     list: [],
 }
 
-var _playlist = {
+let _playlist = {
     list: [],
 }
 
-var _lyrics = {
+const _lyrics = {
     provider: '',
     data: '',
     hasLoaded: false,
@@ -46,6 +48,12 @@ function init(view) {
     initialized = true
     toggleMoreActions(webContents)
     toggleMoreActions(webContents)
+
+    initVolume()
+}
+
+function initVolume() {
+    setVolume(webContents, settingsProvider.get('settings-volume'))
 }
 
 function getAllInfo() {
@@ -56,29 +64,29 @@ function getAllInfo() {
 }
 
 function getPlayerInfo() {
-    if (webContents !== undefined) {
-        hasSong()
-        isPaused(webContents)
-        getVolume(webContents)
-        getSeekbarPosition(webContents)
-        getLikeStatus(webContents)
-        getRepeatType(webContents)
-    }
+    if (webContents === undefined) return player
+
+    hasSong()
+    isPaused(webContents)
+    getVolume(webContents)
+    getSeekbarPosition(webContents)
+    getLikeStatus(webContents)
+    getRepeatType(webContents)
     return player
 }
 
 function getTrackInfo() {
-    if (webContents !== undefined) {
-        getAuthor(webContents)
-        getTitle(webContents)
-        getAlbum(webContents)
-        getCover(webContents)
-        getDuration(webContents)
-        getUrl(webContents)
-        setPercent(player.seekbarCurrentPosition, track.duration)
-        isVideo(webContents)
-        isAdvertisement(webContents)
-    }
+    if (webContents === undefined) return track
+
+    getAuthor(webContents)
+    getTitle(webContents)
+    getAlbum(webContents)
+    getCover(webContents)
+    getDuration(webContents)
+    getUrl(webContents)
+    setPercent(player.seekbarCurrentPosition, track.duration)
+    isVideo(webContents)
+    isAdvertisement(webContents)
     return track
 }
 
@@ -87,9 +95,7 @@ function getQueueInfo() {
 }
 
 function updateQueueInfo() {
-    if (webContents !== undefined) {
-        getQueue(webContents)
-    }
+    if (webContents !== undefined) getQueue(webContents)
 }
 
 function getPlaylistInfo() {
@@ -97,9 +103,7 @@ function getPlaylistInfo() {
 }
 
 function updatePlaylistInfo() {
-    if (webContents !== undefined) {
-        getPlaylist(webContents)
-    }
+    if (webContents !== undefined) getPlaylist(webContents)
 }
 
 function getLyricsInfo() {
@@ -107,7 +111,7 @@ function getLyricsInfo() {
 }
 
 function hasSong() {
-    player.hasSong = track.id != ''
+    player.hasSong = track.id !== ''
 }
 
 function isPaused(webContents) {
@@ -187,8 +191,8 @@ function getVolume(webContents) {
             `document.querySelector('.volume-slider.ytmusic-player-bar').getAttribute('value');`
         )
         .then((volume) => {
-            debug(`Volume % is: ${parseInt(volume)}`)
-            player.volumePercent = parseInt(volume)
+            debug(`Volume % is: ${parseFloat(volume)}`)
+            player.volumePercent = parseFloat(volume)
         })
         .catch((_) => console.log('error getVolume'))
 }
@@ -285,8 +289,8 @@ function getUrl(webContents) {
             if (url) {
                 track.url = url
 
-                var newUrl = new URL(url)
-                var searchParams = new URLSearchParams(newUrl.search)
+                const newUrl = new URL(url)
+                const searchParams = new URLSearchParams(newUrl.search)
 
                 track.id = searchParams.get('v')
                 debug(`Track Url: ${track.url}`)
@@ -335,11 +339,9 @@ function getQueue(webContents) {
         .catch((_) => console.log('error getQueue'))
 }
 
-function setQueueItem(webContents, index) {
-    webContents.executeJavaScript(
-        `
-        var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()
-        `
+async function setQueueItem(webContents, index) {
+    await webContents.executeJavaScript(
+        `var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()`
     )
 }
 
@@ -441,6 +443,7 @@ function setVolume(webContents, time) {
             `
         var slider = document.querySelector('#volume-slider');
         slider.value = ${time};
+        document.querySelector('.video-stream').volume = ${time / 100}
         `
         )
         .then()
@@ -576,8 +579,8 @@ function firstPlay(webContents) {
         .catch((_) => console.log('error firstPlay'))
 }
 
-function toggleMoreActions(webContents) {
-    webContents.executeJavaScript(
+async function toggleMoreActions(webContents) {
+    await webContents.executeJavaScript(
         `
             var middleControlsButtons = document.querySelector('.middle-controls-buttons');
             var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')
