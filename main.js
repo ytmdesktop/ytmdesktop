@@ -1262,6 +1262,9 @@ async function createWindow() {
                 }
             })
 
+            // Devtools
+            // miniplayer.openDevTools()
+
             mainWindow.hide()
         }
     }
