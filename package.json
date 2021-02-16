@@ -5,6 +5,7 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
+        "dev": "nodemon --exec yarn start --dev --inspect",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
         "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
