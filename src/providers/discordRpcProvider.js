@@ -77,7 +77,7 @@ async function setActivity(info) {
             ]
         }
 
-        if (!discordSettings.hideIdle && info.player.isPaused) {
+        if ((!discordSettings.hideIdle && info.player.isPaused) || info.track.isAdvertisement) {
             await client.clearActivity()
         } else {
             // As of writing this discord-rpc was not updated to support buttons with setActivity

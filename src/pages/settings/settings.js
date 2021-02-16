@@ -131,8 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
-    initElement('settings-discord-rich-presence', 'click', null)
-    initElement('settings-app-language', 'change', showRelaunchButton)
+    initElement('settings-shiny-tray-song-title-rollable', 'click', () => {
+        ipc.send('update-tray')
+    })
+    initElement('settings-discord-rich-presence', 'click', showRelaunchButton)
+    initElement('settings-app-language', 'change', () => {
+        ipc.send('language-updated')
+        showRelaunchButton()
+    })
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
         checkClipboardWatcherStatus()
@@ -185,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
+    initElement('settings-pause-on-suspend', 'click', null)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -618,4 +625,11 @@ document.querySelector('#disableAccelerator').addEventListener('click', () => {
 
 document.querySelector('#release-notes').addEventListener('click', () => {
     ipc.send('window', { command: 'show-changelog' })
+})
+
+document.querySelectorAll('[externalURL]').forEach((element) => {
+    var externalURL = element.getAttribute('externalURL')
+    element.addEventListener('click', () => {
+        shell.openExternal(externalURL)
+    })
 })

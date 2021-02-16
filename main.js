@@ -12,6 +12,7 @@ const {
     screen,
     shell,
     dialog,
+    powerMonitor,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -36,7 +37,13 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
-const mprisProvider = require('./src/providers/mprisProvider')
+const mprisProvider = (() => {
+    if (!isLinux()) {
+        return require('./src/providers/mprisProvider')
+    } else {
+        return null
+    }
+})()
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -75,12 +82,21 @@ let windowConfig = {
     titleBarStyle: '',
 }
 
-global.sharedObj = { title: 'N/A', paused: true }
+global.sharedObj = {
+    title: 'YTMDesktop',
+    paused: true,
+    rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
+}
 
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
 let iconPause = assetsProvider.getIcon('favicon_pause')
+let sleepTimer = {
+    mode: 0, // "time/counter/else"
+    counter: 0, // "minutes in time mode/ songs in counter mode"
+    interval: 0, // "valid in time mode"
+}
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
@@ -110,8 +126,6 @@ if (
     } catch (error) {
         console.log('error windowsMediaProvider > ' + error)
     }
-
-if (isLinux()) mprisProvider.start()
 
 if (isMac()) {
     settingsProvider.set(
@@ -364,7 +378,12 @@ async function createWindow() {
     view.webContents.on('media-started-playing', () => {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            if (isLinux()) mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            if (isLinux()) {
+                if (!mprisProvider._isInitialized) {
+                    mprisProvider.start()
+                }
+                mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
+            }
         }
 
         if (
@@ -423,7 +442,9 @@ async function createWindow() {
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
-            mprisProvider.setActivity(getAll())
+            if (isLinux()) {
+                mprisProvider.setActivity(getAll())
+            }
 
             mediaControl.setProgress(
                 mainWindow,
@@ -434,12 +455,12 @@ async function createWindow() {
             )
 
             /**
-             * Srobble when track changes or when current track starts from the beginning
+             * Scrobble when track changes or when current track starts from the beginning
              */
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.01)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
@@ -542,6 +563,16 @@ async function createWindow() {
                             document.documentElement.style.setProperty("--ytm-album-color-muted", 'hsl(${hue}, ${sat}%, 20%)');
                         `)
                     })
+
+                if (sleepTimer.mode == 'counter') {
+                    sleepTimer.counter -= 1
+                    if (sleepTimer.counter <= 0) {
+                        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                            mediaControl.playPauseTrack(view)
+
+                        sleepTimer.mode = 'off'
+                    }
+                }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
@@ -829,21 +860,26 @@ async function createWindow() {
         newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
-    globalShortcut.register('MediaPlayPause', () => {
-        checkDoubleTapPlayPause()
-    })
+    if (
+        !settingsProvider.get('settings-windows10-media-service-show-info') ||
+        !settingsProvider.get('settings-windows10-media-service')
+    ) {
+        globalShortcut.register('MediaPlayPause', () => {
+            checkDoubleTapPlayPause()
+        })
 
-    globalShortcut.register('MediaStop', () => {
-        mediaControl.stopTrack(view)
-    })
+        globalShortcut.register('MediaStop', () => {
+            mediaControl.stopTrack(view)
+        })
 
-    globalShortcut.register('MediaPreviousTrack', () => {
-        mediaControl.previousTrack(view)
-    })
+        globalShortcut.register('MediaPreviousTrack', () => {
+            mediaControl.previousTrack(view)
+        })
 
-    globalShortcut.register('MediaNextTrack', () => {
-        mediaControl.nextTrack(view)
-    })
+        globalShortcut.register('MediaNextTrack', () => {
+            mediaControl.nextTrack(view)
+        })
+    }
 
     if (settingsProvider.get('settings-volume-media-keys')) {
         globalShortcut.register('VolumeUp', () => {
@@ -857,6 +893,16 @@ async function createWindow() {
 
     ipcMain.handle('invoke-all-info', async () =>
         infoPlayerProvider.getAllInfo()
+    )
+
+    settingsProvider.onDidChange(
+        'settings-shiny-tray-song-title-rollable',
+        (data) => {
+            console.log(data.newValue)
+            global.sharedObj.rollable = data.newValue
+            if (renderer_for_status_bar)
+                renderer_for_status_bar.send('update-status-bar')
+        }
     )
 
     settingsProvider.onDidChange(
@@ -989,7 +1035,9 @@ async function createWindow() {
 
     ipcMain.on('update-tray', () => {
         if (!isMac()) return
-
+        global.sharedObj.rollable = settingsProvider.get(
+            'settings-shiny-tray-song-title-rollable'
+        )
         updateStatusBar()
         tray.setShinyTray()
     })
@@ -1203,29 +1251,19 @@ async function createWindow() {
                 }, 1000)
             })
 
-            let storeMiniplayerSizeTimer
-            miniplayer.on('resize', () => {
+            miniplayer.on('resize', (e) => {
                 try {
-                    let size = miniplayer.getSize()
-                    if (storeMiniplayerSizeTimer)
-                        clearTimeout(storeMiniplayerSizeTimer)
-
-                    storeMiniplayerSizeTimer = setTimeout(() => {
-                        settingsProvider.set(
-                            'settings-miniplayer-size',
-                            Math.min(...size)
-                        )
-                        if (miniplayer) {
-                            miniplayer.setSize(
-                                Math.min(...size),
-                                Math.min(...size)
-                            )
-                        }
-                    }, 500)
+                    let size = Math.min(...miniplayer.getSize())
+                    miniplayer.setSize(size, size)
+                    settingsProvider.set('settings-miniplayer-size', size)
+                    e.preventDefault()
                 } catch (_) {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
             })
+
+            // Devtools
+            // miniplayer.openDevTools()
 
             mainWindow.hide()
         }
@@ -1723,6 +1761,15 @@ async function createWindow() {
 }
 
 function handleOpenUrl(url) {
+    const loadMusicByVideoId = ([_, video_id, list_id]) => {
+        let url = 'https://music.youtube.com/watch?v=' + video_id
+        if (list_id) url += '&list=' + list_id
+        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+            mediaControl.stopTrack(view)
+        view.webContents.loadURL(url).then(() => {
+            updateAccentColorPref()
+        })
+    }
     let cmd = url.toString().split('://')[1]
     if (!cmd) return
 
@@ -1730,7 +1777,7 @@ function handleOpenUrl(url) {
         ipcMain.emit('window', { command: 'show-settings' })
 
     if (cmd.includes('play/')) {
-        loadMusicByVideoId(cmd.split('/')[1])
+        loadMusicByVideoId(cmd.split('/'))
         writeLog({ type: 'info', data: JSON.stringify(cmd) })
     }
 }
@@ -1750,7 +1797,7 @@ else {
                 if (mainWindow.isMinimized()) mainWindow.restore()
                 else mainWindow.show()
 
-            mainWindow.focus()
+            mainWindow.show()
         }
     })
 
@@ -2001,9 +2048,10 @@ ipcMain.on('log', (dataMain, dataRenderer) => {
     else writeLog(dataRenderer)
 })
 
-if (settingsProvider.get('settings-companion-server')) companionServer.start()
+if (settingsProvider.get('settings-companion-server') && gotTheLock)
+    companionServer.start()
 
-if (settingsProvider.get('settings-genius-auth-server')) {
+if (settingsProvider.get('settings-genius-auth-server') && gotTheLock) {
     geniusAuthServer.start()
 }
 
@@ -2017,7 +2065,46 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
+ipcMain.on('set-sleep-timer', (_, data) => {
+    let counter = parseInt(data.value)
+    const clearSleepTimer = () => {
+        if (sleepTimer.mode == 'time') clearInterval(sleepTimer.interval)
+        sleepTimer.interval = 0
+        sleepTimer.mode = 'off'
+    }
+    if (counter == 0) {
+        clearSleepTimer()
+    } else {
+        sleepTimer.counter = counter
+        if (data.value[data.value.length - 1] == 'c') {
+            sleepTimer.mode = 'counter'
+        } else {
+            sleepTimer.mode = 'time'
+            clearInterval(sleepTimer.interval)
+            sleepTimer.interval = setInterval(() => {
+                sleepTimer.counter -= 1
+                if (sleepTimer.counter <= 0) {
+                    if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                        mediaControl.playPauseTrack(view)
+                    clearSleepTimer()
+                }
+            }, 60 * 1000)
+        }
+    }
+})
+
+ipcMain.on('retrieve-sleep-timer', (e) => {
+    e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
+})
+
 ipcMain.handle('get-audio-output-list', () => audioDevices)
+
+powerMonitor.on('suspend', () => {
+    if (settingsProvider.get('settings-pause-on-suspend')) {
+        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+            mediaControl.playPauseTrack(view)
+    }
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -2026,6 +2113,7 @@ const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
+const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
