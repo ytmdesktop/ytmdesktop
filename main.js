@@ -38,7 +38,7 @@ const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = (() => {
-    if (!isLinux()) {
+    if (isLinux()) {
         return require('./src/providers/mprisProvider')
     } else {
         return null
