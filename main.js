@@ -400,7 +400,7 @@ async function createWindow() {
         if (isMac()) {
             global.sharedObj.paused = false
             updateStatusBar()
-            macMediaProvider.init(view);
+            macMediaProvider.init(view)
         }
 
         if (infoPlayerInterval === undefined) {
@@ -467,7 +467,7 @@ async function createWindow() {
                     seekbarCurrentPosition,
                     duration,
                     !playerInfo.isPaused
-                );
+                )
             }
 
             /**
