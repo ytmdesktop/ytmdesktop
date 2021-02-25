@@ -70,10 +70,16 @@ async function setActivity(info) {
         activity.largeImageText = 'YouTube Music'
         activity.smallImageText = info.player.isPaused ? 'Paused' : 'Playing'
         activity.instance = false
-
-        if (!discordSettings.hideIdle && info.player.isPaused)
+        if (
+            (!discordSettings.hideIdle && info.player.isPaused) ||
+            info.track.isAdvertisement
+        ) {
             await client.clearActivity()
-        else client.setActivity(activity).catch((err) => console.log(err))
+        } else {
+            client.setActivity(activity).catch((err) => {
+                console.log(err)
+            })
+        }
     }
 }
 

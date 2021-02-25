@@ -12,6 +12,7 @@ const {
     screen,
     shell,
     dialog,
+    powerMonitor,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -37,7 +38,7 @@ const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = (() => {
-    if (!isLinux()) {
+    if (isLinux()) {
         return require('./src/providers/mprisProvider')
     } else {
         return null
@@ -91,6 +92,11 @@ let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
 let iconPause = assetsProvider.getIcon('favicon_pause')
+let sleepTimer = {
+    mode: 0, // "time/counter/else"
+    counter: 0, // "minutes in time mode/ songs in counter mode"
+    interval: 0, // "valid in time mode"
+}
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
@@ -558,6 +564,16 @@ async function createWindow() {
                         `)
                     })
 
+                if (sleepTimer.mode == 'counter') {
+                    sleepTimer.counter -= 1
+                    if (sleepTimer.counter <= 0) {
+                        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                            mediaControl.playPauseTrack(view)
+
+                        sleepTimer.mode = 'off'
+                    }
+                }
+
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
             }
@@ -844,21 +860,26 @@ async function createWindow() {
         newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
-    globalShortcut.register('MediaPlayPause', () => {
-        checkDoubleTapPlayPause()
-    })
+    if (
+        !settingsProvider.get('settings-windows10-media-service-show-info') ||
+        !settingsProvider.get('settings-windows10-media-service')
+    ) {
+        globalShortcut.register('MediaPlayPause', () => {
+            checkDoubleTapPlayPause()
+        })
 
-    globalShortcut.register('MediaStop', () => {
-        mediaControl.stopTrack(view)
-    })
+        globalShortcut.register('MediaStop', () => {
+            mediaControl.stopTrack(view)
+        })
 
-    globalShortcut.register('MediaPreviousTrack', () => {
-        mediaControl.previousTrack(view)
-    })
+        globalShortcut.register('MediaPreviousTrack', () => {
+            mediaControl.previousTrack(view)
+        })
 
-    globalShortcut.register('MediaNextTrack', () => {
-        mediaControl.nextTrack(view)
-    })
+        globalShortcut.register('MediaNextTrack', () => {
+            mediaControl.nextTrack(view)
+        })
+    }
 
     if (settingsProvider.get('settings-volume-media-keys')) {
         globalShortcut.register('VolumeUp', () => {
@@ -1230,29 +1251,19 @@ async function createWindow() {
                 }, 1000)
             })
 
-            let storeMiniplayerSizeTimer
-            miniplayer.on('resize', () => {
+            miniplayer.on('resize', (e) => {
                 try {
-                    let size = miniplayer.getSize()
-                    if (storeMiniplayerSizeTimer)
-                        clearTimeout(storeMiniplayerSizeTimer)
-
-                    storeMiniplayerSizeTimer = setTimeout(() => {
-                        settingsProvider.set(
-                            'settings-miniplayer-size',
-                            Math.min(...size)
-                        )
-                        if (miniplayer) {
-                            miniplayer.setSize(
-                                Math.min(...size),
-                                Math.min(...size)
-                            )
-                        }
-                    }, 500)
+                    let size = Math.min(...miniplayer.getSize())
+                    miniplayer.setSize(size, size)
+                    settingsProvider.set('settings-miniplayer-size', size)
+                    e.preventDefault()
                 } catch (_) {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
             })
+
+            // Devtools
+            // miniplayer.openDevTools()
 
             mainWindow.hide()
         }
@@ -1786,7 +1797,7 @@ else {
                 if (mainWindow.isMinimized()) mainWindow.restore()
                 else mainWindow.show()
 
-            mainWindow.focus()
+            mainWindow.show()
         }
     })
 
@@ -2054,7 +2065,46 @@ ipcMain.on('set-audio-output-list', (_, data) => {
     audioDevices = data
 })
 
+ipcMain.on('set-sleep-timer', (_, data) => {
+    let counter = parseInt(data.value)
+    const clearSleepTimer = () => {
+        if (sleepTimer.mode == 'time') clearInterval(sleepTimer.interval)
+        sleepTimer.interval = 0
+        sleepTimer.mode = 'off'
+    }
+    if (counter == 0) {
+        clearSleepTimer()
+    } else {
+        sleepTimer.counter = counter
+        if (data.value[data.value.length - 1] == 'c') {
+            sleepTimer.mode = 'counter'
+        } else {
+            sleepTimer.mode = 'time'
+            clearInterval(sleepTimer.interval)
+            sleepTimer.interval = setInterval(() => {
+                sleepTimer.counter -= 1
+                if (sleepTimer.counter <= 0) {
+                    if (!infoPlayerProvider.getPlayerInfo().isPaused)
+                        mediaControl.playPauseTrack(view)
+                    clearSleepTimer()
+                }
+            }, 60 * 1000)
+        }
+    }
+})
+
+ipcMain.on('retrieve-sleep-timer', (e) => {
+    e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
+})
+
 ipcMain.handle('get-audio-output-list', () => audioDevices)
+
+powerMonitor.on('suspend', () => {
+    if (settingsProvider.get('settings-pause-on-suspend')) {
+        if (!infoPlayerProvider.getPlayerInfo().isPaused)
+            mediaControl.playPauseTrack(view)
+    }
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -2063,6 +2113,7 @@ const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
+const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
 
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())

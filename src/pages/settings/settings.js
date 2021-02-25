@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-shiny-tray-song-title-rollable', 'click', () => {
         ipc.send('update-tray')
     })
-    initElement('settings-discord-rich-presence', 'click', null)
+    initElement('settings-discord-rich-presence', 'click', showRelaunchButton)
     initElement('settings-app-language', 'change', () => {
         ipc.send('language-updated')
         showRelaunchButton()
@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
+    initElement('settings-pause-on-suspend', 'click', null)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
