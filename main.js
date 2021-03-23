@@ -103,8 +103,10 @@ let sleepTimer = {
 /* First checks ========================================================================= */
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 
-app.setAsDefaultProtocolClient('ytmd', process.execPath)
-
+if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
+    app.setAsDefaultProtocolClient('ytmd', process.execPath)
+}
+    
 createCustomAppDir()
 
 createCustomCSSDir()
