@@ -201,14 +201,10 @@ function getAuthor(webContents) {
     webContents
         .executeJavaScript(
             `
-            var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                        
-            if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
-            title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
-            } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
-            title = bar.getElementsByClassName('byline ytmusic-player-bar')[0].textContent;
-            }
-            title;
+            var title = '';
+            var artist_album_and_year = document.getElementsByClassName('subtitle ytmusic-player-bar')[0].textContent;
+            var split_by_dot = artist_album_and_year.split(" • ");
+            title = split_by_dot[0].trim();
             `
         )
         .then((author) => {
