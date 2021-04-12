@@ -95,5 +95,6 @@
     "SKIP_TRACK_MARKED_DISLIKED": "Skip tracks marked as 'Disliked'",
     "SKIP_TRACK_SHORTER_THAN": "Skip tracks shorter than",
     "TRAY_ICON": "Tray icon",
-    "WANT_PLAY_THIS_LINK": "Want to play this link?"
+    "WANT_PLAY_THIS_LINK": "Want to play this link?",
+    "RPC_PLAY_ON_YOUTUBE_MUSIC": "Play On Youtube Music"
 }
