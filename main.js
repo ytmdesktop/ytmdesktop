@@ -1742,7 +1742,7 @@ async function createWindow() {
 
     async function loadMusicByUrl(videoUrl) {
         if (videoUrl.includes('music.youtube'))
-            await view.webContents.loadUrl(videoUrl)
+            await view.webContents.loadURL(videoUrl)
         else {
             let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)
