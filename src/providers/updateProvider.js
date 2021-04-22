@@ -9,20 +9,20 @@ function checkUpdate(mainWindow, view) {
         // mainWindow.send( 'downloaded-new-update', true );
     })
 
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', (_) => {
         // tray.balloon( 'Update Available', 'Auto Update' );
         mainWindow.send('have-new-update')
     })
 
-    autoUpdater.on('update-not-available', (info) => {
+    autoUpdater.on('update-not-available', (_) => {
         // tray.balloon( 'Update not available.', 'Auto Update' );
     })
 
-    autoUpdater.on('error', (err) => {
+    autoUpdater.on('error', (_) => {
         // tray.balloon( 'Error in auto-updater.', 'Auto Update' );
     })
 
-    autoUpdater.on('update-downloaded', (info) => {
+    autoUpdater.on('update-downloaded', (_) => {
         // tray.balloon( 'Update downloaded', 'Auto Update' );
         view.webContents.send('downloaded-new-update', true)
         settingsProvider.set('has-updated', true)

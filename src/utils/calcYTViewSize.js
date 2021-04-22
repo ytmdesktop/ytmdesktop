@@ -10,7 +10,7 @@ const TITLE_BAR_HEIGHT_MAC = 21
 
 /**
  * @param {settingsProvider} store
- * @param {Array.<width: Number, height: Number, isMac: Boolean, isMaximized: Boolean>} sizes
+ * @param window
  */
 function calculateYoutubeViewSize(store, window) {
     const windowSize = window.getSize()
@@ -18,10 +18,17 @@ function calculateYoutubeViewSize(store, window) {
     const isNiceTitleBarDisabled = store.get('titlebar-type', 'nice') !== 'nice'
     const titlebarType = store.get('titlebar-type')
 
-    const x = PADDING
+    if (window.isFullScreen())
+        return {
+            x: 0,
+            y: 0,
+            width: windowSize[0],
+            height: windowSize[1],
+        }
 
     if (isMac()) {
         // IS MAC
+        const x = PADDING
         const y = isNiceTitleBarDisabled
             ? PADDING + TITLE_BAR_HEIGHT_MAC
             : PADDING + TITLE_BAR_HEIGHT
@@ -34,6 +41,7 @@ function calculateYoutubeViewSize(store, window) {
         }
     } else if (isLinux()) {
         // IS LINUX
+        const x = PADDING_LINUX
         const y = PADDING_LINUX
 
         return {
@@ -44,6 +52,7 @@ function calculateYoutubeViewSize(store, window) {
         }
     } else {
         // IS WINDOWS
+        const x = PADDING
         const y = isNiceTitleBarDisabled ? PADDING : PADDING + TITLE_BAR_HEIGHT
 
         return {

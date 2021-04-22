@@ -2,8 +2,8 @@ const clientId = '495666957501071390'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
-var client
-var _isStarted
+let client
+let _isStarted
 
 function isStarted() {
     return _isStarted
@@ -16,13 +16,11 @@ function _setIsStarted(value) {
 function start() {
     client = new RPC.Client({ transport: 'ipc' })
 
-    client.on('ready', () => {
-        _setIsStarted(true)
-    })
+    client.on('ready', () => _setIsStarted(true))
 
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
-            setTimeout(function () {
+            setTimeout(() => {
                 start()
             }, 10000)
         }
@@ -39,11 +37,11 @@ function stop() {
     _setIsStarted(false)
 }
 
-function setActivity(info) {
+async function setActivity(info) {
     if (isStarted() && info.track.title) {
-        var now = Date.now()
-        var activity = {}
-        var discordSettings = settingsProvider.get('discord-presence-settings')
+        const now = Date.now()
+        const activity = {}
+        const discordSettings = settingsProvider.get('discord-presence-settings')
 
         if (discordSettings.details) activity.details = info.track.title
 
@@ -70,12 +68,37 @@ function setActivity(info) {
         activity.largeImageText = 'YouTube Music'
         activity.smallImageText = info.player.isPaused ? 'Paused' : 'Playing'
         activity.instance = false
+        if (discordSettings.details) {
+            activity.buttons = [
+                {
+                    label: 'Play on YouTube Music',
+                    url: 'https://music.youtube.com/watch?v=' + info.track.id,
+                },
+            ]
+        }
 
-        if (!discordSettings.hideIdle && info.player.isPaused) {
-            client.clearActivity()
+        if ((!discordSettings.hideIdle && info.player.isPaused) || info.track.isAdvertisement) {
+            await client.clearActivity()
         } else {
-            client.setActivity(activity).catch((err) => {
-                console.log(err)
+            // As of writing this discord-rpc was not updated to support buttons with setActivity
+            await client.request('SET_ACTIVITY', {
+                pid: process.pid,
+                activity: {
+                    state: activity.state,
+                    details: activity.details,
+                    timestamps: {
+                        start: activity.startTimestamp,
+                        end: activity.endTimestamp,
+                    },
+                    assets: {
+                        large_image: activity.largeImageKey,
+                        large_text: activity.largeImageText,
+                        small_image: activity.smallImageKey,
+                        small_text: activity.smallImageText,
+                    },
+                    instance: activity.instance,
+                    buttons: activity.buttons,
+                },
             })
         }
     }

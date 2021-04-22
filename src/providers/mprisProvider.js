@@ -10,11 +10,12 @@ class Mpris {
 
     start() {
         this.player = new mpris({
-            name: 'youtubemusic',
+            name: 'youtube-music-desktop-app',
             identity: 'Youtube Music',
             supportedUriSchemes: ['file'],
             supportedMimeTypes: ['audio/mpeg', 'application/ogg'],
             supportedInterfaces: ['player'],
+            canRaise: true,
         })
 
         this._setInitialEvents()
@@ -39,7 +40,9 @@ class Mpris {
             // while mpris represents it as 0.50, so we need to convert it first
             this.player.volume = info.player.volumePercent / 100
             this.player.metadata = {
-                'mpris:trackid': this.player.objectPath('track/0'),
+                'mpris:trackid': this.player
+                    .objectPath('track/0')
+                    .replaceAll('-', '_'), // replacing -'s in name with _ to meet dbus object name spec
                 'mpris:length': info.track.duration * 1000 * 1000, // In microseconds
                 'mpris:artUrl': info.track.cover,
                 'xesam:title': info.track.title,
@@ -63,16 +66,14 @@ class Mpris {
         }
 
         for (let [event, action] of Object.entries(events)) {
-            if (typeof action === 'string') {
+            if (typeof action === 'string')
                 this.player.on(event, () => {
                     ipcMain.emit('media-command', {
                         command: action,
                         value: true,
                     })
                 })
-            } else if (typeof action === 'function') {
-                this.player.on(event, action)
-            }
+            else if (typeof action === 'function') this.player.on(event, action)
         }
 
         this.player.on('position', (args) => {
@@ -91,6 +92,9 @@ class Mpris {
                 // while mpris represents it as 0.50, so we need to convert it first
                 value: args * 100,
             })
+
+        this.player.on('raise', () => {
+            ipcMain.emit('show', null)
         })
 
         this.player.on('seek', (offset) => {
