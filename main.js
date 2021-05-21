@@ -106,6 +106,8 @@ app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This k
 if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
     app.setAsDefaultProtocolClient('ytmd', process.execPath)
 }
+
+app.commandLine.appendSwitch('disable-http-cache')
     
 createCustomAppDir()
 
