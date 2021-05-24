@@ -400,13 +400,15 @@ function createWindow() {
             rainmeterNowPlaying.setActivity(getAll())
             mprisProvider.setActivity(getAll())
 
-            mediaControl.setProgress(
-                mainWindow,
-                settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? progress
-                    : -1,
-                playerInfo.isPaused
-            )
+            if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
+                mediaControl.setProgress(
+                    mainWindow,
+                    settingsProvider.get('settings-enable-taskbar-progressbar')
+                        ? progress
+                        : -1,
+                    playerInfo.isPaused
+                )
+            }
 
             /**
              * Scrobble when track changes or when current track starts from the beginning
@@ -414,7 +416,7 @@ function createWindow() {
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.20)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
@@ -944,6 +946,10 @@ function createWindow() {
                 mediaControl.addToPlaylist(view, value)
                 break
         }
+    })
+
+    ipcMain.on('refresh-progress', () => {
+        mediaControl.setProgress(mainWindow, -1, playerInfo.isPaused)
     })
 
     ipcMain.on('register-renderer', (event, arg) => {

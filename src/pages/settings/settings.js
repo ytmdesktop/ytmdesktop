@@ -156,7 +156,9 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-miniplayer-show-task', 'click')
     initElement('settings-miniplayer-always-show-controls', 'click')
     initElement('settings-miniplayer-paint-controls', 'click')
-    initElement('settings-enable-taskbar-progressbar', 'click')
+    initElement('settings-enable-taskbar-progressbar', 'click', () => {
+        ipc.send('refresh-progress')
+    })
 
     // initElement('settings-enable-shortcut-buttons', 'click')
 
