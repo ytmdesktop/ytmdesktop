@@ -95,9 +95,9 @@ let statusBarMenu = [
             {
                 label: 'Home(YouTube Music)',
                 accelerator: 'CmdOrCtrl+H',
-                click(item, focusedWindow) {
+                async click(item, focusedWindow) {
                     if (focusedWindow)
-                        focusedWindow
+                        await focusedWindow
                             .getBrowserView()
                             .webContents.loadURL('https://music.youtube.com')
                 },
@@ -166,8 +166,8 @@ let statusBarMenu = [
         submenu: [
             {
                 label: 'Learn More',
-                click() {
-                    require('electron').shell.openExternal(
+                async click() {
+                    await require('electron').shell.openExternal(
                         'http://electron.atom.io'
                     )
                 },
@@ -214,7 +214,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: 'YouTube Music Desktop',
             type: 'normal',
-            click: function () {
+            click: () => {
                 doBehavior(saved_mainWindow)
             },
         },
@@ -224,7 +224,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('MEDIA_CONTROL_PLAY_PAUSE'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 mediaControl.playPauseTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -232,7 +232,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('MEDIA_CONTROL_PREVIOUS'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 mediaControl.previousTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -240,7 +240,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('MEDIA_CONTROL_NEXT'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 mediaControl.nextTrack(saved_mainWindow.getBrowserView())
             },
         },
@@ -250,7 +250,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('MEDIA_CONTROL_THUMBS_UP'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 mediaControl.upVote(saved_mainWindow.getBrowserView())
             },
         },
@@ -258,7 +258,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('MEDIA_CONTROL_THUMBS_DOWN'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 mediaControl.downVote(saved_mainWindow.getBrowserView())
             },
         },
@@ -268,7 +268,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('LABEL_MINIPLAYER'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 ipcMain.emit('window', { command: 'show-miniplayer' })
             },
         },
@@ -276,7 +276,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('LABEL_LYRICS'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 ipcMain.emit('window', { command: 'show-lyrics' })
             },
         },
@@ -290,7 +290,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('LABEL_SETTINGS'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 ipcMain.emit('window', { command: 'show-settings' })
             },
         },
@@ -310,7 +310,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
         {
             label: __.trans('LABEL_EXIT'),
             type: 'normal',
-            click: function () {
+            click: () => {
                 app.exit()
             },
         },
