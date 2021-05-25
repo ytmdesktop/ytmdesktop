@@ -450,13 +450,15 @@ async function createWindow() {
                 mprisProvider.setActivity(getAll())
             }
 
-            mediaControl.setProgress(
-                mainWindow,
-                settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? progress
-                    : -1,
-                playerInfo.isPaused
-            )
+            if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
+                mediaControl.setProgress(
+                    mainWindow,
+                    settingsProvider.get('settings-enable-taskbar-progressbar')
+                        ? progress
+                        : -1,
+                    playerInfo.isPaused
+                )
+            }
 
             /**
              * Scrobble when track changes or when current track starts from the beginning
@@ -1031,7 +1033,13 @@ async function createWindow() {
         }
     })
 
+
+    ipcMain.on('refresh-progress', () => {
+        mediaControl.setProgress(mainWindow, -1, playerInfo.isPaused)
+    })
+  
     ipcMain.on('register-renderer', (event, _) => {
+      
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
         event.sender.send('is-dev', isDev)
