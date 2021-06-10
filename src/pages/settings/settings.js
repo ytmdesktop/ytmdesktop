@@ -16,6 +16,10 @@ const elementBtnLastFmLogin = document.getElementById('btn-last-fm-login')
 const elementBtnOpenCompanionServer = document.getElementById(
     'btn-open-companion-server'
 )
+const elementBtnOpenGeniusAuthServer = document.getElementById(
+    'btn-open-genius-auth-server'
+)
+
 const elementBtnDiscordSettings = document.getElementById('btn-discord-setting')
 
 const elementBtnShortcutButtonsSettings = document.getElementById(
@@ -26,13 +30,12 @@ const elementRangeSkipTrackShorterThan = document.getElementById(
     'range-skip-track-shorter-than'
 )
 
-if (isLinux()) {
+if (isLinux())
     document
         .getElementById(
             'i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_TITLEBAR_TYPE_NICE'
         )
         .remove()
-}
 
 const audioOutputSelect = document.querySelector('#settings-app-audio-output')
 
@@ -47,27 +50,28 @@ ipc.invoke('get-audio-output-list').then((devices) => {
         devices.forEach((deviceInfo) => {
             let option = document.createElement('option')
             option.text =
-                deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`
+                deviceInfo.label != null
+                    ? deviceInfo.label
+                    : `speaker ${audioOutputSelect.length + 1}`
             option.value = deviceInfo.label
             audioOutputSelect.appendChild(option)
         })
 
-        initElement('settings-app-audio-output', 'change', function () {
+        initElement('settings-app-audio-output', 'change', () => {
             ipc.send('change-audio-output', audioOutputSelect.value)
         })
 
         const defaultOuput = devices.find(
-            (audio) => audio.deviceId == 'default'
+            (audio) => audio.deviceId === 'default'
         )
-        if (!audioOutputSelect.value.length) {
+        if (!audioOutputSelect.value.length)
             audioOutputSelect.value = defaultOuput.label
-        }
     } else {
         let option = document.createElement('option')
         option.text = __.trans(
             'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
         )
-        option.value = 0
+        option.value = '0'
         audioOutputSelect.appendChild(option)
         audioOutputSelect.disabled = true
     }
@@ -76,50 +80,48 @@ ipc.invoke('get-audio-output-list').then((devices) => {
 })
 
 function checkCompanionStatus() {
-    if (settingsProvider.get('settings-companion-server')) {
+    if (settingsProvider.get('settings-companion-server'))
         document
             .getElementById('companion-server-protect')
             .classList.remove('hide')
-    } else {
+    else
         document
             .getElementById('companion-server-protect')
             .classList.add('hide')
-    }
 }
 
 function checkClipboardWatcherStatus() {
-    if (settingsProvider.get('settings-clipboard-read')) {
+    if (settingsProvider.get('settings-clipboard-read'))
         document
             .getElementById('clipboard-always-ask-read')
             .classList.remove('hide')
-    } else {
+    else
         document
             .getElementById('clipboard-always-ask-read')
             .classList.add('hide')
-    }
 }
 
 function checkWindows10ServiceStatus() {
-    if (settingsProvider.get('settings-windows10-media-service')) {
+    if (settingsProvider.get('settings-windows10-media-service'))
         document.getElementById('windows-10-show-info').classList.remove('hide')
-    } else {
-        document.getElementById('windows-10-show-info').classList.add('hide')
-    }
+    else document.getElementById('windows-10-show-info').classList.add('hide')
 }
 
 checkCompanionStatus()
 checkClipboardWatcherStatus()
 checkWindows10ServiceStatus()
 
-document.addEventListener('DOMContentLoaded', function () {
-    initElement('settings-keep-background', 'click')
-    initElement('settings-show-notifications', 'click')
-    initElement('settings-start-on-boot', 'click')
-    initElement('settings-start-minimized', 'click')
+document.addEventListener('DOMContentLoaded', () => {
+    initElement('settings-keep-background', 'click', null)
+    initElement('settings-show-notifications', 'click', null)
+    initElement('settings-start-on-boot', 'click', null)
+    initElement('settings-start-minimized', 'click', null)
     initElement('settings-companion-server', 'click', checkCompanionStatus)
-    initElement('settings-companion-server-protect', 'click')
+    initElement('settings-genius-auth-server', 'click', null)
+    initElement('settings-companion-server-protect', 'click', null)
     initElement('settings-windows10-media-service', 'click', () => {
-        checkWindows10ServiceStatus(), showRelaunchButton()
+        checkWindows10ServiceStatus()
+        showRelaunchButton()
     })
     initElement(
         'settings-windows10-media-service-show-info',
@@ -129,42 +131,69 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-shiny-tray', 'click', () => {
         ipc.send('update-tray')
     })
-    initElement('settings-discord-rich-presence', 'click')
-    initElement('settings-app-language', 'change', showRelaunchButton)
+    initElement('settings-shiny-tray-song-title-rollable', 'click', () => {
+        ipc.send('update-tray')
+    })
+    initElement('settings-discord-rich-presence', 'click', showRelaunchButton)
+    initElement('settings-app-language', 'change', () => {
+        ipc.send('language-updated')
+        showRelaunchButton()
+    })
     initElement('settings-clipboard-read', 'click', () => {
         ipc.send('switch-clipboard-watcher')
         checkClipboardWatcherStatus()
     })
     initElement('titlebar-type', 'change', showRelaunchButton)
-    initElement('settings-custom-css-page', 'click')
+    initElement('settings-custom-css-page', 'click', null)
     initElement('settings-last-fm-scrobbler', 'click', () => {
-        var login = settingsProvider.get('last-fm-login')
-        if (login.username == '') {
+        const login = settingsProvider.get('last-fm-login')
+        if (login.username === '')
             ipc.send('window', { command: 'show-last-fm-login' })
-        }
     })
-    initElement('settings-rainmeter-web-now-playing', 'click')
-    initElement('settings-enable-double-tapping-show-hide', 'click')
+    initElement('settings-rainmeter-web-now-playing', 'click', null)
+    initElement('settings-enable-double-tapping-show-hide', 'click', null)
+    initElement('settings-volume-media-keys', 'click', () => {
+        let enableVolumeMediaKeys = settingsProvider.get(
+            'settings-volume-media-keys'
+        )
+        ipc.send('change-accelerator', {
+            type: 'media-volume-up',
+            oldValue: enableVolumeMediaKeys ? 'disabled' : 'VolumeUp',
+            newValue: enableVolumeMediaKeys ? 'VolumeUp' : 'disabled',
+        })
+        ipc.send('change-accelerator', {
+            type: 'media-volume-down',
+            oldValue: enableVolumeMediaKeys ? 'disabled' : 'VolumeDown',
+            newValue: enableVolumeMediaKeys ? 'VolumeDown' : 'disabled',
+        })
+    })
+    initElement('settings-decibel-volume', 'click', null)
     initElement(
         'settings-disable-hardware-acceleration',
         'click',
         showRelaunchButton
     )
 
-    initElement('settings-miniplayer-always-top', 'click')
-    initElement('settings-miniplayer-resizable', 'click')
-    initElement('settings-miniplayer-show-task', 'click')
-    initElement('settings-miniplayer-always-show-controls', 'click')
-    initElement('settings-miniplayer-paint-controls', 'click')
-    initElement('settings-enable-taskbar-progressbar', 'click')
+    initElement('settings-miniplayer-always-top', 'click', null)
+    initElement('settings-miniplayer-resizable', 'click', null)
+    initElement('settings-miniplayer-show-task', 'click', null)
+    initElement('settings-miniplayer-always-show-controls', 'click', null)
+    initElement('settings-miniplayer-paint-controls', 'click', null)
+    initElement('settings-enable-taskbar-progressbar', 'click', () => {
+        ipc.send('refresh-progress')
+    })
+    initElement('settings-enable-player-bgcolor', 'click', () => {
+        ipc.send('set-accent-enabled-state')
+    })
 
     // initElement('settings-enable-shortcut-buttons', 'click')
 
-    initElement('settings-continue-where-left-of', 'click')
-    initElement('settings-skip-track-disliked', 'click')
+    initElement('settings-continue-where-left-of', 'click', null)
+    initElement('settings-skip-track-disliked', 'click', null)
 
-    initElement('settings-clipboard-always-ask-read', 'click')
+    initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
+    initElement('settings-pause-on-suspend', 'click', null)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -177,71 +206,74 @@ document.addEventListener('DOMContentLoaded', function () {
 }*/
 
 if (elementRangeZoom) {
-    elementRangeZoom.addEventListener('input', function () {
-        document.getElementById('range-zoom-value').innerText = this.value
-        settingsProvider.set('settings-page-zoom', this.value)
+    elementRangeZoom.addEventListener('input', () => {
+        document.getElementById('range-zoom-value').innerText =
+            elementRangeZoom.value
+        settingsProvider.set('settings-page-zoom', elementRangeZoom.value)
     })
 }
 
-if (elementRangeSkipTrackShorterThan) {
-    elementRangeSkipTrackShorterThan.addEventListener('input', function () {
+if (elementRangeSkipTrackShorterThan)
+    elementRangeSkipTrackShorterThan.addEventListener('input', () => {
         document.getElementById(
             'range-skip-track-shorter-than-value'
-        ).innerText = this.value == 0 ? `(Disabled) ${this.value}` : this.value
-        settingsProvider.set('settings-skip-track-shorter-than', this.value)
+        ).innerText =
+            elementRangeSkipTrackShorterThan.value === 0
+                ? `(Disabled) ${elementRangeSkipTrackShorterThan.value}`
+                : elementRangeSkipTrackShorterThan.value
+        settingsProvider.set(
+            'settings-skip-track-shorter-than',
+            elementRangeSkipTrackShorterThan.value
+        )
     })
-}
 
-if (elementBtnOpenPageEditor) {
-    elementBtnOpenPageEditor.addEventListener('click', function () {
+if (elementBtnOpenPageEditor)
+    elementBtnOpenPageEditor.addEventListener('click', () => {
         ipc.send('window', { command: 'show-editor-theme' })
     })
-}
 
-if (elementBtnLastFmLogin) {
-    elementBtnLastFmLogin.addEventListener('click', function () {
+if (elementBtnLastFmLogin)
+    elementBtnLastFmLogin.addEventListener('click', () => {
         ipc.send('window', { command: 'show-last-fm-login' })
     })
-}
 
-if (elementBtnDiscordSettings) {
-    elementBtnDiscordSettings.addEventListener('click', function () {
+if (elementBtnDiscordSettings)
+    elementBtnDiscordSettings.addEventListener('click', () => {
         ipc.send('window', { command: 'show-discord-settings' })
     })
-}
 
-if (elementBtnShortcutButtonsSettings) {
-    elementBtnShortcutButtonsSettings.addEventListener('click', function () {
+if (elementBtnShortcutButtonsSettings)
+    elementBtnShortcutButtonsSettings.addEventListener('click', () => {
         ipc.send('window', { command: 'show-shortcut-buttons-settings' })
     })
-}
 
-if (elementBtnOpenCompanionServer) {
-    elementBtnOpenCompanionServer.addEventListener('click', function () {
-        shell.openExternal(`http://localhost:9863`)
+if (elementBtnOpenCompanionServer)
+    elementBtnOpenCompanionServer.addEventListener('click', async () => {
+        await shell.openExternal(`http://localhost:9863`)
     })
-}
 
-if (elementBtnAppRelaunch) {
-    elementBtnAppRelaunch.addEventListener('click', function () {
+if (elementBtnOpenGeniusAuthServer)
+    elementBtnOpenGeniusAuthServer.addEventListener('click', async () => {
+        await shell.openExternal(`http://localhost:9864/login`)
+    })
+
+if (elementBtnAppRelaunch)
+    elementBtnAppRelaunch.addEventListener('click', () => {
         relaunch()
     })
-}
 
 if (!isMac()) {
     const macSpecificNodes = document.getElementsByClassName('macos-specific')
-    for (let i = 0; i < macSpecificNodes.length; i++) {
+    for (let i = 0; i < macSpecificNodes.length; i++)
         macSpecificNodes.item(i).classList.add('hide')
-    }
 }
 
 if (!isWindows()) {
     const windowsSpecificNodes = document.getElementsByClassName(
         'windows-specific'
     )
-    for (let i = 0; i < windowsSpecificNodes.length; i++) {
+    for (let i = 0; i < windowsSpecificNodes.length; i++)
         windowsSpecificNodes.item(i).classList.add('hide')
-    }
 }
 
 if (isWindows()) {
@@ -250,9 +282,8 @@ if (isWindows()) {
         const windows10SpecificNodes = document.getElementsByClassName(
             'windows10-specific'
         )
-        for (let i = 0; i < windows10SpecificNodes.length; i++) {
+        for (let i = 0; i < windows10SpecificNodes.length; i++)
             windows10SpecificNodes.item(i).classList.add('hide')
-        }
     }
 }
 
@@ -271,9 +302,6 @@ function showRelaunchButton() {
  * @param {*} fn
  */
 function initElement(elementName, eventType, fn) {
-    if (fn === undefined) {
-        fn = () => {}
-    }
     const element = document.getElementById(elementName)
 
     if (element) {
@@ -290,10 +318,10 @@ function initElement(elementName, eventType, fn) {
  * @param {*} fn
  */
 function createListener(element, settingsName, eventType, fn) {
-    element.addEventListener(eventType, function () {
+    element.addEventListener(eventType, (e) => {
         switch (eventType) {
             case 'click':
-                settingsProvider.set(settingsName, this.checked)
+                settingsProvider.set(settingsName, e.target.checked)
                 /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.checked,
@@ -301,21 +329,21 @@ function createListener(element, settingsName, eventType, fn) {
                 break
 
             case 'change':
-                settingsProvider.set(settingsName, this.value)
+                settingsProvider.set(settingsName, e.target.value)
                 /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.value,
                 })*/
                 break
         }
-        fn()
+        fn && fn()
     })
 }
 
 function loadValue(element, settingsName, eventType) {
     switch (eventType) {
         case 'click':
-            element.checked = settingsProvider.get(settingsName, false)
+            element.checked = settingsProvider.get(settingsName) || false
             break
 
         case 'change':
@@ -327,13 +355,13 @@ function loadValue(element, settingsName, eventType) {
 function loadSettings() {
     // readLocales();
 
-    var settingsZoom = settingsProvider.get('settings-page-zoom')
+    const settingsZoom = settingsProvider.get('settings-page-zoom')
     if (settingsZoom) {
         document.getElementById('range-zoom').value = settingsZoom
         document.getElementById('range-zoom-value').innerText = settingsZoom
     }
 
-    var settingsSkipTrackShorterThan = settingsProvider.get(
+    const settingsSkipTrackShorterThan = settingsProvider.get(
         'settings-skip-track-shorter-than'
     )
     if (settingsSkipTrackShorterThan) {
@@ -343,7 +371,7 @@ function loadSettings() {
         document.getElementById(
             'range-skip-track-shorter-than-value'
         ).innerText =
-            settingsSkipTrackShorterThan == 0
+            settingsSkipTrackShorterThan === 0
                 ? `(Disabled) ${settingsSkipTrackShorterThan}`
                 : settingsSkipTrackShorterThan
     }
@@ -367,6 +395,7 @@ function relaunch() {
     remote.app.exit(0)
 }
 
+// TODO: Unused function?
 function readLocales() {
     fs.readdir(__dirname, (err, files) => {
         console.log(files)
@@ -377,20 +406,16 @@ function mInit() {
     M.FormSelect.init(document.querySelectorAll('select'), {})
     M.Tabs.init(document.getElementsByClassName('tabs')[0], {})
 
-    var elems = document.querySelectorAll('.modal')
+    const elems = document.querySelectorAll('.modal')
     M.Modal.init(elems, {})
 }
 
 function replaceAcceleratorText(text) {
     text = text.replace(/\+/g, ' + ')
 
-    if (text.indexOf('CmdOrCtrl') != -1) {
-        if (isMac()) {
-            text = text.replace('CmdOrCtrl', 'Cmd')
-        } else {
-            text = text.replace('CmdOrCtrl', 'Ctrl')
-        }
-    }
+    if (text.indexOf('CmdOrCtrl') !== -1)
+        if (isMac()) text = text.replace('CmdOrCtrl', 'Cmd')
+        else text = text.replace('CmdOrCtrl', 'Ctrl')
 
     text = text.replace('numadd', '+')
 
@@ -406,66 +431,58 @@ function replaceAcceleratorText(text) {
 function validateKey(e) {
     console.log(e)
 
-    if (e.key == ' ') return 'Space'
+    if (e.key === ' ') return 'Space'
 
-    if (e.code == 'NumpadEnter') return 'Enter'
+    if (e.code === 'NumpadEnter') return 'Enter'
 
-    if (e.code == 'NumpadAdd') return 'numadd'
+    if (e.code === 'NumpadAdd') return 'numadd'
 
-    if (e.code == 'NumpadSubtract') return 'numsub'
+    if (e.code === 'NumpadSubtract') return 'numsub'
 
-    if (e.code == 'NumpadDecimal') return 'numdec'
+    if (e.code === 'NumpadDecimal') return 'numdec'
 
-    if (e.code == 'NumpadMultiply') return 'nummult'
+    if (e.code === 'NumpadMultiply') return 'nummult'
 
-    if (e.code == 'NumpadDivide') return 'numdiv'
+    if (e.code === 'NumpadDivide') return 'numdiv'
 
-    if (e.code == 'ArrowUp') return 'Up'
+    if (e.code === 'ArrowUp') return 'Up'
 
-    if (e.code == 'ArrowDown') return 'Down'
+    if (e.code === 'ArrowDown') return 'Down'
 
-    if (e.code == 'ArrowLeft') return 'Left'
+    if (e.code === 'ArrowLeft') return 'Left'
 
-    if (e.code == 'ArrowRight') return 'Right'
+    if (e.code === 'ArrowRight') return 'Right'
 
-    if (e.keyCode >= 65 && e.keyCode <= 90) {
-        return e.key.toUpperCase()
-    }
+    if (e.keyCode >= 65 && e.keyCode <= 90) return e.key.toUpperCase()
 
     return e.key
 }
 
 function preventSpecialKeys(e) {
     return !(
-        e.key == 'Command' ||
-        e.key == 'Control' ||
-        e.key == 'Alt' ||
-        e.key == 'Shift' ||
-        e.key == 'AltGraph' ||
-        e.key == 'MediaPlayPause' ||
-        e.key == 'MediaTrackPrevious' ||
-        e.key == 'MediaTrackNext' ||
-        e.key == 'MediaStop'
+        e.key === 'Command' ||
+        e.key === 'Control' ||
+        e.key === 'Alt' ||
+        e.key === 'Shift' ||
+        e.key === 'AltGraph' ||
+        e.key === 'MediaPlayPause' ||
+        e.key === 'MediaTrackPrevious' ||
+        e.key === 'MediaTrackNext' ||
+        e.key === 'MediaStop'
     )
 }
 
 document
     .querySelector('#modalEditAccelerator')
-    .addEventListener('keyup', function (e) {
+    .addEventListener('keyup', (e) => {
         if (preventSpecialKeys(e)) {
             keyBindings = ''
 
-            if (e.ctrlKey) {
-                keyBindings += 'CmdOrCtrl+'
-            }
+            if (e.ctrlKey) keyBindings += 'CmdOrCtrl+'
 
-            if (e.altKey) {
-                keyBindings += 'Alt+'
-            }
+            if (e.altKey) keyBindings += 'Alt+'
 
-            if (e.shiftKey) {
-                keyBindings += 'Shift+'
-            }
+            if (e.shiftKey) keyBindings += 'Shift+'
 
             keyBindings += validateKey(e)
             document.querySelector(
@@ -610,4 +627,11 @@ document.querySelector('#disableAccelerator').addEventListener('click', () => {
 
 document.querySelector('#release-notes').addEventListener('click', () => {
     ipc.send('window', { command: 'show-changelog' })
+})
+
+document.querySelectorAll('[externalURL]').forEach((element) => {
+    var externalURL = element.getAttribute('externalURL')
+    element.addEventListener('click', () => {
+        shell.openExternal(externalURL)
+    })
 })

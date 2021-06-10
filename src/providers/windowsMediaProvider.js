@@ -2,30 +2,25 @@ const {
     MediaPlaybackStatus,
     MediaPlaybackType,
     SystemMediaTransportControlsButton,
-} = require('@nodert-win10/windows.media')
-const {
-    BackgroundMediaPlayer,
-} = require('@nodert-win10/windows.media.playback')
+} = require('@nodert-win10-rs4/windows.media')
+const { BackgroundMediaPlayer } = require('windows.media.playback')
 const {
     RandomAccessStreamReference,
-} = require('@nodert-win10/windows.storage.streams')
-const { Uri } = require('@nodert-win10/windows.foundation')
+} = require('@nodert-win10-rs4/windows.storage.streams')
+const { Uri } = require('@nodert-win10-rs4/windows.foundation')
 
 const mediaControl = require('../providers/mediaProvider')
 const settingsProvider = require('./settingsProvider')
 
 class windowsMediaProvider {
     constructor() {
-        this._webContents
+        this._view = null
         this._isInitialized = false
         this._controls =
             BackgroundMediaPlayer.current.systemMediaTransportControls
 
-        if (
-            !settingsProvider.get('settings-windows10-media-service-show-info')
-        ) {
+        if (!settingsProvider.get('settings-windows10-media-service-show-info'))
             this._controls.isEnabled = false
-        }
 
         this._controls.isChannelDownEnabled = false
         this._controls.isChannelUpEnabled = false
@@ -51,16 +46,16 @@ class windowsMediaProvider {
         this._controls.on('buttonpressed', (sender, eventArgs) => {
             switch (eventArgs.button) {
                 case SystemMediaTransportControlsButton.play:
-                    mediaControl.playPauseTrack(this._webContents)
+                    mediaControl.playPauseTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.pause:
-                    mediaControl.playPauseTrack(this._webContents)
+                    mediaControl.playPauseTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.next:
-                    mediaControl.nextTrack(this._webContents)
+                    mediaControl.nextTrack(this._view)
                     break
                 case SystemMediaTransportControlsButton.previous:
-                    mediaControl.previousTrack(this._webContents)
+                    mediaControl.previousTrack(this._view)
                     break
                 default:
                     break
@@ -69,17 +64,16 @@ class windowsMediaProvider {
     }
 
     init(view) {
-        this._webContents = view.webContents
+        this._view = view
         this._isInitialized = true
     }
 
     setPlaybackStatus(status) {
         if (this._isInitialized) {
-            if (status) {
+            if (status)
                 this._controls.playbackStatus = MediaPlaybackStatus.paused
-            } else {
-                this._controls.playbackStatus = MediaPlaybackStatus.playing
-            }
+            else this._controls.playbackStatus = MediaPlaybackStatus.playing
+
             this._controls.displayUpdater.update()
         }
     }
