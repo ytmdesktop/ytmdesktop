@@ -44,6 +44,7 @@
         "electron-is-dev": "^1.2.0",
         "electron-localshortcut": "^3.2.1",
         "electron-log": "^4.3.1",
+        "electron-media-service": "github:tidal-engineering/electron-media-service",
         "electron-store": "^6.0.1",
         "electron-updater": "^4.3.5",
         "i18n": "^0.13.2",
