@@ -23,6 +23,8 @@ settingsProvider.setInitialValue('settings-miniplayer-show-task', false) // hide
 
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
+settingsProvider.setInitialValue('settings-miniplayer-show-top', false) // show on top always
+
 settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
 
 settingsProvider.setInitialValue('settings-enable-player-bgcolor', false)

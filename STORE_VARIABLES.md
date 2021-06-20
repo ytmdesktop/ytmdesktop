@@ -16,6 +16,7 @@
 | `settings-discord-rich-presence`           | Boolean | `true` or `false`            | `false`                      | Integration with Discord Rich Presence                         |
 | `settings-start-on-boot`                   | Boolean | `true` or `false`            | `false`                      | Open player when system starts                                 |
 | `settings-start-minimized`                 | Boolean | `true` or `false`            | `false`                      | Open player minimized in tray                                  |
+| `settings-lyrics-always-top`               | Boolean | `true` or `false`            | `false`                      | Open player minimized in tray                                  |
 | `settings-clipboard-read`                  | Boolean | `true` or `false`            | `false`                      | Reads the clipboard for youtube links                          |
 | `settings-companion-server`                | Boolean | `true` or `false`            | `false`                      | Companion Server to control the player remotely                |
 | `settings-genius-auth-server`              | Boolean | `true` or `false`            | `false`                      | Turns off the authentication server & Genius lyrics provider   |

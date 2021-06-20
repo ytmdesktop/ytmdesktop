@@ -5,7 +5,7 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "dev": "nodemon --exec yarn start --dev --inspect",
+        "dev": "NODE_ENV=development nodemon --exec yarn start --dev --inspect",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
         "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
@@ -29,12 +29,14 @@
         }
     },
     "devDependencies": {
+        "@types/electron": "^1.6.10",
         "electron": "^11.1.1",
         "electron-builder": "^22.9.1",
         "electron-rebuild": "^2.3.4",
         "husky": "^4.3.7",
         "prettier": "^2.2.1",
-        "pretty-quick": "^2.0.2"
+        "pretty-quick": "^2.0.2",
+        "win-node-env": "^0.4.0"
     },
     "dependencies": {
         "ace-builds": "^1.4.12",
