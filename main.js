@@ -773,6 +773,7 @@ async function createWindow() {
                         infoPlayerProvider.getPlayerInfo().likeStatus !==
                         'DISLIKE'
                     ) {
+                        1257
                         mediaControl.downVote(view)
                         if (
                             settingsProvider.get('settings-show-notifications')
@@ -1058,7 +1059,7 @@ async function createWindow() {
     })
 
     ipcMain.on('closed', (_) => {
-        // mainWindow = null
+        mainWindow = null
         if (process.platform !== 'darwin') {
             app.quit()
         }
@@ -1254,7 +1255,6 @@ async function createWindow() {
                     miniplayerPosition.x,
                     miniplayerPosition.y
                 )
-            console.log(miniplayer.getBounds())
             let storeMiniplayerPositionTimer
             miniplayer.on('move', () => {
                 let position = miniplayer.getPosition()
@@ -1890,7 +1890,7 @@ else {
     })
 
     app.on('before-quit', () => {
-        // mainWindow = null
+        mainWindow = null
         view = null
         if (isMac()) app.exit()
 
@@ -1898,7 +1898,7 @@ else {
     })
 
     app.on('quit', () => {
-        // mainWindow = null
+        mainWindow = null
         view = null
         tray.quit()
     })
