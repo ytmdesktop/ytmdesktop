@@ -106,6 +106,8 @@ app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This k
 if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
     app.setAsDefaultProtocolClient('ytmd', process.execPath)
 }
+
+app.commandLine.appendSwitch('disable-http-cache')
     
 createCustomAppDir()
 
@@ -448,13 +450,15 @@ async function createWindow() {
                 mprisProvider.setActivity(getAll())
             }
 
-            mediaControl.setProgress(
-                mainWindow,
-                settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? progress
-                    : -1,
-                playerInfo.isPaused
-            )
+            if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
+                mediaControl.setProgress(
+                    mainWindow,
+                    settingsProvider.get('settings-enable-taskbar-progressbar')
+                        ? progress
+                        : -1,
+                    playerInfo.isPaused
+                )
+            }
 
             /**
              * Scrobble when track changes or when current track starts from the beginning
@@ -1029,7 +1033,13 @@ async function createWindow() {
         }
     })
 
+
+    ipcMain.on('refresh-progress', () => {
+        mediaControl.setProgress(mainWindow, -1, playerInfo.isPaused)
+    })
+  
     ipcMain.on('register-renderer', (event, _) => {
+      
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
         event.sender.send('is-dev', isDev)
@@ -1742,7 +1752,7 @@ async function createWindow() {
 
     async function loadMusicByUrl(videoUrl) {
         if (videoUrl.includes('music.youtube'))
-            await view.webContents.loadUrl(videoUrl)
+            await view.webContents.loadURL(videoUrl)
         else {
             let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)

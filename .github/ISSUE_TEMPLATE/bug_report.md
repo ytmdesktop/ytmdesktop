@@ -26,6 +26,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
+<!-- !!!!! If you are using a build from the development branch, please instead include the commit hash you are on -->
  * YTMDesktop version: ***vx.x.x***
  * OS: ***Windows*** or ***Linux*** or ***Mac***
  * OS version: ***X***
