@@ -35,6 +35,7 @@
         "electron-rebuild": "^2.3.4",
         "husky": "^4.3.7",
         "prettier": "^2.2.1",
+        "nodemon": "^2.0.7",
         "pretty-quick": "^2.0.2"
     },
     "dependencies": {
@@ -69,7 +70,7 @@
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
         "utf-8-validate": "^5.0.2",
-        "windows.media.playback": "git+https://github.com/NovusTheory/nodert-windows.media.playback.git",
-        "win-node-env": "^0.4.0"
+        "win-node-env": "^0.4.0",
+        "windows.media.playback": "git+https://github.com/NovusTheory/nodert-windows.media.playback.git"
     }
 }
