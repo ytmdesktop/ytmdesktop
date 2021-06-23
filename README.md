@@ -7,7 +7,7 @@
 [![GitHub release][release-img]][release-url]
 [![Download][download-img]][download-url]
 
-##### Guide
+##### Guide:
 1. [How to use](https://github.com/ytmdesktop/ytmdesktop/wiki/How-use)
 2. [FAQ](https://github.com/ytmdesktop/ytmdesktop/wiki/FAQ)
 
@@ -30,7 +30,7 @@
 - Brew: ```brew install --cask ytmdesktop-youtube-music```
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
-# Installing ytmdesktop...
+# Installing ytmdesktop
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
 ```sh
@@ -39,7 +39,7 @@ git clone https://github.com/ytmdesktop/ytmdesktop.git
 # Go into the directory
 cd ytmdesktop
 ```
-##### Get started...
+##### And:
 ```sh
 # Install dependencies
 npm install
