@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>YouTube Music</title>
-        <link
-            href="../../../src/assets/css/material_icons.css"
-            rel="stylesheet"
-        />
-        <link
-            type="text/css"
-            rel="stylesheet"
-            href="../../../src/assets/css/styles.css"
-        />
-        <link
-            type="text/css"
-            rel="stylesheet"
-            href="../../../src/assets/css/materialize.min.css"
-            media="screen,projection"
-        />
-        <link type="text/css" rel="stylesheet" href="./home.css" />
-    </head>
-
-    <body>
-        <div class="div-center center">
-            <div id="center-loading" class="preloader-wrapper big active">
-                <div class="spinner-layer spinner-red-only">
-                    <div class="circle-clipper left">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="gap-patch">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="circle-clipper right">
-                        <div class="circle"></div>
-                    </div>
+<head>
+    <meta charset="utf-8" />
+    <title>YouTube Music</title>
+    <link
+        type="text/css"
+        href="../../../src/assets/css/material_icons.css"
+        rel="stylesheet"
+    />
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="../../../src/assets/css/styles.css"
+    />
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="../../../src/assets/css/materialize.min.css"
+        media="screen,projection"
+    />
+    <link type="text/css" rel="stylesheet" href="./home.css" />
+</head>
+<body>
+    <div class="div-center center">
+        <div id="center-loading" class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-red-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
                 </div>
-            </div>
-
-            <div id="is-offline" class="hide">
-                <i class="material-icons medium">signal_wifi_off</i>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
             </div>
         </div>
 
-        <script>
-            require('./home.js')
-        </script>
-    </body>
+        <div id="is-offline" class="hide">
+            <i class="material-icons medium">signal_wifi_off</i>
+        </div>
+    </div>
+
+    <script>
+        require('./home.js');
+    </script>
+</body>
 </html>
