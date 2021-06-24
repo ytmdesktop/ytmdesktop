@@ -773,7 +773,6 @@ async function createWindow() {
                         infoPlayerProvider.getPlayerInfo().likeStatus !==
                         'DISLIKE'
                     ) {
-                        1257
                         mediaControl.downVote(view)
                         if (
                             settingsProvider.get('settings-show-notifications')
