@@ -1,0 +1,12 @@
+{
+    "manifest_version": 2,
+    "name": "No more ad [light]",
+    "description": "Auto skip youtube ads.",
+    "version": "1.0",
+    "content_scripts": [
+        {
+            "matches": ["https://*.youtube.com/*"],
+            "js": ["index.js"]
+        }
+    ]
+}
