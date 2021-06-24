@@ -12,6 +12,7 @@ const {
     screen,
     shell,
     dialog,
+    session,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -36,6 +37,8 @@ const companionServer = require('./src/providers/companionServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
 /* Variables =========================================================================== */
+const extensionPath = path.resolve(__dirname, 'src', 'extension')
+
 const defaultUrl = 'https://music.youtube.com'
 
 let mainWindow,
@@ -414,7 +417,7 @@ function createWindow() {
             if (settingsProvider.get('settings-last-fm-scrobbler')) {
                 if (
                     lastTrackId !== trackId ||
-                    (lastTrackProgress > progress && progress < 0.20)
+                    (lastTrackProgress > progress && progress < 0.2)
                 ) {
                     if (!trackInfo.isAdvertisement) {
                         clearInterval(updateTrackInfoTimeout)
@@ -1715,7 +1718,9 @@ if (!gotTheLock) {
         }
     })
 
-    app.whenReady().then(function () {
+    app.whenReady().then(async function () {
+        await session.defaultSession.loadExtension(extensionPath)
+
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {
                 console.log(visiblePosition)
