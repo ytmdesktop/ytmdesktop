@@ -116,6 +116,15 @@ document.addEventListener('DOMContentLoaded', function () {
     initElement('settings-show-notifications', 'click')
     initElement('settings-start-on-boot', 'click')
     initElement('settings-start-minimized', 'click')
+    initElement('settings-auto-skipad', 'click', () => {
+        let userConfirmation = confirm(
+            'This feature needs to relaunch app, ok?'
+        )
+
+        if (userConfirmation) {
+            relaunch() // Relaunch to turn on/off extension.
+        }
+    })
     initElement('settings-companion-server', 'click', checkCompanionStatus)
     initElement('settings-companion-server-protect', 'click')
     initElement('settings-windows10-media-service', 'click', () => {

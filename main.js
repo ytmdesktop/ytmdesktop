@@ -1719,7 +1719,11 @@ if (!gotTheLock) {
     })
 
     app.whenReady().then(async function () {
-        await session.defaultSession.loadExtension(extensionPath)
+        if (settingsProvider.get('settings-auto-skipad')) {
+            writeLog({ type: 'info', data: 'Loading auto skip extension.' })
+            await session.defaultSession.loadExtension(extensionPath)
+        }
+
 
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {

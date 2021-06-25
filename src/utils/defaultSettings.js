@@ -16,6 +16,8 @@ settingsProvider.setInitialValue('last-fm-login', {
 
 settingsProvider.setInitialValue('settings-app-language', 'en') // English
 
+settingsProvider.setInitialValue('settings-auto-skipad', false) // Not auto skip ad by default.
+
 settingsProvider.setInitialValue('settings-miniplayer-size', '200') // Normal size
 
 settingsProvider.setInitialValue('settings-miniplayer-resizable', false) // Not resizable
