@@ -1693,18 +1693,16 @@ function handleOpenUrl(url) {
 }
 
 function loadAdExtension() {
-    if (settingsProvider.get('settings-auto-skipad')) {
-        const extensionPath = isDev
-            ? path.resolve(app.getAppPath(), 'src', 'extension')
-            : path.resolve(app.getAppPath(), '..', 'extension')
+    const extensionPath = isDev
+        ? path.resolve(app.getAppPath(), 'src', 'extension')
+        : path.resolve(app.getAppPath(), '..', 'extension')
 
-        session.defaultSession.loadExtension(extensionPath).then((data) => {
-            writeLog({
-                type: 'info',
-                data: `Auto skip extension loaded. ID: ${data.id}`,
-            })
+    session.defaultSession.loadExtension(extensionPath).then((data) => {
+        writeLog({
+            type: 'info',
+            data: `Auto skip extension loaded. ID: ${data.id}`,
         })
-    }
+    })
 }
 
 // This method will be called when Electron has finished
