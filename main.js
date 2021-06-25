@@ -37,8 +37,6 @@ const companionServer = require('./src/providers/companionServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = require('./src/providers/mprisProvider')
 /* Variables =========================================================================== */
-const extensionPath = path.resolve(__dirname, 'src', 'extension')
-
 const defaultUrl = 'https://music.youtube.com'
 
 let mainWindow,
@@ -1694,6 +1692,21 @@ function handleOpenUrl(url) {
     }
 }
 
+function loadAdExtension() {
+    if (settingsProvider.get('settings-auto-skipad')) {
+        const extensionPath = isDev
+            ? path.resolve(app.getAppPath(), 'src', 'extension')
+            : path.resolve(app.getAppPath(), '..', 'extension')
+
+        session.defaultSession.loadExtension(extensionPath).then((data) => {
+            writeLog({
+                type: 'info',
+                data: `Auto skip extension loaded. ID: ${data.id}`,
+            })
+        })
+    }
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -1719,11 +1732,7 @@ if (!gotTheLock) {
     })
 
     app.whenReady().then(async function () {
-        if (settingsProvider.get('settings-auto-skipad')) {
-            writeLog({ type: 'info', data: 'Loading auto skip extension.' })
-            await session.defaultSession.loadExtension(extensionPath)
-        }
-
+        if (settingsProvider.get('settings-auto-skipad')) loadAdExtension()
 
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {
