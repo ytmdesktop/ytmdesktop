@@ -2,7 +2,8 @@ node_modules
 .idea
 dist
 .DS_Store
-# yarn.lock
+yarn-error.log
+.yarn
 # package-lock.json
 /youtube-music-desktop-app-*.tgz
 /.cache
