@@ -21,7 +21,11 @@ settingsProvider.setInitialValue('settings-miniplayer-resizable', false) // Not 
 
 settingsProvider.setInitialValue('settings-miniplayer-show-task', false) // hide from taskbar
 
+settingsProvider.setInitialValue('settings-miniplayer-always-top', false) // show on top always
+
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
+
+settingsProvider.setInitialValue('settings-lyrics-always-top', false) // show on top always
 
 settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
 
