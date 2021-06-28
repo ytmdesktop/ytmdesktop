@@ -413,6 +413,9 @@ function replaceAcceleratorText(text) {
     if (text.indexOf('CmdOrCtrl') !== -1)
         if (isMac()) text = text.replace('CmdOrCtrl', 'Cmd')
         else text = text.replace('CmdOrCtrl', 'Ctrl')
+    
+    if (text.indexOf('Meta') !== -1 && isWindows())
+        text = text.replace('Meta', 'Windows')
 
     text = text.replace('numadd', '+')
 
@@ -457,6 +460,7 @@ function validateKey(e) {
 
 function preventSpecialKeys(e) {
     return !(
+        e.key === 'Meta' ||
         e.key === 'Command' ||
         e.key === 'Control' ||
         e.key === 'Alt' ||
@@ -475,6 +479,8 @@ document
         if (preventSpecialKeys(e)) {
             keyBindings = ''
 
+            if (e.metaKey) keyBindings += 'Meta+'
+            
             if (e.ctrlKey) keyBindings += 'CmdOrCtrl+'
 
             if (e.altKey) keyBindings += 'Alt+'
