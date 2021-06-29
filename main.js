@@ -221,6 +221,7 @@ async function createWindow() {
             nodeIntegration: true,
             webviewTag: true,
             enableRemoteModule: true,
+            contextIsolation: false,
         },
     }
 
@@ -293,7 +294,7 @@ async function createWindow() {
             app.getAppPath(),
             '/src/pages/shared/window-buttons/window-buttons.html'
         ),
-        { search: 'page=home/home' }
+        { search: 'page=home/home&trusted=1&script=shiny-tray-helper' }
     )
 
     mainWindow.addBrowserView(view)
