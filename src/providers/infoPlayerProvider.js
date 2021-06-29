@@ -454,7 +454,7 @@ function setSeekbar(webContents, time) {
     webContents
         .executeJavaScript(
             `
-        var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
+        var slider = document.querySelectorAll('.bar-container .tp-yt-paper-slider')[2];
         var sliderKnob = document.querySelectorAll('#progress-bar')[0];
 
         slider.click();
