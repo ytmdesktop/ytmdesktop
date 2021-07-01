@@ -36,6 +36,9 @@ class Mpris {
 
     setActivity(info) {
         if (this._isInitialized) {
+            // 50% is represented as 50 in info.player.volumePercent
+            // while mpris represents it as 0.50, so we need to convert it first
+            this.player.volume = info.player.volumePercent / 100
             this.player.metadata = {
                 'mpris:trackid': this.player
                     .objectPath('track/0')
@@ -77,6 +80,16 @@ class Mpris {
             ipcMain.emit('media-command', {
                 command: 'media-seekbar-set',
                 value: args.position / (1000 * 1000),
+            })
+        })
+
+        this.player.on('volume', (args) => {
+            if (args === undefined) return
+            ipcMain.emit('media-command', {
+                command: 'media-volume-set',
+                // 50% is represented as 50 in info.player.volumePercent
+                // while mpris represents it as 0.50, so we need to convert it first
+                value: args * 100,
             })
         })
 
