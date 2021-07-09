@@ -612,6 +612,13 @@ async function createWindow() {
                                 )
                             }
                         })
+                        .catch(() => {
+                            // JavaScript errored, assume no session link found and default to current url
+                            settingsProvider.set(
+                                'window-url',
+                                view.webContents.getURL()
+                            )
+                        })
                 }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
