@@ -7,7 +7,7 @@ const currentWindow = remote.getCurrentWindow()
 const winElement = document.getElementById('win')
 const macElement = document.getElementById('mac')
 
-const webview = document.querySelector('webview')
+let webview = document.querySelector('webview')
 
 if (store.get('titlebar-type', 'nice') !== 'nice') {
     document.getElementById('nice-titlebar').style.height = '15px'
@@ -28,6 +28,7 @@ if (store.get('titlebar-type', 'nice') !== 'nice') {
         macElement.remove()
     }
     document.getElementById('webview').style.height = '95vh'
+    document.getElementById('iframe').style.height = '95vh'
     document.getElementById('content').style.marginTop = '5vh'
 }
 
@@ -80,8 +81,26 @@ function checkUrlParams() {
     let icon = params.get('icon')
     let title = params.get('title')
     let hide = params.get('hide')
+    let trusted = params.get('trusted')
+    let script = params.get('script')
+
+    if (trusted) {
+        webview.classList.add('hide')
+        webview = document.getElementById('iframe')
+        webview.classList.remove('hide')
+    }
 
     if (page) webview.src = `../../${page}.html`
+
+    if (script) {
+        script = script.split(',')
+
+        script.forEach((src) => {
+            script_block = document.createElement('script')
+            script_block.src = `./${src}.js`
+            document.body.append(script_block)
+        })
+    }
 
     if (icon) {
         let elIcon = document.getElementById('icon')

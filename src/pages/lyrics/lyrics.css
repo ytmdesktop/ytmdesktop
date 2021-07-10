@@ -26,7 +26,7 @@ body {
     position: absolute;
     width: 100%;
     text-align: center;
-    color: lightgreen
+    color: lightgreen;
 }
 
 #content {
@@ -47,7 +47,7 @@ body {
 #lyric-source {
     font-size: 80%;
     padding: 0 0 0 6px;
-    color: #AAA
+    color: #AAA;
 }
 
 .hide {
