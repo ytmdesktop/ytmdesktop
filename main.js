@@ -103,7 +103,11 @@ let sleepTimer = {
 /* First checks ========================================================================= */
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 
-app.setAsDefaultProtocolClient('ytmd', process.execPath)
+if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
+    app.setAsDefaultProtocolClient('ytmd', process.execPath)
+}
+
+app.commandLine.appendSwitch('disable-http-cache')
 
 createCustomAppDir()
 
@@ -217,6 +221,7 @@ async function createWindow() {
             nodeIntegration: true,
             webviewTag: true,
             enableRemoteModule: true,
+            contextIsolation: false,
         },
     }
 
@@ -245,6 +250,11 @@ async function createWindow() {
             break
     }
 
+    /* For the uninformed:
+        - The `view` variable is the actual webpage that contains youtube music and stuff.
+        - The `mainWindow` variable contains the window frame that holds the mainWindow, but you cannot inspect mainWindow elements.
+        Yes, I am confused as you are, but hopefully that clears up some confusion
+    */
     mainWindow = new BrowserWindow(browserWindowConfig)
 
     mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
@@ -284,7 +294,7 @@ async function createWindow() {
             app.getAppPath(),
             '/src/pages/shared/window-buttons/window-buttons.html'
         ),
-        { search: 'page=home/home' }
+        { search: 'page=home/home&trusted=1&script=shiny-tray-helper' }
     )
 
     mainWindow.addBrowserView(view)
@@ -302,9 +312,9 @@ async function createWindow() {
         updateAccentColorPref()
     })
 
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    // view.webContents.openDevTools({ mode: 'detach' })
+    if (process.env.NODE_ENV === 'development') {
+        view.webContents.openDevTools({ mode: 'detach' })
+    }
 
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
@@ -447,13 +457,15 @@ async function createWindow() {
                 mprisProvider.setActivity(getAll())
             }
 
-            mediaControl.setProgress(
-                mainWindow,
-                settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? progress
-                    : -1,
-                playerInfo.isPaused
-            )
+            if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
+                mediaControl.setProgress(
+                    mainWindow,
+                    settingsProvider.get('settings-enable-taskbar-progressbar')
+                        ? progress
+                        : -1,
+                    playerInfo.isPaused
+                )
+            }
 
             /**
              * Scrobble when track changes or when current track starts from the beginning
@@ -1028,6 +1040,10 @@ async function createWindow() {
         }
     })
 
+    ipcMain.on('refresh-progress', () => {
+        mediaControl.setProgress(mainWindow, -1, playerInfo.isPaused)
+    })
+
     ipcMain.on('register-renderer', (event, _) => {
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
@@ -1177,6 +1193,10 @@ async function createWindow() {
                     nodeIntegration: true,
                     webviewTag: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webSecurity: false,
+                    sandbox: false,
                 },
             })
 
@@ -1187,10 +1207,14 @@ async function createWindow() {
                 ),
                 {
                     search:
-                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize&title=' +
+                        'page=settings/settings&trusted=1&icon=settings&hide=btn-minimize,btn-maximize&title=' +
                         __.trans('LABEL_SETTINGS'),
                 }
             )
+
+            if (process.env.NODE_ENV === 'development') {
+                settings.webContents.openDevTools({ mode: 'detach' })
+            }
         }
 
         settings.on('closed', () => {
@@ -1227,7 +1251,6 @@ async function createWindow() {
                     enableRemoteModule: true,
                 },
             })
-
             await miniplayer.loadFile(
                 path.join(
                     app.getAppPath(),
@@ -1241,7 +1264,6 @@ async function createWindow() {
                     miniplayerPosition.x,
                     miniplayerPosition.y
                 )
-
             let storeMiniplayerPositionTimer
             miniplayer.on('move', () => {
                 let position = miniplayer.getPosition()
@@ -1268,7 +1290,9 @@ async function createWindow() {
             })
 
             // Devtools
-            // miniplayer.openDevTools()
+            if (process.env.NODE_ENV === 'development') {
+                miniplayer.openDevTools({ mode: 'detach' })
+            }
 
             mainWindow.hide()
         }
@@ -1340,8 +1364,12 @@ async function createWindow() {
     }
 
     async function windowLyrics() {
-        if (lyrics) lyrics.show()
-        else {
+        if (lyrics) {
+            lyrics.show()
+            process.env.NODE_ENV === 'development'
+                ? lyrics.webContents.openDevTools({ mode: 'detach' })
+                : null
+        } else {
             lyrics = new BrowserWindow({
                 icon: iconDefault,
                 frame: windowConfig.frame,
@@ -1351,6 +1379,7 @@ async function createWindow() {
                 backgroundColor: '#232323',
                 width: 700,
                 height: 800,
+                alwaysOnTop: settingsProvider.get('settings-lyrics-always-top'),
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
@@ -1390,10 +1419,14 @@ async function createWindow() {
 
             lyrics.on('closed', () => {
                 lyrics = null
+                if (process.env.NODE_ENV === 'development') {
+                    lyrics.webContents.closeDevTools()
+                }
             })
 
-            // ENABLE FOR DEBUG
-            // lyrics.webContents.openDevTools();
+            if (process.env.NODE_ENV === 'development') {
+                lyrics.webContents.openDevTools({ mode: 'detach' })
+            }
         }
     }
 
@@ -1750,7 +1783,7 @@ async function createWindow() {
 
     async function loadMusicByUrl(videoUrl) {
         if (videoUrl.includes('music.youtube'))
-            await view.webContents.loadUrl(videoUrl)
+            await view.webContents.loadURL(videoUrl)
         else {
             let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)

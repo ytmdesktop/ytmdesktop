@@ -5,6 +5,7 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
+        "dev": "NODE_ENV=development nodemon --exec yarn start --dev --inspect",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
         "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
@@ -28,10 +29,12 @@
         }
     },
     "devDependencies": {
-        "electron": "^11.1.1",
+        "@types/electron": "^1.6.10",
+        "electron": "^11.4.9",
         "electron-builder": "^22.9.1",
         "electron-rebuild": "^2.3.4",
         "husky": "^4.3.7",
+        "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
         "pretty-quick": "^2.0.2"
     },
@@ -67,6 +70,7 @@
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
         "utf-8-validate": "^5.0.2",
+        "win-node-env": "^0.4.0",
         "windows.media.playback": "git+https://github.com/NovusTheory/nodert-windows.media.playback.git"
     }
 }

@@ -1,97 +1,98 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>YouTube Music</title>
-        <link
-            type="text/css"
-            rel="stylesheet"
-            href="../../../src/assets/css/materialize.min.css"
-            media="screen,projection"
-        />
-        <link
-            href="../../../src/assets/css/material_icons.css"
-            rel="stylesheet"
-        />
-        <link
-            type="text/css"
-            rel="stylesheet"
-            href="../../../src/assets/css/styles.css"
-        />
-        <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
-    </head>
-
-    <body>
-        <div id="loading">
-            <div class="preloader-wrapper big active">
-                <div class="spinner-layer spinner-red-only">
-                    <div class="circle-clipper left">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="gap-patch">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="circle-clipper right">
-                        <div class="circle"></div>
-                    </div>
+<head>
+    <meta charset="utf-8" />
+    <title>YouTube Music</title>
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="../../../src/assets/css/materialize.min.css"
+        media="screen,projection"
+    />
+    <link
+        type="text/css"
+        href="../../../src/assets/css/material_icons.css"
+        rel="stylesheet"
+    />
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="../../../src/assets/css/styles.css"
+    />
+    <link type="text/css" rel="stylesheet" href="./miniplayer.css" />
+</head>
+<body>
+    <div id="loading">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-red-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
                 </div>
             </div>
         </div>
-        <div id="content" class="hide">
-            <div class="cmd-bar drag">
-                <div class="cmd-btn left drag" id="btn-drag">
-                    <i class="material-icons">drag_indicator</i>
-                </div>
-                <div class="pointer cmd-btn right no-drag" id="btn-close">
-                    <i class="material-icons">launch</i>
-                </div>
+    </div>
+    <div id="content" class="hide">
+        <div class="cmd-bar drag">
+            <div class="cmd-btn left drag" id="btn-drag">
+                <i class="material-icons">drag_indicator</i>
             </div>
-
-            <div class="player-info">
-                <div class="title center">
-                    <span id="title">Title</span>
-                </div>
-
-                <div class="author center">
-                    <span id="author">Author</span>
-                </div>
-
-                <div class="duration center">
-                    <span id="current">0:00</span> /
-                    <span id="duration">0:00</span>
-                </div>
-
-                <div class="controls">
-                    <div class="pointer ctrl-btn" id="btn-dislike">
-                        <i class="material-icons hide-solid">thumb_down</i>
-
-                        <!-- This one should always be visible -->
-                        <i class="material-icons outlined">thumb_down</i>
-                    </div>
-                    <div class="pointer ctrl-btn" id="btn-previous">
-                        <i class="material-icons">skip_previous</i>
-                    </div>
-                    <div class="pointer ctrl-btn" id="btn-play-pause">
-                        <i class="material-icons">play_arrow</i>
-                    </div>
-                    <div class="pointer ctrl-btn" id="btn-next">
-                        <i class="material-icons">skip_next</i>
-                    </div>
-                    <div class="pointer ctrl-btn" id="btn-like">
-                        <i class="material-icons hide-solid">thumb_up</i>
-
-                        <!-- Same for this one -->
-                        <i class="material-icons outlined">thumb_up</i>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar">
-                <div id="progress"></div>
+            <div class="pointer cmd-btn right no-drag" id="btn-close">
+                <i class="material-icons">launch</i>
             </div>
         </div>
 
-        <div id="background"></div>
-        <div id="secondsEffect"></div>
-    </body>
+        <div class="player-info">
+            <div class="title center">
+                <span id="title">Title</span>
+            </div>
+
+            <div class="author center">
+                <span id="author">Author</span>
+            </div>
+
+            <div class="duration center">
+                <span id="current">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+
+            <div class="controls">
+                <div class="pointer ctrl-btn" id="btn-dislike">
+                    <i class="material-icons hide-solid">thumb_down</i>
+
+                    <!-- This one should always be visible -->
+                    <i class="material-icons outlined">thumb_down</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-previous">
+                    <i class="material-icons">skip_previous</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-play-pause">
+                    <i class="material-icons">play_arrow</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-next">
+                    <i class="material-icons">skip_next</i>
+                </div>
+                <div class="pointer ctrl-btn" id="btn-like">
+                    <i class="material-icons hide-solid">thumb_up</i>
+
+                    <!-- Same for this one -->
+                    <i class="material-icons outlined">thumb_up</i>
+                </div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div id="progress"></div>
+        </div>
+    </div>
+
+    <div id="background"></div>
+    <div id="secondsEffect"></div>
 
     <script src="./miniplayer.js"></script>
+</body>  
 </html>
