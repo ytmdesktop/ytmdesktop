@@ -201,14 +201,10 @@ function getAuthor(webContents) {
     webContents
         .executeJavaScript(
             `
-            var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                        
-            if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
-            title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
-            } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
-            title = bar.getElementsByClassName('byline ytmusic-player-bar')[0].textContent;
-            }
-            title;
+            var title = '';
+            var artist_album_and_year = document.getElementsByClassName('subtitle ytmusic-player-bar')[0].textContent;
+            var split_by_dot = artist_album_and_year.split(" • ");
+            title = split_by_dot[0].trim();
             `
         )
         .then((author) => {
@@ -223,17 +219,14 @@ function getAlbum(webContents) {
         .executeJavaScript(
             `
             var album = '';
-            var player_bar = document.getElementsByClassName("byline ytmusic-player-bar")[0].children;
-            var arr_player_bar = Array.from(player_bar);
+            var artist_album_and_year = document.getElementsByClassName('subtitle ytmusic-player-bar')[0].textContent;
+            var split_by_dot = artist_album_and_year.split(" • ");
             
-            arr_player_bar.forEach( function(data, index) {
-            
-            if (data.getAttribute('href') != null && data.getAttribute('href').includes('browse')) {
-                album = data.innerText;
-            }
-            } )
-            
-            album
+            // Ensure that we actually have album data set
+            if (split_by_dot.length > 1) {
+                album = split_by_dot[1];
+            }            
+            album;
             `
         )
         .then((album) => {
