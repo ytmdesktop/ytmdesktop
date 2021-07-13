@@ -308,6 +308,7 @@ async function createWindow() {
         mainWindowParams.url = settingsProvider.get('window-url')
 
     view.webContents.loadURL(mainWindowParams.url).then(() => {
+        loadCustomCSSApp()
         updateAccentColorPref()
     })
 
@@ -1132,8 +1133,12 @@ async function createWindow() {
                 windowLastFmLogin()
                 break
 
-            case 'show-editor-theme':
-                windowThemeEditor()
+            case 'show-editor-theme-app':
+                windowThemeEditor('app')
+                break
+
+            case 'show-editor-theme-page':
+                windowThemeEditor('page')
                 break
 
             case 'show-lyrics':
@@ -1363,7 +1368,7 @@ async function createWindow() {
         )
     }
 
-    async function windowThemeEditor() {
+    async function windowThemeEditor(mode = 'page') {
         const editor = new BrowserWindow({
             icon: iconDefault,
             frame: windowConfig.frame,
@@ -1388,8 +1393,7 @@ async function createWindow() {
                 './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
-                search:
-                    'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
+                search: `page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize&mode=${mode}`,
             }
         )
     }
@@ -1644,6 +1648,12 @@ async function createWindow() {
         await view.webContents.loadURL(mainWindowParams.url, options)
     })
 
+    ipcMain.on('update-custom-css-app', (event) => {
+        loadCustomCSSApp()
+
+        sendEventToAllRenders('update-custom-css-app')
+    })
+
     ipcMain.on('update-custom-css-page', () => {
         loadCustomCSSPage()
     })
@@ -1713,8 +1723,8 @@ async function createWindow() {
             settingsProvider.get('settings-custom-css-app') &&
             fileSystem.checkIfExists(customThemeFile)
         ) {
-            removeCustomCssApp()
-            view.webContents
+            if (customCSSAppKey) removeCustomCSSApp()
+            mainWindow.webContents
                 .insertCSS(fileSystem.readFile(customThemeFile).toString())
                 .then((key) => {
                     customCSSAppKey = key
@@ -1723,7 +1733,7 @@ async function createWindow() {
     }
 
     function removeCustomCSSApp() {
-        if (customCSSAppKey) view.webContents.removeInsertedCSS(customCSSAppKey)
+        mainWindow.webContents.removeInsertedCSS(customCSSAppKey)
     }
 
     function loadCustomCSSPage() {
@@ -2097,6 +2107,13 @@ function updateTrayAudioOutputs(data) {
 function updateStatusBar() {
     if (renderer_for_status_bar != null)
         renderer_for_status_bar.send('update-status-bar')
+}
+
+function sendEventToAllRenders(channel, args) {
+    var browserWindows = BrowserWindow.getAllWindows()
+    browserWindows.forEach((sBrowserWindow) => {
+        sBrowserWindow.webContents.send(channel, args)
+    })
 }
 
 function writeLog(log) {

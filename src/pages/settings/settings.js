@@ -9,6 +9,9 @@ const fs = require('fs')
 )*/
 const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
+const elementBtnOpenAppEditor = document.getElementById(
+    'btn-editor-custom-css-app'
+)
 const elementBtnOpenPageEditor = document.getElementById(
     'btn-editor-custom-css-page'
 )
@@ -145,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkClipboardWatcherStatus()
     })
     initElement('titlebar-type', 'change', showRelaunchButton)
+    initElement('settings-custom-css-app', 'click', null)
     initElement('settings-custom-css-page', 'click', null)
     initElement('settings-last-fm-scrobbler', 'click', () => {
         const login = settingsProvider.get('last-fm-login')
@@ -228,9 +232,14 @@ if (elementRangeSkipTrackShorterThan)
         )
     })
 
+if (elementBtnOpenAppEditor)
+    elementBtnOpenAppEditor.addEventListener('click', () => {
+        ipc.send('window', { command: 'show-editor-theme-app' })
+    })
+
 if (elementBtnOpenPageEditor)
     elementBtnOpenPageEditor.addEventListener('click', () => {
-        ipc.send('window', { command: 'show-editor-theme' })
+        ipc.send('window', { command: 'show-editor-theme-page' })
     })
 
 if (elementBtnLastFmLogin)
