@@ -1,6 +1,10 @@
-html, body {
+* {
     margin: 0;
     padding: 0;
+    border: 0;
+}
+
+html, body {
     height: 100%;
     overflow: hidden;
     user-select: none;
@@ -13,7 +17,7 @@ html, body {
 }
 
 .no-drag {
-    -webkit-app-region: no-drag
+    -webkit-app-region: no-drag;
 }
 
 .pointer {

@@ -1,8 +1,10 @@
 Thanks for taking the time to contribute with ytmdesktop!
-If you have some commits to send our way, please, send a pull request to ```development``` branch, and if everything is good to go, it will be merged and included on the next release.
+If you have some commits to send our way, please, send a pull request to `development` branch, and if everything is good to go, it will be merged and included on the next release.
 
 ## Commits
-This repository follows the [😜gitmoji](https://gitmoji.carloscuesta.me/) commit standard. Please, follow this standard to provide an easy way of identifying the purpose or intention of your commit, followed by a small description on the changes you've made. Here are some examples:
+This repository follows the [😜 Gitmoji](https://gitmoji.carloscuesta.me/) commit standard. 
+Please, follow this standard to provide an easy way of identifying the purpose or intention of your commit, followed by a small description on the changes you've made. 
+Here are some examples:
 
     $ git commit -m ":bug: padding on main window"
 > :bug: padding on main window
