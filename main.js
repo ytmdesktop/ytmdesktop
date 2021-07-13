@@ -361,7 +361,6 @@ async function createWindow() {
             `)
         }
         initialized = true
-        settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
@@ -584,6 +583,42 @@ async function createWindow() {
 
                         sleepTimer.mode = 'off'
                     }
+                }
+
+                /**
+                 * Update the saved url if settings-continue-where-left-of is enabled
+                 */
+                if (settingsProvider.get('settings-continue-where-left-of')) {
+                    view.webContents
+                        .executeJavaScript(
+                            `
+                        document.querySelector('.yt-uix-sessionlink').href;
+                    `
+                        )
+                        .then((result) => {
+                            if (result) {
+                                const url = new URL(result)
+                                // Hostname correction as the provided url is for youtube.com
+                                url.hostname = 'music.youtube.com'
+                                settingsProvider.set(
+                                    'window-url',
+                                    url.toString()
+                                )
+                            } else {
+                                // No session link found so just default to the current url
+                                settingsProvider.set(
+                                    'window-url',
+                                    view.webContents.getURL()
+                                )
+                            }
+                        })
+                        .catch(() => {
+                            // JavaScript errored, assume no session link found and default to current url
+                            settingsProvider.set(
+                                'window-url',
+                                view.webContents.getURL()
+                            )
+                        })
                 }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
