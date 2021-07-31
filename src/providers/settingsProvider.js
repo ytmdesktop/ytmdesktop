@@ -2,6 +2,10 @@ const { ipcMain, webContents } = require('electron')
 const electronStore = require('electron-store')
 const store = new electronStore({ watch: true })
 
+//Actually we only have to set the max listener count for the EventEmitter of the electron-store
+//but there doesn't seem to be a way of doing that.
+require('events').EventEmitter.defaultMaxListeners = 500;
+
 /**
  * Get setting value
  * @param {string} settingName

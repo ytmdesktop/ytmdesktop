@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron')
 const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
-const infoPlayerProvider = require('electron').remote.require(
+const infoPlayerProvider = require('@electron/remote').require(
     './src/providers/infoPlayerProvider'
 )
 const settingsProvider = require('../../providers/settingsProvider')

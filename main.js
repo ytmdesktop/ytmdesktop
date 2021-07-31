@@ -14,6 +14,7 @@ const {
     dialog,
     powerMonitor,
 } = require('electron')
+require('@electron/remote/main').initialize()
 const path = require('path')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
@@ -338,9 +339,9 @@ async function createWindow() {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
-    view.webContents.on('new-window', (event, url) => {
-        event.preventDefault()
+    view.webContents.setWindowOpenHandler((details) => {
         shell.openExternal(url)
+        return { action: 'deny' }
     })
 
     // view.webContents.openDevTools({ mode: 'detach' });

@@ -1,4 +1,4 @@
-const { app } = require('electron').remote
+const { app } = require('@electron/remote')
 const markdown = require('markdown').markdown
 const fetch = require('node-fetch')
 const settingsProvider = require('../../providers/settingsProvider')

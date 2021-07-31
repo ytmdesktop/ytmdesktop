@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron')
-const app = require('electron').remote.app
-const path = require('electron').remote.require('path')
+const remote = require('@electron/remote')
+const app = remote.app
+const path = remote.require('path')
 
 const __ = require('../../../src/providers/translateProvider')
 const fileSystem = require('../../../src/utils/fileSystem')

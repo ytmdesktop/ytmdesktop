@@ -1,7 +1,7 @@
-const { remote, ipcRenderer: ipc } = require('electron')
+const { ipcRenderer: ipc } = require('electron')
 const electronStore = require('electron-store')
 const store = new electronStore()
-const status = remote.getGlobal('sharedObj')
+const status = require('@electron/remote').getGlobal('sharedObj')
 
 ipc.on('is-dev', (event, args) => {
     if (args) document.title = document.title + ' DEV'
