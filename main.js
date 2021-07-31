@@ -88,6 +88,8 @@ global.sharedObj = {
     rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
 }
 
+let isAppQuitting = false;
+
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
@@ -276,12 +278,7 @@ async function createWindow() {
 
     view = new BrowserView({
         webPreferences: {
-            nodeIntegration: false,
-            webviewTag: false,
-            enableRemoteModule: false,
-            contextIsolation: true,
-            sandbox: true,
-            nativeWindowOpen: true,
+            //nativeWindowOpen: true,
             preload: path.join(
                 app.getAppPath(),
                 '/src/utils/injectControls.js'
@@ -328,11 +325,6 @@ async function createWindow() {
         if (position !== undefined)
             mainWindow.setPosition(position.x, position.y)
     }
-
-    mainWindow.on('closed', () => {
-        view = null
-        mainWindow = null
-    })
 
     mainWindow.on('show', () => {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
@@ -668,7 +660,6 @@ async function createWindow() {
     }
 
     view.webContents.on('media-started-playing', () => {
-        logDebug('Playing')
         try {
             if (isMac()) {
                 updateStatusBar()
@@ -683,7 +674,6 @@ async function createWindow() {
     })
 
     view.webContents.on('media-paused', () => {
-        logDebug('Paused')
         try {
             if (isMac()) {
                 updateStatusBar()
@@ -733,6 +723,11 @@ async function createWindow() {
     })
 
     mainWindow.on('close', (e) => {
+        //The app.quit() will be prevented if we prevent this event in an effort to minimize the app to the tray
+        if (isAppQuitting) {
+            return;
+        }
+
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
             if (settingsProvider.get('settings-tray-icon')) {
@@ -741,7 +736,7 @@ async function createWindow() {
                 mainWindow.minimize()
             }
         } else {
-            app.exit()
+            app.quit()
         }
     })
 
@@ -1094,7 +1089,6 @@ async function createWindow() {
     })
 
     ipcMain.on('closed', (_) => {
-        mainWindow = null
         if (process.platform !== 'darwin') {
             app.quit()
         }
@@ -1751,11 +1745,6 @@ async function createWindow() {
     }
 
     function switchClipboardWatcher() {
-        logDebug(
-            'Switch clipboard watcher: ' +
-                settingsProvider.get('settings-clipboard-read')
-        )
-
         if (isClipboardWatcherRunning) {
             // TODO: What is this? Doesn't make much sense
             clipboardWatcher !== null && clipboardWatcher.stop()
@@ -1927,29 +1916,11 @@ else {
         else if (mainWindow.isVisible() && !isMac()) mainWindow.hide()
         else mainWindow.show()
     })
-
+    
     app.on('before-quit', () => {
-        mainWindow = null
-        view = null
-        if (isMac()) app.exit()
-
+        isAppQuitting = true
         tray.quit()
     })
-
-    app.on('quit', () => {
-        mainWindow = null
-        view = null
-        tray.quit()
-    })
-}
-
-// TODO: Should this be removed?
-function logDebug(data) {
-    /*
-    Commented out since it's never going to be ran
-    if (false)
-        console.log(data);
-        */
 }
 
 function songInfo() {
@@ -1965,14 +1936,6 @@ function getAll() {
         track: songInfo(),
         player: playerInfo(),
     }
-}
-
-// TODO: Unused function
-function bytesToSize(bytes) {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-    if (bytes === 0) return '0 Byte'
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
 function createCustomAppDir() {

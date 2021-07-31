@@ -389,14 +389,7 @@ function loadSettings() {
 
 function relaunch() {
     remote.app.relaunch()
-    remote.app.exit(0)
-}
-
-// TODO: Unused function?
-function readLocales() {
-    fs.readdir(__dirname, (err, files) => {
-        console.log(files)
-    })
+    remote.app.quit()
 }
 
 function mInit() {

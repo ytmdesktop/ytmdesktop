@@ -311,7 +311,7 @@ const popUpMenu = (__, saved_mainWindow, mediaControl, app) => {
             label: __.trans('LABEL_EXIT'),
             type: 'normal',
             click: () => {
-                app.exit()
+                app.quit()
             },
         },
     ]
