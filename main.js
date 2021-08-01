@@ -331,7 +331,7 @@ async function createWindow() {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
-    mainWindow.on('close', () => {
+    mainWindow.on('closed', () => {
         view = null
         mainWindow = null
     })
