@@ -202,7 +202,7 @@ function getAuthor(webContents) {
         .executeJavaScript(
             `
             var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                        
+            var title;
             if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
             title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
             } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
@@ -343,6 +343,8 @@ async function setQueueItem(webContents, index) {
     await webContents.executeJavaScript(
         `var element = document.querySelector('ytmusic-player-queue #contents').children[${index}].querySelector('.song-info').parentElement.querySelector('.left-items .thumbnail-overlay #play-button').click()`
     )
+    .then()
+    .catch((_) => console.log('error setQueueItem'))
 }
 
 function addToLibrary(webContents) {
@@ -589,6 +591,8 @@ async function toggleMoreActions(webContents) {
             `,
         true
     )
+    .then()
+    .catch((_) => console.log('error toggleMoreActions'))
 }
 
 function debug(data) {

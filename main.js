@@ -14,6 +14,7 @@ const {
     dialog,
     powerMonitor,
 } = require('electron')
+require('@electron/remote/main').initialize()
 const path = require('path')
 const isDev = require('electron-is-dev')
 const ClipboardWatcher = require('electron-clipboard-watcher')
@@ -338,9 +339,9 @@ async function createWindow() {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
-    view.webContents.on('new-window', (event, url) => {
-        event.preventDefault()
+    view.webContents.setWindowOpenHandler((details) => {
         shell.openExternal(url)
+        return { action: 'deny' }
     })
 
     // view.webContents.openDevTools({ mode: 'detach' });
@@ -1353,12 +1354,12 @@ async function createWindow() {
 
         await lastfm.loadFile(
             path.join(
-                __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
-                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
+                    'page=settings/sub/last-fm/last-fm-login&trusted=1&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1384,12 +1385,12 @@ async function createWindow() {
 
         await editor.loadFile(
             path.join(
-                __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
-                    'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
+                    'page=editor/editor&icon=color_lens&trusted=1&hide=btn-minimize,btn-maximize',
             }
         )
     }
@@ -1424,12 +1425,12 @@ async function createWindow() {
 
             await lyrics.loadFile(
                 path.join(
-                    __dirname,
-                    './src/pages/shared/window-buttons/window-buttons.html'
+                    app.getAppPath(),
+                    '/src/pages/shared/window-buttons/window-buttons.html'
                 ),
                 {
                     search:
-                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize&title=' +
+                        'page=lyrics/lyrics&icon=music_note&trusted=1&hide=btn-minimize,btn-maximize&title=' +
                         __.trans('LABEL_LYRICS'),
                 }
             )
@@ -1546,12 +1547,12 @@ async function createWindow() {
 
         await discord.loadFile(
             path.join(
-                __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
-                    'page=settings/sub/discord/discord_settings&icon=settings&title=' +
+                    'page=settings/sub/discord/discord_settings&trusted=1&icon=settings&title=' +
                     __.trans('LABEL_SETTINGS_DISCORD') +
                     '&hide=btn-minimize,btn-maximize',
             }
@@ -1583,12 +1584,12 @@ async function createWindow() {
 
         await discord.loadFile(
             path.join(
-                __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
+                app.getAppPath(),
+                '/src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
                 search:
-                    'page=settings/sub/shortcut-buttons/shortcut-buttons-settings&icon=settings&title=' +
+                    'page=settings/sub/shortcut-buttons/shortcut-buttons-settings&trusted=1&icon=settings&title=' +
                     __.trans('SHORTCUT_BUTTONS') +
                     '&hide=btn-minimize,btn-maximize',
             }
@@ -1624,7 +1625,7 @@ async function createWindow() {
             {
                 search: `title=${__.trans(
                     'LABEL_CHANGELOG'
-                )}&page=changelog/changelog&hide=btn-minimize,btn-maximize`,
+                )}&page=changelog/changelog&trusted=1&hide=btn-minimize,btn-maximize`,
             }
         )
     }

@@ -1,8 +1,8 @@
-const { remote, ipcRenderer: ipc } = require('electron')
+const { ipcRenderer: ipc } = require('electron')
 const electronStore = require('electron-store')
 const store = new electronStore()
 const { isWindows, isMac, isLinux } = require('../../../utils/systemInfo')
-const currentWindow = remote.getCurrentWindow()
+const currentWindow = require('@electron/remote').getCurrentWindow()
 
 const winElement = document.getElementById('win')
 const macElement = document.getElementById('mac')

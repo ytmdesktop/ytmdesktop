@@ -1,4 +1,5 @@
-const { remote, ipcRenderer: ipc, shell } = require('electron')
+const { ipcRenderer: ipc, shell } = require('electron')
+const remote = require('@electron/remote')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')

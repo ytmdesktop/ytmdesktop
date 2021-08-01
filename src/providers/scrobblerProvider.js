@@ -1,4 +1,4 @@
-const { remote } = require('electron')
+const { BrowserWindow } = require('@electron/remote/main')
 const scribble = require('scribble')
 const settingsProvider = require('./settingsProvider')
 const http = require('http')
@@ -83,7 +83,7 @@ function updateNowPlaying(title, author, album, duration) {
 }
 
 async function authorize(token) {
-    let winAuthorize = new remote.BrowserWindow({
+    let winAuthorize = new BrowserWindow({
         title: 'Last.FM Authorization',
         width: 900,
         height: 500,
