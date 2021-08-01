@@ -88,7 +88,7 @@ global.sharedObj = {
     rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
 }
 
-let isAppQuitting = false;
+let isAppQuitting = false
 
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
@@ -221,9 +221,10 @@ async function createWindow() {
         maximizable: true,
         webPreferences: {
             nodeIntegration: true,
-            webviewTag: true,
             enableRemoteModule: true,
             contextIsolation: false,
+            nodeIntegrationInSubFrames: true,
+            webviewTag: true,
         },
     }
 
@@ -328,6 +329,11 @@ async function createWindow() {
 
     mainWindow.on('show', () => {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+    })
+
+    mainWindow.on('close', () => {
+        view = null
+        mainWindow = null
     })
 
     view.webContents.on('new-window', (event, url) => {
@@ -725,7 +731,7 @@ async function createWindow() {
     mainWindow.on('close', (e) => {
         //The app.quit() will be prevented if we prevent this event in an effort to minimize the app to the tray
         if (isAppQuitting) {
-            return;
+            return
         }
 
         if (settingsProvider.get('settings-keep-background')) {
@@ -1215,12 +1221,10 @@ async function createWindow() {
                 skipTaskbar: false,
                 webPreferences: {
                     nodeIntegration: true,
-                    webviewTag: true,
                     enableRemoteModule: true,
                     contextIsolation: false,
                     nodeIntegrationInSubFrames: true,
-                    webSecurity: false,
-                    sandbox: false,
+                    webviewTag: true,
                 },
             })
 
@@ -1235,13 +1239,16 @@ async function createWindow() {
                         __.trans('LABEL_SETTINGS'),
                 }
             )
-
-            if (process.env.NODE_ENV === 'development') {
-                settings.webContents.openDevTools({ mode: 'detach' })
-            }
         }
 
-        settings.on('closed', () => {
+        if (process.env.NODE_ENV === 'development') {
+            settings.webContents.openDevTools({ mode: 'detach' })
+        }
+
+        settings.on('close', () => {
+            if (process.env.NODE_ENV === 'development') {
+                settings.webContents.closeDevTools()
+            }
             settings = null
         })
     }
@@ -1273,6 +1280,9 @@ async function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webviewTag: true,
                 },
             })
             await miniplayer.loadFile(
@@ -1340,8 +1350,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1371,8 +1383,10 @@ async function createWindow() {
             minHeight: 800,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1391,9 +1405,6 @@ async function createWindow() {
     async function windowLyrics() {
         if (lyrics) {
             lyrics.show()
-            process.env.NODE_ENV === 'development'
-                ? lyrics.webContents.openDevTools({ mode: 'detach' })
-                : null
         } else {
             lyrics = new BrowserWindow({
                 icon: iconDefault,
@@ -1407,8 +1418,10 @@ async function createWindow() {
                 alwaysOnTop: settingsProvider.get('settings-lyrics-always-top'),
                 webPreferences: {
                     nodeIntegration: true,
-                    webviewTag: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webviewTag: true,
                 },
             })
 
@@ -1442,47 +1455,21 @@ async function createWindow() {
                 }, 500)
             })
 
-            lyrics.on('closed', () => {
-                lyrics = null
+            lyrics.on('close', () => {
                 if (process.env.NODE_ENV === 'development') {
                     lyrics.webContents.closeDevTools()
                 }
+                lyrics = null
             })
+        }
 
-            if (process.env.NODE_ENV === 'development') {
-                lyrics.webContents.openDevTools({ mode: 'detach' })
-            }
+        if (process.env.NODE_ENV === 'development') {
+            lyrics.webContents.openDevTools({ mode: 'detach' })
         }
     }
 
     async function windowCompanion() {
         await shell.openExternal(`http://localhost:9863`)
-        return
-        //const x = mainWindow.getPosition()[0]
-        //const y = mainWindow.getPosition()[1]
-
-        /* Commented code since the return above blocks its execution
-        let size = screen.getPrimaryDisplay().workAreaSize;
-
-        const settings = new BrowserWindow({
-            // parent: mainWindow,
-            icon: iconDefault,
-            skipTaskbar: false,
-            frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
-            resizable: false,
-            backgroundColor: '#232323',
-            width: size.width - 450,
-            height: size.height - 450,
-            center: true,
-            title: 'companionWindowTitle',
-            webPreferences: {
-                nodeIntegration: false,
-                enableRemoteModule: true,
-            },
-            autoHideMenuBar: true,
-        });
-        await settings.loadURL('http://localhost:9863');*/
     }
 
     async function windowGuest() {
@@ -1504,6 +1491,9 @@ async function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
                 partition: `guest-mode-${Date.now()}`,
             },
         })
@@ -1533,8 +1523,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1570,8 +1562,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1605,8 +1599,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1916,7 +1912,7 @@ else {
         else if (mainWindow.isVisible() && !isMac()) mainWindow.hide()
         else mainWindow.show()
     })
-    
+
     app.on('before-quit', () => {
         isAppQuitting = true
         tray.quit()
