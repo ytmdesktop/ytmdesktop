@@ -47,12 +47,20 @@ settingsProvider.setInitialValue('settings-accelerators', {
     'media-track-dislike': 'CmdOrCtrl+Shift+D',
     'media-volume-up': 'CmdOrCtrl+Shift+Up',
     'media-volume-down': 'CmdOrCtrl+Shift+Down',
+    'media-track-forward':'CmdOrCtrl+Shift+P',
+    'media-track-back':'CmdOrCtrl+Shift+O'
 })
 
 let accelerators = settingsProvider.get('settings-accelerators')
 if (!accelerators['media-volume-up']) {
     accelerators['media-volume-up'] = 'CmdOrCtrl+Shift+Up'
     accelerators['media-volume-down'] = 'CmdOrCtrl+Shift+Down'
+    settingsProvider.set('settings-accelerators', accelerators)
+}
+
+if (!accelerators['media-track-forward']) {
+    accelerators['media-track-forward'] = 'CmdOrCtrl+Shift+P'
+    accelerators['media-track-back'] = 'CmdOrCtrl+Shift+O'
     settingsProvider.set('settings-accelerators', accelerators)
 }
 

@@ -502,6 +502,18 @@ function loadCustomKeys() {
     )
 
     document.querySelector(
+        '#settings-accelerators_media-track-forward'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-forward']
+    )
+
+    document.querySelector(
+        '#settings-accelerators_media-track-back'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-track-back']
+    )
+
+    document.querySelector(
         '#settings-accelerators_media-volume-up'
     ).innerText = replaceAcceleratorText(
         settingsAccelerators['media-volume-up']
@@ -556,6 +568,20 @@ document
     .querySelector('#btn-accelerator-media-track-dislike')
     .addEventListener('click', () => {
         typeAcceleratorSelected = 'media-track-dislike'
+        resetAcceleratorsText()
+    })
+
+    document
+    .querySelector('#btn-accelerator-media-track-forward')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-forward'
+        resetAcceleratorsText()
+    })
+
+    document
+    .querySelector('#btn-accelerator-media-track-back')
+    .addEventListener('click', () => {
+        typeAcceleratorSelected = 'media-track-back'
         resetAcceleratorsText()
     })
 

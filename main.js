@@ -653,6 +653,19 @@ function createWindow() {
         } catch (_) {}
 
         switch (args.type) {
+            case 'media-track-forward':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.mediaForwardTenSeconds(view)
+                })
+                break
+
+
+            case 'media-track-back':
+                registerGlobalShortcut(args.newValue, () => {
+                    mediaControl.mediaRewindTenSeconds(view)
+                })
+                break
+
             case 'media-play-pause':
                 registerGlobalShortcut(args.newValue, () => {
                     checkDoubleTapPlayPause()
@@ -757,6 +770,16 @@ function createWindow() {
 
     // Custom accelerators
     let settingsAccelerator = settingsProvider.get('settings-accelerators')
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-forward',
+        newValue: settingsAccelerator['media-track-forward'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-track-back',
+        newValue: settingsAccelerator['media-track-back'],
+    })
 
     ipcMain.emit('change-accelerator', {
         type: 'media-play-pause',
