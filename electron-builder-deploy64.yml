@@ -49,3 +49,6 @@ linux:
 snap:
   slots: 
     - mpris
+  plugs:
+    - default
+    - u2f-devices
