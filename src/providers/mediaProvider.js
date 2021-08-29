@@ -31,9 +31,11 @@ function mediaDownVote(mainWindow) {
 function mediaVolumeUp(mainWindow) {
     if (settingsProvider.get('settings-decibel-volume')) {
         let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+        let newPercent = percent < 6.0 ? percent + 1 : decibelToPercent(percentToDecibel(percent) + 1.5);
+
         infoPlayerProvider.setVolume(
             mainWindow.webContents,
-            decibelToPercent(percentToDecibel(percent) + 1.5)
+            newPercent
         )
     } else
         mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '=' })
@@ -42,9 +44,11 @@ function mediaVolumeUp(mainWindow) {
 function mediaVolumeDown(mainWindow) {
     if (settingsProvider.get('settings-decibel-volume')) {
         let percent = infoPlayerProvider.getPlayerInfo().volumePercent
+        let newPercent = percent < 6.0 ? percent - 1 : decibelToPercent(percentToDecibel(percent) - 1.5);
+
         infoPlayerProvider.setVolume(
             mainWindow.webContents,
-            decibelToPercent(percentToDecibel(percent) - 1.5)
+            newPercent
         )
     } else
         mainWindow.webContents.sendInputEvent({ type: 'keydown', keyCode: '-' })
