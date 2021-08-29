@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<!-- Start: Premium Sync CTA -->
+<section class="sync-cta bottom-line" style="display: none;">
+  <section class="get-sync-cta" id="locked-user-pay-section-filters">
+    <p>
+      <span i18n="save_custom_settings_cta"></span>
+      <span i18n="try_backup_sync"></span>
+    </p>
+    <section class="user-actions">
+      <a
+        id="get-it-now-filters"
+        i18n="get_it_now"
+        class="btn yellow long"
+        target="_blank"
+        href="https://getadblock.com/premium/enrollment/"
+      ></a>
+      <button id="close-sync-cta-filters">
+        <i class="material-icons" role="img" i18n-aria-label="close">close</i>
+      </button>
+    </section>
+  </section>
+  <section class="goodbye-sync-cta" style="display: none;">
+    <p>
+      <span i18n="wont_show_again"></span>
+      <span i18n="check_out_premium" i18n_replacement_el="premium-from-filters">
+        <a href="#mab" id="premium-from-filters" class="link-text-color link-to-tab"></a>
+      </span>
+    </p>
+  </section>
+</section>
+<!-- End: Premium Sync CTA -->
+
+<div class="option-page-box">
+  <div class="option-page-content">
+    <div id="message_holder" class="failed_fetch error-message"></div>
+
+    <h1 i18n="filterstabtitle" class="page-title"></h1>
+    <a
+      class="section-padding bottom-line"
+      i18n="filterlistlink"
+      i18n_replacement_el="filterlistlink"
+      href="https://adblockplus.org/en/subscriptions"
+      target="_blank"
+    >
+      <span id="filterlistlink" class="link-text-color"></span>
+    </a>
+
+    <div
+      i18n="updatenowmessage2"
+      i18n_replacement_el="btnUpdateNow"
+      class="add-space-between align-items-center section-padding"
+    >
+      <button
+        class="btn red long right"
+        type="button"
+        id="btnUpdateNow"
+        i18n-aria-label="update_filter_lists_now"
+      ></button>
+    </div>
+
+    <div id="filter_subscriptions">
+      <h2 i18n="adblockinglist" class="paragraph-title"></h2>
+
+      <div id="easylist_info">
+        <b><span i18n="easylist_disable_done"></span></b>
+        <span i18n="easylist_disable_how_to_reenable"></span>
+        <br />
+      </div>
+      <div id="ad_blocking_list"></div>
+      <div id="language_list"></div>
+      <div id="language_dropdown_container">
+        <span i18n="languagedropdowndescription"></span>
+        <div id="language-select-box">
+          <select id="language_select" aria-labelledby="language_dropdown_container">
+            <option value="" i18n="selectlanguage2"></option>
+          </select>
+          <i id="language-select-icon" class="material-icons md-18" role="img" aria-hidden="true"
+            >arrow_drop_down_circle</i
+          >
+        </div>
+      </div>
+
+      <h2 i18n="otherfilters" class="paragraph-title"></h2>
+      <div id="other_filter_lists"></div>
+
+      <h2 i18n="customfilters" class="paragraph-title"></h2>
+      <div id="custom_filter_lists"></div>
+    </div>
+
+    <div class="space-between-line">
+      <input id="txtNewSubscriptionUrl" type="text" />
+      <button
+        class="btn red long"
+        type="button"
+        id="btnNewSubscriptionUrl"
+        i18n="subscribebutton"
+      ></button>
+    </div>
+
+    <a id="btnShowLinks" class="advanced" href="#" i18n="showlinkstolists2"></a>
+
+    <div class="translation_credits italic do-not-display"></div>
+  </div>
+</div>

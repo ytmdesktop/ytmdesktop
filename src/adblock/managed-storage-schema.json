@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "suppress_first_run_page": {
+      "type": "boolean"
+    },
+    "suppress_update_page": {
+      "type": "boolean"
+    },
+    "suppress_surveys": {
+      "type": "boolean"
+    },
+    "suppress_premium_cta": {
+      "type": "boolean"
+    },
+    "additional_subscriptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "remove_subscriptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

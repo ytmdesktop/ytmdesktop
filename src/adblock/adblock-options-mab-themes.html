@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<div class="option-page-box mab-page-box">
+  <div class="option-page-content mab-sub-tab">
+    <section>
+      <!-- Start: Payment section visible only to free MAB users -->
+      <section id="locked-user-pay-section-themes" class="bottom-line" style="display: none;">
+        <p i18n="myadblock_short_description_to_pay"></p>
+        <a
+          id="get-it-now-themes"
+          i18n="get_it_now"
+          class="btn yellow long"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+      </section>
+      <!-- End: Payment section visible only to free MAB users -->
+
+      <div class="align-items-center">
+        <i id="video-icon" class="material-icons md-24" role="img" aria-hidden="true"
+          >featured_video</i
+        >
+        <h1 i18n="themes" class="page-title themes-title"></h1>
+      </div>
+
+      <div>
+        <h2 i18n="popup_menu_theme" class="paragraph-title theme-section-title-top"></h2>
+        <section class="theme-section popup-menu-themes">
+          <div class="theme-selection">
+            <h2 i18n="popup_menu_theme" class="paragraph-title theme-section-title"></h2>
+            <div class="theme-section-row">
+              <div class="theme-wrapper">
+                <div
+                  class="theme-box default-theme"
+                  data-key="popup_menu"
+                  data-theme="default_theme"
+                >
+                  <img src="icons/default_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="default_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img">check</i>
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper">
+                <div class="theme-box dark-theme" data-key="popup_menu" data-theme="dark_theme">
+                  <img src="icons/dark_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="dark_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img">check</i>
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper">
+                <div
+                  class="theme-box rebecca-purple-theme"
+                  data-key="popup_menu"
+                  data-theme="rebecca_purple_theme"
+                >
+                  <img src="icons/rebecca_purple_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="rebecca_purple_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img">check</i>
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box solarized-theme"
+                  data-key="popup_menu"
+                  data-theme="solarized_theme"
+                >
+                  <img src="icons/solarized_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="solarized_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box solarized-light-theme"
+                  data-key="popup_menu"
+                  data-theme="solarized_light_theme"
+                >
+                  <img src="icons/solarized_light_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="solarized_light_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box watermelon-theme"
+                  data-key="popup_menu"
+                  data-theme="watermelon_theme"
+                >
+                  <img src="icons/watermelon_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="watermelon_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div class="theme-box ocean-theme" data-key="popup_menu" data-theme="ocean_theme">
+                  <img src="icons/ocean_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="ocean_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box sunshine-theme"
+                  data-key="popup_menu"
+                  data-theme="sunshine_theme"
+                >
+                  <img src="icons/sunshine_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="sunshine_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+            </div>
+          </div>
+          <div class="theme-preview">
+            <h3 class="theme-title popup-menu-theme-title"></h3>
+            <img class="theme-image popup-menu-theme-preview" />
+          </div>
+        </section>
+
+        <h2 i18n="options_page_theme" class="paragraph-title theme-section-title-top"></h2>
+        <section class="theme-section options-page-themes">
+          <div class="theme-selection">
+            <h2 i18n="options_page_theme" class="paragraph-title theme-section-title"></h2>
+            <div class="theme-section-row">
+              <div class="theme-wrapper">
+                <div
+                  class="theme-box default-theme"
+                  data-key="options_page"
+                  data-theme="default_theme"
+                >
+                  <img src="icons/default_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="default_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img">check</i>
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper">
+                <div class="theme-box dark-theme" data-key="options_page" data-theme="dark_theme">
+                  <img src="icons/dark_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="dark_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img">check</i>
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box solarized-theme"
+                  data-key="options_page"
+                  data-theme="solarized_theme"
+                >
+                  <img src="icons/solarized_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="solarized_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+
+              <div class="theme-wrapper locked">
+                <div
+                  class="theme-box solarized-light-theme"
+                  data-key="options_page"
+                  data-theme="solarized_light_theme"
+                >
+                  <img src="icons/solarized_light_theme/tinycard.svg" aria-hidden="true" />
+                  <input
+                    type="radio"
+                    name="options-page-theme"
+                    class="invisible-radio-button"
+                    i18n-aria-label="solarized_light_theme"
+                  />
+                  <div class="theme-hover-overlay">
+                    <div class="theme-hover-overlay-mask"></div>
+                    <i class="material-icons md-64 overlay-icon" role="img" i18n-aria-label="locked"
+                      >lock_open</i
+                    >
+                  </div>
+                </div>
+                <i
+                  class="material-icons circle-icon-bg-24 theme-selected-icon"
+                  role="img"
+                  i18n-aria-label="selected"
+                  >check_circle</i
+                >
+                <i
+                  class="adblock-icons circle-icon-bg-24 theme-locked-icon"
+                  role="img"
+                  i18n-aria-label="locked"
+                  >lock_circle</i
+                >
+              </div>
+            </div>
+          </div>
+          <div class="theme-preview">
+            <h3 class="theme-title options-page-theme-title"></h3>
+            <img class="theme-image options-page-theme-preview" />
+          </div>
+        </section>
+      </div>
+
+      <div class="translation_credits italic do-not-display"></div>
+    </section>
+    <footer style="display: none;">
+      <section>
+        <h2 i18n="myadblock_feedback_title"></h2>
+        <p i18n="myadblock_feedback_info"></p>
+      </section>
+      <div>
+        <button class="mab-feedback-button" i18n="myadblock_feedback_button"></button>
+      </div>
+    </footer>
+  </div>
+</div>

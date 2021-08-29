@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!-- This file is based on this similar ABP file: -->
+<!-- adblockpluschrome/adblockplusui/devtools-panel.html -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="skin/devtools-panel.css" />
+    <script src="polyfill.js"></script>
+    <script src="ext/common.js"></script>
+    <script src="ext/content.js"></script>
+    <script src="ext/devtools.js"></script>
+    <script src="i18n.js"></script>
+    <script src="devtools-panel.js"></script>
+  </head>
+  <body>
+    <header>
+      <table>
+        <colgroup>
+          <col />
+          <col />
+          <col />
+        </colgroup>
+        <tr>
+          <td colspan="3" data-i18n="devtools_header">
+            <select id="filter-state">
+              <option value="" data-i18n="devtools_header_state_all"></option>
+              <option value="blocked" data-i18n="devtools_header_state_blocked"></option>
+              <option value="whitelisted" data-i18n="devtools_header_state_whitelisted"></option>
+            </select>
+            <select id="filter-type">
+              <option value="" data-i18n="devtools_header_type_any"></option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="request-wrapper">
+              <div class="url" data-i18n="devtools_request_title"></div>
+              <div class="domain" data-i18n="devtools_request_subtitle"></div>
+            </div>
+          </td>
+          <td>
+            <div class="type" data-i18n="devtools_type_title"></div>
+          </td>
+          <td>
+            <div class="filter-wrapper">
+              <div class="filter" data-i18n="devtools_filter_title"></div>
+              <div class="origin" data-i18n="devtools_filter_subtitle"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </header>
+    <div id="items">
+      <table>
+        <colgroup>
+          <col />
+          <col />
+          <col />
+        </colgroup>
+        <tbody></tbody>
+      </table>
+    </div>
+    <footer data-i18n="devtools_footer"></footer>
+
+    <template>
+      <tr>
+        <td>
+          <div class="request-wrapper">
+            <div class="url"></div>
+            <div class="domain"></div>
+          </div>
+        </td>
+        <td>
+          <div class="type"></div>
+        </td>
+        <td>
+          <div class="action-wrapper">
+            <div class="filter-wrapper">
+              <div class="filter">&nbsp;</div>
+              <div class="origin">&nbsp;</div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </template>
+  </body>
+</html>

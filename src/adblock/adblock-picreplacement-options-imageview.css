@@ -1,0 +1,162 @@
+@import "adblock.css";
+
+body {
+  background-color: white;
+}
+#page-wrap {
+  width: 600px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+.center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+}
+#header {
+  background: #f1f1f1;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  height: 84px;
+  z-index: 1;
+  border-bottom: 1px solid #e9e9e9;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
+}
+.section {
+  margin: 110px auto 0;
+  max-width: 600px;
+}
+.missingInfoMessage {
+  display: none;
+  color: #f00;
+}
+.redText {
+  color: #f00;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+.wrap {
+  position: relative;
+  margin: 0px auto;
+  max-width: 600px;
+  padding: 0px 10px;
+}
+.adblock-logo {
+  margin: 10px 0px 0px 10px;
+}
+a {
+  cursor: pointer;
+}
+@media screen and (max-width: 1080px) {
+  .social {
+    display: none;
+  }
+  .step {
+    padding: 10px 20px 10px 0px;
+  }
+  #info {
+    margin: 110px auto 30px 15px;
+  }
+}
+#activation-header {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 36px;
+  color: #02a2ed;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#activation-comment {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 20px;
+  color: #636363;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+}
+#activation-license-status {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 28px;
+  color: white;
+  background-color: #bdbdbd;
+  text-align: center;
+  margin: 20px 0px 0px 0px;
+  vertical-align: middle;
+}
+input[type="text"] {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 20px;
+  color: #aaa;
+  display: block;
+  width: 590px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+}
+#btnActivate {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+  display: block;
+  width: 420px;
+  height: 75px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  background-color: #24a4fd;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  line-height: 75px;
+}
+.inputError {
+  border-color: #f00 !important;
+}
+#errormessage {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 18px;
+  color: #ee0505;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  background-color: white;
+}
+#successmessage {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+  background-color: white;
+  color: #aaa;
+}
+#successmessageDiv {
+  position: relative;
+  margin: 0px auto;
+  max-width: 600px;
+  padding: 0px 20px;
+}
+a {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 14px;
+  display: block;
+  width: 590px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}

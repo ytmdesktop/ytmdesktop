@@ -1,0 +1,347 @@
+/* Core AdBlock stylesheet. */
+
+@import "fonts/font-face.css";
+
+/*
+-----------------------------------------------------------------------------
+Global Styles
+-----------------------------------------------------------------------------
+*/
+
+:root {
+  --gray1: #333333;
+  --gray2: #666666;
+  --gray3: #999999;
+  --gray4: #c6c6c6;
+  --gray5: #e6e6e6;
+  --gray6: #f4f4f4;
+  --red1: #ce0707;
+  --red2: #e40d0d;
+  --red3: #ff363b;
+  --red4: #ff363b;
+  --blue1: #0047ff;
+  --blue2: #03bcfc;
+  --blue3: #4ecdf9;
+  --yellow1: #ff9c00;
+  --yellow2: #ffae00;
+  --yellow3: #ffca00;
+  --green: #10b501;
+  --purple: #663399;
+
+  /* Needed for Pop-up Menu */
+  --popup-main-text-color: #333333;
+  --popup-accent-color: #999999;
+  --popup-separator-color: var(--gray5);
+  --popup-accent-hovered-color: #666666;
+  --premium-badge-bg-color: var(--popup-accent-color);
+  --premium-badge-text-color: white;
+  --premium-badge-border-color: var(--gray3);
+  --block-count-color: #e40d0d;
+  --popup-background-color: #f4f4f4;
+  --popup-card-background-color: white;
+  --popup-url-text-color: #333333;
+  --disabled-link-color: #c6c6c6;
+  --popup-button: #ffca00;
+  --popup-button-text: #666666;
+  --popup-button-disabled-text: #666666;
+  --popup-link-text: var(--blue1);
+  --popup-link-text-decoration: none;
+  --popup-divider-line-color: #e6e6e6;
+  --popup-button-background-color: #f4f4f4;
+  --popup-button-outline-color: var(--gray4);
+  --popup-button-reenable-bg-color: white;
+  --popup-button-reenable-text-color: var(--gray1);
+  --popup-button-reenable-hovered-bg-color: var(--red1);
+  --popup-button-reenable-hovered-text-color: white;
+  --popup-yt-icon-color: #e40d0d;
+  --popup-twitch-icon-color: #663399;
+  /* Additional for Options Page */
+  --background-color: white;
+  --link-color: #2284f7;
+  --main-text-color: #666666;
+  --sidebar-bg-color: #f1f1f1;
+  --checkbox-bg-color: #03bcfc;
+  --not-selected-checkbox-bg-color: #e6e6e6;
+  --bottom-line-color: #e6e6e6;
+  --help-icon-color: #c8c8c8;
+  --help-icon-color-hovered: #666666;
+  --link-hovered-color: #f30d12;
+  --sidebar-link-hovered-color: #333333;
+  --customize-dropdown-menu-icon-color: #f30d12;
+  --standout-text-color: #f30d12;
+  --active-tab-color: #666666;
+  --select-language-border-top-width: 1px;
+  --unselected-toggle-border-color: #e6e6e6;
+  --mab-feature-card-header-locked-bg: #e6e6e6;
+  --mab-feature-card-header-unlocked-bg: #666;
+  --mab-feature-card-header-text-color: white;
+  --mab-teaser-card-header-text-color: #666;
+  --mab-feature-card-text-color: #666;
+  --mab-feature-card-body-bg: #f4f4f4;
+  --options-button-text: white;
+  --options-button-bg: #ff363b;
+  --options-button-complete-bg: #10b501;
+  --options-premium-badge: #666666;
+  /* Defaults for all themes:
+     These are all the same for the current themes,
+     but might be differentiated in future themes */
+  --teaser-theme-box-color: #666666;
+  --mab-button-bg: #ffca00;
+  --options-button-bg-hover: #e40d0d;
+  --options-button-disabled-bg: #999999;
+  --options-button-disabled-bg-hover: #666666;
+  --mab-button-text: #333333;
+  --sync-msg-background-color: #2284f7;
+  /* Aliases of other properties:
+     These are currently all defined by other
+     custom properties, but might be further differentiated
+     in future themes */
+  --popup-link-hovered: var(--block-count-color);
+  --options-page-accent-text: var(--popup-main-text-color);
+  --speech-bubble-border-color: var(--bottom-line-color);
+  --hide-mab-enrollment: var(--help-icon-color);
+  --loading-ellipses: var(--help-icon-color);
+  --mab-feedback-button-border: var(--help-icon-color);
+  --header-social-icons: var(--active-tab-color);
+  --image-swap-section-bg-unselected: var(--sidebar-bg-color);
+  --image-swap-section-bg-selected: var(--background-color);
+  --sync-error-msg-background-color: var(--options-button-bg-hover);
+  --sync-msg-color: var(--options-button-text);
+  /* Aliases for Themes CTA:
+     normally these are defined by other custom properties, but here they are set
+     with the solarized colors since it's the default Theme CTA to use */
+  --popup-themes-cta-icon: #00a498;
+  --popup-themes-cta-text: #90a2a2;
+  --popup-themes-cta-background: #003643;
+  --popup-themes-cta-background-on-hover: #00a498;
+  --popup-themes-cta-color-on-hover: #003643;
+  /* stats-tab entries */
+  --primary-button-text-color: #ffffff;
+  --primary-button-bg-color: #e40d0d;
+  --ancillary-button-bg-color: #ffffff;
+  --ancillary-button-text-color: #666666;
+  --primary-panel-bg-color: #ffffff;
+  --primary-cta-bg-color: #ffca00;
+  --stats-menu-text-color: #000000;
+  --ads-blocked-color: #e40d0d;
+  --trackers-blocked-color: #03bcfc;
+  --ads-replaced-color: #ffae00;
+  --stats-main-text-color: #333333;
+  --stats-overlay-text-color: #666666;
+  --stats-border-color: #c6c6c6;
+  /* Image Swap entries, that are never 'themed' */
+  --icon-notes-main-text-color: white;
+  --icon-notes-background-color: #e40d0d;
+  --image-background-color: white;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-size: 16px;
+  font-style: normal;
+  font-family: "Lato", Arial, sans-serif;
+}
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+textarea::-webkit-scrollbar {
+  width: 14px;
+}
+textarea::-webkit-scrollbar-track {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+textarea::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: #e6e6e6;
+  background-clip: content-box;
+  border: 3px solid transparent;
+}
+
+.inactive {
+  display: none;
+}
+
+/*
+-----------------------------------------------------------------------------
+Icons global styling (needs to @import 'fonts/font-face.css')
+-----------------------------------------------------------------------------
+*/
+
+.adblock-icon,
+.adblock-icons {
+  font-family: "AdBlock Icons";
+}
+
+.material-icons {
+  font-family: "Material Icons";
+}
+
+.adblock-icon,
+.adblock-icons,
+.material-icons {
+  color: #999;
+  cursor: pointer;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+/* Stacking 2 icons */
+.md-stack {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  font-size: 24px;
+  line-height: 24px;
+  position: relative;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* default circular background for 24px icons */
+.circle-icon-bg-24 {
+  background-color: white;
+  clip-path: circle(9.6px);
+  -webkit-clip-path: circle(9.6px);
+}
+
+/* Rules for sizing the icon. */
+.material-icons.md-14 {
+  font-size: 14px;
+}
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-24 {
+  font-size: 24px;
+}
+.material-icons.md-36 {
+  font-size: 36px;
+}
+.material-icons.md-48 {
+  font-size: 48px;
+}
+.material-icons.md-64 {
+  font-size: 64px;
+}
+
+.adblock-icon.md-14 {
+  font-size: 18px;
+}
+.adblock-icon.md-18 {
+  font-size: 18px;
+}
+.adblock-icon.md-24 {
+  font-size: 24px;
+}
+.adblock-icon.md-36 {
+  font-size: 36px;
+}
+.adblock-icon.md-48 {
+  font-size: 48px;
+}
+.adblock-icon.md-64 {
+  font-size: 64px;
+}
+
+.adblock-icons.md-14 {
+  font-size: 18px;
+}
+.adblock-icons.md-18 {
+  font-size: 18px;
+}
+.adblock-icons.md-24 {
+  font-size: 24px;
+}
+.adblock-icons.md-36 {
+  font-size: 36px;
+}
+.adblock-icons.md-48 {
+  font-size: 48px;
+}
+.adblock-icons.md-64 {
+  font-size: 64px;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Rules for rotating an element */
+
+.spin-counter-clockwise {
+  -webkit-animation: spin-counter-clockwise 2s infinite linear;
+  animation: spin-counter-clockwise 2s infinite linear;
+}
+
+@-webkit-keyframes spin-counter-clockwise {
+  0% {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+
+  100% {
+    -webkit-transform: rotate(-359deg);
+    transform: rotate(-359deg);
+  }
+}
+
+@keyframes spin-counter-clockwise {
+  0% {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+
+  100% {
+    -webkit-transform: rotate(-359deg);
+    transform: rotate(-359deg);
+  }
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html id="options-page-html">
+  <head>
+    <title i18n="optionstitle"></title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="adblock-options-options.css" />
+    <link rel="stylesheet" href="adblock-options-tabs.css" />
+    <link rel="stylesheet" href="adblock-options-mab.css" />
+    <link rel="stylesheet" href="adblock-options-stats-tabs.css" />
+    <link rel="stylesheet" href="croppie.css" />
+    <script src="polyfill.js"></script>
+    <script src="jquery-3.5.1.min.js"></script>
+    <script src="purify.min.js"></script>
+    <script src="croppie.js"></script>
+    <script src="Chart.min.js"></script>
+    <script src="adblock-functions.js"></script>
+    <script src="adblock-options-tabs.js"></script>
+    <script src="adblock-options-index.js"></script>
+    <script src="adblock-options-premium-payment.js"></script>
+  </head>
+  <body>
+    <div id="sidebar">
+      <div id="sidebar-content">
+        <section id="sidebar-content-top">
+          <a id="adblock-logo-link" href="https://www.getadblock.com" target="_blank">
+            <img
+              id="sidebar-adblock-logo"
+              i18n-alt="adblock_home"
+              src="icons/default_theme/logo.svg"
+              dir="ltr"
+            />
+            <img
+              id="sidebar-adblock-logo-narrow"
+              i18n-alt="adblock_home"
+              src="icons/ab-38.png"
+              dir="ltr"
+            />
+          </a>
+
+          <nav id="sidebar-tabs">
+            <ul>
+              <li>
+                <a href="#stats-tabs" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true">timeline</i
+                  >&#32;&#32;<span i18n="stats"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#general" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true">settings</i
+                  >&#32;&#32;<span i18n="tabgeneral"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#filters" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true"
+                    >format_list_bulleted</i
+                  >&#32;&#32;<span i18n="tabfilterlists"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#customize" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true">create</i
+                  ><span i18n="tabcustomize"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#support" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true">chat</i
+                  ><span i18n="tabsupport"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#mab" class="tablink">
+                  <i class="material-icons md-18" role="img" aria-hidden="true">account_circle</i>
+                  <span i18n="premium"></span>
+                </a>
+                <ul data-parent-tab="#mab">
+                  <li>
+                    <a href="#mab-themes" class="tablink">
+                      <i class="material-icons md-18 unlocked" role="img" aria-hidden="true"
+                        >featured_video</i
+                      >
+                      <span i18n="themes"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#mab-image-swap" class="tablink">
+                      <i class="material-icons md-18 unlocked" role="img" aria-hidden="true"
+                        >image</i
+                      >
+                      <i class="material-icons md-18 locked" role="img" i18n-aria-label="locked"
+                        >lock</i
+                      >
+                      <span i18n="image_swap"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#sync" class="tablink">
+                      <i class="material-icons md-18 unlocked" role="img" aria-hidden="true"
+                        >sync</i
+                      >
+                      <span i18n="sync_tab_item"></span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </section>
+
+        <section id="sidebar-content-bottom">
+          <section id="rate-us-cta" class="hover-shadow" style="display: none;">
+            <section id="rate-us-tooltip">
+              <div i18n="show_some_love"></div>
+              <div i18n="support_with_a_review"></div>
+            </section>
+
+            <a
+              href="https://chrome.google.com/webstore/detail/adblock-%E2%80%94-best-ad-blocker/gighmmpiobklfepjocnamgkkbiglidom/reviews"
+              id="rate-us"
+              class="btn secondary"
+              target="_blank"
+            >
+              <i class="material-icons md-18" role="img" aria-hidden="true">favorite</i>
+              &nbsp;&nbsp;
+              <span i18n="love_adblock"></span>
+            </a>
+          </section>
+          <section id="waitlist-cta" class="hover-shadow" style="display: none;">
+            <section id="waitlist-tooltip">
+              <div i18n="vpn_coming_soon"></div>
+              <div i18n="join_vpn_waitlist"></div>
+            </section>
+
+            <a
+              href="https://getadblock.com/beta/vpn"
+              id="vpn-waitlist-link"
+              class="btn secondary"
+              target="_blank"
+            >
+              <span class="red-text" i18n="callout_new_feature"></span>&nbsp;<span
+                i18n="adblock_vpn"
+              ></span>
+            </a>
+          </section>
+
+          <div id="sidebar-social-links">
+            <a href="https://facebook.com/heres.adblock" target="_blank">
+              <i class="adblock-icon" aria-label="facebook" role="img">facebook</i>
+            </a>
+            <a id="twitter-icon-link" href="https://twitter.com/getadblock" target="_blank">
+              <i class="adblock-icon" aria-label="twitter" role="img">twitter</i>
+            </a>
+            <a href="https://www.linkedin.com/company/adblock/" target="_blank">
+              <i class="adblock-icon" aria-label="linkedin" role="img">linkedin</i>
+            </a>
+          </div>
+          <div class="top-line">
+            <a href="https://getadblock.com/privacy" i18n="privacy_policy" target="_blank"></a>
+            <div id="version_number"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="tab-content">
+      <div id="stats-tabs" class="tab"></div>
+      <div id="mab" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+      <div id="general" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+      <div id="filters" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+      <div id="customize" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+      <div id="support" class="tab"></div>
+      <div id="mab-image-swap" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+      <div id="sync" class="tab" syncMessageDiv="true" unsyncMessage2Div="true"></div>
+      <div id="mab-themes" class="tab" syncMessageDiv="true" unsyncMessageDiv="true"></div>
+    </div>
+  </body>
+</html>

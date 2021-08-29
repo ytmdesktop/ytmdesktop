@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<div class="option-page-box">
+  <div id="stats-tab-option-page-content" class="option-page-content">
+    <div id="overlay" class="inactive"></div>
+    <div id="no-click-overlay" class="inactive"></div>
+    <div id="delete-overlay-page1" class="inactive">
+      <div id="delete-overlay-content">
+        <div id="delete-overlay-title-div">
+          <div>
+            <i
+              id="delete-overlay-delete-icon"
+              class="material-icons md-24 accent-text"
+              role="img"
+              aria-hidden="true"
+              >delete</i
+            >
+            <span i18n="delete_panel_title"></span>
+          </div>
+          <i
+            id="delete-overlay-close-icon-page1"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="delete"
+            >close</i
+          >
+        </div>
+        <div id="delete-overlay-msg-content">
+          <span i18n="delete_detail_msg_part_I"></span>
+          <span i18n="delete_detail_msg_part_II"></span>
+          <span i18n="delete_detail_msg_part_III"></span>
+        </div>
+        <div class="delete-section-padding">
+          <span class="checkbox md-stack">
+            <input type="checkbox" id="delete_all_stats_data" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+
+          <label for="delete_all_stats_data" i18n="delete_all_stats_data"></label>
+        </div>
+        <div class="delete-section-padding">
+          <span class="checkbox md-stack">
+            <input type="checkbox" id="local_data_collection_opt_out" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+          <label for="local_data_collection_opt_out" i18n="opt_out_stats_data"></label>
+        </div>
+        <div id="delete-overlay-footer-div">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnDelete"
+            i18n="delete"
+          ></button>
+          <button
+            class="ancillaryButton btn short right statsBtn"
+            type="button"
+            id="btnCancelDelete"
+            i18n="buttoncancel"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="delete-overlay-page2" class="inactive">
+      <div id="delete-overlay-content">
+        <div id="delete-overlay-title-div">
+          <div>
+            <i
+              id="delete-overlay-delete-icon"
+              class="material-icons md-24 accent-text"
+              role="img"
+              aria-hidden="true"
+              >delete</i
+            >
+            <span i18n="delete_panel_title"></span>
+          </div>
+          <i
+            id="delete-overlay-close-icon-page2"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="delete"
+            >close</i
+          >
+        </div>
+        <div id="delete-overlay-msg-content">
+          <span i18n="delete_detail_page_2_msg_part_I"></span>
+          <span i18n="delete_detail_msg_part_II"></span>
+          <span i18n="delete_detail_msg_part_III"></span>
+        </div>
+        <div id="delete-overlay-footer-div">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnSureDelete"
+            i18n="stats_im_sure_text_button"
+          ></button>
+          <button
+            class="ancillaryButton btn short right statsBtn"
+            type="button"
+            id="btnGoBack"
+            i18n="stats_go_back_text_button"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="stats-sub-tab">
+      <div id="stats-tab-header">
+        <h1 i18n="statstitle" class="page-title"></h1>
+        <i id="stats-page-delete-icon" class="material-icons md-24 accent-text inactive" role="img"
+          >delete</i
+        >
+      </div>
+      <div id="chartDiv">
+        <div id="no-data-overlay" class="inactive">
+          <div id="no_data_title_div">
+            <i id="delete-overlay-delete-icon" class="material-icons md-24 accent-text" role="img"
+              >warning</i
+            >
+            <span i18n="no_data_title"></span>
+          </div>
+          <div id="no-data-msg-content">
+            <span i18n="no_data_msg_part_I"></span>
+            <span i18n="no_data_msg_part_II"></span>
+          </div>
+        </div>
+        <div id="loadingDiv">
+          <i
+            id="loading_progress"
+            class="spin-counter-clockwise material-icons md-128 accent-text"
+            role="img"
+            i18n-aria-label="loading_in_progress"
+            >loop</i
+          >
+        </div>
+        <canvas id="myChart" class="inactive"></canvas>
+      </div>
+      <div id="stats-menu">
+        <span id="stats-menu-level1">
+          <ul>
+            <li class="chart-parent-tab-link active-stats-menu-item">
+              <a data-chart-type="line" class="statstablink">
+                <span i18n="parent_menu_item_time"></span>
+              </a>
+            </li>
+            <li class="chart-parent-tab-link">
+              <a data-chart-type="bar" class="statstablink">
+                <span i18n="parent_menu_item_site"></span>
+              </a>
+            </li>
+          </ul>
+        </span>
+        <span id="stats-menu-level2-container">
+          <span id="stats-menu-level2">
+            <span id="timeBlocks">
+              <ul>
+                <li class="active-stats-sub-menu-item">
+                  <a
+                    data-filter-function-name="today"
+                    data-label-function-name="hourly"
+                    class="statstablink"
+                  >
+                    <span i18n="sub_menu_item_today"></span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    data-filter-function-name="week"
+                    data-label-function-name="days"
+                    class="statstablink"
+                  >
+                    <span i18n="sub_menu_item_week"></span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    data-filter-function-name="months"
+                    data-label-function-name="months"
+                    class="statstablink"
+                  >
+                    <span i18n="sub_menu_item_month"></span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    data-filter-function-name="year"
+                    data-label-function-name="year"
+                    class="statstablink"
+                  >
+                    <span i18n="sub_menu_item_year"></span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    data-filter-function-name="all"
+                    data-label-function-name="all"
+                    class="statstablink"
+                  >
+                    <span i18n="sub_menu_item_all"></span>
+                  </a>
+                </li>
+              </ul>
+            </span>
+            <span id="siteBlocks" class="statstab" style="display: none;">
+              <ul>
+                <li>
+                  <a data-filter-function-name="today" class="statstablink">
+                    <span i18n="sub_menu_item_all">Today</span>
+                  </a>
+                </li>
+                <li>
+                  <a data-filter-function-name="week" class="statstablink">
+                    <span i18n="sub_menu_item_week"></span>
+                  </a>
+                </li>
+                <li>
+                  <a data-filter-function-name="months" class="statstablink">
+                    <span i18n="sub_menu_item_month"></span>
+                  </a>
+                </li>
+                <li>
+                  <a class="statstablink" data-filter-function-name="year">
+                    <span i18n="sub_menu_item_year"></span>
+                  </a>
+                </li>
+                <li>
+                  <a class="statstablink" data-filter-function-name="all">
+                    <span i18n="sub_menu_item_all"></span>
+                  </a>
+                </li>
+              </ul>
+            </span>
+          </span>
+          <div id="stats-menu-parent-panel">
+            <div id="opt-in-panel" class="stats-menu-content-panel inactive">
+              <div id="opt_in_header" class="bottom-line">
+                <i
+                  id="sync-icon"
+                  class="material-icons md-24 accent-text"
+                  role="img"
+                  aria-hidden="true"
+                  >timeline</i
+                >
+                <span i18n="stats_opt_in_header"></span>
+              </div>
+              <div>
+                <span id="stats_opt_in_msg" i18n="stats_opt_in_msg"></span>
+                <span id="already_opt_in_msg" class="inactive">
+                  <span i18n="stats_already_opted"></span>
+                  <span i18n="stats_opt_in_local_msg"></span>
+                </span>
+                <a
+                  i18n="learn_more_without_period"
+                  i18n_replacement_el="opt_in_learn_more_link"
+                  href="https://help.getadblock.com/support/solutions/articles/6000233382-introduction-to-adblock-stats/"
+                  target="_blank"
+                >
+                  <span id="opt_in_learn_more_link" class="link-text-color"></span>
+                </a>
+              </div>
+              <div id="opt_in_footer">
+                <span id="opt_in_data_collection">
+                  <span class="checkbox md-stack">
+                    <input type="checkbox" id="stats_enable_data_collection" />
+                    <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+                    <i
+                      class="checked material-icons circle-icon-bg-24 checkbox-icon"
+                      role="img"
+                      aria-hidden="true"
+                      >check_circle</i
+                    >
+                  </span>
+                  <a
+                    i18n="stats_opt_in_data_collect"
+                    i18n_replacement_el="opt_in_data_collect_link"
+                    href="https://help.getadblock.com/support/solutions/articles/6000067136"
+                    target="_blank"
+                  >
+                    <span id="opt_in_data_collect_link" class="link-text-color"></span>
+                  </a>
+                </span>
+                <button
+                  class="btn short right primaryButton statsBtn"
+                  type="button"
+                  id="btnStatsOptIn"
+                  i18n="stats_opt_in_text_button"
+                ></button>
+              </div>
+            </div>
+            <div id="timeBlocks-stats" class="stats-menu-content-panel inactive">
+              <div id="adsblocked_panel" class="blocked_value_panel">
+                <span id="adsblocked_header">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                  <span i18n="stats_hide_data"></span>
+                </span>
+                <div id="adsblocked_value">-</div>
+                <div id="adblocked_off_icon">
+                  <i class="material-icons md-48 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                </div>
+                <span id="adsblocked_footer">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >block</i
+                  >
+                  <span i18n="stats_ads_blocked"></span>
+                </span>
+              </div>
+              <div id="trackers_cta_panel" class="blocked_value_panel inactive">
+                <div class="cta_panel">
+                  <div id="trackers_cta_header">
+                    <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                      >gps_fixed</i
+                    >
+                    <span i18n="trackers_cta_header"></span>
+                  </div>
+                  <div class="cta_panel_content">
+                    <a
+                      id="aTrackersEnable"
+                      i18n="trackers_cta_msg"
+                      i18n_replacement_el="trackers_cta_msg_link"
+                    >
+                      <span id="trackers_cta_msg_link" class="link-text-color"></span>
+                    </a>
+                  </div>
+                  <div id="trackers_cta_progress_div" class="inactive">
+                    <i
+                      id="trackers_cta_progress"
+                      class="spin-counter-clockwise material-icons md-64 accent-text"
+                      role="img"
+                      i18n-aria-label="loading_in_progress"
+                      >loop</i
+                    >
+                  </div>
+                  <div id="trackers_cta_footer">
+                    <button
+                      class="btn short statsBtn"
+                      type="button"
+                      id="btnTrackersEnable"
+                      i18n="trackers_button_text"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+              <div id="trackers_blocked_panel" class="blocked_value_panel inactive">
+                <span id="trackers_blocked_header">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                  <span i18n="stats_hide_data"></span>
+                </span>
+                <div id="trackers_blocked_value">-</div>
+                <div id="trackers_off_icon">
+                  <i class="material-icons md-48 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                </div>
+                <span id="trackers_blocked_footer">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >gps_fixed</i
+                  >
+                  <span i18n="stats_trackers_blocked"></span>
+                </span>
+              </div>
+              <div id="premium_cta_panel" class="blocked_value_panel">
+                <div class="cta_panel">
+                  <div id="premium_cta_header">
+                    <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                      >photo</i
+                    >
+                    <span i18n="image_swap"></span>
+                  </div>
+                  <div class="cta_panel_content">
+                    <span i18n="premium_cta_msg"></span>
+                  </div>
+                  <div id="premium_cta_footer">
+                    <button
+                      class="btn short statsBtn"
+                      type="button"
+                      id="btnGetPremium"
+                      i18n="premium_cta_button_text"
+                    ></button>
+                    <button
+                      class="btn short inactive statsBtn"
+                      type="button"
+                      id="btnImageSwapEnable"
+                      i18n="premium_cta_button_text_not_enabled"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+              <div id="ads_replaced_panel" class="blocked_value_panel inactive">
+                <span id="ads_replaced_header">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                  <span i18n="stats_hide_data"></span>
+                </span>
+                <div id="ads_replaced_value">-</div>
+                <div id="ads_replaced_off_icon">
+                  <i class="material-icons md-48 accent-text" role="img" aria-hidden="true"
+                    >visibility_off</i
+                  >
+                </div>
+                <span id="ads_replaced_footer">
+                  <i class="material-icons md-18 accent-text" role="img" aria-hidden="true"
+                    >photo</i
+                  >
+                  <span i18n="stats_replaced_blocked"></span>
+                </span>
+              </div>
+            </div>
+            <div id="siteBlocks-stats" class="inactive">
+              <div id="siteBlocks-stats-content" class="box boxcontent">
+                <div id="domainTableHeader">
+                  <span class="siteHeader" scope="col">Site</span>
+                  <span id="adHeader" scope="col">
+                    <i
+                      class="material-icons md-24 accent-text"
+                      role="img"
+                      i18n-aria-label="stats_ads_blocked_aria_label"
+                      >block</i
+                    >
+                  </span>
+                  <span id="trackerHeader" scope="col">
+                    <i
+                      class="material-icons md-24 accent-text"
+                      role="img"
+                      i18n-aria-label="stats_trackers_blocked_aria_label"
+                      >gps_fixed</i
+                    >
+                  </span>
+                  <span id="replacedHeader" scope="col">
+                    <i
+                      class="material-icons md-24 accent-text"
+                      role="img"
+                      i18n-aria-label="stats_replaced_blocked_aria_label"
+                      >photo</i
+                    >
+                  </span>
+                </div>
+                <div id="table-scroll">
+                  <div id="domainTable"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<div class="sync-message-container">
+  <div id="sync-tab-message" class="sync-message-hidden">
+    <div class="sync-message-box">
+      <i class="material-icons md-24" role="img" aria-hidden="true">access_time</i>
+      <span class="sync-tab-message-text" i18n="sync_header_message_no_license"></span>
+    </div>
+  </div>
+</div>
+
+<div class="option-page-box mab-page-box">
+  <div class="option-page-content mab-sub-tab">
+    <section>
+      <!-- Start: Payment section visible only to free MAB users -->
+      <section id="locked-user-pay-section-sync" class="bottom-line" style="display: none;">
+        <p i18n="sync_premium_cta"></p>
+        <a
+          id="get-it-now-sync"
+          i18n="get_it_now"
+          class="btn yellow long"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+      </section>
+      <!-- End: Payment section visible only to free MAB users -->
+
+      <div id="sync-title-block" class="content-block">
+        <div class="align-items-center">
+          <i id="sync-icon" class="material-icons md-24 accent-text" role="img" aria-hidden="true"
+            >sync</i
+          >
+          <h1 id="sync-title" i18n="sync_tab_item" class="page-title"></h1>
+        </div>
+        <div id="toggle-sync-details" class="content-block" style="display: none;">
+          <p></p>
+          <i class="material-icons md-24" role="img" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div id="sync-box" class="accent-box main-text content-block">
+        <div id="sync-text">
+          <div id="sync-description">
+            <span i18n="backup_sync_settings"></span>
+            <span i18n="set_preferences_once"></span>
+          </div>
+          <a
+            class="link-text-color"
+            href="https://help.getadblock.com/support/solutions/articles/6000225588-using-premium-s-sync-feature/"
+            target="_blank"
+            i18n="learn_more_without_period"
+          ></a>
+        </div>
+        <img id="sync-image" alt="" src="icons/sync-image.svg" />
+      </div>
+
+      <a
+        id="get-sync"
+        i18n="get_sync"
+        class="btn yellow"
+        target="_blank"
+        href="https://getadblock.com/premium/enrollment/"
+        style="display: none;"
+      ></a>
+      <button
+        id="btnCheckStatus"
+        class="btn"
+        i18n="check_sync_status"
+        type="button"
+        style="display: none;"
+      ></button>
+
+      <div id="sync-info-block" style="display: none;">
+        <div id="sync-extension-block" class="bottom-line content-block">
+          <div
+            id="sync_extension_section_list_title"
+            class="accent-text main-text"
+            i18n="sync_extension_section_title"
+          ></div>
+          <div id="last-sync-now" class="content-block">
+            <div id="last-updated-on"></div>
+            <button
+              id="btnSyncNow"
+              i18n="sync_now_btn_text"
+              class="btn non-focused-btn"
+              type="button"
+            ></button>
+          </div>
+          <button
+            id="btnAddThisExtension"
+            i18n="add_this_extension"
+            class="btn red"
+            type="button"
+          ></button>
+          <button
+            id="btnCancelSyncName"
+            i18n="buttoncancel"
+            class="btn non-focused-btn"
+            type="button"
+            style="display: none;"
+          ></button>
+          <div id="show-verify-message" class="content-block" style="display: none;">
+            <i id="alert-icon" class="material-icons md-24" role="img" aria-hidden="true"
+              >warning</i
+            >
+            <div i18n="sync_verify_turn_on_text"></div>
+          </div>
+          <div id="verify-overwrite-div" class="content-block" style="display: none;">
+            <button
+              i18n="buttonok"
+              class="btn red button-pair"
+              type="button"
+              id="btnVerifyOK"
+            ></button>
+            <button
+              i18n="buttoncancel"
+              class="btn button-pair non-focused-btn"
+              type="button"
+              id="btnVerifyCancel"
+            ></button>
+          </div>
+        </div>
+        <p
+          id="sync_extension_no_extension_msg"
+          class="accent-text main-text"
+          i18n="sync_extension_no_extension_msg"
+        ></p>
+        <div id="sync-no-click-overlay" class="inactive"></div>
+        <div id="sync-delete-overlay" class="inactive">
+          <div id="delete-overlay-content">
+            <div id="sync-delete-overlay-title-div">
+              <span i18n="sync_delete_panel_title"></span>
+            </div>
+            <div id="sync-delete-overlay-msg-content">
+              <span i18n="confirm_delete_extension"></span>
+              <span i18n="cannot_be_undone"></span>
+            </div>
+            <div id="sync-delete-overlay-footer-div">
+              <button
+                class="ancillaryButton btn short right statsBtn"
+                type="button"
+                id="btnSyncCancelDeleteDevice"
+                i18n="buttoncancel"
+              ></button>
+              <button
+                class="btn red short right statsBtn"
+                type="button"
+                id="btnSyncDeleteDevice"
+                i18n="delete"
+              ></button>
+            </div>
+          </div>
+        </div>
+        <div id="sync-loadingDiv">
+          <i
+            id="loading_progress"
+            class="spin-counter-clockwise material-icons md-128 accent-text"
+            role="img"
+            i18n-aria-label="loading_in_progress"
+            >loop</i
+          >
+        </div>
+        <div id="sync-extension-list-div"></div>
+        <div id="enter-name-div" style="display: none;">
+          <div id="enter-name-child-div">
+            <input
+              id="extension-name"
+              class="accent-text"
+              type="text"
+              i18n_placeholder="sync_extension_name_placeholder"
+            />
+            <button id="btnSaveSyncName" i18n="add" class="btn red" type="button"></button>
+          </div>
+          <p class="error-message" id="error-message"></p>
+        </div>
+      </div>
+      <div class="translation_credits italic do-not-display"></div>
+    </section>
+    <footer style="display: none;">
+      <section>
+        <h2 i18n="myadblock_feedback_title"></h2>
+        <p i18n="myadblock_feedback_info"></p>
+      </section>
+      <div>
+        <button class="mab-feedback-button" i18n="myadblock_feedback_button"></button>
+      </div>
+    </footer>
+  </div>
+</div>

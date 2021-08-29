@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<div class="option-page-box mab-page-box">
+  <div class="option-page-content">
+    <section>
+      <!-- Start: Payment section visible only to free MAB users -->
+      <section id="locked-user-pay-section-mab" class="bottom-line" style="display: none;">
+        <p i18n="myadblock_short_description_to_pay"></p>
+        <a
+          id="get-it-now-mab"
+          i18n="get_it_now"
+          class="btn yellow long"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+      </section>
+      <!-- End: Payment section visible only to free MAB users -->
+
+      <header id="premium-tab-header">
+        <span class="align-items-center">
+          <span class="page-title"></span>
+          <span id="premium_status_msg" class="status_msg"> </span>
+        </span>
+        <a
+          id="manage-subscription"
+          class="link-text-color"
+          i18n="manage_subscription"
+          href="#"
+          target="_blank"
+          style="display: none;"
+        ></a>
+      </header>
+
+      <div id="myadblock-features">
+        <!-- START: Themes tab feature -->
+        <div class="mab-feature hover-shadow">
+          <a href="#mab-themes">
+            <section class="mab-feature-header">
+              <i class="material-icons md-24 header-icon" role="img" aria-hidden="true"
+                >featured_video</i
+              >
+              <span i18n="make_adblock_yours_title"></span>
+            </section>
+            <section class="mab-feature-body">
+              <span i18n="make_adblock_yours_description"></span>
+              <section class="feature-preview">
+                <img
+                  id="themes-preview"
+                  i18n-alt="example_themes"
+                  src="icons/themes_darktext.svg"
+                />
+              </section>
+            </section>
+          </a>
+        </div>
+        <!-- END: Themes tab feature -->
+
+        <!-- START: Image Swap tab feature -->
+        <div class="mab-feature hover-shadow">
+          <a href="#mab-image-swap">
+            <section class="mab-feature-header">
+              <i class="material-icons md-24 header-icon" role="img" aria-hidden="true">photo</i>
+              <span i18n="see_photos_no_ads_title"></span>
+            </section>
+            <section class="mab-feature-body">
+              <span i18n="see_photos_no_ads_description"></span>
+              <section class="feature-preview">
+                <img
+                  id="image-swap-preview"
+                  i18n-alt="image_swap_example"
+                  src="icons/image-swap-preview@2x.png"
+                />
+              </section>
+            </section>
+          </a>
+        </div>
+        <!-- END: Image Swap tab feature -->
+
+        <!-- START: Sync tab feature -->
+        <div class="mab-feature hover-shadow">
+          <a href="#sync">
+            <section class="mab-feature-header">
+              <i class="material-icons md-24 header-icon" role="img" aria-hidden="true">sync</i>
+              <span i18n="sync_your_settings_title"></span>
+            </section>
+            <section class="mab-feature-body">
+              <span i18n="sync_your_settings_description"></span>
+              <section class="feature-preview">
+                <img id="sync-preview" i18n-alt="sync_example" src="icons/sync-preview.svg" />
+              </section>
+            </section>
+          </a>
+        </div>
+        <!-- END: Sync tab  tab feature -->
+
+        <!-- START: Teaser -->
+        <div class="mab-feature teaser">
+          <section class="mab-feature-header">
+            <i class="material-icons md-24 header-icon" role="img" aria-hidden="true"
+              >access_time</i
+            >
+            <span i18n="myadblock_more_coming_soon"></span>
+          </section>
+          <section class="mab-feature-body">
+            <span i18n="premium_benefits_explained"></span>
+          </section>
+        </div>
+        <!-- END: Teaser -->
+      </div>
+      <div class="translation_credits italic do-not-display"></div>
+    </section>
+
+    <footer style="display: none;">
+      <section>
+        <h2 i18n="myadblock_feedback_title"></h2>
+        <p i18n="myadblock_feedback_info"></p>
+      </section>
+      <div>
+        <button class="mab-feedback-button" i18n="myadblock_feedback_button"></button>
+      </div>
+    </footer>
+  </div>
+</div>

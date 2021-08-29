@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<div class="option-page-box mab-page-box">
+  <div class="option-page-content mab-sub-tab">
+    <!-- Start: Payment section visible only to free MAB users -->
+    <section id="locked-user-pay-section-image-swap" class="bottom-line" style="display: none;">
+      <p i18n="myadblock_short_description_to_pay"></p>
+      <a
+        id="get-it-now-image-swap"
+        i18n="get_it_now"
+        class="btn yellow long"
+        target="_blank"
+        href="https://getadblock.com/premium/enrollment/"
+      ></a>
+    </section>
+    <!-- End: Payment section visible only to free MAB users -->
+
+    <div id="swap-edit-overlay" class="inactive"></div>
+    <div id="swap-edit-no-click-overlay" class="inactive"></div>
+    <div id="swap-edit-overlay-page" class="inactive">
+      <div id="swap-edit-overlay-content">
+        <div id="swap-edit-overlay-title-div">
+          <span i18n="edit_image"></span>
+          <i
+            id="swap-edit-overlay-close-icon-page"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="close"
+            >close</i
+          >
+        </div>
+        <div id="swap-edit-overlay-header">
+          <span i18n="edit_image_msg_partI"></span>
+          <span i18n="edit_image_msg_partII"></span>
+        </div>
+        <div id="image-swap-custom-container">
+          <img id="image-swap-custom-image-upload" />
+        </div>
+        <div id="image-swap-custom-sizes">
+          <div
+            id="sample-size-small"
+            class="image-swap-sample-selected"
+            data-viewport-width="161"
+            data-viewport-height="134"
+            data-image-width="336"
+            data-image-height="280"
+          >
+            336 x 280
+          </div>
+          <div
+            id="sample-size-large"
+            class="image-swap-sample"
+            data-image-width="1200"
+            data-image-height="641"
+            data-viewport-width="160"
+            data-viewport-height="83"
+          >
+            1200 x 641
+          </div>
+          <div
+            id="sample-size-medium"
+            class="image-swap-sample"
+            data-viewport-width="160"
+            data-viewport-height="133"
+            data-image-width="300"
+            data-image-height="250"
+          >
+            300 x 250
+          </div>
+        </div>
+        <div id="swap-edit-overlay-footer">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnDoneEditAdd"
+            i18n="savebutton"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="swap-delete-overlay-page" class="inactive">
+      <div id="swap-delete-overlay-content">
+        <div id="swap-delete-overlay-title-div">
+          <span i18n="remove_image"></span>
+          <i
+            id="swap-delete-overlay-close-icon-page"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="close"
+            >close</i
+          >
+        </div>
+        <div id="swap-delete-overlay-header">
+          <span i18n="remove_image_msg"></span>
+        </div>
+        <div id="swap-delete-overlay-footer">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnSwapDelete"
+            i18n="buttonremove"
+          ></button>
+          <button
+            class="ancillaryButton btn short right"
+            type="button"
+            id="btnSwapCancelDelete"
+            i18n="buttonkeep"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="swap-error-overlay-page" class="inactive">
+      <div id="swap-error-overlay-content">
+        <div id="swap-error-overlay-title-div">
+          <span i18n="custom_image_error"></span>
+          <i
+            id="swap-error-overlay-close-icon-page"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="close"
+            >close</i
+          >
+        </div>
+        <div id="swap-error-overlay-header">
+          <span i18n="custom_image_error_msg_partI"></span>
+          <span i18n="custom_image_error_msg_partII"></span>
+          <span
+            i18n="custom_image_error_msg_partIII"
+            i18n_replacement_el="custom_image_error_msg_link"
+          >
+            <a
+              href="https://help.getadblock.com/support/solutions/articles/6000234476-about-custom-image-swap/"
+              id="custom_image_error_msg_link"
+              target="_blank"
+              class="link-text-color link-to-tab"
+            ></a>
+          </span>
+        </div>
+        <div id="swap-error-overlay-footer">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnSendDebug"
+            i18n="senddebugdata"
+          ></button>
+          <button
+            class="ancillaryButton btn short right"
+            type="button"
+            id="btnDontSend"
+            i18n="dontsend"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="swap-unsupported-overlay-page" class="inactive">
+      <div id="swap-unsupported-overlay-content">
+        <div id="swap-unsupported-overlay-title-div">
+          <span i18n="custom_image_unsupported_title"></span>
+          <i
+            id="swap-unsupported-overlay-close-icon-page"
+            class="material-icons md-24 accent-text"
+            role="img"
+            i18n-aria-label="close"
+            >close</i
+          >
+        </div>
+        <div id="swap-unsupported-overlay-header">
+          <span i18n="custom_image_unsupported_msg_partI"></span>
+          <span i18n="custom_image_unsupported_msg_partII"></span>
+
+          <p i18n="custom_image_supported_file_types"></p>
+        </div>
+        <div id="swap-unsupported-overlay-footer">
+          <button
+            class="btn red short right statsBtn"
+            type="button"
+            id="btnUnsupportedOK"
+            i18n="ok"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div class="align-items-center">
+      <i id="photo-icon" class="material-icons md-24" role="img" aria-hidden="true">photo</i>
+      <h1 i18n="image_swap" class="page-title"></h1>
+    </div>
+
+    <h3 class="paragraph-title" i18n="myadblock_pic_replacemenet_description"></h3>
+
+    <p class="section-title" i18n="myadblock_picreplacement_exlained"></p>
+
+    <ul id="channel-options">
+      <li class="channel-box custom-channel-disable">
+        <div id="do_not_swap_ads_panel" class="channel-box-content">
+          <i class="material-icons md-48" role="img" i18n-aria-label="do_not_swap_ads">block</i>
+          <div i18n="do_not_swap_ads"></div>
+        </div>
+        <i class="material-icons circle-icon-bg-24 selected-icon" role="img">check_circle</i>
+        <input id="no-channel" data-channel-id="none" type="checkbox" class="invisible-overlay" />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-cats"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="cats"
+          class="channel-image"
+          i18n-alt="catchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-cat-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="CatsChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="catchannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-dogs"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="dogs"
+          class="channel-image"
+          i18n-alt="dogchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-dog-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+
+        <input
+          id="DogsChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="dogchannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-landscapes"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="landscapes"
+          class="channel-image"
+          i18n-alt="landscapechannelswitchlabel"
+          src="icons/adblock-picreplacement-images-landscape-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="LandscapesChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="landscapechannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-goats"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="goats"
+          class="channel-image"
+          i18n-alt="goatchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-goat-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="GoatsChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="goatchannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-ocean"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="ocean"
+          class="channel-image"
+          i18n-alt="oceanchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-ocean-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="OceanChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="oceanchannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-food"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="food"
+          class="channel-image"
+          i18n-alt="foodchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-food-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="FoodChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="foodchannelswitchlabel"
+        />
+      </li>
+
+      <li class="channel-box image-box">
+        <a
+          id="get-it-now-bird"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <img
+          id="bird"
+          class="channel-image"
+          i18n-alt="birdchannelswitchlabel"
+          src="icons/adblock-picreplacement-images-bird-grayscale.png"
+        />
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="BirdChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="birdchannelswitchlabel"
+        />
+      </li>
+
+      <li id="custom-channel-box" class="channel-box image-box custom-channel-disable">
+        <a
+          id="get-it-now-custom"
+          target="_blank"
+          href="https://getadblock.com/premium/enrollment/"
+        ></a>
+        <div class="channel-box-content">
+          <i
+            id="favorite_icon"
+            class="material-icons md-48 favorite_icon_disable"
+            role="img"
+            i18n-aria-label="custom_images"
+            >favorite_border</i
+          >
+          <div i18n="custom_images"></div>
+        </div>
+        <i
+          class="material-icons circle-icon-bg-24 selected-icon"
+          role="img"
+          i18n-aria-label="selected"
+          >check_circle</i
+        >
+        <i class="adblock-icon circle-icon-bg-24 locked-icon" role="img" i18n-aria-label="selected"
+          >lock_circle</i
+        >
+        <i class="material-icons md-64 hovered" role="img" aria-hidden="true">lock_open</i>
+        <input
+          id="CustomChannel"
+          type="checkbox"
+          class="invisible-overlay"
+          i18n-aria-label="customchannelswitchlabel"
+        />
+      </li>
+    </ul>
+
+    <div id="custom-image-upload-section" class="inactive">
+      <h3 class="paragraph-title" i18n="custom_images"></h3>
+
+      <p class="section-title" i18n="custom_image_description"></p>
+
+      <ul id="custom-channel-options">
+        <li id="custom-channel-options-add-icon" class="custom-channel-box">
+          <label for="custom-images" id="upload_content_icon_label">
+            <i id="upload_content_icon" class="material-icons md-48" role="img">add_a_photo</i>
+          </label>
+          <input
+            id="custom-images"
+            name="custom-images"
+            type="file"
+            accept="image/*"
+            multiple="false"
+          />
+        </li>
+      </ul>
+    </div>
+
+    <div class="translation_credits italic do-not-display"></div>
+    <footer style="display: none;">
+      <section>
+        <h2 i18n="myadblock_feedback_title"></h2>
+        <p i18n="myadblock_feedback_info"></p>
+      </section>
+      <div>
+        <button class="mab-feedback-button" i18n="myadblock_feedback_button"></button>
+      </div>
+    </footer>
+    <canvas id="thumbnail-image-swap-canvas" />
+    <img id="thumbnail-image-swap-image" />
+    <canvas id="temp-croppie-image-swap-canvas" />
+  </div>
+</div>

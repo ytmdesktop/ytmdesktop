@@ -1,0 +1,231 @@
+:host {
+  all: initial;
+
+  --icon-color: #dadada;
+  --text-color: #333333;
+  --button-color: white;
+  --button-background: #2284f7;
+  --button-background-hover: #e40d0d;
+  --icon-color: #999999;
+  --icon-color-hover: #666666;
+  --icon-border-color: #e6e6e6;
+  --premium-accent: #ffca00;
+  --link-color: #2284f7;
+  --main-icon-background-color: #f4f4f4;
+  --thumb-background-color: #c4c4c4;
+}
+
+* {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 16px;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  cursor: pointer;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  color: var(--icon-color);
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+.material-icons:hover {
+  color: var(--icon-color-hover);
+}
+
+/* RTL language */
+
+[dir="rtl"] {
+  left: auto;
+  right: 75px;
+}
+
+#overlayIcon {
+  height: 32px;
+  width: 32px;
+  float: right;
+  cursor: pointer;
+}
+
+#iconlogo {
+  position: relative;
+  left: 5px;
+  top: 32px;
+  display: inline-block;
+}
+
+#header-icons {
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--icon-border-color);
+  padding-bottom: 8px;
+}
+
+#header-icons .material-icons {
+  color: var(--icon-color);
+  opacity: 0.5;
+}
+#header-icons .material-icons:hover {
+  opacity: 1;
+}
+
+#header-icons .material-icons:focus {
+  outline: #2284f7 auto 5px;
+  opacity: 1;
+}
+
+#settingsIcon {
+  margin-right: 8px;
+}
+
+.hoverOverIcon {
+  position: fixed;
+  bottom: 100px;
+  right: -300px;
+  animation: slideInFromRight 2s forwards;
+  animation-delay: 1s;
+}
+
+.grow {
+  display: none;
+  opacity: 0;
+  width: 288px;
+  height: 179px;
+  padding: 8px 16px 24px 16px;
+}
+
+.hoverOverIcon:hover .grow {
+  display: block;
+  animation-duration: 750ms;
+  animation-name: showMore;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes slideInFromRight {
+  100% {
+    right: 50px;
+  }
+}
+
+@keyframes showMore {
+  from {
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  75% {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.speech-bubble {
+  position: relative;
+  background-color: var(--main-icon-background-color);
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  bottom: -20px;
+  right: -14px;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 90%;
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-top-color: var(--main-icon-background-color);
+  border-bottom: 0;
+  margin-left: -5px;
+  margin-bottom: -12px;
+}
+
+#speech-bubble-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 143px;
+}
+
+#titleText {
+  font-weight: bold;
+  line-height: 22px;
+  color: var(--text-color);
+  margin: 12px 0;
+  align-content: flex-start;
+}
+
+#msgText {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--text-color);
+  width: 100%;
+  height: 48px;
+  margin-bottom: 17px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumb-background-color) var(--scrollbarBG);
+}
+#msgText::-webkit-scrollbar {
+  width: 8px;
+}
+#msgText::-webkit-scrollbar-track {
+  background-color: var(--main-icon-background-color);
+}
+#msgText::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-background-color);
+  border-radius: 6px;
+}
+#footer {
+  align-content: flex-end;
+}
+#btnLearnMore {
+  float: right;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 17px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  margin: 0px 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--button-color);
+  background-color: var(--button-background);
+  min-width: 176px;
+}

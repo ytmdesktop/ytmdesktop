@@ -1,0 +1,39 @@
+#_ABoverlay {
+  padding: 0;
+  margin: 0;
+  font: 13px Arial, Helvetica;
+  text-transform: none;
+  font-size: 100%;
+  vertical-align: baseline;
+  line-height: normal;
+  position: fixed;
+  z-index: 2147483647 !important;
+
+  /* CSS reset */
+  div,
+  span,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  em,
+  img,
+  strong,
+  ol,
+  ul,
+  li {
+    padding: 0;
+    margin: 0;
+    font: 13px Arial, Helvetica;
+    text-transform: none;
+    font-size: 100%;
+    vertical-align: baseline;
+    line-height: normal;
+    color: #fff;
+    position: static;
+  }
+}

@@ -1,0 +1,3420 @@
+{
+   "a_theme_preview": {
+      "description": "Text in the alt attribute of the image previewing a theme on an extension page.",
+      "message": "קדם־תצוגה של ערכת נושא $theme_name$ עבור $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "pop-up menu"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "aalinkadreport": {
+      "description": "Acceptable Ads link message on ad report page",
+      "message": "גלה עוד אודות תוכנית הפרסומות המקובלות."
+   },
+   "aamessageadreport": {
+      "description": "Acceptable Ads message on ad report page",
+      "message": "אם אתה מעדיף לא לראות פרסומות כמו זאת, תרצה כנראה להשאיר את רשימת מסנני הפרסומות המקובלות כבויה."
+   },
+   "ab_filters_subscription_lastDownload_checksumMismatch": {
+      "description": "Filter lists tab of the Options page: Corrupted filter list file.",
+      "message": "נכשל, סיכום ביקורת אינו תואם"
+   },
+   "ab_filters_subscription_lastDownload_connectionError": {
+      "description": "Filter lists tab of the Options page: Generic filter list download error message.",
+      "message": "נכשל, כישלון הורדה"
+   },
+   "ab_filters_subscription_lastDownload_invalidData": {
+      "description": "Filter lists tab of the Options page: Invalid filter list file.",
+      "message": "נכשל, לא רשימת מסננים תקפה"
+   },
+   "ab_filters_subscription_lastDownload_invalidURL": {
+      "description": "Filter lists tab of the Options page: Message when you subscribe to a non-list URL.",
+      "message": "נכשל, כתובת אינה תקפה"
+   },
+   "aboutadblock": {
+      "description": "Subtitle on the Support tab",
+      "message": "אודות AdBlock"
+   },
+   "acceptable_ads_content_blocking_disbled_message": {
+      "description": "Warning shown when Safari Content Blocking is enabled while the Acceptable Ads filter list was already enabled.",
+      "message": "ביטלנו את הרשמתך כמנוי מפרסומות מקובלות מאחר שהפעלת את חסימת התוכן של Safari. אתה יכול לבחור רק באחד בכל פעם. ([[למה?]])"
+   },
+   "acceptable_ads_privacy": {
+      "description": "The text of an Acceptable Ads sub-option in the General tab",
+      "message": "התר רק פרסומות בלי מעקב צד־שלישי"
+   },
+   "acceptableadsdisable_done": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "אינך רשום כמנוי אל רשימת המסננים של הפרסומות המקובלות."
+   },
+   "acceptableadsdisable_how_to_reenable": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "אתה יכול להפעיל זאת חזרה ולתמוך באתרים שאתה אוהב ע״י בחירה \"התר מעט פרסום בלתי פולשני\" למטה."
+   },
+   "acceptableadsoption": {
+      "description": "Checkbox on the 'General' tab of the Options page to enable the Acceptable Ads filter list",
+      "message": "התר מעט פרסום בלתי פולשני"
+   },
+   "access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "השג גישה קלה אל התוכן שאתה אוהב בלי להשבית את AdBlock!"
+   },
+   "ad_everywhere_malware": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אם אתה רואה פרסומת זו בכל מקום, ייתכן שאתה נגוע בנוזקה."
+   },
+   "adalreadyblocked": {
+      "description": "On the ad report page, telling the user there is nothing to do as the ad they were seeing is now blocked.",
+      "message": "מצוין! אתה מוכן."
+   },
+   "adblock_click_for_details": {
+      "description": "Tooltip on the AdBlock button, to help users understand that they can click the button to access more options.",
+      "message": "AdBlock - לחץ לפרטים"
+   },
+   "adblock_facebook": {
+      "description": "Title for link to AdBlock's Facebook account",
+      "message": "Facebook של AdBlock"
+   },
+   "adblock_home": {
+      "description": "Text in the alt attribute of an AdBlock logo / icon that links to getadblock.com.",
+      "message": "בית AdBlock"
+   },
+   "adblock_logo": {
+      "description": "Text in the alt attribute of an AdBlock logo image.",
+      "message": "סמליל AdBlock"
+   },
+   "adblock_looked_like_this": {
+      "description": "Part 1 of a call-to-action on the Popup menu",
+      "message": "מה אם AdBlock נראה כך?"
+   },
+   "adblock_premium": {
+      "description": "Full name of the AdBlock upgrade.",
+      "message": "AdBlock Premium"
+   },
+   "adblock_twitter": {
+      "description": "Title for link to AdBlock's Twitter account",
+      "message": "Twitter של AdBlock"
+   },
+   "adblock_vpn": {
+      "description": "Text of a Options page lower menu button",
+      "message": "AdBlock VPN"
+   },
+   "adblock_website": {
+      "description": "Title for link to AdBlock's website",
+      "message": "דף הבית של AdBlock"
+   },
+   "adblock_will_block_ads_again": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "במקרה שנלחץ, AdBlock יחסום פרסומות שוב."
+   },
+   "adblock_will_pause_on_all_sites": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "במקרה שנלחץ, AdBlock יפסיק לחסום פרסומות בכל האתרים."
+   },
+   "adblock_will_pause_on_this_site": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on this site.",
+      "message": "במקרה שנלחץ, AdBlock יפסיק לחסום פרסומות באתר זה."
+   },
+   "adblock_wont_run_on_pages_matching": {
+      "description": "Message displayed when the allowlist wizard will allowlist part of an entire website, for example '*.google.com/reader/*'.  The URL will appear on the next line.",
+      "message": "AdBlock לא ירוץ על כל דף שתואם אל:"
+   },
+   "adblockinglist": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block ads.",
+      "message": "רשימות מסננים של חסימת פרסומות"
+   },
+   "adblockreportinganad": {
+      "description": "Title of the ad report page",
+      "message": "AdBlock - דיווח על פרסומת"
+   },
+   "adblocksupport": {
+      "description": "Title of the Support tab of the Options page",
+      "message": "תמיכת AdBlock"
+   },
+   "adblockupdates": {
+      "description": "Subtitle on the Support tab",
+      "message": "עדכוני AdBlock"
+   },
+   "add": {
+      "description": "Button on Sync tab that adds an entered name for this extension to the list of synced extensions",
+      "message": "הוסף"
+   },
+   "add_info": {
+      "description": "section title on hidding wizard, shown when advance user option enabled",
+      "message": "מידע נוסף"
+   },
+   "add_this_extension": {
+      "description": "Button on Sync tab that adds this extension to the Sync process",
+      "message": "הוסף הרחבה זו"
+   },
+   "additional_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "צריך עזרה נוספת?"
+   },
+   "additional_troubleshooting": {
+      "description": "Message for help flow in popup menu.",
+      "message": "הנה מספר [[צעדים נוספים של פיתרון תקלות]] שאתה יכול לבצע כדי לפתור סוגייה זו."
+   },
+   "adreport_all_debug_info": {
+      "description": "Shows the user the debug information that will be sent along with their report.",
+      "message": "המידע הבא גם יכלל בדוח הפרסומות."
+   },
+   "adreport_email": {
+      "description": "Label for a textbox where the user enters their email address to submit a bug or ad report.",
+      "message": "מה כתובת הדוא״ל שלך?"
+   },
+   "adreport_email_privacy": {
+      "description": "Let the user know that their email address won't be used for reasons other than contacting them about their bug or ad report.",
+      "message": "נשתמש בזה רק כדי ליצור איתך קשר אם נצטרך עוד מידע."
+   },
+   "adreport_filter": {
+      "description": "Optional question on the ad report page when the ad needs to be reported to AdBlock.",
+      "message": "במקרה שיצרת מסנן עובד ע״י שימוש באשף \"חסום פרסומת\", הדבק אותו בתיבה להלן:"
+   },
+   "adreport_laststep": {
+      "description": "Subtitle on the ad report page. Shown when the ad needs to be reported to AdBlock, and not filter list maintainers.",
+      "message": "צעד אחרון: דווח לנו על הסוגייה."
+   },
+   "adreport_location": {
+      "description": "Question on the ad report page asking the user to describe the ad and its location on a webpage.",
+      "message": "איפה בדיוק בדף זה הפרסומת נמצאת? איך היא נראית?"
+   },
+   "adreport_missing_info": {
+      "description": "Error message shown when the user doesn't enter anything in some of the text fields.",
+      "message": "מידע דרוש חסר או בלתי־תקף. אנא מלא את השאלות שיש להן גבול אדום."
+   },
+   "adreport_missing_screenshot": {
+      "description": "Error message shown when the user doesn't attach a screenshot to an ad report.",
+      "message": "שכחת לצרף צילום מסך! איננו יכולים לעזור לך בלי לראות את הפרסומת (או הפרסומות) שאתה מדווח עליה."
+   },
+   "adreport_name": {
+      "description": "Label for a textbox where the user enters their name (or nickname) to submit a bug or ad report.",
+      "message": "מה שמך?"
+   },
+   "adreport_response_file_name": {
+      "description": "Error message shown when the file name of an attachement the user is trying to submit in a report is longer than 255 characters.",
+      "message": "שם הקובץ הזה ארוך מדי. אנא תן לקובץ שלך שם קצר יותר."
+   },
+   "adreport_response_invalid_file": {
+      "description": "Error message shown when the user uploads an invalid file type.",
+      "message": "זה אינו קובץ תמונה. אנא העלה קובץ gif ,png או jpg."
+   },
+   "adreport_response_large_file": {
+      "description": "Error message shown when the user tries to upload a large image file.",
+      "message": "הקובץ הזה גדול מדי. אנא וודא שהקובץ שלך הוא פחות מ־10 מ\"ב."
+   },
+   "adreport_response_save_error": {
+      "description": "Error message shown when the server could not save an attached file.",
+      "message": "שגיאה בשמירת הקובץ המועלה."
+   },
+   "adreport_response_success": {
+      "description": "Shown when a ticket has been sumbitted to AdBlock's support site successfully.",
+      "message": "הכל מוכן! נהיה בקשר בהקדם האפשרי. בינתיים, חפש דוא״ל מאת AdBlock. תמצא שם קישור אל הכרטיס שלך באתר העזרה שלנו, ביחד עם מספר הצעות עזרה־עצמית אם איננו יכולים לחזור אליך מיד."
+   },
+   "adreport_screen_cap_upload": {
+      "description": "Label next to a file upload button.",
+      "message": "צרף צילום מסך:"
+   },
+   "adreport_server_response_error__manual_msg_step1": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "אנא לך אל [[אתר התמיכה שלנו]]."
+   },
+   "adreport_server_response_error__manual_msg_step2": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "וצור כרטיס באופן ידני, והעתק והדבק את המידע להלן לתוך הקטע \"Fill in any details you think will help us understand your issue\"."
+   },
+   "adreport_server_response_error_msg": {
+      "description": "Error message shown when an new ticket is sumbitted for an ad or bug report, and the server had an issue while processing the data.",
+      "message": "הייתה שגיאה בעיבוד בקשתך."
+   },
+   "adreportintro": {
+      "description": "Introduction of the ad reporting page",
+      "message": "מצאת פרסומת בדף רשת? נעזור לך למצוא את המקום הנכון לדווח עליה!"
+   },
+   "adreportthanks": {
+      "description": "Message to the user thanking them for sharing the URL with us.",
+      "message": "תודה!"
+   },
+   "adreportvoluntary": {
+      "description": "Introduction of the ad reporting page",
+      "message": "דיווח על פרסומת הוא התנדבותי. הוא עוזר לאנשים אחרים ע״י אפשור למתחזקי רשימות המסננים לחסום את הפרסומת בשביל כולם. אם אינך מרגיש זולתני כרגע, זה בסדר. סגור דף זה ו[[חסום את הפרסומת]] רק לעצמך."
+   },
+   "adstillappear": {
+      "description": "Question on ad report page",
+      "message": "האם הפרסומת עדין מופיעה?"
+   },
+   "advanced_options2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "אני משתמש מתקדם, הראה לי אפשרויות מתקדמות"
+   },
+   "allow_whitelisting_youtube_channels2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "התר פרסומות בערוצי YouTube מסוימים"
+   },
+   "allowlist_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube or Twitch and has enabled the YouTube or Twitch channel allow listing option",
+      "message": "התר פרסומות בערוץ זה"
+   },
+   "allowlisted_channel": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "תיצרת את AdBlock להישאר מושהה בערוץ זה עבור כל ביקור."
+   },
+   "allowlisting_twitch_channels": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "התר פרסומות בערוצי Twitch מסוימים"
+   },
+   "always": {
+      "description": "The button text on the popup menu",
+      "message": "תמיד"
+   },
+   "apply_theme": {
+      "description": "Text of clickable element that applies the theme of a theme box in the Themes tab of the Options page",
+      "message": "החל ערכת נושא"
+   },
+   "back_help_flow": {
+      "description": "Aria label for back button in help flow (in popup menu)",
+      "message": "חזור צעד אחד בזרימת העזרה."
+   },
+   "backup_sync_settings": {
+      "description": "Description of Sync on Sync tab",
+      "message": "גבה וסנכרן באופן אוטומטי את הגדרות AdBlock שלך ברחבי כל המכשירים שלך."
+   },
+   "betalabel": {
+      "description": "Label for experimental features in AdBlock Options",
+      "message": "בטא"
+   },
+   "birdchannelswitchlabel": {
+      "description": "The label text for the Birds switch on the MyAdBlock Options page",
+      "message": "ציפורים"
+   },
+   "blacklistclickmessage": {
+      "description": "'Hide a section of a webpage' part on the Customize tab of the Options page.",
+      "message": "לחץ לחיצה ימנית על פרסומת כדי לחסום אותה -- או חסום אותה כאן באופן ידני."
+   },
+   "blacklisterattrwillbe": {
+      "description": "Checkbox label for attributes in 'Block an ad' wizard.",
+      "message": "$attribute$ יהיה $value$",
+      "placeholders": {
+         "attribute": {
+            "content": "$1",
+            "example": "class"
+         },
+         "value": {
+            "content": "$2",
+            "example": "AdBanner"
+         }
+      }
+   },
+   "blacklisterblockedelement": {
+      "description": "Tells the user what the blocked element is on the 'Block an ad' wizard.",
+      "message": "אלמנט חסום:"
+   },
+   "blacklisterblocksalloftype": {
+      "description": "Warns the user that all elements of type X will be blocked.",
+      "message": "היזהר: מסנן זה חוסם את כל אלמנטי $elementtype$ בדף זה!",
+      "placeholders": {
+         "elementtype": {
+            "content": "$1",
+            "example": "DIV"
+         }
+      }
+   },
+   "blacklistereditfilter": {
+      "description": "Text if the user wants to manually edit a filter. 'OK' is the standard JavaScript popup button text.",
+      "message": "אנא הקלד את המסנן הנכון למטה ולחץ על אישור"
+   },
+   "blacklistereditinvalid1": {
+      "description": "Alert if the manually edited filter is invalid. Error messages are not translated.",
+      "message": "המסנן בלתי־תקף: $exception$",
+      "placeholders": {
+         "exception": {
+            "content": "$1",
+            "example": "This filter is not supported"
+         }
+      }
+   },
+   "blacklistermatches": {
+      "description": "Tells the user multiple matches were found",
+      "message": "תואם אל $matchcount$ פריטים בדף זה.",
+      "placeholders": {
+         "matchcount": {
+            "content": "$1",
+            "example": "5"
+         }
+      }
+   },
+   "blacklisternofilter": {
+      "description": "Warning if the user hasn't specified a filter",
+      "message": "לא צוין מסנן!"
+   },
+   "blacklisternotsure_part_I": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "כלל יתווסף אל ההגדרות שלך שיסתיר את הפריט הזה בכל פעם שאתה מבקר באתר."
+   },
+   "blacklisternotsure_part_II": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "אתה יכול לבטל עשייה של זה בכל זמן שהוא ע״י בחירה 'בטל הסתרה של פריטים מוסתרים' מתפריט AdBlock."
+   },
+   "blacklisteroptions1": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "להשאיר את הפריט מוסתר?"
+   },
+   "blacklistersinglematch": {
+      "description": "Tells the user only one match was found",
+      "message": "אלמנט 1 נמצא בדף."
+   },
+   "blacklistertype": {
+      "description": "node name is called 'Type' (HTML tag)",
+      "message": "סוג"
+   },
+   "blacklisterwarningnofilter": {
+      "description": "Warns the user that nothing will be blocked.",
+      "message": "אזהרה: לא צוין מסנן!"
+   },
+   "block_ads_on_youtube": {
+      "description": "Label for checkbox letting user choose whether to block ads on youtube.com",
+      "message": "הסר פרסומות ב־YouTube"
+   },
+   "block_an_ad_on_this_page": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "הסתר משהו בדף זה"
+   },
+   "block_annonyances_on_youtube": {
+      "description": "Checkbox letting user choose whether to block annoyances on youtube.com (such as comments, suggested videos, annotations, and recommended channels)",
+      "message": "הסר מטרדים ב־YouTube"
+   },
+   "block_newsletter_popups": {
+      "description": "Description of 'hide newsletter pop-ups' on the distraction control options page",
+      "message": "חסום חלונות קופצים מטרידים מהזמנה שלך להירשם אל עלון של אתר."
+   },
+   "block_privacy_on_youtube": {
+      "description": "Checkbox letting user choose whether to block privacy-related requests on youtube.com",
+      "message": "הגן על פרטיותי ב־YouTube"
+   },
+   "block_this_ad": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "חסום פרסומת זו"
+   },
+   "blockanadtitle": {
+      "description": "Title of the first two dialogs of the 'Block an ad' wizard",
+      "message": "אשף הסתרה של AdBlock"
+   },
+   "blockdomain": {
+      "description": "Message of the URL and CSS blocking sections",
+      "message": "תחום של עמוד להחיל בו"
+   },
+   "blocked_ads": {
+      "description": "Title for toolbar icon menu section showing number of ads blocked",
+      "message": "פרסומות חסומות:"
+   },
+   "blocked_n_in_total": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked since AdBlock was installed. $count$ will be a number between 1 and 999,999,999.",
+      "message": "$count$ בסך הכל",
+      "placeholders": {
+         "count": {
+            "content": "[[123,456]]",
+            "example": "123,456"
+         }
+      }
+   },
+   "blocked_n_on_this_page": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked on this page. $count$ will be a number between 1 and 999.",
+      "message": "$count$ בדף זה",
+      "placeholders": {
+         "count": {
+            "content": "[[123]]",
+            "example": "123"
+         }
+      }
+   },
+   "blocked_something": {
+      "description": "Part 1 of a call-to-action on the blocklist wizard",
+      "message": "חסמת הרגע משהו באתר זה!"
+   },
+   "blockedresource": {
+      "description": "Resource list page: resource status",
+      "message": "משאב חסום"
+   },
+   "blockmoreads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "חסום עוד פרסומות:"
+   },
+   "blockmoreads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "חסום עוד פרסומות"
+   },
+   "blockurlwithtext": {
+      "description": "Message of the URL-blocking section (Block an ad by its URL) on the Customize tab",
+      "message": "חסום כתובות המכילות מלל זה"
+   },
+   "browserestartrequired": {
+      "description": "Displayed after disabling Safari Content Blocking, which requres a browser relaunch.",
+      "message": "אנא הפעל מחדש את Safari כדי לסיים כיבוי חסימת תוכן."
+   },
+   "bugreport": {
+      "description": "Link to send a bug report on the Support tab",
+      "message": "שלח לנו [[דוח תקלים]]"
+   },
+   "buttonblockit": {
+      "description": "Block button",
+      "message": "חסום את זה!"
+   },
+   "buttoncancel": {
+      "description": "Cancel button",
+      "message": "בטל"
+   },
+   "buttonconfirm": {
+      "description": "Button for confirming a new rule in the hiding wizard",
+      "message": "אשר"
+   },
+   "buttonedit": {
+      "description": "Edit filter(s) manually button",
+      "message": "ערוך"
+   },
+   "buttonexclude": {
+      "description": "Button for excluding a domain in the allowlist wizard",
+      "message": "שלול"
+   },
+   "buttonkeep": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "השאר"
+   },
+   "buttonlooksgood": {
+      "description": "Confirmation button after user chose what to block on the page",
+      "message": "נִרְאֶה טוב"
+   },
+   "buttonok": {
+      "description": "OK button",
+      "message": "בסדר!"
+   },
+   "buttonremove": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "הסר"
+   },
+   "buttonsubmit": {
+      "description": "Button to send a form.",
+      "message": "הגש"
+   },
+   "callout_new_feature": {
+      "description": "Text to callout a new feature",
+      "message": "חדש!"
+   },
+   "cannot_be_undone": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "פעולה זו אינה ניתנת לביטול."
+   },
+   "cantblockflash": {
+      "description": "Result of the final ad report question",
+      "message": "איננו יכולים לחסום עדין פרסומות בתוך Flash ומתקעים אחרים. אנו ממתינים לתמיכה מהדפדפן ומ־WebKit."
+   },
+   "cantblockflashwarning": {
+      "description": "Text of the final ad report question",
+      "message": "האם הפרסומת מופיעה בסרט או לפני סרט או בכל מתקע שהוא כמו משחק Flash?"
+   },
+   "catchannelswitchlabel": {
+      "description": "The label text for the cat switch on the MyAdBlock Options page",
+      "message": "חתולים"
+   },
+   "change_behavior_settings": {
+      "description": "Part of a message on the allowlist and blocklist wizards",
+      "message": "אתה יכול לשנות התנהגות זו ב[[הגדרות]] שלך."
+   },
+   "changes_to_adblock": {
+      "description": "Link to Options page with more information about the changes.",
+      "message": "עשינו שינויים אל AdBlock!"
+   },
+   "check_out_premium": {
+      "description": "Part 2 of message shown when user opts out of call-to-action",
+      "message": "אם אתה רוצה ללמוד עוד, בדוק את [[Premium]]."
+   },
+   "check_out_themes": {
+      "description": "Part 2 of a call-to-action on the Popup menu",
+      "message": "גלה ערכות נושא!"
+   },
+   "check_sync_status": {
+      "description": "Button on Sync tab that checks the status of the Sync feature",
+      "message": "בדוק מעמד סינכרון"
+   },
+   "check_whitelist": {
+      "description": "Message for help flow in popup menu.",
+      "message": "בוא נבדוק את הגדרות רשימת ההתרה שלך כדי לראות אם הן עשויות להיות הבעיה."
+   },
+   "checked_basics": {
+      "description": "Message for help flow in popup menu.",
+      "message": "סימנו את היסודות, ועידכנו את רשימות המסננים שלך."
+   },
+   "checkinfirefox_1": {
+      "description": "instruction for how to check Firefox for a reported ad",
+      "message": "התקן את Firefox אם אין לך אותו מותקן."
+   },
+   "checkinfirefox_2": {
+      "description": "Instruction for how to check Firefox for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "התקן את Adblock Plus עבור Firefox אם אין לך אותו מותקן."
+   },
+   "checkinfirefox_3": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "בדפדפן זה, הירשם כמנוי לאותן רשימות מסנן כפי שיש לך כאן."
+   },
+   "checkinfirefox_4": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "בדפדפן זה, טען את הדף עם הפרסומת."
+   },
+   "checkinfirefox_5": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "האם הפרסומת מופיעה גם בדפדפן זה?"
+   },
+   "checkinfirefoxorchrome_1": {
+      "description": "instruction for how to check Firefox or Chrome for a reported ad",
+      "message": "התקן את Firefox או את Chrome אם אין לך אותם מותקנים."
+   },
+   "checkinfirefoxorchrome_2": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "התקן את Adblock Plus עבור Firefox או את AdBlock עבור Chrome אם אין לך אותם מותקנים."
+   },
+   "checkinfirefoxorchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox/Chrome",
+      "message": "בדיקה ב־Firefox או ב־Chrome"
+   },
+   "checkinfirefoxtitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox",
+      "message": "בדיקה ב־Firefox"
+   },
+   "chromebutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Chrome displays when you right click a toolbar button.",
+      "message": "לחץ לחיצה ימנית על כפתור AdBlock ובחר 'הסתר בתפריט Chrome'. כדי להראותו, לחץ על תפריט Chrome, לחץ לחיצה ימנית על כפתור AdBlock, ובחר 'השאר בסרגל הכלים'."
+   },
+   "cleanuplist2": {
+      "description": "Label at the bottom of the 'Customize' tab of the Options page",
+      "message": "נקה רשימה זו"
+   },
+   "clickdisableaa": {
+      "description": "Instruction on ad report page",
+      "message": "לחץ על זה: [[השבת פרסומות מקובלות]]"
+   },
+   "clickdisableotherextensions": {
+      "description": "On the ad report page, an alternative way to disable other extensions",
+      "message": "או, לחץ פשוט על כפתור זה כדי שנעשה מה שלעיל: [[השבת אל כל ההרחבות האחרות]]"
+   },
+   "clickthead": {
+      "description": "User has to click the ad they want to block.",
+      "message": "לחץ על פריט כלשהו להסתיר בדף הזה שתרצה להסתיר אותו."
+   },
+   "clickupdatefilters": {
+      "description": "Instruction on ad report page",
+      "message": "לחץ על זה: [[עדכן את המסננים שלי!]]"
+   },
+   "close": {
+      "description": "Generic message for buttons that close a view or window",
+      "message": "סגור"
+   },
+   "close_help_flow": {
+      "description": "Aria label for close button in help flow (in popup menu)",
+      "message": "סגור את זרימת העזרה וחזור אל התפריט הקופץ."
+   },
+   "confirm_delete_extension": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "האם אתה בטוח שאתה רוצה למחוק הרחבה זו?"
+   },
+   "confirm_undo_custom_filters": {
+      "description": "Confirmation message when user wants to undo their custom blocks for a domain. $count$ will be a number between 1 and 999,999,999, $host$ will be the domain where the custom blocks will be reset.",
+      "message": "האם אתה בטוח שאתה רוצה להסיר את $count$ החסימות שיצרת ב־$host$?",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "12"
+         },
+         "host": {
+            "content": "$2",
+            "example": "stackoverflow.com"
+         }
+      }
+   },
+   "contact_support": {
+      "description": "Message for help flow in popup menu.",
+      "message": "[[צור קשר עם צוות התמיכה!]]"
+   },
+   "contact_the_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אנחנו ממליצים ליצור קשר עם האתר."
+   },
+   "content_blocking_acceptable_ads_disbled_message": {
+      "description": "Warning shown when the Acceptable Ads filter list is enabled while Safari Content Blocking was already enabled.",
+      "message": "כיבינו את חסימת התוכן של Safari מאחר שבחרת להתיר פרסומות בלתי פולשניות. אתה יכול לבחור רק אחת בכל פעם. ([[למה?]])"
+   },
+   "contributors": {
+      "description": "Link to the contributors page on the Support tab",
+      "message": "למד עוד על [[הצוות שלנו]]"
+   },
+   "copieddebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "הועתק!"
+   },
+   "copydebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "העתק נתוני ניפוי תקלים"
+   },
+   "correctfilters": {
+      "description": "On the ad report page, label describing having the right filter lists enabled",
+      "message": "וודא שאתה משתמש במסנן(ים) של השפה הנכונה:"
+   },
+   "csstomatch": {
+      "description": "Message of the CSS-hiding section (Hide a section of a webpage) on the Customize tab",
+      "message": "CSS להתאמה"
+   },
+   "custom_filters_migration_error_message_part1": {
+      "description": "Part one of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "ספירת שגיאות של מסננים מותאמים אישית: "
+   },
+   "custom_filters_migration_error_message_part2": {
+      "description": "Part two of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "ההודעות (הודעה) הבאות התחוללו במהלך הגירת המסננים המותאמים אישית (התעלם ממספרי השורה): "
+   },
+   "custom_filters_migration_error_message_part3": {
+      "description": "Part three of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "כניסה מקורית: "
+   },
+   "custom_image_description": {
+      "description": "text on the image swap tab",
+      "message": "בחר עד 9 תמונות שאתה רוצה ש־AdBlock ישתמש בהן להחליף פרסומות."
+   },
+   "custom_image_error": {
+      "description": "header / title text on the error message on the image swap tab",
+      "message": "אופס! משהו השתבש"
+   },
+   "custom_image_error_msg_partI": {
+      "description": "error message text error message on the image swap tab",
+      "message": "לא יכולנו להוסיף את התמונה שלך."
+   },
+   "custom_image_error_msg_partII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "אנא המתן רגע ונסה שוב."
+   },
+   "custom_image_error_msg_partIII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "אתה יכול גם לשתף [[נתונים אלמוניים של ניפוי תקלים]] כדי לעזור לנו להבין מה השתבש."
+   },
+   "custom_image_supported_file_types": {
+      "description": "supported file types, shown on the error message dialog box when a user selects a unsupported file type",
+      "message": "*.bmp, *.gif, *.jpeg, *.png, *.svg, *.tiff, *.webp"
+   },
+   "custom_image_unsupported_msg_partI": {
+      "description": "First sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "אופס! נראה שאתה מנסה להוסיף תמונה שהחלפה מותאמת של תמונה אינה תומכת בה."
+   },
+   "custom_image_unsupported_msg_partII": {
+      "description": "second sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "אנא בחר באחד מסוגי התמונה להלן:"
+   },
+   "custom_image_unsupported_title": {
+      "description": "header / title on error message dialog box when a user selects a unsupported file type",
+      "message": "סוג תמונה בלתי נתמך"
+   },
+   "custom_images": {
+      "description": "text on the image swap tab",
+      "message": "תמונות מותאמות אישית"
+   },
+   "customchannelswitchlabel": {
+      "description": "The label text for the Custom Image switch on the MyAdBlock Options page",
+      "message": "מותאם אישית"
+   },
+   "customfilters": {
+      "description": "Subtitle on the Filter lists tab: Section for adding your own filter lists.",
+      "message": "רשימות מסננים מותאמות אישית"
+   },
+   "customfilterserrormessage": {
+      "description": "Error message when there is an issue with a custom filter on the 'Customize' tab of the Options page",
+      "message": "למסנן הבא:\n $filter$ \n יש שגיאה: \n $message$",
+      "placeholders": {
+         "filter": {
+            "content": "$1",
+            "example": "@@.ad"
+         },
+         "message": {
+            "content": "$2",
+            "example": "invalid filter"
+         }
+      }
+   },
+   "dark_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "כהה"
+   },
+   "datacollectionoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "התר אל AdBlock לאסוף נתוני שימוש אלמוניים של רשימת מסננים, ומידע אודות תוכן שנחסם ע״י רשימות מסננים"
+   },
+   "debuginfo": {
+      "description": "Users can click this link to provide debug information to AdBlock staff",
+      "message": "האם הצוות שלנו ביקש מידע ניפוי תקלים?"
+   },
+   "debuginlogoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "הראה הצהרות ניפוי תקלים ביומן מסוף (אשר מאט את ההרחבה)"
+   },
+   "debuginlogoption2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "הראה הצהרות ניפוי ביומן מסוף"
+   },
+   "decline_allow_notifications": {
+      "description": "Description of 'block site notifications' on the distraction control options page",
+      "message": "דחה באופן אוטומטי בקשות 'התר התראות' מאתרים שאתה מבקר בהם."
+   },
+   "default_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "ברירת מחדל"
+   },
+   "delete": {
+      "description": "Text on a delete button",
+      "message": "מחק"
+   },
+   "delete_all_stats_data": {
+      "description": "text related to the delete all data checkbox on the statistics page of the Options page",
+      "message": "מחק את הסטטיסטיקה המאוחסנת הנוכחית שלי של חסימה"
+   },
+   "delete_detail_msg_part_I": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "אתה יכול למחוק את הסטטיסטיקה המאוחסנת המקומית של החסימה שלך כאן."
+   },
+   "delete_detail_msg_part_II": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "זה יסיר את כל הנתונים המוצגים כרגע בדף הסטטיסטיקה שלך, כולל אתרים מובילים חסומים."
+   },
+   "delete_detail_msg_part_III": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "הסטטיסטיקה שלך מאוחסנת רק במכשיר שלך, וסטטיסטיקה כלשהי שאתה מוחק אינה ניתנת להשבה."
+   },
+   "delete_detail_page_2_msg_part_I": {
+      "description": "text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "האם אתה בטוח?"
+   },
+   "delete_migration_error_messages": {
+      "description": "Button to delete error messages when adding custom filters manually",
+      "message": "מחק הודעות"
+   },
+   "delete_panel_title": {
+      "description": "title text on the delete overlay on the statistics page of the Options page",
+      "message": "מחק סטטיסטיקת חסימה"
+   },
+   "description": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "חסום פרסומות וחלונות קופצים ב־YouTube, Facebook, Twitch ובאתרים המועדפים שלך."
+   },
+   "description2": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "הרחבת Chrome הפופולרית ביותר, עם יותר מ־60 מיליון משתמשים! חוסמת פרסומות בכל רחבי הרשת."
+   },
+   "description_edge": {
+      "description": "Description for the AdBlock for Edge extension. Should not exceed 132 characters.",
+      "message": "AdBlock. חוסם הפרסומות #1 עם למעלה מ־200 מיליון הורדות. חוסם פרסומות מכל רחבי הרשת."
+   },
+   "description_yt": {
+      "description": "Description for the AdBlock on YouTube extension. Should not exceed 132 characters.",
+      "message": "חוסם פרסומות YouTube היחיד שנבנה ע״י AdBlock, הרחבת Chrome הפופולרית ביותר עם 60 מיליון משתמשים ברחבי העולם"
+   },
+   "devtools_action_block": {
+      "description": "Button text on the dev tools panel.",
+      "message": "חסום פריט"
+   },
+   "devtools_action_remove": {
+      "description": "Button text on the dev tools panel.",
+      "message": "הסר כלל"
+   },
+   "devtools_action_unblock": {
+      "description": "Button text on the dev tools panel.",
+      "message": "הוסף חריגה"
+   },
+   "devtools_filter_origin_custom": {
+      "description": "sub-title text of the rule showing the source of the rule as custom rules",
+      "message": "מוגדר־משתמש"
+   },
+   "devtools_filter_origin_none": {
+      "description": "sub-title text of the rule showing the source of the rule as a unamed filter list",
+      "message": "מינוי ללא שם"
+   },
+   "devtools_filter_subtitle": {
+      "description": "sub-title text of the rule showing the source of the rule a named filter list",
+      "message": "מוצא"
+   },
+   "devtools_filter_title": {
+      "description": "Text of the filter that was applied to the list item.",
+      "message": "מסנן"
+   },
+   "devtools_footer": {
+      "description": "message on the bottom of the panel",
+      "message": "\u003Ca0>טען מחדש\u003C/a0> את הדף כדי לראות השפעה של שינויי מסננים"
+   },
+   "devtools_header": {
+      "description": "Text on the top of the dev tools panel to show all items of any type; slot0 and slot1 are two seperate drop down lists",
+      "message": "הראה \u003Cslot0>\u003C/slot0> פריטים מסוג \u003Cslot1>\u003C/slot1>"
+   },
+   "devtools_header_state_all": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "הכל"
+   },
+   "devtools_header_state_blocked": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "חסום"
+   },
+   "devtools_header_state_whitelisted": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "ברשימת התרה"
+   },
+   "devtools_header_type_any": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "כלשהו"
+   },
+   "devtools_request_subtitle": {
+      "description": "sub title text for the request-column header of the dev tools panel",
+      "message": "תחום מסמך"
+   },
+   "devtools_request_title": {
+      "description": "title text for the request-column header of the dev tools panel",
+      "message": "בקשה"
+   },
+   "devtools_request_url": {
+      "description": "A request URL in the AdBlock DevTools panel",
+      "message": "\u003Ca0>$original$\u003C/a0> שוכתב אל \u003Ca1>$rewritten$\u003C/a1>",
+      "placeholders": {
+         "original": {
+            "content": "$1",
+            "example": "http://example.com/foo"
+         },
+         "rewritten": {
+            "content": "$2",
+            "example": "http://example.com/bar"
+         }
+      }
+   },
+   "devtools_type_title": {
+      "description": "Type column header text",
+      "message": "סוג"
+   },
+   "disableaa": {
+      "description": "Section header on the ad report page",
+      "message": "בדוק את מסנני הפרסומות המקובלות:"
+   },
+   "disableallextensions": {
+      "description": "Instruction on ad report page",
+      "message": "השבת את כל ההרחבות מלבד AdBlock:"
+   },
+   "disabled": {
+      "description": "Title shown in menu when AdBlock is paused on all sites",
+      "message": "AdBlock מושהה"
+   },
+   "disabled_by_filter_lists": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list.",
+      "message": "מצטערים, AdBlock מושבת בדף זה ע״י אחת מרשימות המסננים שלך."
+   },
+   "disabled_by_filter_lists_yt": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "מצטערים, AdBlock ב־YouTube מושבת בדף זה ע״י אחת מהאפשרויות שלך."
+   },
+   "disabled_on_all_sites": {
+      "description": "Message shown in menu when AdBlock is paused on all sites",
+      "message": "תיצרת את AdBlock להישאר מושהה בכל האתרים."
+   },
+   "disabled_on_this_channel": {
+      "description": "Message shown in the toolbar button menu on YouTube channel pages and videos that have been allowlisted.",
+      "message": "הִתַּרְתָּ פרסומות בערוץ זה."
+   },
+   "disabled_on_this_page": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "AdBlock מושבת בדף זה."
+   },
+   "disabled_site_title": {
+      "description": "header title on the menu when a user is on tab that extensions are disabled on (Chrome settings, etc)",
+      "message": "אין מה לחסום כאן!"
+   },
+   "disableforchromeandsafaristeptwo": {
+      "description": "Step 2 for disabling Chrome and Safari extensions",
+      "message": "בטל את הסימון \"מאופשר\" ליד כל הרחבה מלבד AdBlock. השאר את AdBlock מאופשר."
+   },
+   "disableforchromestepone": {
+      "description": "Step 1 for disabling Chrome extensions",
+      "message": "פתח את [[דף ההרחבות]]."
+   },
+   "disableforedgestepone": {
+      "description": "Step 1 for disabling Edge extensions",
+      "message": "לחץ על התפריט עוד (…) ובחר בהרחבות."
+   },
+   "disableforedgesteptwo": {
+      "description": "Step 2 for disabling Edge extensions",
+      "message": "לכל הרחבה מלבד AdBlock, לחץ על צלמית גלגל השיניים ולחץ על כפתור עירור כדי לשנות אותה אל כבויה."
+   },
+   "disableforsafaristepone": {
+      "description": "Step 1 for disabling Safari extensions",
+      "message": "לחץ על תפריט Safari > העדפות > הרחבות."
+   },
+   "disableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "השבתנו את כל ההרחבות האחרות. עכשיו נטען מחדש את הדף עם הפרסומת. שנייה אחת, בבקשה."
+   },
+   "display_language_selector": {
+      "description": "Text shown before language selector drop-down.",
+      "message": "הצג את AdBlock ב"
+   },
+   "do_not_swap_ads": {
+      "description": "Text of a clickable option to stop swapping ads with images in the Options page Image Swap tab.",
+      "message": "אל תחליף פרסומות"
+   },
+   "dogchannelswitchlabel": {
+      "description": "The label text for the dog switch on the MyAdBlock Options page",
+      "message": "כלבים"
+   },
+   "domain_pause_adblock": {
+      "description": "Menu entry to pause AdBlock on this domain (stop blocking ads)",
+      "message": "השהה באתר זה"
+   },
+   "domain_unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site'",
+      "message": "השהה את AdBlock באתר זה"
+   },
+   "donate_to_adblock": {
+      "description": "Text of a donate link in the toolbar button menu",
+      "message": "אוהב את AdBlock? שקול לתרום!"
+   },
+   "donate_to_youtube_adblock": {
+      "description": "Text of a donate link in the toolbar button menu. 'This' refers to the 'AdBlock on YouTube' extension.",
+      "message": "אוהב את זה? שקול לתרום!"
+   },
+   "done": {
+      "description": "Message for help flow in popup menu.",
+      "message": "סיים"
+   },
+   "done_reload_page": {
+      "description": "text on panel in the help flow",
+      "message": "ברגע שנסיים, אנא טען מחדש את הדף."
+   },
+   "dont_know_help_me": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אני לא יודע! עזור לי!"
+   },
+   "dont_run_on_pages_on_domain": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "אל תריץ בדפים בתחום זה"
+   },
+   "dont_run_on_this_page": {
+      "description": "Menu entry to allowlist the current page",
+      "message": "אל תריץ בדף זה"
+   },
+   "dont_show_me_again": {
+      "description": "opt out option on all-to-action on the blocklist / hiding wizard",
+      "message": "אל תראה לי הודעה זו שוב"
+   },
+   "dont_show_reminder": {
+      "description": "GFC messaging on the popup menu",
+      "message": "אל תראה לי תזכורת זו שוב"
+   },
+   "dontsend": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "אל תשלח"
+   },
+   "download_mac_app": {
+      "description": "Link to download our Mac App. [[ and ]] will be replaced with HTML to link to the Mac App Store",
+      "message": "כדי לקבל את חווית AdBlock הטובה ביותר על Mac, אנא הורד את [[יישום Mac של AdBlock עבור Safari]] שלנו!"
+   },
+   "easylist_disable_done": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock משתמש ב־EasyList כדי לחסום פרסומות ברוב האתרים."
+   },
+   "easylist_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "אנו ממליצים להשאיר את זה פועל. במקרה שביטלת הרשמה כמנוי בטעות, אנא בחר \"EasyList\" כעת כדי לחסום יותר פרסומות."
+   },
+   "easylist_lite_disable_done": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock משתמש ב־AdBlock דל או ב־AdBlock כדי לחסום פרסומות במרבית האתרים."
+   },
+   "easylist_lite_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "אנחנו ממליצים להשאיר את זה פועל. במקרה שביטלת הרשמה כמנוי בטעות, אנא בחר \"EasyList דל\" או \"EasyList\" כעת כדי לחסום יותר פרסומות."
+   },
+   "easylist_lite_or_easylist": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "אנחנו ממליצים להירשם כמנוי אל \"EasyList דל\" או \"EasyList\" אבל לא לשניהם."
+   },
+   "edit_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "ייתכן שתצטרך [[לערוך את רשימת המסננים שלך]]."
+   },
+   "edit_image": {
+      "description": "header text in the on custom image swap modal dialog",
+      "message": "ערוך תמונה"
+   },
+   "edit_image_msg_partI": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "כתבנו ברשימה 3 גדלים מתוך גדלי הפרסומת הנפוצים ביותר למטה."
+   },
+   "edit_image_msg_partII": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "בחר את הגודל הקרוב ביותר אל התמונה שלך, כוונן עם המַחְלֵק, ולחץ על שמור כשתסיים."
+   },
+   "enable_adblock": {
+      "description": "Link text to un-allowlist a page, displayed immediately after 'AdBlock is disabled on this page'",
+      "message": "אפשר את AdBlock בדף זה"
+   },
+   "enable_adblock_on_this_channel": {
+      "description": "Menu entry to un-allowlist a YouTube channel, displayed under 'You allowed ads on this channel.'",
+      "message": "חסום פרסומות בערוץ זה"
+   },
+   "enable_do_not_track_advice": {
+      "description": "The text advicing to enable DNT if Acceptable Ads is enabled in the General tab",
+      "message": "כדי שמאפיין זה יעבוד כראוי, אנא אפשר את Do Not Track (אל תעקוב) בהעדפות הדפדפן שלך."
+   },
+   "enable_on_this_site": {
+      "description": "GFC messaging on the popup menu",
+      "message": "אפשר את AdBlock באתר הזה"
+   },
+   "enableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've re-enabled extensions that were previously disabled",
+      "message": "ההרחבות שהושבתו בעבר אופשרו מחדש."
+   },
+   "english_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האם אתה באתר בשפה האנגלית?"
+   },
+   "englishonly": {
+      "description": "Lets the user know that a link/page is only available in English.",
+      "message": "אנגלית בלבד"
+   },
+   "enjoying_adblock": {
+      "description": "Text of a footer in the popup menu help flow asking users to leave us a review.",
+      "message": "נהנה מן AdBlock?"
+   },
+   "enter_url": {
+      "description": "Placeholder text in the Custom Filter list URL bar",
+      "message": "הכנס כתובת"
+   },
+   "error": {
+      "description": "Text in the aria-label attribute of an icon indicating an error occurred.",
+      "message": "שגיאה"
+   },
+   "error_msg_header": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "אופס!"
+   },
+   "error_msg_help_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "אם זה לא עוזר, "
+   },
+   "error_msg_help_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "לחץ כאן לעוד מידע."
+   },
+   "error_msg_help_us_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "עזור לנו לפתור בעיה זו  "
+   },
+   "error_msg_help_us_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": " על ידי שליחת נתונים של ניפוי תקלים."
+   },
+   "error_msg_partI": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "אנחנו מצטערים, לתפריט AdBlock הייתה בעיה בטעינה."
+   },
+   "error_msg_reload_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "לאחר מכן, נסה לטעון מחדש את ההרחבה על ידי "
+   },
+   "error_msg_reload_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "לחיצה כאן."
+   },
+   "error_msg_thank_you": {
+      "description": "The text on the popup menu when an error has occurred",
+      "message": "תודה"
+   },
+   "example_themes": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the themes feature.",
+      "message": "ערכות נושא לדוגמה"
+   },
+   "excludedomainorurl": {
+      "description": "Message of the exclude section (Show ads on a webpage or domain) on the Customize tab",
+      "message": "התחום או הכתובת שבהם AdBlock אינו אמור לחסום כלום"
+   },
+   "failedtofetchfilter": {
+      "description": "Error alert when subscribing to a filter list",
+      "message": "נכשל במשיכת מסנן זה!"
+   },
+   "feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "יש לך הערה או בקשת מאפיין בשבילנו? נשמח לשמוע ממך!"
+   },
+   "feedback_title": {
+      "description": "Title for feedback call to action.",
+      "message": "משוב"
+   },
+   "fetchinglabel": {
+      "description": "Status label when selecting a new filter list",
+      "message": "מושך… אנא המתן."
+   },
+   "ff_button_how_to_hide": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Remove from Toolbar' should match the text that Firefox displays when you right click a toolbar button, and 'Customize' should match the text that shows when you click the button on the Firefox toolbar with three lines.",
+      "message": "כדי להסתיר את הכפתור, לחץ לחיצה ימנית עליו ובחר הסר מסרגל הכלים. אתה יכול להראותו שוב תחת תפריט Firefox -> התאם אישית."
+   },
+   "ff_checkinchrome_1": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "התקן את Chrome, אם אין לך אותו."
+   },
+   "ff_checkinchrome_2": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "התקן את AdBlock עבור Chrome, אם אין לך אותו."
+   },
+   "ff_checkinchrome_3": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "ב־Chrome, הירשם כמנוי לאותן רשימות מסננים כמו שיש לך כאן."
+   },
+   "ff_checkinchrome_4": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "ב־Chrome, טען את הדף עם הפרסומת."
+   },
+   "ff_checkinchrome_5": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "האם הפרסומת מופיעה גם ב־Chrome?"
+   },
+   "ff_checkinchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Chrome",
+      "message": "בדיקה ב־Chrome"
+   },
+   "filter_annoyances_explained": {
+      "description": "A filter list explanation",
+      "message": "חוסם חלונות קופצים בתוך־דף, מדיה חברתית ויישומונים קשורים, ומטרדים אחרים"
+   },
+   "filter_antisocial_explained": {
+      "description": "A filter list explaination",
+      "message": "מסיר כפתורי מדיה חברתית"
+   },
+   "filter_chinese": {
+      "description": "A filter list combined with EasyList",
+      "message": "סינית + EasyList"
+   },
+   "filter_czech": {
+      "description": "A filter list combined with EasyList",
+      "message": "צ'כית וסלובקית + EasyList"
+   },
+   "filter_dutch": {
+      "description": "A filter list combined with EasyList",
+      "message": "הולנדית + EasyList"
+   },
+   "filter_easylist_plus_arabic_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "ערבית + צרפתית + EasyList"
+   },
+   "filter_easylist_plus_bulgarian": {
+      "description": "A filter list combined with EasyList",
+      "message": "בולגרית + EasyList"
+   },
+   "filter_easylist_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "צרפתית + EasyList"
+   },
+   "filter_easylist_plus_german": {
+      "description": "A filter list combined with EasyList",
+      "message": "גרמנית + EasyList"
+   },
+   "filter_easylist_plus_indonesian": {
+      "description": "A filter list combined with EasyList",
+      "message": "אינדונזית + EasyList"
+   },
+   "filter_easylist_plus_lithuania": {
+      "description": "A filter list combined with EasyList",
+      "message": "ליטאית + EasyList"
+   },
+   "filter_easylist_plus_romanian": {
+      "description": "A filter list combined with EasyList",
+      "message": "רומנית + EasyList"
+   },
+   "filter_easylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "ווייטנאמית + EasyList"
+   },
+   "filter_elemhideemulation_nodomain": {
+      "message": "תחום פעיל לא צויין עבור אלמנט מורחב של מסנן הסתרה"
+   },
+   "filter_idcac_explained": {
+      "description": "A filter list explanation",
+      "message": "חוסם התראות עוגייה, מה שאומר שתוותר על זכותך להיות מיודע לגבי שימוש בעוגיות באתרים שאתה מבקר בהם"
+   },
+   "filter_invalid": {
+      "description": "Generic error shown when the user tries to add an invalid filter rule to their custom filters",
+      "message": "מסנן בלתי תקף"
+   },
+   "filter_invalid_csp": {
+      "message": "מדיניות בלתי תקפה של אבטחת תוכן"
+   },
+   "filter_invalid_domain": {
+      "message": "תחום בלתי תקף (או ריק) צויין"
+   },
+   "filter_invalid_regexp": {
+      "message": "ביטוי רגולרי בלתי תקף"
+   },
+   "filter_israeli": {
+      "description": "A filter list combined with EasyList",
+      "message": "עברית + EasyList"
+   },
+   "filter_italian": {
+      "description": "A filter list combined with EasyList",
+      "message": "איטלקית + EasyList"
+   },
+   "filter_latvian": {
+      "description": "A filter list combined with EasyList",
+      "message": "לטבית + EasyList"
+   },
+   "filter_russian": {
+      "description": "A filter list combined with EasyList",
+      "message": "רוסית ואוקראינית + EasyList"
+   },
+   "filter_snippet_nodomain": {
+      "message": "תחום פעיל לא צויין עבור מסנן גזירים"
+   },
+   "filter_unknown_option": {
+      "message": "אפשרות מסנן בלתי ידועה"
+   },
+   "filter_warning_removal_explained": {
+      "description": "A filter list explanation",
+      "message": "מסיר אזהרות לגבי שימוש בחוסמי פרסומות"
+   },
+   "filteracceptable_ads": {
+      "description": "A filter list",
+      "message": "פרסומות מקובלות"
+   },
+   "filteracceptable_ads_privacy": {
+      "description": "A filter list",
+      "message": "פרטיות של פרסומות מקובלות"
+   },
+   "filteradblock_custom": {
+      "description": "A filter list",
+      "message": "מסננים מותאמים אישית של AdBlock"
+   },
+   "filterannoyances": {
+      "description": "A filter list",
+      "message": "מטרדי מעריצים (חוסם חלונות קופצים בתוך־דף, מדיה חברתית ויישומונים קשורים, ומטרדים אחרים)"
+   },
+   "filterannoyances2": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances"
+   },
+   "filteranticircumvent": {
+      "description": "A filter list",
+      "message": "מסנני נגד־עקיפה"
+   },
+   "filterantisocial": {
+      "description": "A filter list",
+      "message": "רשימת מסננים נגד־חברתיים (מסיר כפתורי מדיה חברתית)"
+   },
+   "filterantisocial2": {
+      "description": "A filter list",
+      "message": "רשימת מסננים נגד־חברתיים"
+   },
+   "filterbitcoin_mining_protection": {
+      "description": "A filter list",
+      "message": "רשימת הגנה מפני כריית מטבע מבוזר (ביטקוין)"
+   },
+   "filterbrazilian_portuguese": {
+      "description": "A filter list",
+      "message": "פורטוגזית ברזילאית"
+   },
+   "filterchinese": {
+      "description": "A filter list",
+      "message": "סינית"
+   },
+   "filterczech": {
+      "description": "A filter list",
+      "message": "צ'כית וסלובקית"
+   },
+   "filterdanish": {
+      "description": "A filter list",
+      "message": "דנית"
+   },
+   "filterdutch": {
+      "description": "A filter list",
+      "message": "הולנדית"
+   },
+   "filtereasylist": {
+      "description": "A filter list",
+      "message": "EasyList"
+   },
+   "filtereasylist_lite": {
+      "description": "A filter list",
+      "message": "EasyList דל"
+   },
+   "filtereasylist_plun_korean": {
+      "description": "A filter list",
+      "message": "קוריאנית"
+   },
+   "filtereasylist_plus_arabic": {
+      "description": "A filter list",
+      "message": "ערבית"
+   },
+   "filtereasylist_plus_bulgarian": {
+      "description": "A filter list",
+      "message": "בולגרית"
+   },
+   "filtereasylist_plus_estonian": {
+      "description": "A filter list",
+      "message": "אסטונית"
+   },
+   "filtereasylist_plus_finnish": {
+      "description": "A filter list",
+      "message": "פינית"
+   },
+   "filtereasylist_plus_french": {
+      "description": "A filter list",
+      "message": "צרפתית"
+   },
+   "filtereasylist_plus_german": {
+      "description": "A filter list",
+      "message": "גרמנית"
+   },
+   "filtereasylist_plus_greek": {
+      "description": "A filter list",
+      "message": "יוונית"
+   },
+   "filtereasylist_plus_indian": {
+      "description": "A filter list",
+      "message": "IndianList + EasyList"
+   },
+   "filtereasylist_plus_indonesian": {
+      "description": "A filter list",
+      "message": "אינדונזית"
+   },
+   "filtereasylist_plus_lithuania": {
+      "description": "A filter list",
+      "message": "ליטאית"
+   },
+   "filtereasylist_plus_polish": {
+      "description": "A filter list",
+      "message": "פולנית"
+   },
+   "filtereasylist_plus_portuguese": {
+      "description": "A filter list",
+      "message": "פורטוגזית + EasyList"
+   },
+   "filtereasylist_plus_romanian": {
+      "description": "A filter list",
+      "message": "רומנית"
+   },
+   "filtereasylist_plus_spanish": {
+      "description": "A filter list",
+      "message": "ספרדית"
+   },
+   "filtereasylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "ווייטנאמית"
+   },
+   "filtereasyprivacy": {
+      "description": "A filter list",
+      "message": "EasyPrivacy (הגנה על פרטיות)"
+   },
+   "filterfb_notifications": {
+      "description": "A filter list",
+      "message": "התראות של Fanboy (חוסם חלונות קופצים בתוך־עמוד, מדיה חברתית ויישומונים קשורים, ומטרדים אחרים)"
+   },
+   "filterhungarian": {
+      "description": "A filter list",
+      "message": "הונגרית"
+   },
+   "filtericelandic": {
+      "description": "A filter list",
+      "message": "איסלנדית"
+   },
+   "filteridcac": {
+      "description": "A filter list",
+      "message": "לא אכפת לי לגבי עוגיות"
+   },
+   "filterisraeli": {
+      "description": "A filter list",
+      "message": "עברית"
+   },
+   "filteritalian": {
+      "description": "A filter list",
+      "message": "איטלקית"
+   },
+   "filterjapanese": {
+      "description": "A filter list",
+      "message": "יפנית"
+   },
+   "filterlatvian": {
+      "description": "A filter list",
+      "message": "לטבית"
+   },
+   "filterlistlink": {
+      "description": "Filter lists tab explanation and link to filter list credits.",
+      "message": "אל תירשם כמנוי ליותר ממה שאתה צריך -- כולם מאיטים אותך טיפה! קרדיטים ורשימות נוספות ניתנות להימצא [[כאן]]."
+   },
+   "filterlistsrock": {
+      "description": "Header text on the Customize tab",
+      "message": "רשימות המסננים חוסמות את מרבית הפרסומות ברשת. אתה גם יכול:"
+   },
+   "filterlistsrock2": {
+      "description": "Header text on the Customize tab",
+      "message": "רשימות המסננים חוסמות את רוב הפרסומות ברשת. אתה גם יכול…"
+   },
+   "filternorwegian": {
+      "description": "A filter lsit",
+      "message": "נורבגית"
+   },
+   "filterorigin": {
+      "description": "Resource list page: tooltip of matching filter, telling which filter list contains the filter",
+      "message": "מוצא מסנן:\n$list$",
+      "placeholders": {
+         "list": {
+            "content": "$1",
+            "example": "A filter list name OR AdBlock OR the translation of 'tabcustomize'"
+         }
+      }
+   },
+   "filterrussian": {
+      "description": "Language names for a filter list",
+      "message": "רוסית ואוקראינית"
+   },
+   "filtersavewarning_part1": {
+      "description": "Warning when manually editing filters -- first part not clickable.",
+      "message": "היזהר: אם תעשה כאן טעות מסננים רבים אחרים, כולל המסננים הרשמיים, יכולים להישבר!"
+   },
+   "filtersavewarning_part2": {
+      "description": "Warning when manually editing filters -- second part clickable.",
+      "message": "קרא את [[הדרכת תחביר המסננים]] כדי ללמוד איך להוסיף מסננים מתקדמים של רשימת חסימה ורשימת התרה."
+   },
+   "filterstabtitle": {
+      "description": "Title of the Filter lists tab of the Options page",
+      "message": "הירשם כמנוי לרשימות מסננים"
+   },
+   "filterswedish": {
+      "description": "A filter list",
+      "message": "שבדית"
+   },
+   "filterturkish": {
+      "description": "A filter list",
+      "message": "טורקית"
+   },
+   "filterviewsource": {
+      "description": "Title for links to view filter lists on website",
+      "message": "הצג רשימת מסננים"
+   },
+   "filterwarning_removal": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "רשימת הסרת אזהרה של AdBlock (מסיר אזהרות בנוגע לשימוש בחוסמי פרסומות)"
+   },
+   "filterwarning_removal2": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "רשימת הסרת אזהרה לגבי חסימת פרסומות"
+   },
+   "find_out_more": {
+      "description": "Text in the button on the Premium CTA on the hiding wizard.",
+      "message": "גלה עוד"
+   },
+   "findingads": {
+      "description": "'Block an ad' wizard loading message",
+      "message": "מוצא פרסומות…\n\nזה יקח רק רגע."
+   },
+   "firefox_explanation": {
+      "description": "Explanation of the 'Check in Firefox or Chrome' step on the ad report page",
+      "message": "המטרה של שאלה זו היא לקבוע מי אמור לקבל את הדוח שלך. אם תענה על שאלה זאת באופן שגוי, הדוח יישלח לאנשים הלא נכונים, כך שהוא עשוי להיתקל בהתעלמות."
+   },
+   "first_time_seeing_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "זאת הפעם הראשונה שאני רואה פרסומת זו"
+   },
+   "fixityourself": {
+      "description": "Telling users who won't report an ad to us how to handle it for themselves",
+      "message": "בסדר, אתה עדיין יכול לחסום פרסומת זו לעצמך בדף האפשרויות. תודה!"
+   },
+   "flashads": {
+      "description": "Title of the final ad report question if the ad didn't appear in Firefox",
+      "message": "וידאו ו־Flash"
+   },
+   "foodchannelswitchlabel": {
+      "description": "The label text for the Food switch on the MyAdBlock Options page",
+      "message": "אוכל"
+   },
+   "framedomain": {
+      "description": "Resource list page: domain name of the frame",
+      "message": "תחום מסגרת: "
+   },
+   "frametype": {
+      "description": "Resource list page: followed by frame type (top frame, subframe)",
+      "message": "סוג מסגרת: "
+   },
+   "frameurl": {
+      "description": "Resource list page: full URL of the frame",
+      "message": "כתובת מסגרת: "
+   },
+   "future_show_ads": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "בעתיד, דפים אלו ימשיכו להראות פרסומות."
+   },
+   "generaloptions": {
+      "description": "Title of the first Options page tab",
+      "message": "אפשרויות כלליות"
+   },
+   "generaloptions2": {
+      "description": "Title of one of the Options page tabs",
+      "message": "אפשרויות כלליות"
+   },
+   "get_it_now": {
+      "description": "The text in a button visible to locked users in the MyAdBlock Options page",
+      "message": "השג זאת כעת"
+   },
+   "get_sync": {
+      "description": "Link to pay for Sync (part of AdBlock Premium)",
+      "message": "השג סינכרון"
+   },
+   "goatchannelswitchlabel": {
+      "description": "The label text for the Goats switch on the MyAdBlock Options page",
+      "message": "עזים"
+   },
+   "got_it": {
+      "description": "Message for help flow in popup menu.",
+      "message": "הבנתי."
+   },
+   "header": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 10 characters)",
+      "message": "כותרת"
+   },
+   "headerfilter": {
+      "description": "Resource list page: title of a column",
+      "message": "מסנן מתאים"
+   },
+   "headerresource": {
+      "description": "Resource list page: title of a column",
+      "message": "משאב"
+   },
+   "headertype": {
+      "description": "Resource list page: title of a column",
+      "message": "סוג"
+   },
+   "help": {
+      "description": "Text in the aria-label attribute of the support icon on the pop-up menu.",
+      "message": "עזרה"
+   },
+   "help_and_feedback": {
+      "description": "Text of a help link in the toolbar button menu",
+      "message": "עזרה ומשוב"
+   },
+   "helpcenter": {
+      "description": "Link to AdBlock's help site. This is found on the Support tab of the options.",
+      "message": "בקר ב[[מרכז העזרה]] שלנו"
+   },
+   "hiddenelement": {
+      "description": "Resource list page: resource status",
+      "message": "אלמנט מוסתר"
+   },
+   "hiddenelementmessagecount": {
+      "description": "The total number of ads or 'things' hidden on a page by the new rule.",
+      "message": "$count$ פריטים אחרים בדף הזה מוסתרים גם באופן זמני",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "2"
+         }
+      }
+   },
+   "hide_details": {
+      "description": "Toggle that hides the details section",
+      "message": "הסתר פרטים"
+   },
+   "hide_this_button": {
+      "description": "Toolbar button menu entry to hide the AdBlock button",
+      "message": "הסתר כפתור זה"
+   },
+   "how": {
+      "description": "Text of a link pointing to instructions on how to do something",
+      "message": "איך?"
+   },
+   "how_can_we_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "איך נוכל לעזור?"
+   },
+   "image_of_channel": {
+      "description": "Text in the alt attribute of an image injected into a page as part of the Image Swap feature.",
+      "message": "תמונה של $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Dogs"
+         }
+      }
+   },
+   "image_swap": {
+      "description": "Title of the Image Swap sub-tab of the Options page",
+      "message": "החלפת תמונות"
+   },
+   "image_swap_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Image Swap feature.",
+      "message": "דוגמה של החלפת תמונה"
+   },
+   "images_coming_soon": {
+      "description": "The text telling MyAdBlock active users that there will be more photos for MyAdBlock.",
+      "message": "עוד תצלומים בקרוב!"
+   },
+   "invalidListUrl": {
+      "description": "Message when you subscribe to a non-list URL",
+      "message": "כתובת בלתי תקפה של רשימה. היא תימחק."
+   },
+   "isithidden": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "האם הפריט מוסתר?"
+   },
+   "issue_unrelated_adblock": {
+      "description": "Message for help flow in popup menu.",
+      "message": "נראה שיש סוגייה עם האתר שאינה קשורה אל AdBlock."
+   },
+   "join_vpn_waitlist": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "הצטרף אל רשימת הבטא בשביל גישה מוקדמת!"
+   },
+   "landscapechannelswitchlabel": {
+      "description": "The label text for the Landscape switch on the MyAdBlock Options page",
+      "message": "נופים"
+   },
+   "lang_arabic": {
+      "description": "Language name",
+      "message": "ערבית"
+   },
+   "lang_bulgarian": {
+      "description": "Language name",
+      "message": "בולגרית"
+   },
+   "lang_catalan": {
+      "description": "Language name",
+      "message": "קטלנית"
+   },
+   "lang_chinese": {
+      "description": "Language name",
+      "message": "סינית"
+   },
+   "lang_chinese_simplified": {
+      "description": "Language name",
+      "message": "סינית פשוטה"
+   },
+   "lang_chinese_traditional": {
+      "description": "Language name",
+      "message": "סינית מסורתית"
+   },
+   "lang_croatian": {
+      "description": "Language name",
+      "message": "קרואטית"
+   },
+   "lang_czech": {
+      "description": "Language name",
+      "message": "צ'כית"
+   },
+   "lang_danish": {
+      "description": "Language name",
+      "message": "דנית"
+   },
+   "lang_dutch": {
+      "description": "Language name",
+      "message": "הולנדית"
+   },
+   "lang_english": {
+      "description": "Language name",
+      "message": "אנגלית"
+   },
+   "lang_estonian": {
+      "description": "Language name",
+      "message": "אסטונית"
+   },
+   "lang_finnish": {
+      "description": "Language name",
+      "message": "פינית"
+   },
+   "lang_french": {
+      "description": "Language name",
+      "message": "צרפתית"
+   },
+   "lang_german": {
+      "description": "Language name",
+      "message": "גרמנית"
+   },
+   "lang_greek": {
+      "description": "Language name",
+      "message": "יוונית"
+   },
+   "lang_hungarian": {
+      "description": "Language name",
+      "message": "הונגרית"
+   },
+   "lang_icelandic": {
+      "description": "Language name",
+      "message": "איסלנדית"
+   },
+   "lang_indonesian": {
+      "description": "Language name",
+      "message": "אינדונזית"
+   },
+   "lang_israeli": {
+      "description": "Language name",
+      "message": "עברית"
+   },
+   "lang_italian": {
+      "description": "Language name",
+      "message": "איטלקית"
+   },
+   "lang_japanese": {
+      "description": "Language name",
+      "message": "יפנית"
+   },
+   "lang_korean": {
+      "description": "Language name",
+      "message": "קוריאנית"
+   },
+   "lang_latvian": {
+      "description": "Language name",
+      "message": "לטבית"
+   },
+   "lang_lithuania": {
+      "description": "Language name",
+      "message": "ליטאית"
+   },
+   "lang_norwegian": {
+      "description": "Language name",
+      "message": "נורבגית"
+   },
+   "lang_polish": {
+      "description": "Language name",
+      "message": "פולנית"
+   },
+   "lang_portuguese_brazil": {
+      "description": "Language name",
+      "message": "פורטוגזית (ברזיל)"
+   },
+   "lang_portuguese_portugal": {
+      "description": "Language name",
+      "message": "פורטוגזית (פורטוגל)"
+   },
+   "lang_romanian": {
+      "description": "Language name",
+      "message": "רומנית"
+   },
+   "lang_russian": {
+      "description": "Language name",
+      "message": "רוסית"
+   },
+   "lang_serbian": {
+      "description": "Language name",
+      "message": "סרבית"
+   },
+   "lang_slovak": {
+      "description": "Language name",
+      "message": "סלובקית"
+   },
+   "lang_slovenian": {
+      "description": "Language name",
+      "message": "סלובנית"
+   },
+   "lang_spanish": {
+      "description": "Language name",
+      "message": "ספרדית"
+   },
+   "lang_swedish": {
+      "description": "Language name",
+      "message": "שבדית"
+   },
+   "lang_turkish": {
+      "description": "Language name",
+      "message": "טורקית"
+   },
+   "lang_ukranian": {
+      "description": "Language name",
+      "message": "אוקראינית"
+   },
+   "lang_vietnamese": {
+      "description": "Language name",
+      "message": "ווייטנאמית"
+   },
+   "languagedropdowndescription": {
+      "description": "Dropdown list for language-specific filter lists",
+      "message": "הוסף מסננים לשפה אחרת: "
+   },
+   "learn_more": {
+      "description": "Link to Knowledge Base article with more information about the settings change",
+      "message": "למד עוד."
+   },
+   "learn_more_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "ייתכן שתרצה [[ללמוד עוד על רשימות מסננים]]."
+   },
+   "learn_more_lower": {
+      "description": "GFC messaging on the popup menu",
+      "message": "למד עוד"
+   },
+   "learn_more_to_resolve": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אתה יכול [[ללמוד עוד כאן]] כדי לעזור לפתור זאת."
+   },
+   "learn_more_without_period": {
+      "description": "Text in the aria-label attribute of an icon linking to extra information about an option.",
+      "message": "למד עוד"
+   },
+   "leave_a_review": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "השאר לנו ביקורת!"
+   },
+   "legend": {
+      "description": "Resource list page: followed by color codes for various resource statuses (blocked, allowlisted, hidden)",
+      "message": "מקרא: "
+   },
+   "linkblockadbyurl": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "חסום פרסומת לפי כתובתה"
+   },
+   "linkhidesection": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "הסתר קטע של דף"
+   },
+   "linkunblock": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "הראה פרסומות בדף או בתחום"
+   },
+   "loading": {
+      "description": "Generic message displayed during processes that take some time",
+      "message": "טוען…"
+   },
+   "loading_in_progress": {
+      "description": "Text in the aria-label attribute of an icon indicating that page is currently loading",
+      "message": "טעינה בתהליך"
+   },
+   "local_cdn_option": {
+      "description": "Option to let the user enable Local CDN feature.",
+      "message": "אפשר הטמנת תוכן מקומי עבור סיפריות אתרים פופולריים"
+   },
+   "locked": {
+      "description": "Text in the aria-label attribute of an icon showing a feature/option is locked.",
+      "message": "נעול"
+   },
+   "love_adblock": {
+      "description": "Text in a button that asks users to rate us.",
+      "message": "אוהב את AdBlock?"
+   },
+   "mac_app_message_menu_part_one": {
+      "description": "part one of the message to safari users on the popup menu",
+      "message": "חדש!"
+   },
+   "mac_app_message_menu_part_two": {
+      "description": "part two of the message to safari users on the popup menu",
+      "message": "נסה את יישום Mac של AdBlock"
+   },
+   "mac_app_message_options": {
+      "description": "Message to users on the Options page",
+      "message": "AdBlock עבור Safari זמין כעת בתור יישום Mac!"
+   },
+   "make_adblock_yours_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "אתה בשליטה של מראה, הרגשה וגודל גופן של AdBlock עם בקרות קלות לשימוש."
+   },
+   "make_adblock_yours_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "עשה את AdBlock שלך"
+   },
+   "manage_subscribed_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube and has enabled the YouTube channel allow listing option",
+      "message": "נהל פרסומות בערוצים מנויים"
+   },
+   "manage_subscription": {
+      "description": "Text of link to manage the user's Premium subscription on the Premium tab of the Options page",
+      "message": "נהל את המינוי שלך"
+   },
+   "manualexcludefilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "ערוך מסננים מושבתים:"
+   },
+   "manualexcludefilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "ערוך מסננים מושבתים"
+   },
+   "manualfilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "ערוך באופן ידני את מסנניך:"
+   },
+   "manualfilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "ערוך באופן ידני את מסנניך"
+   },
+   "manualfilteredit_yt": {
+      "description": "Subtitle on the 'General' tab of AdBlock on YouTube",
+      "message": "ערוך באופן ידני את מסנניך:"
+   },
+   "manuallyenableotherextensions": {
+      "description": "On the ad report page, alert notifying users that they will need to manually reenable the extensions",
+      "message": "פתח את דף ההרחבות כדי לאפשר את ההרחבות שהושבתו בעבר."
+   },
+   "migration_error_message": {
+      "description": "Error when adding custom filters manually",
+      "message": "מצאנו מספר שגיאות במסננים המותאמים אישית שלך. ראה למטה את ההודעות."
+   },
+   "modifydomain": {
+      "description": "Caption for the allowlist wizard slider that modifies the domain part of a URL",
+      "message": "אתר:"
+   },
+   "modifypath": {
+      "description": "Caption for the allowlist wizard slider that modifies the path part of a URL",
+      "message": "דף:"
+   },
+   "more_themes_coming_soon": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "בדוק שוב בקרוב, ערכות נושא נוספות בדרך!"
+   },
+   "more_themes_on_the_way": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "עוד ערכות נושא בדרך!"
+   },
+   "myadblock_benefits_explained": {
+      "description": "Main text of the teaser MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "בתמורה לתמיכה בנו ע״י איפשור MyAdBlock, תקבל גישה אל הכלים והמאפיינים האחרונים ברגע שהם ישוחררו."
+   },
+   "myadblock_feedback_button": {
+      "description": "Text on the MyAdBlock feedback button",
+      "message": "הגש משוב"
+   },
+   "myadblock_feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "אם יש לך משוב כלשהו או בקשות מאפיין כלשהן בשבילנו, אנא השתמש בדף המשוב שלנו."
+   },
+   "myadblock_feedback_title": {
+      "description": "Title for MyAdBlock feedback call to action.",
+      "message": "נשמח לשמוע ממך!"
+   },
+   "myadblock_more_coming_soon": {
+      "description": "Title of the teaser MyAdBlock feature box in the MyAdBlock tab of the Options page",
+      "message": "עוד מאפיינים יגיעו בקרוב!"
+   },
+   "myadblock_options_page_header": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblock_page_title": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock: דרך טובה יותר לגלוש באינטרנט."
+   },
+   "myadblock_payment_not_available_callout": {
+      "description": "The text notifying something is wrong in the payment iframe in the Options page.",
+      "message": "אוי לא!"
+   },
+   "myadblock_payment_not_available_subtitle": {
+      "description": "The sub-title of an error message box in payment iframe in the Options page.",
+      "message": "לא הצלחנו להתחבר אל השרתים שלנו"
+   },
+   "myadblock_payment_not_available_text": {
+      "description": "The text of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "אנחנו כל כך שמחים שאתה מעוניין ב־MyAdBlock! למרבה הצער, איננו יכולים לעבד תשלומים כרגע. אנא נסה שוב יותר מאוחר."
+   },
+   "myadblock_payment_not_available_title": {
+      "description": "The title of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "הו לא! לא יכולנו להתחבר לשרתים שלנו"
+   },
+   "myadblock_pic_replacemenet_description": {
+      "description": "The text briefly describing what the feature does in the MyAdBlock tab in the option page.",
+      "message": "החלף פרסומות בתמונות שאתה אוהב"
+   },
+   "myadblock_picreplacement_exlained": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "בחר מהקטגוריות להלן ו־AdBlock יחליף לעיתים פרסומות בתמונות באיכות גבוהה כדי להבהיר את היום שלך."
+   },
+   "myadblock_short_description": {
+      "description": "Text substitle of myAdBlock page in the options page",
+      "message": "חווה AdBlock מוגבר עם מאפיינים כיפיים חדשים בלעדיים עבור תורמים"
+   },
+   "myadblock_short_description_to_pay": {
+      "description": "The text next to the 'Get It Now' button on top of the MyAdBlock Options page",
+      "message": "תהיה מקצוען של חסימת פרסומות עם התוספים קלי השימוש האלו."
+   },
+   "myadblock_subscribe_invite": {
+      "description": "Text on hover of a locked MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "הירשם כמנוי אל MyAdBlock כדי לשחרר נעילה"
+   },
+   "myadblock_themes_description": {
+      "description": "Text briefly describing what themes do on the MyAdBlock tab of the Options page",
+      "message": "שנה את האופן שבו AdBlock נִרְאֶה, כולל גודל גופן ומתכונת צבע"
+   },
+   "myadblockenrollment": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "אפשר את MyAdBlock"
+   },
+   "myadblockoptions": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblockoptionscategoryheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "קטגוריות"
+   },
+   "myadblockoptionspageheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "אפשרויות MyAdBlock"
+   },
+   "myadblockpicreplacementswitchlabel": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "החלף מספר פרסומות חסומות בתמונות באיכות גבוהה מהקטגוריות להלן"
+   },
+   "name": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — חוסם הפרסומות הטוב ביותר"
+   },
+   "name_adblock_on_youtube": {
+      "description": "Name of version of the AdBlock extension that only blocks ads on YouTube. Other strings that refer to the 'AdBlock on YouTube' extension should use this name.",
+      "message": "AdBlock ב־YouTube"
+   },
+   "name_devbuild": {
+      "description": "Extension name to be shown for development builds. Note: this cannot be longer than 45 characters. Should not be translated",
+      "message": "בניית פיתוח של AdBlock"
+   },
+   "name_releasebuild": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — חוסם הפרסומות הטוב ביותר"
+   },
+   "needhelp": {
+      "description": "Subtitle on the Support tab",
+      "message": "צריך עזרה?"
+   },
+   "never_lose_settings": {
+      "description": "Part 2 of a call-to-action on the allowlist and blocklist wizards",
+      "message": "החל הגדרה זו בכל המכשירים שלך ווודא שלעולם לא תאבד את הגדרות AdBlock שלך עם גיבוי וסינכרון."
+   },
+   "new_badge": {
+      "description": "Max 4 characters. If it's not possible to translate in four characters or less, please don't translate. Text in the badge of our extension toolbar icon.",
+      "message": "חדש"
+   },
+   "new_cta_default_text": {
+      "description": "Text of a temporary call-to-action item in the popup menu.",
+      "message": "שדרג את AdBlock שלך"
+   },
+   "new_cta_hovered_text": {
+      "description": "Text of a temporary call-to-action hovered item in the popup menu.",
+      "message": "תיהנה מגלישה טובה יותר"
+   },
+   "new_myadblock_feature_available": {
+      "description": "The text in the popup menu item saying there is a new MyAdBlock feature and takes you to the MyAdBlock tab in the option page.",
+      "message": "לחץ כאן כדי לשחרר מאפייינים חדשים!"
+   },
+   "new_resourcelist_explanation_osx": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Mac)",
+      "message": "כדי לראות את כל הבקשות, לחץ לחיצה ימנית על הדף, בחר 'בחן' (Option+Cmd+I), לאחר מכן בחר בלשונית 'AdBlock'."
+   },
+   "new_resourcelist_explanation_win": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Windows)",
+      "message": "כדי לראות את כל הבקשות, לחץ לחיצה ימנית על הדף, בחר 'בחן' (Ctrl+Shift+I), לאחר מכן בחר בלשונית 'AdBlock'."
+   },
+   "newmyadblockenrollment": {
+      "description": "The text of the 'Enable MyAdBlock' menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "חדש"
+   },
+   "no": {
+      "description": "A negative response to a question",
+      "message": "לא"
+   },
+   "no_changes_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "לא נשנה כלום כך שתמשיך לראות פרסומות."
+   },
+   "no_data_msg_part_I": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "אין לך כרגע סטטיסטיקת חסימה להציג."
+   },
+   "no_data_msg_part_II": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "רענן דף זה לאחר גלישה ברשת כדי להתחיל לראות סטטיסטיקת חסימה."
+   },
+   "no_data_title": {
+      "description": "title text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "אין סטטיסטיקה"
+   },
+   "nodefaultfilter1": {
+      "description": "Instructions on ad report page pointing users to EasyList subscriptions list.",
+      "message": "אין לנו רשימת מסננים ברירת מחדל עבור שפה זו.\nאנא [[נסה למצוא רשימה מתאימה שתומכת בשפה זו]] או חסום פרסומת זו בעצמך דרך תפריט AdBlock."
+   },
+   "noresourcessend2": {
+      "description": "Resource list page: error message",
+      "message": "משהו השתבש. משאבים לא נשלחו. דף זה ייסגר עכשיו. נסה לטעון מחדש את האתר."
+   },
+   "note": {
+      "description": "Indicates that the user should take note of the message that follows.",
+      "message": "הערה:"
+   },
+   "notification_antiadblock_message": {
+      "message": "אתר זה ידוע בראות הודעות מוכוונות אל משתמשי AdBlock. האם אתה רוצה ש־AdBlock יסתיר הודעות מוכוונות?"
+   },
+   "notification_antiadblock_title": {
+      "message": "להסתיר הודעות מוכוונות?"
+   },
+   "ocean_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "אוקיינוס"
+   },
+   "oceanchannelswitchlabel": {
+      "description": "The label text for the Ocean switch on the MyAdBlock Options page",
+      "message": "אוקיינוס"
+   },
+   "ok": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אשר"
+   },
+   "once": {
+      "description": "The button text on the popup menu",
+      "message": "פעם אחת"
+   },
+   "only_block_ads_on_these_sites": {
+      "description": "Label for textbox where user enters a list of sites on Customize tab",
+      "message": "חסום פרסומות רק באתרים אלו:"
+   },
+   "onpage_messages": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "התר אל AdBlock להראות לי הודעות על דפי רשת כאשר הן ענייניות"
+   },
+   "open_allowlist_wizard": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "עוד אפשרויות השהיה"
+   },
+   "operabutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Opera displays on the Extensions page.",
+      "message": "כדי להסתיר את הכפתור, לך אל opera://extensions וסמן את האפשרות 'הסתר מסרגל הכלים'. אתה יכול להציגו שוב ע״י ביטול סימון אפשרות זו."
+   },
+   "opt_out_stats_data": {
+      "description": "text related to the opt out data collection checkbox on the statistics page of the Options page",
+      "message": "אל תאסוף את סטטיסטיקת החסימה שלי בעתיד"
+   },
+   "options": {
+      "description": "The text of the link on chrome://chrome/extensions that takes you to the Options page",
+      "message": "אפשרויות"
+   },
+   "options_page": {
+      "description": "General text used to define the extension options page.",
+      "message": "דף האפשרויות"
+   },
+   "options_page_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "ערכת נושא של דף האפשרויות"
+   },
+   "optionstitle": {
+      "description": "Title for the Options page",
+      "message": "אפשרויות AdBlock"
+   },
+   "optionstitle_yt": {
+      "description": "Title for the Options page for the 'AdBlock on YouTube' extension.",
+      "message": "אפשרויות AdBlock ב־YouTube"
+   },
+   "optionsversion": {
+      "description": "Version number",
+      "message": "גרסה $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "3.9.2"
+         }
+      }
+   },
+   "orenteraurl": {
+      "description": "Text box to enter a link to a custom filter list",
+      "message": "או הכנס כתובת:"
+   },
+   "other": {
+      "description": "Multiple choice option",
+      "message": "אחר"
+   },
+   "otherfilters": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block other elements that are not ads.",
+      "message": "רשימות מסננים אחרות"
+   },
+   "overlay_notification_button_no": {
+      "message": "לא"
+   },
+   "overlay_notification_button_yes": {
+      "message": "כן"
+   },
+   "page_is_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "עמוד זה נמצא ברשימת ההתרה שלך, זאת הסיבה שאתה רואה פרסומת."
+   },
+   "page_not_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "עמוד זה אינו ברשימת ההתרה שלך."
+   },
+   "pagelanguagecheck": {
+      "description": "Question on ad report page",
+      "message": "באיזו שפה הדף הזה כתוב?"
+   },
+   "parent_menu_item_site": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "חסימות לפי אתר"
+   },
+   "parent_menu_item_time": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "חסימות לאורך זמן"
+   },
+   "pause_adblock": {
+      "description": "Menu entry to pause AdBlock (stop blocking ads)",
+      "message": "השהה את AdBlock"
+   },
+   "pause_adblock_everywhere": {
+      "description": "Menu entry to pause AdBlock everywhere (stop blocking ads)",
+      "message": "השהה בכל האתרים"
+   },
+   "pause_adblocking": {
+      "description": "Menu entry to pause the extension (stop blocking ads)",
+      "message": "השהה חסימת פרסומות"
+   },
+   "pause_on_all_sites": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "השהה בכל האתרים."
+   },
+   "pause_on_this_site": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on this site. This will be followed by the options 'Once' and 'Always'",
+      "message": "השהה באתר זה:"
+   },
+   "paused_not_blocking": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock מושהה כרגע, אז אנחנו לא חוסמים פרסומות כלשהן."
+   },
+   "paused_site_issue": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock מושהה כרגע, אז נראה שיש סוגייה עם האתר שאינה קשורה אל AdBlock."
+   },
+   "popup_menu": {
+      "description": "General text used to define the pop-up menu.",
+      "message": "תפריט קופץ"
+   },
+   "popup_menu_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "ערכת נושא של תפריט קופץ"
+   },
+   "popup_menu_title": {
+      "description": "Title for the popup menu.",
+      "message": "תפריט קופץ של AdBlock"
+   },
+   "premium": {
+      "description": "Abbreviated name of the AdBlock upgrade.",
+      "message": "Premium"
+   },
+   "premium_access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "מאפיינים חדשים ב‏־AdBlock Premium מקלים להשיג גישה אל התוכן שאתה אוהב בלי להשבית את AdBlock."
+   },
+   "premium_benefits_explained": {
+      "description": "Main text of the teaser AdBlock Premium feature in the AdBlock Premium tab of the Options page",
+      "message": "בתמורה לתמיכה בנו ע״י איפשור AdBlock Premium, תקבל גישה אל הכלים והמאפיינים האחרונים ברגע שהם ישוחררו."
+   },
+   "premium_cta_button_text": {
+      "description": "button text on the statistics page of the Options page in the image swap panel",
+      "message": "קבל Premium"
+   },
+   "premium_cta_button_text_not_enabled": {
+      "description": "button text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "הפעל"
+   },
+   "premium_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel",
+      "message": "שחרר נעילה של מעקב החלפת תמונות ועוד עם Premium."
+   },
+   "premium_cta_msg_not_enabled": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "נראה כי אין לך החלפת תמונות מאופשרת."
+   },
+   "premium_page_title": {
+      "description": "The text of the header the AdBlock Premium Options page",
+      "message": "AdBlock Premium: דרך טובה יותר לגלוש באינטרנט."
+   },
+   "premium_status_msg": {
+      "description": "Message shown on the premium tab of the options page when the user is a licensed premium user",
+      "message": "תומך מאז $date$",
+      "placeholders": {
+         "date": {
+            "content": "$1",
+            "example": "January 2020"
+         }
+      }
+   },
+   "premium_status_short_msg": {
+      "description": "Message shown on the premium tab of the option page when user is a licensed premium user",
+      "message": "פעיל"
+   },
+   "prevent_videos": {
+      "description": "Description of 'stop autoplay videos' on the distraction control options page",
+      "message": "מנע מסרטונים להתנגן באופן אוטומטי ועצור סרטונים 'צפים' ממעקב אחריך בזמן שאתה גולש."
+   },
+   "preview_a_theme": {
+      "description": "Text in the aria-label attribute of an icon indicating that clicking will show the preview image of a theme on an extension page.",
+      "message": "הצג מראש ערכת נושא $theme_name$ עבור $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "options page"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "preview_channel_image": {
+      "description": "Text in the alt attribute of an image previewed as part of the Image Swap feature.",
+      "message": "תמונת קדם־תצוגה של $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Cats"
+         }
+      }
+   },
+   "privacy_policy": {
+      "description": "Link to AdBlock's privacy policy",
+      "message": "מדיניות פרטיות"
+   },
+   "problem_solved": {
+      "description": "Message for help flow in popup menu.",
+      "message": "נפלא! הבעיה נפתרה."
+   },
+   "pwyw": {
+      "description": "Text of a payment request link",
+      "message": "שלם כפי יכולתך!"
+   },
+   "pwyw2": {
+      "description": "Text of a payment request link",
+      "message": "שלם כפי יכולתך!"
+   },
+   "rate_us": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "דרג אותנו"
+   },
+   "rebecca_purple_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "סגול רבקה"
+   },
+   "reenableadsonebyone": {
+      "description": "Tells the user to re-enable the extensions one by one",
+      "message": "מעולה! עכשיו בוא נמצא איזו הרחבה היא הגורם. לך אליהן ואפשר כל הרחבה אחת אחת. ההרחבה שמחזירה את הפרסומת (פרסומות) היא האחת שאתה צריך להסיר כדי להיפטר מהפרסומות."
+   },
+   "refusetocheck": {
+      "description": "User is telling us they don't wish to investigate something for us",
+      "message": "אני לא רוצה לסמן את זה"
+   },
+   "reload_not_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "טען מחדש את הדף כך שלא תראה את הפרסומת הזאת יותר!"
+   },
+   "reload_the_page": {
+      "description": "Message for help flow in popup menu.",
+      "message": "טען מחדש את הדף"
+   },
+   "reload_when_ready": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אנא לחץ למטה כדי לטעון מחדש את הדף כשתהיה מוכן."
+   },
+   "reloadadpage": {
+      "description": "Instruction on ad report page",
+      "message": "טען מחדש את הדף עם הפרסומת."
+   },
+   "reloadpageafterwhitelist": {
+      "description": "Checkbox in the allowlist wizard",
+      "message": "טען מחדש את הדף."
+   },
+   "remove_image": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "הסר תמונה"
+   },
+   "remove_image_msg": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "האם אתה בטוח שאתה רוצה להסיר תמונה זו?"
+   },
+   "removed_url": {
+      "description": "Message for help flow in popup menu.",
+      "message": "בסדר! הסרנו את הכתובת מהרשימת ההתרה שלך."
+   },
+   "removefromlist": {
+      "description": "Label to remove a custom filter list",
+      "message": "הסר מהרשימה"
+   },
+   "report_ad_on_page": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "דווח על פרסומת בדף זה"
+   },
+   "reportfilterlistproblem": {
+      "description": "Telling the user to report an ad to a filter list maintainer",
+      "message": "זאת בעיה של רשימת מסננים. דווח עליה כאן: $link$",
+      "placeholders": {
+         "link": {
+            "content": "[[]]",
+            "example": "The link could point to a filter list's forum, or to the email address of a filter list maintainer. For example, forums.lanik.us or someguy@list.com."
+         }
+      }
+   },
+   "reportpubliclyavailable": {
+      "description": "Ad report page string, when you're about to submit a report.",
+      "message": "הערה: הדוח שלך עשוי להפוך לזמין באופן ציבורי. קח זאת בחשבון לפני שאתה מכליל דבר מה פרטי."
+   },
+   "require_restart_browser": {
+      "description": "Text displayed within an option to notify users to restart the browser to fully enable the option",
+      "message": "דורש הפעלה מחדש של הדפדפן שלך"
+   },
+   "resourceblocktitle": {
+      "description": "Resource list page name",
+      "message": "כל המשאבים"
+   },
+   "resourcedomain": {
+      "description": "Resource list page: text shown when hovering over an item in the third-party column",
+      "message": "נטען בדף עם תחום:\n$domain$",
+      "placeholders": {
+         "domain": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "resume_blocking_ads": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site' or 'AdBlock is paused on all sites'",
+      "message": "המשך לחסום פרסומות"
+   },
+   "resume_blocking_ads_period": {
+      "description": "First sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "המשך לחסום פרסומות."
+   },
+   "resume_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האם אתה רוצה להמשיך לחסום פרסומות ולטעון מחדש את הדף?"
+   },
+   "retryaftersubscribe": {
+      "description": "Instructions on ad report page telling users to subscribe to a filter list and then check again to see whether the ad exists",
+      "message": "הירשם כמנוי לרשימת מסננים זו, לאחר מכן נסה שוב: $list_title$",
+      "placeholders": {
+         "list_title": {
+            "content": "$1",
+            "example": "French"
+         }
+      }
+   },
+   "safaributton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Customize Toolbar' should match the text that Safari displays in the toolbar's context menu.",
+      "message": "כדי להסתיר את הכפתור, לחץ לחיצה ימנית על סרגל הכלים של Safari ובחר בסרגל הכלים התאמה אישית, לאחר מכן גרור את כפתור AdBlock מחוץ אל סרגל הכלים. אתה יכול להראותו שוב ע״י גרירתו חזרה אל סרגל הכלים."
+   },
+   "safaricontentblocking": {
+      "description": "Checkbox on the 'General' tab of the Options page. 'Content Blocking' is the name of a different way of blocking resources introduced in Safari 9.",
+      "message": "התר חסימת תוכן של Safari"
+   },
+   "safaricontentblockinglimitexceeded": {
+      "description": "Displayed when the number of rules in the subscribed filter lists is larger than the number supported by Safari Content Blocking, if that option is enabled.",
+      "message": "המספר של כלליי רשימת המסננים חרג את מגבלת 50,000, והופחת באופן אוטומטי. אנא בטל הרשמה כמנוי ממספר רשימות מסננים או השבת את חסימת התוכן של Safari!"
+   },
+   "safaricontentblockingpausemessage": {
+      "description": "Alert displayed after clicking 'Pause AdBlock' in the AdBlock menu while Safari Content blocking is enabled.",
+      "message": "כדי להשהות את AdBlock עם חסימת תוכן מאופשרת, אנא בחר Safari (בשורת התפריט) > העדפות > הרחבות > AdBlock, ובטל את סימון 'אפשר את AdBlock'."
+   },
+   "safarinotificationbody": {
+      "description": "Body of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "אנא השבת מספר רשימות מסננים. עוד מידע באפשרויות של AdBlock."
+   },
+   "safarinotificationtitle": {
+      "description": "Title of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "מגבלת כלליי חסימת תוכן חרגה"
+   },
+   "save_custom_settings_cta": {
+      "description": "Part 1 of a Premium call-to-action on the Options page",
+      "message": "האם אתה רוצה לשמור הגדרות של חסימת פרסומות מותאמת אישית ולהשתמש בהן בכל דפדפן?"
+   },
+   "savebutton": {
+      "description": "Save button",
+      "message": "שמור"
+   },
+   "savereminder": {
+      "description": "Reminder to click 'Save'",
+      "message": "אל תשכח לשמור!"
+   },
+   "see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אני רואה פרסומת"
+   },
+   "see_ad_everywhere": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אני רואה פרסומת זו בכל מקום"
+   },
+   "see_photos_no_ads_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "נחסום עדיין פרסומות, אבל נחליף כמה מהן בתמונות של חתולים, כלבים וטבע."
+   },
+   "see_photos_no_ads_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "ראה תמונות, לא פרסומות"
+   },
+   "selected": {
+      "description": "Text in the aria-label attribute of an icon showing an option is selected.",
+      "message": "נבחר"
+   },
+   "selectlanguage": {
+      "description": "First option in the language dropdown menu on the Filter lists tab. Include the ' -- ' on either side of your translation.",
+      "message": " -- בחר שפה -- "
+   },
+   "selectlanguage2": {
+      "description": "First option in the language dropdown menu on the Filter lists tab.",
+      "message": "בחר שפה"
+   },
+   "senddebugdata": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "שלח נתוני ניפוי תקלים"
+   },
+   "set_preferences_once": {
+      "description": "Description of Sync on Sync tab",
+      "message": "הגדר את ההעדפות שלך פעם אחת, ולעולם לא תדאג לגבי אובדן נתונים או ביצוע אותו שינוי שוב בהרחבות רבות."
+   },
+   "settings": {
+      "description": "Text in the aria-label attribute of the gear icon on the pop-up menu.",
+      "message": "הגדרות"
+   },
+   "settings_changed": {
+      "description": "Part of Options page message letting users know of settings change.",
+      "message": "כהכנה, AdBlock עובד כעת בצורה שונה וחלק מההגדרות שלך כנראה השתנה."
+   },
+   "show_ads_except_for": {
+      "description": "Section title for the allowlisting section of Customize tab",
+      "message": "הראה פרסומות בכל מקום חוץ מתחומים אלו…"
+   },
+   "show_details": {
+      "description": "Toggle that shows the details section",
+      "message": "הראה פרטים"
+   },
+   "show_devtools_panel": {
+      "description": "Checkbox letting user choose whether the AdBlock tab should be displayed in the developer tools window",
+      "message": "הראה לוח 'AdBlock' בכליי המפתחים"
+   },
+   "show_language_options": {
+      "description": "Option to let the user choose AdBlock's display language.",
+      "message": "תן לי לבחור את שפת התצוגה של AdBlock"
+   },
+   "show_on_adblock_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "הראה מספר של פרסומות חסומות בכפתור AdBlock"
+   },
+   "show_on_adblock_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "הראה מספר של פרסומות חסומות בתפריט AdBlock"
+   },
+   "show_on_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "הראה מספר של פרסומות חסומות בתחתית"
+   },
+   "show_on_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "הראה מספר של פרסומות חסומות בתפריט"
+   },
+   "show_resourcelist": {
+      "description": "Menu entry to open the resource list page",
+      "message": "הראה את כל הבקשות"
+   },
+   "show_some_love": {
+      "description": "Title of the tooltip of the rate us button CTA in the Options page.",
+      "message": "הראה אל AdBlock קצת אהבה!"
+   },
+   "showcontextmenus2": {
+      "description": "Checkbox on the 'General' tab of the Options page.",
+      "message": "הוסף פריטים לתפריט הלחיצה הימנית"
+   },
+   "showlinkstolists2": {
+      "description": "Label to display filter list links",
+      "message": "הראה קישורים אל רשימות המסננים"
+   },
+   "sliderexplanation": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "אם לא, השתמש במַחְלֵק כדי להסתיר פריטים נוספים בדף הזה:"
+   },
+   "slidertitle": {
+      "description": "'Block an ad' wizard title",
+      "message": "צעד 1: הבן מה לחסום"
+   },
+   "sliderwarning": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "היזהר, הסתרה יותר מדי בדף יכולה לשבור תפקודיות"
+   },
+   "slows_down_extension": {
+      "description": "Text of an option telling users that the option slows down the extension",
+      "message": "מאט את ההרחבה"
+   },
+   "solarized_light_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "סולארי בהיר"
+   },
+   "solarized_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "סולארי"
+   },
+   "something_else_going_on": {
+      "description": "Message for help flow in popup menu.",
+      "message": "משהו אחר בטוח קורה."
+   },
+   "something_not_working": {
+      "description": "Message for help flow in popup menu.",
+      "message": "משהו לא עובד."
+   },
+   "sourcecode": {
+      "description": "Link to the source code of AdBlock on the Support tab",
+      "message": "סקור את [[קוד המקור]] שלנו"
+   },
+   "stats": {
+      "description": "Title of the statistics (metrics) tab of the Options page",
+      "message": "סטטיסטיקה"
+   },
+   "stats_ads_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "פרסומות נחסמו"
+   },
+   "stats_ads_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "מספר של פרסומות שנחסמו"
+   },
+   "stats_already_opted": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "אתה משתתף כבר בשיתוף נתוני שימוש אלמוניים איתנו."
+   },
+   "stats_go_back_text_button": {
+      "description": "button text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "חזור"
+   },
+   "stats_hide_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "הסתר סטטיסטיקה"
+   },
+   "stats_im_sure_text_button": {
+      "description": "button text on page 2 of delete modal box on the statistics page of the Options page",
+      "message": "אני בטוח"
+   },
+   "stats_opt_in_data_collect": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "עזור לשפר את AdBlock ע״י שיתוף [[נתוני שימוש אלמוניים]]"
+   },
+   "stats_opt_in_header": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "רוצה לראות את סטטיסטיקת AdBlock שלך? "
+   },
+   "stats_opt_in_local_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "השתתף גם באיסוף סטטיסטיקה מקומית על מנת להשיג גישה אל כל סטטיסטיקת AdBlock שלך, כגון באילו אתרים אתה חוסם הכי הרבה פרסומות ועוקבנים, סה״כ חסימות לאורך הזמן, ותמונות מוחלפות עבור משתמשי Premium."
+   },
+   "stats_opt_in_local_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "השתתף באיסוף סטטיסטיקה מקומית"
+   },
+   "stats_opt_in_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "השתתף באיסוף סטטיסטיקה מקומית כדי לראות את סטטיסטיקת AdBlock שלך, כגון באילו אתרים אתה חוסם הכי הרבה פרסומות ועוקבנים, סה״כ חסימות לאורך הזמן, ותמונות מוחלפות עבור משתמשי Premium."
+   },
+   "stats_opt_in_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "השתתף"
+   },
+   "stats_replaced_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "תמונות הוחלפו"
+   },
+   "stats_replaced_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "מספר של תמונות שהוחלפו"
+   },
+   "stats_show_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "הראה סטטיסטיקה"
+   },
+   "stats_trackers_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "עוקבנים נחסמו"
+   },
+   "stats_trackers_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "מספר של עוקבנים שנחסמו"
+   },
+   "statstitle": {
+      "description": "On page title of the statistics page of the Options page",
+      "message": "לוח מחוונים של סטטיסטיקה"
+   },
+   "status_allowlisted": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a page or website",
+      "message": "תיצרת את AdBlock להישאר מושהה באתר זה עבור כל ביקור."
+   },
+   "status_domain_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a specific domain",
+      "message": "AdBlock מושהה עבור ביקור זה. ייתכן שתצטרך לרענן את הדף כדי לראות את השינויים שלך."
+   },
+   "status_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running",
+      "message": "AdBlock מושבת."
+   },
+   "status_universal_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on all domains",
+      "message": "AdBlock מושהה בכל האתרים."
+   },
+   "stay_tuned": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "הישאר במעקב"
+   },
+   "still_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האם אתה עדין רואה את הפרסומת?"
+   },
+   "stop_blocking_ads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "הפסק לחסום פרסומות:"
+   },
+   "stop_blocking_ads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "הפסק לחסום פרסומות"
+   },
+   "storage_quota_exceeded": {
+      "description": "Message shown when the user uses more storage than allowed by the browser.",
+      "message": "חרגת את כמות האחסון אשר AdBlock יכול להשתמש. אנא בטל הרשמת מינוי ממספר רשימות מסננים!"
+   },
+   "sub_menu_item_all": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "כל הזמן"
+   },
+   "sub_menu_item_month": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "החודש"
+   },
+   "sub_menu_item_today": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "היום"
+   },
+   "sub_menu_item_week": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "השבוע"
+   },
+   "sub_menu_item_year": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "השנה"
+   },
+   "subframe": {
+      "description": "Resource list page: frame type",
+      "message": "תת־מסגרת"
+   },
+   "subscribebutton": {
+      "description": "Subscribe to a filter list button",
+      "message": "הירשם כמנוי"
+   },
+   "subscribeconfirm": {
+      "description": "Prompt question before subscribing to a filter list",
+      "message": "האם אתה בטוח שאתה רוצה להירשם כמנוי לרשימת המסננים $title$?",
+      "placeholders": {
+         "title": {
+            "content": "$1",
+            "example": "Prebake"
+         }
+      }
+   },
+   "subscribingfailed": {
+      "description": "abp: link subscriber unsuccessful result",
+      "message": "נכשל ! :("
+   },
+   "subscribingfinished": {
+      "description": "abp: link subscriber successful result",
+      "message": "הסתיים!"
+   },
+   "subscribingtitle": {
+      "description": "abp: link subscriber title",
+      "message": "נרשם כמנוי אל רשימת מסננים…"
+   },
+   "success": {
+      "description": "Text in the aria-label attribute of an icon indicating successful results.",
+      "message": "הצלחה"
+   },
+   "successfully_whitelisted": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "הוספת בהצלחה כתובת זו אל רשימת ההתרה שלך."
+   },
+   "sunshine_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "אור שמש"
+   },
+   "support_to_unlock": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "תמוך כדי לשחרר נעילה"
+   },
+   "support_with_a_review": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "תמוך בצוות שלנו ע״י השארת ביקורת."
+   },
+   "supportsite": {
+      "description": "Link to the support site on the Support tab",
+      "message": "יידע אותנו ב[[אתר התמיכה]] שלנו!"
+   },
+   "sync_delete_panel_title": {
+      "description": "Panel title text on the delete device overlay",
+      "message": "מחק הרחבה מסונכרנת"
+   },
+   "sync_device_name_list_updated_at_msg": {
+      "description": "message to users on when the sync page was last updated with the name of the extensions / devices (displayed in locale specific format)",
+      "message": "עודכן בפעם האחרונה $timestamp$",
+      "placeholders": {
+         "timestamp": {
+            "content": "$1",
+            "example": "April 30, 2019 6:25 pm for US/English locale"
+         }
+      }
+   },
+   "sync_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Sync feature.",
+      "message": "דוגמת סינכרון"
+   },
+   "sync_extension_name_placeholder": {
+      "description": "placeholder text in the extension / device name field on the sync page",
+      "message": "תן שם להרחבה זו כך שתוכל לכנות אותה בנפרד מאחרות…"
+   },
+   "sync_extension_no_extension_msg": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "אין לך הרחבות מסונכרנות."
+   },
+   "sync_extension_section_title": {
+      "description": "section title text on the Sync sub-tab of the Options page",
+      "message": "הרחבות"
+   },
+   "sync_header_error_save_message_part_2": {
+      "description": "part 2 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "הרחבה זו אינה מסונכרנת."
+   },
+   "sync_header_error_save_message_part_3": {
+      "description": "part 3 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "אנא נסה סינכרון ידני מאוחר יותר."
+   },
+   "sync_header_message_error_prefix": {
+      "description": "Start of an sync error message to users on the Options page or AdBlock popup menu.",
+      "message": "הרחבה זו לא הייתה מסונכרנת."
+   },
+   "sync_header_message_getting_license": {
+      "description": "message to users on the sync page when the extension is getting the license",
+      "message": "בודק…"
+   },
+   "sync_header_message_in_progress": {
+      "description": "message to users on the options pages when syncing with the server is in progress",
+      "message": "סינכרון בתהליך…"
+   },
+   "sync_header_message_no_license": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "אנא תן לנו מספר רגעים כדי להכין את סינכרון עבורך."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_2": {
+      "description": "part 2 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "סינכרנו הרחבה זו ונחזיר את השינויים שלך."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "אנא העתק את הכללים המותאמים אישית ללוח הגזירה, טען מחדש את הדף ובצע שוב את השינויים שלך."
+   },
+   "sync_header_message_old_commit_version_part_2": {
+      "description": "part 2 of a message to users on the sync page and popup menu when initial setup of sync fails for some unknown reason.",
+      "message": "סינכרנו הרחבה זו והחזרנו את השינויים שלך."
+   },
+   "sync_header_message_old_commit_version_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "אנא טען מחדש את הדף ובצע שוב את השינויים שלך."
+   },
+   "sync_header_message_setup_fail_part_2": {
+      "description": "message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "אנא נסה להוסיף שוב הרחבה זו עוד מספר דקות."
+   },
+   "sync_header_message_setup_fail_prefix": {
+      "description": "start of error message to users on the sync page when sync fails.",
+      "message": "שגיאת סינכרון:"
+   },
+   "sync_header_message_sync_complete": {
+      "description": "message to users on the option pages when syncing with the server server is complete",
+      "message": "סינכרון הושלם"
+   },
+   "sync_message_old_version_part_1": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "אתה משתמש בגרסה ישנה של AdBlock."
+   },
+   "sync_message_old_version_part_2": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "אנא [[עדכן את AdBlock]] כך שנוכל לסנכרן את ההגדרות שלך."
+   },
+   "sync_now_btn_text": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "סנכרן כעת"
+   },
+   "sync_premium_cta": {
+      "description": "AdBlock Premium CTA on the Sync tab",
+      "message": "תהיה מקצוען של חסימת פרסומות עם מאפייני Premium כמו סינכרון."
+   },
+   "sync_removed_error_msg_part_1": {
+      "description": "sync error message text on the popup menu",
+      "message": "הרחבה זו אינה מסונכרנת"
+   },
+   "sync_removed_error_msg_part_2": {
+      "description": "sync error message text on the popup menu and options page",
+      "message": "לחץ כאן כדי לעדכן את ההגדרות שלך"
+   },
+   "sync_tab_item": {
+      "description": "Title of the Sync sub-tab of the Options page",
+      "message": "גיבוי וסינכרון"
+   },
+   "sync_turn_on_duplicate_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "שם זה של הרחבה נמצא כבר בשימוש"
+   },
+   "sync_turn_on_invalid_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "אנא תן שם להרחבה זו כדי להמשיך"
+   },
+   "sync_verify_turn_on_text": {
+      "description": "message text in the extension / device name field on the sync page",
+      "message": "הפעלת גיבוי וסינכרון תנקה מידע הגדרות קיים מהרחבה זו."
+   },
+   "sync_your_settings_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "קח את הכללים וההגדרות של חסימת הפרסומות שלך איתך לכל מחשב שאתה משתמש."
+   },
+   "sync_your_settings_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "סנכרן הגדרות"
+   },
+   "tabcustomize": {
+      "description": "A tab on the Options page",
+      "message": "התאמה אישית"
+   },
+   "tabcustomizetitle": {
+      "description": "Title of the Customize tab of the Options page",
+      "message": "התאם אישית את AdBlock"
+   },
+   "tabfilterlists": {
+      "description": "A tab on the Options page",
+      "message": "רשימות מסננים"
+   },
+   "tabgeneral": {
+      "description": "A tab on the Options page",
+      "message": "כללי"
+   },
+   "tabreloadcomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "הסתיים! טענו מחדש את הדף עם הפרסומת. אנא בדוק את הדף כדי לראות האם הפרסומת נעלמה. לאחר מכן חזור אל דף זה וענה על השאלה להלן."
+   },
+   "tabsupport": {
+      "description": "A tab on the Options page",
+      "message": "תמיכה"
+   },
+   "tabtranslations": {
+      "description": "A tab on the Options page",
+      "message": "תרגומים"
+   },
+   "text_body": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 22 characters)",
+      "message": "טקסט גוף"
+   },
+   "thanks": {
+      "description": "Message for help flow in popup menu.",
+      "message": "תודה"
+   },
+   "themes": {
+      "description": "Title of the Themes tab of the Options page",
+      "message": "ערכות נושא"
+   },
+   "thirdparty": {
+      "description": "Resource list page: column title telling if the resource originates from a different domain",
+      "message": "צד שלישי"
+   },
+   "this_extension": {
+      "description": "description for name of the current extension",
+      "message": "(הרחבה זו)"
+   },
+   "topframe": {
+      "description": "Resource list page: frame type",
+      "message": "מסגרת עליונה"
+   },
+   "trackers_button_text": {
+      "description": "button text on the statistics page of the Options page in the trackers panel",
+      "message": "אפשר"
+   },
+   "trackers_cta_header": {
+      "description": "Header text on the statistics page of the Options page in the trackers panel",
+      "message": "גששים"
+   },
+   "trackers_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the trackers panel",
+      "message": "אפשר את [[רשימת מסנני Easy Privacy]] כדי להתחיל לחסום עוקבנים"
+   },
+   "translator_credit": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "קרדיט לתרגום הולך אל:"
+   },
+   "translator_credit2": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "קרדיט לתרגום הולך אל…"
+   },
+   "translators": {
+      "description": "A link on the Options page / translators tab to a KB article about how to help translate AdBlock",
+      "message": "למד עוד על איך לעזור לתרגם את AdBlock [[כאן]]"
+   },
+   "troubleshoot_an_ad": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "פתור תקלת פרסומת"
+   },
+   "try_backup_sync": {
+      "description": "Part 2 of a Premium call-to-action on the Options page",
+      "message": "אם כך, נסה את המאפיין גיבוי וסינכרון."
+   },
+   "try_manual_update": {
+      "description": "Message for help flow in popup menu.",
+      "message": "אנא נסה [[לעדכן באופן ידני את רשימות המסננים]]."
+   },
+   "try_pausing": {
+      "description": "Message for help flow in popup menu.",
+      "message": "בסדר, בוא ננסה להשהות את AdBlock."
+   },
+   "typehiding": {
+      "description": "A resource type",
+      "message": "הסתרה"
+   },
+   "typeimage": {
+      "description": "A resource type",
+      "message": "תמונה"
+   },
+   "typemain_frame": {
+      "description": "A resource type",
+      "message": "דף"
+   },
+   "typemedia": {
+      "description": "A resource type",
+      "message": "שמע/וידאו"
+   },
+   "typeobject": {
+      "description": "A resource type",
+      "message": "עצם הידודי"
+   },
+   "typeobject_subrequest": {
+      "description": "A resource type",
+      "message": "object_subrequest"
+   },
+   "typeother": {
+      "description": "A resource type",
+      "message": "אחר"
+   },
+   "typepage": {
+      "description": "A resource type",
+      "message": "דף"
+   },
+   "typepopup": {
+      "description": "A resource type",
+      "message": "חלון קופץ"
+   },
+   "typescript": {
+      "description": "A resource type",
+      "message": "תסריט"
+   },
+   "typeselector": {
+      "description": "A resource type",
+      "message": "בורר"
+   },
+   "typestylesheet": {
+      "description": "A resource type",
+      "message": "הגדרת סגנון"
+   },
+   "typesub_frame": {
+      "description": "A resource type",
+      "message": "מסגרת"
+   },
+   "typesubdocument": {
+      "description": "A resource type",
+      "message": "מסגרת"
+   },
+   "typeunknown": {
+      "description": "A resource type",
+      "message": "לא ידוע"
+   },
+   "typewebsocket": {
+      "description": "A resource type",
+      "message": "תושבת רשת"
+   },
+   "typexmlhttprequest": {
+      "description": "A resource type",
+      "message": "xmlhttprequest"
+   },
+   "undo_last_block": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "בטל את החסימות שלי בתחום זה"
+   },
+   "undo_last_block_site": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "בטל הסתרה של פריטים מוסתרים"
+   },
+   "unexpected_filter_list_header": {
+      "description": "Error message shown when the user attempts to add a custom filter that has the format of a header (e.g. \"[Adblock Plus 2.0]\") which are only allowed in filter lists",
+      "message": "כותרות של רשימת מסננים אינן מותרות כאן"
+   },
+   "unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused'",
+      "message": "בטל השהית AdBlock"
+   },
+   "unpause_adblocking": {
+      "description": "Menu entry to unpause the extension (start blocking ads again)",
+      "message": "בטל השהית חסימת פרסומות"
+   },
+   "unpaused_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "הרגע ביטלנו השהיה של AdBlock וטענו מחדש את הדף."
+   },
+   "unsubscribe_from_all_confirmation": {
+      "description": "Confirmation message shown to user if they try to unsubscribe from all filter lists. The user will have two options: OK and Cancel.",
+      "message": "AdBlock אינו יכול לחסום פרסומות אם תשבית את כל רשימות המסננים. אנחנו ממליצים להשהות את AdBlock במקום זאת. לבטל הרשמת מינוי מרשימה זו בכל זאת?"
+   },
+   "unsubscribedlabel": {
+      "description": "Status label when unselecting a filter list",
+      "message": "ביטלת הרשמה כמנוי."
+   },
+   "unsync_error_msg_part_1": {
+      "description": "sync error message text on the options menu",
+      "message": "שגיאת סינכרון"
+   },
+   "unsync_error_msg_part_2": {
+      "description": "sync error message text on the popup menu",
+      "message": "הרחבה זו אינה מסתנכרנת יותר."
+   },
+   "unsync_error_msg_part_3": {
+      "description": "sync error message text on the Sync tab of the options page",
+      "message": "לחץ כאן כדי לרענן דף זה, לאחר מכן לחץ על \"הוסף הרחבה זו\" כדי לסנכרן מכשיר זה"
+   },
+   "update_filter_lists_now": {
+      "description": "Text in the aria-label attribute of the 'update now' button on the Options page in the Filter Lists tab.",
+      "message": "עדכן רשימות מסננים כעת"
+   },
+   "updateddayago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני יום"
+   },
+   "updateddaysago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני $days$ ימים",
+      "placeholders": {
+         "days": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedhourago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני שעה"
+   },
+   "updatedhoursago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני $hours$ שעות",
+      "placeholders": {
+         "hours": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedminuteago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני דקה"
+   },
+   "updatedminutesago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני $minutes$ דקות",
+      "placeholders": {
+         "minutes": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedrightnow": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן הרגע"
+   },
+   "updatedsecondsago": {
+      "description": "Label for filter list subscription",
+      "message": "עודכן לפני $seconds$ שניות",
+      "placeholders": {
+         "seconds": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedtimestamp": {
+      "description": "Label for filter list subscription last updated timestamp",
+      "message": "עודכן $ts$",
+      "placeholders": {
+         "ts": {
+            "content": "$1",
+            "example": "8/26/2019 10:23:44 PM"
+         }
+      }
+   },
+   "updatenowmessage2": {
+      "description": "Update filters text and button",
+      "message": "אמשוך עדכונים באופן אוטומטי; אתה גם יכול [[לעדכן כעת]]"
+   },
+   "updateyourlists": {
+      "description": "Section header on the ad report page",
+      "message": "וודא שרשימות המסננים שלך מעודכנות:"
+   },
+   "updating_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock מעדכן את רשימות המסננים שלך כעת כדי לראות אם הן עשויות להיות הבעיה."
+   },
+   "urgent_safari_changes": {
+      "description": "Title for Options page message letting users know of settings change.",
+      "message": "דחוף: Apple משנה את הרחבות Safari."
+   },
+   "visit_help_center": {
+      "description": "Message for help flow in popup menu.",
+      "message": "ייתכן שתרצה [[לבקר במרכז התמיכה שלנו]] עבור עוד אפשרויות של פיתרון תקלות."
+   },
+   "vpn_coming_soon": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "בדוק מה מגיע בקרוב מאת AdBlock"
+   },
+   "want_stop_seeing": {
+      "description": "GFC messaging on the popup menu",
+      "message": "רוצה להפסיק לראות את אלו?"
+   },
+   "want_to_remove": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האם אתה רוצה להסיר את זה?"
+   },
+   "warning": {
+      "description": "Warns the user about an error.",
+      "message": "אזהרה"
+   },
+   "warning_overrules_filters": {
+      "description": "Message on the 'Customize' tab of the options page, explaining the danger of adding a allowlist filter for all websites with only some exceptions.",
+      "message": "אזהרה: בכל האתרים האחרים תראה פרסומות!\nזה גובר על כל המסננים האחרים עבור האתרים הללו."
+   },
+   "watermelon_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "אבטיח"
+   },
+   "website_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האתר שבור"
+   },
+   "website_still_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "האם האתר עדין שבור?"
+   },
+   "whatmakesadblocktick": {
+      "description": "Subtitle on the Support tab. This section contains links to the AdBlock source code and contributors. In this context, 'tick' can be replaced with the word 'work'.",
+      "message": "רוצה לראות מה גורם אל AdBlock לעבוד?"
+   },
+   "whats_this": {
+      "description": "Text of a link pointing to the explanation of a new feature",
+      "message": "מה זה?"
+   },
+   "whatsnew": {
+      "description": "Link to display the changelog on the Support tab",
+      "message": "ראה את העדכונים האחרונים ב[[יומן השינויים]] שלנו"
+   },
+   "whitelist_youtube_channel_v2": {
+      "description": "Menu entry to whitelist the channel of the current YouTube video or page. The channel name will appear on a line below this menu item.",
+      "message": "התר פרסומות בערוץ YouTube:"
+   },
+   "whitelisted_a_site": {
+      "description": "Part 1 of a call-to-action on the allowlist wizard",
+      "message": "הוספת הרגע אתר אל רשימת ההתרה שלך!"
+   },
+   "whitelistertitle2": {
+      "description": "The title of the allowlist wizard (Don't run on this page/pages on this domain)",
+      "message": "אל תריץ את AdBlock ב…"
+   },
+   "wizard_premium_cta_part_I": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "חסמת הרגע משהו באתר הזה."
+   },
+   "wizard_premium_cta_part_II": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "החל העדפה זו בכל המכשירים שלך ווודא שלעולם לא תאבד את הגדרות AdBlock שלך עם גיבוי וסינכרון."
+   },
+   "wizard_premium_cta_title": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "היי, נראה שתאהב את AdBlock Premium"
+   },
+   "wizardcantrunonframesets": {
+      "description": "Alert shown when the user tries to use a blocklist/allowlist wizard on an old website",
+      "message": "מאפיין AdBlock זה אינו עובד באתר זה מאחר שהוא משתמש בטכנולוגיה מיושנת. אתה יכול להתיר או לחסום באופן ידני פרסומות בלשונית 'התאמה אישית' של דף האפשרויות."
+   },
+   "wont_change_anything": {
+      "description": "Message for help flow in popup menu.",
+      "message": "לא נשנה כלום כך שתמשיך לראות את הפרסומת."
+   },
+   "wont_show_again": {
+      "description": "Message shown when user opts out of call-to-action",
+      "message": "בסדר, לא נראה לך שוב הודעה זו."
+   },
+   "work_around_hulu_problems": {
+      "description": "Advanced Options page checkbox, which users only need to use if Hulu.com videos break. It directs the user to restart their browser in order for changes to the checkbox to take effect.",
+      "message": "עבוד מסביב Hulu.com כשסרטונים אינם מתנגנים (דורש הפעלה מחדש של הדפדפן שלך)"
+   },
+   "yes": {
+      "description": "A positive response to a question",
+      "message": "כן"
+   },
+   "you_can_slide_to_change": {
+      "description": "allowlist slider usage instructions. Sometimes only one slider will show, and sometimes two will show, and if possible the text should handle both cases.",
+      "message": "אתה יכול להחליק למטה כדי לשנות בדיוק באילו דפים AdBlock לא ירוץ."
+   },
+   "you_know_thats_a_bad_idea_right": {
+      "description": "Confirmation message shown to user if they try to subscribe to too many lists. The user will have two options: OK and Cancel.",
+      "message": "ככל שתשתמש ביותר רשימות מסננים, ככה AdBlock ירוץ לאט יותר. שימוש ביותר מדי רשימות יכול גם לגרום לדפדפ שלך לקרוס באתרים מסוימים. לחץ אישור כדי לבטל הרשמה כמנוי לרשימה זו בכל מקרה."
+   },
+   "youtube_manage_subscribed": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "נהל הגדרות AdBlock מתוך דף מינויי YouTube שלי"
+   },
+   "youtube_onpage_icon_allow_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "התר פרסומות בהכל"
+   },
+   "youtube_onpage_icon_allowed_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "פרסומות מותרות בכל הערוצים המנויים"
+   },
+   "youtube_onpage_icon_allowing_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "פרסומות מותרות בערוץ זה"
+   },
+   "youtube_onpage_icon_block_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "חסום פרסומות בהכל"
+   },
+   "youtube_onpage_icon_blocked_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "פרסומות חסומות בכל הערוצים המנויים"
+   },
+   "youtube_onpage_icon_blocking_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "פרסומות חסומות בערוץ זה"
+   },
+   "youtube_onpage_icon_msg": {
+      "description": "The message text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "נהל פרסומות בערוצים המנויים שלך:"
+   },
+   "youtube_onpage_icon_no_channels_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "הירשם כמנוי לערוץ YouTube אחד לפחות כדי לנהל פרסומות בערוצים המנויים שלך."
+   },
+   "youtube_onpage_icon_one_moment_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "רק רגע…"
+   },
+   "youtube_onpage_icon_sign_in_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "היכנס אל חשבון YouTube שלך כדי לנהל פרסומות בערוצים המנויים שלך."
+   },
+   "youve_blocked_num_ads": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review. The $numBlocked$ will be replaced with the number of ads the users has blocked, starting at 10,000.",
+      "message": "חסמת $numBlocked$ פרסומות!",
+      "placeholders": {
+         "numBlocked": {
+            "content": "$1",
+            "example": "10,000"
+         }
+      }
+   },
+   "ytadblockupdates": {
+      "description": "Subtitle on the Support tab. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "עדכוני AdBlock ב־YouTube"
+   }
+}

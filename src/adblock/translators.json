@@ -1,0 +1,1661 @@
+{
+  "en":{
+    "language": "English",
+    "localized": "English",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "The AdBlock Team",
+        "username": null,
+        "professional": true,
+        "proofreader": true,
+        "joined": "2009-12"
+      }
+    ]
+  },
+  "ar": {
+    "language": "Arabic",
+    "localized": "العربية",
+    "professional": false,
+    "translators": [
+      {
+        "credit": "Ahmed Walid",
+        "username": "ahmedwalid05",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-12"
+      },
+      {
+        "credit": "Umar Hoj",
+        "username": "uhoj999",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-08"
+      },
+      {
+        "credit": "2B-4G10",
+        "username": "2B-4G10",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-10"
+      },
+      {
+        "credit": "ABDELGHANI HOURANI",
+        "username": "abdelghani.me",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      },
+      {
+        "credit": "Khaled Hosny",
+        "username": "khaledhosny",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2019-01"
+      },
+      {
+        "credit": "Mumtaz76",
+        "username": "Mumtaz76",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-02"
+      },
+      {
+        "credit": "mmona",
+        "username": "mmona",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-09"
+      },
+      {
+        "credit": "Safa Alfulaij",
+        "username": "safaalfulaij",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-08"
+      },
+      {
+        "credit": "yazan.abohethm",
+        "username": "yazan.abohethm",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2019-12"
+      }
+    ]
+  },
+  "bg":{
+    "language": "Bulgarian",
+    "localized": "български",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Николай Филипов",
+        "username": "zmeYpc",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2011-05"
+      },
+      {
+        "credit": "djradimix",
+        "username": "djradimix",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-01"
+      }
+    ]
+  },
+  "ca":{
+    "language": "Catalan",
+    "localized": "català",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "CatTranslations",
+        "username": "CatTranslations",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-10"
+      },
+      {
+        "credit": "Jaime Muñoz Martín",
+        "username": "jmmartin_5",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2016-04"
+      }
+    ]
+  },
+  "cs":{
+    "language": "Czech",
+    "localized": "čeština",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Petr Cízl",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+        "credit": "Viktor De Pasquale",
+        "username": "neytireyqa",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-01"
+      },
+      {
+        "credit": "Tomáš Branda",
+        "username": "PapuleX",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2017-08"
+      },
+      {
+        "credit": "Dominio Suzi",
+        "username": "DominioCz",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "Eva Čermáková",
+        "username": "evacerm",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-05"
+      },
+      {
+        "credit": "Jirka Skalník",
+        "username": "jirkaskalnik",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      },
+      {
+        "credit": "Luis Levi",
+        "username": "luislevi32",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-02"
+      },
+      {
+        "credit": "Tom_Hraje",
+        "username": "Tom_Hraje",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2019-10"
+      },
+      {
+        "credit": "Vít Loyd Kolomazník",
+        "username": "nirczech",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-08"
+      }
+    ]
+  },
+  "da":{
+    "language": "Danish",
+    "localized": "dansk",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "stallemanden",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-03"
+      },
+      {
+        "credit": "Rasmus S.",
+        "username": "rasmussch",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2013-06"
+      }
+    ]
+  },
+  "de":{
+    "language": "German",
+    "localized": "Deutsch",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "John Rey",
+        "username": "Johnnz",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-08"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "el":{
+    "language": "Greek",
+    "localized": "Ελληνικά",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Ανέστης Βαρσαμίδης",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+        "credit": "Ελευθερία Κ.",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-10"
+      },
+      {
+        "credit": "jimspentzos2000",
+        "username": "jimspentzos2000",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "double-beep",
+        "username": "double-beep",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-01"
+      }
+    ]
+  },
+  "es":{
+    "language": "Spanish",
+    "localized": "español",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "@Jotaele_",
+        "username": "Jotaele_",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "Jaime Muñoz Martín",
+        "username": "jmmartin_5",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-06"
+      },
+      {
+        "credit": "Dani de elASDFblog",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "fi":{
+    "language": "Finnish",
+    "localized": "Suomi",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "ollinpos",
+        "username": "Olli",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2011-02"
+      },
+      {
+        "credit": "Jesse Järvi",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-07"
+      },
+      {
+        "credit": "PatrikSelin",
+        "username": "PatrikSelin",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-10"
+      },
+      {
+        "credit": "JoosuaKoskinen",
+        "username": "JoosuaKoskinen",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-04"
+      }
+    ]
+  },
+  "fil":{
+    "language": "Filipino",
+    "localized": "Filipino",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "franzancot",
+        "username": "franzancot",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2018-02"
+      }
+    ]
+  },
+  "fr": {
+    "language": "French",
+    "localized": "Français",
+    "professional": true,
+    "translators": [
+      {
+        "credit": "Neelfyn",
+        "username": "Neelfyn",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-05"
+      },
+      {
+        "credit": "Matthieu Bobillot",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+        "credit": "Cash-man",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-08"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "gl":{
+    "language": "Galician",
+    "localized": "Galego",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Xesús M. Mosquera Carregal (@estaengalego)",
+        "username": "xesusmosquera",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-03"
+      },
+      {
+        "credit": "Iváns",
+        "username": "Ivans_translator",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-03"
+      },
+      {
+        "credit": "Yupi",
+        "username": "Yupi",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-01"
+      }
+    ]
+  },
+  "gu":{
+    "language": "Gujarati",
+    "localized": "ગુજરાતી",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Vatsal Shah (imvatsalshah)",
+        "username": "imvatsalshah",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-04"
+      }
+    ]
+  },
+  "he":{
+    "language": "Hebrew",
+    "localized": "עברית",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "BarakSt",
+        "username": "BarakSt",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-09"
+      },
+      {
+        "credit": "ION",
+        "username": "IONIL",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2018-02"
+      },
+      {
+        "credit": "AdBlockPlusIsrael",
+        "username": "AdBlockPlusIsrael",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-08"
+      },
+      {
+        "credit": "icecore",
+        "username": "icecore",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-01"
+      }
+    ]
+  },
+  "hr":{
+    "language": "Croatian",
+    "localized": "hrvatski",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Stjepan Treger",
+        "username": "streger",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2011-04"
+      }
+    ]
+  },
+  "hu":{
+    "language": "Hungarian",
+    "localized": "magyar",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "iScream",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-06"
+      },
+      {
+        "credit": "Ofalvai",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+        "credit": "Shibelion",
+        "username": "AllenWalkerHU",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2014-08"
+      },
+      {
+        "credit": "Moonline",
+        "username": "Moonline",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-06"
+      },
+      {
+        "credit": "Sándor Seres",
+        "username": "seress",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-08"
+      }
+    ]
+  },
+  "id":{
+    "language": "Indonesian",
+    "localized": "Bahasa Indonesia",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Ghie2lo",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+        "credit": "Hisyam Pratama Islam",
+        "username": "azbez",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "M. Ridwan Hakim",
+        "username": "Remoirex",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2014-11"
+      },
+      {
+        "credit": "Alfatta Rezqa Winnersyah",
+        "username": "alfatta",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-07"
+      },
+      {
+        "credit": "Ridho Aliga",
+        "username": "ridhoaliga",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-04"
+      },
+      {
+        "credit": "yuzrizal12",
+        "username": "yuzrizal12",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-03"
+      }
+    ]
+  },
+  "it":{
+    "language": "Italian",
+    "localized": "italiano",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Giordano",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "Fabio B.",
+        "username": "regulus",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-12"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "ja":{
+    "language": "Japanese",
+    "localized": "日本語",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Yujin Takayanagi",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-05"
+      },
+      {
+        "credit": "minami1983",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "s.tamaki",
+        "username": "randplus",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "lindwurm",
+        "username": "lindwurm",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "MoeMoePig",
+        "username": "MoeMoePig",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-11"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      },
+      {
+        "credit": "Satoshi YAMAMOTO",
+        "username": "may-s",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-04"
+      }
+    ]
+  },
+  "ko":{
+    "language": "Korean",
+    "localized": "한국어",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "메이비(Maybee)",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-08"
+      },
+      {
+        "credit": "Hongjoo Lee",
+        "username": "mamadontgodaddycomehome",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-08"
+      },
+      {
+        "credit": "auth",
+        "username": "auth",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2016-06"
+      },
+      {
+        "credit": "Jason C",
+        "username": "www719",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-05"
+      },
+      {
+        "credit": "greedyred1110",
+        "username": "greedyred1110",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-03"
+      },
+      {
+        "credit": "Kyusang Whang",
+        "username": "kyusangwhang",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-09"
+      },
+      {
+        "credit": "Seohyun Lee",
+        "username": "Seo-Rii",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      }
+    ]
+  },
+  "lv":{
+    "language": "Latvian",
+    "localized": "latviešu",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "KristapsK",
+        "username": "KristapsK",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-08"
+      }
+    ]
+  },
+  "ms":{
+    "language": "Malay",
+    "localized": "Bahasa Melayu",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Muhammad Ajwad",
+        "username": "Ajwad",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-12"
+      }
+    ]
+  },
+  "no":{
+    "language": "Norwegian",
+    "localized": "Norsk bokmål",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Martin Hoftun",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-11"
+      },
+      {
+        "credit": "Emil Broll",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-06"
+      },
+      {
+        "credit": "Erling Stangnes",
+        "username": "erlingstangnes",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-08"
+      },
+      {
+        "credit": "Imre Kristoffer Eilertsen",
+        "username": "DandelionSprout",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-11"
+      },
+      {
+        "credit": "Haakon",
+        "username": "haaso",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-11"
+      },
+      {
+        "credit": "SirTerning",
+        "username": "SirTerning",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2019-08"
+      }
+    ]
+  },
+  "nl":{
+    "language": "Dutch",
+    "localized": "Nederlands",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Jérémy Keusters",
+        "username": "Jeremyboy222",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-07"
+      },
+      {
+        "credit": "Otto B. Wiersma",
+        "username": "ottobw",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-01"
+      },
+      {
+        "credit": "Frank Martens",
+        "username": "Trivium",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-08"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "pl":{
+    "language": "Polish",
+    "localized": "polski",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Izokrex",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-10"
+      },
+      {
+        "credit": "skmedix",
+        "username": "skmedix",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-06"
+      },
+      {
+        "credit": "Piter432",
+        "username": "Piter432",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "damian1432",
+        "username": "damian1432",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-01"
+      },
+      {
+        "credit": "maciejka45",
+        "username": "maciejka45",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-02"
+      },
+      {
+        "credit": "zioxei",
+        "username": "zioxei",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "ThePolish96",
+        "username": "ThePolish96",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-01"
+      },
+      {
+        "credit": "Askan",
+        "username": "Askan",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-02"
+      },
+      {
+        "credit": "bastard79PL",
+        "username": "bastard79",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-12"
+      },
+      {
+        "credit": "Daniel Wieczorek",
+        "username": "Kennyluz",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-10"
+      },
+      {
+        "credit": "krzyz23",
+        "username": "krzyz23",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-01"
+      },
+      {
+        "credit": "Patryk Paprzycki",
+        "username": "Bryczek",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-04"
+      },
+      {
+        "credit": "Tomasz Bachorski",
+        "username": "iThomash",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-01"
+      },
+      {
+        "credit": "VFX",
+        "username": "VFX",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-11"
+      }
+    ]
+  },
+  "pt-br":{
+    "language": "Portuguese (Brazilian)",
+    "localized": "português (Brasil)",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Philippe R.",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-09"
+      },
+      {
+        "credit": "Jacques L.",
+        "username": "jacques030498",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-05"
+      },
+      {
+        "credit": "Matheus M.",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-06"
+      },
+      {
+        "credit": "Ezequiel Reynaud",
+        "username": "ezreynaud",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "Marcelo Amarante",
+        "username": "marceloamarante",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-09"
+      },
+      {
+        "credit": "Eduardo Addad de Oliveira",
+        "username": "eduardoaddad",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-04"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "pt-pt":{
+    "language": "Portuguese",
+    "localized": "português (Portugal)",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Pedro Oliveira",
+        "username": "pedrofran12",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2011-05"
+      },
+      {
+        "credit": "Ricardo Costa",
+        "username": "cotaricky",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      },
+      {
+        "credit": "Skellingtor",
+        "username": "Skellingtor",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-11"
+      },
+      {
+        "credit": "Slimakoi",
+        "username": "Slimakoi",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-12"
+      },
+      {
+        "credit": "Vinícius Novaes",
+        "username": "VinyCola",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-05"
+      },
+      {
+        "credit": "Schneider Valverde",
+        "username": "SchneiderValverde",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2021-07"
+      }
+    ]
+  },
+  "ro":{
+    "language": "Romanian",
+    "localized": "română",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Eli",
+        "username": "eliboyDEV",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-07"
+      },
+      {
+        "credit": "TeRuRe",
+        "username": "TeRuRe",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-06"
+      },
+      {
+        "credit": "gamangabriel",
+        "username": "gamangabriel",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "Marina Bercea",
+        "username": "marinab",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-02"
+      },
+      {
+        "credit": "Silviu Iacob",
+        "username": "Sylvester08",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-07"
+      },
+      {
+        "credit": "pompierul31",
+        "username": "pompierul31",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-08"
+      },
+      {
+        "credit": "Diana Zlotea",
+        "username": "zloteadiana",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-09"
+      },
+      {
+        "credit": "gotaioan16",
+        "username": "gotaioan16",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-10"
+      },
+      {
+        "credit": "Nicolae Liviu",
+        "username": "nicklcanada",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2020-01"
+      },
+      {
+        "credit": "Vlăduț Ilie",
+        "username": "vladut.ilie",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-10"
+      }
+    ]
+  },
+  "ru": {
+    "language": "Russian",
+    "localized": "русский",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Вадим Богайсков",
+        "username": "VBog",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-09"
+      },
+      {
+         "credit": "Даниил Санкин",
+         "username": "dsankin",
+         "professional": false,
+         "proofreader": false,
+         "joined": "2013-12"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "sk":{
+    "language": "Slovak",
+    "localized": "slovenský",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Tomáš Taro",
+        "username": "tomasko126",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-11"
+      },
+      {
+        "credit": "Ján Krasnovský",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-02"
+      },
+      {
+        "credit": "Alex Jurík",
+        "username": "TheProttotype",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "Andrej Kračmar",
+        "username": "18mundy18",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-12"
+      },
+      {
+        "credit": "Matúš Antol",
+        "username": "matus.antol",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-01"
+      },
+      {
+        "credit": "Ondrej Kapusta",
+        "username": "onokapo",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-11"
+      },
+      {
+        "credit": "TheWolfiKK",
+        "username": "TheWolfiKK",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-08"
+      },
+      {
+        "credit": "Tomáš Václav",
+        "username": "TWatz",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-08"
+      }
+    ]
+  },
+  "sl":{
+    "language": "Slovenian",
+    "localized": "slovenščina",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Gregory_K",
+        "username": "Gregory_K",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "Aleksander Kovač",
+        "username": "Acookook",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-07"
+      },
+      {
+        "credit": "Matevž Špacapan",
+        "username": "Pur3Bolt",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-10"
+      }
+    ]
+  },
+  "sr":{
+    "language": "Serbian",
+    "localized": "Српски",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Stefan Bajić",
+        "username": "stefanbajic1",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-05"
+      },
+      {
+        "credit": "Aleksa Marković",
+        "username": "topofkeks",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      }
+    ]
+  },
+  "sv":{
+    "language": "Swedish",
+    "localized": "svenska",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Åke Engelbrektson",
+        "username": "eson",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-04"
+      },
+      {
+        "credit": "Henrik Mattsson-Mårn",
+        "username": "rchk",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-11"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "te":{
+    "language": "Telugu",
+    "localized": "తెలుగు",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Ponakala P.",
+        "username": "pponakala",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2013-01"
+      }
+    ]
+  },
+  "tr":{
+    "language": "Turkish",
+    "localized": "Türkçe",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Necip Ateş",
+        "username": "NightWatch",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2012-06"
+      },
+      {
+        "credit": "Can Umay",
+        "username": "canumay",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-06"
+      },
+      {
+        "credit": "Bilgehan Demirel",
+        "username": "bilgehandemirel",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2020-07"
+      },
+      {
+        "credit": "Alf404",
+        "username": "Alf404",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-09"
+      },
+      {
+        "credit": "Ali Kömesöğütlü",
+        "username": "(Mobile46) (byzlo685)",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-09"
+      },
+      {
+        "credit": "arda şahin",
+        "username": "dinikez22",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-09"
+      },
+      {
+        "credit": "BedirhanGltkn",
+        "username": "bedirhangltkn",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-05"
+      },
+      {
+        "credit": "Burak Eker",
+        "username": "mburakeker",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2017-10"
+      },
+      {
+        "credit": "Ege",
+        "username": "ekto",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-10"
+      },
+      {
+        "credit": "Furkan Taşkın",
+        "username": "furkant1",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-03"
+      },
+      {
+        "credit": "gokdenizcetintr",
+        "username": "gokdenizcetintr",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-04"
+      },
+      {
+        "credit": "hyperion02",
+        "username": "hyperion02",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      },
+      {
+        "credit": "M. Enes Çoban",
+        "username": "GorunmezBKZ",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-10"
+      },
+      {
+        "credit": "Mehmet Çağrı Aksoy",
+        "username": "mcagriaksoy",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-04"
+      },
+      {
+        "credit": "meliha ergincan",
+        "username": "mergc",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2019-07"
+      },
+      {
+        "credit": "organic",
+        "username": "organic",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-11"
+      },
+      {
+        "credit": "panasonicleni",
+        "username": "mergc",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2018-11"
+      },
+      {
+        "credit": "Selim unver",
+        "username": "cardex",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-05"
+      },
+      {
+        "credit": "Serhat Ordulu",
+        "username": "serhatordulu83",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-12"
+      },
+      {
+        "credit": "Soykan Sevgi",
+        "username": "soykanonline",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-12"
+      },
+      {
+        "credit": "ulasW",
+        "username": "ulasW",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-12"
+      }
+    ]
+  },
+  "uk":{
+    "language": "Ukrainian",
+    "localized": "українська",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Юрій Жарков",
+        "username": "yurqua",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-06"
+      },
+      {
+        "credit": "Maksym Tymoshyk",
+        "username": "maximillian_",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-01"
+      },
+      {
+        "credit": "Тимур Роман",
+        "username": "TSpell",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-01"
+      },
+      {
+        "credit": "Євген Гіль",
+        "username": "IevgenGil",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-03"
+      },
+      {
+        "credit": "Александр Степанов",
+        "username": "tuitioner",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "Павло Тимошенко",
+        "username": "poru",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "cutepenguin",
+        "username": "cutepenguin",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-08"
+      },
+      {
+        "credit": "Александр Невидомский",
+        "username": "neviksasha",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2015-11"
+      },
+      {
+        "credit": "Stepan Tkhir",
+        "username": "stkhir",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-02"
+      },
+      {
+        "credit": "Сергій Пономаренко",
+        "username": "serhii1997",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-10"
+      },
+      {
+        "credit": "ata_zh",
+        "username": "ata_zh",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      },
+      {
+        "credit": "Electroz",
+        "username": "Electroz",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2016-02"
+      },
+      {
+        "credit": "mstrashkiv",
+        "username": "mstrashkiv",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2020-04"
+      }
+    ]
+  },
+  "vi":{
+    "language": "Vietnamese",
+    "localized": "Tiếng Việt",
+    "professional": false,
+    "translators":[
+      {
+        "credit": "Tuấn Phạm",
+        "username": "TuanPham",
+        "professional": false,
+        "proofreader": true,
+        "joined": "2014-06"
+      }
+    ]
+  },
+  "zh-cn":{
+    "language": "Chinese (Simplified)",
+    "localized": "中文 (简体)",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Tai-Lin Chu",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-01"
+      },
+      {
+        "credit": "Gaosong2",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-08"
+      },
+      {
+        "credit": "Gli",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "Chenxiao",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2011-03"
+      },
+      {
+        "credit": "庄泓川",
+        "username": "kidneybean",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-07"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  },
+  "zh-tw":{
+    "language": "Chinese (Traditional)",
+    "localized": "中文 (繁體)",
+    "professional": true,
+    "translators":[
+      {
+        "credit": "Tai-Lin Chu",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-11"
+      },
+      {
+        "credit": "Illusionmist62442",
+        "username": null,
+        "professional": false,
+        "proofreader": false,
+        "joined": "2010-10"
+      },
+      {
+        "credit": "Tong Tom",
+        "username": "hkcryinglion",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2014-06"
+      },
+      {
+        "credit": "PG",
+        "username": "smartPG",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-06"
+      },
+      {
+        "credit": "iF Chen",
+        "username": "ifchen0",
+        "professional": false,
+        "proofreader": false,
+        "joined": "2015-07"
+      },
+      {
+        "credit": "Inlingo",
+        "username": "Inlingo",
+        "professional": true,
+        "proofreader": false,
+        "joined": "2018-08"
+      }
+    ]
+  }
+}

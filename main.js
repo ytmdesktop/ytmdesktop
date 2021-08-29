@@ -1692,10 +1692,12 @@ function handleOpenUrl(url) {
     }
 }
 
-function loadAdExtension() {
+function loadAdExtension(name) {
+    if (!name) throw new Error('Unprovided extension folder name.')
+
     const extensionPath = isDev
-        ? path.resolve(app.getAppPath(), 'src', 'extension')
-        : path.resolve(app.getAppPath(), '..', 'extension')
+        ? path.resolve(app.getAppPath(), 'src', name)
+        : path.resolve(app.getAppPath(), '..', name)
 
     session.defaultSession.loadExtension(extensionPath).then((data) => {
         writeLog({
@@ -1730,7 +1732,8 @@ if (!gotTheLock) {
     })
 
     app.whenReady().then(async function () {
-        if (settingsProvider.get('settings-auto-skipad')) loadAdExtension()
+        if (settingsProvider.get('settings-auto-skipad'))
+            loadAdExtension('adblock')
 
         checkWindowPosition(settingsProvider.get('window-position')).then(
             (visiblePosition) => {

@@ -1,0 +1,3526 @@
+{
+   "a_theme_preview": {
+      "description": "Text in the alt attribute of the image previewing a theme on an extension page.",
+      "message": "$extension_page$的$theme_name$主題預覽",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "pop-up menu"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "aalinkadreport": {
+      "description": "Acceptable Ads link message on ad report page",
+      "message": "瞭解更多關於可接受廣告計畫的詳情。"
+   },
+   "aamessageadreport": {
+      "description": "Acceptable Ads message on ad report page",
+      "message": "如果不想看到像這樣的廣告，建議可以關閉可接受廣告過濾清單。"
+   },
+   "ab_filters_subscription_lastDownload_checksumMismatch": {
+      "description": "Filter lists tab of the Options page: Corrupted filter list file.",
+      "message": "失敗，總和檢查碼不符合"
+   },
+   "ab_filters_subscription_lastDownload_connectionError": {
+      "description": "Filter lists tab of the Options page: Generic filter list download error message.",
+      "message": "失敗，下載失敗"
+   },
+   "ab_filters_subscription_lastDownload_invalidData": {
+      "description": "Filter lists tab of the Options page: Invalid filter list file.",
+      "message": "失敗，不是有效的過濾清單"
+   },
+   "ab_filters_subscription_lastDownload_invalidURL": {
+      "description": "Filter lists tab of the Options page: Message when you subscribe to a non-list URL.",
+      "message": "失敗，不是有效的位址"
+   },
+   "aboutadblock": {
+      "description": "Subtitle on the Support tab",
+      "message": "關於 AdBlock"
+   },
+   "acceptable_ads_content_blocking_disbled_message": {
+      "description": "Warning shown when Safari Content Blocking is enabled while the Acceptable Ads filter list was already enabled.",
+      "message": "我們已為您取消訂閱可接受廣告，因為您已開啟 Safari 內容阻擋器。一次只能選擇一種。（[[為什麼？]]）"
+   },
+   "acceptable_ads_privacy": {
+      "description": "The text of an Acceptable Ads sub-option in the General tab",
+      "message": "只允許沒有第三方追蹤的廣告"
+   },
+   "acceptableadsdisable_done": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "您不再訂閱可接受廣告過濾清單。"
+   },
+   "acceptableadsdisable_how_to_reenable": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "您可以透過選擇「允許部份非侵入廣告」將它重新打開，支持您所喜愛的網站。"
+   },
+   "acceptableadsoption": {
+      "description": "Checkbox on the 'General' tab of the Options page to enable the Acceptable Ads filter list",
+      "message": "允許部份非侵入廣告"
+   },
+   "access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "不須停用 AdBlock，就能輕鬆存取喜歡的內容！"
+   },
+   "ad_everywhere_malware": {
+      "description": "Message for help flow in popup menu.",
+      "message": "如果您到處都看到這則廣告，您可能受到惡意軟體感染。"
+   },
+   "adalreadyblocked": {
+      "description": "On the ad report page, telling the user there is nothing to do as the ad they were seeing is now blocked.",
+      "message": "太好了！全部都沒問題了。"
+   },
+   "adblock_click_for_details": {
+      "description": "Tooltip on the AdBlock button, to help users understand that they can click the button to access more options.",
+      "message": "AdBlock - 按一下查看詳細資訊"
+   },
+   "adblock_facebook": {
+      "description": "Title for link to AdBlock's Facebook account",
+      "message": "AdBlock Facebook"
+   },
+   "adblock_home": {
+      "description": "Text in the alt attribute of an AdBlock logo / icon that links to getadblock.com.",
+      "message": "AdBlock 主頁"
+   },
+   "adblock_logo": {
+      "description": "Text in the alt attribute of an AdBlock logo image.",
+      "message": "AdBlock 標誌"
+   },
+   "adblock_looked_like_this": {
+      "description": "Part 1 of a call-to-action on the Popup menu",
+      "message": "如果 AdBlock 看起來像這樣呢？"
+   },
+   "adblock_premium": {
+      "description": "Full name of the AdBlock upgrade.",
+      "message": "AdBlock Premium"
+   },
+   "adblock_twitter": {
+      "description": "Title for link to AdBlock's Twitter account",
+      "message": "AdBlock Twitter"
+   },
+   "adblock_vpn": {
+      "description": "Text of a Options page lower menu button",
+      "message": "AdBlock VPN"
+   },
+   "adblock_website": {
+      "description": "Title for link to AdBlock's website",
+      "message": "AdBlock 主頁"
+   },
+   "adblock_will_block_ads_again": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "如果按下，AdBlock 將再次阻擋廣告。"
+   },
+   "adblock_will_pause_on_all_sites": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "如果按下，AdBlock 將停止在所有網站上阻擋廣告。"
+   },
+   "adblock_will_pause_on_this_site": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on this site.",
+      "message": "如果按下，AdBlock 將停止在這個網站上阻擋廣告。"
+   },
+   "adblock_wont_run_on_pages_matching": {
+      "description": "Message displayed when the allowlist wizard will allowlist part of an entire website, for example '*.google.com/reader/*'.  The URL will appear on the next line.",
+      "message": "AdBlock 不會在任何符合條件的頁面上執行："
+   },
+   "adblockinglist": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block ads.",
+      "message": "Ad 阻擋過濾清單"
+   },
+   "adblockreportinganad": {
+      "description": "Title of the ad report page",
+      "message": "AdBlock - 回報廣告"
+   },
+   "adblocksupport": {
+      "description": "Title of the Support tab of the Options page",
+      "message": "AdBlock 支援"
+   },
+   "adblockupdates": {
+      "description": "Subtitle on the Support tab",
+      "message": "AdBlock 更新"
+   },
+   "add": {
+      "description": "Button on Sync tab that adds an entered name for this extension to the list of synced extensions",
+      "message": "新增"
+   },
+   "add_info": {
+      "description": "section title on hidding wizard, shown when advance user option enabled",
+      "message": "額外資訊"
+   },
+   "add_this_extension": {
+      "description": "Button on Sync tab that adds this extension to the Sync process",
+      "message": "新增此擴充套件"
+   },
+   "additional_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "需要其他協助嗎？"
+   },
+   "additional_troubleshooting": {
+      "description": "Message for help flow in popup menu.",
+      "message": "這裡有一些[[其他的疑難排解步驟]]，您可以用來解決此問題。"
+   },
+   "adreport_all_debug_info": {
+      "description": "Shows the user the debug information that will be sent along with their report.",
+      "message": "以下資訊也將包括在廣告報告中。"
+   },
+   "adreport_email": {
+      "description": "Label for a textbox where the user enters their email address to submit a bug or ad report.",
+      "message": "您的電子郵件地址是？"
+   },
+   "adreport_email_privacy": {
+      "description": "Let the user know that their email address won't be used for reasons other than contacting them about their bug or ad report.",
+      "message": "我們只會在需要更多資訊時，才會使用此方式與您聯絡。"
+   },
+   "adreport_filter": {
+      "description": "Optional question on the ad report page when the ad needs to be reported to AdBlock.",
+      "message": "如果您使用「阻擋廣告」精靈建立了可運作的過濾條件，請貼到下方框內："
+   },
+   "adreport_laststep": {
+      "description": "Subtitle on the ad report page. Shown when the ad needs to be reported to AdBlock, and not filter list maintainers.",
+      "message": "最後一步：向我們回報這個問題。"
+   },
+   "adreport_location": {
+      "description": "Question on the ad report page asking the user to describe the ad and its location on a webpage.",
+      "message": "廣告在那一頁的確切位置是哪裡？看起來怎麼樣？"
+   },
+   "adreport_missing_info": {
+      "description": "Error message shown when the user doesn't enter anything in some of the text fields.",
+      "message": "所需資訊遺失或無效。請填寫有紅色邊框的問題。"
+   },
+   "adreport_missing_screenshot": {
+      "description": "Error message shown when the user doesn't attach a screenshot to an ad report.",
+      "message": "您忘了附加截圖！如果看不到您要回報的廣告，我們無法幫助您。"
+   },
+   "adreport_name": {
+      "description": "Label for a textbox where the user enters their name (or nickname) to submit a bug or ad report.",
+      "message": "您的姓名是？"
+   },
+   "adreport_response_file_name": {
+      "description": "Error message shown when the file name of an attachement the user is trying to submit in a report is longer than 255 characters.",
+      "message": "檔案名稱太長。請以較短的名稱重新命名檔案。"
+   },
+   "adreport_response_invalid_file": {
+      "description": "Error message shown when the user uploads an invalid file type.",
+      "message": "這不是圖片檔案。請上傳.png、.gif 或 .jpg 檔案。"
+   },
+   "adreport_response_large_file": {
+      "description": "Error message shown when the user tries to upload a large image file.",
+      "message": "檔案太大了。請確認您的檔案小於 10 MB。"
+   },
+   "adreport_response_save_error": {
+      "description": "Error message shown when the server could not save an attached file.",
+      "message": "儲存上傳檔案時出現錯誤。"
+   },
+   "adreport_response_success": {
+      "description": "Shown when a ticket has been sumbitted to AdBlock's support site successfully.",
+      "message": "完成了！我們會盡快聯絡您。在此同時，請查看來自 AdBlock 的電子郵件，上面有您在我們説明網站上的問題登錄連結，還有一些自助建議，方便您在我們無法立即回覆時查詢使用。"
+   },
+   "adreport_screen_cap_upload": {
+      "description": "Label next to a file upload button.",
+      "message": "附加螢幕截圖："
+   },
+   "adreport_server_response_error__manual_msg_step1": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "請到[[我們的支援網站]]。"
+   },
+   "adreport_server_response_error__manual_msg_step2": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "然後手動登錄問題回報，並將下方資訊複製貼上到「填寫您認為可以幫助我們瞭解問題的任何細節」部分。"
+   },
+   "adreport_server_response_error_msg": {
+      "description": "Error message shown when an new ticket is sumbitted for an ad or bug report, and the server had an issue while processing the data.",
+      "message": "處理您的請求時出現錯誤。"
+   },
+   "adreportintro": {
+      "description": "Introduction of the ad reporting page",
+      "message": "在網頁上看到了廣告？我們會幫您找到合適的地方通報！"
+   },
+   "adreportthanks": {
+      "description": "Message to the user thanking them for sharing the URL with us.",
+      "message": "謝謝！"
+   },
+   "adreportvoluntary": {
+      "description": "Introduction of the ad reporting page",
+      "message": "回報廣告是自願性質，可以讓過濾清單維護者為大家阻擋廣告、造福大眾。如果您現在不想幫助別人也沒關係，只要關閉本頁並為您自己[[阻擋廣告]]。"
+   },
+   "adstillappear": {
+      "description": "Question on ad report page",
+      "message": "廣告還會出現嗎？"
+   },
+   "advanced_options2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "我是進階使用者，顯示進階選項"
+   },
+   "allow_whitelisting_youtube_channels2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "允許特定 YouTube 頻道上的廣告"
+   },
+   "allowlist_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube or Twitch and has enabled the YouTube or Twitch channel allow listing option",
+      "message": "在這個頻道上允許廣告"
+   },
+   "allowlisted_channel": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "您已將 AdBlock 設定為每次造訪此頻道時維持暫停。"
+   },
+   "allowlisting_twitch_channels": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "允許特定 Twitch 頻道上的廣告"
+   },
+   "always": {
+      "description": "The button text on the popup menu",
+      "message": "一律採用"
+   },
+   "annoyance_free_browsing": {
+      "description": "Description of Distraction Control on the main Premium options page",
+      "message": "體驗無干擾的瀏覽方式"
+   },
+   "apply_theme": {
+      "description": "Text of clickable element that applies the theme of a theme box in the Themes tab of the Options page",
+      "message": "套用主題"
+   },
+   "back_help_flow": {
+      "description": "Aria label for back button in help flow (in popup menu)",
+      "message": "在說明流程中返回前一步。"
+   },
+   "backup_sync_settings": {
+      "description": "Description of Sync on Sync tab",
+      "message": "在所有裝置上自動備份與同步您的 AdBlock 設定。"
+   },
+   "betalabel": {
+      "description": "Label for experimental features in AdBlock Options",
+      "message": "測試版"
+   },
+   "birdchannelswitchlabel": {
+      "description": "The label text for the Birds switch on the MyAdBlock Options page",
+      "message": "鳥"
+   },
+   "blacklistclickmessage": {
+      "description": "'Hide a section of a webpage' part on the Customize tab of the Options page.",
+      "message": "在頁面上的廣告按右鍵以阻擋它，或從這裡手動阻擋。"
+   },
+   "blacklisterattrwillbe": {
+      "description": "Checkbox label for attributes in 'Block an ad' wizard.",
+      "message": "$attribute$ 將為 $value$",
+      "placeholders": {
+         "attribute": {
+            "content": "$1",
+            "example": "class"
+         },
+         "value": {
+            "content": "$2",
+            "example": "AdBanner"
+         }
+      }
+   },
+   "blacklisterblockedelement": {
+      "description": "Tells the user what the blocked element is on the 'Block an ad' wizard.",
+      "message": "已阻擋的元素："
+   },
+   "blacklisterblocksalloftype": {
+      "description": "Warns the user that all elements of type X will be blocked.",
+      "message": "注意：此過濾條件會阻擋頁面上所有 $elementtype$ 元素！",
+      "placeholders": {
+         "elementtype": {
+            "content": "$1",
+            "example": "DIV"
+         }
+      }
+   },
+   "blacklistereditfilter": {
+      "description": "Text if the user wants to manually edit a filter. 'OK' is the standard JavaScript popup button text.",
+      "message": "請在下面輸入正確的過濾條件，然後按「確定」"
+   },
+   "blacklistereditinvalid1": {
+      "description": "Alert if the manually edited filter is invalid. Error messages are not translated.",
+      "message": "過濾條件無效：$exception$",
+      "placeholders": {
+         "exception": {
+            "content": "$1",
+            "example": "This filter is not supported"
+         }
+      }
+   },
+   "blacklistermatches": {
+      "description": "Tells the user multiple matches were found",
+      "message": "與此頁面上的 $matchcount$ 個項目符合。",
+      "placeholders": {
+         "matchcount": {
+            "content": "$1",
+            "example": "5"
+         }
+      }
+   },
+   "blacklisternofilter": {
+      "description": "Warning if the user hasn't specified a filter",
+      "message": "未指定過濾條件！"
+   },
+   "blacklisternotsure_part_I": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "您的設定將新增一條規則，如此一來，每次您造訪該網站，就會隱藏該項目。"
+   },
+   "blacklisternotsure_part_II": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "您可隨時在 AdBlock 選單上選取「復原本頁面上的隱藏項目」，即可取消這條規則。"
+   },
+   "blacklisteroptions1": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "是否保持該項目隱藏？"
+   },
+   "blacklistersinglematch": {
+      "description": "Tells the user only one match was found",
+      "message": "與此頁面上的 1 個項目符合。"
+   },
+   "blacklistertype": {
+      "description": "node name is called 'Type' (HTML tag)",
+      "message": "類型"
+   },
+   "blacklisterwarningnofilter": {
+      "description": "Warns the user that nothing will be blocked.",
+      "message": "警告：沒有指定過濾條件！"
+   },
+   "block_ads_on_youtube": {
+      "description": "Label for checkbox letting user choose whether to block ads on youtube.com",
+      "message": "移除 YouTube 上的廣告"
+   },
+   "block_an_ad_on_this_page": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "隱藏此頁面的某個內容"
+   },
+   "block_and_replace": {
+      "description": "Description of Image Swap on the main Premium options page",
+      "message": "使用圖片交換功能，我們仍會阻擋廣告，但是會以您喜歡的照片類型取代。"
+   },
+   "block_annonyances_on_youtube": {
+      "description": "Checkbox letting user choose whether to block annoyances on youtube.com (such as comments, suggested videos, annotations, and recommended channels)",
+      "message": "移除 YouTube 上的擾人內容"
+   },
+   "block_newsletter_popups": {
+      "description": "Description of 'hide newsletter pop-ups' on the distraction control options page",
+      "message": "阻擋邀請您註冊網站電子報的擾人彈出視窗。"
+   },
+   "block_privacy_on_youtube": {
+      "description": "Checkbox letting user choose whether to block privacy-related requests on youtube.com",
+      "message": "在 YouTube 上保護我的隱私"
+   },
+   "block_site_notifications": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "阻擋網站通知"
+   },
+   "block_this_ad": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "阻擋這個廣告"
+   },
+   "blockanadtitle": {
+      "description": "Title of the first two dialogs of the 'Block an ad' wizard",
+      "message": "AdBlock 隱藏協助精靈"
+   },
+   "blockdomain": {
+      "description": "Message of the URL and CSS blocking sections",
+      "message": "要應用的頁面網域"
+   },
+   "blocked_ads": {
+      "description": "Title for toolbar icon menu section showing number of ads blocked",
+      "message": "已阻擋廣告："
+   },
+   "blocked_n_in_total": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked since AdBlock was installed. $count$ will be a number between 1 and 999,999,999.",
+      "message": "總計 $count$ 個",
+      "placeholders": {
+         "count": {
+            "content": "[[123,456]]",
+            "example": "123,456"
+         }
+      }
+   },
+   "blocked_n_on_this_page": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked on this page. $count$ will be a number between 1 and 999.",
+      "message": "此頁有 $count$ 個",
+      "placeholders": {
+         "count": {
+            "content": "[[123]]",
+            "example": "123"
+         }
+      }
+   },
+   "blocked_something": {
+      "description": "Part 1 of a call-to-action on the blocklist wizard",
+      "message": "您剛剛阻擋了這個網站上的內容！"
+   },
+   "blockedresource": {
+      "description": "Resource list page: resource status",
+      "message": "已阻擋的資源"
+   },
+   "blockmoreads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "阻擋更多廣告："
+   },
+   "blockmoreads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "阻擋更多廣告"
+   },
+   "blockurlwithtext": {
+      "description": "Message of the URL-blocking section (Block an ad by its URL) on the Customize tab",
+      "message": "阻擋包含此文字的網址"
+   },
+   "browserestartrequired": {
+      "description": "Displayed after disabling Safari Content Blocking, which requres a browser relaunch.",
+      "message": "請重新啟動 Safari 以完成內容阻擋器的關閉。"
+   },
+   "bugreport": {
+      "description": "Link to send a bug report on the Support tab",
+      "message": "向我們傳送[[錯誤報告]]"
+   },
+   "buttonback": {
+      "description": "Back to previous page button",
+      "message": "返回"
+   },
+   "buttonblockit": {
+      "description": "Block button",
+      "message": "擋住它！"
+   },
+   "buttoncancel": {
+      "description": "Cancel button",
+      "message": "取消"
+   },
+   "buttonconfirm": {
+      "description": "Button for confirming a new rule in the hiding wizard",
+      "message": "確認"
+   },
+   "buttonedit": {
+      "description": "Edit filter(s) manually button",
+      "message": "編輯"
+   },
+   "buttonexclude": {
+      "description": "Button for excluding a domain in the allowlist wizard",
+      "message": "排除"
+   },
+   "buttonkeep": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "保留"
+   },
+   "buttonlooksgood": {
+      "description": "Confirmation button after user chose what to block on the page",
+      "message": "看起來不錯"
+   },
+   "buttonok": {
+      "description": "OK button",
+      "message": "確定！"
+   },
+   "buttonremove": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "移除"
+   },
+   "buttonsubmit": {
+      "description": "Button to send a form.",
+      "message": "送出"
+   },
+   "bypass_mode": {
+      "description": "Header on the main Premium options page",
+      "message": "略過模式"
+   },
+   "callout_new_feature": {
+      "description": "Text to callout a new feature",
+      "message": "新增!"
+   },
+   "cannot_be_undone": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "這項動作必須做完。"
+   },
+   "cantblockflash": {
+      "description": "Result of the final ad report question",
+      "message": "我們還無法阻擋廣告內的 Flash 和其他外掛程式。我們正在等待來自瀏覽器和 WebKit 的支援。"
+   },
+   "cantblockflashwarning": {
+      "description": "Text of the final ad report question",
+      "message": "廣告是否出現在電影或其他像是 Flash 遊戲等外掛程式上？"
+   },
+   "catchannelswitchlabel": {
+      "description": "The label text for the cat switch on the MyAdBlock Options page",
+      "message": "貓"
+   },
+   "change_behavior_settings": {
+      "description": "Part of a message on the allowlist and blocklist wizards",
+      "message": "您可以在[[設定]]中更改此動作。"
+   },
+   "changes_to_adblock": {
+      "description": "Link to Options page with more information about the changes.",
+      "message": "我們更改了 AdBlock！"
+   },
+   "check_out_premium": {
+      "description": "Part 2 of message shown when user opts out of call-to-action",
+      "message": "如果想進一步了解，請參閱 [[Premium]]。"
+   },
+   "check_out_themes": {
+      "description": "Part 2 of a call-to-action on the Popup menu",
+      "message": "快來看看各種主題！"
+   },
+   "check_sync_status": {
+      "description": "Button on Sync tab that checks the status of the Sync feature",
+      "message": "檢查同步狀態"
+   },
+   "check_whitelist": {
+      "description": "Message for help flow in popup menu.",
+      "message": "讓我們來檢查您的允許名單設定是否有問題。"
+   },
+   "checked_basics": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我們已經檢查了基本項目，並更新了您的過濾清單。"
+   },
+   "checkinfirefox_1": {
+      "description": "instruction for how to check Firefox for a reported ad",
+      "message": "如果沒有的話，請安裝 Firefox。"
+   },
+   "checkinfirefox_2": {
+      "description": "Instruction for how to check Firefox for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "如果沒有的話，請安裝 Firefox 版 Adblock Plus。"
+   },
+   "checkinfirefox_3": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "在該瀏覽器中，訂閱與這裡相同的過濾清單。"
+   },
+   "checkinfirefox_4": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "在該瀏覽器中，載入有廣告的頁面。"
+   },
+   "checkinfirefox_5": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "廣告也出現在瀏覽器中嗎？"
+   },
+   "checkinfirefoxorchrome_1": {
+      "description": "instruction for how to check Firefox or Chrome for a reported ad",
+      "message": "如果沒有的話，請安裝 Firefox 或 Chrome。"
+   },
+   "checkinfirefoxorchrome_2": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "如果沒有的話，請安裝 Firefox 版 Adblock Plus 或 Chrome 版 AdBlock。"
+   },
+   "checkinfirefoxorchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox/Chrome",
+      "message": "檢查 Firefox 或 Chrome"
+   },
+   "checkinfirefoxtitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox",
+      "message": "查看 Firefox "
+   },
+   "chromebutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Chrome displays when you right click a toolbar button.",
+      "message": "以右鍵按 AdBlock 按鈕，然後選擇「在 Chrome 選單中隱藏」。若要顯示，請按一下 Chrome 選單，以右鍵按 AdBlock 按鈕，然後選擇「顯示在工具列中」。"
+   },
+   "cleanuplist2": {
+      "description": "Label at the bottom of the 'Customize' tab of the Options page",
+      "message": "清理此清單"
+   },
+   "clickdisableaa": {
+      "description": "Instruction on ad report page",
+      "message": "請按這裡：[[停用可接受廣告]]"
+   },
+   "clickdisableotherextensions": {
+      "description": "On the ad report page, an alternative way to disable other extensions",
+      "message": "或者，只需按一下此按鈕，我們就可以完成上述所有操作：[[停用所有其他擴充套件]"
+   },
+   "clickthead": {
+      "description": "User has to click the ad they want to block.",
+      "message": "按一下本頁面上任何想隱藏的項目。"
+   },
+   "clickupdatefilters": {
+      "description": "Instruction on ad report page",
+      "message": "按這裡：[[更新我的過濾條件！]]"
+   },
+   "close": {
+      "description": "Generic message for buttons that close a view or window",
+      "message": "關閉"
+   },
+   "close_help_flow": {
+      "description": "Aria label for close button in help flow (in popup menu)",
+      "message": "關閉說明流程並回到彈出視窗選單。"
+   },
+   "confirm_delete_extension": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "確定要刪除此擴充套件嗎？"
+   },
+   "confirm_msg": {
+      "description": "text on hidding wizard, shown when advance user option enabled",
+      "message": "確認該元素的屬性正確："
+   },
+   "confirm_undo_custom_filters": {
+      "description": "Confirmation message when user wants to undo their custom blocks for a domain. $count$ will be a number between 1 and 999,999,999, $host$ will be the domain where the custom blocks will be reset.",
+      "message": "確定要移除在 $host$ 上建立的 $count$ 個阻擋嗎？",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "12"
+         },
+         "host": {
+            "content": "$2",
+            "example": "stackoverflow.com"
+         }
+      }
+   },
+   "contact_support": {
+      "description": "Message for help flow in popup menu.",
+      "message": "[[請聯絡我們的支援團隊！]]"
+   },
+   "contact_the_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我們建議與網站聯絡。"
+   },
+   "content_blocking_acceptable_ads_disbled_message": {
+      "description": "Warning shown when the Acceptable Ads filter list is enabled while Safari Content Blocking was already enabled.",
+      "message": " 我們已為您關閉 Safari 內容阻擋器，因為您已選擇允許非侵入廣告。一次只能選擇一種。（[[為什麼？]]）"
+   },
+   "contributors": {
+      "description": "Link to the contributors page on the Support tab",
+      "message": "進一步了解[[我們的團隊]]"
+   },
+   "copieddebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "已複製！"
+   },
+   "copydebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "複製偵錯資訊"
+   },
+   "correctfilters": {
+      "description": "On the ad report page, label describing having the right filter lists enabled",
+      "message": "請確保您使用的是正確的語言過濾條件："
+   },
+   "csstomatch": {
+      "description": "Message of the CSS-hiding section (Hide a section of a webpage) on the Customize tab",
+      "message": "符合的 CSS"
+   },
+   "custom_filters_migration_error_message_part1": {
+      "description": "Part one of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "自訂過濾條件錯誤數量："
+   },
+   "custom_filters_migration_error_message_part2": {
+      "description": "Part two of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "在自訂過濾條件移轉過程中產生以下訊息（忽略行號）："
+   },
+   "custom_filters_migration_error_message_part3": {
+      "description": "Part three of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "原始條目："
+   },
+   "custom_image_description": {
+      "description": "text on the image swap tab",
+      "message": "最多可選 9 張您希望 AdBlock 用來替換廣告的圖片"
+   },
+   "custom_image_error": {
+      "description": "header / title text on the error message on the image swap tab",
+      "message": "糟糕！發生錯誤"
+   },
+   "custom_image_error_msg_partI": {
+      "description": "error message text error message on the image swap tab",
+      "message": "我們無法新增您的圖片。"
+   },
+   "custom_image_error_msg_partII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "請稍待片刻再試一次。"
+   },
+   "custom_image_error_msg_partIII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "您也可以分享[[匿名除錯資料]]以協助我們了解錯誤的原因。"
+   },
+   "custom_image_supported_file_types": {
+      "description": "supported file types, shown on the error message dialog box when a user selects a unsupported file type",
+      "message": "*.bmp、*.gif、*.jpeg、*.png、*.svg、*.tiff、*.webp"
+   },
+   "custom_image_unsupported_msg_partI": {
+      "description": "First sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "糟糕！看來自訂圖片交換不支援您嘗試新增的圖片。"
+   },
+   "custom_image_unsupported_msg_partII": {
+      "description": "second sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "請選擇以下的圖片類型："
+   },
+   "custom_image_unsupported_title": {
+      "description": "header / title on error message dialog box when a user selects a unsupported file type",
+      "message": "不支援的圖片類型"
+   },
+   "custom_images": {
+      "description": "text on the image swap tab",
+      "message": "自訂圖片"
+   },
+   "customchannelswitchlabel": {
+      "description": "The label text for the Custom Image switch on the MyAdBlock Options page",
+      "message": "自訂"
+   },
+   "customfilters": {
+      "description": "Subtitle on the Filter lists tab: Section for adding your own filter lists.",
+      "message": "自訂過濾清單"
+   },
+   "customfilterserrormessage": {
+      "description": "Error message when there is an issue with a custom filter on the 'Customize' tab of the Options page",
+      "message": "以下過濾條件：\n $filter$ \n 有一個錯誤：\n $message$",
+      "placeholders": {
+         "filter": {
+            "content": "$1",
+            "example": "@@.ad"
+         },
+         "message": {
+            "content": "$2",
+            "example": "invalid filter"
+         }
+      }
+   },
+   "customize_your_adblock": {
+      "description": "Sub-header describing Themes on the main Premium options page",
+      "message": "自訂 AdBlock"
+   },
+   "dark_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "暗色"
+   },
+   "datacollectionoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "允許 AdBlock 收集匿名過濾清單使用率資料，以及有關過濾清單阻擋內容的資訊"
+   },
+   "debuginfo": {
+      "description": "Users can click this link to provide debug information to AdBlock staff",
+      "message": "我們的團隊是否要求偵錯資訊？"
+   },
+   "debuginlogoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "在主控台記錄中顯示偵錯說明（會讓擴充功能變慢）"
+   },
+   "debuginlogoption2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "在主控台紀錄中顯示偵錯說明"
+   },
+   "decline_allow_notifications": {
+      "description": "Description of 'block site notifications' on the distraction control options page",
+      "message": "自動拒絕所造訪網站的「允許通知」要求。"
+   },
+   "default_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "預設"
+   },
+   "delete": {
+      "description": "Text on a delete button",
+      "message": "刪除"
+   },
+   "delete_all_stats_data": {
+      "description": "text related to the delete all data checkbox on the statistics page of the Options page",
+      "message": "刪除我目前儲存的阻擋統計資料"
+   },
+   "delete_detail_msg_part_I": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "您可以在此處刪除本機儲存的阻擋統計資料。"
+   },
+   "delete_detail_msg_part_II": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "這會刪除目前在您的統計頁面上顯示的所有資料，包括阻擋的網站排行。"
+   },
+   "delete_detail_msg_part_III": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "您的統計資料僅儲存在裝置上，刪除的任何統計資料均「無法」復原。"
+   },
+   "delete_detail_page_2_msg_part_I": {
+      "description": "text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "確定嗎？"
+   },
+   "delete_migration_error_messages": {
+      "description": "Button to delete error messages when adding custom filters manually",
+      "message": "刪除訊息"
+   },
+   "delete_panel_title": {
+      "description": "title text on the delete overlay on the statistics page of the Options page",
+      "message": "刪除阻擋統計資料"
+   },
+   "description": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "在 YouTube、Facebook、Twitch 以及其他您喜愛的網站上阻擋廣告與彈出視窗。"
+   },
+   "description2": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "最受歡迎的 Chrome 擴充功能，擁有超過六千萬使用者！阻擋網路上的各種廣告。"
+   },
+   "description_edge": {
+      "description": "Description for the AdBlock for Edge extension. Should not exceed 132 characters.",
+      "message": "AdBlock。排名第一的廣告攔截程式，下載量超過兩億。阻擋網路上的各種廣告。"
+   },
+   "description_yt": {
+      "description": "Description for the AdBlock on YouTube extension. Should not exceed 132 characters.",
+      "message": "由 AdBlock 打造的唯一一款 YouTube 廣告攔截程式，是最受歡迎的 Chrome 擴充功能，全球擁有超過六千萬使用者"
+   },
+   "devtools_action_block": {
+      "description": "Button text on the dev tools panel.",
+      "message": "阻擋項目"
+   },
+   "devtools_action_remove": {
+      "description": "Button text on the dev tools panel.",
+      "message": "移除規則"
+   },
+   "devtools_action_unblock": {
+      "description": "Button text on the dev tools panel.",
+      "message": "新增例外"
+   },
+   "devtools_filter_origin_custom": {
+      "description": "sub-title text of the rule showing the source of the rule as custom rules",
+      "message": "使用者定義"
+   },
+   "devtools_filter_origin_none": {
+      "description": "sub-title text of the rule showing the source of the rule as a unamed filter list",
+      "message": "未命名訂閱"
+   },
+   "devtools_filter_subtitle": {
+      "description": "sub-title text of the rule showing the source of the rule a named filter list",
+      "message": "原始"
+   },
+   "devtools_filter_title": {
+      "description": "Text of the filter that was applied to the list item.",
+      "message": "過濾條件"
+   },
+   "devtools_footer": {
+      "description": "message on the bottom of the panel",
+      "message": "\u003Ca0>重新載入\u003C/a0>頁面以查看過濾條件變更效果"
+   },
+   "devtools_header": {
+      "description": "Text on the top of the dev tools panel to show all items of any type; slot0 and slot1 are two seperate drop down lists",
+      "message": "顯示\u003Cslot1>\u003C/slot1>類型的\u003Cslot0>\u003C/slot0>項目"
+   },
+   "devtools_header_state_all": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "全部"
+   },
+   "devtools_header_state_blocked": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "已阻擋"
+   },
+   "devtools_header_state_whitelisted": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "已加入允許名單"
+   },
+   "devtools_header_type_any": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "任何"
+   },
+   "devtools_request_subtitle": {
+      "description": "sub title text for the request-column header of the dev tools panel",
+      "message": "文件網域"
+   },
+   "devtools_request_title": {
+      "description": "title text for the request-column header of the dev tools panel",
+      "message": "要求"
+   },
+   "devtools_request_url": {
+      "description": "A request URL in the AdBlock DevTools panel",
+      "message": "\u003Ca0>$original$\u003C/a0>改寫為\u003Ca1>$rewritten$\u003C/a1>",
+      "placeholders": {
+         "original": {
+            "content": "$1",
+            "example": "http://example.com/foo"
+         },
+         "rewritten": {
+            "content": "$2",
+            "example": "http://example.com/bar"
+         }
+      }
+   },
+   "devtools_type_title": {
+      "description": "Type column header text",
+      "message": "類型"
+   },
+   "disableaa": {
+      "description": "Section header on the ad report page",
+      "message": "檢查可接受廣告過濾條件："
+   },
+   "disableallextensions": {
+      "description": "Instruction on ad report page",
+      "message": "停用除 AdBlock 之外的所有擴充套件："
+   },
+   "disabled": {
+      "description": "Title shown in menu when AdBlock is paused on all sites",
+      "message": "AdBlock 已暫停"
+   },
+   "disabled_by_filter_lists": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list.",
+      "message": "對不起，AdBlock 在該頁上被您的一個過濾清單停用。"
+   },
+   "disabled_by_filter_lists_yt": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "抱歉，此頁上的 YouTube 版 AdBlock 被您的一個選項停用。"
+   },
+   "disabled_on_all_sites": {
+      "description": "Message shown in menu when AdBlock is paused on all sites",
+      "message": "您已將 AdBlock 設定為在所有網站都維持暫停。"
+   },
+   "disabled_on_this_channel": {
+      "description": "Message shown in the toolbar button menu on YouTube channel pages and videos that have been allowlisted.",
+      "message": "您已允許這個頻道上的廣告。"
+   },
+   "disabled_on_this_page": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "此頁面停用 AdBlock。"
+   },
+   "disabled_site_title": {
+      "description": "header title on the menu when a user is on tab that extensions are disabled on (Chrome settings, etc)",
+      "message": "這裡沒有需要阻擋的！"
+   },
+   "disableforchromeandsafaristeptwo": {
+      "description": "Step 2 for disabling Chrome and Safari extensions",
+      "message": "取消選中除 AdBlock 之外的每個擴充套件旁邊的「啟用」核取方塊。 保留 AdBlock 啟用。"
+   },
+   "disableforchromestepone": {
+      "description": "Step 1 for disabling Chrome extensions",
+      "message": "打開[[擴充套件頁面]]。"
+   },
+   "disableforedgestepone": {
+      "description": "Step 1 for disabling Edge extensions",
+      "message": "按一下「更多」選單（...）並選擇擴充套件。"
+   },
+   "disableforedgesteptwo": {
+      "description": "Step 2 for disabling Edge extensions",
+      "message": "對於除 AdBlock 之外的每個擴充套件，按一下齒輪圖示，然後按一下「開啟」開關更改為關閉。"
+   },
+   "disableforsafaristepone": {
+      "description": "Step 1 for disabling Safari extensions",
+      "message": "按一下 Safari 選單 > 偏好設定 > 擴充套件。"
+   },
+   "disableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "我們已經停用了所有其他擴充套件。現在，我們將重新載入有廣告的頁面。請稍待片刻。"
+   },
+   "dismiss_invitations": {
+      "description": "Description of 'ignore survey requests' on the distraction control options page",
+      "message": "立即關閉網站發出的問卷調查邀請。"
+   },
+   "display_language_selector": {
+      "description": "Text shown before language selector drop-down.",
+      "message": "AdBlock 顯示語言為"
+   },
+   "distraction_control": {
+      "description": "Name of a Premium option",
+      "message": "干擾控制"
+   },
+   "do_not_swap_ads": {
+      "description": "Text of a clickable option to stop swapping ads with images in the Options page Image Swap tab.",
+      "message": "不要換廣告"
+   },
+   "dogchannelswitchlabel": {
+      "description": "The label text for the dog switch on the MyAdBlock Options page",
+      "message": "狗"
+   },
+   "domain_pause_adblock": {
+      "description": "Menu entry to pause AdBlock on this domain (stop blocking ads)",
+      "message": "在這個網站上暫停"
+   },
+   "domain_unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site'",
+      "message": "在這個網站上取消暫停 AdBlock "
+   },
+   "donate_to_adblock": {
+      "description": "Text of a donate link in the toolbar button menu",
+      "message": "喜歡 AdBlock 嗎？考慮捐款吧！"
+   },
+   "donate_to_youtube_adblock": {
+      "description": "Text of a donate link in the toolbar button menu. 'This' refers to the 'AdBlock on YouTube' extension.",
+      "message": "喜歡嗎？考慮捐款吧！"
+   },
+   "done": {
+      "description": "Message for help flow in popup menu.",
+      "message": "完成"
+   },
+   "done_reload_page": {
+      "description": "Message for help flow in popup menu.",
+      "message": "請在我們完成後重新載入頁面。"
+   },
+   "dont_know_help_me": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我不知道。幫幫我！"
+   },
+   "dont_run_on_pages_on_domain": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "不要在此網域上的頁面上執行"
+   },
+   "dont_run_on_this_page": {
+      "description": "Menu entry to allowlist the current page",
+      "message": "不要在此頁上執行"
+   },
+   "dont_show_me_again": {
+      "description": "opt out option on all-to-action on the blocklist / hiding wizard",
+      "message": "別再顯示此訊息"
+   },
+   "dont_show_reminder": {
+      "description": "GFC messaging on the popup menu",
+      "message": "別再顯示此提醒"
+   },
+   "dontsend": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "不要傳送"
+   },
+   "download_mac_app": {
+      "description": "Link to download our Mac App. [[ and ]] will be replaced with HTML to link to the Mac App Store",
+      "message": "為了讓您在 Mac 上獲得最好的 AdBlock 體驗，請下載我們的 [[Safari Mac 版 AdBlock 應用程式！]]"
+   },
+   "easylist_disable_done": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock 使用 EasyList 攔截大多數網站上的廣告。"
+   },
+   "easylist_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "我們建議維持開啟。如果您不小心取消訂閱，請立即選擇「EasyList」，以阻擋更多的廣告。"
+   },
+   "easylist_lite_disable_done": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock 使用 EasyList Lite 或 EasyList 攔截大多數網站上的廣告。"
+   },
+   "easylist_lite_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "我們建議維持開啟。如果您不小心取消訂閱，請立即選擇「EasyList Lite」或「EasyList」，以阻擋更多的廣告。"
+   },
+   "easylist_lite_or_easylist": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "我們建議訂閱「EasyList Lite」或「EasyList」，但不要兩者皆訂閱。"
+   },
+   "edit_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您可能需要[[編輯您的過濾清單]]。"
+   },
+   "edit_image": {
+      "description": "header text in the on custom image swap modal dialog",
+      "message": "編輯圖片"
+   },
+   "edit_image_msg_partI": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "我們在下方列出了 3 種最常見的廣告尺寸。"
+   },
+   "edit_image_msg_partII": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "請選擇最接近您圖片的尺寸，滑動調整後按下儲存。"
+   },
+   "enable_adblock": {
+      "description": "Link text to un-allowlist a page, displayed immediately after 'AdBlock is disabled on this page'",
+      "message": "在此頁面啟用 AdBlock"
+   },
+   "enable_adblock_on_this_channel": {
+      "description": "Menu entry to un-allowlist a YouTube channel, displayed under 'You allowed ads on this channel.'",
+      "message": "在這個頻道上攔截廣告"
+   },
+   "enable_do_not_track_advice": {
+      "description": "The text advicing to enable DNT if Acceptable Ads is enabled in the General tab",
+      "message": "若要正常執行此功能，請在瀏覽器偏好設定中啟用「不要追蹤」(DNT)。"
+   },
+   "enable_on_this_site": {
+      "description": "GFC messaging on the popup menu",
+      "message": "在本網站啟用 AdBlock"
+   },
+   "enableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've re-enabled extensions that were previously disabled",
+      "message": "之前停用的擴充套件已重新啟用。"
+   },
+   "english_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您是否在英文網站上？"
+   },
+   "englishonly": {
+      "description": "Lets the user know that a link/page is only available in English.",
+      "message": "只提供英文"
+   },
+   "enjoying_adblock": {
+      "description": "Text of a footer in the popup menu help flow asking users to leave us a review.",
+      "message": "喜歡 AdBlock 嗎？"
+   },
+   "enter_url": {
+      "description": "Placeholder text in the Custom Filter list URL bar",
+      "message": "輸入連結網址"
+   },
+   "error": {
+      "description": "Text in the aria-label attribute of an icon indicating an error occurred.",
+      "message": "錯誤"
+   },
+   "error_msg_header": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "糟糕！"
+   },
+   "error_msg_help_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "If that doesn't work, "
+   },
+   "error_msg_help_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "check here for more help."
+   },
+   "error_msg_help_us_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "協助我們解決這個問題 "
+   },
+   "error_msg_help_us_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": " by sending us some debug data."
+   },
+   "error_msg_partI": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "We're sorry, the AdBlock menu had trouble loading."
+   },
+   "error_msg_reload_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "Next, try reloading the extension by "
+   },
+   "error_msg_reload_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "clicking here."
+   },
+   "error_msg_thank_you": {
+      "description": "The text on the popup menu when an error has occurred",
+      "message": "謝謝！"
+   },
+   "example_themes": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the themes feature.",
+      "message": "範例主題"
+   },
+   "excludedomainorurl": {
+      "description": "Message of the exclude section (Show ads on a webpage or domain) on the Customize tab",
+      "message": "AdBlock 不應該阻擋任何項目的網域或網址"
+   },
+   "failedtofetchfilter": {
+      "description": "Error alert when subscribing to a filter list",
+      "message": "無法擷取此過濾條件！"
+   },
+   "feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "有任何意見或希望的功能嗎？歡迎盡量提出！"
+   },
+   "feedback_title": {
+      "description": "Title for feedback call to action.",
+      "message": "提供回饋"
+   },
+   "fetchinglabel": {
+      "description": "Status label when selecting a new filter list",
+      "message": "擷取中……請稍候。"
+   },
+   "ff_button_how_to_hide": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Remove from Toolbar' should match the text that Firefox displays when you right click a toolbar button, and 'Customize' should match the text that shows when you click the button on the Firefox toolbar with three lines.",
+      "message": "若要隱藏按鈕，請以右鍵按下並選擇「從工具列刪除」。若要重新顯示，可以從 Firefox 功能表 -> 「自訂」設定。"
+   },
+   "ff_checkinchrome_1": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "如果沒有的話，請安裝 Chrome。"
+   },
+   "ff_checkinchrome_2": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "如果沒有的話，請安裝 Chrome 版 AdBlock。"
+   },
+   "ff_checkinchrome_3": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "在 Chrome 中，訂閱與這裡相同的過濾清單。"
+   },
+   "ff_checkinchrome_4": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "在 Chrome 中，重新載入有廣告的頁面。"
+   },
+   "ff_checkinchrome_5": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "廣告也出現在 Chrome 中嗎？"
+   },
+   "ff_checkinchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Chrome",
+      "message": "檢查 Chrome"
+   },
+   "filter_annoyances_explained": {
+      "description": "A filter list explanation",
+      "message": "阻擋頁面內彈出視窗、社群媒體與相關小工具以及其他煩惱"
+   },
+   "filter_antisocial_explained": {
+      "description": "A filter list explaination",
+      "message": "刪除社群媒體按鈕"
+   },
+   "filter_chinese": {
+      "description": "A filter list combined with EasyList",
+      "message": "中文 + EasyList"
+   },
+   "filter_czech": {
+      "description": "A filter list combined with EasyList",
+      "message": "捷克文與斯洛伐克文 + EasyList"
+   },
+   "filter_dutch": {
+      "description": "A filter list combined with EasyList",
+      "message": "荷蘭文 + EasyList"
+   },
+   "filter_easylist_plus_arabic_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "阿拉伯文 + 法文 + EasyList"
+   },
+   "filter_easylist_plus_bulgarian": {
+      "description": "A filter list combined with EasyList",
+      "message": "保加利亞文 + EasyList"
+   },
+   "filter_easylist_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "法文 + EasyList"
+   },
+   "filter_easylist_plus_german": {
+      "description": "A filter list combined with EasyList",
+      "message": "德文 + EasyList"
+   },
+   "filter_easylist_plus_indonesian": {
+      "description": "A filter list combined with EasyList",
+      "message": "印尼文 + EasyList"
+   },
+   "filter_easylist_plus_lithuania": {
+      "description": "A filter list combined with EasyList",
+      "message": "立陶宛文 + EasyList"
+   },
+   "filter_easylist_plus_romanian": {
+      "description": "A filter list combined with EasyList",
+      "message": "羅馬尼亞文 + EasyList"
+   },
+   "filter_easylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "越南文 + EasyList"
+   },
+   "filter_elemhideemulation_nodomain": {
+      "message": "沒有擴充元素隱藏過濾條件的指定啟用網域"
+   },
+   "filter_idcac_explained": {
+      "description": "A filter list explanation",
+      "message": "阻擋 Cookie 通知，即表示您放棄瀏覽網站時收到使用 Cookie 通知的權利"
+   },
+   "filter_invalid": {
+      "description": "Generic error shown when the user tries to add an invalid filter rule to their custom filters",
+      "message": "無效的過濾條件"
+   },
+   "filter_invalid_csp": {
+      "message": "無效的內容安全政策"
+   },
+   "filter_invalid_domain": {
+      "message": "指定的網域無效（或空白）"
+   },
+   "filter_invalid_regexp": {
+      "message": "無效的規則運算式"
+   },
+   "filter_israeli": {
+      "description": "A filter list combined with EasyList",
+      "message": "希伯來文 + EasyList"
+   },
+   "filter_italian": {
+      "description": "A filter list combined with EasyList",
+      "message": "義大利文 + EasyList"
+   },
+   "filter_latvian": {
+      "description": "A filter list combined with EasyList",
+      "message": "拉脫維亞文 + EasyList"
+   },
+   "filter_russian": {
+      "description": "A filter list combined with EasyList",
+      "message": "俄文與烏克蘭文 + EasyList"
+   },
+   "filter_snippet_nodomain": {
+      "message": "程式碼片段過濾條件未指定有效網域"
+   },
+   "filter_unknown_option": {
+      "message": "未知過濾條件選項"
+   },
+   "filter_warning_removal_explained": {
+      "description": "A filter list explanation",
+      "message": "移除使用廣告攔截程式的警告"
+   },
+   "filteracceptable_ads": {
+      "description": "A filter list",
+      "message": "可接受廣告"
+   },
+   "filteracceptable_ads_privacy": {
+      "description": "A filter list",
+      "message": "可接受廣告政策"
+   },
+   "filteradblock_custom": {
+      "description": "A filter list",
+      "message": "AdBlock 自訂過濾條件"
+   },
+   "filterannoyances": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances（阻擋頁面內彈出視窗、社群媒體與相關小工具以及其他煩惱）"
+   },
+   "filterannoyances2": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances"
+   },
+   "filteranticircumvent": {
+      "description": "A filter list",
+      "message": "反規避過濾條件"
+   },
+   "filterantisocial": {
+      "description": "A filter list",
+      "message": "反社群過濾清單（刪除社群媒體按鈕）"
+   },
+   "filterantisocial2": {
+      "description": "A filter list",
+      "message": "反社群過濾清單"
+   },
+   "filterbitcoin_mining_protection": {
+      "description": "A filter list",
+      "message": "加密貨幣（比特幣）挖礦保護清單"
+   },
+   "filterbrazilian_portuguese": {
+      "description": "A filter list",
+      "message": "巴西葡萄牙文"
+   },
+   "filterchinese": {
+      "description": "A filter list",
+      "message": "中文"
+   },
+   "filterczech": {
+      "description": "A filter list",
+      "message": "捷克文與斯洛伐克文"
+   },
+   "filterdanish": {
+      "description": "A filter list",
+      "message": "丹麥文"
+   },
+   "filterdutch": {
+      "description": "A filter list",
+      "message": "荷蘭文"
+   },
+   "filtereasylist": {
+      "description": "A filter list",
+      "message": "EasyList"
+   },
+   "filtereasylist_lite": {
+      "description": "A filter list",
+      "message": "EasyList Lite"
+   },
+   "filtereasylist_plun_korean": {
+      "description": "A filter list",
+      "message": "韓文"
+   },
+   "filtereasylist_plus_arabic": {
+      "description": "A filter list",
+      "message": "阿拉伯文"
+   },
+   "filtereasylist_plus_bulgarian": {
+      "description": "A filter list",
+      "message": "保加利亞文"
+   },
+   "filtereasylist_plus_estonian": {
+      "description": "A filter list",
+      "message": "愛沙尼亞文"
+   },
+   "filtereasylist_plus_finnish": {
+      "description": "A filter list",
+      "message": "芬蘭文"
+   },
+   "filtereasylist_plus_french": {
+      "description": "A filter list",
+      "message": "法文"
+   },
+   "filtereasylist_plus_german": {
+      "description": "A filter list",
+      "message": "德文"
+   },
+   "filtereasylist_plus_greek": {
+      "description": "A filter list",
+      "message": "希臘文"
+   },
+   "filtereasylist_plus_indian": {
+      "description": "A filter list",
+      "message": "IndianList + EasyList"
+   },
+   "filtereasylist_plus_indonesian": {
+      "description": "A filter list",
+      "message": "印尼文"
+   },
+   "filtereasylist_plus_lithuania": {
+      "description": "A filter list",
+      "message": "立陶宛文"
+   },
+   "filtereasylist_plus_polish": {
+      "description": "A filter list",
+      "message": "波蘭文"
+   },
+   "filtereasylist_plus_portuguese": {
+      "description": "A filter list",
+      "message": "葡萄牙文 + EasyList"
+   },
+   "filtereasylist_plus_romanian": {
+      "description": "A filter list",
+      "message": "羅馬尼亞文"
+   },
+   "filtereasylist_plus_spanish": {
+      "description": "A filter list",
+      "message": "西班牙文"
+   },
+   "filtereasylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "越南文"
+   },
+   "filtereasyprivacy": {
+      "description": "A filter list",
+      "message": "EasyPrivacy（隱私保護）"
+   },
+   "filterfb_notifications": {
+      "description": "A filter list",
+      "message": "Fanboy 通知 (阻擋頁面內彈出視窗、社群媒體與相關小工具，以及其他擾人內容)"
+   },
+   "filterhungarian": {
+      "description": "A filter list",
+      "message": "匈牙利文"
+   },
+   "filtericelandic": {
+      "description": "A filter list",
+      "message": "冰島文"
+   },
+   "filteridcac": {
+      "description": "A filter list",
+      "message": "我不介意 Cookie"
+   },
+   "filterisraeli": {
+      "description": "A filter list",
+      "message": "希伯來文"
+   },
+   "filteritalian": {
+      "description": "A filter list",
+      "message": "義大利文"
+   },
+   "filterjapanese": {
+      "description": "A filter list",
+      "message": "日文"
+   },
+   "filterlatvian": {
+      "description": "A filter list",
+      "message": "拉脫維亞文"
+   },
+   "filterlistlink": {
+      "description": "Filter lists tab explanation and link to filter list credits.",
+      "message": "不要訂閱比您需要更多的清單──每一個都會讓您變慢一點點！貢獻者還有更多清單請查看[[這裡]]。"
+   },
+   "filterlistsrock": {
+      "description": "Header text on the Customize tab",
+      "message": "過濾清單可以阻擋網路上大部分的廣告，您也可以："
+   },
+   "filterlistsrock2": {
+      "description": "Header text on the Customize tab",
+      "message": "過濾清單可以阻擋網路上大部分的廣告。您也可以……"
+   },
+   "filternorwegian": {
+      "description": "A filter lsit",
+      "message": "挪威文"
+   },
+   "filterorigin": {
+      "description": "Resource list page: tooltip of matching filter, telling which filter list contains the filter",
+      "message": "過濾條件來源：\n$list$",
+      "placeholders": {
+         "list": {
+            "content": "$1",
+            "example": "A filter list name OR AdBlock OR the translation of 'tabcustomize'"
+         }
+      }
+   },
+   "filterrussian": {
+      "description": "Language names for a filter list",
+      "message": "俄文與烏克蘭文"
+   },
+   "filtersavewarning_part1": {
+      "description": "Warning when manually editing filters -- first part not clickable.",
+      "message": "注意：如果在這裡犯了錯誤，包括官方過濾條件的其他許多過濾條件也可能會出錯！"
+   },
+   "filtersavewarning_part2": {
+      "description": "Warning when manually editing filters -- second part clickable.",
+      "message": "請參閱[[篩選語法教學]]，了解如何新增進階阻擋名單與允許名單過濾條件。"
+   },
+   "filterstabtitle": {
+      "description": "Title of the Filter lists tab of the Options page",
+      "message": "訂閱到過濾清單……"
+   },
+   "filterswedish": {
+      "description": "A filter list",
+      "message": "瑞典文"
+   },
+   "filterturkish": {
+      "description": "A filter list",
+      "message": "土耳其文"
+   },
+   "filterviewsource": {
+      "description": "Title for links to view filter lists on website",
+      "message": "查看過濾清單"
+   },
+   "filterwarning_removal": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Adblock Warning Removal 清單（移除使用廣告攔截程式的警告）"
+   },
+   "filterwarning_removal2": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Adblock Warning Removal 清單"
+   },
+   "find_out_more": {
+      "description": "Text in the button on the Premium CTA on the hiding wizard.",
+      "message": "深入了解"
+   },
+   "findingads": {
+      "description": "'Block an ad' wizard loading message",
+      "message": "尋找廣告……\n\n只需要一下子。"
+   },
+   "firefox_explanation": {
+      "description": "Explanation of the 'Check in Firefox or Chrome' step on the ad report page",
+      "message": "這個問題的目的是為了判斷接收您報告的對象。如果您未正確回答這個問題，報告將傳送到錯誤的對象而可能被忽略。"
+   },
+   "first_time_seeing_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "這是我第一次看到這則廣告"
+   },
+   "fixityourself": {
+      "description": "Telling users who won't report an ad to us how to handle it for themselves",
+      "message": "好的，您仍然可以在「選項」頁上為自己阻擋這個廣告。謝謝！"
+   },
+   "flashads": {
+      "description": "Title of the final ad report question if the ad didn't appear in Firefox",
+      "message": "影片和 Flash"
+   },
+   "foodchannelswitchlabel": {
+      "description": "The label text for the Food switch on the MyAdBlock Options page",
+      "message": "食物"
+   },
+   "format": {
+      "description": "Example showing users how to input a list of sites on the Customize tab. You can translate the 'news' and 'siteN' but leave the '|'s and '~'s in place.",
+      "message": "格式："
+   },
+   "framedomain": {
+      "description": "Resource list page: domain name of the frame",
+      "message": "框架網域："
+   },
+   "frametype": {
+      "description": "Resource list page: followed by frame type (top frame, subframe)",
+      "message": "框架類型："
+   },
+   "frameurl": {
+      "description": "Resource list page: full URL of the frame",
+      "message": "框架網址："
+   },
+   "fun_way_customize": {
+      "description": "Description of Themes on the main Premium options page",
+      "message": "主題是在您的瀏覽器中自訂 AdBlock 的有趣方式。"
+   },
+   "future_show_ads": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "以後這些頁面將繼續顯示廣告。"
+   },
+   "generaloptions": {
+      "description": "Title of the first Options page tab",
+      "message": "一般選項"
+   },
+   "generaloptions2": {
+      "description": "Title of one of the Options page tabs",
+      "message": "一般選項"
+   },
+   "get_around_popups": {
+      "description": "Description of Bypass Mode on the main Premium options page",
+      "message": "有了略過模式，您將能在不停用 AdBlock 的情況下略過那些彈出視窗。"
+   },
+   "get_it_now": {
+      "description": "The text in a button visible to locked users in the MyAdBlock Options page",
+      "message": "立刻取得"
+   },
+   "get_sync": {
+      "description": "Link to pay for Sync (part of AdBlock Premium)",
+      "message": "取得同步功能"
+   },
+   "goatchannelswitchlabel": {
+      "description": "The label text for the Goats switch on the MyAdBlock Options page",
+      "message": "山羊"
+   },
+   "goodbye_distractions": {
+      "description": "Description of the distraction control option",
+      "message": "利用干擾控制功能，告別電子報彈出視窗、浮動視窗影片以及其他擾人的內容。"
+   },
+   "got_it": {
+      "description": "Message for help flow in popup menu.",
+      "message": "知道了。"
+   },
+   "header": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 10 characters)",
+      "message": "標題"
+   },
+   "headerfilter": {
+      "description": "Resource list page: title of a column",
+      "message": "符合的過濾條件"
+   },
+   "headerresource": {
+      "description": "Resource list page: title of a column",
+      "message": "資源"
+   },
+   "headertype": {
+      "description": "Resource list page: title of a column",
+      "message": "類型"
+   },
+   "help": {
+      "description": "Text in the aria-label attribute of the support icon on the pop-up menu.",
+      "message": "説明"
+   },
+   "help_and_feedback": {
+      "description": "Text of a help link in the toolbar button menu",
+      "message": "説明與回饋"
+   },
+   "helpcenter": {
+      "description": "Link to AdBlock's help site. This is found on the Support tab of the options.",
+      "message": "造訪[[幫助中心]]"
+   },
+   "hiddenelement": {
+      "description": "Resource list page: resource status",
+      "message": "隱藏元素"
+   },
+   "hiddenelementmessagecount": {
+      "description": "The total number of ads or 'things' hidden on a page by the new rule.",
+      "message": "$count$ 本頁面上其他項目也暫時隱藏",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "2"
+         }
+      }
+   },
+   "hide_details": {
+      "description": "Toggle that hides the details section",
+      "message": "隱藏詳細資訊"
+   },
+   "hide_newsletter_popups": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "隱藏電子報彈出視窗"
+   },
+   "hide_this_button": {
+      "description": "Toolbar button menu entry to hide the AdBlock button",
+      "message": "隱藏此按鈕"
+   },
+   "how": {
+      "description": "Text of a link pointing to instructions on how to do something",
+      "message": "怎麼做？"
+   },
+   "how_can_we_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我該如何協助您？"
+   },
+   "ignore_survey_requests": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "忽略問卷填寫要求"
+   },
+   "image_of_channel": {
+      "description": "Text in the alt attribute of an image injected into a page as part of the Image Swap feature.",
+      "message": "$image_category$的圖片",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Dogs"
+         }
+      }
+   },
+   "image_swap": {
+      "description": "Title of the Image Swap sub-tab of the Options page",
+      "message": "交換圖片"
+   },
+   "image_swap_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Image Swap feature.",
+      "message": "圖片交換範例"
+   },
+   "images_coming_soon": {
+      "description": "The text telling MyAdBlock active users that there will be more photos for MyAdBlock.",
+      "message": "更多照片即將推出！"
+   },
+   "invalidListUrl": {
+      "description": "Message when you subscribe to a non-list URL",
+      "message": "無效清單網址，將被刪除。"
+   },
+   "isithidden": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "該項目隱藏起來了嗎？"
+   },
+   "issue_unrelated_adblock": {
+      "description": "Message for help flow in popup menu.",
+      "message": "網站似乎存在與 AdBlock 無關的問題。"
+   },
+   "join_vpn_waitlist": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "加入測試名單以搶先體驗！"
+   },
+   "landscapechannelswitchlabel": {
+      "description": "The label text for the Landscape switch on the MyAdBlock Options page",
+      "message": "風景"
+   },
+   "lang_arabic": {
+      "description": "Language name",
+      "message": "阿拉伯文"
+   },
+   "lang_bulgarian": {
+      "description": "Language name",
+      "message": "保加利亞文"
+   },
+   "lang_catalan": {
+      "description": "Language name",
+      "message": "加泰隆尼亞文"
+   },
+   "lang_chinese": {
+      "description": "Language name",
+      "message": "中文"
+   },
+   "lang_chinese_simplified": {
+      "description": "Language name",
+      "message": "簡體中文"
+   },
+   "lang_chinese_traditional": {
+      "description": "Language name",
+      "message": "繁體中文"
+   },
+   "lang_croatian": {
+      "description": "Language name",
+      "message": "克羅埃西亞文"
+   },
+   "lang_czech": {
+      "description": "Language name",
+      "message": "捷克文"
+   },
+   "lang_danish": {
+      "description": "Language name",
+      "message": "丹麥文"
+   },
+   "lang_dutch": {
+      "description": "Language name",
+      "message": "荷蘭文"
+   },
+   "lang_english": {
+      "description": "Language name",
+      "message": "英文"
+   },
+   "lang_estonian": {
+      "description": "Language name",
+      "message": "愛沙尼亞文"
+   },
+   "lang_finnish": {
+      "description": "Language name",
+      "message": "芬蘭文"
+   },
+   "lang_french": {
+      "description": "Language name",
+      "message": "法文"
+   },
+   "lang_german": {
+      "description": "Language name",
+      "message": "德文"
+   },
+   "lang_greek": {
+      "description": "Language name",
+      "message": "希臘文"
+   },
+   "lang_hungarian": {
+      "description": "Language name",
+      "message": "匈牙利文"
+   },
+   "lang_icelandic": {
+      "description": "Language name",
+      "message": "冰島文"
+   },
+   "lang_indonesian": {
+      "description": "Language name",
+      "message": "印尼文"
+   },
+   "lang_israeli": {
+      "description": "Language name",
+      "message": "希伯來文"
+   },
+   "lang_italian": {
+      "description": "Language name",
+      "message": "義大利文"
+   },
+   "lang_japanese": {
+      "description": "Language name",
+      "message": "日文"
+   },
+   "lang_korean": {
+      "description": "Language name",
+      "message": "韓文"
+   },
+   "lang_latvian": {
+      "description": "Language name",
+      "message": "拉脫維亞文"
+   },
+   "lang_lithuania": {
+      "description": "Language name",
+      "message": "立陶宛文"
+   },
+   "lang_norwegian": {
+      "description": "Language name",
+      "message": "挪威文"
+   },
+   "lang_polish": {
+      "description": "Language name",
+      "message": "波蘭文"
+   },
+   "lang_portuguese_brazil": {
+      "description": "Language name",
+      "message": "葡萄牙文（巴西）"
+   },
+   "lang_portuguese_portugal": {
+      "description": "Language name",
+      "message": "葡萄牙文（葡萄牙）"
+   },
+   "lang_romanian": {
+      "description": "Language name",
+      "message": "羅馬尼亞文"
+   },
+   "lang_russian": {
+      "description": "Language name",
+      "message": "俄文"
+   },
+   "lang_serbian": {
+      "description": "Language name",
+      "message": "塞爾維亞文"
+   },
+   "lang_slovak": {
+      "description": "Language name",
+      "message": "斯洛伐克文"
+   },
+   "lang_slovenian": {
+      "description": "Language name",
+      "message": "斯洛維尼亞文"
+   },
+   "lang_spanish": {
+      "description": "Language name",
+      "message": "西班牙文"
+   },
+   "lang_swedish": {
+      "description": "Language name",
+      "message": "瑞典文"
+   },
+   "lang_turkish": {
+      "description": "Language name",
+      "message": "土耳其文"
+   },
+   "lang_ukranian": {
+      "description": "Language name",
+      "message": "烏克蘭文"
+   },
+   "lang_vietnamese": {
+      "description": "Language name",
+      "message": "越南文"
+   },
+   "languagedropdowndescription": {
+      "description": "Dropdown list for language-specific filter lists",
+      "message": "新增其他語言的過濾條件："
+   },
+   "learn_more": {
+      "description": "Link to Knowledge Base article with more information about the settings change",
+      "message": "瞭解更多資訊。"
+   },
+   "learn_more_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您可能還需要[[了解更多關於過濾清單的資訊]]。"
+   },
+   "learn_more_lower": {
+      "description": "GFC messaging on the popup menu",
+      "message": "進一步了解"
+   },
+   "learn_more_to_resolve": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您可以[[在這裡了解更多]]來解決此問題。"
+   },
+   "learn_more_without_period": {
+      "description": "Text in the aria-label attribute of an icon linking to extra information about an option.",
+      "message": "進一步了解"
+   },
+   "leave_a_review": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "寫評論給我們！"
+   },
+   "legend": {
+      "description": "Resource list page: followed by color codes for various resource statuses (blocked, allowlisted, hidden)",
+      "message": "圖例："
+   },
+   "linkblockadbyurl": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "以網址阻擋廣告"
+   },
+   "linkhidesection": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "隱藏網頁的一部分"
+   },
+   "linkunblock": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "在網頁或網域上顯示廣告"
+   },
+   "loading": {
+      "description": "Generic message displayed during processes that take some time",
+      "message": "載入中……"
+   },
+   "loading_in_progress": {
+      "description": "Text in the aria-label attribute of an icon indicating that page is currently loading",
+      "message": "載入中"
+   },
+   "local_cdn_option": {
+      "description": "Option to let the user enable Local CDN feature.",
+      "message": "啟動熱門網站庫的本機內容快取"
+   },
+   "locked": {
+      "description": "Text in the aria-label attribute of an icon showing a feature/option is locked.",
+      "message": "已鎖"
+   },
+   "love_adblock": {
+      "description": "Text in a button that asks users to rate us.",
+      "message": "喜歡 AdBlock 嗎？"
+   },
+   "mac_app_message_menu_part_one": {
+      "description": "part one of the message to safari users on the popup menu",
+      "message": "全新！"
+   },
+   "mac_app_message_menu_part_two": {
+      "description": "part two of the message to safari users on the popup menu",
+      "message": "試試 AdBlock Mac App"
+   },
+   "mac_app_message_options": {
+      "description": "Message to users on the Options page",
+      "message": "Safari 版 AdBlock 現已推出 Mac App！"
+   },
+   "make_adblock_yours_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "您可以輕鬆控制 AdBlock 的外觀與字型大小。"
+   },
+   "make_adblock_yours_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "擁有 AdBlock"
+   },
+   "manage_subscribed_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube and has enabled the YouTube channel allow listing option",
+      "message": "管理訂閱頻道上的廣告"
+   },
+   "manage_subscription": {
+      "description": "Text of link to manage the user's Premium subscription on the Premium tab of the Options page",
+      "message": "管理您的訂閱"
+   },
+   "manualexcludefilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "編輯停用的過濾條件："
+   },
+   "manualexcludefilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "編輯停用的過濾條件"
+   },
+   "manualfilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "手動編輯過濾條件："
+   },
+   "manualfilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "手動編輯過濾條件"
+   },
+   "manualfilteredit_yt": {
+      "description": "Subtitle on the 'General' tab of AdBlock on YouTube",
+      "message": "手動編輯過濾條件："
+   },
+   "manuallyenableotherextensions": {
+      "description": "On the ad report page, alert notifying users that they will need to manually reenable the extensions",
+      "message": "打開擴充套件頁面以啟用之前停用的擴充套件。"
+   },
+   "migration_error_message": {
+      "description": "Error when adding custom filters manually",
+      "message": "我們在您的自訂過濾條件中發現了錯誤。請參閱以下訊息。"
+   },
+   "modifydomain": {
+      "description": "Caption for the allowlist wizard slider that modifies the domain part of a URL",
+      "message": "網站："
+   },
+   "modifypath": {
+      "description": "Caption for the allowlist wizard slider that modifies the path part of a URL",
+      "message": "頁面："
+   },
+   "more_themes_coming_soon": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "很快還會推出更多佈景主題，敬請期待！"
+   },
+   "more_themes_on_the_way": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "還有更多主題即將推出！"
+   },
+   "myadblock_benefits_explained": {
+      "description": "Main text of the teaser MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "為了感謝您支持並啟用 MyAdBlock，您將在最新工具與功能推出時獲得優先使用權。"
+   },
+   "myadblock_feedback_button": {
+      "description": "Text on the MyAdBlock feedback button",
+      "message": "送出回饋意見"
+   },
+   "myadblock_feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "如果您有任何回饋意見或功能要求，請使用我們的回饋意見頁面。"
+   },
+   "myadblock_feedback_title": {
+      "description": "Title for MyAdBlock feedback call to action.",
+      "message": "我們很樂意聽到您的意見！"
+   },
+   "myadblock_more_coming_soon": {
+      "description": "Title of the teaser MyAdBlock feature box in the MyAdBlock tab of the Options page",
+      "message": "更多功能即將推出！"
+   },
+   "myadblock_options_page_header": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblock_page_title": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock：瀏覽網路的更好方式"
+   },
+   "myadblock_payment_not_available_callout": {
+      "description": "The text notifying something is wrong in the payment iframe in the Options page.",
+      "message": "糟糕！"
+   },
+   "myadblock_payment_not_available_subtitle": {
+      "description": "The sub-title of an error message box in payment iframe in the Options page.",
+      "message": "我們無法連到伺服器"
+   },
+   "myadblock_payment_not_available_text": {
+      "description": "The text of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "很高興您對 MyAdBlock 感興趣！很抱歉我們目前無法處理付款。請稍後再試。"
+   },
+   "myadblock_payment_not_available_title": {
+      "description": "The title of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "糟糕！無法連到我們的伺服器"
+   },
+   "myadblock_pic_replacemenet_description": {
+      "description": "The text briefly describing what the feature does in the MyAdBlock tab in the option page.",
+      "message": "將廣告替換為您喜愛的圖片"
+   },
+   "myadblock_picreplacement_exlained": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "從以下類別選擇，AdBlock 有時就會將廣告替換為高畫質圖片，帶給您愉快的心情。"
+   },
+   "myadblock_short_description": {
+      "description": "Text substitle of myAdBlock page in the options page",
+      "message": "體驗捐款人專屬的有趣功能，享受更強大的 AdBlock"
+   },
+   "myadblock_short_description_to_pay": {
+      "description": "The text next to the 'Get It Now' button on top of the MyAdBlock Options page",
+      "message": "有了這些使用方便的附加元件，您就會成為廣告攔截達人。"
+   },
+   "myadblock_subscribe_invite": {
+      "description": "Text on hover of a locked MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "訂閱 MyAdBlock 即可解鎖"
+   },
+   "myadblock_themes_description": {
+      "description": "Text briefly describing what themes do on the MyAdBlock tab of the Options page",
+      "message": "更改 AdBlock 外觀，包括字型大小與顏色主題"
+   },
+   "myadblockenrollment": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "啟用 MyAdBlock"
+   },
+   "myadblockoptions": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblockoptionscategoryheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "類別"
+   },
+   "myadblockoptionspageheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock 選項"
+   },
+   "myadblockpicreplacementswitchlabel": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "將以下類別中的高品質圖片取代阻擋的廣告"
+   },
+   "name": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — 最佳廣告攔截程式"
+   },
+   "name_adblock_on_youtube": {
+      "description": "Name of version of the AdBlock extension that only blocks ads on YouTube. Other strings that refer to the 'AdBlock on YouTube' extension should use this name.",
+      "message": "YouTube 版 AdBlock"
+   },
+   "name_devbuild": {
+      "description": "Extension name to be shown for development builds. Note: this cannot be longer than 45 characters. Should not be translated",
+      "message": "AdBlock 開發版本"
+   },
+   "name_releasebuild": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — 最佳廣告攔截程式"
+   },
+   "needhelp": {
+      "description": "Subtitle on the Support tab",
+      "message": "需要協助嗎？"
+   },
+   "never_lose_settings": {
+      "description": "Part 2 of a call-to-action on the allowlist and blocklist wizards",
+      "message": "將此設定套用到所有裝置，並使用「備份與同步」以確保您不會遺失您的 AdBlock 設定。"
+   },
+   "new_badge": {
+      "description": "Max 4 characters. If it's not possible to translate in four characters or less, please don't translate. Text in the badge of our extension toolbar icon.",
+      "message": "新"
+   },
+   "new_cta_default_text": {
+      "description": "Text of a temporary call-to-action item in the popup menu.",
+      "message": "升級您的 AdBlock"
+   },
+   "new_cta_hovered_text": {
+      "description": "Text of a temporary call-to-action hovered item in the popup menu.",
+      "message": "享受更佳的瀏覽體驗"
+   },
+   "new_myadblock_feature_available": {
+      "description": "The text in the popup menu item saying there is a new MyAdBlock feature and takes you to the MyAdBlock tab in the option page.",
+      "message": "按這裡解鎖新功能！"
+   },
+   "new_resourcelist_explanation_osx": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Mac)",
+      "message": "若要顯示所有請求，請在該頁按右鍵，選擇「檢查」(Option+Cmd+I)，然後選擇「AdBlock」分頁。"
+   },
+   "new_resourcelist_explanation_win": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Windows)",
+      "message": "若要顯示所有請求，請在該頁按右鍵，選擇「檢查」(Ctrl+Shift+I)，然後選擇「AdBlock」分頁。"
+   },
+   "newmyadblockenrollment": {
+      "description": "The text of the 'Enable MyAdBlock' menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "新增"
+   },
+   "no": {
+      "description": "A negative response to a question",
+      "message": "否"
+   },
+   "no_changes_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我們不會更改任何項目，因此您會繼續看到廣告。"
+   },
+   "no_data_msg_part_I": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "您目前沒有任何阻擋統計資料可顯示。"
+   },
+   "no_data_msg_part_II": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "請在上網瀏覽後重新整理此頁面，即可開始看到阻擋統計資料。"
+   },
+   "no_data_title": {
+      "description": "title text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "無統計資料"
+   },
+   "nodefaultfilter1": {
+      "description": "Instructions on ad report page pointing users to EasyList subscriptions list.",
+      "message": "我們沒有該語言的預設過濾清單。\n請[[嘗試尋找支援此語言的適當清單]] 或透過 AdBlock 功能表為自己阻擋廣告。"
+   },
+   "noresourcessend2": {
+      "description": "Resource list page: error message",
+      "message": "發生錯誤。未傳送任何資源。此頁現在將關閉。請嘗試重新載入網站。"
+   },
+   "note": {
+      "description": "Indicates that the user should take note of the message that follows.",
+      "message": "注意："
+   },
+   "notification_antiadblock_message": {
+      "message": "已知該網站會向 AdBlock 使用者顯示定向訊息。要 AdBlock 隱藏定向訊息嗎？"
+   },
+   "notification_antiadblock_title": {
+      "message": "是否隱藏定向訊息？"
+   },
+   "ocean_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "海洋"
+   },
+   "oceanchannelswitchlabel": {
+      "description": "The label text for the Ocean switch on the MyAdBlock Options page",
+      "message": "海洋"
+   },
+   "ok": {
+      "description": "Message for help flow in popup menu.",
+      "message": "確定"
+   },
+   "once": {
+      "description": "The button text on the popup menu",
+      "message": "僅限一次"
+   },
+   "only_block_ads_on_these_sites": {
+      "description": "Label for textbox where user enters a list of sites on Customize tab",
+      "message": "只在這些網站上阻擋廣告："
+   },
+   "onpage_messages": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "允許 AdBlock 在網頁上顯示相關的訊息"
+   },
+   "open_allowlist_wizard": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "更多暫停選項"
+   },
+   "operabutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Opera displays on the Extensions page.",
+      "message": "若要隱藏按鈕，請到 opera://extensions 並選取「從工具列隱藏」選項。您可以取消選取該選項以重新顯示。"
+   },
+   "opt_out_stats_data": {
+      "description": "text related to the opt out data collection checkbox on the statistics page of the Options page",
+      "message": "以後不要收集我的阻擋統計資料"
+   },
+   "options": {
+      "description": "The text of the link on chrome://chrome/extensions that takes you to the Options page",
+      "message": "選項"
+   },
+   "options_page": {
+      "description": "General text used to define the extension options page.",
+      "message": "選項頁面"
+   },
+   "options_page_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "選項頁面佈景主題"
+   },
+   "optionstitle": {
+      "description": "Title for the Options page",
+      "message": "AdBlock 選項"
+   },
+   "optionstitle_yt": {
+      "description": "Title for the Options page for the 'AdBlock on YouTube' extension.",
+      "message": "YouTube 版 AdBlock 選項"
+   },
+   "optionsversion": {
+      "description": "Version number",
+      "message": "版本：$version$",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "3.9.2"
+         }
+      }
+   },
+   "orenteraurl": {
+      "description": "Text box to enter a link to a custom filter list",
+      "message": "或輸入連結網址："
+   },
+   "other": {
+      "description": "Multiple choice option",
+      "message": "其他"
+   },
+   "otherfilters": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block other elements that are not ads.",
+      "message": "其他過濾清單"
+   },
+   "overlay_notification_button_no": {
+      "message": "否"
+   },
+   "overlay_notification_button_yes": {
+      "message": "是"
+   },
+   "page_is_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "這個網頁在您的允許名單上，因此您可以看到廣告。"
+   },
+   "page_not_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "這個網頁不在您的允許名單上。"
+   },
+   "pagelanguagecheck": {
+      "description": "Question on ad report page",
+      "message": "頁面是用什麼語言寫的？"
+   },
+   "parent_menu_item_site": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "依網站統計阻擋的廣告"
+   },
+   "parent_menu_item_time": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "依時間統計阻擋的廣告"
+   },
+   "pause_adblock": {
+      "description": "Menu entry to pause AdBlock (stop blocking ads)",
+      "message": "暫停 AdBlock"
+   },
+   "pause_adblock_everywhere": {
+      "description": "Menu entry to pause AdBlock everywhere (stop blocking ads)",
+      "message": "在所有網站上暫停"
+   },
+   "pause_adblocking": {
+      "description": "Menu entry to pause the extension (stop blocking ads)",
+      "message": "暫停廣告阻擋"
+   },
+   "pause_on_all_sites": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "在所有網站上暫停。"
+   },
+   "pause_on_this_site": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on this site. This will be followed by the options 'Once' and 'Always'",
+      "message": "在這個網站上暫停："
+   },
+   "paused_not_blocking": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock 目前已暫停，因此我們沒有阻擋任何廣告。"
+   },
+   "paused_site_issue": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock 目前已暫停，所以網站似乎存在與 AdBlock 無關的問題。"
+   },
+   "personalize_experience": {
+      "description": "Description of Image Swap on the main Premium options page",
+      "message": "將您的瀏覽體驗個人化，充分利用 $browser$ 版 AdBlock。",
+      "placeholders": {
+         "browser": {
+            "content": "$1",
+            "example": "Chrome"
+         }
+      }
+   },
+   "popup_menu": {
+      "description": "General text used to define the pop-up menu.",
+      "message": "彈出視窗選單"
+   },
+   "popup_menu_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "彈出功能表佈景主題"
+   },
+   "popup_menu_title": {
+      "description": "Title for the popup menu.",
+      "message": "AdBlock 彈出選單"
+   },
+   "popups_disable_adblock": {
+      "description": "Description of Bypass Mode on the main Premium options page",
+      "message": "網路上要求您停用 AdBlock 的彈出視窗越來越常見。"
+   },
+   "premium": {
+      "description": "Abbreviated name of the AdBlock upgrade.",
+      "message": "Premium"
+   },
+   "premium_access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "AdBlock Premium 的新功能讓您不須停用 AdBlock，就能輕鬆存取喜歡的內容。"
+   },
+   "premium_benefits_explained": {
+      "description": "Main text of the teaser AdBlock Premium feature in the AdBlock Premium tab of the Options page",
+      "message": "為了感謝您支持我們並啟用 AdBlock Premium，您將在最新工具與功能推出時獲得優先使用權。"
+   },
+   "premium_cta_button_text": {
+      "description": "button text on the statistics page of the Options page in the image swap panel",
+      "message": "取得 Premium 版"
+   },
+   "premium_cta_button_text_not_enabled": {
+      "description": "button text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "開啟"
+   },
+   "premium_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel",
+      "message": "選擇 Premium 版以使用解鎖圖片交換追蹤等更多功能。"
+   },
+   "premium_cta_msg_not_enabled": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "您似乎沒有啟用圖片交換功能。"
+   },
+   "premium_page_title": {
+      "description": "The text of the header the AdBlock Premium Options page",
+      "message": "AdBlock Premium：瀏覽網路的更好方式。"
+   },
+   "premium_status_msg": {
+      "description": "Message shown on the premium tab of the options page when the user is a licensed premium user",
+      "message": "自 $date$成為支持者",
+      "placeholders": {
+         "date": {
+            "content": "$1",
+            "example": "January 2020"
+         }
+      }
+   },
+   "premium_status_short_msg": {
+      "description": "Message shown on the premium tab of the option page when user is a licensed premium user",
+      "message": "已啟用"
+   },
+   "prevent_videos": {
+      "description": "Description of 'stop autoplay videos' on the distraction control options page",
+      "message": "防止您瀏覽網頁時影片自動播放，亦可停止「浮動視窗」影片跟著移動。"
+   },
+   "preview_a_theme": {
+      "description": "Text in the aria-label attribute of an icon indicating that clicking will show the preview image of a theme on an extension page.",
+      "message": "預覽$extension_page$的$theme_name$主題",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "options page"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "preview_channel_image": {
+      "description": "Text in the alt attribute of an image previewed as part of the Image Swap feature.",
+      "message": "$image_category$的圖片預覽",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Cats"
+         }
+      }
+   },
+   "privacy_policy": {
+      "description": "Link to AdBlock's privacy policy",
+      "message": "隱私權政策"
+   },
+   "problem_solved": {
+      "description": "Message for help flow in popup menu.",
+      "message": "太棒了！問題解決了。"
+   },
+   "pwyw": {
+      "description": "Text of a payment request link",
+      "message": "支付您想要的金額！"
+   },
+   "pwyw2": {
+      "description": "Text of a payment request link",
+      "message": "支付您想要的金額！"
+   },
+   "rate_us": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "給我們評價"
+   },
+   "rebecca_purple_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "雷貝嘉紫色"
+   },
+   "reenableadsonebyone": {
+      "description": "Tells the user to re-enable the extensions one by one",
+      "message": "太好了！現在讓我們來找出是哪個擴充套件的問題。一個接著一個啟用每個擴充套件。讓廣告恢復的擴充套件就是您需要解除安裝才能擺脫廣告的擴充套件。"
+   },
+   "refusetocheck": {
+      "description": "User is telling us they don't wish to investigate something for us",
+      "message": "我不想檢查這個"
+   },
+   "reload_not_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "請重新載入頁面，就不會再看到那則廣告了！"
+   },
+   "reload_the_page": {
+      "description": "Message for help flow in popup menu.",
+      "message": "重新載入頁面"
+   },
+   "reload_when_ready": {
+      "description": "Message for help flow in popup menu.",
+      "message": "準備好後，請按下方重新載入頁面。"
+   },
+   "reloadadpage": {
+      "description": "Instruction on ad report page",
+      "message": "重新載入有廣告的頁面。"
+   },
+   "reloadpageafterwhitelist": {
+      "description": "Checkbox in the allowlist wizard",
+      "message": "重新載入頁面。"
+   },
+   "remove_image": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "移除圖片"
+   },
+   "remove_image_msg": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "確定要移除這張圖片嗎？"
+   },
+   "removed_url": {
+      "description": "Message for help flow in popup menu.",
+      "message": "好了！我們已經將 URL 從您的允許名單中刪除。"
+   },
+   "removefromlist": {
+      "description": "Label to remove a custom filter list",
+      "message": "從清單中刪除"
+   },
+   "report_ad_on_page": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "回報此頁上的廣告"
+   },
+   "reportfilterlistproblem": {
+      "description": "Telling the user to report an ad to a filter list maintainer",
+      "message": "這是過濾清單的問題。從這裡回報：$link$",
+      "placeholders": {
+         "link": {
+            "content": "[[]]",
+            "example": "The link could point to a filter list's forum, or to the email address of a filter list maintainer. For example, forums.lanik.us or someguy@list.com."
+         }
+      }
+   },
+   "reportpubliclyavailable": {
+      "description": "Ad report page string, when you're about to submit a report.",
+      "message": "注意：您的報告可能會公開顯示。在涵蓋任何私人資訊之前請記得這一點。"
+   },
+   "require_restart_browser": {
+      "description": "Text displayed within an option to notify users to restart the browser to fully enable the option",
+      "message": "需要重新啟動瀏覽器"
+   },
+   "resourceblocktitle": {
+      "description": "Resource list page name",
+      "message": "所有資源"
+   },
+   "resourcedomain": {
+      "description": "Resource list page: text shown when hovering over an item in the third-party column",
+      "message": "載入到具有以下網域的頁面上：\n$domain$",
+      "placeholders": {
+         "domain": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "resume_blocking_ads": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site' or 'AdBlock is paused on all sites'",
+      "message": "恢復阻擋廣告"
+   },
+   "resume_blocking_ads_period": {
+      "description": "First sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "恢復阻擋廣告。"
+   },
+   "resume_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您要恢復廣告攔截並重新載入頁面嗎？"
+   },
+   "retryaftersubscribe": {
+      "description": "Instructions on ad report page telling users to subscribe to a filter list and then check again to see whether the ad exists",
+      "message": "訂閱此過濾清單，然後重試：$list_title$",
+      "placeholders": {
+         "list_title": {
+            "content": "$1",
+            "example": "French"
+         }
+      }
+   },
+   "safaributton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Customize Toolbar' should match the text that Safari displays in the toolbar's context menu.",
+      "message": "若要隱藏按鈕，請以右鍵按下 Safari 的工具列並選擇「自訂工具列」，然後將 AdBlock 按鈕拖出工具列。您可以將它拖回到工具列以再次顯示。"
+   },
+   "safaricontentblocking": {
+      "description": "Checkbox on the 'General' tab of the Options page. 'Content Blocking' is the name of a different way of blocking resources introduced in Safari 9.",
+      "message": "啟用 Safari 內容阻擋器"
+   },
+   "safaricontentblockinglimitexceeded": {
+      "description": "Displayed when the number of rules in the subscribed filter lists is larger than the number supported by Safari Content Blocking, if that option is enabled.",
+      "message": "過濾清單規則的數量超過了 5 萬條的限制，並且已自動減少。請取消訂閱某些過濾清單或停用 Safari 內容阻擋器！"
+   },
+   "safaricontentblockingpausemessage": {
+      "description": "Alert displayed after clicking 'Pause AdBlock' in the AdBlock menu while Safari Content blocking is enabled.",
+      "message": "若要暫停啟用內容阻擋器的 AdBlock，請選擇 Safari（在選單列中）> 偏好設定 > 擴充套件 > AdBlock，並取消選取「啟用 AdBlock」。"
+   },
+   "safarinotificationbody": {
+      "description": "Body of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "請停用部分過濾清單。更多資訊請參閱 AdBlock 選項。"
+   },
+   "safarinotificationtitle": {
+      "description": "Title of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "已超出內容阻擋器規則限制"
+   },
+   "save_custom_settings_cta": {
+      "description": "Part 1 of a Premium call-to-action on the Options page",
+      "message": "您是否要儲存自訂廣告攔截設定並在每個瀏覽器中使用？"
+   },
+   "save_settings_multiple": {
+      "description": "Sub-header describing Backup & Sync on the main Premium options page",
+      "message": "在多個裝置上儲存您的 AdBlock 設定"
+   },
+   "savebutton": {
+      "description": "Save button",
+      "message": "儲存"
+   },
+   "savereminder": {
+      "description": "Reminder to click 'Save'",
+      "message": "別忘了儲存！"
+   },
+   "see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我會看到廣告"
+   },
+   "see_ad_everywhere": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我到處都看到這則廣告"
+   },
+   "see_fewer_walls": {
+      "description": "Sub-header describing Bypass Mode on the main Premium options page",
+      "message": "更少看見反 AdBlock 牆"
+   },
+   "see_photos_no_ads_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "我們仍會阻擋廣告，但我們會以好看的貓狗或自然照片取代。"
+   },
+   "see_photos_no_ads_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "看照片，不要廣告"
+   },
+   "selected": {
+      "description": "Text in the aria-label attribute of an icon showing an option is selected.",
+      "message": "已選"
+   },
+   "selectlanguage": {
+      "description": "First option in the language dropdown menu on the Filter lists tab. Include the ' -- ' on either side of your translation.",
+      "message": " -- 選擇語言 -- "
+   },
+   "selectlanguage2": {
+      "description": "First option in the language dropdown menu on the Filter lists tab.",
+      "message": "選擇語言"
+   },
+   "senddebugdata": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "傳送除錯資料"
+   },
+   "set_preferences_once": {
+      "description": "Description of Sync on Sync tab",
+      "message": "只需設定一次偏好設定，就永遠不需擔心資料遺失或需要再對多個擴充套件進行相同的變更。"
+   },
+   "set_up_once": {
+      "description": "Description of Backup & Sync on the main Premium options page",
+      "message": "只需要一次設定，就可以將設定帶著走！"
+   },
+   "settings": {
+      "description": "Text in the aria-label attribute of the gear icon on the pop-up menu.",
+      "message": "設定"
+   },
+   "settings_changed": {
+      "description": "Part of Options page message letting users know of settings change.",
+      "message": "因應這項變更，AdBlock 現在以不同的方式運作，您的部分設定可能有變化。"
+   },
+   "show_ads_except_for": {
+      "description": "Section title for the allowlisting section of Customize tab",
+      "message": "除了這些網域之外，顯示其他所有廣告……"
+   },
+   "show_details": {
+      "description": "Toggle that shows the details section",
+      "message": "顯示詳細資訊"
+   },
+   "show_devtools_panel": {
+      "description": "Checkbox letting user choose whether the AdBlock tab should be displayed in the developer tools window",
+      "message": "在開發工具中顯示「AdBlock」面板"
+   },
+   "show_language_options": {
+      "description": "Option to let the user choose AdBlock's display language.",
+      "message": "讓我選擇 AdBlock 的顯示語言"
+   },
+   "show_on_adblock_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "在 AdBlock 按鈕上顯示阻擋的廣告數量"
+   },
+   "show_on_adblock_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "在 AdBlock 功能表上顯示阻擋的廣告數量"
+   },
+   "show_on_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "在按鈕上顯示阻擋的廣告數量"
+   },
+   "show_on_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "在選單上顯示阻擋的廣告數量"
+   },
+   "show_resourcelist": {
+      "description": "Menu entry to open the resource list page",
+      "message": "顯示所有請求"
+   },
+   "show_some_love": {
+      "description": "Title of the tooltip of the rate us button CTA in the Options page.",
+      "message": "展示您對 AdBlock 的愛！"
+   },
+   "showcontextmenus2": {
+      "description": "Checkbox on the 'General' tab of the Options page.",
+      "message": "將項目新增到右鍵選單中"
+   },
+   "showlinkstolists2": {
+      "description": "Label to display filter list links",
+      "message": "顯示過濾清單的連結"
+   },
+   "sliderexplanation": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "如果未隱藏，滑動即可隱藏頁面上額外的項目："
+   },
+   "slidertitle": {
+      "description": "'Block an ad' wizard title",
+      "message": "步驟 1：找出要阻擋的內容"
+   },
+   "sliderwarning": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "務必小心，頁面隱藏太多項目可能會使某些功能無法正常運作"
+   },
+   "slows_down_extension": {
+      "description": "Text of an option telling users that the option slows down the extension",
+      "message": "會讓擴充功能變慢"
+   },
+   "solarized_light_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Solarized Light"
+   },
+   "solarized_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Solarized"
+   },
+   "something_else_going_on": {
+      "description": "Message for help flow in popup menu.",
+      "message": "嗯，一定還有其他問題。"
+   },
+   "something_not_working": {
+      "description": "Message for help flow in popup menu.",
+      "message": "嗯，有些工作無法執行。"
+   },
+   "sourcecode": {
+      "description": "Link to the source code of AdBlock on the Support tab",
+      "message": "檢視[[原始程式碼]]"
+   },
+   "stats": {
+      "description": "Title of the statistics (metrics) tab of the Options page",
+      "message": "統計"
+   },
+   "stats_ads_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "已阻擋廣告"
+   },
+   "stats_ads_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "阻擋的廣告數"
+   },
+   "stats_already_opted": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "您已選擇將匿名使用狀況資料分享給我們。"
+   },
+   "stats_go_back_text_button": {
+      "description": "button text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "返回"
+   },
+   "stats_hide_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "隱藏統計資料"
+   },
+   "stats_im_sure_text_button": {
+      "description": "button text on page 2 of delete modal box on the statistics page of the Options page",
+      "message": "我確定"
+   },
+   "stats_opt_in_data_collect": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "分享[[匿名使用狀況資料]]來協助改善 AdBlock"
+   },
+   "stats_opt_in_header": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "想查看您的 AdBlock 統計嗎？"
+   },
+   "stats_opt_in_local_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "也選擇加入本機統計資料收集以存取您的 AdBlock 統計資訊，例如您在哪些網站上阻擋了最多的廣告與追蹤代碼、一段時間內的總阻擋數，Premium 使用者還可查看交換的圖片。"
+   },
+   "stats_opt_in_local_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "選擇加入本機統計資料收集"
+   },
+   "stats_opt_in_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "選擇加入本機統計資料收集以查看您的 AdBlock 統計資訊，例如您在哪些網站上阻擋了最多的廣告與追蹤代碼、一段時間內的總阻擋數，Premium 使用者還可查看交換的圖片。"
+   },
+   "stats_opt_in_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "選擇加入"
+   },
+   "stats_replaced_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "已交換圖片"
+   },
+   "stats_replaced_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "已交換圖片數"
+   },
+   "stats_show_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "顯示統計資料"
+   },
+   "stats_trackers_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "已阻擋追蹤代碼"
+   },
+   "stats_trackers_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "阻擋的追蹤代碼數"
+   },
+   "statstitle": {
+      "description": "On page title of the statistics page of the Options page",
+      "message": "統計面板"
+   },
+   "status_allowlisted": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a page or website",
+      "message": "您已將 AdBlock 設定為每次造訪此網站時維持暫停。"
+   },
+   "status_domain_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a specific domain",
+      "message": "本次造訪已暫停 AdBlock。可能需要重新整理頁面才能看到變更。"
+   },
+   "status_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running",
+      "message": "AdBlock 已暫停。"
+   },
+   "status_universal_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on all domains",
+      "message": "AdBlock 已在所有網站上暫停。"
+   },
+   "stay_tuned": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "敬請期待"
+   },
+   "still_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您仍然可以看到廣告嗎？"
+   },
+   "stop_autoplay_videos": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "停止自動播放影片"
+   },
+   "stop_blocking_ads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "停止阻擋廣告："
+   },
+   "stop_blocking_ads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "停止阻擋廣告"
+   },
+   "storage_quota_exceeded": {
+      "description": "Message shown when the user uses more storage than allowed by the browser.",
+      "message": "您超過了 AdBlock 可以使用的儲存量。請取消訂閱部分過濾清單！"
+   },
+   "sub_menu_item_all": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "全部時間"
+   },
+   "sub_menu_item_month": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "本月"
+   },
+   "sub_menu_item_today": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "今天"
+   },
+   "sub_menu_item_week": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "本週"
+   },
+   "sub_menu_item_year": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "今年"
+   },
+   "subframe": {
+      "description": "Resource list page: frame type",
+      "message": "子框架"
+   },
+   "subscribebutton": {
+      "description": "Subscribe to a filter list button",
+      "message": "訂閱"
+   },
+   "subscribeconfirm": {
+      "description": "Prompt question before subscribing to a filter list",
+      "message": "確定要訂閱 $title$ 過濾清單嗎？",
+      "placeholders": {
+         "title": {
+            "content": "$1",
+            "example": "Prebake"
+         }
+      }
+   },
+   "subscribingfailed": {
+      "description": "abp: link subscriber unsuccessful result",
+      "message": "失敗！"
+   },
+   "subscribingfinished": {
+      "description": "abp: link subscriber successful result",
+      "message": "完成！"
+   },
+   "subscribingtitle": {
+      "description": "abp: link subscriber title",
+      "message": "正在訂閱過濾清單……"
+   },
+   "success": {
+      "description": "Text in the aria-label attribute of an icon indicating successful results.",
+      "message": "成功"
+   },
+   "successfully_whitelisted": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "您已成功將此 URL 加到允許名單中。"
+   },
+   "sunshine_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "陽光"
+   },
+   "support_to_unlock": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "支持即可解鎖"
+   },
+   "support_with_a_review": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "留下評論給我們，對我們的團隊表達支持。"
+   },
+   "supportsite": {
+      "description": "Link to the support site on the Support tab",
+      "message": "到我們的[[支援網站]]告訴我們！"
+   },
+   "swap_ads_for_images": {
+      "description": "Sub-header describing Image Swap on the main Premium options page",
+      "message": "廣告交換圖片"
+   },
+   "sync_delete_panel_title": {
+      "description": "Panel title text on the delete device overlay",
+      "message": "刪除同步的擴充套件"
+   },
+   "sync_device_name_list_updated_at_msg": {
+      "description": "message to users on when the sync page was last updated with the name of the extensions / devices (displayed in locale specific format)",
+      "message": "上次更新於 $timestamp$",
+      "placeholders": {
+         "timestamp": {
+            "content": "$1",
+            "example": "April 30, 2019 6:25 pm for US/English locale"
+         }
+      }
+   },
+   "sync_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Sync feature.",
+      "message": "同步範例"
+   },
+   "sync_extension_name_placeholder": {
+      "description": "placeholder text in the extension / device name field on the sync page",
+      "message": "請命名此擴充套件，以便與其他擴充套件區別……"
+   },
+   "sync_extension_no_extension_msg": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "您沒有同步的擴充套件。"
+   },
+   "sync_extension_section_title": {
+      "description": "section title text on the Sync sub-tab of the Options page",
+      "message": "擴充套件"
+   },
+   "sync_header_error_save_message_part_2": {
+      "description": "part 2 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "此擴充套件未同步。"
+   },
+   "sync_header_error_save_message_part_3": {
+      "description": "part 3 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "請稍後再嘗試手動同步。"
+   },
+   "sync_header_message_error_prefix": {
+      "description": "Start of an sync error message to users on the Options page or AdBlock popup menu.",
+      "message": "此擴充套件未同步。"
+   },
+   "sync_header_message_getting_license": {
+      "description": "message to users on the sync page when the extension is getting the license",
+      "message": "檢查中……"
+   },
+   "sync_header_message_in_progress": {
+      "description": "message to users on the options pages when syncing with the server is in progress",
+      "message": "同步進行中……"
+   },
+   "sync_header_message_no_license": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "請容我們花一點時間為您準備同步。"
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_2": {
+      "description": "part 2 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "我們已同步此擴充套件並將還原您的變更。"
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "請將自訂規則複製到剪貼簿，重新載入頁面，然後再次進行變更。"
+   },
+   "sync_header_message_old_commit_version_part_2": {
+      "description": "part 2 of a message to users on the sync page and popup menu when initial setup of sync fails for some unknown reason.",
+      "message": "我們已同步此擴充套件並還原了您的變更。"
+   },
+   "sync_header_message_old_commit_version_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "請重新載入頁面，然後再次進行變更。"
+   },
+   "sync_header_message_setup_fail_part_2": {
+      "description": "message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "請在幾分鐘後再次嘗試新增此擴充套件。"
+   },
+   "sync_header_message_setup_fail_prefix": {
+      "description": "start of error message to users on the sync page when sync fails.",
+      "message": "同步錯誤："
+   },
+   "sync_header_message_sync_complete": {
+      "description": "message to users on the option pages when syncing with the server server is complete",
+      "message": "同步完成"
+   },
+   "sync_message_old_version_part_1": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "您使用的是舊版的 AdBlock。"
+   },
+   "sync_message_old_version_part_2": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "請[[更新 AdBlock]] 以便我們將您的設定同步。"
+   },
+   "sync_now_btn_text": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "立即同步"
+   },
+   "sync_premium_cta": {
+      "description": "AdBlock Premium CTA on the Sync tab",
+      "message": "有了「同步」等 Premium 功能，您將成為廣告攔截專家。"
+   },
+   "sync_removed_error_msg_part_1": {
+      "description": "sync error message text on the popup menu",
+      "message": "這項擴充套件並未同步"
+   },
+   "sync_removed_error_msg_part_2": {
+      "description": "sync error message text on the popup menu and options page",
+      "message": "按一下這裡以更新設定"
+   },
+   "sync_tab_item": {
+      "description": "Title of the Sync sub-tab of the Options page",
+      "message": "備份與同步"
+   },
+   "sync_turn_on_duplicate_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "此擴充套件名稱已使用"
+   },
+   "sync_turn_on_invalid_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "請命名此擴充套件然後繼續"
+   },
+   "sync_verify_turn_on_text": {
+      "description": "message text in the extension / device name field on the sync page",
+      "message": "開啟「備份與同步」功能將清除此擴充套件中的現有設定資訊。"
+   },
+   "sync_your_settings_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "無論使用哪一台電腦，您的自訂廣告攔截規則與設定都可以帶著走。"
+   },
+   "sync_your_settings_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "同步您的設定"
+   },
+   "tabcustomize": {
+      "description": "A tab on the Options page",
+      "message": "自訂"
+   },
+   "tabcustomizetitle": {
+      "description": "Title of the Customize tab of the Options page",
+      "message": "自訂 AdBlock"
+   },
+   "tabfilterlists": {
+      "description": "A tab on the Options page",
+      "message": "過濾清單"
+   },
+   "tabgeneral": {
+      "description": "A tab on the Options page",
+      "message": "一般"
+   },
+   "tabreloadcomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "好了！我們重新載入了有廣告的頁面。請查看該頁面的廣告是否已消失，然後回到本頁，回答以下問題。"
+   },
+   "tabsupport": {
+      "description": "A tab on the Options page",
+      "message": "支援"
+   },
+   "tabtranslations": {
+      "description": "A tab on the Options page",
+      "message": "翻譯"
+   },
+   "take_control": {
+      "description": "Description of the distraction control option",
+      "message": "掌控您的瀏覽器，依您的喜好瀏覽！"
+   },
+   "take_control_easy": {
+      "description": "Description of Themes on the main Premium options page",
+      "message": "利用輕鬆使用的控制方式來自訂 AdBlock 的外觀、體驗與字型大小。讓 AdBlock 為您所用！"
+   },
+   "take_custom_with_you": {
+      "description": "Description of Backup & Sync on the main Premium options page",
+      "message": "在您所有的 Chrome 個人檔案中使用自己的自訂廣告阻擋規則、過濾清單訂閱與白名單。"
+   },
+   "text_body": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 22 characters)",
+      "message": "內文"
+   },
+   "thanks": {
+      "description": "Message for help flow in popup menu.",
+      "message": "謝謝"
+   },
+   "themes": {
+      "description": "Title of the Themes tab of the Options page",
+      "message": "佈景主題"
+   },
+   "thirdparty": {
+      "description": "Resource list page: column title telling if the resource originates from a different domain",
+      "message": "第三方"
+   },
+   "this_extension": {
+      "description": "description for name of the current extension",
+      "message": "（此擴充套件）"
+   },
+   "topframe": {
+      "description": "Resource list page: frame type",
+      "message": "上層框架"
+   },
+   "trackers_button_text": {
+      "description": "button text on the statistics page of the Options page in the trackers panel",
+      "message": "啟用"
+   },
+   "trackers_cta_header": {
+      "description": "Header text on the statistics page of the Options page in the trackers panel",
+      "message": "追蹤代碼"
+   },
+   "trackers_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the trackers panel",
+      "message": "啟用 [[Easy Privacy 過濾清單]]以開始阻擋追蹤代碼"
+   },
+   "translator_credit": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "翻譯貢獻來自："
+   },
+   "translator_credit2": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "翻譯貢獻來自……"
+   },
+   "translators": {
+      "description": "A link on the Options page / translators tab to a KB article about how to help translate AdBlock",
+      "message": "在[[這裡]]瞭解更多有關如何幫助翻譯 AdBlock 的資訊"
+   },
+   "troubleshoot_an_ad": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "對廣告進行疑難排解"
+   },
+   "try_backup_sync": {
+      "description": "Part 2 of a Premium call-to-action on the Options page",
+      "message": "如果是，請嘗試我們的「備份與同步」功能。"
+   },
+   "try_manual_update": {
+      "description": "Message for help flow in popup menu.",
+      "message": "請嘗試[[手動更新您的過濾清單]]。"
+   },
+   "try_pausing": {
+      "description": "Message for help flow in popup menu.",
+      "message": "好，讓我們嘗試暫停 AdBlock。"
+   },
+   "typehiding": {
+      "description": "A resource type",
+      "message": "隱藏"
+   },
+   "typeimage": {
+      "description": "A resource type",
+      "message": "圖片"
+   },
+   "typemain_frame": {
+      "description": "A resource type",
+      "message": "頁面"
+   },
+   "typemedia": {
+      "description": "A resource type",
+      "message": "音訊/影片"
+   },
+   "typeobject": {
+      "description": "A resource type",
+      "message": "互動式物件"
+   },
+   "typeobject_subrequest": {
+      "description": "A resource type",
+      "message": "object_subrequest"
+   },
+   "typeother": {
+      "description": "A resource type",
+      "message": "其他"
+   },
+   "typepage": {
+      "description": "A resource type",
+      "message": "頁面"
+   },
+   "typepopup": {
+      "description": "A resource type",
+      "message": "彈出"
+   },
+   "typescript": {
+      "description": "A resource type",
+      "message": "指令碼"
+   },
+   "typeselector": {
+      "description": "A resource type",
+      "message": "選取器"
+   },
+   "typestylesheet": {
+      "description": "A resource type",
+      "message": "樣式定義"
+   },
+   "typesub_frame": {
+      "description": "A resource type",
+      "message": "框架"
+   },
+   "typesubdocument": {
+      "description": "A resource type",
+      "message": "框架"
+   },
+   "typeunknown": {
+      "description": "A resource type",
+      "message": "未知"
+   },
+   "typewebsocket": {
+      "description": "A resource type",
+      "message": "websocket"
+   },
+   "typexmlhttprequest": {
+      "description": "A resource type",
+      "message": "xmlHTTPrequest"
+   },
+   "undo_last_block": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "復原我在這個網域上的阻擋"
+   },
+   "undo_last_block_site": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "復原我的隱藏項目"
+   },
+   "unexpected_filter_list_header": {
+      "description": "Error message shown when the user attempts to add a custom filter that has the format of a header (e.g. \"[Adblock Plus 2.0]\") which are only allowed in filter lists",
+      "message": "此處不允許過濾清單標題"
+   },
+   "unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused'",
+      "message": "取消暫停 AdBlock"
+   },
+   "unpause_adblocking": {
+      "description": "Menu entry to unpause the extension (start blocking ads again)",
+      "message": "取消暫停廣告阻擋"
+   },
+   "unpaused_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我們取消暫停 AdBlock，並重新載入頁面了。"
+   },
+   "unsubscribe_from_all_confirmation": {
+      "description": "Confirmation message shown to user if they try to unsubscribe from all filter lists. The user will have two options: OK and Cancel.",
+      "message": "如果停用所有過濾清單，AdBlock 將無法阻擋廣告。建議可以暫停 AdBlock。是否取消訂閱此清單？"
+   },
+   "unsubscribedlabel": {
+      "description": "Status label when unselecting a filter list",
+      "message": "已取消訂閱。"
+   },
+   "unsync_error_msg_part_1": {
+      "description": "sync error message text on the options menu",
+      "message": "同步錯誤"
+   },
+   "unsync_error_msg_part_2": {
+      "description": "sync error message text on the popup menu",
+      "message": "這項擴充套件已經不再同步。"
+   },
+   "unsync_error_msg_part_3": {
+      "description": "sync error message text on the Sync tab of the options page",
+      "message": "按一下這裡以更新這個頁面，接著按一下「新增此擴充套件」以同步這個裝置"
+   },
+   "update_filter_lists_now": {
+      "description": "Text in the aria-label attribute of the 'update now' button on the Options page in the Filter Lists tab.",
+      "message": "更新過濾清單"
+   },
+   "updateddayago": {
+      "description": "Label for filter list subscription",
+      "message": "1 天前更新"
+   },
+   "updateddaysago": {
+      "description": "Label for filter list subscription",
+      "message": "$days$ 天前更新",
+      "placeholders": {
+         "days": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedhourago": {
+      "description": "Label for filter list subscription",
+      "message": "1 小時前更新"
+   },
+   "updatedhoursago": {
+      "description": "Label for filter list subscription",
+      "message": "$hours$ 小時前更新",
+      "placeholders": {
+         "hours": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedminuteago": {
+      "description": "Label for filter list subscription",
+      "message": "1 分鐘前更新"
+   },
+   "updatedminutesago": {
+      "description": "Label for filter list subscription",
+      "message": "$minutes$ 分鐘前更新",
+      "placeholders": {
+         "minutes": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedrightnow": {
+      "description": "Label for filter list subscription",
+      "message": "剛剛更新"
+   },
+   "updatedsecondsago": {
+      "description": "Label for filter list subscription",
+      "message": "$seconds$ 秒前更新",
+      "placeholders": {
+         "seconds": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedtimestamp": {
+      "description": "Label for filter list subscription last updated timestamp",
+      "message": "更新於 $ts$",
+      "placeholders": {
+         "ts": {
+            "content": "$1",
+            "example": "8/26/2019 10:23:44 PM"
+         }
+      }
+   },
+   "updatenowmessage2": {
+      "description": "Update filters text and button",
+      "message": "我會自動擷取更新；您也可以[[立即更新]]"
+   },
+   "updateyourlists": {
+      "description": "Section header on the ad report page",
+      "message": "請確保過濾清單是最新的："
+   },
+   "updating_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock 正在更新您的過濾清單，檢查是否有問題。"
+   },
+   "urgent_safari_changes": {
+      "description": "Title for Options page message letting users know of settings change.",
+      "message": "緊急：Apple 正在變更 Safari 的擴充套件。"
+   },
+   "visit_help_center": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您可能需要[[到我們的幫助中心]]查看更多疑難排解選擇。"
+   },
+   "vpn_coming_soon": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "查看 AdBlock 即將推出的功能"
+   },
+   "want_stop_seeing": {
+      "description": "GFC messaging on the popup menu",
+      "message": "不想再看到這些內容？"
+   },
+   "want_to_remove": {
+      "description": "Message for help flow in popup menu.",
+      "message": "您想要移除它嗎？"
+   },
+   "warning": {
+      "description": "Warns the user about an error.",
+      "message": "警告"
+   },
+   "warning_overrules_filters": {
+      "description": "Message on the 'Customize' tab of the options page, explaining the danger of adding a allowlist filter for all websites with only some exceptions.",
+      "message": "警告：您將在所有其他網站上看到廣告！\n這樣會推翻這些網站的所有其他過濾條件。"
+   },
+   "watermelon_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "西瓜"
+   },
+   "website_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "網站故障了"
+   },
+   "website_still_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "網站仍然故障嗎？"
+   },
+   "whatmakesadblocktick": {
+      "description": "Subtitle on the Support tab. This section contains links to the AdBlock source code and contributors. In this context, 'tick' can be replaced with the word 'work'.",
+      "message": "想知道 AdBlock 是如何運作的嗎？"
+   },
+   "whats_this": {
+      "description": "Text of a link pointing to the explanation of a new feature",
+      "message": "這是什麼？"
+   },
+   "whatsnew": {
+      "description": "Link to display the changelog on the Support tab",
+      "message": "在 [[changelog]] 查看最新更新"
+   },
+   "whitelist_youtube_channel_v2": {
+      "description": "Menu entry to whitelist the channel of the current YouTube video or page. The channel name will appear on a line below this menu item.",
+      "message": "允許 YouTube 頻道上的廣告："
+   },
+   "whitelisted_a_site": {
+      "description": "Part 1 of a call-to-action on the allowlist wizard",
+      "message": "您剛剛將網站加到了允許名單中！"
+   },
+   "whitelistertitle2": {
+      "description": "The title of the allowlist wizard (Don't run on this page/pages on this domain)",
+      "message": "不要執行 AdBlock……"
+   },
+   "wizard_premium_cta_part_I": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "您剛剛阻擋了這個網站上的內容。"
+   },
+   "wizard_premium_cta_part_II": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "將此偏好套用到所有裝置，並使用「備份與同步」以確保您不會遺失您的 AdBlock 設定。"
+   },
+   "wizard_premium_cta_title": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "嘿，看來您可能會喜歡 AdBlock Premium"
+   },
+   "wizardcantrunonframesets": {
+      "description": "Alert shown when the user tries to use a blocklist/allowlist wizard on an old website",
+      "message": "此 AdBlock 功能不適用於這個網站，因為網頁使用過時的技術。您可以在「選項」頁的「自訂」分頁中手動允許或阻擋廣告。"
+   },
+   "wont_change_anything": {
+      "description": "Message for help flow in popup menu.",
+      "message": "我們不會更改任何項目，因此您會繼續看到廣告。"
+   },
+   "wont_show_again": {
+      "description": "Message shown when user opts out of call-to-action",
+      "message": "好的，我們不會再顯示此訊息。"
+   },
+   "work_around_hulu_problems": {
+      "description": "Advanced Options page checkbox, which users only need to use if Hulu.com videos break. It directs the user to restart their browser in order for changes to the checkbox to take effect.",
+      "message": "解決 Hulu.com 影片不播放問題（需要重新開啟瀏覽器）"
+   },
+   "yes": {
+      "description": "A positive response to a question",
+      "message": "是"
+   },
+   "you_can_slide_to_change": {
+      "description": "allowlist slider usage instructions. Sometimes only one slider will show, and sometimes two will show, and if possible the text should handle both cases.",
+      "message": "滑動下方以準確變更不執行 AdBlock 的頁面。"
+   },
+   "you_know_thats_a_bad_idea_right": {
+      "description": "Confirmation message shown to user if they try to subscribe to too many lists. The user will have two options: OK and Cancel.",
+      "message": "使用的過濾清單越多，AdBlock 的執行速度會越慢。使用太多清單甚至會讓您的瀏覽器在某些網站上當機。如果還是要訂閱此清單，請按「確定」。"
+   },
+   "youtube_manage_subscribed": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "從我的 YouTube 訂閱頁面管理 AdBlock 設定"
+   },
+   "youtube_onpage_icon_allow_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "允許所有廣告"
+   },
+   "youtube_onpage_icon_allowed_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "已允許所有訂閱頻道上的廣告"
+   },
+   "youtube_onpage_icon_allowing_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "在這個頻道上允許廣告"
+   },
+   "youtube_onpage_icon_block_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "阻擋所有廣告"
+   },
+   "youtube_onpage_icon_blocked_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "已阻擋所有訂閱頻道上的廣告"
+   },
+   "youtube_onpage_icon_blocking_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "在這個頻道上攔截廣告"
+   },
+   "youtube_onpage_icon_msg": {
+      "description": "The message text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "管理訂閱頻道上的廣告："
+   },
+   "youtube_onpage_icon_no_channels_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "訂閱至少一個 YouTube 頻道，以管理您訂閱頻道上的廣告。"
+   },
+   "youtube_onpage_icon_one_moment_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "請稍候……"
+   },
+   "youtube_onpage_icon_sign_in_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "請登入您的 YouTube 帳號以管理您訂閱頻道上的廣告。"
+   },
+   "youve_blocked_num_ads": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review. The $numBlocked$ will be replaced with the number of ads the users has blocked, starting at 10,000.",
+      "message": "您已阻擋了 $numBlocked$ 則廣告！",
+      "placeholders": {
+         "numBlocked": {
+            "content": "$1",
+            "example": "10,000"
+         }
+      }
+   },
+   "ytadblockupdates": {
+      "description": "Subtitle on the Support tab. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "YouTube™ 版 AdBlock 更新"
+   }
+}

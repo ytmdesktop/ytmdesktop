@@ -1,0 +1,3518 @@
+{
+   "a_theme_preview": {
+      "description": "Text in the alt attribute of the image previewing a theme on an extension page.",
+      "message": "Previzualizarea temei $theme_name$ pentru $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "pop-up menu"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "aalinkadreport": {
+      "description": "Acceptable Ads link message on ad report page",
+      "message": "Aflați mai mult despre programul Reclame Acceptabile."
+   },
+   "aamessageadreport": {
+      "description": "Acceptable Ads message on ad report page",
+      "message": "Dacă preferați să nu vedeți reclame ca aceasta, este preferabil să lăsați filtrul de Reclame Acceptabile oprit."
+   },
+   "ab_filters_subscription_lastDownload_checksumMismatch": {
+      "description": "Filter lists tab of the Options page: Corrupted filter list file.",
+      "message": "Eșuată, nepotrivire în sumă de verificare"
+   },
+   "ab_filters_subscription_lastDownload_connectionError": {
+      "description": "Filter lists tab of the Options page: Generic filter list download error message.",
+      "message": "Eșuată, descărcare nereușita"
+   },
+   "ab_filters_subscription_lastDownload_invalidData": {
+      "description": "Filter lists tab of the Options page: Invalid filter list file.",
+      "message": "Eșuare, listă de filtre nevalidă"
+   },
+   "ab_filters_subscription_lastDownload_invalidURL": {
+      "description": "Filter lists tab of the Options page: Message when you subscribe to a non-list URL.",
+      "message": "Eșuată, nu este o adresă validă"
+   },
+   "aboutadblock": {
+      "description": "Subtitle on the Support tab",
+      "message": "Despre AdBlock"
+   },
+   "acceptable_ads_content_blocking_disbled_message": {
+      "description": "Warning shown when Safari Content Blocking is enabled while the Acceptable Ads filter list was already enabled.",
+      "message": "V-am dezabonat de la Reclame Acceptabile, deoarece ați activat Blocare Conținut Safari. Puteți alege doar una la un moment dat. ([[De ce?]])"
+   },
+   "acceptable_ads_privacy": {
+      "description": "The text of an Acceptable Ads sub-option in the General tab",
+      "message": "Lăsați doar reclame fără urmăriri de la terți"
+   },
+   "acceptableadsdisable_done": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "Nu mai sunteți abonat la lista de filtre Reclame Acceptabile."
+   },
+   "acceptableadsdisable_how_to_reenable": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "Puteți reactiva aceasta și sprijini site-urile favorite selectând \"Permiteți unele reclame neintruzive\" mai jos."
+   },
+   "acceptableadsoption": {
+      "description": "Checkbox on the 'General' tab of the Options page to enable the Acceptable Ads filter list",
+      "message": "Permiteți unele reclame neintruzive"
+   },
+   "access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Obțineți acces ușor la conținutul pe care îl iubiți, fără a dezactiva AdBlock!"
+   },
+   "ad_everywhere_malware": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Dacă vedeți acest anunț peste tot, s-ar putea să fiți infectat cu malware."
+   },
+   "adalreadyblocked": {
+      "description": "On the ad report page, telling the user there is nothing to do as the ad they were seeing is now blocked.",
+      "message": "Excelent! Sunteți gata."
+   },
+   "adblock_click_for_details": {
+      "description": "Tooltip on the AdBlock button, to help users understand that they can click the button to access more options.",
+      "message": "AdBlock - clicați pentru detalii"
+   },
+   "adblock_facebook": {
+      "description": "Title for link to AdBlock's Facebook account",
+      "message": "AdBlock pe Facebook"
+   },
+   "adblock_home": {
+      "description": "Text in the alt attribute of an AdBlock logo / icon that links to getadblock.com.",
+      "message": "Acasă AdBlock"
+   },
+   "adblock_logo": {
+      "description": "Text in the alt attribute of an AdBlock logo image.",
+      "message": "Logo AdBlock"
+   },
+   "adblock_looked_like_this": {
+      "description": "Part 1 of a call-to-action on the Popup menu",
+      "message": "Dacă AdBlock ar arăta astfel?"
+   },
+   "adblock_premium": {
+      "description": "Full name of the AdBlock upgrade.",
+      "message": "AdBlock Premium"
+   },
+   "adblock_twitter": {
+      "description": "Title for link to AdBlock's Twitter account",
+      "message": "AdBlock pe Twitter"
+   },
+   "adblock_vpn": {
+      "description": "Text of a Options page lower menu button",
+      "message": "AdBlock VPN"
+   },
+   "adblock_website": {
+      "description": "Title for link to AdBlock's website",
+      "message": "Pagina de Start AdBlock"
+   },
+   "adblock_will_block_ads_again": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "Clicați și AdBlock va bloca din nou reclame."
+   },
+   "adblock_will_pause_on_all_sites": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "Dacă este clicat, AdBlock nu va mai bloca reclame pe niciun site."
+   },
+   "adblock_will_pause_on_this_site": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on this site.",
+      "message": "Dacă este clicat, AdBlock va întrerupe blocarea de pub pe acest site."
+   },
+   "adblock_wont_run_on_pages_matching": {
+      "description": "Message displayed when the allowlist wizard will allowlist part of an entire website, for example '*.google.com/reader/*'.  The URL will appear on the next line.",
+      "message": "AdBlock nu va rula pe vreo pagină care conține:"
+   },
+   "adblockinglist": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block ads.",
+      "message": "Filtre de Blocare Reclame"
+   },
+   "adblockreportinganad": {
+      "description": "Title of the ad report page",
+      "message": "AdBlock - Reportare reclamă"
+   },
+   "adblocksupport": {
+      "description": "Title of the Support tab of the Options page",
+      "message": "Asistență AdBlock"
+   },
+   "adblockupdates": {
+      "description": "Subtitle on the Support tab",
+      "message": "Actualizări AdBlock"
+   },
+   "add": {
+      "description": "Button on Sync tab that adds an entered name for this extension to the list of synced extensions",
+      "message": "Adaugă"
+   },
+   "add_info": {
+      "description": "section title on hidding wizard, shown when advance user option enabled",
+      "message": "Informații suplimentare"
+   },
+   "add_this_extension": {
+      "description": "Button on Sync tab that adds this extension to the Sync process",
+      "message": "Adăugați această extensie"
+   },
+   "additional_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Vreți mai mult ajutor?"
+   },
+   "additional_troubleshooting": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Iată câțiva [[pași suplimentari de depanare]] ce pot fi luați ca să rezolvați problema."
+   },
+   "adreport_all_debug_info": {
+      "description": "Shows the user the debug information that will be sent along with their report.",
+      "message": "Aceste informații vor fi deasemenea incluse în raportul reclamei."
+   },
+   "adreport_email": {
+      "description": "Label for a textbox where the user enters their email address to submit a bug or ad report.",
+      "message": "Care este adresă dvs. de e-mail?"
+   },
+   "adreport_email_privacy": {
+      "description": "Let the user know that their email address won't be used for reasons other than contacting them about their bug or ad report.",
+      "message": "Vom folosi-o să vă contactăm numai dacă ne trebuie mai multe informații."
+   },
+   "adreport_filter": {
+      "description": "Optional question on the ad report page when the ad needs to be reported to AdBlock.",
+      "message": "Dacă ați creat un filtru valid cu expertul \"blocați o reclamă\", lipiți-l în caseta de mai jos:"
+   },
+   "adreport_laststep": {
+      "description": "Subtitle on the ad report page. Shown when the ad needs to be reported to AdBlock, and not filter list maintainers.",
+      "message": "Ultimul pas: raportați-ne problema."
+   },
+   "adreport_location": {
+      "description": "Question on the ad report page asking the user to describe the ad and its location on a webpage.",
+      "message": "Exact unde pe acea pagină se află reclama? Cum arată?"
+   },
+   "adreport_missing_info": {
+      "description": "Error message shown when the user doesn't enter anything in some of the text fields.",
+      "message": "Informația necesară lipsește sau este invalidă. Vă rugăm completați întrebările cu bordură roșie."
+   },
+   "adreport_missing_screenshot": {
+      "description": "Error message shown when the user doesn't attach a screenshot to an ad report.",
+      "message": "Nu ați atașat o captură de ecran! Nu vă putem ajuta fără să vedem reclama(ele) raportată(e)."
+   },
+   "adreport_name": {
+      "description": "Label for a textbox where the user enters their name (or nickname) to submit a bug or ad report.",
+      "message": "Cum vă numiți?"
+   },
+   "adreport_response_file_name": {
+      "description": "Error message shown when the file name of an attachement the user is trying to submit in a report is longer than 255 characters.",
+      "message": "Nume de fișier prea lung. Dați fișierului un nume mai scurt."
+   },
+   "adreport_response_invalid_file": {
+      "description": "Error message shown when the user uploads an invalid file type.",
+      "message": "Aceasta nu este o imagine. Încărcați vă rugăm un fișier .png, .gif sau .jpg."
+   },
+   "adreport_response_large_file": {
+      "description": "Error message shown when the user tries to upload a large image file.",
+      "message": "Fișierul este prea mare. Talia lui trebuie să fie mai mică de 10 MB."
+   },
+   "adreport_response_save_error": {
+      "description": "Error message shown when the server could not save an attached file.",
+      "message": "Eroare la salvarea fișierului încărcat."
+   },
+   "adreport_response_success": {
+      "description": "Shown when a ticket has been sumbitted to AdBlock's support site successfully.",
+      "message": "Totul reglat ! Vă vom contacta cât mai curând. Între timp, căutați un e-mail de la AdBlock. Pe site-ul nostru de ajutor veți găsi un link către biletul dvs., împreună cu câteva sugestii de auto-ajutor dacă nu vă putem răspunde imediat."
+   },
+   "adreport_screen_cap_upload": {
+      "description": "Label next to a file upload button.",
+      "message": "Atașați o captură de ecran:"
+   },
+   "adreport_server_response_error__manual_msg_step1": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "Vă rugăm accesați-ne [[site-ul de asistență]]."
+   },
+   "adreport_server_response_error__manual_msg_step2": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "Și creați manual un bilet, apoi copiați și lipiți informațiile de mai jos în secția \"Fill in any details you think will help us understand your issue\"."
+   },
+   "adreport_server_response_error_msg": {
+      "description": "Error message shown when an new ticket is sumbitted for an ad or bug report, and the server had an issue while processing the data.",
+      "message": "A apărut o eroare la procesarea solicitării."
+   },
+   "adreportintro": {
+      "description": "Introduction of the ad reporting page",
+      "message": "Ați găsit un anunț pe o pagină? Vă vom ajuta să găsiți exact unde să raportați!"
+   },
+   "adreportthanks": {
+      "description": "Message to the user thanking them for sharing the URL with us.",
+      "message": "Vă mulțumim!"
+   },
+   "adreportvoluntary": {
+      "description": "Introduction of the ad reporting page",
+      "message": "Raportul de reclame este voluntar. Ajută pe ceilalți permițând responsabililor de liste de filtre să blocheze reclama pentru toți. Dacă nu vă simțiți altruist acum, e în regulă. Închideți pagina și [[blocați reclama]] doar pentru dvs."
+   },
+   "adstillappear": {
+      "description": "Question on ad report page",
+      "message": "Reclama încă apare?"
+   },
+   "advanced_options2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Sunt un utilizator avansat, afișați-mi opțiunile avansate"
+   },
+   "allow_whitelisting_youtube_channels2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Permite reclame pe anumite canale YouTube"
+   },
+   "allowlist_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube or Twitch and has enabled the YouTube or Twitch channel allow listing option",
+      "message": "Permite reclame pe acest canal"
+   },
+   "allowlisted_channel": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "Ați configurat AdBlock să rămână întrerupt pe acest canal la fiecare vizită."
+   },
+   "allowlisting_twitch_channels": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Permite reclame pe anumite canale Twitch"
+   },
+   "always": {
+      "description": "The button text on the popup menu",
+      "message": "Întotdeauna"
+   },
+   "annoyance_free_browsing": {
+      "description": "Description of Distraction Control on the main Premium options page",
+      "message": "Experimentați navigarea fără distrageri"
+   },
+   "apply_theme": {
+      "description": "Text of clickable element that applies the theme of a theme box in the Themes tab of the Options page",
+      "message": "Aplică tema"
+   },
+   "back_help_flow": {
+      "description": "Aria label for back button in help flow (in popup menu)",
+      "message": "Reveniți cu un pas în fluxul de ajutor."
+   },
+   "backup_sync_settings": {
+      "description": "Description of Sync on Sync tab",
+      "message": "Faceți backup automat și sincronizați setările AdBlock pe toate aparatele dvs."
+   },
+   "betalabel": {
+      "description": "Label for experimental features in AdBlock Options",
+      "message": "Beta"
+   },
+   "birdchannelswitchlabel": {
+      "description": "The label text for the Birds switch on the MyAdBlock Options page",
+      "message": "Păsări"
+   },
+   "blacklistclickmessage": {
+      "description": "'Hide a section of a webpage' part on the Customize tab of the Options page.",
+      "message": "Clic dreapta pe o reclamă într-o pagină pentru a o bloca -- sau blocați-o aici manual"
+   },
+   "blacklisterattrwillbe": {
+      "description": "Checkbox label for attributes in 'Block an ad' wizard.",
+      "message": "$attribute$ va fi $value$",
+      "placeholders": {
+         "attribute": {
+            "content": "$1",
+            "example": "class"
+         },
+         "value": {
+            "content": "$2",
+            "example": "AdBanner"
+         }
+      }
+   },
+   "blacklisterblockedelement": {
+      "description": "Tells the user what the blocked element is on the 'Block an ad' wizard.",
+      "message": "Element blocat:"
+   },
+   "blacklisterblocksalloftype": {
+      "description": "Warns the user that all elements of type X will be blocked.",
+      "message": "Fiți atent: acest filtru blochează toate elementele $elementtype$ de pe pagină.",
+      "placeholders": {
+         "elementtype": {
+            "content": "$1",
+            "example": "DIV"
+         }
+      }
+   },
+   "blacklistereditfilter": {
+      "description": "Text if the user wants to manually edit a filter. 'OK' is the standard JavaScript popup button text.",
+      "message": "Introduceți filtrul corect dedesubt și apăsați OK"
+   },
+   "blacklistereditinvalid1": {
+      "description": "Alert if the manually edited filter is invalid. Error messages are not translated.",
+      "message": "Filtrul este invalid: $exception$",
+      "placeholders": {
+         "exception": {
+            "content": "$1",
+            "example": "This filter is not supported"
+         }
+      }
+   },
+   "blacklistermatches": {
+      "description": "Tells the user multiple matches were found",
+      "message": "Corespunde cu $matchcount$ elemente de pe pagină",
+      "placeholders": {
+         "matchcount": {
+            "content": "$1",
+            "example": "5"
+         }
+      }
+   },
+   "blacklisternofilter": {
+      "description": "Warning if the user hasn't specified a filter",
+      "message": "Niciun filtru specificat!"
+   },
+   "blacklisternotsure_part_I": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "O regulă va fi adăugată la setările dvs., care va ascunde acest articol, de fiecare dată când vizitați site-ul."
+   },
+   "blacklisternotsure_part_II": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "Puteți anula acest lucru oricând, selectând „Anulează ascunderea elementelor mele” din meniul AdBlock."
+   },
+   "blacklisteroptions1": {
+      "description": "'Block an ad' wizard attribute choice page",
+      "message": "Păstrați acest element ascuns?"
+   },
+   "blacklistersinglematch": {
+      "description": "Tells the user only one match was found",
+      "message": "Corespunde cu 1 element de pe pagină"
+   },
+   "blacklistertype": {
+      "description": "node name is called 'Type' (HTML tag)",
+      "message": "Tip"
+   },
+   "blacklisterwarningnofilter": {
+      "description": "Warns the user that nothing will be blocked.",
+      "message": "Atenție: niciun filtru specificat!"
+   },
+   "block_ads_on_youtube": {
+      "description": "Label for checkbox letting user choose whether to block ads on youtube.com",
+      "message": "Elimină reclame pe YouTube"
+   },
+   "block_an_ad_on_this_page": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "Ascunde ceva pe această pagină"
+   },
+   "block_and_replace": {
+      "description": "Description of Image Swap on the main Premium options page",
+      "message": "Cu Schimbul de imagini, vom bloca în continuare reclame, dar vom înlocui unele dintre ele cu fotografii din categoriile preferate. "
+   },
+   "block_annonyances_on_youtube": {
+      "description": "Checkbox letting user choose whether to block annoyances on youtube.com (such as comments, suggested videos, annotations, and recommended channels)",
+      "message": "Elimină deranjări pe YouTube"
+   },
+   "block_newsletter_popups": {
+      "description": "Description of 'hide newsletter pop-ups' on the distraction control options page",
+      "message": "Blochează ferestrele enervante care vă invită să vă înscrieți pentru buletinul informativ al unui site."
+   },
+   "block_privacy_on_youtube": {
+      "description": "Checkbox letting user choose whether to block privacy-related requests on youtube.com",
+      "message": "Protejați-mi intimitatea pe YouTube"
+   },
+   "block_site_notifications": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "Blocați notificările site-ului"
+   },
+   "block_this_ad": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "Blocați acestă reclamă"
+   },
+   "blockanadtitle": {
+      "description": "Title of the first two dialogs of the 'Block an ad' wizard",
+      "message": "Asistent de ascundere AdBlock"
+   },
+   "blockdomain": {
+      "description": "Message of the URL and CSS blocking sections",
+      "message": "Domeniul paginii pe care se va aplica:"
+   },
+   "blocked_ads": {
+      "description": "Title for toolbar icon menu section showing number of ads blocked",
+      "message": "Reclame blocate:"
+   },
+   "blocked_n_in_total": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked since AdBlock was installed. $count$ will be a number between 1 and 999,999,999.",
+      "message": "$count$ în total",
+      "placeholders": {
+         "count": {
+            "content": "[[123,456]]",
+            "example": "123,456"
+         }
+      }
+   },
+   "blocked_n_on_this_page": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked on this page. $count$ will be a number between 1 and 999.",
+      "message": "$count$ pe această pagină",
+      "placeholders": {
+         "count": {
+            "content": "[[123]]",
+            "example": "123"
+         }
+      }
+   },
+   "blocked_something": {
+      "description": "Part 1 of a call-to-action on the blocklist wizard",
+      "message": "Tocmai ați blocat ceva pe acest site!"
+   },
+   "blockedresource": {
+      "description": "Resource list page: resource status",
+      "message": "Resursă blocată"
+   },
+   "blockmoreads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Blocați mai multe reclame:"
+   },
+   "blockmoreads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Opri mai multe reclame"
+   },
+   "blockurlwithtext": {
+      "description": "Message of the URL-blocking section (Block an ad by its URL) on the Customize tab",
+      "message": "Blocați URL-urile care conțin acest text"
+   },
+   "browserestartrequired": {
+      "description": "Displayed after disabling Safari Content Blocking, which requres a browser relaunch.",
+      "message": "Reporniți Safari pentru a finaliza oprirea blocării de conținut."
+   },
+   "bugreport": {
+      "description": "Link to send a bug report on the Support tab",
+      "message": "Trimiteți-ne un [[raport de eroare]]"
+   },
+   "buttonblockit": {
+      "description": "Block button",
+      "message": "Blocați-l!"
+   },
+   "buttoncancel": {
+      "description": "Cancel button",
+      "message": "Anulare"
+   },
+   "buttonconfirm": {
+      "description": "Button for confirming a new rule in the hiding wizard",
+      "message": "Confirmați"
+   },
+   "buttonedit": {
+      "description": "Edit filter(s) manually button",
+      "message": "Editează"
+   },
+   "buttonexclude": {
+      "description": "Button for excluding a domain in the allowlist wizard",
+      "message": "Exclude"
+   },
+   "buttonkeep": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Ține"
+   },
+   "buttonlooksgood": {
+      "description": "Confirmation button after user chose what to block on the page",
+      "message": "Arată bine"
+   },
+   "buttonok": {
+      "description": "OK button",
+      "message": "OK!"
+   },
+   "buttonremove": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Șterge"
+   },
+   "buttonsubmit": {
+      "description": "Button to send a form.",
+      "message": "Trimite"
+   },
+   "bypass_mode": {
+      "description": "Header on the main Premium options page",
+      "message": "Mod Evitare"
+   },
+   "callout_new_feature": {
+      "description": "Text to callout a new feature",
+      "message": "NOU!"
+   },
+   "cannot_be_undone": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "Această acțiune nu poate fi anulată."
+   },
+   "cantblockflash": {
+      "description": "Result of the final ad report question",
+      "message": "Nu putem bloca reclame din plugin-uri (Flash). Avem nevoie de suport de la navigator și de la motorul WebKit."
+   },
+   "cantblockflashwarning": {
+      "description": "Text of the final ad report question",
+      "message": "Reclama apare înainte sau înăuntru unui film sau plugin (Flash)?"
+   },
+   "catchannelswitchlabel": {
+      "description": "The label text for the cat switch on the MyAdBlock Options page",
+      "message": "Pisici"
+   },
+   "change_behavior_settings": {
+      "description": "Part of a message on the allowlist and blocklist wizards",
+      "message": "Puteți modifica această comportare în [[settings]] dvs."
+   },
+   "changes_to_adblock": {
+      "description": "Link to Options page with more information about the changes.",
+      "message": "Am făcut modificări în AdBlock!"
+   },
+   "check_out_premium": {
+      "description": "Part 2 of message shown when user opts out of call-to-action",
+      "message": "Dacă doriți să aflați mai multe, verificați [[Premium]]."
+   },
+   "check_out_themes": {
+      "description": "Part 2 of a call-to-action on the Popup menu",
+      "message": "Verificați temele!"
+   },
+   "check_sync_status": {
+      "description": "Button on Sync tab that checks the status of the Sync feature",
+      "message": "Verificare Stare Sync"
+   },
+   "check_whitelist": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Să verificăm setările listei de permisiuni pentru a vedea dacă asta ar putea fi problema."
+   },
+   "checked_basics": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Am verificat elementele de bază și am actualizat listele de filtre."
+   },
+   "checkinfirefox_1": {
+      "description": "instruction for how to check Firefox for a reported ad",
+      "message": "Instalați Firefox dacă nu-l aveți."
+   },
+   "checkinfirefox_2": {
+      "description": "Instruction for how to check Firefox for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "Instalați AdBlock Plus pentru Firefox, dacă nu-l aveți."
+   },
+   "checkinfirefox_3": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "În acel browser, abonați-vă acelorași liste de filtre ca cele de aici."
+   },
+   "checkinfirefox_4": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "În acel browser, navigați la pagina cu reclama."
+   },
+   "checkinfirefox_5": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "Reclama apare și în celălalt browser?"
+   },
+   "checkinfirefoxorchrome_1": {
+      "description": "instruction for how to check Firefox or Chrome for a reported ad",
+      "message": "Instalați Firefox sau Chrome dacă nu-l aveți."
+   },
+   "checkinfirefoxorchrome_2": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "Instalați Adblock Plus pentru Firefox sau AdBlock pentru Chrome dacă nu-l aveți."
+   },
+   "checkinfirefoxorchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox/Chrome",
+      "message": "Verificați în Firefox sau Chrome"
+   },
+   "checkinfirefoxtitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox",
+      "message": "Verificați în Firefox"
+   },
+   "chromebutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Chrome displays when you right click a toolbar button.",
+      "message": "Pentru a-l ascunde: dați clic dreapta pe butonul AdBlock și selectați 'Ascunde-l din Meniul Chrome'. \nPentru a-l afișa: clicați pe meniul Chrome, dați clic dreapta pe butonul AdBlock și selectați 'Păstrează-l în Bara de instrumente'."
+   },
+   "cleanuplist2": {
+      "description": "Label at the bottom of the 'Customize' tab of the Options page",
+      "message": "Curăță această listă"
+   },
+   "clickdisableaa": {
+      "description": "Instruction on ad report page",
+      "message": "Clicați aici: [[Dezactivare Reclame Acceptabile]]"
+   },
+   "clickdisableotherextensions": {
+      "description": "On the ad report page, an alternative way to disable other extensions",
+      "message": "Sau, doar clicați acest buton pentru ca noi să facem toate cele de mai sus: [[Dezactivați toate celelalte extensii]]"
+   },
+   "clickthead": {
+      "description": "User has to click the ad they want to block.",
+      "message": "Faceți clic pe orice element de pe această pagină, pe care doriți să-l ascundeți."
+   },
+   "clickupdatefilters": {
+      "description": "Instruction on ad report page",
+      "message": "Clicați aici: [[Actualizați-mi filtrele!]]"
+   },
+   "close": {
+      "description": "Generic message for buttons that close a view or window",
+      "message": "Închide"
+   },
+   "close_help_flow": {
+      "description": "Aria label for close button in help flow (in popup menu)",
+      "message": "Închideți fluxul de ajutor și reveniți la meniul pop-up."
+   },
+   "confirm_delete_extension": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "Sunteți sigur că vreți să ștergeți această extensie?"
+   },
+   "confirm_undo_custom_filters": {
+      "description": "Confirmation message when user wants to undo their custom blocks for a domain. $count$ will be a number between 1 and 999,999,999, $host$ will be the domain where the custom blocks will be reset.",
+      "message": "Sigur doriți să eliminați $count$ blocaje pe care le-ați creat pe $host$?",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "12"
+         },
+         "host": {
+            "content": "$2",
+            "example": "stackoverflow.com"
+         }
+      }
+   },
+   "contact_support": {
+      "description": "Message for help flow in popup menu.",
+      "message": "[[Contactați-ne echipa de Asistență!]]"
+   },
+   "contact_the_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Vă recomandăm să luați legătura cu site-ul."
+   },
+   "content_blocking_acceptable_ads_disbled_message": {
+      "description": "Warning shown when the Acceptable Ads filter list is enabled while Safari Content Blocking was already enabled.",
+      "message": "Am dezactivat Blocare Conținut Safari, deoarece ați ales lăsarea de reclame neintruzive. Puteți alege doar una la un moment dat.([[De ce?]])"
+   },
+   "contributors": {
+      "description": "Link to the contributors page on the Support tab",
+      "message": "Aflați mai multe despre [[echipa noastră]]"
+   },
+   "copieddebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "Copiat!"
+   },
+   "copydebugdata": {
+      "description": "Button text on the Support tab of the options.",
+      "message": "Copiere date de depanare"
+   },
+   "correctfilters": {
+      "description": "On the ad report page, label describing having the right filter lists enabled",
+      "message": "Asigurați-vă că folosiți filtrul(ele) limbii corecte:"
+   },
+   "csstomatch": {
+      "description": "Message of the CSS-hiding section (Hide a section of a webpage) on the Customize tab",
+      "message": "CSS care corespunde"
+   },
+   "custom_filters_migration_error_message_part1": {
+      "description": "Part one of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Număr de erori cu filtrele adaptate: "
+   },
+   "custom_filters_migration_error_message_part2": {
+      "description": "Part two of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Următorul(oarele) mesaj(e) s-au generat la migrarea filtrului personalizat (ignorați numerele de linie): "
+   },
+   "custom_filters_migration_error_message_part3": {
+      "description": "Part three of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Înscris original: "
+   },
+   "custom_image_description": {
+      "description": "text on the image swap tab",
+      "message": "Alegeți până la 9 imagini cu care AdBlock va înlocui reclamele"
+   },
+   "custom_image_error": {
+      "description": "header / title text on the error message on the image swap tab",
+      "message": "Oops! Ceva a mers prost"
+   },
+   "custom_image_error_msg_partI": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Nu am putut adăuga imaginea dvs."
+   },
+   "custom_image_error_msg_partII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Așteptați un moment și încercați din nou."
+   },
+   "custom_image_error_msg_partIII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Puteți de asemeni partaja [[date anonime de depanare]] pentru a ne ajuta să aflăm ce nu a mers bine."
+   },
+   "custom_image_supported_file_types": {
+      "description": "supported file types, shown on the error message dialog box when a user selects a unsupported file type",
+      "message": "*.bmp, *.gif, *.jpeg, *.png, *.svg, *.tiff, *.webp"
+   },
+   "custom_image_unsupported_msg_partI": {
+      "description": "First sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "Oops! Încercați să adaugați o imagine pe care Schimbul Personalizat de Imagini n-o suportă."
+   },
+   "custom_image_unsupported_msg_partII": {
+      "description": "second sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "Alegeți vă rog unul din următoarele tipuri de imagini:"
+   },
+   "custom_image_unsupported_title": {
+      "description": "header / title on error message dialog box when a user selects a unsupported file type",
+      "message": "Tip de imagine neacceptat"
+   },
+   "custom_images": {
+      "description": "text on the image swap tab",
+      "message": "Imagini Adaptate"
+   },
+   "customchannelswitchlabel": {
+      "description": "The label text for the Custom Image switch on the MyAdBlock Options page",
+      "message": "Adaptat"
+   },
+   "customfilters": {
+      "description": "Subtitle on the Filter lists tab: Section for adding your own filter lists.",
+      "message": "Filtre Personalizate"
+   },
+   "customfilterserrormessage": {
+      "description": "Error message when there is an issue with a custom filter on the 'Customize' tab of the Options page",
+      "message": "Următorul filtru:\n $filter$ \n are o eroare: \n $message$",
+      "placeholders": {
+         "filter": {
+            "content": "$1",
+            "example": "@@.ad"
+         },
+         "message": {
+            "content": "$2",
+            "example": "invalid filter"
+         }
+      }
+   },
+   "customize_your_adblock": {
+      "description": "Sub-header describing Themes on the main Premium options page",
+      "message": "Personalizați-vă AdBlock"
+   },
+   "dark_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Sombră"
+   },
+   "datacollectionoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Permite AdBlock să colecteze anonim date de utilizare a listei de filtre, și informații despre conținutul blocat de listele de filtre"
+   },
+   "debuginfo": {
+      "description": "Users can click this link to provide debug information to AdBlock staff",
+      "message": "Echipa noastră a solicitat unele informații de depanare?"
+   },
+   "debuginlogoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Arată declarații de depanare în Consolă (încetinește AdBlock)"
+   },
+   "debuginlogoption2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Afișați declarații de depanare în Jurnal Consolă"
+   },
+   "decline_allow_notifications": {
+      "description": "Description of 'block site notifications' on the distraction control options page",
+      "message": "Refuză automat cererile 'permiteți notificările' de la site-urile pe care le vizitați."
+   },
+   "default_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Implicit"
+   },
+   "delete": {
+      "description": "Text on a delete button",
+      "message": "Șterge"
+   },
+   "delete_all_stats_data": {
+      "description": "text related to the delete all data checkbox on the statistics page of the Options page",
+      "message": "Șterge statisticile de blocări stocate curent"
+   },
+   "delete_detail_msg_part_I": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Aici puteți șterge statisticile de blocare stocate local."
+   },
+   "delete_detail_msg_part_II": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Veți șterge toate datele afișate actual pe pagina dvs. de statistici, inclusiv site-uri de top blocate."
+   },
+   "delete_detail_msg_part_III": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Statisticile fiind stocate doar pe aparatul dvs., odată șterse NU MAI POT FI recuperate."
+   },
+   "delete_detail_page_2_msg_part_I": {
+      "description": "text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "Sunteți sigur?"
+   },
+   "delete_migration_error_messages": {
+      "description": "Button to delete error messages when adding custom filters manually",
+      "message": "Șterge mesajele"
+   },
+   "delete_panel_title": {
+      "description": "title text on the delete overlay on the statistics page of the Options page",
+      "message": "Șterge Statistici Blocare"
+   },
+   "description": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "Blochează reclame și pop-up-uri pe YouTube, Facebook, Twitch și site-urile preferate."
+   },
+   "description2": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "Cea mai populara extensie Chrome, cu peste 60 milioane de utilizatori! Blochează reclamele pe tot webul."
+   },
+   "description_edge": {
+      "description": "Description for the AdBlock for Edge extension. Should not exceed 132 characters.",
+      "message": "AdBlock. Nr.1 în blocarea de reclame cu peste 200 milioane de descărcări. Blochează reclamele pe tot webul."
+   },
+   "description_yt": {
+      "description": "Description for the AdBlock on YouTube extension. Should not exceed 132 characters.",
+      "message": " Singurul blocant de reclame YouTube creat de AdBlock, cea mai populară extensie Chrome cu 60 de milioane de utilizatori în întreaga lume"
+   },
+   "devtools_action_block": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Blocați elementul"
+   },
+   "devtools_action_remove": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Ștergeți regula"
+   },
+   "devtools_action_unblock": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Adăugați excepția"
+   },
+   "devtools_filter_origin_custom": {
+      "description": "sub-title text of the rule showing the source of the rule as custom rules",
+      "message": "personalizată"
+   },
+   "devtools_filter_origin_none": {
+      "description": "sub-title text of the rule showing the source of the rule as a unamed filter list",
+      "message": "abonament fără nume"
+   },
+   "devtools_filter_subtitle": {
+      "description": "sub-title text of the rule showing the source of the rule a named filter list",
+      "message": "Origine"
+   },
+   "devtools_filter_title": {
+      "description": "Text of the filter that was applied to the list item.",
+      "message": "Filtru"
+   },
+   "devtools_footer": {
+      "description": "message on the bottom of the panel",
+      "message": "\u003Ca0>Reîncărcați\u003C/a0> pagina ca să vedeți efectul schimbării filtrului"
+   },
+   "devtools_header": {
+      "description": "Text on the top of the dev tools panel to show all items of any type; slot0 and slot1 are two seperate drop down lists",
+      "message": "Arată \u003Cslot0>\u003C/slot0> elemente de \u003Cslot1>\u003C/slot1>tip"
+   },
+   "devtools_header_state_all": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "toate"
+   },
+   "devtools_header_state_blocked": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "blocate"
+   },
+   "devtools_header_state_whitelisted": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "lista de permisiuni"
+   },
+   "devtools_header_type_any": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "orice"
+   },
+   "devtools_request_subtitle": {
+      "description": "sub title text for the request-column header of the dev tools panel",
+      "message": "Domeniu document"
+   },
+   "devtools_request_title": {
+      "description": "title text for the request-column header of the dev tools panel",
+      "message": "Solicitare"
+   },
+   "devtools_request_url": {
+      "description": "A request URL in the AdBlock DevTools panel",
+      "message": "\u003Ca0>$original$\u003C/a0> rescris ca \u003Ca1>$rewritten$\u003C/a1>",
+      "placeholders": {
+         "original": {
+            "content": "$1",
+            "example": "http://example.com/foo"
+         },
+         "rewritten": {
+            "content": "$2",
+            "example": "http://example.com/bar"
+         }
+      }
+   },
+   "devtools_type_title": {
+      "description": "Type column header text",
+      "message": "Tip"
+   },
+   "disableaa": {
+      "description": "Section header on the ad report page",
+      "message": "Verificați filtrele de Reclame Acceptabile:"
+   },
+   "disableallextensions": {
+      "description": "Instruction on ad report page",
+      "message": "Dezactivați toate extensiile cu excepția AdBlock:"
+   },
+   "disabled": {
+      "description": "Title shown in menu when AdBlock is paused on all sites",
+      "message": "AdBlock este Întrerupt"
+   },
+   "disabled_by_filter_lists": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list.",
+      "message": "Ne pare rău, AdBlock este dezactivat pe pagină din cauza unui filtru."
+   },
+   "disabled_by_filter_lists_yt": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "Ne pare rău, una din opțiunile dvs. a dezactivat AdBlock pe YouTube pe această pagină."
+   },
+   "disabled_on_all_sites": {
+      "description": "Message shown in menu when AdBlock is paused on all sites",
+      "message": "Ați configurat AdBlock să rămână întrerupt pe toate site-urile."
+   },
+   "disabled_on_this_channel": {
+      "description": "Message shown in the toolbar button menu on YouTube channel pages and videos that have been allowlisted.",
+      "message": "Ați permis reclame pe acest canal."
+   },
+   "disabled_on_this_page": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "AdBlock este dezactivat pe această pagină."
+   },
+   "disabled_site_title": {
+      "description": "header title on the menu when a user is on tab that extensions are disabled on (Chrome settings, etc)",
+      "message": "Nimic de blocat aici!"
+   },
+   "disableforchromeandsafaristeptwo": {
+      "description": "Step 2 for disabling Chrome and Safari extensions",
+      "message": "Debifați caseta de selectare 'Activată' de lângă fiecare extensie, cu excepția AdBlock. Lăsați AdBlock activat."
+   },
+   "disableforchromestepone": {
+      "description": "Step 1 for disabling Chrome extensions",
+      "message": "Deschideți [[pagina extensiilor]]."
+   },
+   "disableforedgestepone": {
+      "description": "Step 1 for disabling Edge extensions",
+      "message": "Clicați pe meniul Mai Multe (...) și alegeți Extensii."
+   },
+   "disableforedgesteptwo": {
+      "description": "Step 2 for disabling Edge extensions",
+      "message": "Afară de AdBlock, clicați pe iconul roată al fiecărei extensii apoi pe comutatorul Deschis ca să devină Închis."
+   },
+   "disableforsafaristepone": {
+      "description": "Step 1 for disabling Safari extensions",
+      "message": "Clicați pe meniul Safari > Preferințe > Extensii."
+   },
+   "disableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "Am dezactivat toate celelalte extensii. Acum vom reîncărca pagina cu reclama. O secunda vă rog."
+   },
+   "dismiss_invitations": {
+      "description": "Description of 'ignore survey requests' on the distraction control options page",
+      "message": "Respinge instantaneu invitațiile site-urilor web pentru a participa la sondaje."
+   },
+   "display_language_selector": {
+      "description": "Text shown before language selector drop-down.",
+      "message": "Afișați AdBlock în"
+   },
+   "distraction_control": {
+      "description": "Name of a Premium option",
+      "message": "Control de distragere"
+   },
+   "do_not_swap_ads": {
+      "description": "Text of a clickable option to stop swapping ads with images in the Options page Image Swap tab.",
+      "message": "Nu înlocui pub"
+   },
+   "dogchannelswitchlabel": {
+      "description": "The label text for the dog switch on the MyAdBlock Options page",
+      "message": "Câini"
+   },
+   "domain_pause_adblock": {
+      "description": "Menu entry to pause AdBlock on this domain (stop blocking ads)",
+      "message": "În pauză pe acest site"
+   },
+   "domain_unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site'",
+      "message": "Reluați AdBlock pe acest site"
+   },
+   "donate_to_adblock": {
+      "description": "Text of a donate link in the toolbar button menu",
+      "message": "Vă place AdBlock? Vă rugăm donați!"
+   },
+   "donate_to_youtube_adblock": {
+      "description": "Text of a donate link in the toolbar button menu. 'This' refers to the 'AdBlock on YouTube' extension.",
+      "message": "Vă place extensia? Vă rugăm donați!"
+   },
+   "done": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Terminat"
+   },
+   "done_reload_page": {
+      "description": "text on panel in the help flow",
+      "message": "Imediat ce terminăm, vă rugăm să reîncărcați pagina."
+   },
+   "dont_know_help_me": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Nu știu. Ajutați-mă!"
+   },
+   "dont_run_on_pages_on_domain": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "Nu rula pe paginile acestui domeniu"
+   },
+   "dont_run_on_this_page": {
+      "description": "Menu entry to allowlist the current page",
+      "message": "Nu rula pe această pagină"
+   },
+   "dont_show_me_again": {
+      "description": "opt out option on all-to-action on the blocklist / hiding wizard",
+      "message": "Nu-mi arătați din nou acest mesaj"
+   },
+   "dont_show_reminder": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Nu-mi mai arătați acest memento"
+   },
+   "dontsend": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "Nu Trimite"
+   },
+   "download_mac_app": {
+      "description": "Link to download our Mac App. [[ and ]] will be replaced with HTML to link to the Mac App Store",
+      "message": "Pentru cea mai bună experiență AdBlock pe Mac, descărcați vă rog [[App AdBlock pentru Safari Mac!]]"
+   },
+   "easylist_disable_done": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock folosește EasyList la blocare reclame pe majoritatea site-urilor."
+   },
+   "easylist_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "Recomandăm ținerea ei activă. Dacă v-ați dezabonat eronat, alegeți acum \"EasyList\" pentru a bloca mai multe reclame."
+   },
+   "easylist_lite_disable_done": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock, pe majoritatea site-urilor blochează reclame cu EasyList Lite sau EasyList."
+   },
+   "easylist_lite_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "Recomandăm ținerea ei activă. Dacă v-ați dezabonat eronat, alegeți acum \"EasyList Lite\" sau \"EasyList\" pentru a bloca mai multe reclame."
+   },
+   "easylist_lite_or_easylist": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "Recomandăm abonarea fie la \"EasyList Lite\" sau \"EasyList\" dar nu la ambele."
+   },
+   "edit_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Poate va trebui să [[editați listele de filtre]]."
+   },
+   "edit_image": {
+      "description": "header text in the on custom image swap modal dialog",
+      "message": "Editare Imagine"
+   },
+   "edit_image_msg_partI": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "Listăm mai jos 3 din cele mai comune talii de reclame."
+   },
+   "edit_image_msg_partII": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "Selectați talia cea mai apropiată de imaginea dvs., ajustați-o cu glisorul și clicați pe Salvare când terminați."
+   },
+   "enable_adblock": {
+      "description": "Link text to un-allowlist a page, displayed immediately after 'AdBlock is disabled on this page'",
+      "message": "Activați AdBlock pe această pagină"
+   },
+   "enable_adblock_on_this_channel": {
+      "description": "Menu entry to un-allowlist a YouTube channel, displayed under 'You allowed ads on this channel.'",
+      "message": "Blocați reclame pe acest canal"
+   },
+   "enable_do_not_track_advice": {
+      "description": "The text advicing to enable DNT if Acceptable Ads is enabled in the General tab",
+      "message": "Pentru ca funcția să lucreze corect, vă rugăm activați Do Not Track (DNT) în preferințele navigatorului."
+   },
+   "enable_on_this_site": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Activați AdBlock pe acest site"
+   },
+   "enableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've re-enabled extensions that were previously disabled",
+      "message": "Extensiile care au fost dezactivate anterior acum au fost reactivate."
+   },
+   "english_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Sunteți pe un site în limba engleză?"
+   },
+   "englishonly": {
+      "description": "Lets the user know that a link/page is only available in English.",
+      "message": "Doar engleză"
+   },
+   "enjoying_adblock": {
+      "description": "Text of a footer in the popup menu help flow asking users to leave us a review.",
+      "message": "Vă place AdBlock?"
+   },
+   "enter_url": {
+      "description": "Placeholder text in the Custom Filter list URL bar",
+      "message": "introduceți un URL"
+   },
+   "error": {
+      "description": "Text in the aria-label attribute of an icon indicating an error occurred.",
+      "message": "Eroare"
+   },
+   "error_msg_header": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "Oops!"
+   },
+   "error_msg_help_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "Dacă asta nu merge, "
+   },
+   "error_msg_help_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "consultați aici pentru ajutor suplimentar."
+   },
+   "error_msg_help_us_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "Ajutați-ne să rezolvăm această problemă  "
+   },
+   "error_msg_help_us_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": " prin trimiterea unor date de depanare."
+   },
+   "error_msg_partI": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "Ne pare rău, meniul AdBlock a avut probleme la încărcare."
+   },
+   "error_msg_reload_partI": {
+      "description": "DO NOT TRANSLATE",
+      "message": "Apoi, încercați reîncărcarea extensiei "
+   },
+   "error_msg_reload_partII": {
+      "description": "DO NOT TRANSLATE",
+      "message": "clicând aici."
+   },
+   "error_msg_thank_you": {
+      "description": "The text on the popup menu when an error has occurred",
+      "message": "Vă mulțumim"
+   },
+   "example_themes": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the themes feature.",
+      "message": "Exemplu de teme"
+   },
+   "excludedomainorurl": {
+      "description": "Message of the exclude section (Show ads on a webpage or domain) on the Customize tab",
+      "message": "Domeniul sau URL-ul unde AdBlock nu va bloca reclame"
+   },
+   "failedtofetchfilter": {
+      "description": "Error alert when subscribing to a filter list",
+      "message": "Eșec la preluarea filtrului!"
+   },
+   "feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "Aveți un comentariu sau o cerere de funcție pentru noi? Ne-ar face plăcere să vă ascultăm!"
+   },
+   "feedback_title": {
+      "description": "Title for feedback call to action.",
+      "message": "Feedback"
+   },
+   "fetchinglabel": {
+      "description": "Status label when selecting a new filter list",
+      "message": "Preluare... vă rugăm așteptați."
+   },
+   "ff_button_how_to_hide": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Remove from Toolbar' should match the text that Firefox displays when you right click a toolbar button, and 'Customize' should match the text that shows when you click the button on the Firefox toolbar with three lines.",
+      "message": "Pentru a ascunde butonul: dați clic dreapta pe el și alegeți 'Elimină din Bara de Instrumente'. \nÎl puteți afișa din nou din meniul Firefox -> Personalizare."
+   },
+   "ff_checkinchrome_1": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Instalați Chrome dacă nu-l aveți."
+   },
+   "ff_checkinchrome_2": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Instalați AdBlock pentru Chrome, dacă nu-l aveți."
+   },
+   "ff_checkinchrome_3": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "În Chrome, abonați-vă la aceleași liste de filtrare ca aici."
+   },
+   "ff_checkinchrome_4": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "În Chrome, încărcați pagina cu reclama."
+   },
+   "ff_checkinchrome_5": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Reclama apare și în Chrome?"
+   },
+   "ff_checkinchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Chrome",
+      "message": "Verificați în Chrome"
+   },
+   "filter_annoyances_explained": {
+      "description": "A filter list explanation",
+      "message": "blochează pop-up-uri în pagină, social media și widget-uri asociate, și alte deranjări"
+   },
+   "filter_antisocial_explained": {
+      "description": "A filter list explaination",
+      "message": "elimină butoanele de social media"
+   },
+   "filter_chinese": {
+      "description": "A filter list combined with EasyList",
+      "message": "Chineză + EasyList"
+   },
+   "filter_czech": {
+      "description": "A filter list combined with EasyList",
+      "message": "EasyList cehă și slovacă"
+   },
+   "filter_dutch": {
+      "description": "A filter list combined with EasyList",
+      "message": "Olandeză + EasyList"
+   },
+   "filter_easylist_plus_arabic_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "Arabă + Franceză + EasyList"
+   },
+   "filter_easylist_plus_bulgarian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Bulgară + EasyList"
+   },
+   "filter_easylist_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "Franceză + EasyList"
+   },
+   "filter_easylist_plus_german": {
+      "description": "A filter list combined with EasyList",
+      "message": "Germană + EasyList"
+   },
+   "filter_easylist_plus_indonesian": {
+      "description": "A filter list combined with EasyList",
+      "message": "EasyList indoneziană"
+   },
+   "filter_easylist_plus_lithuania": {
+      "description": "A filter list combined with EasyList",
+      "message": "Lituaniană + EasyList"
+   },
+   "filter_easylist_plus_romanian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Română + EasyList"
+   },
+   "filter_easylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "Vietnameză + EasyList"
+   },
+   "filter_elemhideemulation_nodomain": {
+      "message": "Niciun domeniu activ specificat pentru filtrul extins de ascundere elemente"
+   },
+   "filter_idcac_explained": {
+      "description": "A filter list explanation",
+      "message": "blochează notificările cookie, adică renunțați la dreptul de a fi informat despre folosirea cookie-urilor pe site-urile vizitate"
+   },
+   "filter_invalid": {
+      "description": "Generic error shown when the user tries to add an invalid filter rule to their custom filters",
+      "message": "Filtru invalid"
+   },
+   "filter_invalid_csp": {
+      "message": "Politica Securității de Conținut Invalidă"
+   },
+   "filter_invalid_domain": {
+      "message": "Domeniu specificat invalid (sau gol)"
+   },
+   "filter_invalid_regexp": {
+      "message": "Expresie obișnuită invalidă"
+   },
+   "filter_israeli": {
+      "description": "A filter list combined with EasyList",
+      "message": "Ebraică + EasyList"
+   },
+   "filter_italian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Italiană + EasyList"
+   },
+   "filter_latvian": {
+      "description": "A filter list combined with EasyList",
+      "message": "EasyList letonă"
+   },
+   "filter_russian": {
+      "description": "A filter list combined with EasyList",
+      "message": "EasyList rusă și ucraineană"
+   },
+   "filter_snippet_nodomain": {
+      "message": "Niciun domeniu activ specificat pentru filtrul snippet"
+   },
+   "filter_unknown_option": {
+      "message": "Opțiune filtru necunoscut"
+   },
+   "filter_warning_removal_explained": {
+      "description": "A filter list explanation",
+      "message": "elimină alerte de folosire de blocante de pub"
+   },
+   "filteracceptable_ads": {
+      "description": "A filter list",
+      "message": "Reclame Acceptabile"
+   },
+   "filteracceptable_ads_privacy": {
+      "description": "A filter list",
+      "message": "Intimitatea Publicității Acceptabile"
+   },
+   "filteradblock_custom": {
+      "description": "A filter list",
+      "message": "Filtre personalizate AdBlock"
+   },
+   "filterannoyances": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances (blochează pop-up-uri în pagină, social media și widget-uri conexe și alte deranjări)"
+   },
+   "filterannoyances2": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances"
+   },
+   "filteranticircumvent": {
+      "description": "A filter list",
+      "message": "Filtre Anti-Eludare"
+   },
+   "filterantisocial": {
+      "description": "A filter list",
+      "message": "Filtru antisocial (elimină butoanele de social media)"
+   },
+   "filterantisocial2": {
+      "description": "A filter list",
+      "message": "Lista de filtre Antisociale"
+   },
+   "filterbitcoin_mining_protection": {
+      "description": "A filter list",
+      "message": "Listă de Protecție contra Minării de Cripto-monedă (Bitcoin)"
+   },
+   "filterbrazilian_portuguese": {
+      "description": "A filter list",
+      "message": "Portugheză braziliană"
+   },
+   "filterchinese": {
+      "description": "A filter list",
+      "message": "Chineză"
+   },
+   "filterczech": {
+      "description": "A filter list",
+      "message": "Cehă și slovacă"
+   },
+   "filterdanish": {
+      "description": "A filter list",
+      "message": "Daneză"
+   },
+   "filterdutch": {
+      "description": "A filter list",
+      "message": "Olandeză"
+   },
+   "filtereasylist": {
+      "description": "A filter list",
+      "message": "EasyList"
+   },
+   "filtereasylist_lite": {
+      "description": "A filter list",
+      "message": "EasyList Lite"
+   },
+   "filtereasylist_plun_korean": {
+      "description": "A filter list",
+      "message": "Coreeană"
+   },
+   "filtereasylist_plus_arabic": {
+      "description": "A filter list",
+      "message": "Arabă"
+   },
+   "filtereasylist_plus_bulgarian": {
+      "description": "A filter list",
+      "message": "Bulgară"
+   },
+   "filtereasylist_plus_estonian": {
+      "description": "A filter list",
+      "message": "Estonă"
+   },
+   "filtereasylist_plus_finnish": {
+      "description": "A filter list",
+      "message": "Finlandeză"
+   },
+   "filtereasylist_plus_french": {
+      "description": "A filter list",
+      "message": "Franceză"
+   },
+   "filtereasylist_plus_german": {
+      "description": "A filter list",
+      "message": "Germană"
+   },
+   "filtereasylist_plus_greek": {
+      "description": "A filter list",
+      "message": "Greacă"
+   },
+   "filtereasylist_plus_indian": {
+      "description": "A filter list",
+      "message": "ListăIndiană + EasyList"
+   },
+   "filtereasylist_plus_indonesian": {
+      "description": "A filter list",
+      "message": "Indoneziană"
+   },
+   "filtereasylist_plus_lithuania": {
+      "description": "A filter list",
+      "message": "Lituaniană"
+   },
+   "filtereasylist_plus_polish": {
+      "description": "A filter list",
+      "message": "Poloneză"
+   },
+   "filtereasylist_plus_portuguese": {
+      "description": "A filter list",
+      "message": "Portugheză + EasyList"
+   },
+   "filtereasylist_plus_romanian": {
+      "description": "A filter list",
+      "message": "Română"
+   },
+   "filtereasylist_plus_spanish": {
+      "description": "A filter list",
+      "message": "Spaniolă"
+   },
+   "filtereasylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "Vietnameză"
+   },
+   "filtereasyprivacy": {
+      "description": "A filter list",
+      "message": "EasyPrivacy (protecție a vieții private)"
+   },
+   "filterfb_notifications": {
+      "description": "A filter list",
+      "message": "Notificările Fanboy (blochează pop-up-uri în pagină, social media și widget-uri conexe și alte deranjări)"
+   },
+   "filterhungarian": {
+      "description": "A filter list",
+      "message": "Maghiară"
+   },
+   "filtericelandic": {
+      "description": "A filter list",
+      "message": "Islandeză"
+   },
+   "filteridcac": {
+      "description": "A filter list",
+      "message": "Nu-mi Pasă de Cookie-uri"
+   },
+   "filterisraeli": {
+      "description": "A filter list",
+      "message": "Ebraică"
+   },
+   "filteritalian": {
+      "description": "A filter list",
+      "message": "Italiană"
+   },
+   "filterjapanese": {
+      "description": "A filter list",
+      "message": "Japoneză"
+   },
+   "filterlatvian": {
+      "description": "A filter list",
+      "message": "Letonă"
+   },
+   "filterlistlink": {
+      "description": "Filter lists tab explanation and link to filter list credits.",
+      "message": "Nu adăugați mai multe filtre decât sunt necesare -- fiecare încetinește navigarea puțin! Credite și alte liste pot fi găsite [[aici]]."
+   },
+   "filterlistsrock": {
+      "description": "Header text on the Customize tab",
+      "message": "Filtrele blochează majoritatea reclamelor de pe web. De asemenea, puteți:"
+   },
+   "filterlistsrock2": {
+      "description": "Header text on the Customize tab",
+      "message": "Listele de filtre opresc majoritatea reclamelor pe web. În plus puteți..."
+   },
+   "filternorwegian": {
+      "description": "A filter lsit",
+      "message": "Norvegiană"
+   },
+   "filterorigin": {
+      "description": "Resource list page: tooltip of matching filter, telling which filter list contains the filter",
+      "message": "Origine filtru:\n$list$",
+      "placeholders": {
+         "list": {
+            "content": "$1",
+            "example": "A filter list name OR AdBlock OR the translation of 'tabcustomize'"
+         }
+      }
+   },
+   "filterrussian": {
+      "description": "Language names for a filter list",
+      "message": "Rusă și ucraineană"
+   },
+   "filtersavewarning_part1": {
+      "description": "Warning when manually editing filters -- first part not clickable.",
+      "message": "Aveți grijă: dacă greșiți aici, multe alte filtre, inclusiv filtrele oficiale, se pot deteriora de asemenea!"
+   },
+   "filtersavewarning_part2": {
+      "description": "Warning when manually editing filters -- second part clickable.",
+      "message": "Citiți [[ghidul sintaxei filtrelor]] ca să învățați cum se adaugă filtre avansate la listă de blocări sau permisiuni."
+   },
+   "filterstabtitle": {
+      "description": "Title of the Filter lists tab of the Options page",
+      "message": "Adăugați alte filtre"
+   },
+   "filterswedish": {
+      "description": "A filter list",
+      "message": "Suedeză"
+   },
+   "filterturkish": {
+      "description": "A filter list",
+      "message": "Turcă"
+   },
+   "filterviewsource": {
+      "description": "Title for links to view filter lists on website",
+      "message": "Vedeți lista de filtre"
+   },
+   "filterwarning_removal": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Lista de Alerte de Eliminare AdBlock (suprimă mesaje de folosire de blocante pub)"
+   },
+   "filterwarning_removal2": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Lista de Eliminare Alerte Adblock"
+   },
+   "find_out_more": {
+      "description": "Text in the button on the Premium CTA on the hiding wizard.",
+      "message": "Aflați mai multe"
+   },
+   "findingads": {
+      "description": "'Block an ad' wizard loading message",
+      "message": "Căutare reclame... \n\nVa rugăm așteptați."
+   },
+   "firefox_explanation": {
+      "description": "Explanation of the 'Check in Firefox or Chrome' step on the ad report page",
+      "message": "Scopul acestei întrebări este de a determina cine vă primește raportul. Dacă răspundeți incorect la această întrebare, raportul va fi transmis persoanelor greșite și poate fi ignorat."
+   },
+   "first_time_seeing_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Văd pentru prima dată această reclamă"
+   },
+   "fixityourself": {
+      "description": "Telling users who won't report an ad to us how to handle it for themselves",
+      "message": "OK, puteți încă bloca această reclamă pentru dvs. în Opțiuni. Mulțumesc!"
+   },
+   "flashads": {
+      "description": "Title of the final ad report question if the ad didn't appear in Firefox",
+      "message": "Video și Flash"
+   },
+   "foodchannelswitchlabel": {
+      "description": "The label text for the Food switch on the MyAdBlock Options page",
+      "message": "Mâncare"
+   },
+   "format": {
+      "description": "Example showing users how to input a list of sites on the Customize tab. You can translate the 'news' and 'siteN' but leave the '|'s and '~'s in place.",
+      "message": "Format:"
+   },
+   "framedomain": {
+      "description": "Resource list page: domain name of the frame",
+      "message": "Domeniul cadrului: "
+   },
+   "frametype": {
+      "description": "Resource list page: followed by frame type (top frame, subframe)",
+      "message": "Tip de cadru: "
+   },
+   "frameurl": {
+      "description": "Resource list page: full URL of the frame",
+      "message": "URL Cadru: "
+   },
+   "fun_way_customize": {
+      "description": "Description of Themes on the main Premium options page",
+      "message": "Temele sunt un mod plăcut de a personaliza AdBlock în browser-ul dvs."
+   },
+   "future_show_ads": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "În viitor, aceste pagini vor continua să afișeze reclame."
+   },
+   "generaloptions": {
+      "description": "Title of the first Options page tab",
+      "message": "Opțiuni generale"
+   },
+   "generaloptions2": {
+      "description": "Title of one of the Options page tabs",
+      "message": "Opțiuni Generale"
+   },
+   "get_around_popups": {
+      "description": "Description of Bypass Mode on the main Premium options page",
+      "message": "Cu Modul Evitare, veți putea să ocoliți unele dintre aceste ferestre pop-up fără a dezactiva AdBlock."
+   },
+   "get_it_now": {
+      "description": "The text in a button visible to locked users in the MyAdBlock Options page",
+      "message": "Obțineți-l Acum"
+   },
+   "get_sync": {
+      "description": "Link to pay for Sync (part of AdBlock Premium)",
+      "message": "Obțineți Sync"
+   },
+   "goatchannelswitchlabel": {
+      "description": "The label text for the Goats switch on the MyAdBlock Options page",
+      "message": "Capre"
+   },
+   "goodbye_distractions": {
+      "description": "Description of the distraction control option",
+      "message": "Spuneți la revedere ferestrelor pop-up cu buletine informative, videoclipurilor flotante și altor distrageri enervante, cu Controlul de distragere."
+   },
+   "got_it": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Am înțeles."
+   },
+   "header": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 10 characters)",
+      "message": "Antet"
+   },
+   "headerfilter": {
+      "description": "Resource list page: title of a column",
+      "message": "Filtru potrivit"
+   },
+   "headerresource": {
+      "description": "Resource list page: title of a column",
+      "message": "Resurse"
+   },
+   "headertype": {
+      "description": "Resource list page: title of a column",
+      "message": "Tip"
+   },
+   "help": {
+      "description": "Text in the aria-label attribute of the support icon on the pop-up menu.",
+      "message": "Ajutor"
+   },
+   "help_and_feedback": {
+      "description": "Text of a help link in the toolbar button menu",
+      "message": "Ajutor și Feedback"
+   },
+   "helpcenter": {
+      "description": "Link to AdBlock's help site. This is found on the Support tab of the options.",
+      "message": "Vizitați-ne [[Centrul de ajutor]]"
+   },
+   "hiddenelement": {
+      "description": "Resource list page: resource status",
+      "message": "Element ascuns"
+   },
+   "hiddenelementmessagecount": {
+      "description": "The total number of ads or 'things' hidden on a page by the new rule.",
+      "message": "$count$ elemente de pe această pagină sunt, de asemenea, ascunse temporar",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "2"
+         }
+      }
+   },
+   "hide_details": {
+      "description": "Toggle that hides the details section",
+      "message": "Ascunde Detalii"
+   },
+   "hide_newsletter_popups": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "Ascundeți pop-up-uri cu buletine informative"
+   },
+   "hide_this_button": {
+      "description": "Toolbar button menu entry to hide the AdBlock button",
+      "message": "Ascunde acest buton"
+   },
+   "how": {
+      "description": "Text of a link pointing to instructions on how to do something",
+      "message": "Cum?"
+   },
+   "how_can_we_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Cum vă putem ajuta?"
+   },
+   "ignore_survey_requests": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "Ignorați solicitările de sondaj"
+   },
+   "image_of_channel": {
+      "description": "Text in the alt attribute of an image injected into a page as part of the Image Swap feature.",
+      "message": "Imagine de $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Dogs"
+         }
+      }
+   },
+   "image_swap": {
+      "description": "Title of the Image Swap sub-tab of the Options page",
+      "message": "Schimbare cu imagini"
+   },
+   "image_swap_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Image Swap feature.",
+      "message": "Exemplu de înlocuire cu imagini"
+   },
+   "images_coming_soon": {
+      "description": "The text telling MyAdBlock active users that there will be more photos for MyAdBlock.",
+      "message": "Mai multe imagini în curând!"
+   },
+   "invalidListUrl": {
+      "description": "Message when you subscribe to a non-list URL",
+      "message": "URL de listă invalid. Va fi șters."
+   },
+   "isithidden": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": " Elementul este ascuns?"
+   },
+   "issue_unrelated_adblock": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Se pare că există o problemă cu site-ul fără legătură cu AdBlock."
+   },
+   "join_vpn_waitlist": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "Alăturați-vă listei beta pentru acces anticipat!"
+   },
+   "landscapechannelswitchlabel": {
+      "description": "The label text for the Landscape switch on the MyAdBlock Options page",
+      "message": "Peisaje"
+   },
+   "lang_arabic": {
+      "description": "Language name",
+      "message": "Arabă"
+   },
+   "lang_bulgarian": {
+      "description": "Language name",
+      "message": "Bulgară"
+   },
+   "lang_catalan": {
+      "description": "Language name",
+      "message": "Catalană"
+   },
+   "lang_chinese": {
+      "description": "Language name",
+      "message": "Chineză"
+   },
+   "lang_chinese_simplified": {
+      "description": "Language name",
+      "message": "Chineză simplificată"
+   },
+   "lang_chinese_traditional": {
+      "description": "Language name",
+      "message": "Chineză Tradițională"
+   },
+   "lang_croatian": {
+      "description": "Language name",
+      "message": "Croată"
+   },
+   "lang_czech": {
+      "description": "Language name",
+      "message": "Cehă"
+   },
+   "lang_danish": {
+      "description": "Language name",
+      "message": "Daneză"
+   },
+   "lang_dutch": {
+      "description": "Language name",
+      "message": "Olandeză"
+   },
+   "lang_english": {
+      "description": "Language name",
+      "message": "Engleză"
+   },
+   "lang_estonian": {
+      "description": "Language name",
+      "message": "Estonă"
+   },
+   "lang_finnish": {
+      "description": "Language name",
+      "message": "Finlandeză"
+   },
+   "lang_french": {
+      "description": "Language name",
+      "message": "Franceză"
+   },
+   "lang_german": {
+      "description": "Language name",
+      "message": "Germană"
+   },
+   "lang_greek": {
+      "description": "Language name",
+      "message": "Greacă"
+   },
+   "lang_hungarian": {
+      "description": "Language name",
+      "message": "Maghiară"
+   },
+   "lang_icelandic": {
+      "description": "Language name",
+      "message": "Islandeză"
+   },
+   "lang_indonesian": {
+      "description": "Language name",
+      "message": "Indoneziană"
+   },
+   "lang_israeli": {
+      "description": "Language name",
+      "message": "Ebraică"
+   },
+   "lang_italian": {
+      "description": "Language name",
+      "message": "Italiană"
+   },
+   "lang_japanese": {
+      "description": "Language name",
+      "message": "Japoneză"
+   },
+   "lang_korean": {
+      "description": "Language name",
+      "message": "Coreeană"
+   },
+   "lang_latvian": {
+      "description": "Language name",
+      "message": "Letonă"
+   },
+   "lang_lithuania": {
+      "description": "Language name",
+      "message": "Lituaniană"
+   },
+   "lang_norwegian": {
+      "description": "Language name",
+      "message": "Norvegiană"
+   },
+   "lang_polish": {
+      "description": "Language name",
+      "message": "Poloneză"
+   },
+   "lang_portuguese_brazil": {
+      "description": "Language name",
+      "message": "Portugheză (Brazilia)"
+   },
+   "lang_portuguese_portugal": {
+      "description": "Language name",
+      "message": "Portugheză (Portugalia)"
+   },
+   "lang_romanian": {
+      "description": "Language name",
+      "message": "Română"
+   },
+   "lang_russian": {
+      "description": "Language name",
+      "message": "Rusă"
+   },
+   "lang_serbian": {
+      "description": "Language name",
+      "message": "Sârbă"
+   },
+   "lang_slovak": {
+      "description": "Language name",
+      "message": "Slovacă"
+   },
+   "lang_slovenian": {
+      "description": "Language name",
+      "message": "Slovenă"
+   },
+   "lang_spanish": {
+      "description": "Language name",
+      "message": "Spaniolă"
+   },
+   "lang_swedish": {
+      "description": "Language name",
+      "message": "Suedeză"
+   },
+   "lang_turkish": {
+      "description": "Language name",
+      "message": "Turcă"
+   },
+   "lang_ukranian": {
+      "description": "Language name",
+      "message": "Ucraineană"
+   },
+   "lang_vietnamese": {
+      "description": "Language name",
+      "message": "Vietnameză"
+   },
+   "languagedropdowndescription": {
+      "description": "Dropdown list for language-specific filter lists",
+      "message": "Adăugați filtru pentru altă limbă: "
+   },
+   "learn_more": {
+      "description": "Link to Knowledge Base article with more information about the settings change",
+      "message": "Aflați mai multe."
+   },
+   "learn_more_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Poate doriți să [[aflați mai multe despre listele de filtre]]."
+   },
+   "learn_more_lower": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Aflați mai multe"
+   },
+   "learn_more_to_resolve": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Puteți [[afla mai multe aici]] ca să vă ajute la reglarea problemei."
+   },
+   "learn_more_without_period": {
+      "description": "Text in the aria-label attribute of an icon linking to extra information about an option.",
+      "message": "Află Mai Multe"
+   },
+   "leave_a_review": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "Lăsați-ne o evaluare!"
+   },
+   "legend": {
+      "description": "Resource list page: followed by color codes for various resource statuses (blocked, allowlisted, hidden)",
+      "message": "Legendă: "
+   },
+   "linkblockadbyurl": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Blocați o reclamă cu adresa sa URL"
+   },
+   "linkhidesection": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Ascundeți o secțiune de pagină"
+   },
+   "linkunblock": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Arătați reclame pe o pagină sau domeniu"
+   },
+   "loading": {
+      "description": "Generic message displayed during processes that take some time",
+      "message": "Încărcare..."
+   },
+   "loading_in_progress": {
+      "description": "Text in the aria-label attribute of an icon indicating that page is currently loading",
+      "message": "încărcare în curs"
+   },
+   "local_cdn_option": {
+      "description": "Option to let the user enable Local CDN feature.",
+      "message": "Activați caching-ul de conținut local pentru librării de site-uri populare"
+   },
+   "locked": {
+      "description": "Text in the aria-label attribute of an icon showing a feature/option is locked.",
+      "message": "Blocat"
+   },
+   "love_adblock": {
+      "description": "Text in a button that asks users to rate us.",
+      "message": "Vă place AdBlock?"
+   },
+   "mac_app_message_menu_part_one": {
+      "description": "part one of the message to safari users on the popup menu",
+      "message": "Nou!"
+   },
+   "mac_app_message_menu_part_two": {
+      "description": "part two of the message to safari users on the popup menu",
+      "message": "Încercați aplicația AdBlock Mac"
+   },
+   "mac_app_message_options": {
+      "description": "Message to users on the Options page",
+      "message": "AdBlock pentru Safari este acum disponibil ca o aplicație Mac!"
+   },
+   "make_adblock_yours_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "Controlați aspectul, percepția și talia fontului AdBlock cu controale ușor de utilizat."
+   },
+   "make_adblock_yours_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Faceți AdBlock al Dvs."
+   },
+   "manage_subscribed_channel": {
+      "description": "Entry in the AdBlock menu, only displayed when a user is browsing YouTube and has enabled the YouTube channel allow listing option",
+      "message": "Gestionare de reclame pe canalele abonate"
+   },
+   "manage_subscription": {
+      "description": "Text of link to manage the user's Premium subscription on the Premium tab of the Options page",
+      "message": "Gestionați-vă abonamentul"
+   },
+   "manualexcludefilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Editați filtre dezactivate:"
+   },
+   "manualexcludefilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Edita filtrele dezactivate"
+   },
+   "manualfilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Editați manual filtrele:"
+   },
+   "manualfilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Să vă editați manual filtrele"
+   },
+   "manualfilteredit_yt": {
+      "description": "Subtitle on the 'General' tab of AdBlock on YouTube",
+      "message": "Editați manual filtrele:"
+   },
+   "manuallyenableotherextensions": {
+      "description": "On the ad report page, alert notifying users that they will need to manually reenable the extensions",
+      "message": "Deschideți pagina de extensii pentru a activa extensiile care au fost dezactivate anterior."
+   },
+   "migration_error_message": {
+      "description": "Error when adding custom filters manually",
+      "message": "Am găsit unele erori în filtrele dvs. personalizate. Vedeți mesajele de mai jos."
+   },
+   "modifydomain": {
+      "description": "Caption for the allowlist wizard slider that modifies the domain part of a URL",
+      "message": "Site:"
+   },
+   "modifypath": {
+      "description": "Caption for the allowlist wizard slider that modifies the path part of a URL",
+      "message": "Pagina:"
+   },
+   "more_themes_coming_soon": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "Reveniți curând, mai multe teme sunt pe drum!"
+   },
+   "more_themes_on_the_way": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "Mai multe teme în curând!"
+   },
+   "myadblock_benefits_explained": {
+      "description": "Main text of the teaser MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "În schimbul susținerii noastre activând MyAdBlock, veți avea acces la cele mai recente instrumente și funcții imediat ce sunt lansate."
+   },
+   "myadblock_feedback_button": {
+      "description": "Text on the MyAdBlock feedback button",
+      "message": "Trimiteți Feedback"
+   },
+   "myadblock_feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "Pentru orice feedback și cerere de caracteristici, folosiți pagina noastră de feedback."
+   },
+   "myadblock_feedback_title": {
+      "description": "Title for MyAdBlock feedback call to action.",
+      "message": "Ne-ar place să auzim de la dvs!"
+   },
+   "myadblock_more_coming_soon": {
+      "description": "Title of the teaser MyAdBlock feature box in the MyAdBlock tab of the Options page",
+      "message": "Mai multe opțiuni în curând!"
+   },
+   "myadblock_options_page_header": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblock_page_title": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock: O manieră mai bună de a naviga pe internet."
+   },
+   "myadblock_payment_not_available_callout": {
+      "description": "The text notifying something is wrong in the payment iframe in the Options page.",
+      "message": "Vai Nu!"
+   },
+   "myadblock_payment_not_available_subtitle": {
+      "description": "The sub-title of an error message box in payment iframe in the Options page.",
+      "message": "Nu am reușit conectarea la serverele noastre"
+   },
+   "myadblock_payment_not_available_text": {
+      "description": "The text of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "Ne bucurăm că sunteți interesat de MyAdBlock! Din păcate, nu putem procesa plăți în acest moment. Vă rugăm încercați mai târziu."
+   },
+   "myadblock_payment_not_available_title": {
+      "description": "The title of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "OH NU! Nu ne-am putut conecta la serverele noastre"
+   },
+   "myadblock_pic_replacemenet_description": {
+      "description": "The text briefly describing what the feature does in the MyAdBlock tab in the option page.",
+      "message": "Înlocuiți reclamele cu imagini dragi"
+   },
+   "myadblock_picreplacement_exlained": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "Alegeți din grupurile de mai jos și AdBlock va înlocui ocazional reclame cu imagini de mare calitate care să vă facă mai fericiți."
+   },
+   "myadblock_short_description": {
+      "description": "Text substitle of myAdBlock page in the options page",
+      "message": "Folosiți un AdBlock ameliorat, cu funcții noi distractive exclusiv donatorilor"
+   },
+   "myadblock_short_description_to_pay": {
+      "description": "The text next to the 'Get It Now' button on top of the MyAdBlock Options page",
+      "message": "Veți fi un as la blocare reclame cu aceste complemente ușor de utilizat."
+   },
+   "myadblock_subscribe_invite": {
+      "description": "Text on hover of a locked MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "Abonați-vă la MyAdBlock pentru a debloca"
+   },
+   "myadblock_themes_description": {
+      "description": "Text briefly describing what themes do on the MyAdBlock tab of the Options page",
+      "message": "Schimbați aspectul AdBlock, inclusiv talie font și scheme culori"
+   },
+   "myadblockenrollment": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "Activați MyAdBlock"
+   },
+   "myadblockoptions": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblockoptionscategoryheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "Categorii"
+   },
+   "myadblockoptionspageheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "Opțiuni MyAdBlock"
+   },
+   "myadblockpicreplacementswitchlabel": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "Înlocuiți unele reclame blocate cu imagini de înaltă calitate din grupurile de mai jos"
+   },
+   "name": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock - cel mai bun blocant de reclame"
+   },
+   "name_adblock_on_youtube": {
+      "description": "Name of version of the AdBlock extension that only blocks ads on YouTube. Other strings that refer to the 'AdBlock on YouTube' extension should use this name.",
+      "message": "AdBlock pe YouTube"
+   },
+   "name_devbuild": {
+      "description": "Extension name to be shown for development builds. Note: this cannot be longer than 45 characters. Should not be translated",
+      "message": "AdBlock versiune dezvoltare"
+   },
+   "name_releasebuild": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock - cel mai bun blocant de reclame"
+   },
+   "needhelp": {
+      "description": "Subtitle on the Support tab",
+      "message": "Aveți nevoie de ajutor?"
+   },
+   "never_lose_settings": {
+      "description": "Part 2 of a call-to-action on the allowlist and blocklist wizards",
+      "message": "Aplicați setarea pe toate aparatele dvs. și vă asigurați că nu pierdeți niciodată setările AdBlock cu Backup & Sincronizare."
+   },
+   "new_badge": {
+      "description": "Max 4 characters. If it's not possible to translate in four characters or less, please don't translate. Text in the badge of our extension toolbar icon.",
+      "message": "Nou"
+   },
+   "new_cta_default_text": {
+      "description": "Text of a temporary call-to-action item in the popup menu.",
+      "message": "Actualizați AdBlock"
+   },
+   "new_cta_hovered_text": {
+      "description": "Text of a temporary call-to-action hovered item in the popup menu.",
+      "message": "Bucurați-vă de o navigare mai bună"
+   },
+   "new_myadblock_feature_available": {
+      "description": "The text in the popup menu item saying there is a new MyAdBlock feature and takes you to the MyAdBlock tab in the option page.",
+      "message": "Deblocați funcții noi clicând aici!"
+   },
+   "new_resourcelist_explanation_osx": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Mac)",
+      "message": "Ca să afișați toate cererile, cu clic dreapta pe pagină alegeți 'Inspecție' (Option+Cmd+I), apoi fila 'AdBlock'."
+   },
+   "new_resourcelist_explanation_win": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Windows)",
+      "message": "Ca să afișați toate cererile, cu clic dreapta pe pagină, alegeți 'Inspecție' (Ctrl+Shift+I), apoi fila 'AdBlock'.."
+   },
+   "newmyadblockenrollment": {
+      "description": "The text of the 'Enable MyAdBlock' menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "NOU"
+   },
+   "no": {
+      "description": "A negative response to a question",
+      "message": "Nu"
+   },
+   "no_changes_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Nu vom schimba nimic, așa că veți continua să vedeți reclame."
+   },
+   "no_data_msg_part_I": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "Actual nu aveți nicio statistică de blocări pentru afișare."
+   },
+   "no_data_msg_part_II": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "Actualizați pagina după navigarea pe web și veți începe a vedea statistici de blocare."
+   },
+   "no_data_title": {
+      "description": "title text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "Nicio Statistică"
+   },
+   "nodefaultfilter1": {
+      "description": "Instructions on ad report page pointing users to EasyList subscriptions list.",
+      "message": "Nu avem o listă de filtre implicită a acestei limbi.\nVă rugăm [[să găsiți o listă adecvată ce acceptă această limbă]] sau blocați această reclamă manual în meniul AdBlock."
+   },
+   "noresourcessend2": {
+      "description": "Resource list page: error message",
+      "message": "Ceva a mers rău. Nu s-a trimis nicio resursă. Pagină va fi închisă acum. Încercați să reîncărcarea site-ului."
+   },
+   "note": {
+      "description": "Indicates that the user should take note of the message that follows.",
+      "message": "NOTĂ:"
+   },
+   "notification_antiadblock_message": {
+      "message": "Acest site e cunoscut pentru a afișa mesajele vizate utilizatorilor AdBlock. Doriți ca AdBlock să ascundă mesajele vizate?"
+   },
+   "notification_antiadblock_title": {
+      "message": "Ascundeți mesajele vizate?"
+   },
+   "ocean_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Ocean"
+   },
+   "oceanchannelswitchlabel": {
+      "description": "The label text for the Ocean switch on the MyAdBlock Options page",
+      "message": "Ocean"
+   },
+   "ok": {
+      "description": "Message for help flow in popup menu.",
+      "message": "OK"
+   },
+   "once": {
+      "description": "The button text on the popup menu",
+      "message": "O data"
+   },
+   "only_block_ads_on_these_sites": {
+      "description": "Label for textbox where user enters a list of sites on Customize tab",
+      "message": "Blocați reclame doar pe aceste site-uri:"
+   },
+   "onpage_messages": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Permite AdBlock să-mi arate numai mesaje relevante pe site-uri."
+   },
+   "open_allowlist_wizard": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "Mai multe opțiuni de pauză"
+   },
+   "operabutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Opera displays on the Extensions page.",
+      "message": "Pentru a ascunde butonul, accesați opera://extensions și bifați opțiunea  'Ascunde-l din Bara de instrumente'. \nPoate fi reafișat prin debifarea acestei opțiuni."
+   },
+   "opt_out_stats_data": {
+      "description": "text related to the opt out data collection checkbox on the statistics page of the Options page",
+      "message": "Nu colectează statisticile de blocări viitoare"
+   },
+   "options": {
+      "description": "The text of the link on chrome://chrome/extensions that takes you to the Options page",
+      "message": "Opțiuni"
+   },
+   "options_page": {
+      "description": "General text used to define the extension options page.",
+      "message": "pagina de opțiuni"
+   },
+   "options_page_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "Tema Paginii de Opțiuni"
+   },
+   "optionstitle": {
+      "description": "Title for the Options page",
+      "message": "Opțiuni AdBlock"
+   },
+   "optionstitle_yt": {
+      "description": "Title for the Options page for the 'AdBlock on YouTube' extension.",
+      "message": "Opțiuni AdBlock pe YouTube"
+   },
+   "optionsversion": {
+      "description": "Version number",
+      "message": "Versiunea $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "3.9.2"
+         }
+      }
+   },
+   "orenteraurl": {
+      "description": "Text box to enter a link to a custom filter list",
+      "message": "Sau introduceți un URL:"
+   },
+   "other": {
+      "description": "Multiple choice option",
+      "message": "Alte"
+   },
+   "otherfilters": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block other elements that are not ads.",
+      "message": "Alte Filtre"
+   },
+   "overlay_notification_button_no": {
+      "message": "Nu"
+   },
+   "overlay_notification_button_yes": {
+      "message": "Da"
+   },
+   "page_is_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Această pagină este pe lista de permisiuni de aceea vedeți o reclamă."
+   },
+   "page_not_whitelisted": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Această pagină nu este în lista de permisiuni."
+   },
+   "pagelanguagecheck": {
+      "description": "Question on ad report page",
+      "message": "În ce limbă este scrisă pagina?"
+   },
+   "parent_menu_item_site": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "Blocări după site"
+   },
+   "parent_menu_item_time": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "Blocări în timp"
+   },
+   "pause_adblock": {
+      "description": "Menu entry to pause AdBlock (stop blocking ads)",
+      "message": "Întrerupe AdBlock"
+   },
+   "pause_adblock_everywhere": {
+      "description": "Menu entry to pause AdBlock everywhere (stop blocking ads)",
+      "message": "În pauză peste tot"
+   },
+   "pause_adblocking": {
+      "description": "Menu entry to pause the extension (stop blocking ads)",
+      "message": "Suspendați blocarea de pub"
+   },
+   "pause_on_all_sites": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "Întrerupeți pe orice site."
+   },
+   "pause_on_this_site": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on this site. This will be followed by the options 'Once' and 'Always'",
+      "message": "Întrerupeți pe acest site:"
+   },
+   "paused_not_blocking": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock este acum în pauză, deci nu blocăm nicio reclamă."
+   },
+   "paused_site_issue": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock este acum în pauză, deci se pare că există o problemă cu site-ul fără legătură cu AdBlock."
+   },
+   "personalize_experience": {
+      "description": "Description of Image Swap on the main Premium options page",
+      "message": "Personalizați-vă experiența navigării și obțineți și mai mult de la AdBlock pentru $browser$.",
+      "placeholders": {
+         "browser": {
+            "content": "$1",
+            "example": "Chrome"
+         }
+      }
+   },
+   "popup_menu": {
+      "description": "General text used to define the pop-up menu.",
+      "message": "meniu pop-up"
+   },
+   "popup_menu_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "Temă Meniu Pop-up"
+   },
+   "popup_menu_title": {
+      "description": "Title for the popup menu.",
+      "message": "Meniu pop-up AdBlock"
+   },
+   "popups_disable_adblock": {
+      "description": "Description of Bypass Mode on the main Premium options page",
+      "message": "Pop-up-urile care necesită dezactivarea AdBlock devin din ce în ce mai frecvente pe web."
+   },
+   "premium": {
+      "description": "Abbreviated name of the AdBlock upgrade.",
+      "message": "Premium"
+   },
+   "premium_access_without_disabling": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Funcțiile noi din AdBlock Premium, facilitează accesul la conținutul pe care îl iubiți, fără a dezactiva AdBlock."
+   },
+   "premium_benefits_explained": {
+      "description": "Main text of the teaser AdBlock Premium feature in the AdBlock Premium tab of the Options page",
+      "message": "În schimbul susținerii noastre prin activarea AdBlock Premium, veți avea acces la cele mai recente unelte și funcții de cum sunt lansate."
+   },
+   "premium_cta_button_text": {
+      "description": "button text on the statistics page of the Options page in the image swap panel",
+      "message": "Obțineți Premium"
+   },
+   "premium_cta_button_text_not_enabled": {
+      "description": "button text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "Activați"
+   },
+   "premium_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel",
+      "message": "Deblocați înlocuirea cu imagini și multe altele cu Premium."
+   },
+   "premium_cta_msg_not_enabled": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "Se pare că nu ați activat înlocuirea de imagini."
+   },
+   "premium_page_title": {
+      "description": "The text of the header the AdBlock Premium Options page",
+      "message": "AdBlock Premium: O manieră mai bună de a naviga pe internet."
+   },
+   "premium_status_msg": {
+      "description": "Message shown on the premium tab of the options page when the user is a licensed premium user",
+      "message": "Susținător Din $date$",
+      "placeholders": {
+         "date": {
+            "content": "$1",
+            "example": "January 2020"
+         }
+      }
+   },
+   "premium_status_short_msg": {
+      "description": "Message shown on the premium tab of the option page when user is a licensed premium user",
+      "message": "Activ"
+   },
+   "prevent_videos": {
+      "description": "Description of 'stop autoplay videos' on the distraction control options page",
+      "message": "Împiedică redarea automată a videoclipurilor și oprește videoclipurile 'flotante' să vă urmărească în timp ce navigați."
+   },
+   "preview_a_theme": {
+      "description": "Text in the aria-label attribute of an icon indicating that clicking will show the preview image of a theme on an extension page.",
+      "message": "Previzualizarea temei $theme_name$ pentru $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "options page"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "preview_channel_image": {
+      "description": "Text in the alt attribute of an image previewed as part of the Image Swap feature.",
+      "message": "Previzualizare imagine de $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Cats"
+         }
+      }
+   },
+   "privacy_policy": {
+      "description": "Link to AdBlock's privacy policy",
+      "message": "Politica Intimității"
+   },
+   "problem_solved": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Excelent! Problemă rezolvată."
+   },
+   "pwyw": {
+      "description": "Text of a payment request link",
+      "message": "Plătiți ceea ce doriți!"
+   },
+   "pwyw2": {
+      "description": "Text of a payment request link",
+      "message": "Plătiți Cât Doriți!"
+   },
+   "rate_us": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "Evaluați-ne"
+   },
+   "rebecca_purple_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Violet Rebecca"
+   },
+   "reenableadsonebyone": {
+      "description": "Tells the user to re-enable the extensions one by one",
+      "message": "Excelent! Acum, să aflăm care extensie este cauza. Mergeți și activați fiecare extensie una câte una. Extensia care aduce înapoi reclamele este cea care trebuie dezinstalată pentru a elimina reclamele."
+   },
+   "refusetocheck": {
+      "description": "User is telling us they don't wish to investigate something for us",
+      "message": "Nu doresc să încerc asta"
+   },
+   "reload_not_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Reîncărcați pagina și nu veți mai vedea această reclamă!"
+   },
+   "reload_the_page": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Reîncărcați pagina"
+   },
+   "reload_when_ready": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Clicați mai jos pentru a reîncărca pagina când sunteți gata."
+   },
+   "reloadadpage": {
+      "description": "Instruction on ad report page",
+      "message": "Reîncărcați pagina cu reclama."
+   },
+   "reloadpageafterwhitelist": {
+      "description": "Checkbox in the allowlist wizard",
+      "message": "Reîncărcați pagina."
+   },
+   "remove_image": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Șterge Imaginea"
+   },
+   "remove_image_msg": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Sunteți sigur că vreți să ștergeți această imagine?"
+   },
+   "removed_url": {
+      "description": "Message for help flow in popup menu.",
+      "message": "OK! Am eliminat URL-ul din lista de permisiuni."
+   },
+   "removefromlist": {
+      "description": "Label to remove a custom filter list",
+      "message": "Șterge din listă"
+   },
+   "report_ad_on_page": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "Raportați o reclamă pe această pagină"
+   },
+   "reportfilterlistproblem": {
+      "description": "Telling the user to report an ad to a filter list maintainer",
+      "message": "Aceasta este o problemă de filtru. Reportați-o aici: $link$",
+      "placeholders": {
+         "link": {
+            "content": "[[]]",
+            "example": "The link could point to a filter list's forum, or to the email address of a filter list maintainer. For example, forums.lanik.us or someguy@list.com."
+         }
+      }
+   },
+   "reportpubliclyavailable": {
+      "description": "Ad report page string, when you're about to submit a report.",
+      "message": "Notă: raportul dvs. poate deveni accesibil publicului. Gândiți-vă la aceasta înainte de a include ceva privat."
+   },
+   "require_restart_browser": {
+      "description": "Text displayed within an option to notify users to restart the browser to fully enable the option",
+      "message": "necesită repornirea navigatorului"
+   },
+   "resourceblocktitle": {
+      "description": "Resource list page name",
+      "message": "Toate Resursele"
+   },
+   "resourcedomain": {
+      "description": "Resource list page: text shown when hovering over an item in the third-party column",
+      "message": "Încărcat pe pagina cu domeniul:\n$domain$",
+      "placeholders": {
+         "domain": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "resume_blocking_ads": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site' or 'AdBlock is paused on all sites'",
+      "message": "Reluați blocarea de pub"
+   },
+   "resume_blocking_ads_period": {
+      "description": "First sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "Reluați blocarea de pub"
+   },
+   "resume_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Vreți să reluați blocarea de pub și să reîncărcați pagina?"
+   },
+   "retryaftersubscribe": {
+      "description": "Instructions on ad report page telling users to subscribe to a filter list and then check again to see whether the ad exists",
+      "message": "Adăugați acest filtru, iar apoi încearcă din nou: $list_title$",
+      "placeholders": {
+         "list_title": {
+            "content": "$1",
+            "example": "French"
+         }
+      }
+   },
+   "safaributton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Customize Toolbar' should match the text that Safari displays in the toolbar's context menu.",
+      "message": "Pentru a ascunde butonul: dați clic dreapta pe bara de instrumente Safari și alegeți Personalizare Bară de Instrumente, apoi trageți afară de pe bară butonul AdBlock.\nPentru a-l reafișa, trageți butonul înapoi pe bară."
+   },
+   "safaricontentblocking": {
+      "description": "Checkbox on the 'General' tab of the Options page. 'Content Blocking' is the name of a different way of blocking resources introduced in Safari 9.",
+      "message": "Permite blocarea conținutului Safari"
+   },
+   "safaricontentblockinglimitexceeded": {
+      "description": "Displayed when the number of rules in the subscribed filter lists is larger than the number supported by Safari Content Blocking, if that option is enabled.",
+      "message": "S-a depășit limita de 50.000 de reguli a listei de filtre și au fost reduse automat. Vă rog dezabonați-vă de la unele liste de filtre sau dezactivați Blocare Conținut Safari!"
+   },
+   "safaricontentblockingpausemessage": {
+      "description": "Alert displayed after clicking 'Pause AdBlock' in the AdBlock menu while Safari Content blocking is enabled.",
+      "message": "Puneți în pauză AdBlock cu Blocarea de Conținut activată, alegând Safari (în bara de meniu) > Preferințe > Extensii > AdBlock și debifați 'Activare AdBlock'."
+   },
+   "safarinotificationbody": {
+      "description": "Body of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "Dezactivați câteva liste de filtre. Aflați mai multe în Opțiuni AdBlock."
+   },
+   "safarinotificationtitle": {
+      "description": "Title of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "Limita de reguli de Blocare Conținut depășită"
+   },
+   "save_custom_settings_cta": {
+      "description": "Part 1 of a Premium call-to-action on the Options page",
+      "message": "Vreți să salvați setările adaptate de blocare pub și să le folosiți în fiecare browser?"
+   },
+   "save_settings_multiple": {
+      "description": "Sub-header describing Backup & Sync on the main Premium options page",
+      "message": "Salvați setările AdBlock pe mai multe dispozitive"
+   },
+   "savebutton": {
+      "description": "Save button",
+      "message": "Salvează"
+   },
+   "savereminder": {
+      "description": "Reminder to click 'Save'",
+      "message": "Nu uita să salvezi!"
+   },
+   "see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Văd o reclamă"
+   },
+   "see_ad_everywhere": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Văd acest anunț peste tot"
+   },
+   "see_fewer_walls": {
+      "description": "Sub-header describing Bypass Mode on the main Premium options page",
+      "message": "Vedeți mai puține ziduri anti-AdBlock"
+   },
+   "see_photos_no_ads_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "Vom bloca mai departe reclame, dar vom înlocui unele cu imagini frumoase de pisici, câini și natură."
+   },
+   "see_photos_no_ads_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Vedeți Fotografii, Nu Reclame"
+   },
+   "selected": {
+      "description": "Text in the aria-label attribute of an icon showing an option is selected.",
+      "message": "Selectat"
+   },
+   "selectlanguage": {
+      "description": "First option in the language dropdown menu on the Filter lists tab. Include the ' -- ' on either side of your translation.",
+      "message": "-- Alegeți Limba --"
+   },
+   "selectlanguage2": {
+      "description": "First option in the language dropdown menu on the Filter lists tab.",
+      "message": "selectați limba"
+   },
+   "senddebugdata": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "Trimite Date de Depanare"
+   },
+   "set_preferences_once": {
+      "description": "Description of Sync on Sync tab",
+      "message": "Setați o dată preferințele și nu vă mai îngrijiți de pierderi de date sau schimbări identice pe multiple extensii."
+   },
+   "set_up_once": {
+      "description": "Description of Backup & Sync on the main Premium options page",
+      "message": "Setați AdBlock o dată și luați setările cu dvs!"
+   },
+   "settings": {
+      "description": "Text in the aria-label attribute of the gear icon on the pop-up menu.",
+      "message": "Setări"
+   },
+   "settings_changed": {
+      "description": "Part of Options page message letting users know of settings change.",
+      "message": "În pregătire, AdBlock lucrează altfel și unele din setările dvs. poate că s-au schimbat."
+   },
+   "show_ads_except_for": {
+      "description": "Section title for the allowlisting section of Customize tab",
+      "message": "Arătați reclame peste tot cu excepția acestor domenii..."
+   },
+   "show_details": {
+      "description": "Toggle that shows the details section",
+      "message": "Arată Detalii"
+   },
+   "show_devtools_panel": {
+      "description": "Checkbox letting user choose whether the AdBlock tab should be displayed in the developer tools window",
+      "message": "Arată panoul 'AdBlock' în instrumente dezvoltatori"
+   },
+   "show_language_options": {
+      "description": "Option to let the user choose AdBlock's display language.",
+      "message": "Lăsați-mă să aleg limba de afișare AdBlock"
+   },
+   "show_on_adblock_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "Arată numărul de reclame blocate pe butonul AdBlock"
+   },
+   "show_on_adblock_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "Arată numărul de reclame blocate în meniul AdBlock"
+   },
+   "show_on_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "Arată numărul de reclame blocate pe buton"
+   },
+   "show_on_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "Arată numărul de reclame blocate în meniu"
+   },
+   "show_resourcelist": {
+      "description": "Menu entry to open the resource list page",
+      "message": "Arată toate cererile"
+   },
+   "show_some_love": {
+      "description": "Title of the tooltip of the rate us button CTA in the Options page.",
+      "message": "Arătați AdBlock ceva iubire!"
+   },
+   "showcontextmenus2": {
+      "description": "Checkbox on the 'General' tab of the Options page.",
+      "message": "Adăugați elemente la meniul clic dreapta"
+   },
+   "showlinkstolists2": {
+      "description": "Label to display filter list links",
+      "message": "Arată linkurile către listele de filtre"
+   },
+   "sliderexplanation": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "Dacă nu, utilizați cursorul pentru a ascunde elemente adiționale pe această pagină:"
+   },
+   "slidertitle": {
+      "description": "'Block an ad' wizard title",
+      "message": "Pasul 1: Găsiți ce vreți să blocați"
+   },
+   "sliderwarning": {
+      "description": "'Block an ad' wizard usage explanation",
+      "message": "Aveți grijă, ascunderea prea multor elemente pe o pagină, poate rupe anumite funcționalități"
+   },
+   "slows_down_extension": {
+      "description": "Text of an option telling users that the option slows down the extension",
+      "message": "încetinește extensia"
+   },
+   "solarized_light_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Salarizat Luminos"
+   },
+   "solarized_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Solarizat"
+   },
+   "something_else_going_on": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Hmm, altceva trebuie să se întâmple."
+   },
+   "something_not_working": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Hmm, Ceva nu funcționează."
+   },
+   "sourcecode": {
+      "description": "Link to the source code of AdBlock on the Support tab",
+      "message": "Consultați [[codul sursă]]"
+   },
+   "stats": {
+      "description": "Title of the statistics (metrics) tab of the Options page",
+      "message": "Statistici"
+   },
+   "stats_ads_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Reclame Blocate"
+   },
+   "stats_ads_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Număr de Reclame Blocate"
+   },
+   "stats_already_opted": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Ați optat deja să ne împărtășiți datele anonime de utilizare."
+   },
+   "stats_go_back_text_button": {
+      "description": "button text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "Înapoi"
+   },
+   "stats_hide_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "Ascunde Statistici"
+   },
+   "stats_im_sure_text_button": {
+      "description": "button text on page 2 of delete modal box on the statistics page of the Options page",
+      "message": "Sunt sigur"
+   },
+   "stats_opt_in_data_collect": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Ajutați-ne să ameliorăm AdBlock partajând [[date de utilizare anonime]]"
+   },
+   "stats_opt_in_header": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Vreți să vă vedeți statisticile AdBlock? "
+   },
+   "stats_opt_in_local_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Optați colectarea de date locale pentru a vedea statisticile dvs. AdBlock, ca site-uri cu cele mai multe reclame și trackere blocate, total blocări în timp și imagini schimbate utilizatorilor Premium."
+   },
+   "stats_opt_in_local_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Optați în colecția locală de statistici"
+   },
+   "stats_opt_in_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Optați colectarea de date locale pentru a vedea statisticile dvs. AdBlock, ca site-uri cu cele mai multe reclame și trackere blocate, total blocări în timp și imagini schimbate utilizatorilor Premium."
+   },
+   "stats_opt_in_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Permiteți"
+   },
+   "stats_replaced_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Imagini Schimbate"
+   },
+   "stats_replaced_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Număr de Imagini Schimbate"
+   },
+   "stats_show_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "Arată Statistici"
+   },
+   "stats_trackers_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Trackere Blocate"
+   },
+   "stats_trackers_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Număr de Trackere Blocate"
+   },
+   "statstitle": {
+      "description": "On page title of the statistics page of the Options page",
+      "message": "Tablou de Bord Statistici"
+   },
+   "status_allowlisted": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a page or website",
+      "message": "Ați configurat AdBlock să rămână întrerupt pe acest site la fiecare vizită."
+   },
+   "status_domain_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on a specific domain",
+      "message": "AdBlock este întrerupt pentru această vizită. Poate fi necesar să reîmprospătați pagina pentru a vedea modificările."
+   },
+   "status_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running",
+      "message": "AdBlock este în pauză."
+   },
+   "status_universal_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on all domains",
+      "message": "AdBlock este în pauză peste tot."
+   },
+   "stay_tuned": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "Stați pe recepție"
+   },
+   "still_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Încă mai vedeți reclama?"
+   },
+   "stop_autoplay_videos": {
+      "description": "Sub-header on the distraction control options page",
+      "message": "Opriți videoclipurile cu redare automate"
+   },
+   "stop_blocking_ads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Opriți blocarea reclamelor:"
+   },
+   "stop_blocking_ads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Opri blocarea de reclame"
+   },
+   "storage_quota_exceeded": {
+      "description": "Message shown when the user uses more storage than allowed by the browser.",
+      "message": "Ați depășit spațiul de stocare pe care AdBlock îl poate folosi. Vă rugăm ștergeți câteva filtre!"
+   },
+   "sub_menu_item_all": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Tot Timpul"
+   },
+   "sub_menu_item_month": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Luna Aceasta"
+   },
+   "sub_menu_item_today": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Azi"
+   },
+   "sub_menu_item_week": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Săptămâna Aceasta"
+   },
+   "sub_menu_item_year": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Anul Acesta"
+   },
+   "subframe": {
+      "description": "Resource list page: frame type",
+      "message": "Sub-cadru"
+   },
+   "subscribebutton": {
+      "description": "Subscribe to a filter list button",
+      "message": "Adăugați"
+   },
+   "subscribeconfirm": {
+      "description": "Prompt question before subscribing to a filter list",
+      "message": "Sunteți sigur că doriți să vă abonați la lista de filtrare $title$?",
+      "placeholders": {
+         "title": {
+            "content": "$1",
+            "example": "Prebake"
+         }
+      }
+   },
+   "subscribingfailed": {
+      "description": "abp: link subscriber unsuccessful result",
+      "message": "Eșec!"
+   },
+   "subscribingfinished": {
+      "description": "abp: link subscriber successful result",
+      "message": "Terminat!"
+   },
+   "subscribingtitle": {
+      "description": "abp: link subscriber title",
+      "message": "Se adaugă filtrul..."
+   },
+   "success": {
+      "description": "Text in the aria-label attribute of an icon indicating successful results.",
+      "message": "Succes"
+   },
+   "successfully_whitelisted": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "Ați adăugat cu succes acest URL în lista de permisiuni."
+   },
+   "sunshine_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Însorit"
+   },
+   "support_to_unlock": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "Susțineți pentru a debloca"
+   },
+   "support_with_a_review": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "Sprijiniți-ne echipa lăsând o evaluare."
+   },
+   "supportsite": {
+      "description": "Link to the support site on the Support tab",
+      "message": "Aduceți-ne la cunoștință pe [[site-ul de suport]]!"
+   },
+   "swap_ads_for_images": {
+      "description": "Sub-header describing Image Swap on the main Premium options page",
+      "message": "Schimbați reclame pentru imagini "
+   },
+   "sync_delete_panel_title": {
+      "description": "Panel title text on the delete device overlay",
+      "message": "Ștergeți extensia sincronizată"
+   },
+   "sync_device_name_list_updated_at_msg": {
+      "description": "message to users on when the sync page was last updated with the name of the extensions / devices (displayed in locale specific format)",
+      "message": "ultima actualizare: $timestamp$",
+      "placeholders": {
+         "timestamp": {
+            "content": "$1",
+            "example": "April 30, 2019 6:25 pm for US/English locale"
+         }
+      }
+   },
+   "sync_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Sync feature.",
+      "message": "Exemplu de sincronizare"
+   },
+   "sync_extension_name_placeholder": {
+      "description": "placeholder text in the extension / device name field on the sync page",
+      "message": "Numiți această extensie ca s-o puteți deosebi de celelalte..."
+   },
+   "sync_extension_no_extension_msg": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "Nu aveți extensii sincronizate."
+   },
+   "sync_extension_section_title": {
+      "description": "section title text on the Sync sub-tab of the Options page",
+      "message": "Extensii"
+   },
+   "sync_header_error_save_message_part_2": {
+      "description": "part 2 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "Această extensie nu este sincronizată."
+   },
+   "sync_header_error_save_message_part_3": {
+      "description": "part 3 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "Încercați sincronizarea manuală mai târziu."
+   },
+   "sync_header_message_error_prefix": {
+      "description": "Start of an sync error message to users on the Options page or AdBlock popup menu.",
+      "message": "Această extensie nu a fost sincronizată."
+   },
+   "sync_header_message_getting_license": {
+      "description": "message to users on the sync page when the extension is getting the license",
+      "message": "se verifică ..."
+   },
+   "sync_header_message_in_progress": {
+      "description": "message to users on the options pages when syncing with the server is in progress",
+      "message": "Sincronizare în progres…"
+   },
+   "sync_header_message_no_license": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "Așteptați puțin, cât timp pregătim Sincronizarea pentru dvs."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_2": {
+      "description": "part 2 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Am sincronizat această extensie și vom anula modificările."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Vă rugăm să copiați regulile adaptate în clipboard, reîncărcați pagina și efectuați din nou modificările."
+   },
+   "sync_header_message_old_commit_version_part_2": {
+      "description": "part 2 of a message to users on the sync page and popup menu when initial setup of sync fails for some unknown reason.",
+      "message": "Am sincronizat această extensie și v-am anulat modificările."
+   },
+   "sync_header_message_old_commit_version_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Reîncărcați pagina și faceți din nou modificările."
+   },
+   "sync_header_message_setup_fail_part_2": {
+      "description": "message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Vă rugăm să reîncercați adăugarea acestei extensii în câteva minute."
+   },
+   "sync_header_message_setup_fail_prefix": {
+      "description": "start of error message to users on the sync page when sync fails.",
+      "message": "Sincronizare eronată:"
+   },
+   "sync_header_message_sync_complete": {
+      "description": "message to users on the option pages when syncing with the server server is complete",
+      "message": "Sincronizare completă"
+   },
+   "sync_message_old_version_part_1": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Folosiți o versiune veche de AdBlock."
+   },
+   "sync_message_old_version_part_2": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Vă rugăm [[actualizați AdBlock]] pentru a vă sincroniza setările."
+   },
+   "sync_now_btn_text": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Sincronizați!"
+   },
+   "sync_premium_cta": {
+      "description": "AdBlock Premium CTA on the Sync tab",
+      "message": "Cu funcții Premium ca Sincronizarea veți fi un pro la blocare reclame."
+   },
+   "sync_removed_error_msg_part_1": {
+      "description": "sync error message text on the popup menu",
+      "message": "Această extensie nu este sincronizată."
+   },
+   "sync_removed_error_msg_part_2": {
+      "description": "sync error message text on the popup menu and options page",
+      "message": "Faceți clic aici pentru a vă actualiza setările"
+   },
+   "sync_tab_item": {
+      "description": "Title of the Sync sub-tab of the Options page",
+      "message": "Backup & Sincronizare"
+   },
+   "sync_turn_on_duplicate_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "Acest nume de extensie este deja în uz"
+   },
+   "sync_turn_on_invalid_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "Vă rugăm numiți extensia pentru a continua"
+   },
+   "sync_verify_turn_on_text": {
+      "description": "message text in the extension / device name field on the sync page",
+      "message": "Activarea Backup & Sincronizare va șterge actualele informații de setări din această extensie."
+   },
+   "sync_your_settings_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "Luați cu dvs. regulile și setările personalizate de blocare a reclamelor pe orice computer folosiți."
+   },
+   "sync_your_settings_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Sincronizați-vă Setările"
+   },
+   "tabcustomize": {
+      "description": "A tab on the Options page",
+      "message": "Personalizează"
+   },
+   "tabcustomizetitle": {
+      "description": "Title of the Customize tab of the Options page",
+      "message": "Personalizare AdBlock"
+   },
+   "tabfilterlists": {
+      "description": "A tab on the Options page",
+      "message": "Liste de filtre"
+   },
+   "tabgeneral": {
+      "description": "A tab on the Options page",
+      "message": "General"
+   },
+   "tabreloadcomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "Terminat! Am reîncărcat pagina cu reclama. Vedeți dacă reclama de pe acea pagină a dispărut. Apoi reveniți aici și răspundeți la întrebarea de mai jos."
+   },
+   "tabsupport": {
+      "description": "A tab on the Options page",
+      "message": "Asistență"
+   },
+   "tabtranslations": {
+      "description": "A tab on the Options page",
+      "message": "Traduceri"
+   },
+   "take_control": {
+      "description": "Description of the distraction control option",
+      "message": "Preluați controlul browserului dvs. și navigați așa cum doriți!"
+   },
+   "take_control_easy": {
+      "description": "Description of Themes on the main Premium options page",
+      "message": "Luați controlul aspectului, senzației și taliei fontului AdBlock cu controale ușor de folosit. Faceți-vă AdBloc personal!"
+   },
+   "take_custom_with_you": {
+      "description": "Description of Backup & Sync on the main Premium options page",
+      "message": "Vă preia regulile de blocare a anunțurilor personalizate, abonamentele la lista de filtre și lista albă în toate profilurile dvs. Chrome."
+   },
+   "text_body": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 22 characters)",
+      "message": "corp text"
+   },
+   "thanks": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Mulțumim"
+   },
+   "themes": {
+      "description": "Title of the Themes tab of the Options page",
+      "message": "Teme"
+   },
+   "thirdparty": {
+      "description": "Resource list page: column title telling if the resource originates from a different domain",
+      "message": "Părți terțe"
+   },
+   "this_extension": {
+      "description": "description for name of the current extension",
+      "message": "(această extensie)"
+   },
+   "topframe": {
+      "description": "Resource list page: frame type",
+      "message": "Cadru superior"
+   },
+   "trackers_button_text": {
+      "description": "button text on the statistics page of the Options page in the trackers panel",
+      "message": "Activați"
+   },
+   "trackers_cta_header": {
+      "description": "Header text on the statistics page of the Options page in the trackers panel",
+      "message": "Trackere"
+   },
+   "trackers_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the trackers panel",
+      "message": "Activați [[lista de filtre Easy Privacy]] pentru a începe blocarea de trackere"
+   },
+   "translator_credit": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "Credit la traducere se acordă lui:"
+   },
+   "translator_credit2": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "Credit la traducere se atribuie lui..."
+   },
+   "translators": {
+      "description": "A link on the Options page / translators tab to a KB article about how to help translate AdBlock",
+      "message": "Aflați [[aici]] cum puteți ajuta traducerea AdBlock"
+   },
+   "troubleshoot_an_ad": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "Depanare cu o reclamă"
+   },
+   "try_backup_sync": {
+      "description": "Part 2 of a Premium call-to-action on the Options page",
+      "message": "Dacă da, încercați funcția noastră Backup & Sincronizare"
+   },
+   "try_manual_update": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Încercați vă rog să [[actualizați manual listele de filtre]]."
+   },
+   "try_pausing": {
+      "description": "Message for help flow in popup menu.",
+      "message": "OK, să încercăm să întrerupem AdBlock."
+   },
+   "typehiding": {
+      "description": "A resource type",
+      "message": "ascuns"
+   },
+   "typeimage": {
+      "description": "A resource type",
+      "message": "imagine"
+   },
+   "typemain_frame": {
+      "description": "A resource type",
+      "message": "pagină"
+   },
+   "typemedia": {
+      "description": "A resource type",
+      "message": "audio/video"
+   },
+   "typeobject": {
+      "description": "A resource type",
+      "message": "obiect interactiv"
+   },
+   "typeobject_subrequest": {
+      "description": "A resource type",
+      "message": "obiect-subsolicitare"
+   },
+   "typeother": {
+      "description": "A resource type",
+      "message": "altele"
+   },
+   "typepage": {
+      "description": "A resource type",
+      "message": "pagină"
+   },
+   "typepopup": {
+      "description": "A resource type",
+      "message": "pop-up"
+   },
+   "typescript": {
+      "description": "A resource type",
+      "message": "script"
+   },
+   "typeselector": {
+      "description": "A resource type",
+      "message": "selector"
+   },
+   "typestylesheet": {
+      "description": "A resource type",
+      "message": "definire de stil"
+   },
+   "typesub_frame": {
+      "description": "A resource type",
+      "message": "cadru"
+   },
+   "typesubdocument": {
+      "description": "A resource type",
+      "message": "cadru"
+   },
+   "typeunknown": {
+      "description": "A resource type",
+      "message": "necunoscut"
+   },
+   "typewebsocket": {
+      "description": "A resource type",
+      "message": "websocket"
+   },
+   "typexmlhttprequest": {
+      "description": "A resource type",
+      "message": "XMLHttpRequest"
+   },
+   "undo_last_block": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "Anulați-mi blocajele pe acest domeniu"
+   },
+   "undo_last_block_site": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "Anulează ascunderea elementelor mele"
+   },
+   "unexpected_filter_list_header": {
+      "description": "Error message shown when the user attempts to add a custom filter that has the format of a header (e.g. \"[Adblock Plus 2.0]\") which are only allowed in filter lists",
+      "message": "Anteturi de liste de filtru nepermise aici"
+   },
+   "unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused'",
+      "message": "Reluați AdBlock"
+   },
+   "unpause_adblocking": {
+      "description": "Menu entry to unpause the extension (start blocking ads again)",
+      "message": "Reluați blocarea reclamelor"
+   },
+   "unpaused_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Doar ce am repornit AdBlock și am reîncărcat pagina."
+   },
+   "unsubscribe_from_all_confirmation": {
+      "description": "Confirmation message shown to user if they try to unsubscribe from all filter lists. The user will have two options: OK and Cancel.",
+      "message": "AdBlock nu va bloca reclame dacă dezactivați toate filtrele. Vă sugerăm să întrerupeți AdBlock în schimb. Vă dezabonați de la această listă oricum?"
+   },
+   "unsubscribedlabel": {
+      "description": "Status label when unselecting a filter list",
+      "message": "Dezabonat."
+   },
+   "unsync_error_msg_part_1": {
+      "description": "sync error message text on the options menu",
+      "message": "Eroare de sincronizare"
+   },
+   "unsync_error_msg_part_2": {
+      "description": "sync error message text on the popup menu",
+      "message": "Această extensie nu mai este sincronizată."
+   },
+   "unsync_error_msg_part_3": {
+      "description": "sync error message text on the Sync tab of the options page",
+      "message": "Faceți clic aici pentru a reîmprospăta această pagină, apoi faceți clic pe \"Adăugați această extensie\" pentru a sincroniza acest dispozitiv"
+   },
+   "update_filter_lists_now": {
+      "description": "Text in the aria-label attribute of the 'update now' button on the Options page in the Filter Lists tab.",
+      "message": "Actualizați Lista Filtrelor Acum"
+   },
+   "updateddayago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum o zi"
+   },
+   "updateddaysago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum $days$ zile",
+      "placeholders": {
+         "days": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedhourago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum o oră"
+   },
+   "updatedhoursago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum $hours$ ore",
+      "placeholders": {
+         "hours": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedminuteago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum un minut"
+   },
+   "updatedminutesago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum $minutes$ minute",
+      "placeholders": {
+         "minutes": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedrightnow": {
+      "description": "Label for filter list subscription",
+      "message": "tocmai s-a actualizat"
+   },
+   "updatedsecondsago": {
+      "description": "Label for filter list subscription",
+      "message": "actualizat acum $seconds$ secunde",
+      "placeholders": {
+         "seconds": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedtimestamp": {
+      "description": "Label for filter list subscription last updated timestamp",
+      "message": "actualizat pe $ts$",
+      "placeholders": {
+         "ts": {
+            "content": "$1",
+            "example": "8/26/2019 10:23:44 PM"
+         }
+      }
+   },
+   "updatenowmessage2": {
+      "description": "Update filters text and button",
+      "message": "Voi descărca automat actualizări; puteți de asemeni, să [[actualizați acum]]"
+   },
+   "updateyourlists": {
+      "description": "Section header on the ad report page",
+      "message": "Verificați actualizarea listelor de filtre:"
+   },
+   "updating_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock aduce acum la zi listele de filtre ca să vadă dacă asta ar putea fi problema."
+   },
+   "urgent_safari_changes": {
+      "description": "Title for Options page message letting users know of settings change.",
+      "message": "URGENT: Apple schimbă extensiile Safari."
+   },
+   "visit_help_center": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Poate doriți să ne [[vizitați Centrul de Ajutor]] pentru alte opțiuni de depanare."
+   },
+   "vpn_coming_soon": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "Verificați ce va veni în curând de la AdBlock"
+   },
+   "want_stop_seeing": {
+      "description": "GFC messaging on the popup menu",
+      "message": "Doriți să nu mai vedeți acestea?"
+   },
+   "want_to_remove": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Doriți să-l eliminați?"
+   },
+   "warning": {
+      "description": "Warns the user about an error.",
+      "message": "avertisment"
+   },
+   "warning_overrules_filters": {
+      "description": "Message on the 'Customize' tab of the options page, explaining the danger of adding a allowlist filter for all websites with only some exceptions.",
+      "message": "Atenție: pe toate celelalte site-uri veți vedea reclame!\nAceasta anulează celelalte filtre pentru acele site-uri."
+   },
+   "watermelon_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Pepene"
+   },
+   "website_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Site-ul este stricat"
+   },
+   "website_still_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Site-ul este încă defect?"
+   },
+   "whatmakesadblocktick": {
+      "description": "Subtitle on the Support tab. This section contains links to the AdBlock source code and contributors. In this context, 'tick' can be replaced with the word 'work'.",
+      "message": "Vă întrebați cum este creat AdBlock?"
+   },
+   "whats_this": {
+      "description": "Text of a link pointing to the explanation of a new feature",
+      "message": "Ce-i asta?"
+   },
+   "whatsnew": {
+      "description": "Link to display the changelog on the Support tab",
+      "message": "Vedeți cele mai recente actualizări în [[changelog]]"
+   },
+   "whitelist_youtube_channel_v2": {
+      "description": "Menu entry to whitelist the channel of the current YouTube video or page. The channel name will appear on a line below this menu item.",
+      "message": "Permite reclame pe canalul Youtube:"
+   },
+   "whitelisted_a_site": {
+      "description": "Part 1 of a call-to-action on the allowlist wizard",
+      "message": "Tocmai ați adăugat un site în lista de permisiuni!"
+   },
+   "whitelistertitle2": {
+      "description": "The title of the allowlist wizard (Don't run on this page/pages on this domain)",
+      "message": "Nu rula AdBlock pe..."
+   },
+   "wizard_premium_cta_part_I": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "Tocmai ați blocat ceva pe acest site"
+   },
+   "wizard_premium_cta_part_II": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "Aplicați această preferință pe toate dispozitivele dvs. și asigurați-vă că nu pierdeți niciodată setările AdBlock cu Backup & Sincronizare."
+   },
+   "wizard_premium_cta_title": {
+      "description": "Part of a message on the blocklist wizard",
+      "message": "Hei, se pare că ți-ar putea plăcea AdBlock Premium"
+   },
+   "wizardcantrunonframesets": {
+      "description": "Alert shown when the user tries to use a blocklist/allowlist wizard on an old website",
+      "message": "Această caracteristică AdBlock nu funcționează pe acest site deoarece folosește tehnologie învechită. Puteți permite sau bloca reclame manual în fila \"Personalizare\" din pagina de opțiuni."
+   },
+   "wont_change_anything": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Nu vom schimba nimic așa că veți continua să vedeți reclama."
+   },
+   "wont_show_again": {
+      "description": "Message shown when user opts out of call-to-action",
+      "message": "OK, nu vă vom arăta din nou acest mesaj."
+   },
+   "work_around_hulu_problems": {
+      "description": "Advanced Options page checkbox, which users only need to use if Hulu.com videos break. It directs the user to restart their browser in order for changes to the checkbox to take effect.",
+      "message": "Bifați pentru a putea folosi pe Hulu.com în cazul în care nu merge. Este necesară repornirea navigatorului."
+   },
+   "yes": {
+      "description": "A positive response to a question",
+      "message": "Da"
+   },
+   "you_can_slide_to_change": {
+      "description": "allowlist slider usage instructions. Sometimes only one slider will show, and sometimes two will show, and if possible the text should handle both cases.",
+      "message": "Puteți glisa dedesubt pentru a alege exact pe ce pagini AdBlock nu va rula."
+   },
+   "you_know_thats_a_bad_idea_right": {
+      "description": "Confirmation message shown to user if they try to subscribe to too many lists. The user will have two options: OK and Cancel.",
+      "message": "Cu cât aveți mai multe filtre, cu atât mai încet funcționează AdBlock. Pe unele site-uri, prea multe filtre în uz poate duce la căderea browser-ului. Apăsați OK pentru a adăuga filtrul oricum."
+   },
+   "youtube_manage_subscribed": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Gestionează setările AdBlock din pagina mea de abonamente YouTube"
+   },
+   "youtube_onpage_icon_allow_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "Permite Reclame pe Toate"
+   },
+   "youtube_onpage_icon_allowed_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Reclamele sunt permise pe toate canalele abonate"
+   },
+   "youtube_onpage_icon_allowing_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Se permit reclame pe acest canal"
+   },
+   "youtube_onpage_icon_block_all_btn_text": {
+      "description": "The button text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "Blochează Reclame pe Toate"
+   },
+   "youtube_onpage_icon_blocked_complete_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Reclamele sunt blocate pe toate canalele abonate"
+   },
+   "youtube_onpage_icon_blocking_ads_on_channel": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Se blochează reclame pe acest canal"
+   },
+   "youtube_onpage_icon_msg": {
+      "description": "The message text on the YouTube on page icon; shown on https://www.youtube.com/feed/channels",
+      "message": "Gestionează reclamele pe canalele dvs. abonate:"
+   },
+   "youtube_onpage_icon_no_channels_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Abonați-vă la cel puțin un canal YouTube pentru a gestiona reclame pe canalele dvs. abonate."
+   },
+   "youtube_onpage_icon_one_moment_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Un moment..."
+   },
+   "youtube_onpage_icon_sign_in_text": {
+      "description": "The message text on the YouTube on page panel; shown on https://www.youtube.com/feed/channels",
+      "message": "Conectați-vă la contul dvs. YouTube pentru a gestiona reclame pe canalele dvs. abonate."
+   },
+   "youve_blocked_num_ads": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review. The $numBlocked$ will be replaced with the number of ads the users has blocked, starting at 10,000.",
+      "message": "Ați blocat $numBlocked$ de reclame!",
+      "placeholders": {
+         "numBlocked": {
+            "content": "$1",
+            "example": "10,000"
+         }
+      }
+   },
+   "ytadblockupdates": {
+      "description": "Subtitle on the Support tab. Specific to the 'AdBlock on YouTube' extension.",
+      "message": "Actualizări AdBlock pe YouTube"
+   }
+}

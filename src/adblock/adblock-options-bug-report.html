@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+  <head>
+    <title>AdBlock - Report a bug</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="adblock-options-options.css" />
+    <script src="polyfill.js"></script>
+    <script src="jquery-3.5.1.min.js"></script>
+    <script src="adblock-functions.js"></script>
+    <script src="adblock-options-bug-report.js"></script>
+  </head>
+  <body>
+    <div id="sidebar">
+      <div id="sidebar-content">
+        <section id="sidebar-content-top">
+          <a id="adblock-logo-link" href="https://www.getadblock.com" target="_blank">
+            <img
+              id="sidebar-adblock-logo"
+              i18n-alt="adblock_home"
+              src="icons/default_theme/logo.svg"
+            />
+            <img id="sidebar-adblock-logo-narrow" i18n-alt="adblock_home" src="icons/ab-38.png" />
+          </a>
+        </section>
+
+        <section id="sidebar-content-bottom">
+          <div id="sidebar-social-links">
+            <a href="https://facebook.com/heres.adblock" target="_blank">
+              <i class="adblock-icon">facebook</i>
+            </a>
+            <a id="twitter-icon-link" href="https://twitter.com/getadblock" target="_blank">
+              <i class="adblock-icon">twitter</i>
+            </a>
+            <a href="https://www.linkedin.com/company/adblock/" target="_blank">
+              <i class="adblock-icon">linkedin</i>
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="bug-report-page-content">
+      <div class="option-page-box">
+        <div class="option-page-content">
+          <!--STEP 0-->
+          <h1 id="info" class="page-title">
+            Found a bug in AdBlock? Tell us about it and we'll investigate!
+          </h1>
+
+          <!--Step 1: Name & Email -->
+          <div id="step_name_email">
+            <span class="do-not-display error-message"
+              >Required information is missing or invalid. Please fill in the questions that have a
+              red border.</span
+            >
+            <p class="error-message">* Required</p>
+            <label for="name">What's your name?<span class="error-message">&nbsp;*</span></label>
+            <input type="text" id="name" class="widest" />
+            <br />
+
+            <label for="email"
+              >What's your email address?<span class="error-message">&nbsp;*</span><br />
+              <span class="italic"
+                >(We'll only use this to contact you if we need more information)</span
+              >
+            </label>
+            <input type="email" id="email" class="widest" />
+            <div class="checkbox-indentation">
+              <span class="checkbox md-stack">
+                <input type="checkbox" checked="true" id="rememberDetails" />
+                <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+                <i
+                  class="checked material-icons circle-icon-bg-24 checkbox-icon"
+                  role="img"
+                  aria-hidden="true"
+                  >check_circle</i
+                >
+              </span>
+              <label for="rememberDetails">Remember my name and email for next time!</label>
+            </div>
+            <br />
+
+            <label for="summary"
+              >Briefly describe the bug:<span class="error-message">&nbsp;*</span></label
+            >
+            <input type="text" id="summary" class="widest" />
+            <br />
+
+            <label for="repro-steps"
+              >If you can, tell us how it happened.<span class="error-message">&nbsp;*</span><br />
+              <span class="italic"
+                >(Be specific, because we'll try to reproduce the bug on our systems)</span
+              >
+            </label>
+            <textarea id="repro-steps" class="widest">
+  1.
+  2.
+  3.
+            </textarea>
+            <br />
+
+            <label for="expected-result">
+              When you do this, what should happen?<span class="error-message">&nbsp;*</span></label
+            >
+            <textarea id="expected-result" class="widest"></textarea>
+            <br />
+
+            <label for="actual-result"
+              >What's happening instead?<span class="error-message">&nbsp;*</span></label
+            >
+            <textarea id="actual-result" class="widest"></textarea>
+            <div class="flex-end">
+              <button type="button" class="btn short red" id="step1-next">
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Final Checks -->
+          <div class="do-not-display" id="step_final_questions">
+            <label for="debug-info"
+              >The following information will be included in the bug report.</label
+            >
+            <textarea id="debug-info" class="widest" disabled></textarea>
+            <div class="flex-end">
+              <button type="button" class="btn short grey" id="step2-back">
+                Back
+              </button>
+              <button type="button" class="btn short red" id="submit">Submit</button>
+            </div>
+          </div>
+
+          <!-- Only show if response success -->
+          <div class="do-not-display" id="step_response_success">
+            <p>
+              All set! We'll be in touch as soon as we can. In the meantime, look for an email from
+              AdBlock. You'll find a link to your ticket on our help site there, along with some
+              self-help suggestions if we can't get back to you right away.
+            </p>
+          </div>
+
+          <!-- Only show if response error -->
+
+          <br />
+          <div class="do-not-display" id="step_response_error">
+            <p>There was an error processing your request.</p>
+            <p id="step_response_error_msg"></p>
+            <p>
+              Please go to
+              <a href="https://adblocksupport.freshdesk.com/support/tickets/new" target="_blank"
+                >our support website</a
+              >.
+            </p>
+            <p>
+              And manually create a ticket, and copy and paste the information below into the "Fill
+              in any details you think will help us understand your issue" do-not-display
+            </p>
+            <textarea id="manual_submission" class="widest"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,503 @@
+{
+  "start": {
+    "title": "how_can_we_help",
+    "segues": [
+      {
+        "content": "see_ad",
+        "segueTo": "seeAd",
+        "segueToIfPaused": "seeAdPaused"
+      },
+      {
+        "content": "website_broken",
+        "segueTo": "websiteBroken",
+        "segueToIfPaused": "brokenPaused"
+      }
+    ],
+    "footer": "dont_know_help_me"
+  },
+  "seeAd": {
+    "title": "see_ad",
+    "segues": [
+      {
+        "content": "first_time_seeing_ad",
+        "segueTo": "seeAdFirstTime"
+      },
+      {
+        "content": "see_ad_everywhere",
+        "segueTo": "seeAdEverywhere"
+      }
+    ]
+  },
+  "seeAdFirstTime": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "got_it"
+          },
+          {
+            "text": "check_whitelist"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "ok",
+        "action": "okCheckWhitelistAction"
+      }
+    ]
+  },
+  "seeAdOnWhitelist": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "page_is_whitelisted"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "want_to_remove"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "removeWhitelistAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "dontRemoveWhitelistAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "seeAdNotOnWhitelist": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "page_not_whitelisted"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "updating_filter_lists"
+          },
+          {
+            "text": "done_reload_page"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "reload_the_page",
+        "action": "reloadCheckAction"
+      }
+    ]
+  },
+  "seeAdEverywhere": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "ad_everywhere_malware"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "learn_more_to_resolve",
+            "linkURL": "https://help.getadblock.com/support/solutions/articles/6000055822-how-do-i-remove-adware-or-malware-from-my-computer-"
+          }
+        ]
+      }
+    ]
+  },
+  "dontRemoveWhitelist": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "wont_change_anything"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "ok",
+        "action": "finishFlowAction"
+      }
+    ]
+  },
+  "removeWhitelist": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "removed_url"
+          },
+          {
+            "text": "reload_not_see_ad"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "reload_the_page",
+        "action": "reloadFinishFlowAction"
+      }
+    ]
+  },
+  "checkedBasics": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "checked_basics"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "still_see_ad"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "stillSeeAdAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "problemSolvedAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "problemSolved": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "problem_solved"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "done",
+        "action": "finishFlowAction"
+      }
+    ]
+  },
+  "seeAdFilterError": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "something_not_working"
+          },
+          {
+            "text": "try_manual_update",
+            "linkURL": "https://help.getadblock.com/support/solutions/articles/6000055734-how-do-i-manually-update-my-filter-lists-"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "additional_help"
+          },
+          {
+            "text": "contact_support",
+            "linkURL": "mailto:help@getadblock.com"
+          }
+        ]
+      }
+    ]
+  },
+  "seeAdFiltersGood": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "english_site"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "seeAdEnglishSiteAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "seeAdNotEnglishSiteAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "seeAdEnglishSite": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "visit_help_center",
+            "linkURL": "https://help.getadblock.com"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "additional_help"
+          },
+          {
+            "text": "contact_support",
+            "linkURL": "mailto:help@getadblock.com"
+          }
+        ]
+      }
+    ]
+  },
+  "seeAdNotEnglishSite": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "edit_filter_lists",
+            "linkURL": "https://help.getadblock.com/support/solutions/articles/6000066909-which-filter-lists-should-i-use-"
+          },
+          {
+            "text": "learn_more_filter_lists",
+            "linkURL": "https://help.getadblock.com/support/solutions/articles/6000161377-how-to-use-custom-filters"
+          }
+        ]
+      },
+      {
+        "content": [
+          {
+            "text": "additional_help"
+          },
+          {
+            "text": "contact_support",
+            "linkURL": "mailto:help@getadblock.com"
+          }
+        ]
+      }
+    ]
+  },
+  "seeAdPaused": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "paused_not_blocking"
+          },
+          {
+            "text": "resume_reload"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "unpauseAndReloadAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "dontChangeSeeAdsAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "unpauseAndReload": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "unpaused_reload"
+          },
+          {
+            "text": "still_see_ad"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "seeAdsUnpausedAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "problemSolvedAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "dontChangeSeeAds": {
+    "title": "see_ad",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "no_changes_see_ad"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "ok",
+        "action": "finishFlowAction"
+      }
+    ]
+  },
+  "websiteBroken": {
+    "title": "website_broken",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "try_pausing"
+          },
+          {
+            "text": "reload_when_ready"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "reload_the_page",
+        "action": "reloadStillBrokenAction"
+      }
+    ]
+  },
+  "reloadStillBroken": {
+    "title": "website_broken",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "website_still_broken"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "yes",
+        "action": "stillBrokenNotAdBlockAction",
+        "icon": "check"
+      },
+      {
+        "text": "no",
+        "action": "stillBrokenAdBlockAction",
+        "icon": "close"
+      }
+    ]
+  },
+  "stillBrokenNotAdBlock": {
+    "title": "website_broken",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "issue_unrelated_adblock"
+          },
+          {
+            "text": "contact_the_site"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "ok",
+        "action": "finishFlowAction"
+      }
+    ]
+  },
+  "stillBrokenAdBlock": {
+    "title": "website_broken",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "something_else_going_on"
+          },
+          {
+            "text": "additional_troubleshooting",
+            "linkURL": "https://help.getadblock.com/support/solutions/articles/6000061205-a-web-page-doesn-t-work-or-looks-wrong-with-adblock-on"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "thanks",
+        "action": "finishFlowAction"
+      }
+    ]
+  },
+  "brokenPaused": {
+    "title": "website_broken",
+    "sections": [
+      {
+        "content": [
+          {
+            "text": "paused_site_issue"
+          },
+          {
+            "text": "contact_the_site"
+          }
+        ]
+      }
+    ],
+    "buttons": [
+      {
+        "text": "ok",
+        "action": "finishFlowAction"
+      }
+    ]
+  }
+}

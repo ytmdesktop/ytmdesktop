@@ -1,0 +1,263 @@
+/*
+ * This file is part of Adblock Plus <https://adblockplus.org/>,
+ * Copyright (C) 2006-present eyeo GmbH
+ *
+ * Adblock Plus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * Adblock Plus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+*
+{
+  box-sizing: border-box;
+  font-family: "Lucida Grande", "Segoe UI", Ubuntu, Tahoma, Arial, sans-serif;
+  font-size: 11px;
+}
+
+html
+{
+  overflow: hidden;
+  height: 100%;
+}
+
+a
+{
+  color: inherit;
+}
+
+body
+{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+  color: #303942;
+}
+
+body.default
+{
+  background-color: #fff;
+}
+
+body.dark
+{
+  color: #fff;
+}
+
+table
+{
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table *
+{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+td
+{
+  padding: 3px;
+  border-left: 1px solid #cdcdcd;
+  white-space: nowrap;
+}
+
+td:first-child
+{
+  border-left-style: none;
+}
+
+col:nth-child(2)
+{
+  width: 115px;
+}
+
+col:nth-child(3)
+{
+  width: 50%;
+}
+
+header
+{
+  overflow-y: scroll;
+  border-bottom: 1px solid #cdcdcd;
+  flex-shrink: 0;
+}
+
+/*
+ * We have to add a scrollbar to the header to have the columns there aligned
+ * with the table below. But we don't want the scrollbar to be visible there.
+ */
+header::-webkit-scrollbar
+{
+  visibility: hidden;
+}
+
+#items
+{
+  overflow-y: scroll;
+  flex-grow: 1;
+}
+
+#items table
+{
+  line-height: 17px;
+
+  /* This background image gives every other row a gray background.
+   * This is simlar to "tr:nth-child(odd) background-color: #eee;".
+   * However, we can't do it that way, since some rows might be hidden.
+   */
+  background-image: url(data:image/gif;base64,R0lGODdhAQBQAIABAO7u7v///ywAAAAAAQBQAAACC4SPqcsYD6OctMYCADs=);
+  background-repeat: repeat;
+}
+
+body.dark #items table
+{
+  background-image: url(data:image/gif;base64,R0lGODdhAQBQAIACACQkJExMTCwAAAAAAQBQAAACC4yPqcsID6OctMYCADs=);
+}
+
+#items tr
+{
+  height: 40px;
+}
+
+#items tr[data-state=blocked]
+{
+  color: #ED1E45;
+}
+
+body.dark #items tr[data-state=blocked]
+{
+  color: #ff3a3a;
+}
+
+#items tr[data-state=whitelisted]
+{
+  color: #080;
+}
+
+body.dark #items tr[data-state=whitelisted]
+{
+  color: #389c22;
+}
+
+#items[data-filter-state=blocked]       tr:not([data-state=blocked]),
+#items[data-filter-state=whitelisted]   tr:not([data-state=whitelisted])
+{
+  display: none;
+}
+
+.changed,
+.unnamed
+{
+  font-style: italic
+}
+
+.request-wrapper,
+.filter-wrapper
+{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+tr:not(:hover) .action
+{
+  display: none;
+}
+
+.url
+{
+  width: 100%;
+}
+
+.url > a,
+.url-rewritten > a
+{
+  text-decoration: none;
+}
+
+.url > a:hover,
+.url-rewritten > a:hover
+{
+  text-decoration: underline;
+}
+
+.action-wrapper
+{
+  display: flex;
+  width: 100%;
+}
+
+.action
+{
+  flex-shrink: 0;
+  margin: auto;
+  margin-left: 5px;
+  padding: 2px 6px;
+  border-radius: 7px;
+  font-style: 400;
+  color: #fff;
+  background: #555;
+  cursor: pointer;
+}
+
+.filter-wrapper,
+.filter,
+.origin,
+.domain
+{
+  flex-grow: 1;
+}
+
+.domain,
+.origin,
+.changed .request-wrapper,
+.changed .filter-wrapper,
+.changed .type
+{
+  opacity: 0.6;
+}
+
+footer
+{
+  width: 100%;
+  height: 23px;
+  margin-bottom: -23px;
+  padding: 4px 3px;
+  border-top: 1px solid #cdcdcd;
+  flex-shrink: 0;
+}
+
+.has-changes + footer
+{
+  margin-bottom: 0;
+  transition: margin-bottom 0.5s;
+}
+
+footer > a
+{
+  color: #00f;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filtered-by-search
+{
+  display: none;
+}
+
+body.dark #reload
+{
+  color: #2a67e7;
+}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!-- Start: Premium Sync CTA -->
+<section class="sync-cta bottom-line" style="display: none;">
+  <section class="get-sync-cta" id="locked-user-pay-section-general">
+    <p>
+      <span i18n="save_custom_settings_cta"></span>
+      <span i18n="try_backup_sync"></span>
+    </p>
+    <section class="user-actions">
+      <a
+        id="get-it-now-general"
+        i18n="get_it_now"
+        class="btn yellow long"
+        target="_blank"
+        href="https://getadblock.com/premium/enrollment/"
+      ></a>
+      <button id="close-sync-cta-general">
+        <i class="material-icons" role="img" i18n-aria-label="close">close</i>
+      </button>
+    </section>
+  </section>
+  <section class="goodbye-sync-cta" style="display: none;">
+    <p>
+      <span i18n="wont_show_again"></span>
+      <span i18n="check_out_premium" i18n_replacement_el="premium-from-general">
+        <a href="#mab" id="premium-from-general" class="link-text-color link-to-tab"></a>
+      </span>
+    </p>
+  </section>
+</section>
+<!-- End: Premium Sync CTA -->
+<div class="option-page-box">
+  <div class="option-page-content">
+    <h1 i18n="generaloptions2" class="page-title"></h1>
+
+    <div id="acceptable_ads_info">
+      <span i18n="acceptableadsdisable_done"></span>
+      <br />
+      <span i18n="acceptableadsdisable_how_to_reenable"></span>
+    </div>
+    <ul id="general-option-list">
+      <li class="checkbox-indentation">
+        <div class="add-space-between section-padding bottom-line">
+          <div>
+            <span class="checkbox md-stack">
+              <input type="checkbox" class="feature" id="acceptable_ads" />
+              <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+              <i
+                class="checked material-icons circle-icon-bg-24 checkbox-icon"
+                role="img"
+                aria-hidden="true"
+                >check_circle</i
+              >
+            </span>
+            <label for="acceptable_ads" i18n="acceptableadsoption"></label>
+          </div>
+          <a
+            class="help-link-icon"
+            href="https://help.getadblock.com/support/solutions/articles/6000092027-why-does-adblock-allow-some-ads-to-appear-"
+            target="_blank"
+          >
+            <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+              >live_help</i
+            >
+          </a>
+        </div>
+        <div class="toggle-indentation add-space-between section-padding">
+          <label class="switch" for="acceptable_ads_privacy">
+            <input type="checkbox" class="feature" id="acceptable_ads_privacy" />
+            <span class="slider round"></span>
+            <span i18n="acceptable_ads_privacy"></span>
+          </label>
+          <a
+            class="help-link-icon"
+            href="https://help.getadblock.com/support/solutions/articles/6000224547-about-acceptable-ads-and-third-party-tracking/"
+            target="_blank"
+          >
+            <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+              >live_help</i
+            >
+          </a>
+        </div>
+        <div class="toggle-indentation" id="aa-privacy-helper">
+          <span class="toggle-padding" i18n="enable_do_not_track_advice"></span>&nbsp;
+          <a
+            class="link-text-color"
+            href="https://help.getadblock.com/support/solutions/articles/6000224542-using-do-not-track-/"
+            target="_blank"
+            ><span i18n="learn_more"></span
+          ></a>
+        </div>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <div class="section-padding">
+          <span class="checkbox md-stack">
+            <input type="checkbox" class="feature" id="enable_youtube_channel_whitelist" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+          <label
+            for="enable_youtube_channel_whitelist"
+            i18n="allow_whitelisting_youtube_channels2"
+          ></label>
+        </div>
+        <div class="extra-info bottom-line">
+          <div i18n="require_restart_browser" class="italic"></div>
+        </div>
+        <div class="toggle-indentation add-space-between section-padding">
+          <label class="switch" for="enable_youtube_manage_subscribed">
+            <input type="checkbox" class="feature" id="enable_youtube_manage_subscribed" />
+            <span class="slider round"></span>
+            <span i18n="youtube_manage_subscribed"></span>
+          </label>
+          <span class="text-help-link-icon">
+            <span
+              id="youtube_manage_subscribed_link"
+              class="link-text-color pointer"
+              i18n="settings"
+            ></span>
+            &nbsp;
+            <a
+              class="inline"
+              href="https://help.getadblock.com/support/solutions/articles/6000067131-can-i-use-adblock-and-still-allow-ads-on-my-favorite-youtube-channels-"
+              target="_blank"
+            >
+              <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+                >live_help</i
+              >
+            </a>
+          </span>
+        </div>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <div class="section-padding add-space-between">
+          <div>
+            <span class="checkbox md-stack">
+              <input type="checkbox" class="feature" id="enable_twitch_channel_allowlist" />
+              <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+              <i
+                class="checked material-icons circle-icon-bg-24 checkbox-icon"
+                role="img"
+                aria-hidden="true"
+                >check_circle</i
+              >
+            </span>
+            <label
+              for="enable_twitch_channel_allowlist"
+              i18n="allowlisting_twitch_channels"
+            ></label>
+          </div>
+          <a
+            class="help-link-icon right"
+            href="https://help.getadblock.com/support/solutions/articles/6000148339-does-adblock-block-ads-on-twitch-"
+            target="_blank"
+          >
+            <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+              >live_help</i
+            >
+          </a>
+        </div>
+        <div class="extra-info">
+          <div i18n="require_restart_browser" class="italic no-indent"></div>
+        </div>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="prefs__shouldShowBlockElementMenu" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="prefs__shouldShowBlockElementMenu" i18n="showcontextmenus2"></label>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="prefs__show_statsinicon" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="prefs__show_statsinicon" i18n="show_on_adblock_button"></label>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="prefs__show_statsinpopup" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="prefs__show_statsinpopup" i18n="show_on_adblock_menu"></label>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="prefs__show_devtools_panel" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="prefs__show_devtools_panel" i18n="show_devtools_panel"></label>
+      </li>
+
+      <li class="add-space-between checkbox-indentation section-padding">
+        <div>
+          <span class="checkbox md-stack">
+            <input type="checkbox" class="feature" id="enable_data_collection_v2" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+          <label for="enable_data_collection_v2" i18n="datacollectionoption"></label>
+        </div>
+        <a
+          class="help-link-icon"
+          href="https://help.getadblock.com/support/solutions/articles/6000067136"
+          target="_blank"
+        >
+          <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+            >live_help</i
+          >
+        </a>
+      </li>
+
+      <li id="local_cdn_option" class="add-space-between checkbox-indentation section-padding">
+        <div>
+          <span class="checkbox md-stack">
+            <input type="checkbox" class="feature" id="enable_local_cdn" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+          <label for="enable_local_cdn" i18n="local_cdn_option"></label>
+        </div>
+        <a
+          class="help-link-icon"
+          href="https://help.getadblock.com/support/solutions/articles/6000191643-what-is-the-local-cdn-feature"
+          target="_blank"
+        >
+          <i class="material-icons md-18" role="img" i18n-aria-label="learn_more_without_period"
+            >live_help</i
+          >
+        </a>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="enable_onpageMessages" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="enable_onpageMessages" i18n="onpage_messages"></label>
+      </li>
+
+      <li class="section-padding checkbox-indentation">
+        <span class="checkbox md-stack">
+          <input type="checkbox" class="feature" id="enable_show_advanced_options" />
+          <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+          <i
+            class="checked material-icons circle-icon-bg-24 checkbox-icon"
+            role="img"
+            aria-hidden="true"
+            >check_circle</i
+          >
+        </span>
+        <label for="enable_show_advanced_options" i18n="advanced_options2"></label>
+      </li>
+
+      <li class="section-padding advanced light-grey-text">
+        <div class="checkbox-indentation forDebug">
+          <span class="checkbox md-stack">
+            <input type="checkbox" class="feature" id="enable_debug_logging" />
+            <i class="unchecked material-icons" role="img" aria-hidden="true">lens</i>
+            <i
+              class="checked material-icons circle-icon-bg-24 checkbox-icon"
+              role="img"
+              aria-hidden="true"
+              >check_circle</i
+            >
+          </span>
+          <label for="enable_debug_logging" i18n="debuginlogoption2"></label>
+        </div>
+        <div class="extra-info">
+          <div i18n="slows_down_extension" class="italic"></div>
+        </div>
+      </li>
+    </ul>
+    <div class="translation_credits italic do-not-display"></div>
+  </div>
+</div>

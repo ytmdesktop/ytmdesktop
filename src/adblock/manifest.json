@@ -1,0 +1,90 @@
+{
+   "author": "BetaFish",
+   "background": {
+      "persistent": true,
+      "scripts": [ "polyfill.js", "ext/common.js", "ext/background.js", "abp-background.js", "pubnub.min.js" ]
+   },
+   "browser_action": {
+      "default_icon": {
+         "16": "icons/adblock-16.png",
+         "19": "icons/adblock-19.png",
+         "20": "icons/adblock-20.png",
+         "32": "icons/adblock-32.png",
+         "38": "icons/adblock-38.png",
+         "40": "icons/adblock-40.png"
+      },
+      "default_popup": "adblock-button-popup.html",
+      "default_title": "__MSG_name__"
+   },
+   "commands": {
+      "toggle_pause": {
+         "description": "Toggle Pause/Resume on all sites",
+         "suggested_key": {
+            "default": "Ctrl+Period",
+            "mac": "Command+Period"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "polyfill.js", "ext/common.js", "ext/content.js", "include.preload.js", "adblock-functions.js" ],
+      "match_about_blank": true,
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "adblock-uiscripts-rightclick_hook.js", "adblock-onpage-icon-cs.js" ],
+      "match_about_blank": true,
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "js": [ "subscriptionLink.postload.js" ],
+      "matches": [ "https://*.abpchina.org/*", "https://*.abpindo.blogspot.com/*", "https://*.abpvn.com/*", "https://*.adblock.ee/*", "https://*.adblock.gardar.net/*", "https://*.adblockplus.me/*", "https://*.adblockplus.org/*", "https://*.commentcamarche.net/*", "https://*.droit-finances.commentcamarche.com/*", "https://*.easylist.to/*", "https://*.eyeo.com/*", "https://*.fanboy.co.nz/*", "https://*.filterlists.com/*", "https://*.forums.lanik.us/*", "https://*.gitee.com/*", "https://*.gitee.io/*", "https://*.github.com/*", "https://*.github.io/*", "https://*.gitlab.com/*", "https://*.gitlab.io/*", "https://*.gurud.ee/*", "https://*.hugolescargot.com/*", "https://*.i-dont-care-about-cookies.eu/*", "https://*.journaldesfemmes.fr/*", "https://*.journaldunet.com/*", "https://*.linternaute.com/*", "https://*.spam404.com/*", "https://*.stanev.org/*", "https://*.void.gr/*", "https://*.xfiles.noads.it/*", "https://*.zoso.ro/*" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "js": [ "adblock-bandaids.js" ],
+      "matches": [ "*://*.getadblock.com/*", "*://*.getadblockpremium.com/*", "*://mail.live.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "adblock-twitch-contentscript.js" ],
+      "matches": [ "*://*.twitch.tv/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "adblock-yt-cs.js" ],
+      "matches": [ "*://*.youtube.com/*" ],
+      "run_at": "document_start"
+   } ],
+   "default_locale": "en_US",
+   "description": "__MSG_description__",
+   "devtools_page": "devtools.html",
+   "differential_fingerprint": "1.a071951738d965302d7a1e9d6c770903a287969f42429eb7d012090231b256b8",
+   "icons": {
+      "128": "icons/adblock-128.png",
+      "16": "icons/adblock-16.png",
+      "32": "icons/adblock-32.png",
+      "48": "icons/adblock-48.png",
+      "64": "icons/adblock-64.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZWWNkerYNFB0SIg87WwcrcniMYkCqxLz4OB3CLNoogUUsHN+Rk9vRB7o3Jjc4shlz2LBvAbtPbrGkU+NK9Hc3ubVydzpnoRDEl1RKz3GhqKFkECvTyAxrsKainXH+4Ni2+K7bg1U0tLoQMPJ9f3ieYLIwXeHh9+lYXQi6soq0pwIDAQAB",
+   "manifest_version": 2,
+   "minimum_chrome_version": "55.0",
+   "minimum_opera_version": "42.0",
+   "name": "__MSG_name__",
+   "optional_permissions": [ "management" ],
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "options.html"
+   },
+   "permissions": [ "tabs", "\u003Call_urls>", "contextMenus", "webRequest", "webRequestBlocking", "webNavigation", "storage", "unlimitedStorage", "notifications", "idle", "alarms" ],
+   "short_name": "__MSG_name__",
+   "storage": {
+      "managed_schema": "managed-storage-schema.json"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "4.35.0",
+   "web_accessible_resources": [ "adblock-uiscripts-adblock-wizard.css", "adblock-onpage-icon.css", "adblock-onpage-icon.svg", "adblock-ads-allowed-icon.svg", "adblock-ads-blocked-icon.svg", "adblock-wizard_sync_cta.svg", "adblock-yt-manage.css", "icons/icon24.png", "icons/ab-19.png", "icons/dark_theme/logo.svg", "fonts/lato-ext-italic.woff", "fonts/lato-italic.woff", "fonts/lato-ext-bolditalic.woff", "fonts/lato-bolditalic.woff", "fonts/lato-ext-regular.woff", "fonts/lato-regular.woff", "fonts/lato-ext-bold.woff", "fonts/lato-bold.woff", "fonts/font-face.css", "icons/MaterialIcons-Regular.woff2", "icons/adblock-icons.woff2", "purify.min.js", "localLib/jquery/jquery-1.10.2.min.js", "localLib/jquery/jquery-1.11.0.min.js", "localLib/jquery/jquery-1.11.1.min.js", "localLib/jquery/jquery-1.11.2.min.js", "localLib/jquery/jquery-1.11.3.min.js", "localLib/jquery/jquery-1.12.4.min.js", "localLib/jquery/jquery-1.3.2.min.js", "localLib/jquery/jquery-1.4.2.min.js", "localLib/jquery/jquery-1.7.1.min.js", "localLib/jquery/jquery-1.7.2.min.js", "localLib/jquery/jquery-1.8.2.min.js", "localLib/jquery/jquery-1.8.3.min.js", "localLib/jquery/jquery-1.9.1.min.js", "localLib/jquery/jquery-2.1.1.min.js", "localLib/jquery/jquery-2.1.3.min.js", "localLib/jquery/jquery-2.1.4.min.js", "localLib/jquery/jquery-2.2.4.min.js", "localLib/jquery/jquery-3.1.1.min.js", "localLib/jquery/jquery-3.2.1.min.js" ]
+}

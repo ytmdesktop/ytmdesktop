@@ -1,0 +1,2976 @@
+{
+   "a_theme_preview": {
+      "description": "Text in the alt attribute of the image previewing a theme on an extension page.",
+      "message": "$theme_name$ попередній перегляд теми для $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "pop-up menu"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "aalinkadreport": {
+      "description": "Acceptable Ads link message on ad report page",
+      "message": "Дізнайтесь більше про програму Прийнятних рекламних оголошень."
+   },
+   "aamessageadreport": {
+      "description": "Acceptable Ads message on ad report page",
+      "message": "Якщо ви не бажаєте бачити рекламу на зразок цієї, вам необхідно залишити фільтр Прийнятних рекламних оголошень вимкнутим."
+   },
+   "ab_filters_subscription_lastDownload_checksumMismatch": {
+      "description": "Filter lists tab of the Options page: Corrupted filter list file.",
+      "message": "Помилка, контрольні суми не зійшлись"
+   },
+   "ab_filters_subscription_lastDownload_connectionError": {
+      "description": "Filter lists tab of the Options page: Generic filter list download error message.",
+      "message": "Помилка, завантаження перервалось"
+   },
+   "ab_filters_subscription_lastDownload_invalidURL": {
+      "description": "Filter lists tab of the Options page: Message when you subscribe to a non-list URL.",
+      "message": "Помилка, недійсна адреса"
+   },
+   "aboutadblock": {
+      "description": "Subtitle on the Support tab",
+      "message": "Про AdBlock"
+   },
+   "acceptable_ads_content_blocking_disbled_message": {
+      "description": "Warning shown when Safari Content Blocking is enabled while the Acceptable Ads filter list was already enabled.",
+      "message": "Ми відписали Вас від Прийнятної Реклами, тому що Ви увімкнули блокування вмісту в Safari. Ви можете одночасно обрати лише одне. ([[Чому?]])"
+   },
+   "acceptable_ads_privacy": {
+      "description": "The text of an Acceptable Ads sub-option in the General tab",
+      "message": "Дозволити лише рекламу без відстеження третіми особами"
+   },
+   "acceptableadsdisable_done": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "Ви більше не підписані на список фільтрів Прийнятної реклами."
+   },
+   "acceptableadsdisable_how_to_reenable": {
+      "description": "Message shown to users after disabling Acceptable Ads via the Options page.",
+      "message": "Ви можете знову увімкнути це і підтримати улюблені веб-сайти, просто оберіть \"Дозволити деяку ненав’язливу рекламу\" нижче."
+   },
+   "acceptableadsoption": {
+      "description": "Checkbox on the 'General' tab of the Options page to enable the Acceptable Ads filter list",
+      "message": "Дозволити деяку ненав’язливу рекламу"
+   },
+   "ad_everywhere_malware": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Якщо ви бачите це оголошення скрізь, ви можете бути заражені шкідливими програмами."
+   },
+   "adalreadyblocked": {
+      "description": "On the ad report page, telling the user there is nothing to do as the ad they were seeing is now blocked.",
+      "message": "Чудово! Все налаштовано."
+   },
+   "adblock_click_for_details": {
+      "description": "Tooltip on the AdBlock button, to help users understand that they can click the button to access more options.",
+      "message": "AdBlock — натисніть щоб побачити деталі"
+   },
+   "adblock_facebook": {
+      "description": "Title for link to AdBlock's Facebook account",
+      "message": "AdBlock Facebook"
+   },
+   "adblock_home": {
+      "description": "Text in the alt attribute of an AdBlock logo / icon that links to getadblock.com.",
+      "message": "Головна Сторінка AdBlock"
+   },
+   "adblock_logo": {
+      "description": "Text in the alt attribute of an AdBlock logo image.",
+      "message": "Логотип AdBlock"
+   },
+   "adblock_looked_like_this": {
+      "description": "Part 1 of a call-to-action on the Popup menu",
+      "message": "Що, якщо AdBlock виглядав саме так?"
+   },
+   "adblock_premium": {
+      "description": "Full name of the AdBlock upgrade.",
+      "message": "AdBlock Premium"
+   },
+   "adblock_twitter": {
+      "description": "Title for link to AdBlock's Twitter account",
+      "message": "AdBlock Twitter"
+   },
+   "adblock_vpn": {
+      "description": "Text of a Options page lower menu button",
+      "message": "AdBlock VPN"
+   },
+   "adblock_website": {
+      "description": "Title for link to AdBlock's website",
+      "message": "Головна сторінка AdBlock"
+   },
+   "adblock_will_block_ads_again": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "Якщо ви натисните, AdBlock знову заблокує рекламу."
+   },
+   "adblock_will_pause_on_all_sites": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "Якщо ви натиснете, AdBlock перестане блокувати рекламу на всіх сайтах."
+   },
+   "adblock_will_pause_on_this_site": {
+      "description": "Second sentence in the aria-label of the pop-up menu action to pause blocking ads on this site.",
+      "message": "Якщо ви натиснете, AdBlock перестане блокувати рекламу на цьому сайті."
+   },
+   "adblock_wont_run_on_pages_matching": {
+      "description": "Message displayed when the allowlist wizard will allowlist part of an entire website, for example '*.google.com/reader/*'.  The URL will appear on the next line.",
+      "message": "AdBlock не працюватиме на сторінках, що містять:"
+   },
+   "adblockinglist": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block ads.",
+      "message": "Списки фільтрів реклами"
+   },
+   "adblockreportinganad": {
+      "description": "Title of the ad report page",
+      "message": "AdBlock — скарга на рекламу"
+   },
+   "adblocksupport": {
+      "description": "Title of the Support tab of the Options page",
+      "message": "Підтримка користувачів AdBlock"
+   },
+   "adblockupdates": {
+      "description": "Subtitle on the Support tab",
+      "message": "Оновлення AdBlock"
+   },
+   "add": {
+      "description": "Button on Sync tab that adds an entered name for this extension to the list of synced extensions",
+      "message": "Додати"
+   },
+   "add_this_extension": {
+      "description": "Button on Sync tab that adds this extension to the Sync process",
+      "message": "Додати це розширення"
+   },
+   "additional_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Потрібна додаткова допомога?"
+   },
+   "additional_troubleshooting": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ось кілька [[додаткових кроків як вирішити проблему]] ви можете спробувати їх, щоб вирішити цю проблему."
+   },
+   "adreport_all_debug_info": {
+      "description": "Shows the user the debug information that will be sent along with their report.",
+      "message": "Наступні відомості будуть також включені у звіт про рекламу."
+   },
+   "adreport_email": {
+      "description": "Label for a textbox where the user enters their email address to submit a bug or ad report.",
+      "message": "Адреса Вашої електронної пошти?"
+   },
+   "adreport_email_privacy": {
+      "description": "Let the user know that their email address won't be used for reasons other than contacting them about their bug or ad report.",
+      "message": "Ми будемо використовувати його тільки для зв'язку з Вами, якщо нам потрібно буде більше інформації."
+   },
+   "adreport_filter": {
+      "description": "Optional question on the ad report page when the ad needs to be reported to AdBlock.",
+      "message": "Якщо ви створили робочий фільтр за допомогою майстра \"блокування реклами\", вставте його в поле нижче:"
+   },
+   "adreport_laststep": {
+      "description": "Subtitle on the ad report page. Shown when the ad needs to be reported to AdBlock, and not filter list maintainers.",
+      "message": "Останній крок: повідомте нам про проблему."
+   },
+   "adreport_location": {
+      "description": "Question on the ad report page asking the user to describe the ad and its location on a webpage.",
+      "message": "Де саме на цій сторінці з'являється реклама? Як це виглядає?"
+   },
+   "adreport_missing_info": {
+      "description": "Error message shown when the user doesn't enter anything in some of the text fields.",
+      "message": "Обов'язкова інформація відсутня або неприпустима.  Будь ласка, дайте відповідь на запитання в червоних рамках."
+   },
+   "adreport_missing_screenshot": {
+      "description": "Error message shown when the user doesn't attach a screenshot to an ad report.",
+      "message": "Ви забули прикріпити знімок екрану! Ми не зможемо допомогти Вам не побачивши рекламу, про яку ви повідомляєте."
+   },
+   "adreport_name": {
+      "description": "Label for a textbox where the user enters their name (or nickname) to submit a bug or ad report.",
+      "message": "Як Вас звуть?"
+   },
+   "adreport_response_file_name": {
+      "description": "Error message shown when the file name of an attachement the user is trying to submit in a report is longer than 255 characters.",
+      "message": "Це ім'я файлу занадто довге. Будь ласка, дайте Вашому файлу коротше ім'я."
+   },
+   "adreport_response_invalid_file": {
+      "description": "Error message shown when the user uploads an invalid file type.",
+      "message": "Цей файл не є зображенням. Будь ласка, завантажте файл .png, .gif, або .jpg."
+   },
+   "adreport_response_large_file": {
+      "description": "Error message shown when the user tries to upload a large image file.",
+      "message": "Цей файл завеликий. Переконайтесь, що ваш файл менш ніж 10 МБ."
+   },
+   "adreport_response_save_error": {
+      "description": "Error message shown when the server could not save an attached file.",
+      "message": "Помилка під час збереження завантаженого файлу."
+   },
+   "adreport_response_success": {
+      "description": "Shown when a ticket has been sumbitted to AdBlock's support site successfully.",
+      "message": "Все готово! Ми зв'яжемося з Вами, як тільки зможемо. Тим часом подивіться лист від AdBlock. Там Ви знайдете посилання на Вашу заявку на нашому сайті допомоги, а також деякі рекомендації для самостійного вирішення проблеми, на випадок, якщо ми не зможемо допомогти Вам відразу."
+   },
+   "adreport_screen_cap_upload": {
+      "description": "Label next to a file upload button.",
+      "message": "Прикріпити знімок:"
+   },
+   "adreport_server_response_error__manual_msg_step1": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "Будь ласка, перейдіть на [[наш сайт підтримки]]."
+   },
+   "adreport_server_response_error__manual_msg_step2": {
+      "description": "Error message shown when the server has an unrecoverable error during the submission of an ad or bug report.",
+      "message": "І вручну створити картку, а також копіювати та вставити інформацію нижче в розділ «Fill in any details you think will help us understand your issue»."
+   },
+   "adreport_server_response_error_msg": {
+      "description": "Error message shown when an new ticket is sumbitted for an ad or bug report, and the server had an issue while processing the data.",
+      "message": "При обробці Вашого запиту сталася помилка."
+   },
+   "adreportintro": {
+      "description": "Introduction of the ad reporting page",
+      "message": "Знайшли рекламу на сторінці? Ми допоможемо вам знайти правильне місце, щоб повідомити про це!"
+   },
+   "adreportthanks": {
+      "description": "Message to the user thanking them for sharing the URL with us.",
+      "message": "Дякуємо!"
+   },
+   "adreportvoluntary": {
+      "description": "Introduction of the ad reporting page",
+      "message": "Повідомлення про наявність реклами є добровільним. Це допоможе іншим людям, додавання до списку фільтрів заблокує рекламу кожному користувачу. Якщо ви не відчуваєте себе альтруїстом прямо зараз - це нормально. Закрийте цю сторінку та [[заблокуйте рекламу]] тільки для себе."
+   },
+   "adstillappear": {
+      "description": "Question on ad report page",
+      "message": "Ви все ще її бачите?"
+   },
+   "advanced_options2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Я досвідчений користувач, покажіть мені просунуті налаштування"
+   },
+   "apply_theme": {
+      "description": "Text of clickable element that applies the theme of a theme box in the Themes tab of the Options page",
+      "message": "Застосувати тему"
+   },
+   "back_help_flow": {
+      "description": "Aria label for back button in help flow (in popup menu)",
+      "message": "Поверніться на один крок до потоку допомоги."
+   },
+   "backup_sync_settings": {
+      "description": "Description of Sync on Sync tab",
+      "message": "Автоматично робити резервне копіювання і синхронізувати налаштування AdBlock на всіх ваших пристроях."
+   },
+   "betalabel": {
+      "description": "Label for experimental features in AdBlock Options",
+      "message": "Бета"
+   },
+   "blacklistclickmessage": {
+      "description": "'Hide a section of a webpage' part on the Customize tab of the Options page.",
+      "message": "Натисніть правою кнопкою миші на рекламі, щоб заблокувати її, або зробіть це тут вручну."
+   },
+   "blacklisterattrwillbe": {
+      "description": "Checkbox label for attributes in 'Block an ad' wizard.",
+      "message": "$attribute$ відповідатиме $value$",
+      "placeholders": {
+         "attribute": {
+            "content": "$1",
+            "example": "class"
+         },
+         "value": {
+            "content": "$2",
+            "example": "AdBanner"
+         }
+      }
+   },
+   "blacklisterblockedelement": {
+      "description": "Tells the user what the blocked element is on the 'Block an ad' wizard.",
+      "message": "Заблокований елемент:"
+   },
+   "blacklisterblocksalloftype": {
+      "description": "Warns the user that all elements of type X will be blocked.",
+      "message": "Будьте обережні: цей фільтр заблокує усі елементи $elementtype$ на цій сторінці!",
+      "placeholders": {
+         "elementtype": {
+            "content": "$1",
+            "example": "DIV"
+         }
+      }
+   },
+   "blacklistereditfilter": {
+      "description": "Text if the user wants to manually edit a filter. 'OK' is the standard JavaScript popup button text.",
+      "message": "Будь ласка, введіть вірний фільтр та натисніть «ОК»"
+   },
+   "blacklistereditinvalid1": {
+      "description": "Alert if the manually edited filter is invalid. Error messages are not translated.",
+      "message": "Неприпустимий фільтр: $exception$",
+      "placeholders": {
+         "exception": {
+            "content": "$1",
+            "example": "This filter is not supported"
+         }
+      }
+   },
+   "blacklistermatches": {
+      "description": "Tells the user multiple matches were found",
+      "message": "Елементів під фільтром на поточній сторінці: $matchcount$.",
+      "placeholders": {
+         "matchcount": {
+            "content": "$1",
+            "example": "5"
+         }
+      }
+   },
+   "blacklisternofilter": {
+      "description": "Warning if the user hasn't specified a filter",
+      "message": "Фільтр не вказано!"
+   },
+   "blacklistersinglematch": {
+      "description": "Tells the user only one match was found",
+      "message": "Відповідає 1 елементу на цій сторінці."
+   },
+   "blacklistertype": {
+      "description": "node name is called 'Type' (HTML tag)",
+      "message": "Тип"
+   },
+   "blacklisterwarningnofilter": {
+      "description": "Warns the user that nothing will be blocked.",
+      "message": "Увага: фільтр не вказано!"
+   },
+   "block_this_ad": {
+      "description": "Toolbar button menu entry and context menu entry",
+      "message": "Заблокувати цю рекламу"
+   },
+   "blockdomain": {
+      "description": "Message of the URL and CSS blocking sections",
+      "message": "Домен чи сторінка для обробки"
+   },
+   "blocked_ads": {
+      "description": "Title for toolbar icon menu section showing number of ads blocked",
+      "message": "Заблокована реклама:"
+   },
+   "blocked_n_in_total": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked since AdBlock was installed. $count$ will be a number between 1 and 999,999,999.",
+      "message": "$count$ загалом",
+      "placeholders": {
+         "count": {
+            "content": "[[123,456]]",
+            "example": "123,456"
+         }
+      }
+   },
+   "blocked_n_on_this_page": {
+      "description": "Shown below the 'Blocked ads:' message. Shows the number of ads blocked on this page. $count$ will be a number between 1 and 999.",
+      "message": "$count$ на цій сторінці",
+      "placeholders": {
+         "count": {
+            "content": "[[123]]",
+            "example": "123"
+         }
+      }
+   },
+   "blocked_something": {
+      "description": "Part 1 of a call-to-action on the blocklist wizard",
+      "message": "Ви просто заблокували що-небудь на цьому сайті!"
+   },
+   "blockedresource": {
+      "description": "Resource list page: resource status",
+      "message": "Заблокований ресурс"
+   },
+   "blockmoreads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Блокувати більше реклами:"
+   },
+   "blockmoreads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Блокувати більше реклами"
+   },
+   "blockurlwithtext": {
+      "description": "Message of the URL-blocking section (Block an ad by its URL) on the Customize tab",
+      "message": "Блокувати URL’и, що містять такий текст"
+   },
+   "browserestartrequired": {
+      "description": "Displayed after disabling Safari Content Blocking, which requres a browser relaunch.",
+      "message": "Будь ласка, перезавантажте Safari, щоб закінчити вимкнення блокування вмісту."
+   },
+   "buttonblockit": {
+      "description": "Block button",
+      "message": "Заблокувати!"
+   },
+   "buttoncancel": {
+      "description": "Cancel button",
+      "message": "Скасувати"
+   },
+   "buttonedit": {
+      "description": "Edit filter(s) manually button",
+      "message": "Змінити"
+   },
+   "buttonexclude": {
+      "description": "Button for excluding a domain in the allowlist wizard",
+      "message": "Виключити"
+   },
+   "buttonkeep": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Зберегти"
+   },
+   "buttonlooksgood": {
+      "description": "Confirmation button after user chose what to block on the page",
+      "message": "Так краще"
+   },
+   "buttonok": {
+      "description": "OK button",
+      "message": "OK!"
+   },
+   "buttonremove": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Видалити"
+   },
+   "buttonsubmit": {
+      "description": "Button to send a form.",
+      "message": "Надіслати"
+   },
+   "callout_new_feature": {
+      "description": "Text to callout a new feature",
+      "message": "НОВЕ!"
+   },
+   "cantblockflash": {
+      "description": "Result of the final ad report question",
+      "message": "Поки що ми не маємо змоги блокувати рекламу всередині Flash та інших плаґінів. Ми очікуємо на пітримку таких технологій від браузера та WebKit."
+   },
+   "cantblockflashwarning": {
+      "description": "Text of the final ad report question",
+      "message": "Чи з’являється ця реклама усередині чи перед початком відео, або ж у рамках якихось інших плаґінів на кшталт ігр на Flash?"
+   },
+   "catchannelswitchlabel": {
+      "description": "The label text for the cat switch on the MyAdBlock Options page",
+      "message": "Кішки"
+   },
+   "change_behavior_settings": {
+      "description": "Part of a message on the allowlist and blocklist wizards",
+      "message": "Ви можете змінити цю поведінку у ваших [[settings]]."
+   },
+   "changes_to_adblock": {
+      "description": "Link to Options page with more information about the changes.",
+      "message": "Ми внесли зміни до AdBlock!"
+   },
+   "check_out_premium": {
+      "description": "Part 2 of message shown when user opts out of call-to-action",
+      "message": "Якщо ви хочете дізнатися більше, перевірте [[Premium]]."
+   },
+   "check_out_themes": {
+      "description": "Part 2 of a call-to-action on the Popup menu",
+      "message": "Перевірте теми!"
+   },
+   "check_sync_status": {
+      "description": "Button on Sync tab that checks the status of the Sync feature",
+      "message": "Перевірка статусу синхронізації"
+   },
+   "checked_basics": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ми перевірили основи та оновили ваші списки фільтрів."
+   },
+   "checkinfirefox_1": {
+      "description": "instruction for how to check Firefox for a reported ad",
+      "message": "Встановіть Firefox, якщо ще не зробили цього."
+   },
+   "checkinfirefox_2": {
+      "description": "Instruction for how to check Firefox for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "Встановіть Adblock Plus для Firefox, якщо у вас його досі немає."
+   },
+   "checkinfirefox_3": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "У тому браузері підпишіться на той же список фільтрів, як у вас тут."
+   },
+   "checkinfirefox_4": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "У тому браузері відкрийте сторінку із рекламою."
+   },
+   "checkinfirefox_5": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad",
+      "message": "Реклама з’являється в цьому браузері теж?"
+   },
+   "checkinfirefoxorchrome_1": {
+      "description": "instruction for how to check Firefox or Chrome for a reported ad",
+      "message": "Встановіть Firefox або Chrome, якщо ще не зробили цього."
+   },
+   "checkinfirefoxorchrome_2": {
+      "description": "Instruction for how to check Firefox/Chrome for a reported ad. Don't translate the name 'Adblock Plus'.",
+      "message": "Встановіть Adblock Plus для Firefox або AdBlock для Chrome, якщо у вас його немає."
+   },
+   "checkinfirefoxorchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox/Chrome",
+      "message": "Перевірте в Firefox чи в Chrome"
+   },
+   "checkinfirefoxtitle": {
+      "description": "Tell a user to see if a reported ad also appears in Firefox",
+      "message": "Перевірте у Firefox "
+   },
+   "chromebutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Chrome displays when you right click a toolbar button.",
+      "message": "Натисніть правою клавішею миші на кнопку AdBlock та оберіть «Сховати в меню Chrome». Натомість, щоб показати її, відкрийте меню Chrome, натисніть правою клавішею на кнопку AdBlock та оберіть «Показати на панелі інструментів»."
+   },
+   "cleanuplist2": {
+      "description": "Label at the bottom of the 'Customize' tab of the Options page",
+      "message": "Очистити цей список"
+   },
+   "clickdisableaa": {
+      "description": "Instruction on ad report page",
+      "message": "Натисніть сюди:  [[Вимкнути Прийнятні рекламні оголошення]]"
+   },
+   "clickdisableotherextensions": {
+      "description": "On the ad report page, an alternative way to disable other extensions",
+      "message": "АБО, просто натисніть цю кнопку, щоб зробити все що перераховано вище:[[Вимкнути всі інші розширення]]"
+   },
+   "clickupdatefilters": {
+      "description": "Instruction on ad report page",
+      "message": "Натисніть: [[Оновити фільтри!]]"
+   },
+   "close": {
+      "description": "Generic message for buttons that close a view or window",
+      "message": "Закрити"
+   },
+   "close_help_flow": {
+      "description": "Aria label for close button in help flow (in popup menu)",
+      "message": "Закрити потік допомоги і повернутися до спливаючих меню."
+   },
+   "confirm_delete_extension": {
+      "description": "Warning/confirmation message shown when the user clicks on the delete icon for a device",
+      "message": "Ви дійсно бажаєте видалити це розширення?"
+   },
+   "confirm_undo_custom_filters": {
+      "description": "Confirmation message when user wants to undo their custom blocks for a domain. $count$ will be a number between 1 and 999,999,999, $host$ will be the domain where the custom blocks will be reset.",
+      "message": "Ви впевнені, що хочете видалити блокування, створені на $host$? Кількість створених блокувань: $count$",
+      "placeholders": {
+         "count": {
+            "content": "$1",
+            "example": "12"
+         },
+         "host": {
+            "content": "$2",
+            "example": "stackoverflow.com"
+         }
+      }
+   },
+   "contact_support": {
+      "description": "Message for help flow in popup menu.",
+      "message": "[[Зв'яжіться з нашою службою підтримки!]]"
+   },
+   "contact_the_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Рекомендуємо зв'язатися з сайтом."
+   },
+   "content_blocking_acceptable_ads_disbled_message": {
+      "description": "Warning shown when the Acceptable Ads filter list is enabled while Safari Content Blocking was already enabled.",
+      "message": "Ми вимкнули блокування вмісту Safari, тому що Ви дозволити показ ненав'язливої реклами. Ви можете обрати одночасно лише одне. ([[Чому?]])"
+   },
+   "correctfilters": {
+      "description": "On the ad report page, label describing having the right filter lists enabled",
+      "message": "Переконайтеся, що ви використовуєте правильний мовний фільтр(и):"
+   },
+   "csstomatch": {
+      "description": "Message of the CSS-hiding section (Hide a section of a webpage) on the Customize tab",
+      "message": "захопити CSS"
+   },
+   "custom_filters_migration_error_message_part1": {
+      "description": "Part one of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Кількість помилок користувацьких фільтрів: "
+   },
+   "custom_filters_migration_error_message_part2": {
+      "description": "Part two of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Такі повідомлення були отримані в ході міграції користувацьких фільтрів (номери рядків ігноруйте): "
+   },
+   "custom_filters_migration_error_message_part3": {
+      "description": "Part three of a message shown to users on the Customize tab of the Options page after invalid custom filters have been migrated",
+      "message": "Оригінальний запис: "
+   },
+   "custom_image_description": {
+      "description": "text on the image swap tab",
+      "message": "Виберіть до 9 зображень, які ви хочете, щоб AdBlock використовував для заміни реклами"
+   },
+   "custom_image_error": {
+      "description": "header / title text on the error message on the image swap tab",
+      "message": "Ой! Щось пішло не так."
+   },
+   "custom_image_error_msg_partI": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Ми не змогли додати ваше зображення."
+   },
+   "custom_image_error_msg_partII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Зачекайте кілька хвилин і спробуйте ще раз"
+   },
+   "custom_image_error_msg_partIII": {
+      "description": "error message text error message on the image swap tab",
+      "message": "Ви також можете поділитися [[анонімними даними про налагодження]], щоб допомогти нам зрозуміти, що пішло не так."
+   },
+   "custom_image_supported_file_types": {
+      "description": "supported file types, shown on the error message dialog box when a user selects a unsupported file type",
+      "message": "*.bmp, *.gif, *.jpeg, *.png, *.svg, *.tiff, *.webp"
+   },
+   "custom_image_unsupported_msg_partI": {
+      "description": "First sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "Ой! Схоже, що ви намагаєтеся додати зображення, яке не підтримує користувальницький обмін зображень."
+   },
+   "custom_image_unsupported_msg_partII": {
+      "description": "second sentence, on the error message dialog box when a user selects a unsupported file type",
+      "message": "Будь ласка, оберіть один з наступних типів зображень:"
+   },
+   "custom_image_unsupported_title": {
+      "description": "header / title on error message dialog box when a user selects a unsupported file type",
+      "message": "Непідтримуваний тип зображення"
+   },
+   "custom_images": {
+      "description": "text on the image swap tab",
+      "message": "Користувацькі зображення"
+   },
+   "customchannelswitchlabel": {
+      "description": "The label text for the Custom Image switch on the MyAdBlock Options page",
+      "message": "Власний"
+   },
+   "customfilters": {
+      "description": "Subtitle on the Filter lists tab: Section for adding your own filter lists.",
+      "message": "Додатковий список фільтрів"
+   },
+   "customfilterserrormessage": {
+      "description": "Error message when there is an issue with a custom filter on the 'Customize' tab of the Options page",
+      "message": "Наступний фільтр: \n $filter$ \n містить помилку: \n $message$",
+      "placeholders": {
+         "filter": {
+            "content": "$1",
+            "example": "@@.ad"
+         },
+         "message": {
+            "content": "$2",
+            "example": "invalid filter"
+         }
+      }
+   },
+   "dark_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Темна"
+   },
+   "datacollectionoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Дозволити AdBlock анонімно збирати дані про використання фільтрів та про заблокований ними контент"
+   },
+   "debuginlogoption": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Показувати повідомлення налагодження в Журналі Консолі (сповільнює розширення)"
+   },
+   "debuginlogoption2": {
+      "description": "Checkbox on the 'General' tab of the Options page",
+      "message": "Показувати відомості налагодження в консольному журналі реєстрації"
+   },
+   "default_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Типова"
+   },
+   "delete": {
+      "description": "Text on a delete button",
+      "message": "Видалити"
+   },
+   "delete_all_stats_data": {
+      "description": "text related to the delete all data checkbox on the statistics page of the Options page",
+      "message": "Видалити мою поточну статистику блокування"
+   },
+   "delete_detail_msg_part_I": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Тут ви можете видалити вашу локально збережену статистику блокування."
+   },
+   "delete_detail_msg_part_II": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Буде видалено всі дані, що відображаються на вашій сторінці статистики, включаючи заблоковані сайти."
+   },
+   "delete_detail_msg_part_III": {
+      "description": "text on the delete overlay on the statistics page of the Options page",
+      "message": "Статистика зберігається лише на вашому пристрої, а також будь-яка статистика, яку ви видалите НЕ МОЖЕ бути відновлена."
+   },
+   "delete_detail_page_2_msg_part_I": {
+      "description": "text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "Ви впевнені?"
+   },
+   "delete_migration_error_messages": {
+      "description": "Button to delete error messages when adding custom filters manually",
+      "message": "Видалити повідомлення"
+   },
+   "delete_panel_title": {
+      "description": "title text on the delete overlay on the statistics page of the Options page",
+      "message": "Видалити статистику блокування"
+   },
+   "description": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "Блокуйте рекламу та спливаючі вікна на YouTube, Facebook, Twitter та ваших улюблених веб-сайтах."
+   },
+   "description2": {
+      "description": "Extension description in manifest. Should not exceed 132 characters.",
+      "message": "Найпопулярніше розширення для Chrome, яким користуються понад 60 мільйонів людей! Заблокуйте рекламу по всьому інтернету."
+   },
+   "description_edge": {
+      "description": "Description for the AdBlock for Edge extension. Should not exceed 132 characters.",
+      "message": "AdBlock. Блокувальник реклами № 1, завантажений більш ніж 200 мільйонів разів. Блокує рекламу по всьому інтернету."
+   },
+   "devtools_action_block": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Заблокувати елемент"
+   },
+   "devtools_action_remove": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Вилучити правило"
+   },
+   "devtools_action_unblock": {
+      "description": "Button text on the dev tools panel.",
+      "message": "Додати виняток"
+   },
+   "devtools_filter_origin_custom": {
+      "description": "sub-title text of the rule showing the source of the rule as custom rules",
+      "message": "визначені користувачем"
+   },
+   "devtools_filter_origin_none": {
+      "description": "sub-title text of the rule showing the source of the rule as a unamed filter list",
+      "message": "неназвана підписка"
+   },
+   "devtools_filter_subtitle": {
+      "description": "sub-title text of the rule showing the source of the rule a named filter list",
+      "message": "Походження"
+   },
+   "devtools_filter_title": {
+      "description": "Text of the filter that was applied to the list item.",
+      "message": "Фільтр"
+   },
+   "devtools_footer": {
+      "description": "message on the bottom of the panel",
+      "message": "\u003Ca0>Перезавантажте\u003C/a0> сторінку, щоб побачити ефект зміни фільтра"
+   },
+   "devtools_header": {
+      "description": "Text on the top of the dev tools panel to show all items of any type; slot0 and slot1 are two seperate drop down lists",
+      "message": "Показати \u003Cslot0>\u003C/slot0> елемент \u003Cslot1>\u003C/slot1> типу"
+   },
+   "devtools_header_state_all": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "всі"
+   },
+   "devtools_header_state_blocked": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "заблоковано"
+   },
+   "devtools_header_type_any": {
+      "description": "one of the items in the drop down list in the header of the dev tools panel",
+      "message": "будь-який"
+   },
+   "devtools_request_subtitle": {
+      "description": "sub title text for the request-column header of the dev tools panel",
+      "message": "Домен документа"
+   },
+   "devtools_request_title": {
+      "description": "title text for the request-column header of the dev tools panel",
+      "message": "Запит"
+   },
+   "devtools_request_url": {
+      "description": "A request URL in the AdBlock DevTools panel",
+      "message": "\u003Ca0>$original$\u003C/a0> переписано на \u003Ca1>$rewritten$\u003C/a1>",
+      "placeholders": {
+         "original": {
+            "content": "$1",
+            "example": "http://example.com/foo"
+         },
+         "rewritten": {
+            "content": "$2",
+            "example": "http://example.com/bar"
+         }
+      }
+   },
+   "devtools_type_title": {
+      "description": "Type column header text",
+      "message": "Тип"
+   },
+   "disableaa": {
+      "description": "Section header on the ad report page",
+      "message": "Перевіряємо фільтр Прийнятних рекламних оголошень:"
+   },
+   "disableallextensions": {
+      "description": "Instruction on ad report page",
+      "message": "Вимкніть усі розширення, окрім AdBlock:"
+   },
+   "disabled_by_filter_lists": {
+      "description": "Message shown when a user tries to un-allowlist a web page that has been allowlisted by a rule in a subscribed filter list.",
+      "message": "Перепрошуємо, AdBlock вимкнено на цій сторінці одним зі списків фільтрів."
+   },
+   "disabled_on_this_channel": {
+      "description": "Message shown in the toolbar button menu on YouTube channel pages and videos that have been allowlisted.",
+      "message": "Ви дозволили показувати рекламу на цьому каналі."
+   },
+   "disabled_on_this_page": {
+      "description": "Message shown in toolbar button on web pages that have been allowlisted",
+      "message": "AdBlock вимкнено на цій сторінці."
+   },
+   "disableforchromeandsafaristeptwo": {
+      "description": "Step 2 for disabling Chrome and Safari extensions",
+      "message": "Зніміть позначку «Увімкнено» поруч із кожним розширенням крім AdBlock. Залиште AdBlock увімкненим."
+   },
+   "disableforchromestepone": {
+      "description": "Step 1 for disabling Chrome extensions",
+      "message": "Відкрити [[сторінку розширень]]."
+   },
+   "disableforedgestepone": {
+      "description": "Step 1 for disabling Edge extensions",
+      "message": "Натисніть меню Більше (...) і виберіть розширення."
+   },
+   "disableforedgesteptwo": {
+      "description": "Step 2 for disabling Edge extensions",
+      "message": "Для кожного розширення крім AdBlock, натисніть на значок шестерні, а потім на перемикач, щоб змінити значення на Off."
+   },
+   "disableforsafaristepone": {
+      "description": "Step 1 for disabling Safari extensions",
+      "message": "Клацніть на меню «Safari» > «Налаштування» > «Розширення»."
+   },
+   "disableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "Ми вимкнули усі інші розширення. Зараз ми перезавантажимо сторінку з рекламою. Зачекайте секунду, будь ласка."
+   },
+   "display_language_selector": {
+      "description": "Text shown before language selector drop-down.",
+      "message": "Показувати AdBlock на"
+   },
+   "do_not_swap_ads": {
+      "description": "Text of a clickable option to stop swapping ads with images in the Options page Image Swap tab.",
+      "message": "Не замінюйте рекламу"
+   },
+   "dogchannelswitchlabel": {
+      "description": "The label text for the dog switch on the MyAdBlock Options page",
+      "message": "Собаки"
+   },
+   "domain_pause_adblock": {
+      "description": "Menu entry to pause AdBlock on this domain (stop blocking ads)",
+      "message": "Призупинити на цьому сайті"
+   },
+   "domain_unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site'",
+      "message": "Відновити AdBlock на цьому сайті"
+   },
+   "donate_to_adblock": {
+      "description": "Text of a donate link in the toolbar button menu",
+      "message": "Подобається AdBlock? Подумайте о пожертвуванні!"
+   },
+   "donate_to_youtube_adblock": {
+      "description": "Text of a donate link in the toolbar button menu. 'This' refers to the 'AdBlock on YouTube' extension.",
+      "message": "Подобається AdBlock на YouTube? Подумайте о пожертвуванні!"
+   },
+   "done": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Готово"
+   },
+   "done_reload_page": {
+      "description": "text on panel in the help flow",
+      "message": "Як тільки ми завершили, будь ласка, оновіть сторінку."
+   },
+   "dont_know_help_me": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Не знаю. Допоможіть мені!"
+   },
+   "dont_run_on_pages_on_domain": {
+      "description": "Menu entry to open the allowlist wizard",
+      "message": "Не виконувати на сторінках цього домена"
+   },
+   "dont_run_on_this_page": {
+      "description": "Menu entry to allowlist the current page",
+      "message": "Не запускати на цій сторінці"
+   },
+   "dontsend": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "Не надсилати"
+   },
+   "download_mac_app": {
+      "description": "Link to download our Mac App. [[ and ]] will be replaced with HTML to link to the Mac App Store",
+      "message": "Щоб отримати кращий досвід від AdBlock на вашому Mac, будь ласка, завантажте наш [[AdBlock для Safari Mac App!]]"
+   },
+   "easylist_disable_done": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock використовує EasyList для блокування реклами на більшості сайтів."
+   },
+   "easylist_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling EasyList via the Filter lists tab on the Options page.",
+      "message": "Ми рекомендуємо не вимикати його. Якщо ви випадково скасували підписку, оберіть «EasyList», щоб заблокувати більше реклами."
+   },
+   "easylist_lite_disable_done": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "AdBlock використовує EasyList Lite або EasyList, щоб блокувати оголошення на більшості сайтів."
+   },
+   "easylist_lite_disable_how_to_reenable": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "Ми рекомендуємо не вимикати його. Якщо ви випадково скасували підписку, оберіть «EasyList», щоб заблокувати більше реклами."
+   },
+   "easylist_lite_or_easylist": {
+      "description": "Message shown to users after disabling both EasyList Lite and EasyList via the Filter lists tab on the Options page.",
+      "message": "Ми рекомендуємо підписатись на \"EasyList Lite\" або \"EasyList\", але не на обидва."
+   },
+   "edit_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Вам може знадобитися [[редагувати список фільтрів]]."
+   },
+   "edit_image": {
+      "description": "header text in the on custom image swap modal dialog",
+      "message": "Редагувати зображення"
+   },
+   "edit_image_msg_partI": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "Нижче ми перерахували 3 найбільш поширених розмірів оголошень."
+   },
+   "edit_image_msg_partII": {
+      "description": "Text in the on custom image swap modal dialog",
+      "message": "Виберіть розмір скрині для вашого зображення, відрегулюйте повзунком та клікніть \"Зберегти\" після завершення."
+   },
+   "enable_adblock": {
+      "description": "Link text to un-allowlist a page, displayed immediately after 'AdBlock is disabled on this page'",
+      "message": "Увімкнути AdBlock на цій сторінці"
+   },
+   "enable_adblock_on_this_channel": {
+      "description": "Menu entry to un-allowlist a YouTube channel, displayed under 'You allowed ads on this channel.'",
+      "message": "Блокувати рекламу на цьому каналі"
+   },
+   "enable_do_not_track_advice": {
+      "description": "The text advicing to enable DNT if Acceptable Ads is enabled in the General tab",
+      "message": "Для правильної роботи цієї функції, будь ласка, увімкніть  Do Not Track (DNT) у ваших налаштуваннях браузера."
+   },
+   "enableotherextensionscomplete": {
+      "description": "On the ad report page, alert notifying users that we've re-enabled extensions that were previously disabled",
+      "message": "Розширення, які були раніше вимкнуті були повторно увімкнено."
+   },
+   "english_site": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ви на англомовному сайті?"
+   },
+   "englishonly": {
+      "description": "Lets the user know that a link/page is only available in English.",
+      "message": "Лише англійською мовою"
+   },
+   "enjoying_adblock": {
+      "description": "Text of a footer in the popup menu help flow asking users to leave us a review.",
+      "message": "Подобається AdBlock?"
+   },
+   "enter_url": {
+      "description": "Placeholder text in the Custom Filter list URL bar",
+      "message": "введіть URL"
+   },
+   "error": {
+      "description": "Text in the aria-label attribute of an icon indicating an error occurred.",
+      "message": "Помилка"
+   },
+   "error_msg_header": {
+      "description": "DO NOT TRANSLATE The text on the popup menu when an error has occurred",
+      "message": "Ой!"
+   },
+   "error_msg_thank_you": {
+      "description": "The text on the popup menu when an error has occurred",
+      "message": "Дякуємо"
+   },
+   "example_themes": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the themes feature.",
+      "message": "Приклади тем"
+   },
+   "excludedomainorurl": {
+      "description": "Message of the exclude section (Show ads on a webpage or domain) on the Customize tab",
+      "message": "Домен або URL, на якому AdBlock не працюватиме"
+   },
+   "failedtofetchfilter": {
+      "description": "Error alert when subscribing to a filter list",
+      "message": "Помилка отримання фільтру!"
+   },
+   "fetchinglabel": {
+      "description": "Status label when selecting a new filter list",
+      "message": "Забираємо... будь ласка, чекайте."
+   },
+   "ff_button_how_to_hide": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Remove from Toolbar' should match the text that Firefox displays when you right click a toolbar button, and 'Customize' should match the text that shows when you click the button on the Firefox toolbar with three lines.",
+      "message": "Щоб приховати кнопку, натисніть правою кнопкою мишки і виберіть Видалити з Тулбару. Ви можете знову відобразити її, для цього потрібно зайти в меню Firefox ->Кастомізувати."
+   },
+   "ff_checkinchrome_1": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Встановіть Chrome, якщо його у вас нема."
+   },
+   "ff_checkinchrome_2": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Встановіть AdBlock для Chrome, якщо у вас його нема."
+   },
+   "ff_checkinchrome_3": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "У Chrome підпишіться на ті ж списки фільтрів, як і тут."
+   },
+   "ff_checkinchrome_4": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "В Chrome, завантажте сторінку з рекламою."
+   },
+   "ff_checkinchrome_5": {
+      "description": "Instruction for how to check Chrome for a reported ad",
+      "message": "Реклама з'являється в Chrome теж?"
+   },
+   "ff_checkinchrometitle": {
+      "description": "Tell a user to see if a reported ad also appears in Chrome",
+      "message": "Перевірте в Chrome"
+   },
+   "filter_annoyances_explained": {
+      "description": "A filter list explanation",
+      "message": "блокує спливаючі вікна на сторінці, соціальні медіа, пов'язані віджети та інші дратуючі речі"
+   },
+   "filter_antisocial_explained": {
+      "description": "A filter list explaination",
+      "message": "видаляє соціальні кнопки"
+   },
+   "filter_chinese": {
+      "description": "A filter list combined with EasyList",
+      "message": "Китайська + EasyList"
+   },
+   "filter_czech": {
+      "description": "A filter list combined with EasyList",
+      "message": "Чеська & Словацька + EasyList"
+   },
+   "filter_dutch": {
+      "description": "A filter list combined with EasyList",
+      "message": "Нідерландська + EasyList"
+   },
+   "filter_easylist_plus_arabic_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "Арабська & Французька + EasyList"
+   },
+   "filter_easylist_plus_bulgarian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Болгарська + EasyList"
+   },
+   "filter_easylist_plus_french": {
+      "description": "A filter list combined with EasyList",
+      "message": "Французька + EasyList"
+   },
+   "filter_easylist_plus_german": {
+      "description": "A filter list combined with EasyList",
+      "message": "Німецька + EasyList"
+   },
+   "filter_easylist_plus_indonesian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Індонезійська + EasyList"
+   },
+   "filter_easylist_plus_lithuania": {
+      "description": "A filter list combined with EasyList",
+      "message": "Литовська + EasyList"
+   },
+   "filter_easylist_plus_romanian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Румунська + EasyList"
+   },
+   "filter_easylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "В'єтнамська + EasyList"
+   },
+   "filter_elemhideemulation_nodomain": {
+      "message": "Не вказано домен для розширеного фільтра приховування елементів"
+   },
+   "filter_invalid": {
+      "description": "Generic error shown when the user tries to add an invalid filter rule to their custom filters",
+      "message": "Невірний фільтр"
+   },
+   "filter_invalid_csp": {
+      "message": "Невірна політика захисту вмісту"
+   },
+   "filter_invalid_domain": {
+      "message": "Вказано некоректний (порожній) домен"
+   },
+   "filter_invalid_regexp": {
+      "message": "Неправильний регулярний вираз"
+   },
+   "filter_israeli": {
+      "description": "A filter list combined with EasyList",
+      "message": "Іврит + EasyList"
+   },
+   "filter_italian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Італійська + EasyList"
+   },
+   "filter_latvian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Латиська + EasyList"
+   },
+   "filter_russian": {
+      "description": "A filter list combined with EasyList",
+      "message": "Українська & Російська + EasyList"
+   },
+   "filter_snippet_nodomain": {
+      "message": "Не вказано активний домен для фрагментного фільтра"
+   },
+   "filter_unknown_option": {
+      "message": "Невідома опція фільтра"
+   },
+   "filter_warning_removal_explained": {
+      "description": "A filter list explanation",
+      "message": "усуває застереження щодо використання блокувальників реклами"
+   },
+   "filteracceptable_ads": {
+      "description": "A filter list",
+      "message": "Прийнятна реклама"
+   },
+   "filteracceptable_ads_privacy": {
+      "description": "A filter list",
+      "message": "Конфіденційність Acceptable Ads"
+   },
+   "filteradblock_custom": {
+      "description": "A filter list",
+      "message": "Користувацькі фільтри AdBlock"
+   },
+   "filterannoyances": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances (блокує спливаючі вікна на сторінці, соціальні медіа, пов'язані віджети та інші дратуючі речі)"
+   },
+   "filterannoyances2": {
+      "description": "A filter list",
+      "message": "Fanboy's Annoyances"
+   },
+   "filteranticircumvent": {
+      "description": "A filter list",
+      "message": "Протиобхідні фільтри"
+   },
+   "filterantisocial": {
+      "description": "A filter list",
+      "message": "Антисоціальний список фільтрів (прибирає кнопки соціальних мереж)"
+   },
+   "filterantisocial2": {
+      "description": "A filter list",
+      "message": "Список фільтрів Antisocial"
+   },
+   "filterbitcoin_mining_protection": {
+      "description": "A filter list",
+      "message": "Список захисту від майнінга криптовалюти (Bitcoin)"
+   },
+   "filterbrazilian_portuguese": {
+      "description": "A filter list",
+      "message": "Бразильська Португальська"
+   },
+   "filterchinese": {
+      "description": "A filter list",
+      "message": "Китайською"
+   },
+   "filterczech": {
+      "description": "A filter list",
+      "message": "Чеська та словацька"
+   },
+   "filterdanish": {
+      "description": "A filter list",
+      "message": "Датською"
+   },
+   "filterdutch": {
+      "description": "A filter list",
+      "message": "Голландською"
+   },
+   "filtereasylist": {
+      "description": "A filter list",
+      "message": "EasyList"
+   },
+   "filtereasylist_lite": {
+      "description": "A filter list",
+      "message": "EasyList Lite"
+   },
+   "filtereasylist_plun_korean": {
+      "description": "A filter list",
+      "message": "Корейською"
+   },
+   "filtereasylist_plus_arabic": {
+      "description": "A filter list",
+      "message": "Арабською"
+   },
+   "filtereasylist_plus_bulgarian": {
+      "description": "A filter list",
+      "message": "Болгарською"
+   },
+   "filtereasylist_plus_estonian": {
+      "description": "A filter list",
+      "message": "Естонською"
+   },
+   "filtereasylist_plus_finnish": {
+      "description": "A filter list",
+      "message": "Фінською"
+   },
+   "filtereasylist_plus_french": {
+      "description": "A filter list",
+      "message": "Французькою"
+   },
+   "filtereasylist_plus_german": {
+      "description": "A filter list",
+      "message": "Німецькою"
+   },
+   "filtereasylist_plus_greek": {
+      "description": "A filter list",
+      "message": "Грецькою"
+   },
+   "filtereasylist_plus_indian": {
+      "description": "A filter list",
+      "message": "Індонезійська + EasyList"
+   },
+   "filtereasylist_plus_indonesian": {
+      "description": "A filter list",
+      "message": "Індонезійська"
+   },
+   "filtereasylist_plus_lithuania": {
+      "description": "A filter list",
+      "message": "Литовською"
+   },
+   "filtereasylist_plus_polish": {
+      "description": "A filter list",
+      "message": "Польською"
+   },
+   "filtereasylist_plus_portuguese": {
+      "description": "A filter list",
+      "message": "Португальська + EasyList"
+   },
+   "filtereasylist_plus_romanian": {
+      "description": "A filter list",
+      "message": "Румунською"
+   },
+   "filtereasylist_plus_spanish": {
+      "description": "A filter list",
+      "message": "Іспанською"
+   },
+   "filtereasylist_plus_vietnamese": {
+      "description": "A filter list combined with EasyList",
+      "message": "В’єтнамська"
+   },
+   "filtereasyprivacy": {
+      "description": "A filter list",
+      "message": "EasyPrivacy (для захисту приватності)"
+   },
+   "filterhungarian": {
+      "description": "A filter list",
+      "message": "Угорською"
+   },
+   "filtericelandic": {
+      "description": "A filter list",
+      "message": "Ісландською"
+   },
+   "filterisraeli": {
+      "description": "A filter list",
+      "message": "Івритом"
+   },
+   "filteritalian": {
+      "description": "A filter list",
+      "message": "Італійською"
+   },
+   "filterjapanese": {
+      "description": "A filter list",
+      "message": "Японською"
+   },
+   "filterlatvian": {
+      "description": "A filter list",
+      "message": "Латиська"
+   },
+   "filterlistlink": {
+      "description": "Filter lists tab explanation and link to filter list credits.",
+      "message": "Не підписуйтесь на більше ніж потрібно — кожен з них трохи уповільнює роботу! Першоджерела та додаткові списки Ви можете знайти [[тут]]."
+   },
+   "filterlistsrock": {
+      "description": "Header text on the Customize tab",
+      "message": "Списки фільтрів блокують майже всю рекламу в інтернеті. Проте ви можете:"
+   },
+   "filterlistsrock2": {
+      "description": "Header text on the Customize tab",
+      "message": "Списки фільтрів блокують майже всю рекламу в інтернеті. Також ви можете..."
+   },
+   "filternorwegian": {
+      "description": "A filter lsit",
+      "message": "Норвезька"
+   },
+   "filterorigin": {
+      "description": "Resource list page: tooltip of matching filter, telling which filter list contains the filter",
+      "message": "Походження фільтру: $list$",
+      "placeholders": {
+         "list": {
+            "content": "$1",
+            "example": "A filter list name OR AdBlock OR the translation of 'tabcustomize'"
+         }
+      }
+   },
+   "filterrussian": {
+      "description": "Language names for a filter list",
+      "message": "Українська та російська"
+   },
+   "filtersavewarning_part1": {
+      "description": "Warning when manually editing filters -- first part not clickable.",
+      "message": "Будьте обачними: якщо ви зробите тут помилку то купа інших фільтрів, включно з офіційними, також можуть зламатися!"
+   },
+   "filterstabtitle": {
+      "description": "Title of the Filter lists tab of the Options page",
+      "message": "Підписатись на список фільтрів"
+   },
+   "filterswedish": {
+      "description": "A filter list",
+      "message": "Шведська"
+   },
+   "filterturkish": {
+      "description": "A filter list",
+      "message": "Турецька"
+   },
+   "filterviewsource": {
+      "description": "Title for links to view filter lists on website",
+      "message": "Переглянути список фільтрів"
+   },
+   "filterwarning_removal": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Список Попереджень про видалення AdBlock (видаляє попередження про використання блокувальника реклами)"
+   },
+   "filterwarning_removal2": {
+      "description": "A filter list. \"Adblock\" is written with a lowercase B in this string as it refers to ad blocking extensions in general, not just AdBlock specifically.",
+      "message": "Попередження AdBlock про список видалення"
+   },
+   "findingads": {
+      "description": "'Block an ad' wizard loading message",
+      "message": "Пошук реклами...\n\nЦе триватиме недовго."
+   },
+   "firefox_explanation": {
+      "description": "Explanation of the 'Check in Firefox or Chrome' step on the ad report page",
+      "message": "Мета цього питання визначити, хто має отримати вашу скаргу. Якщо ви дасте хибну відповідь, скарга потрапить не у ті руки і, у такому випадку, може бути проігнорована."
+   },
+   "first_time_seeing_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Це мій перший раз, коли я бачу це оголошення"
+   },
+   "fixityourself": {
+      "description": "Telling users who won't report an ad to us how to handle it for themselves",
+      "message": "Гаразд, ви все ще можете заблокувати цю рекламу лише для себе на сторінці настройок. Дякуємо!"
+   },
+   "flashads": {
+      "description": "Title of the final ad report question if the ad didn't appear in Firefox",
+      "message": "Відео та Flash"
+   },
+   "framedomain": {
+      "description": "Resource list page: domain name of the frame",
+      "message": "Домен фрейму: "
+   },
+   "frametype": {
+      "description": "Resource list page: followed by frame type (top frame, subframe)",
+      "message": "Тип фрейму: "
+   },
+   "frameurl": {
+      "description": "Resource list page: full URL of the frame",
+      "message": "URL фрейму: "
+   },
+   "future_show_ads": {
+      "description": "Part of a message on the allowlist wizard",
+      "message": "В майбутньому ці сторінки продовжуватимуть показувати рекламу."
+   },
+   "generaloptions": {
+      "description": "Title of the first Options page tab",
+      "message": "Основні налаштування"
+   },
+   "generaloptions2": {
+      "description": "Title of one of the Options page tabs",
+      "message": "Основні налаштування"
+   },
+   "get_it_now": {
+      "description": "The text in a button visible to locked users in the MyAdBlock Options page",
+      "message": "Отримати зараз"
+   },
+   "get_sync": {
+      "description": "Link to pay for Sync (part of AdBlock Premium)",
+      "message": "Отримати синхронізацію"
+   },
+   "got_it": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Зрозуміло."
+   },
+   "header": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 10 characters)",
+      "message": "Заголовок"
+   },
+   "headerfilter": {
+      "description": "Resource list page: title of a column",
+      "message": "Підпадає під фільтр"
+   },
+   "headerresource": {
+      "description": "Resource list page: title of a column",
+      "message": "Ресурс"
+   },
+   "headertype": {
+      "description": "Resource list page: title of a column",
+      "message": "Тип"
+   },
+   "help": {
+      "description": "Text in the aria-label attribute of the support icon on the pop-up menu.",
+      "message": "Допомога"
+   },
+   "help_and_feedback": {
+      "description": "Text of a help link in the toolbar button menu",
+      "message": "Довідка та зворотній зв'язок"
+   },
+   "hiddenelement": {
+      "description": "Resource list page: resource status",
+      "message": "Прихований елемент"
+   },
+   "hide_details": {
+      "description": "Toggle that hides the details section",
+      "message": "Приховати подробиці"
+   },
+   "hide_this_button": {
+      "description": "Toolbar button menu entry to hide the AdBlock button",
+      "message": "Сховати цю кнопку"
+   },
+   "how": {
+      "description": "Text of a link pointing to instructions on how to do something",
+      "message": "Як?"
+   },
+   "how_can_we_help": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Як ми можемо допомогти?"
+   },
+   "image_of_channel": {
+      "description": "Text in the alt attribute of an image injected into a page as part of the Image Swap feature.",
+      "message": "Зображення $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Dogs"
+         }
+      }
+   },
+   "image_swap": {
+      "description": "Title of the Image Swap sub-tab of the Options page",
+      "message": "Обмін зображеннями"
+   },
+   "image_swap_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Image Swap feature.",
+      "message": "Приклад заміни зображення"
+   },
+   "images_coming_soon": {
+      "description": "The text telling MyAdBlock active users that there will be more photos for MyAdBlock.",
+      "message": "Незабаром більше фото!"
+   },
+   "invalidListUrl": {
+      "description": "Message when you subscribe to a non-list URL",
+      "message": "Неприпустимий список URL. Його буде видалено."
+   },
+   "issue_unrelated_adblock": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Схоже, проблема з сайтом, яка не пов'язана з AdBlock."
+   },
+   "landscapechannelswitchlabel": {
+      "description": "The label text for the Landscape switch on the MyAdBlock Options page",
+      "message": "Ландшафтний режим"
+   },
+   "lang_arabic": {
+      "description": "Language name",
+      "message": "Арабська"
+   },
+   "lang_bulgarian": {
+      "description": "Language name",
+      "message": "Болгарська"
+   },
+   "lang_catalan": {
+      "description": "Language name",
+      "message": "Каталонська"
+   },
+   "lang_chinese": {
+      "description": "Language name",
+      "message": "Китайська"
+   },
+   "lang_chinese_simplified": {
+      "description": "Language name",
+      "message": "Китайська спрощена"
+   },
+   "lang_chinese_traditional": {
+      "description": "Language name",
+      "message": "Китайська традиційна"
+   },
+   "lang_croatian": {
+      "description": "Language name",
+      "message": "Хорватська"
+   },
+   "lang_czech": {
+      "description": "Language name",
+      "message": "Чеською"
+   },
+   "lang_danish": {
+      "description": "Language name",
+      "message": "Датська"
+   },
+   "lang_dutch": {
+      "description": "Language name",
+      "message": "Голландська"
+   },
+   "lang_english": {
+      "description": "Language name",
+      "message": "Англійською"
+   },
+   "lang_estonian": {
+      "description": "Language name",
+      "message": "Естонська"
+   },
+   "lang_finnish": {
+      "description": "Language name",
+      "message": "Фінська"
+   },
+   "lang_french": {
+      "description": "Language name",
+      "message": "Французька"
+   },
+   "lang_german": {
+      "description": "Language name",
+      "message": "Німецька"
+   },
+   "lang_greek": {
+      "description": "Language name",
+      "message": "Грецька"
+   },
+   "lang_hungarian": {
+      "description": "Language name",
+      "message": "Угорська"
+   },
+   "lang_icelandic": {
+      "description": "Language name",
+      "message": "Ісландська"
+   },
+   "lang_indonesian": {
+      "description": "Language name",
+      "message": "Індонезійська"
+   },
+   "lang_israeli": {
+      "description": "Language name",
+      "message": "Іврит"
+   },
+   "lang_italian": {
+      "description": "Language name",
+      "message": "Італійська"
+   },
+   "lang_japanese": {
+      "description": "Language name",
+      "message": "Японська"
+   },
+   "lang_korean": {
+      "description": "Language name",
+      "message": "Корейська"
+   },
+   "lang_latvian": {
+      "description": "Language name",
+      "message": "Латиська"
+   },
+   "lang_lithuania": {
+      "description": "Language name",
+      "message": "Литовська"
+   },
+   "lang_norwegian": {
+      "description": "Language name",
+      "message": "Норвезька"
+   },
+   "lang_polish": {
+      "description": "Language name",
+      "message": "Польська"
+   },
+   "lang_portuguese_brazil": {
+      "description": "Language name",
+      "message": "Португальська (Бразилія)"
+   },
+   "lang_portuguese_portugal": {
+      "description": "Language name",
+      "message": "Португальська (Португалія)"
+   },
+   "lang_romanian": {
+      "description": "Language name",
+      "message": "Румунська"
+   },
+   "lang_russian": {
+      "description": "Language name",
+      "message": "Російською"
+   },
+   "lang_serbian": {
+      "description": "Language name",
+      "message": "Сербська"
+   },
+   "lang_slovak": {
+      "description": "Language name",
+      "message": "Словацькою"
+   },
+   "lang_slovenian": {
+      "description": "Language name",
+      "message": "Словенська"
+   },
+   "lang_spanish": {
+      "description": "Language name",
+      "message": "Іспанська"
+   },
+   "lang_swedish": {
+      "description": "Language name",
+      "message": "Шведська"
+   },
+   "lang_turkish": {
+      "description": "Language name",
+      "message": "Турецька"
+   },
+   "lang_ukranian": {
+      "description": "Language name",
+      "message": "Українською"
+   },
+   "lang_vietnamese": {
+      "description": "Language name",
+      "message": "В’єтнамська"
+   },
+   "languagedropdowndescription": {
+      "description": "Dropdown list for language-specific filter lists",
+      "message": "Додати фільтри для сторінок іншою мовою: "
+   },
+   "learn_more": {
+      "description": "Link to Knowledge Base article with more information about the settings change",
+      "message": "Дізнатися більше."
+   },
+   "learn_more_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Можливо, ви також хотіли б [[дізнатися більше про список фільтрів]]."
+   },
+   "learn_more_to_resolve": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ви можете [[дізнатися більше тут]], щоб допомогти вирішити проблему."
+   },
+   "learn_more_without_period": {
+      "description": "Text in the aria-label attribute of an icon linking to extra information about an option.",
+      "message": "Дізнатися більше"
+   },
+   "leave_a_review": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "Залиште нам відгук!"
+   },
+   "legend": {
+      "description": "Resource list page: followed by color codes for various resource statuses (blocked, allowlisted, hidden)",
+      "message": "Умовні позначення: "
+   },
+   "linkblockadbyurl": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Заблокувати рекламу за її URL"
+   },
+   "linkhidesection": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Приховати частину веб-сторінки"
+   },
+   "linkunblock": {
+      "description": "Link label on the 'Customize' tab",
+      "message": "Показувати рекламу на веб-сторінці або домені"
+   },
+   "loading": {
+      "description": "Generic message displayed during processes that take some time",
+      "message": "ЗАВАНТАЖЕННЯ..."
+   },
+   "loading_in_progress": {
+      "description": "Text in the aria-label attribute of an icon indicating that page is currently loading",
+      "message": "триває завантаження"
+   },
+   "local_cdn_option": {
+      "description": "Option to let the user enable Local CDN feature.",
+      "message": "Дозволити локальне кешування вмісту для популярних бібліотек сайтів"
+   },
+   "locked": {
+      "description": "Text in the aria-label attribute of an icon showing a feature/option is locked.",
+      "message": "Заблоковано"
+   },
+   "love_adblock": {
+      "description": "Text in a button that asks users to rate us.",
+      "message": "Подобається AdBlock?"
+   },
+   "mac_app_message_menu_part_one": {
+      "description": "part one of the message to safari users on the popup menu",
+      "message": "Нове!"
+   },
+   "mac_app_message_menu_part_two": {
+      "description": "part two of the message to safari users on the popup menu",
+      "message": "Спробуйте додаток AdBlock для Mac"
+   },
+   "mac_app_message_options": {
+      "description": "Message to users on the Options page",
+      "message": "AdBlock для Safari тепер доступний як додаток для Mac!"
+   },
+   "make_adblock_yours_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "Ви контролюєте зовнішній вигляд і розмір шрифту AdBlock за допомогою простих у використанні інструментів."
+   },
+   "make_adblock_yours_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Зробіть AdBlock своїм"
+   },
+   "manage_subscription": {
+      "description": "Text of link to manage the user's Premium subscription on the Premium tab of the Options page",
+      "message": "Керування підпискою"
+   },
+   "manualexcludefilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Відредагуйте вимкнені фільтри:"
+   },
+   "manualexcludefilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Відредагуйте вимкнені фільтри"
+   },
+   "manualfilteredit": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Налаштувати фільтри вручну:"
+   },
+   "manualfilteredit2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Налаштувати фільтри вручну"
+   },
+   "manualfilteredit_yt": {
+      "description": "Subtitle on the 'General' tab of AdBlock on YouTube",
+      "message": "Налаштувати фільтри вручну:"
+   },
+   "manuallyenableotherextensions": {
+      "description": "On the ad report page, alert notifying users that they will need to manually reenable the extensions",
+      "message": "Відкрийте сторінку розширень, щоб увімкнути розширення, які раніше були відключені."
+   },
+   "migration_error_message": {
+      "description": "Error when adding custom filters manually",
+      "message": "Ми знайшли деякі помилки в користувацьких фільтрах. Дивіться повідомлення нижче."
+   },
+   "modifydomain": {
+      "description": "Caption for the allowlist wizard slider that modifies the domain part of a URL",
+      "message": "Сайт:"
+   },
+   "modifypath": {
+      "description": "Caption for the allowlist wizard slider that modifies the path part of a URL",
+      "message": "Сторінка:"
+   },
+   "more_themes_coming_soon": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "Перевірте пізніше, незабаром буде більше тем!"
+   },
+   "more_themes_on_the_way": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 60 characters)",
+      "message": "Більше тем на шляху!"
+   },
+   "myadblock_benefits_explained": {
+      "description": "Main text of the teaser MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "В обмін на підтримку нас, включивши MyAdBlock, ви отримаєте доступ до новітніх інструментів і функцій відразу після їх випуску."
+   },
+   "myadblock_feedback_button": {
+      "description": "Text on the MyAdBlock feedback button",
+      "message": "Надіслати відгук"
+   },
+   "myadblock_feedback_info": {
+      "description": "Text describing the MyAdBlock feedback call to action.",
+      "message": "Якщо у вас є відгуки або побажання, будь ласка, використайте нашу сторінку зворотнього зв'язку."
+   },
+   "myadblock_feedback_title": {
+      "description": "Title for MyAdBlock feedback call to action.",
+      "message": "Нам важлива Ваша думка!"
+   },
+   "myadblock_more_coming_soon": {
+      "description": "Title of the teaser MyAdBlock feature box in the MyAdBlock tab of the Options page",
+      "message": "Нові можливості вже незабаром"
+   },
+   "myadblock_options_page_header": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblock_page_title": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "MyAdBlock: кращий спосіб перегляду інтернету."
+   },
+   "myadblock_payment_not_available_callout": {
+      "description": "The text notifying something is wrong in the payment iframe in the Options page.",
+      "message": "О Ні!"
+   },
+   "myadblock_payment_not_available_subtitle": {
+      "description": "The sub-title of an error message box in payment iframe in the Options page.",
+      "message": "Ми не змогли під'єднатися до наших серверів"
+   },
+   "myadblock_payment_not_available_text": {
+      "description": "The text of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "Ми дуже раді, що вас зацікавив MyAdBlock! Нажаль, ми не можемо приймати платежі в даний момент. Будь ласка, спробуйте пізніше."
+   },
+   "myadblock_payment_not_available_title": {
+      "description": "The title of an error message box in the MyAdBlock tab in option page when we cannot load iframe.",
+      "message": "О НІ! Ми не змогли під'єднатися до наших серверів"
+   },
+   "myadblock_pic_replacemenet_description": {
+      "description": "The text briefly describing what the feature does in the MyAdBlock tab in the option page.",
+      "message": "Замініть рекламу зображеннями, які вам подобаються"
+   },
+   "myadblock_picreplacement_exlained": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "Оберіть з категорій нижче і AdBlock інколи замінюватиме рекламу високоякісними зображеннями, щоб прикрасити ваш день."
+   },
+   "myadblock_short_description": {
+      "description": "Text substitle of myAdBlock page in the options page",
+      "message": "Дізнайтеся про розширений AdBlock з цікавими можливостями виключно для донорів"
+   },
+   "myadblock_short_description_to_pay": {
+      "description": "The text next to the 'Get It Now' button on top of the MyAdBlock Options page",
+      "message": "Ви будете блокувати рекламу pro за допомогою цих простих у використанні додатків."
+   },
+   "myadblock_subscribe_invite": {
+      "description": "Text on hover of a locked MyAdBlock feature in the MyAdBlock tab of the Options page",
+      "message": "Підпишіться на MyAdBlock, щоб розблокувати"
+   },
+   "myadblock_themes_description": {
+      "description": "Text briefly describing what themes do on the MyAdBlock tab of the Options page",
+      "message": "Змінити особливості вигляну AdBlock, включаючи розмір шрифту та колірну схему"
+   },
+   "myadblockenrollment": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "Увімкнути MyAdBlock"
+   },
+   "myadblockoptions": {
+      "description": "The text of the menu item in the popup menu that takes you to the MyAdBlock Options page",
+      "message": "MyAdBlock"
+   },
+   "myadblockoptionscategoryheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "Категорії"
+   },
+   "myadblockoptionspageheader": {
+      "description": "The text of the header the MyAdBlock Options page",
+      "message": "Налаштування MyAdBlock"
+   },
+   "myadblockpicreplacementswitchlabel": {
+      "description": "The label text for the switch on the MyAdBlock Options page",
+      "message": "Замінити деякі заблоковані оголошення високоякісними зображеннями з наведених нижче категорій"
+   },
+   "name": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — найкращий блокувальник реклами"
+   },
+   "name_adblock_on_youtube": {
+      "description": "Name of version of the AdBlock extension that only blocks ads on YouTube. Other strings that refer to the 'AdBlock on YouTube' extension should use this name.",
+      "message": "AdBlock on YouTube"
+   },
+   "name_devbuild": {
+      "description": "Extension name to be shown for development builds. Note: this cannot be longer than 45 characters. Should not be translated",
+      "message": "AdBlock розробник"
+   },
+   "name_releasebuild": {
+      "description": "Extension name to be shown for release / published builds.  The extension name 'AdBlock' should NOT be translated, but the text after the dash should be translated",
+      "message": "AdBlock — найкращий блокувальник реклами"
+   },
+   "never_lose_settings": {
+      "description": "Part 2 of a call-to-action on the allowlist and blocklist wizards",
+      "message": "Використовуйте цей параметр для всіх ваших пристроїв і переконайтеся, що ви ніколи не втратите налаштування AdBlock з резервим копіюванням та синхронізацією."
+   },
+   "new_badge": {
+      "description": "Max 4 characters. If it's not possible to translate in four characters or less, please don't translate. Text in the badge of our extension toolbar icon.",
+      "message": "Новий"
+   },
+   "new_cta_default_text": {
+      "description": "Text of a temporary call-to-action item in the popup menu.",
+      "message": "Оновіть AdBlock"
+   },
+   "new_cta_hovered_text": {
+      "description": "Text of a temporary call-to-action hovered item in the popup menu.",
+      "message": "Насолоджуйтесь кращим переглядом"
+   },
+   "new_myadblock_feature_available": {
+      "description": "The text in the popup menu item saying there is a new MyAdBlock feature and takes you to the MyAdBlock tab in the option page.",
+      "message": "Натисніть тут, щоб розблокувати нові можливості!"
+   },
+   "new_resourcelist_explanation_osx": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Mac)",
+      "message": "Щоб подивитись на всі запити, натисніть правою кнопкою миші на сторінці, виберіть «Перевірити» (Option+Cmd+I), і перейдіть на вкладку «AdBlock»."
+   },
+   "new_resourcelist_explanation_win": {
+      "description": "Message explaining how to access the resource list page on AdBlock 3.0+ (Windows)",
+      "message": "Щоб подивитись на всі запити, натисніть правою кнопкою миші на сторінці, виберіть «Перевірити» (Ctrl + Shift + I), і перейдіть на вкладку «AdBlock»."
+   },
+   "newmyadblockenrollment": {
+      "description": "The text of the 'Enable MyAdBlock' menu item in the popup menu that takes you to the MyAdBlock Enrollment page",
+      "message": "НОВЕ"
+   },
+   "no": {
+      "description": "A negative response to a question",
+      "message": "Ні"
+   },
+   "no_changes_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ми не будемо нічого змінювати, тому ви й надалі будете бачити рекламу."
+   },
+   "no_data_msg_part_I": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "В даний час у вас немає жодної блокуючої статистики для відображення."
+   },
+   "no_data_msg_part_II": {
+      "description": "text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "Оновіть цю сторінку після перегляду веб-сторінки, щоб почати бачити список блокування."
+   },
+   "no_data_title": {
+      "description": "title text on warning message when there's no user data to show on the statistics page of the Options page",
+      "message": "Немає статистики"
+   },
+   "nodefaultfilter1": {
+      "description": "Instructions on ad report page pointing users to EasyList subscriptions list.",
+      "message": "У нас немає стандартного списку фільтрів для цієї мови.\nБудь ласка, [[спробуйте знайти відповідний список з підтримкою цієї мови]], або заблокуйте цю рекламу лише для себе в меню AdBlock."
+   },
+   "noresourcessend2": {
+      "description": "Resource list page: error message",
+      "message": "Щось пішло не так. Не було відпревлено жодних ресурсів. Цю сторінку буде закрито. Спробуйте перезавантажити сайт."
+   },
+   "note": {
+      "description": "Indicates that the user should take note of the message that follows.",
+      "message": "ПРИМІТКА:"
+   },
+   "notification_antiadblock_message": {
+      "message": "Цей сайт, як відомо, показує цільові повідомлення користувачам AdBlock. Ви хочете, щоб AdBlock приховував цільові повідомлення?"
+   },
+   "notification_antiadblock_title": {
+      "message": "Приховати цільові повідомлення?"
+   },
+   "ocean_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Океан"
+   },
+   "oceanchannelswitchlabel": {
+      "description": "The label text for the Ocean switch on the MyAdBlock Options page",
+      "message": "Океан"
+   },
+   "ok": {
+      "description": "Message for help flow in popup menu.",
+      "message": "OK"
+   },
+   "only_block_ads_on_these_sites": {
+      "description": "Label for textbox where user enters a list of sites on Customize tab",
+      "message": "Блокувати рекламу лише на цих сайтах:"
+   },
+   "operabutton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Hide Button' should match the text that Opera displays on the Extensions page.",
+      "message": "Щоб приховати цю кнопку, перейдіть на сторінку opera://extensions і позначте «Приховати з панелі інструментів». Кнопку можна буде повернути, знявши позначку."
+   },
+   "opt_out_stats_data": {
+      "description": "text related to the opt out data collection checkbox on the statistics page of the Options page",
+      "message": "Не збирати мою статистику блокування в майбутньому"
+   },
+   "options": {
+      "description": "The text of the link on chrome://chrome/extensions that takes you to the Options page",
+      "message": "Параметри"
+   },
+   "options_page": {
+      "description": "General text used to define the extension options page.",
+      "message": "сторінка параметрів"
+   },
+   "options_page_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "Тема Сторінки Налаштувань"
+   },
+   "optionstitle": {
+      "description": "Title for the Options page",
+      "message": "Налаштування AdBlock"
+   },
+   "optionsversion": {
+      "description": "Version number",
+      "message": "Версія $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1",
+            "example": "3.9.2"
+         }
+      }
+   },
+   "orenteraurl": {
+      "description": "Text box to enter a link to a custom filter list",
+      "message": "Введіть URL додаткового списку:"
+   },
+   "other": {
+      "description": "Multiple choice option",
+      "message": "Іншою"
+   },
+   "otherfilters": {
+      "description": "Subtitle on the Filter lists tab: List of filter lists to block other elements that are not ads.",
+      "message": "Інші списки фільтрів"
+   },
+   "overlay_notification_button_no": {
+      "message": "Ні"
+   },
+   "overlay_notification_button_yes": {
+      "message": "Так"
+   },
+   "pagelanguagecheck": {
+      "description": "Question on ad report page",
+      "message": "Якою мовою складено цю сторінку?"
+   },
+   "parent_menu_item_site": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "Блоки зроблені сайтом"
+   },
+   "parent_menu_item_time": {
+      "description": "menu item text on the statistics page of the Options page",
+      "message": "Блоки за весь час"
+   },
+   "pause_adblock": {
+      "description": "Menu entry to pause AdBlock (stop blocking ads)",
+      "message": "Призупинити AdBlock"
+   },
+   "pause_adblock_everywhere": {
+      "description": "Menu entry to pause AdBlock everywhere (stop blocking ads)",
+      "message": "Призупинити на всіх сайтах"
+   },
+   "pause_adblocking": {
+      "description": "Menu entry to pause the extension (stop blocking ads)",
+      "message": "Призупинити блокування реклами"
+   },
+   "pause_on_all_sites": {
+      "description": "First sentence in the aria-label of the pop-up menu action to pause blocking ads on all sites.",
+      "message": "Призупинити на всіх сайтах."
+   },
+   "paused_not_blocking": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock на даний момент призупинено, тому ми не блокуємо жодної реклами."
+   },
+   "paused_site_issue": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock на даний момент призупинений, здається, є проблема з сайтом, не пов'язана з AdBlock."
+   },
+   "popup_menu": {
+      "description": "General text used to define the pop-up menu.",
+      "message": "спливаюче меню"
+   },
+   "popup_menu_theme": {
+      "description": "Section title of the Themes tab of the Options page",
+      "message": "Тема спливаючого вікна"
+   },
+   "popup_menu_title": {
+      "description": "Title for the popup menu.",
+      "message": "Меню спливаючих вікон AdBlock"
+   },
+   "premium": {
+      "description": "Abbreviated name of the AdBlock upgrade.",
+      "message": "Premium"
+   },
+   "premium_benefits_explained": {
+      "description": "Main text of the teaser AdBlock Premium feature in the AdBlock Premium tab of the Options page",
+      "message": "В обмін на підтримку нас, увімкнувши AdBlock Premium, ви отримаєте доступ до новітніх інструментів та функцій, відразу після їх випуску."
+   },
+   "premium_cta_button_text": {
+      "description": "button text on the statistics page of the Options page in the image swap panel",
+      "message": "Отримати Premium"
+   },
+   "premium_cta_button_text_not_enabled": {
+      "description": "button text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "Увімкнути"
+   },
+   "premium_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel",
+      "message": "Розблокувати відстеження замін зображень і багато іншого за допомогою Premium."
+   },
+   "premium_cta_msg_not_enabled": {
+      "description": "message body text on the statistics page of the Options page in the image swap panel for premium users that haven't enabled image swap",
+      "message": "Схоже, що у вас не ввімкнено функцію заміни зображення."
+   },
+   "premium_page_title": {
+      "description": "The text of the header the AdBlock Premium Options page",
+      "message": "AdBlock Premium: кращий спосіб перегляду веб-сторінок."
+   },
+   "preview_a_theme": {
+      "description": "Text in the aria-label attribute of an icon indicating that clicking will show the preview image of a theme on an extension page.",
+      "message": "Попередній перегляд $theme_name$ теми для $extension_page$",
+      "placeholders": {
+         "extension_page": {
+            "content": "$2",
+            "example": "options page"
+         },
+         "theme_name": {
+            "content": "$1",
+            "example": "Dark"
+         }
+      }
+   },
+   "preview_channel_image": {
+      "description": "Text in the alt attribute of an image previewed as part of the Image Swap feature.",
+      "message": "Попередній перегляд зображення $image_category$",
+      "placeholders": {
+         "image_category": {
+            "content": "$1",
+            "example": "Cats"
+         }
+      }
+   },
+   "privacy_policy": {
+      "description": "Link to AdBlock's privacy policy",
+      "message": "Політика конфіденційності"
+   },
+   "problem_solved": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Чудово! Проблема вирішена."
+   },
+   "pwyw": {
+      "description": "Text of a payment request link",
+      "message": "Заплатіть стільки, скільки готові!"
+   },
+   "pwyw2": {
+      "description": "Text of a payment request link",
+      "message": "Заплатіть стільки, скільки готові!"
+   },
+   "rate_us": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review.",
+      "message": "Оцініть нас"
+   },
+   "rebecca_purple_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": " Фіолетова Rebecca "
+   },
+   "reenableadsonebyone": {
+      "description": "Tells the user to re-enable the extensions one by one",
+      "message": "Чудово! Тепер давайте визначимо яке з розширень є причиною. Перевірте це вмикаючи розширення одне за одним. Розширення, яке поверне рекламні оголошення необхідно видалити, щоб позбавитися від реклами."
+   },
+   "refusetocheck": {
+      "description": "User is telling us they don't wish to investigate something for us",
+      "message": "Мені ліньки перевіряти"
+   },
+   "reload_not_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Перезавантажте сторінку, щоб більше не бачити рекламу!"
+   },
+   "reload_the_page": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Перезавантажте сторінку"
+   },
+   "reload_when_ready": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Будь ласка, натисніть нижче, щоб перезавантажити сторінку, коли будете готові."
+   },
+   "reloadadpage": {
+      "description": "Instruction on ad report page",
+      "message": "Оновіть сторінку з рекламою."
+   },
+   "reloadpageafterwhitelist": {
+      "description": "Checkbox in the allowlist wizard",
+      "message": "Перезавантажте сторінку."
+   },
+   "remove_image": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Видалити зображення"
+   },
+   "remove_image_msg": {
+      "description": "text on the remove / delete image modal on the image swap tab",
+      "message": "Ви впевнені, що хочете видалити це зображення?"
+   },
+   "removefromlist": {
+      "description": "Label to remove a custom filter list",
+      "message": "Видалити зі списку"
+   },
+   "report_ad_on_page": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "Поскаржитись на рекламу на цій сторінці"
+   },
+   "reportfilterlistproblem": {
+      "description": "Telling the user to report an ad to a filter list maintainer",
+      "message": "Проблема у списку фільтрів. Поскаржіться тут: $link$",
+      "placeholders": {
+         "link": {
+            "content": "[[]]",
+            "example": "The link could point to a filter list's forum, or to the email address of a filter list maintainer. For example, forums.lanik.us or someguy@list.com."
+         }
+      }
+   },
+   "reportpubliclyavailable": {
+      "description": "Ad report page string, when you're about to submit a report.",
+      "message": "Зауважте: ваша скарга може стати публічно доступною. Пам’ятайте про це, залишаючи будь-яку особисту інформацію."
+   },
+   "require_restart_browser": {
+      "description": "Text displayed within an option to notify users to restart the browser to fully enable the option",
+      "message": "потребує перезапуску вашого браузера"
+   },
+   "resourceblocktitle": {
+      "description": "Resource list page name",
+      "message": "Всі ресурси"
+   },
+   "resourcedomain": {
+      "description": "Resource list page: text shown when hovering over an item in the third-party column",
+      "message": "Завантажено на сторінці із доменом:\n$domain$",
+      "placeholders": {
+         "domain": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "resume_blocking_ads": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused on this site' or 'AdBlock is paused on all sites'",
+      "message": "Відновити блокування реклами"
+   },
+   "resume_blocking_ads_period": {
+      "description": "First sentence in the aria-label of the pop-up menu action to resume blocking ads.",
+      "message": "Відновити блокування реклами."
+   },
+   "resume_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ви хочете відновити блокування реклами і перезавантажити сторінку?"
+   },
+   "retryaftersubscribe": {
+      "description": "Instructions on ad report page telling users to subscribe to a filter list and then check again to see whether the ad exists",
+      "message": "Передплатіть список фільтрів «$list_title$» та спробуйте знов.",
+      "placeholders": {
+         "list_title": {
+            "content": "$1",
+            "example": "French"
+         }
+      }
+   },
+   "safaributton_how_to_hide2": {
+      "description": "Message explaining how to hide the AdBlock toolbar button. 'Customize Toolbar' should match the text that Safari displays in the toolbar's context menu.",
+      "message": "Щоб приховати кнопку, клацніть правою кнопкою мишки по панелі інструментів Safari і виберіть Кастомізувати Тулбар, а потім перетягніть кнопку AdBlock з панелі інструментів. Ви можете відобразити її знову, перетягнувши назад на панель інструментів."
+   },
+   "safaricontentblocking": {
+      "description": "Checkbox on the 'General' tab of the Options page. 'Content Blocking' is the name of a different way of blocking resources introduced in Safari 9.",
+      "message": "Увімкнути блокування вмісту в Safari"
+   },
+   "safaricontentblockinglimitexceeded": {
+      "description": "Displayed when the number of rules in the subscribed filter lists is larger than the number supported by Safari Content Blocking, if that option is enabled.",
+      "message": "Кількість правил списку фільтрів перевищує обмеження в 50 000 і автоматично зменшена. Будь ласка, відпишіться від деяких списків фільтрів або вимкніть блокування вмісту Safari!"
+   },
+   "safaricontentblockingpausemessage": {
+      "description": "Alert displayed after clicking 'Pause AdBlock' in the AdBlock menu while Safari Content blocking is enabled.",
+      "message": "Щоб призупинити AdBlock з увімкненим Блокуванням Вмісту, будь ласка, оберіть Safari (в меню) > Вподобання > Розширення > AdBlock та зніміть прапорець 'Увімкнути AdBlock'."
+   },
+   "safarinotificationbody": {
+      "description": "Body of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "Будь ласка, вимкніть деякі списки фільтрів. Більше інформації дивіться в Параметрах AdBlock."
+   },
+   "safarinotificationtitle": {
+      "description": "Title of a notification shown to Safari Content Blocking users with too many filter list rules.",
+      "message": "Перевищено обмеження правил Блокування Вмісту"
+   },
+   "save_custom_settings_cta": {
+      "description": "Part 1 of a Premium call-to-action on the Options page",
+      "message": "Ви хочете зберегти налаштування блокування реклами і використовувати їх у будь-якому браузері?"
+   },
+   "savebutton": {
+      "description": "Save button",
+      "message": "Зберегти"
+   },
+   "savereminder": {
+      "description": "Reminder to click 'Save'",
+      "message": "Не забудьте зберегти!"
+   },
+   "see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Я бачу рекламу"
+   },
+   "see_ad_everywhere": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Я бачу це оголошення всюди"
+   },
+   "see_photos_no_ads_description": {
+      "description": "The main text of a feature box in the MyAdBlock Options page",
+      "message": "Ми як і раніше будемо блокувати рекламу, але замінимо її гарними фотографіями кішок, собак і дикої природи."
+   },
+   "see_photos_no_ads_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Дивіться Фото, Не Рекламу"
+   },
+   "selected": {
+      "description": "Text in the aria-label attribute of an icon showing an option is selected.",
+      "message": "Вибрано"
+   },
+   "selectlanguage": {
+      "description": "First option in the language dropdown menu on the Filter lists tab. Include the ' -- ' on either side of your translation.",
+      "message": " -- Оберіть якою -- "
+   },
+   "selectlanguage2": {
+      "description": "First option in the language dropdown menu on the Filter lists tab.",
+      "message": "вибір мови"
+   },
+   "senddebugdata": {
+      "description": "button text on the error message on the image swap tab",
+      "message": "Відправити налагоджувальні дані"
+   },
+   "set_preferences_once": {
+      "description": "Description of Sync on Sync tab",
+      "message": "Встановіть свої налаштування один раз і ніколи не турбуйтеся про втрату даних або зміну налаштувань для декількох розширень."
+   },
+   "settings": {
+      "description": "Text in the aria-label attribute of the gear icon on the pop-up menu.",
+      "message": "Налаштування"
+   },
+   "settings_changed": {
+      "description": "Part of Options page message letting users know of settings change.",
+      "message": "У процесі підготовки AdBlock тепер працює по-різному і частину встановлених вами параметрів може бути змінено."
+   },
+   "show_ads_except_for": {
+      "description": "Section title for the allowlisting section of Customize tab",
+      "message": "Показувати рекламу всюди, за винятком цих доменів..."
+   },
+   "show_details": {
+      "description": "Toggle that shows the details section",
+      "message": "Детальніше"
+   },
+   "show_devtools_panel": {
+      "description": "Checkbox letting user choose whether the AdBlock tab should be displayed in the developer tools window",
+      "message": "Показувати вкладку \"AdBlock\" у інструментах розробника"
+   },
+   "show_language_options": {
+      "description": "Option to let the user choose AdBlock's display language.",
+      "message": "Дозвольте мені вибрати мову відображення на AdBlock"
+   },
+   "show_on_adblock_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "Показати кількість заблокованих оголошень на кнопці AdBlock"
+   },
+   "show_on_adblock_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "Показати кількість заблокованих оголошень в меню AdBlock"
+   },
+   "show_on_button": {
+      "description": "Checkbox letting user choose whether the toolbar button should show a badge with the number of ads blocked",
+      "message": "Показати кількість заблокованої реклами на кнопці"
+   },
+   "show_on_menu": {
+      "description": "Checkbox letting user choose whether the AdBlock menu should show the number of ads blocked",
+      "message": "Показати кількість заблокованої реклами в меню"
+   },
+   "show_resourcelist": {
+      "description": "Menu entry to open the resource list page",
+      "message": "Показати всі запити"
+   },
+   "show_some_love": {
+      "description": "Title of the tooltip of the rate us button CTA in the Options page.",
+      "message": "Покажіть AdBlock трохи любові!"
+   },
+   "showcontextmenus2": {
+      "description": "Checkbox on the 'General' tab of the Options page.",
+      "message": "Додати елементи в меню правої кнопки миші"
+   },
+   "showlinkstolists2": {
+      "description": "Label to display filter list links",
+      "message": "Показати посилання на списки фільтрів"
+   },
+   "slidertitle": {
+      "description": "'Block an ad' wizard title",
+      "message": "Крок 1: З’ясуймо, що слід заблокувати"
+   },
+   "slows_down_extension": {
+      "description": "Text of an option telling users that the option slows down the extension",
+      "message": "сповільнює розширення"
+   },
+   "solarized_light_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Солярізоване світло"
+   },
+   "solarized_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Соляризований"
+   },
+   "something_else_going_on": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Хм, мабуть, відбувається щось інше."
+   },
+   "something_not_working": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Хм, щось не працює."
+   },
+   "stats": {
+      "description": "Title of the statistics (metrics) tab of the Options page",
+      "message": "Статистика"
+   },
+   "stats_ads_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Оголошення заблоковані"
+   },
+   "stats_ads_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Кількість заблокованих оголошень"
+   },
+   "stats_already_opted": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Ви вже вирішили поділитися з нами анонімними даними про використання."
+   },
+   "stats_go_back_text_button": {
+      "description": "button text on page 2 of the delete modal box on the statistics page of the Options page",
+      "message": "Повернутися назад"
+   },
+   "stats_hide_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "Приховати статистику"
+   },
+   "stats_im_sure_text_button": {
+      "description": "button text on page 2 of delete modal box on the statistics page of the Options page",
+      "message": "Я впевнений"
+   },
+   "stats_opt_in_data_collect": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Допоможіть покращити AdBlock, поділившись [[анонімними даними про використання]]"
+   },
+   "stats_opt_in_header": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Хочете побачити свою статистику в AdBlock? "
+   },
+   "stats_opt_in_local_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Крім того, ви можете скористатися локальним збором даних, щоб отримати доступ до всієї статистики AdBlock, наприклад до тих сайтів, на яких ви блокуєте найбільше оголошень і трекерів, загальних блоків за весь час і зображень, замінених для преміум-користувачів."
+   },
+   "stats_opt_in_local_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Погодитись на локальний збір даних"
+   },
+   "stats_opt_in_msg": {
+      "description": "On page text of the statistics page of the Options page",
+      "message": "Перейдіть на локальний збір даних, щоб переглянути статистику AdBlock, наприклад, на яких сайтах ви блокуєте найбільше оголошень і трекерів, загальна кількість блоків за весь час і обмін зображеннями для преміум-користувачів."
+   },
+   "stats_opt_in_text_button": {
+      "description": "Text in the Opt In button on the statistics page of the Options page",
+      "message": "Взяти участь у"
+   },
+   "stats_replaced_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Обмінені зображення"
+   },
+   "stats_replaced_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Кількість застосованих зображень"
+   },
+   "stats_show_data": {
+      "description": "text shown on panels during mouse over on the statistics page of the Options page within the ads blocked panel",
+      "message": "Показати статистику"
+   },
+   "stats_trackers_blocked": {
+      "description": "Text on the statistics page of the Options page within the ads blocked panel",
+      "message": "Трекери заблоковано"
+   },
+   "stats_trackers_blocked_aria_label": {
+      "description": "Text in the aria-label attribute of an icon for the Blocks by site column heading",
+      "message": "Кількість заблокованих трекерів"
+   },
+   "statstitle": {
+      "description": "On page title of the statistics page of the Options page",
+      "message": "Панель статистики"
+   },
+   "status_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running",
+      "message": "AdBlock призупинено."
+   },
+   "status_universal_paused": {
+      "description": "Message shown in toolbar button when AdBlock is not running on all domains",
+      "message": "AdBlock призупинено на всіх сайтах."
+   },
+   "stay_tuned": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "Будьте в курсі!"
+   },
+   "still_see_ad": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ви все ще бачите рекламу?"
+   },
+   "stop_blocking_ads": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Припинити блокувати рекламу:"
+   },
+   "stop_blocking_ads2": {
+      "description": "Subtitle on the 'Customize' tab",
+      "message": "Припинити блокувати рекламу"
+   },
+   "storage_quota_exceeded": {
+      "description": "Message shown when the user uses more storage than allowed by the browser.",
+      "message": "Ви перевищили об'єм пам'яті, який може використовувати AdBlock. Будь ласка, вимкніть деякі списки фільтрів!"
+   },
+   "sub_menu_item_all": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "За весь час"
+   },
+   "sub_menu_item_month": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Цього місяця"
+   },
+   "sub_menu_item_today": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "Сьогодні"
+   },
+   "sub_menu_item_week": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "На цьому тижні"
+   },
+   "sub_menu_item_year": {
+      "description": "sub menu item text on the statistics page of the Options page",
+      "message": "This Year"
+   },
+   "subframe": {
+      "description": "Resource list page: frame type",
+      "message": "Субфрейм"
+   },
+   "subscribebutton": {
+      "description": "Subscribe to a filter list button",
+      "message": "Додати"
+   },
+   "subscribeconfirm": {
+      "description": "Prompt question before subscribing to a filter list",
+      "message": "Ви впевнені, що бажаєте підписатися на список фільтрів $title$?",
+      "placeholders": {
+         "title": {
+            "content": "$1",
+            "example": "Prebake"
+         }
+      }
+   },
+   "subscribingfailed": {
+      "description": "abp: link subscriber unsuccessful result",
+      "message": "Невдало!"
+   },
+   "subscribingfinished": {
+      "description": "abp: link subscriber successful result",
+      "message": "Готово!"
+   },
+   "subscribingtitle": {
+      "description": "abp: link subscriber title",
+      "message": "Підписка на список фільтрів..."
+   },
+   "success": {
+      "description": "Text in the aria-label attribute of an icon indicating successful results.",
+      "message": "Успіх"
+   },
+   "sunshine_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Сонячне проміння"
+   },
+   "support_to_unlock": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 30 characters)",
+      "message": "Підтримка розблокування"
+   },
+   "support_with_a_review": {
+      "description": "Text of the tooltip of the rate us button CTA in the Options page.",
+      "message": "Підтримайте нашу команду, залишивши відгук."
+   },
+   "supportsite": {
+      "description": "Link to the support site on the Support tab",
+      "message": "Дайте нам знати на нашому [[сайті підтримки]]!"
+   },
+   "sync_device_name_list_updated_at_msg": {
+      "description": "message to users on when the sync page was last updated with the name of the extensions / devices (displayed in locale specific format)",
+      "message": "востаннє оновлено $timestamp$",
+      "placeholders": {
+         "timestamp": {
+            "content": "$1",
+            "example": "April 30, 2019 6:25 pm for US/English locale"
+         }
+      }
+   },
+   "sync_example": {
+      "description": "Text in the alt attribute of an image in the Options page mab that visualizes the Sync feature.",
+      "message": "Приклад синхронізації"
+   },
+   "sync_extension_name_placeholder": {
+      "description": "placeholder text in the extension / device name field on the sync page",
+      "message": "Назвіть це розширення, щоб відрізнити його від інших..."
+   },
+   "sync_extension_no_extension_msg": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "У вас немає синхронізованих розширень."
+   },
+   "sync_extension_section_title": {
+      "description": "section title text on the Sync sub-tab of the Options page",
+      "message": "Розширення"
+   },
+   "sync_header_error_save_message_part_2": {
+      "description": "part 2 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "Це розширення не було синхронізоване."
+   },
+   "sync_header_error_save_message_part_3": {
+      "description": "part 3 of a message to users on the Options pages when sending the sync data fails for some unknown reason.",
+      "message": "Будь ласка, спробуйте синхронізувати вручну пізніше."
+   },
+   "sync_header_message_error_prefix": {
+      "description": "Start of an sync error message to users on the Options page or AdBlock popup menu.",
+      "message": "Це розширення не було синхронізоване."
+   },
+   "sync_header_message_getting_license": {
+      "description": "message to users on the sync page when the extension is getting the license",
+      "message": "перевірка ..."
+   },
+   "sync_header_message_in_progress": {
+      "description": "message to users on the options pages when syncing with the server is in progress",
+      "message": "Виконується синхронізація..."
+   },
+   "sync_header_message_no_license": {
+      "description": "message to users on the sync page when the license is unavailable, inactive or a license ID hasn't been returned yet",
+      "message": "Будь ласка, дайте нам кілька хвилин, щоб ми могли синхронізувати спеціально для вас."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_2": {
+      "description": "part 2 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Ми синхронізували це розширення і відновимо ваші зміни."
+   },
+   "sync_header_message_old_commit_version_customize_tab_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Скопіюйте власні правила в буфер обміну, перезавантажте сторінку і знову внесіть зміни."
+   },
+   "sync_header_message_old_commit_version_part_2": {
+      "description": "part 2 of a message to users on the sync page and popup menu when initial setup of sync fails for some unknown reason.",
+      "message": "Ми синхронізували це розширення і відновили ваші зміни."
+   },
+   "sync_header_message_old_commit_version_part_3": {
+      "description": "part 3 of a message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Будь ласка, оновіть сторінку та внесіть зміни знову."
+   },
+   "sync_header_message_setup_fail_part_2": {
+      "description": "message to users on the sync page when initial setup of sync fails for some unknown reason.",
+      "message": "Будь ласка, спробуйте додати це розширення знову через декілька хвилин."
+   },
+   "sync_header_message_setup_fail_prefix": {
+      "description": "start of error message to users on the sync page when sync fails.",
+      "message": "Помилка синхронізації:"
+   },
+   "sync_header_message_sync_complete": {
+      "description": "message to users on the option pages when syncing with the server server is complete",
+      "message": "Синхронізацію завершено"
+   },
+   "sync_message_old_version_part_1": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Ви використовуєте стару версію AdBlock."
+   },
+   "sync_message_old_version_part_2": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Будь ласка [[оновіть AdBlock]], щоб ми могли синхронізувати ваші налаштування."
+   },
+   "sync_now_btn_text": {
+      "description": "button text on the Sync sub-tab of the Options page",
+      "message": "Синхронізувати зараз"
+   },
+   "sync_premium_cta": {
+      "description": "AdBlock Premium CTA on the Sync tab",
+      "message": "Ви будете блокувати рекламу pro з Premium функціями, такими як синхронізація."
+   },
+   "sync_tab_item": {
+      "description": "Title of the Sync sub-tab of the Options page",
+      "message": "Резервне копіювання і синхронізація"
+   },
+   "sync_turn_on_duplicate_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "Ця назва розширення вже використовується"
+   },
+   "sync_turn_on_invalid_name_text": {
+      "description": "error message text on the Sync sub-tab of the Options page",
+      "message": "Назвіть це розширення, щоб продовжити"
+   },
+   "sync_verify_turn_on_text": {
+      "description": "message text in the extension / device name field on the sync page",
+      "message": "Увімкнення резервного копіювання та синхронізації очистить наявні параметри з цього розширення."
+   },
+   "sync_your_settings_title": {
+      "description": "The title of a feature box in the MyAdBlock Options page",
+      "message": "Синхронізувати Ваші Налаштування"
+   },
+   "tabcustomize": {
+      "description": "A tab on the Options page",
+      "message": "Налаштувати"
+   },
+   "tabcustomizetitle": {
+      "description": "Title of the Customize tab of the Options page",
+      "message": "Налаштувати AdBlock"
+   },
+   "tabfilterlists": {
+      "description": "A tab on the Options page",
+      "message": "Список фільтрів"
+   },
+   "tabgeneral": {
+      "description": "A tab on the Options page",
+      "message": "Основні"
+   },
+   "tabreloadcomplete": {
+      "description": "On the ad report page, alert notifying users that we've disabled all other extensions",
+      "message": "Готово! Ми перезавантажили сторінку з рекламою. Будь ласка, перевірте чи зникла реклама на тій сторінці. Потім поверніться на цю сторінку та дайте відповіді на наступні запитання."
+   },
+   "tabsupport": {
+      "description": "A tab on the Options page",
+      "message": "Підтримка"
+   },
+   "tabtranslations": {
+      "description": "A tab on the Options page",
+      "message": "Переклади"
+   },
+   "text_body": {
+      "description": "Text in theme box of the Themes tab of the Options page (no more than 22 characters)",
+      "message": "основний текст"
+   },
+   "thanks": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Дякуємо"
+   },
+   "themes": {
+      "description": "Title of the Themes tab of the Options page",
+      "message": "Теми"
+   },
+   "thirdparty": {
+      "description": "Resource list page: column title telling if the resource originates from a different domain",
+      "message": "Сторонні"
+   },
+   "this_extension": {
+      "description": "description for name of the current extension",
+      "message": "(це розширення)"
+   },
+   "topframe": {
+      "description": "Resource list page: frame type",
+      "message": "Топ фрейм"
+   },
+   "trackers_button_text": {
+      "description": "button text on the statistics page of the Options page in the trackers panel",
+      "message": "Увімкнути"
+   },
+   "trackers_cta_header": {
+      "description": "Header text on the statistics page of the Options page in the trackers panel",
+      "message": "Трекери"
+   },
+   "trackers_cta_msg": {
+      "description": "message body text on the statistics page of the Options page in the trackers panel",
+      "message": "Увімкніть [[Прості списки фільтрів конфіденційності]] щоб почати блокування трекерів"
+   },
+   "translator_credit": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "Переклад українською:"
+   },
+   "translator_credit2": {
+      "description": "This message will be followed by a list of names of the translators who contributed to the language AdBlock is currently displayed in. Do not add any names to this string.",
+      "message": "Переклад українською:"
+   },
+   "translators": {
+      "description": "A link on the Options page / translators tab to a KB article about how to help translate AdBlock",
+      "message": "Дізнайтеся більше про те, як допомогти перекласти AdBlock [[here]]"
+   },
+   "troubleshoot_an_ad": {
+      "description": "Entry in the AdBlock button menu",
+      "message": "Вирішення проблем з рекламою"
+   },
+   "try_backup_sync": {
+      "description": "Part 2 of a Premium call-to-action on the Options page",
+      "message": "Якщо так, спробуйте функцію \"Резервне копіювання\" та \"Синхронізація\"."
+   },
+   "try_manual_update": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Будь ласка, спробуйте [[оновити списки фільтрів]]."
+   },
+   "try_pausing": {
+      "description": "Message for help flow in popup menu.",
+      "message": "OK, давайте спробуємо зупинити AdBlock."
+   },
+   "typehiding": {
+      "description": "A resource type",
+      "message": "приховане"
+   },
+   "typeimage": {
+      "description": "A resource type",
+      "message": "зображення"
+   },
+   "typemain_frame": {
+      "description": "A resource type",
+      "message": "сторінка"
+   },
+   "typemedia": {
+      "description": "A resource type",
+      "message": "аудіо/відео"
+   },
+   "typeobject": {
+      "description": "A resource type",
+      "message": "інтерактивний об’єкт"
+   },
+   "typeobject_subrequest": {
+      "description": "A resource type",
+      "message": "object_subrequest"
+   },
+   "typeother": {
+      "description": "A resource type",
+      "message": "інший"
+   },
+   "typepage": {
+      "description": "A resource type",
+      "message": "сторінка"
+   },
+   "typepopup": {
+      "description": "A resource type",
+      "message": "зринаючий"
+   },
+   "typescript": {
+      "description": "A resource type",
+      "message": "скрипт"
+   },
+   "typeselector": {
+      "description": "A resource type",
+      "message": "селектор"
+   },
+   "typestylesheet": {
+      "description": "A resource type",
+      "message": "визначення стилю"
+   },
+   "typesub_frame": {
+      "description": "A resource type",
+      "message": "фрейм"
+   },
+   "typesubdocument": {
+      "description": "A resource type",
+      "message": "фрейм"
+   },
+   "typeunknown": {
+      "description": "A resource type",
+      "message": "невідомо"
+   },
+   "typewebsocket": {
+      "description": "A resource type",
+      "message": "веб-сокет"
+   },
+   "typexmlhttprequest": {
+      "description": "A resource type",
+      "message": "xmlhttprequest"
+   },
+   "undo_last_block": {
+      "description": "Menu entry to let the user cancel the result of running the blocklist wizard.",
+      "message": "Скасувати обмеження, запроваджені мною на цьому домені"
+   },
+   "unexpected_filter_list_header": {
+      "description": "Error message shown when the user attempts to add a custom filter that has the format of a header (e.g. \"[Adblock Plus 2.0]\") which are only allowed in filter lists",
+      "message": "Заголовки списків фільтрів тут не допускаються"
+   },
+   "unpause_adblock": {
+      "description": "Link text to start blocking ads again, displayed immediately after 'AdBlock is paused'",
+      "message": "Запустити AdBlock"
+   },
+   "unpause_adblocking": {
+      "description": "Menu entry to unpause the extension (start blocking ads again)",
+      "message": "Активувати блокування реклами"
+   },
+   "unpaused_reload": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ми щойно активували AdBlock і перезавантажили сторінку."
+   },
+   "unsubscribe_from_all_confirmation": {
+      "description": "Confirmation message shown to user if they try to unsubscribe from all filter lists. The user will have two options: OK and Cancel.",
+      "message": "AdBlock не зможе блокувати оголошення, якщо вимкнути всі списки фільтрів. Натомість ми рекомендуємо призупинити AdBlock. Всеодно відписатися від цього списку?"
+   },
+   "unsubscribedlabel": {
+      "description": "Status label when unselecting a filter list",
+      "message": "Підписку скасовано."
+   },
+   "update_filter_lists_now": {
+      "description": "Text in the aria-label attribute of the 'update now' button on the Options page in the Filter Lists tab.",
+      "message": "Оновити списки фільтрів"
+   },
+   "updateddayago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено день тому"
+   },
+   "updateddaysago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено $days$ дні(в) тому",
+      "placeholders": {
+         "days": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedhourago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено годину тому"
+   },
+   "updatedhoursago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено $hours$ годин(и) тому",
+      "placeholders": {
+         "hours": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedminuteago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено хвилину тому"
+   },
+   "updatedminutesago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено $minutes$ хвилин(и) тому",
+      "placeholders": {
+         "minutes": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedrightnow": {
+      "description": "Label for filter list subscription",
+      "message": "щойно оновлено"
+   },
+   "updatedsecondsago": {
+      "description": "Label for filter list subscription",
+      "message": "оновлено $seconds$ секунд(и) тому",
+      "placeholders": {
+         "seconds": {
+            "content": "$1",
+            "example": "15"
+         }
+      }
+   },
+   "updatedtimestamp": {
+      "description": "Label for filter list subscription last updated timestamp",
+      "message": "оновлено станом на $ts$",
+      "placeholders": {
+         "ts": {
+            "content": "$1",
+            "example": "8/26/2019 10:23:44 PM"
+         }
+      }
+   },
+   "updatenowmessage2": {
+      "description": "Update filters text and button",
+      "message": "Списки оновлюватимуться автоматично, але ви можете [[оновити їх]] просто зараз"
+   },
+   "updateyourlists": {
+      "description": "Section header on the ad report page",
+      "message": "Переконайтесь, що списки фільтрів свіжі:"
+   },
+   "updating_filter_lists": {
+      "description": "Message for help flow in popup menu.",
+      "message": "AdBlock оновлює список фільтрів, щоб побачити чи може це бути проблемою."
+   },
+   "urgent_safari_changes": {
+      "description": "Title for Options page message letting users know of settings change.",
+      "message": "ВАЖЛИВО: Apple змінює розширення для Safari."
+   },
+   "visit_help_center": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Можливо, ви хотіли б [[відвідати наш довідковий центр]] щоб вирішити більше проблем."
+   },
+   "want_to_remove": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ви хочете видалити це?"
+   },
+   "warning_overrules_filters": {
+      "description": "Message on the 'Customize' tab of the options page, explaining the danger of adding a allowlist filter for all websites with only some exceptions.",
+      "message": "Увага: на всіх інших сайтах Ви побачите рекламу!\nБудуть скасовані всі інші фільтри для цих сайтів."
+   },
+   "watermelon_theme": {
+      "description": "Name of a theme in the Themes tab of the Options page",
+      "message": "Кавун"
+   },
+   "website_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Сайт не працює"
+   },
+   "website_still_broken": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Сайт все ще зламаний?"
+   },
+   "whatmakesadblocktick": {
+      "description": "Subtitle on the Support tab. This section contains links to the AdBlock source code and contributors. In this context, 'tick' can be replaced with the word 'work'.",
+      "message": "Хочете побачити, хто робить AdBlock живим?"
+   },
+   "whats_this": {
+      "description": "Text of a link pointing to the explanation of a new feature",
+      "message": "Що це таке?"
+   },
+   "whitelistertitle2": {
+      "description": "The title of the allowlist wizard (Don't run on this page/pages on this domain)",
+      "message": "Не застосовувати AdBlock до..."
+   },
+   "wont_change_anything": {
+      "description": "Message for help flow in popup menu.",
+      "message": "Ми не будемо нічого змінювати, тому ви й надалі будете бачити рекламу."
+   },
+   "wont_show_again": {
+      "description": "Message shown when user opts out of call-to-action",
+      "message": "OK, ми більше не будемо показувати це повідомлення."
+   },
+   "work_around_hulu_problems": {
+      "description": "Advanced Options page checkbox, which users only need to use if Hulu.com videos break. It directs the user to restart their browser in order for changes to the checkbox to take effect.",
+      "message": "Полагодити відео з Hulu.com, що не хочуть відтворюватися (потребує перезапуску вашого браузера)"
+   },
+   "yes": {
+      "description": "A positive response to a question",
+      "message": "Так"
+   },
+   "you_can_slide_to_change": {
+      "description": "allowlist slider usage instructions. Sometimes only one slider will show, and sometimes two will show, and if possible the text should handle both cases.",
+      "message": "Ви можете переміститись нижче, щоб змінити саме ті сторінки, на яких AdBlock не буде працювати."
+   },
+   "you_know_thats_a_bad_idea_right": {
+      "description": "Confirmation message shown to user if they try to subscribe to too many lists. The user will have two options: OK and Cancel.",
+      "message": "Що більше списків фільтрів ви використовуєте, то повільніше працює AdBlock. На деяких сайтах надмірне використання списків може навіть призвести до аварійного завершення роботи браузера. Натисніть OK, щоб все одно підписатись на цей список."
+   },
+   "youve_blocked_num_ads": {
+      "description": "Text of a menu item in the popup menu asking users to leave us a review. The $numBlocked$ will be replaced with the number of ads the users has blocked, starting at 10,000.",
+      "message": "Ви заблокували $numBlocked$ рекламні оголошення!",
+      "placeholders": {
+         "numBlocked": {
+            "content": "$1",
+            "example": "10,000"
+         }
+      }
+   }
+}

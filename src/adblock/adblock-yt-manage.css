@@ -1,0 +1,305 @@
+:host {
+  all: initial;
+
+  --icon-color: #dadada;
+  --text-color: #333333;
+  --button-color: white;
+  --button-background: #2284f7;
+  --button-background-hover: #e40d0d;
+  --icon-color: #999999;
+  --icon-color-hover: #666666;
+  --icon-border-color: #e6e6e6;
+  --premium-accent: #ffca00;
+  --link-color: #2284f7;
+  --main-icon-background-color: #f4f4f4;
+  --thumb-background-color: #c4c4c4;
+}
+
+* {
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 16px;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  cursor: pointer;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  color: var(--icon-color);
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+.material-icons:hover {
+  color: var(--icon-color-hover);
+}
+
+/* RTL language */
+[dir="rtl"] {
+  left: auto;
+  right: 75px;
+}
+
+#overlayIcon {
+  height: 32px;
+  width: 32px;
+  float: right;
+  cursor: pointer;
+}
+
+#iconlogo {
+  position: relative;
+  left: 5px;
+  top: 32px;
+  display: inline-block;
+}
+
+#header-icons {
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--icon-border-color);
+  padding-bottom: 8px;
+}
+
+#header-icons .material-icons {
+  color: var(--icon-color);
+  opacity: 0.5;
+  font-size: 20px;
+}
+#header-icons .material-icons:hover {
+  opacity: 1;
+}
+
+#header-icons .material-icons:focus {
+  outline: #2284f7 auto 5px;
+  opacity: 1;
+}
+#header-icons i {
+  font-size: 20px;
+}
+
+#settingsIcon {
+  margin-right: 8px;
+}
+
+.hoverOverIcon {
+  position: fixed;
+  bottom: 100px;
+  right: -300px;
+  animation: slideInFromRight 2s forwards;
+  animation-delay: 1s;
+}
+
+.grow {
+  display: none;
+  opacity: 0;
+  width: 288px;
+  min-height: 210px;
+  padding: 10px 20px 24px 20px;
+}
+
+.run-show-animation {
+  display: block;
+  animation-duration: 300ms;
+  animation-name: showMore;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+.run-hide-animation {
+  animation-duration: 5oh 00ms;
+  animation-name: showLess;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes slideInFromRight {
+  100% {
+    right: 50px;
+  }
+}
+
+@keyframes showMore {
+  from {
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  75% {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes showLess {
+  from {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0.75;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  75% {
+    opacity: 0.25;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.speech-bubble {
+  position: relative;
+  background-color: white;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  bottom: -20px;
+  right: -14px;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 90%;
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-top-color: var(--main-icon-background-color);
+  border-bottom: 0;
+  margin-left: -5px;
+  margin-bottom: -12px;
+}
+#speech-bubble-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 173px;
+}
+#titleText {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-top: 17px;
+  margin-bottom: 20px;
+  align-content: flex-start;
+}
+#buttonContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.onPageIconButton {
+  background-color: #e6e6e6;
+  border-radius: 6px;
+}
+#btnBlockAll:hover,
+#btnAllowAll:hover {
+  background-color: white;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+}
+#btnBlockAll:hover .textContent {
+  color: #e40d0d;
+}
+#btnAllowAll:hover .textContent {
+  color: #10b501;
+}
+#footer {
+  align-content: flex-end;
+  margin-top: 12px;
+}
+#linkWhatsThis {
+  font-size: 12px;
+  text-decoration: underline;
+  float: right;
+}
+.centerContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 112px;
+  min-height: 60px;
+  margin: 10px;
+}
+.centerContent div {
+  font-size: 14px;
+}
+#processingContent {
+  display: none;
+  justify-content: space-evenly;
+  align-content: space-evenly;
+  flex-direction: column;
+  margin: auto;
+}
+.center {
+  display: flex;
+  justify-content: center;
+}
+#loading_progress {
+  font-size: 64px;
+  color: red;
+}
+#processingText {
+  display: flex;
+  align-self: center;
+}
+#blockAllDoneContent,
+#allowAllDoneContent,
+#noChannelsFoundMessageContent,
+#signInMessageContent {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  height: 173px;
+  justify-content: center;
+}
+#blockAllDoneContent div,
+#allowAllDoneContent div {
+  margin-top: 10px;
+}
+.largeIconLogo {
+  height: 64px;
+  width: 64px;
+  margin: 0;
+}
+.smallIconLogo {
+  height: 32px;
+  width: 32px;
+  margin: 0;
+}

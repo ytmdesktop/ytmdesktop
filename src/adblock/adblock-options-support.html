@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<div class="option-page-box">
+  <div class="option-page-content">
+    <h1 i18n="adblocksupport" class="page-title"></h1>
+    <h2 i18n="needhelp" class="paragraph-title bottom-line"></h2>
+    <div class="section-padding support-text">
+      <a
+        i18n="bugreport"
+        i18n_replacement_el="bugreport"
+        href="adblock-options-bug-report.html"
+        target="_blank"
+      >
+        <span id="bugreport" class="link-text-color"></span>
+      </a>
+      <span class="english-only do-not-display support-text"
+        >(<span i18n="englishonly"></span>)</span
+      >
+    </div>
+    <div class="section-padding support-text">
+      <a
+        i18n="helpcenter"
+        i18n_replacement_el="helpcenter_link"
+        href="https://help.getadblock.com/support/home"
+        target="_blank"
+      >
+        <span id="helpcenter_link" class="link-text-color"></span>
+      </a>
+    </div>
+    <div class="section-padding add-space-between support-text">
+      <span i18n="debuginfo"> </span>
+      <span class="btn red" id="btnCopyDebugData">
+        <span id="checkmark-circle" class="do-not-display">
+          <span id="checkmark-circle-checkmark"></span>
+        </span>
+        <span id="copyDebugData" i18n="copydebugdata"></span>
+        <span id="copiedDebugData" class="do-not-display" i18n="copieddebugdata"></span>
+      </span>
+    </div>
+    <textarea id="debugInfo" class="widest do-not-display"></textarea>
+    <h2 i18n="aboutadblock" class="paragraph-title bottom-line"></h2>
+    <div class="section-padding support-text">
+      <a
+        i18n="contributors"
+        i18n_replacement_el="contributors"
+        href="https://getadblock.com/contributors/"
+        target="_blank"
+      >
+        <span id="contributors" class="link-text-color support-text"></span>
+      </a>
+    </div>
+    <div class="section-padding support-text">
+      <a
+        i18n="sourcecode"
+        i18n_replacement_el="sourcecode"
+        href="https://github.com/betafish-inc/adblock-releases"
+        target="_blank"
+      >
+        <span id="sourcecode" class="link-text-color"></span>
+      </a>
+    </div>
+    <div class="section-padding support-text">
+      <a id="whatsnew_link" i18n="whatsnew" i18n_replacement_el="whatsnew" href="#">
+        <span id="whatsnew" class="link-text-color"></span>
+      </a>
+    </div>
+    <textarea id="changes" class="widest" style="display:none;"></textarea>
+
+    <div class="translation_credits italic do-not-display"></div>
+    <footer>
+      <section>
+        <h2 i18n="feedback_title" class="paragraph-title bottom-line"></h2>
+        <div class="section-padding add-space-between support-text">
+          <span i18n="feedback_info" class="support-text" id="feedback-info"></span>
+          <button
+            id="support-feedback-button"
+            class="feedback-button btn"
+            i18n="myadblock_feedback_button"
+          ></button>
+        </div>
+      </section>
+    </footer>
+  </div>
+</div>
