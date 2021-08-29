@@ -442,8 +442,8 @@ function setVolume(webContents, time) {
         .executeJavaScript(
             `
         var slider = document.querySelector('#volume-slider');
-        slider.step = ${time} - slider.value;
-        slider.dispatchEvent(new KeyboardEvent("keydown", {"key":"ArrowRight"}));
+        slider.value = ${parseFloat(time)};
+        document.querySelector("#volume-slider").dispatchEvent(new Event("change"));
         `
         )
         .then()
