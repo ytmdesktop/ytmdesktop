@@ -38,6 +38,8 @@ const mprisProvider = require('./src/providers/mprisProvider')
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
+const isFlatpak = (process.platform === 'linux' && process.env.FLATPAK_HOST==='1')
+
 let mainWindow,
     view,
     miniplayer,
@@ -1739,7 +1741,7 @@ if (!gotTheLock) {
                 tray.updateImage(payload)
         })
 
-        if (!isDev) {
+        if (!isDev && isFlatpak===false) {
             updater.checkUpdate(mainWindow, view)
 
             setInterval(function () {
