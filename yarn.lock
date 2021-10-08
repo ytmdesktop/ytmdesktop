@@ -173,27 +173,6 @@
   dependencies:
     cross-spawn "^7.0.1"
 
-"@nodert-win10-rs4/windows.foundation@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.foundation/-/windows.foundation-0.4.4.tgz#9a488824b8b677ee5711347cfaf97c62592f2708"
-  integrity sha512-gA/jMwvKkEm+AFyIc9L6TZvP+DjcL54gkTOY0Izvcfmj3ctUiLFUqs1MdBJ5fjhTi0COPRhoq2eDSNl6t3IWEg==
-  dependencies:
-    nan latest
-
-"@nodert-win10-rs4/windows.media@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.media/-/windows.media-0.4.4.tgz#dcf358fb49e479a5a48aeb6e8e4aff45a85eb086"
-  integrity sha512-y5oGRVOBLlFVHP65LuG8YHhkfC8tR/o3USfsiAkTDyky6mXkba8wzthlVACMWpxJ7cRpFloznELpwnci75rocA==
-  dependencies:
-    nan latest
-
-"@nodert-win10-rs4/windows.storage.streams@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@nodert-win10-rs4/windows.storage.streams/-/windows.storage.streams-0.4.4.tgz#edcc1b62cf94d69648de0364bddec35149ccec81"
-  integrity sha512-xoK6sTG4FxyLYfD/oW9NuElBwKiWFS6wmegQunSPaFpv+j6FYU6olfSqgvqu1/rSMzPV5aZ68JkrPu8uKqZo3Q==
-  dependencies:
-    nan latest
-
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -776,6 +755,11 @@ camelcase@^5.3.1:
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
+
+cargo-cp-artifact@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/cargo-cp-artifact/-/cargo-cp-artifact-0.1.5.tgz#2c35f7d658f22acfe9b1fa2774344d9a389efd14"
+  integrity sha512-mWwNdfrEyvMPxDHoAhbCYwQBNP3RyW9bV+yi5VaaHtVZqoDXbGU5JQF5qG7s65SJhqP7HIVAQD7wZM6Fk2COuw==
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1380,10 +1364,10 @@ electron@*:
     "@types/node" "^12.0.12"
     extract-zip "^1.0.3"
 
-electron@^11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-11.1.1.tgz#188f036f8282798398dca9513e9bb3b10213e3aa"
-  integrity sha512-tlbex3xosJgfileN6BAQRotevPRXB/wQIq48QeQ08tUJJrXwE72c8smsM/hbHx5eDgnbfJ2G3a60PmRjHU2NhA==
+electron@^11.4.9:
+  version "11.5.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-11.5.0.tgz#f1650543b9d8f2047d3807755bdb120153ed210f"
+  integrity sha512-WjNDd6lGpxyiNjE3LhnFCAk/D9GIj1rU3GSDealVShhkkkPR3Vh4q8ErXGDl1OAO/faomVa10KoFPUN/pLbNxg==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^12.0.12"
@@ -2680,7 +2664,7 @@ mustache@^4.0.1:
   resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.0.1.tgz#d99beb031701ad433338e7ea65e0489416c854a2"
   integrity sha512-yL5VE97+OXn4+Er3THSmTdCFCtx5hHWzrolvH+JObZnUYwuaG7XV+Ch4fR2cIrcYI0tFHxS7iyFYl14bW8y2sA==
 
-nan@^2.12.1, nan@latest:
+nan@^2.12.1:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
@@ -4152,12 +4136,6 @@ win-node-env@^0.4.0:
   resolved "https://registry.yarnpkg.com/win-node-env/-/win-node-env-0.4.0.tgz#2d9dc991702920c73eaa1d644655b773886da5cb"
   integrity sha512-bf4TV/NOBEazlHJW/bOns7u2JaHe3f5bz8BYanm/xuqJ405NG9OK3VAI1Y2WvHJsAo4GMU8EYTHSh59Q3UfHvA==
 
-"windows.media.playback@git+https://github.com/NovusTheory/nodert-windows.media.playback.git":
-  version "0.1.0"
-  resolved "git+https://github.com/NovusTheory/nodert-windows.media.playback.git#855edf625b2762caa89dc7aab0b686d535b79f34"
-  dependencies:
-    nan latest
-
 wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
@@ -4236,6 +4214,13 @@ xmlhttprequest-ssl@~1.5.4:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.5.tgz#c2876b06168aadc40e57d97e81191ac8f4398b3e"
   integrity sha1-wodrBhaKrcQOV9l+gRkayPQ5iz4=
+
+xosms@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/xosms/-/xosms-0.1.0.tgz#8d58227bd65b1aeb7196ab0c19256357a14ee934"
+  integrity sha512-+pdeYtDPpnaNpQN6Zd9MxypZNKmhhOg0k2XlgGJ0QpLYZzqrEsa/liiziowHSREcMDLc2zZjZtuyzM/wZyBSGw==
+  dependencies:
+    cargo-cp-artifact "^0.1.5"
 
 xtend@^4.0.0:
   version "4.0.2"
