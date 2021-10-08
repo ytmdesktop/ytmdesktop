@@ -61,13 +61,13 @@
         "scribble": "github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43",
         "socket.io": "^2.3.0",
         "uuid": "^8.3.2",
-        "ws": "^7.4.2",
-        "xosms": "^0.1.0"
+        "ws": "^7.4.2"
     },
     "optionalDependencies": {
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
         "utf-8-validate": "^5.0.2",
-        "win-node-env": "^0.4.0"
+        "win-node-env": "^0.4.0",
+        "xosms": "^0.1.0"
     }
 }
