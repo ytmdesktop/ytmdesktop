@@ -7,29 +7,33 @@ class windowsMediaProvider {
     constructor() {
         this._view = null
         this._isInitialized = false
-        this._controls = new xosms.MediaServiceProvider()
+        this._controls = new xosms.MediaServiceProvider(
+            'ytmdesktop',
+            'YouTube Music'
+        ) // The two parameters are for MPRIS DBus name and Identity
 
-        if (!settingsProvider.get('settings-windows10-media-service-show-info'))
-            this._controls.isEnabled = false
-        else this._controls.isEnabled = true
-
+        this._controls.isEnabled = true
         this._controls.nextButtonEnabled = true
         this._controls.pauseButtonEnabled = true
         this._controls.playButtonEnabled = true
         this._controls.previousButtonEnabled = true
+        this._controls.trackId = "'/org/mpris/MediaPlayer2/ytmdesktop'" // Required for MPRIS, we use a generic object name that is tied to our DBus name
 
         this._controls.playbackStatus = xosms.PlaybackStatus.Closed
         this._controls.mediaType = xosms.MediaType.Music
 
         this._controls.title = 'YouTube Music'
         this._controls.artist = ''
-        this._controls.SetThumbnail(
+        this._controls.setThumbnail(
             xosms.ThumbnailType.Uri,
             'https://avatars1.githubusercontent.com/u/48072485?s=500'
         )
 
         this._controls.buttonPressed = (button) => {
             switch (button) {
+                case 'playpause':
+                    mediaControl.playPauseTrack(this._view)
+                    break
                 case 'play':
                     mediaControl.playPauseTrack(this._view)
                     break
@@ -65,7 +69,7 @@ class windowsMediaProvider {
         if (this._isInitialized) {
             this._controls.title = title
             this._controls.artist = author
-            this._controls.SetThumbnail(xosms.ThumbnailType.Uri, cover)
+            this._controls.setThumbnail(xosms.ThumbnailType.Uri, cover)
             this._controls.albumTitle = album
         }
     }
