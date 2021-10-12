@@ -317,17 +317,15 @@ async function createWindow() {
 
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
+    let position = settingsProvider.get('window-position')
+    if (position !== undefined) mainWindow.setPosition(position.x, position.y)
+
     if (windowMaximized)
         setTimeout(() => {
             mainWindow.send('window-is-maximized', true)
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
         }, 700)
-    else {
-        let position = settingsProvider.get('window-position')
-        if (position !== undefined)
-            mainWindow.setPosition(position.x, position.y)
-    }
 
     mainWindow.on('closed', () => {
         view = null
@@ -1870,19 +1868,29 @@ else {
     })
 
     app.whenReady().then(async () => {
-        checkWindowPosition(settingsProvider.get('window-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(
+            settingsProvider.get('window-position'),
+            settingsProvider.get('window-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('window-position', visiblePosition)
+        })
 
-        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('lyrics-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(settingsProvider.get('lyrics-position'), {
+            width: 700,
+            height: 800,
+        }).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('lyrics-position', visiblePosition)
+        })
+
+        checkWindowPosition(
+            settingsProvider.get('miniplayer-position'),
+            settingsProvider.get('settings-miniplayer-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('miniplayer-position', visiblePosition)
+        })
 
         await createWindow()
 
