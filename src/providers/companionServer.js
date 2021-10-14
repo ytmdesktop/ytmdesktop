@@ -500,6 +500,10 @@ function execCmd(cmd, value) {
             })
             break
 
+        case `skip-ad`:
+            ipcMain.emit('media-command', { command: 'media-skip-ad' })
+            break
+
         case 'show-lyrics-hidden':
             ipcMain.emit('window', { command: 'show-lyrics-hidden' })
             break

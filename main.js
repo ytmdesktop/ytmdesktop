@@ -1069,6 +1069,9 @@ async function createWindow() {
             case 'media-add-playlist':
                 mediaControl.addToPlaylist(view, value)
                 break
+            case 'media-skip-ad':
+                mediaControl.skipAd(view)
+                break
         }
     })
 

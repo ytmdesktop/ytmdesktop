@@ -11,6 +11,7 @@ const player = {
     statePercent: 0.0,
     likeStatus: 'INDIFFERENT',
     repeatType: 'NONE',
+    isSkippable: false,
 }
 
 const track = {
@@ -72,6 +73,7 @@ function getPlayerInfo() {
     getSeekbarPosition(webContents)
     getLikeStatus(webContents)
     getRepeatType(webContents)
+    canSkipAd(webContents)
     return player
 }
 
@@ -437,6 +439,34 @@ function isAdvertisement(webContents) {
         .catch((_) => console.log('error isAdvertisement'))
 }
 
+function canSkipAd(webContents) {
+    webContents
+        .executeJavaScript(
+            `document.querySelector(".ytp-ad-preview-slot").style.display`
+        )
+        .then((isSkippable) => {
+            if (Boolean(isSkippable)) { 
+                player.isSkippable = true
+            } else {
+                player.isSkippable = false
+            }
+        })
+        .catch((_) => {
+            player.isSkippable = false
+        })
+}
+
+function skipAd(webContents) {
+    if (player.isSkippable) {
+        webContents
+            .executeJavaScript(
+                `document.querySelector(".ytp-ad-skip-button").click()`
+            )
+            .then()
+            .catch((_) => console.log('error SkipAd'))
+    }
+}
+
 function setVolume(webContents, time) {
     webContents
         .executeJavaScript(
@@ -611,6 +641,7 @@ module.exports = {
     setVolume: setVolume,
     setSeekbar: setSeekbar,
     setQueueItem: setQueueItem,
+    skipAd: skipAd,
 
     updatePlaylistInfo: updatePlaylistInfo,
     updateQueueInfo: updateQueueInfo,
