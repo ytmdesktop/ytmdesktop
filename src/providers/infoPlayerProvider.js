@@ -11,6 +11,7 @@ const player = {
     statePercent: 0.0,
     likeStatus: 'INDIFFERENT',
     repeatType: 'NONE',
+    isSkippable: false,
 }
 
 const track = {
@@ -72,6 +73,7 @@ function getPlayerInfo() {
     getSeekbarPosition(webContents)
     getLikeStatus(webContents)
     getRepeatType(webContents)
+    canSkipAd(webContents)
     return player
 }
 
@@ -437,6 +439,34 @@ function isAdvertisement(webContents) {
         .catch((_) => console.log('error isAdvertisement'))
 }
 
+function canSkipAd(webContents) {
+    webContents
+        .executeJavaScript(
+            `document.querySelector(".ytp-ad-preview-slot").style.display`
+        )
+        .then((isSkippable) => {
+            if (Boolean(isSkippable)) {
+                player.isSkippable = true
+            } else {
+                player.isSkippable = false
+            }
+        })
+        .catch((_) => {
+            player.isSkippable = false
+        })
+}
+
+function skipAd(webContents) {
+    if (player.isSkippable) {
+        webContents
+            .executeJavaScript(
+                `document.querySelector(".ytp-ad-skip-button").click()`
+            )
+            .then()
+            .catch((_) => console.log('error SkipAd'))
+    }
+}
+
 function setVolume(webContents, time) {
     webContents
         .executeJavaScript(
@@ -448,6 +478,38 @@ function setVolume(webContents, time) {
         )
         .then()
         .catch((_) => console.log('error changeVolume'))
+}
+
+function startPlaylist(webContents, playlistName) {
+    webContents
+        .executeJavaScript(
+            `
+            new Promise((resolve, reject) => {
+                try {
+                    if (document.querySelector(".iron-selected").tabId !== "FEmusic_liked") {
+                        document.querySelector("[tab-id='FEmusic_liked']").click()
+            
+                    }
+                } catch (err) {
+                      document.querySelector("[tab-id='FEmusic_liked']").click()
+                }
+                setTimeout( resolve, 5000)
+            })
+            .then(() => {
+                document.querySelectorAll("div>ytmusic-two-row-item-renderer").forEach((playlist) => {
+                    let innerSpanText = playlist.querySelector("div>span>yt-formatted-string>span:nth-child(3)");
+                    if (playlist.querySelector("a").href !== "#" && innerSpanText !== null && innerSpanText.innerText !== "0 songs"){
+                        if (playlist.querySelector("div>div>yt-formatted-string>a").innerText === "Fav"){
+                            let startPlay = playlist.querySelector("a>ytmusic-item-thumbnail-overlay-renderer>div>ytmusic-play-button-renderer")
+                            if (startPlay.getAttribute("state") === "default") { startPlay.click() } // Check if User is already playing this Playlist if Not start it
+                        }
+                    }
+                })
+            })
+            `
+        )
+        .then()
+        .catch((_) => console.log('error Playlist ' + _))
 }
 
 function setSeekbar(webContents, time) {
@@ -611,6 +673,7 @@ module.exports = {
     setVolume: setVolume,
     setSeekbar: setSeekbar,
     setQueueItem: setQueueItem,
+    skipAd: skipAd,
 
     updatePlaylistInfo: updatePlaylistInfo,
     updateQueueInfo: updateQueueInfo,
@@ -618,4 +681,5 @@ module.exports = {
 
     addToLibrary: addToLibrary,
     addToPlaylist: addToPlaylist,
+    startPlaylist: startPlaylist,
 }

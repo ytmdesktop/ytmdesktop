@@ -10,7 +10,8 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
+const pattIgnoreInterface =
+    /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -496,6 +497,17 @@ function execCmd(cmd, value) {
         case 'player-add-playlist':
             ipcMain.emit('media-command', {
                 command: 'media-add-playlist',
+                value: value,
+            })
+            break
+
+        case `skip-ad`:
+            ipcMain.emit('media-command', { command: 'media-skip-ad' })
+            break
+
+        case `start-playlist`:
+            ipcMain.emit('media-command', {
+                command: 'media-start-playlist',
                 value: value,
             })
             break
