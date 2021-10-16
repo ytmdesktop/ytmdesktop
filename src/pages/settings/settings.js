@@ -195,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
     initElement('settings-pause-on-suspend', 'click', null)
+    initElement('settings-surround-sound', 'click', showRelaunchButton)
+
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -270,8 +272,9 @@ if (!isMac()) {
 }
 
 if (!isWindows()) {
-    const windowsSpecificNodes =
-        document.getElementsByClassName('windows-specific')
+    const windowsSpecificNodes = document.getElementsByClassName(
+        'windows-specific'
+    )
     for (let i = 0; i < windowsSpecificNodes.length; i++)
         windowsSpecificNodes.item(i).classList.add('hide')
 }
@@ -279,8 +282,9 @@ if (!isWindows()) {
 if (isWindows()) {
     const os = require('os')
     if (!os.release().startsWith('10.')) {
-        const windows10SpecificNodes =
-            document.getElementsByClassName('windows10-specific')
+        const windows10SpecificNodes = document.getElementsByClassName(
+            'windows10-specific'
+        )
         for (let i = 0; i < windows10SpecificNodes.length; i++)
             windows10SpecificNodes.item(i).classList.add('hide')
     }
@@ -364,8 +368,9 @@ function loadSettings() {
         'settings-skip-track-shorter-than'
     )
     if (settingsSkipTrackShorterThan) {
-        document.getElementById('range-skip-track-shorter-than').value =
-            settingsSkipTrackShorterThan
+        document.getElementById(
+            'range-skip-track-shorter-than'
+        ).value = settingsSkipTrackShorterThan
         document.getElementById(
             'range-skip-track-shorter-than-value'
         ).innerText =
@@ -376,8 +381,9 @@ function loadSettings() {
 
     document.getElementById('app-version').innerText = remote.app.getVersion()
 
-    document.getElementById('label-settings-companion-server-token').innerText =
-        settingsProvider.get('settings-companion-server-token')
+    document.getElementById(
+        'label-settings-companion-server-token'
+    ).innerText = settingsProvider.get('settings-companion-server-token')
 
     // Disable unsupported platforms which may get an API later
     if (!['darwin', 'win32'].includes(process.platform)) {
@@ -413,7 +419,7 @@ function replaceAcceleratorText(text) {
     if (text.indexOf('CmdOrCtrl') !== -1)
         if (isMac()) text = text.replace('CmdOrCtrl', 'Cmd')
         else text = text.replace('CmdOrCtrl', 'Ctrl')
-    
+
     if (text.indexOf('Meta') !== -1 && isWindows())
         text = text.replace('Meta', 'Windows')
 
@@ -480,7 +486,7 @@ document
             keyBindings = ''
 
             if (e.metaKey) keyBindings += 'Meta+'
-            
+
             if (e.ctrlKey) keyBindings += 'CmdOrCtrl+'
 
             if (e.altKey) keyBindings += 'Alt+'
@@ -488,8 +494,9 @@ document
             if (e.shiftKey) keyBindings += 'Shift+'
 
             keyBindings += validateKey(e)
-            document.querySelector('#modalEditAcceleratorKeys').innerText =
-                replaceAcceleratorText(keyBindings)
+            document.querySelector(
+                '#modalEditAcceleratorKeys'
+            ).innerText = replaceAcceleratorText(keyBindings)
         }
     })
 
@@ -520,8 +527,11 @@ function loadCustomKeys() {
         settingsAccelerators['media-track-dislike']
     )
 
-    document.querySelector('#settings-accelerators_media-volume-up').innerText =
-        replaceAcceleratorText(settingsAccelerators['media-volume-up'])
+    document.querySelector(
+        '#settings-accelerators_media-volume-up'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-volume-up']
+    )
     document.querySelector(
         '#settings-accelerators_media-volume-down'
     ).innerText = replaceAcceleratorText(

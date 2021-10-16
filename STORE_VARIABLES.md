@@ -36,6 +36,7 @@
 | `settings-volume`                          | String  | `0` ~ `100`                  | `100`                        | Playback volume                                                                      |
 | `settings-volume-media-keys`               | Boolean | `true` or `false`            | `false`                      | Enable media volume keys for the playback volume                                     |
 | `settings-pause-on-suspend`                | Boolean | `true` or `false`            | `false`                      | Pause media playback on `suspend` event triggered                                    |
+| `settings-surround-sound`                  | Boolean | `true` or `false`            | `false`                      | Enable Chromium Flag "try-supported-channel-layouts" for 5.1 surround sound/Speaker Fill
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |
