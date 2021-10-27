@@ -499,7 +499,7 @@ function startPlaylist(webContents, playlistName) {
                 document.querySelectorAll("div>ytmusic-two-row-item-renderer").forEach((playlist) => {
                     let innerSpanText = playlist.querySelector("div>span>yt-formatted-string>span:nth-child(3)");
                     if (playlist.querySelector("a").href !== "#" && innerSpanText !== null && innerSpanText.innerText !== "0 songs"){
-                        if (playlist.querySelector("div>div>yt-formatted-string>a").innerText === "Fav"){
+                        if (playlist.querySelector("div>div>yt-formatted-string>a").innerText === "${playlistName}"){
                             let startPlay = playlist.querySelector("a>ytmusic-item-thumbnail-overlay-renderer>div>ytmusic-play-button-renderer")
                             if (startPlay.getAttribute("state") === "default") { startPlay.click() } // Check if User is already playing this Playlist if Not start it
                         }
