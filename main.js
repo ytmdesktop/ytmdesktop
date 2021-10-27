@@ -13,7 +13,6 @@ const {
     shell,
     dialog,
     powerMonitor,
-    webContents,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
