@@ -13,6 +13,7 @@ const {
     shell,
     dialog,
     powerMonitor,
+    webContents,
 } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -446,6 +447,7 @@ async function createWindow() {
         const duration = trackInfo.duration
         const cover = trackInfo.cover
         const nowPlaying = `${title} - ${author}`
+        const isAdPlaying = playerInfo.isSkippable
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
@@ -488,6 +490,18 @@ async function createWindow() {
                         )
                     }
                 }
+            }
+
+            /**
+             * skip ad when SkipAd button shows
+             */
+            if (settingsProvider.get('settings-AutoClick_SkipAd')) {
+                setTimeout(() => {
+                    if (isAdPlaying) {
+                        console.log('trying to skip!')
+                        mediaControl.skipAd(view)
+                    }
+                }, 1000)
             }
 
             /**

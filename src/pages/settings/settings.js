@@ -195,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
     initElement('settings-pause-on-suspend', 'click', null)
+    initElement('settings-AutoClick_SkipAd', 'click', null)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -413,7 +414,7 @@ function replaceAcceleratorText(text) {
     if (text.indexOf('CmdOrCtrl') !== -1)
         if (isMac()) text = text.replace('CmdOrCtrl', 'Cmd')
         else text = text.replace('CmdOrCtrl', 'Ctrl')
-    
+
     if (text.indexOf('Meta') !== -1 && isWindows())
         text = text.replace('Meta', 'Windows')
 
@@ -480,7 +481,7 @@ document
             keyBindings = ''
 
             if (e.metaKey) keyBindings += 'Meta+'
-            
+
             if (e.ctrlKey) keyBindings += 'CmdOrCtrl+'
 
             if (e.altKey) keyBindings += 'Alt+'
