@@ -1,4 +1,5 @@
 const settingsProvider = require('./settingsProvider')
+const { handleOpenUrl } = require('../../main')
 
 let webContents, initialized
 
@@ -512,6 +513,32 @@ function startPlaylist(webContents, playlistName) {
         .catch((_) => console.log('error Playlist ' + _))
 }
 
+function playURL(url) {
+    if (url && url.includes('watch?v=')) {
+        let video = url.split('watch?v=')
+        let baseurl = 'ytmd://play/'
+        if (video[0] == 'https://music.youtube.com/' && false) {
+            if (video[1].includes('&list=')) {
+                console.log(baseurl + video[1].split('&list=')[0])
+                handleOpenUrl(baseurl + video[1].split('&list=')[0])
+            } else {
+                console.log(baseurl + video[1])
+                handleOpenUrl(baseurl + video[1])
+            }
+        }
+        webContents
+            .executeJavaScript(
+                `
+                window.location.assign("${url}");
+                `
+            )
+            .then(() => {
+                console.log('It should work...')
+            })
+            .catch((_) => console.log('error play URL'))
+    }
+}
+
 function setSeekbar(webContents, time) {
     webContents
         .executeJavaScript(
@@ -682,4 +709,5 @@ module.exports = {
     addToLibrary: addToLibrary,
     addToPlaylist: addToPlaylist,
     startPlaylist: startPlaylist,
+    playURL: playURL,
 }

@@ -497,7 +497,7 @@ async function createWindow() {
             if (settingsProvider.get('settings-AutoClick_SkipAd')) {
                 setTimeout(() => {
                     if (isAdPlaying) {
-                        console.log('trying to skip!')
+                        //console.log('trying to skip!')
                         mediaControl.skipAd(view)
                     }
                 }, 1000)
@@ -1082,11 +1082,17 @@ async function createWindow() {
             case 'media-add-playlist':
                 mediaControl.addToPlaylist(view, value)
                 break
+
             case 'media-skip-ad':
                 mediaControl.skipAd(view)
                 break
+
             case 'media-start-playlist':
                 mediaControl.startPlaylist(view, value)
+                break
+
+            case 'media-play-url':
+                mediaControl.playURL(view, value)
                 break
         }
     })
@@ -1862,6 +1868,7 @@ function handleOpenUrl(url) {
         ipcMain.emit('window', { command: 'show-settings' })
 
     if (cmd.includes('play/')) {
+        console.log(cmd.split('/'))
         loadMusicByVideoId(cmd.split('/'))
         writeLog({ type: 'info', data: JSON.stringify(cmd) })
     }
@@ -2214,3 +2221,7 @@ const { ipcRenderer } = require('electron/renderer')
 analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
 analytics.setEvent('main', 'os', process.platform, process.platform)
 analytics.setScreen('main')
+
+module.exports = {
+    handleOpenUrl: handleOpenUrl,
+}

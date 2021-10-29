@@ -512,6 +512,13 @@ function execCmd(cmd, value) {
             })
             break
 
+        case `play-url`:
+            ipcMain.emit('media-command', {
+                command: 'media-play-url',
+                value: value,
+            })
+            break
+
         case 'show-lyrics-hidden':
             ipcMain.emit('window', { command: 'show-lyrics-hidden' })
             break
