@@ -189,6 +189,7 @@ function createContextMenu() {
                     font-size: 28px;
                     font-weight: bold;
                   }
+                  
                   .ytmd-modal-close:hover,
                   .ytmd-modal-close:focus {
                     color: #000;
@@ -345,27 +346,11 @@ function createTopMiddleContent() {
         )
         forward_element.style.cssText = 'transform: rotate(180deg);'
         forward_element.innerText = 'keyboard_backspace'
+
         forward_element.addEventListener('click', function () {
             history.forward()
         })
 
-        const likes_element = document.createElement('i')
-        likes_element.id = 'ytmd_likes'
-        likes_element.classList.add(
-            'material-icons',
-            'pointer',
-            'shine',
-            'ytmd-icons',
-            'center-content'
-        )
-        likes_element.classList.add('shine')
-        likes_element.style.cssText =
-            'font-family: Roboto;font-size: 20px;font-weight: 500;font-style: normal;padding-top: 14px'
-        likes_element.textContent = 'Likes'
-        likes_element.addEventListener('click', function () {
-            window.location = 'https://music.youtube.com/playlist?list=LM'
-        })
-        center_content.prepend(likes_element)
         center_content.prepend(forward_element)
         center_content.prepend(back_element)
     } catch (err) {
@@ -869,8 +854,7 @@ function createBottomPlayerBarContent() {
 
         document.getElementById(
             'sleep-timer-minutes'
-        ).onkeydown = document.getElementById(
-            // use the same function when change/keydown
+        ).onkeydown = document.getElementById( // use the same function when change/keydown
             'sleep-timer-minutes'
         ).onchange = (e) => {
             var radio = document.getElementById('sleep-timer-customized')
@@ -880,8 +864,7 @@ function createBottomPlayerBarContent() {
 
         document.getElementById(
             'sleep-timer-songs'
-        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = (
-            // use the same function when change/keydown
+        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = ( // use the same function when change/keydown
             e
         ) => {
             var radio = document.getElementById('sleep-timer-customized-c')
