@@ -360,7 +360,7 @@ function createTopMiddleContent() {
         )
         likes_element.classList.add('shine')
         likes_element.style.cssText =
-            'font-family: Roboto;font-size: 20px;font-weight: 500;font-style: normal;padding-top: 14px'
+            'font-family: Roboto, Noto Naskh Arabic UI, Arial, sans-serif;font-size: 20px;font-weight: 500;font-style: normal;padding-top: 14px'
         likes_element.textContent = 'Likes'
         likes_element.addEventListener('click', function () {
             window.location = 'https://music.youtube.com/playlist?list=LM'
