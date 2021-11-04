@@ -42,9 +42,9 @@ cd ytmdesktop
 ##### And:
 ```sh
 # Install dependencies
-npm install
+yarn install
 # Run the app
-npm start
+yarn start
 ```
 
 **Note:** If you're using Linux Bash for Windows, [see this guide][more] or use `node` from the command prompt.
