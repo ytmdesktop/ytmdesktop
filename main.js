@@ -320,17 +320,15 @@ async function createWindow() {
 
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
+    let position = settingsProvider.get('window-position')
+    if (position !== undefined) mainWindow.setPosition(position.x, position.y)
+
     if (windowMaximized)
         setTimeout(() => {
             mainWindow.send('window-is-maximized', true)
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
         }, 700)
-    else {
-        let position = settingsProvider.get('window-position')
-        if (position !== undefined)
-            mainWindow.setPosition(position.x, position.y)
-    }
 
     mainWindow.on('closed', () => {
         view = null
@@ -364,7 +362,6 @@ async function createWindow() {
             `)
         }
         initialized = true
-        settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
@@ -600,6 +597,42 @@ async function createWindow() {
 
                         sleepTimer.mode = 'off'
                     }
+                }
+
+                /**
+                 * Update the saved url if settings-continue-where-left-of is enabled
+                 */
+                if (settingsProvider.get('settings-continue-where-left-of')) {
+                    view.webContents
+                        .executeJavaScript(
+                            `
+                        document.querySelector('.yt-uix-sessionlink').href;
+                    `
+                        )
+                        .then((result) => {
+                            if (result) {
+                                const url = new URL(result)
+                                // Hostname correction as the provided url is for youtube.com
+                                url.hostname = 'music.youtube.com'
+                                settingsProvider.set(
+                                    'window-url',
+                                    url.toString()
+                                )
+                            } else {
+                                // No session link found so just default to the current url
+                                settingsProvider.set(
+                                    'window-url',
+                                    view.webContents.getURL()
+                                )
+                            }
+                        })
+                        .catch(() => {
+                            // JavaScript errored, assume no session link found and default to current url
+                            settingsProvider.set(
+                                'window-url',
+                                view.webContents.getURL()
+                            )
+                        })
                 }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
@@ -1851,19 +1884,29 @@ else {
     })
 
     app.whenReady().then(async () => {
-        checkWindowPosition(settingsProvider.get('window-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(
+            settingsProvider.get('window-position'),
+            settingsProvider.get('window-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('window-position', visiblePosition)
+        })
 
-        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('lyrics-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(settingsProvider.get('lyrics-position'), {
+            width: 700,
+            height: 800,
+        }).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('lyrics-position', visiblePosition)
+        })
+
+        checkWindowPosition(
+            settingsProvider.get('miniplayer-position'),
+            settingsProvider.get('settings-miniplayer-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('miniplayer-position', visiblePosition)
+        })
 
         await createWindow()
 

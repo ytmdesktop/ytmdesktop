@@ -4,30 +4,62 @@ function create() {
     // for create window
 }
 
-function checkWindowPosition(windowPosition) {
+function checkWindowPosition(windowPosition, windowSize) {
     return new Promise((resolve, reject) => {
         try {
-            let displays = screen.getAllDisplays()
-            let externalDisplay = displays.find((display) => {
-                return display.bounds.x !== 0 || display.bounds.y !== 0
+            let nearestDisplay = screen.getDisplayMatching({
+                x: windowPosition.x,
+                y: windowPosition.y,
+                width: windowSize.width,
+                height: windowSize.height,
             })
+            let nearestDisplayBounds = nearestDisplay.bounds
 
-            if (externalDisplay === undefined) {
-                primaryDisplayPosition = displays[0].bounds
-
-                if (
-                    windowPosition &&
-                    windowPosition.x > primaryDisplayPosition.width
-                ) {
-                    var position = {
-                        x: windowPosition.x - primaryDisplayPosition.width,
-                        y: windowPosition.y,
-                    }
-                    resolve(position)
-                }
+            var position = {
+                x: windowPosition.x,
+                y: windowPosition.y,
             }
-        } catch (_) {
-            console.log('error -> checkWindowPosition')
+
+            // The reason for + 64 in window sizes is because 1px inside nearest display is considered visible but not user friendly as it's quite well hidden and could prevent dragging
+            if (
+                windowPosition &&
+                windowSize &&
+                windowPosition.x - (windowSize.width + 64) >
+                    nearestDisplayBounds.x
+            ) {
+                position.x = windowPosition.x - nearestDisplayBounds.width
+            }
+
+            if (
+                windowPosition &&
+                windowSize &&
+                windowPosition.x + (windowSize.width + 64) <
+                    nearestDisplayBounds.x
+            ) {
+                position.x = windowPosition.x + nearestDisplayBounds.width
+            }
+
+            if (
+                windowPosition &&
+                windowSize &&
+                windowPosition.y - (windowSize.height + 64) >
+                    nearestDisplayBounds.y
+            ) {
+                position.y = windowPosition.y - nearestDisplayBounds.height
+            }
+
+            if (
+                windowPosition &&
+                windowSize &&
+                windowPosition.y + (windowSize.height + 64) <
+                    nearestDisplayBounds.y
+            ) {
+                position.y = windowPosition.y + nearestDisplayBounds.height
+            }
+
+            resolve(position)
+        } catch (err) {
+            console.log('error -> checkWindowPosition', err)
             reject(false)
         }
     })
