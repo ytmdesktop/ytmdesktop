@@ -1321,6 +1321,7 @@ electron-log@^4.3.1:
 "electron-media-service@github:tidal-engineering/electron-media-service":
   version "0.2.6"
   resolved "https://codeload.github.com/tidal-engineering/electron-media-service/tar.gz/4fdb3d43a74b274a53261b11aa5c11a4f5a9d62f"
+  integrity sha512-OL2p3epr4wvbxwcSemgzZgV9trvlmTZSdqOZlBxkPiIGr6TflGWP7iH3CH2OTl6fplwV18orvOdEpA+iV8OYSA==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^3.0.2"
@@ -2720,9 +2721,9 @@ node-addon-api@^1.3.0, node-addon-api@^1.6.0:
   integrity sha512-ibPK3iA+vaY1eEjESkQkM0BbCqFOaZMiXRTtdB0u7b4djtY6JnsjvPdUHVMg6xQt3B8fpTTWHI9A+ADjM9frzg==
 
 node-addon-api@^3.0.2:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.1.0.tgz#98b21931557466c6729e51cb77cd39c965f42239"
-  integrity sha512-flmrDNB06LIl5lywUz7YlNGZH/5p0M7W28k8hzd9Lshtdh1wshD2Y+U4h9LD6KObOy1f+fEVdgprPrEymjM5uw==
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
+  integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
 
 node-fetch@^2.6.0:
   version "2.6.0"
