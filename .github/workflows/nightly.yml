@@ -1,13 +1,13 @@
 name: Nightly
 
 on:
-  push:
-    branches:
-      - "github-action-for-nightly-release"
-  # workflow_run:
-  #   workflows: ["build"]
-  #   types:
-  #     - completed
+  # push:
+    # branches:
+      # - "github-action-for-nightly-release"
+  workflow_run:
+    workflows: ["build"]
+    types:
+      - completed
 
 jobs:
   build:
