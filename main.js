@@ -336,6 +336,11 @@ async function createWindow() {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
+    mainWindow.on('reload', () => {
+        view.webContents.forcefullyCrashRenderer()
+        view.webContents.reload()
+    })
+
     view.webContents.on('new-window', (event, url) => {
         event.preventDefault()
         shell.openExternal(url)
@@ -906,9 +911,16 @@ async function createWindow() {
     })
 
     if (
-        !settingsProvider.get('settings-windows10-media-service-show-info') ||
-        !settingsProvider.get('settings-windows10-media-service')
+        (isWindows() &&
+            (!settingsProvider.get(
+                'settings-windows10-media-service-show-info'
+            ) ||
+                !settingsProvider.get('settings-windows10-media-service'))) ||
+        isMac() ||
+        isLinux()
     ) {
+        let settingsAccelerator = settingsProvider.get('settings-accelerators')
+
         globalShortcut.register('MediaPlayPause', () => {
             checkDoubleTapPlayPause()
         })
