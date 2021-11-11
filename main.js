@@ -38,7 +38,7 @@ const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
 const mprisProvider = (() => {
-    if (!isLinux()) {
+    if (isLinux()) {
         return require('./src/providers/mprisProvider')
     } else {
         return null
@@ -63,7 +63,8 @@ let mainWindow,
     updateTrackInfoTimeout,
     activityLikeStatus,
     windowsMediaProvider,
-    audioDevices
+    audioDevices,
+    settingsRendererIPC
 
 let isFirstTime = false
 
@@ -103,7 +104,11 @@ let sleepTimer = {
 /* First checks ========================================================================= */
 app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This keeps chromium from trying to launch up it's own mpris service, hence stopping the double service.
 
-app.setAsDefaultProtocolClient('ytmd', process.execPath)
+if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
+    app.setAsDefaultProtocolClient('ytmd', process.execPath)
+}
+
+app.commandLine.appendSwitch('disable-http-cache')
 
 createCustomAppDir()
 
@@ -217,6 +222,7 @@ async function createWindow() {
             nodeIntegration: true,
             webviewTag: true,
             enableRemoteModule: true,
+            contextIsolation: false,
         },
     }
 
@@ -245,6 +251,11 @@ async function createWindow() {
             break
     }
 
+    /* For the uninformed:
+        - The `view` variable is the actual webpage that contains youtube music and stuff.
+        - The `mainWindow` variable contains the window frame that holds the mainWindow, but you cannot inspect mainWindow elements.
+        Yes, I am confused as you are, but hopefully that clears up some confusion
+    */
     mainWindow = new BrowserWindow(browserWindowConfig)
 
     mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
@@ -284,7 +295,7 @@ async function createWindow() {
             app.getAppPath(),
             '/src/pages/shared/window-buttons/window-buttons.html'
         ),
-        { search: 'page=home/home' }
+        { search: 'page=home/home&trusted=1&script=shiny-tray-helper' }
     )
 
     mainWindow.addBrowserView(view)
@@ -301,11 +312,14 @@ async function createWindow() {
         updateAccentColorPref()
     })
 
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    // view.webContents.openDevTools({ mode: 'detach' })
+    if (process.env.NODE_ENV === 'development') {
+        view.webContents.openDevTools({ mode: 'detach' })
+    }
 
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+
+    let position = settingsProvider.get('window-position')
+    if (position !== undefined) mainWindow.setPosition(position.x, position.y)
 
     if (windowMaximized)
         setTimeout(() => {
@@ -313,11 +327,6 @@ async function createWindow() {
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
         }, 700)
-    else {
-        let position = settingsProvider.get('window-position')
-        if (position !== undefined)
-            mainWindow.setPosition(position.x, position.y)
-    }
 
     mainWindow.on('closed', () => {
         view = null
@@ -326,6 +335,11 @@ async function createWindow() {
 
     mainWindow.on('show', () => {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+    })
+
+    mainWindow.on('reload', () => {
+        view.webContents.forcefullyCrashRenderer()
+        view.webContents.reload()
     })
 
     view.webContents.on('new-window', (event, url) => {
@@ -351,7 +365,6 @@ async function createWindow() {
             `)
         }
         initialized = true
-        settingsProvider.set('window-url', view.webContents.getURL())
         view.webContents.insertCSS(`
             /* width */
             ::-webkit-scrollbar {
@@ -446,13 +459,15 @@ async function createWindow() {
                 mprisProvider.setActivity(getAll())
             }
 
-            mediaControl.setProgress(
-                mainWindow,
-                settingsProvider.get('settings-enable-taskbar-progressbar')
-                    ? progress
-                    : -1,
-                playerInfo.isPaused
-            )
+            if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
+                mediaControl.setProgress(
+                    mainWindow,
+                    settingsProvider.get('settings-enable-taskbar-progressbar')
+                        ? progress
+                        : -1,
+                    playerInfo.isPaused
+                )
+            }
 
             /**
              * Scrobble when track changes or when current track starts from the beginning
@@ -572,6 +587,42 @@ async function createWindow() {
 
                         sleepTimer.mode = 'off'
                     }
+                }
+
+                /**
+                 * Update the saved url if settings-continue-where-left-of is enabled
+                 */
+                if (settingsProvider.get('settings-continue-where-left-of')) {
+                    view.webContents
+                        .executeJavaScript(
+                            `
+                        document.querySelector('.yt-uix-sessionlink').href;
+                    `
+                        )
+                        .then((result) => {
+                            if (result) {
+                                const url = new URL(result)
+                                // Hostname correction as the provided url is for youtube.com
+                                url.hostname = 'music.youtube.com'
+                                settingsProvider.set(
+                                    'window-url',
+                                    url.toString()
+                                )
+                            } else {
+                                // No session link found so just default to the current url
+                                settingsProvider.set(
+                                    'window-url',
+                                    view.webContents.getURL()
+                                )
+                            }
+                        })
+                        .catch(() => {
+                            // JavaScript errored, assume no session link found and default to current url
+                            settingsProvider.set(
+                                'window-url',
+                                view.webContents.getURL()
+                            )
+                        })
                 }
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
@@ -860,21 +911,33 @@ async function createWindow() {
         newValue: settingsAccelerator['miniplayer-open-close'],
     })
 
-    globalShortcut.register('MediaPlayPause', () => {
-        checkDoubleTapPlayPause()
-    })
+    if (
+        (isWindows() &&
+            (!settingsProvider.get(
+                'settings-windows10-media-service-show-info'
+            ) ||
+                !settingsProvider.get('settings-windows10-media-service'))) ||
+        isMac() ||
+        isLinux()
+    ) {
+        let settingsAccelerator = settingsProvider.get('settings-accelerators')
 
-    globalShortcut.register('MediaStop', () => {
-        mediaControl.stopTrack(view)
-    })
+        globalShortcut.register('MediaPlayPause', () => {
+            checkDoubleTapPlayPause()
+        })
 
-    globalShortcut.register('MediaPreviousTrack', () => {
-        mediaControl.previousTrack(view)
-    })
+        globalShortcut.register('MediaStop', () => {
+            mediaControl.stopTrack(view)
+        })
 
-    globalShortcut.register('MediaNextTrack', () => {
-        mediaControl.nextTrack(view)
-    })
+        globalShortcut.register('MediaPreviousTrack', () => {
+            mediaControl.previousTrack(view)
+        })
+
+        globalShortcut.register('MediaNextTrack', () => {
+            mediaControl.nextTrack(view)
+        })
+    }
 
     if (settingsProvider.get('settings-volume-media-keys')) {
         globalShortcut.register('VolumeUp', () => {
@@ -1022,6 +1085,10 @@ async function createWindow() {
         }
     })
 
+    ipcMain.on('refresh-progress', () => {
+        mediaControl.setProgress(mainWindow, -1, playerInfo.isPaused)
+    })
+
     ipcMain.on('register-renderer', (event, _) => {
         renderer_for_status_bar = event.sender
         event.sender.send('update-status-bar')
@@ -1167,6 +1234,10 @@ async function createWindow() {
                     nodeIntegration: true,
                     webviewTag: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webSecurity: false,
+                    sandbox: false,
                 },
             })
 
@@ -1177,10 +1248,14 @@ async function createWindow() {
                 ),
                 {
                     search:
-                        'page=settings/settings&icon=settings&hide=btn-minimize,btn-maximize&title=' +
+                        'page=settings/settings&trusted=1&icon=settings&hide=btn-minimize,btn-maximize&title=' +
                         __.trans('LABEL_SETTINGS'),
                 }
             )
+
+            if (process.env.NODE_ENV === 'development') {
+                settings.webContents.openDevTools({ mode: 'detach' })
+            }
         }
 
         settings.on('closed', () => {
@@ -1217,7 +1292,6 @@ async function createWindow() {
                     enableRemoteModule: true,
                 },
             })
-
             await miniplayer.loadFile(
                 path.join(
                     app.getAppPath(),
@@ -1231,7 +1305,6 @@ async function createWindow() {
                     miniplayerPosition.x,
                     miniplayerPosition.y
                 )
-
             let storeMiniplayerPositionTimer
             miniplayer.on('move', () => {
                 let position = miniplayer.getPosition()
@@ -1256,6 +1329,11 @@ async function createWindow() {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
             })
+
+            // Devtools
+            if (process.env.NODE_ENV === 'development') {
+                miniplayer.openDevTools({ mode: 'detach' })
+            }
 
             mainWindow.hide()
         }
@@ -1328,8 +1406,12 @@ async function createWindow() {
     }
 
     async function windowLyrics() {
-        if (lyrics) lyrics.show()
-        else {
+        if (lyrics) {
+            lyrics.show()
+            process.env.NODE_ENV === 'development'
+                ? lyrics.webContents.openDevTools({ mode: 'detach' })
+                : null
+        } else {
             lyrics = new BrowserWindow({
                 icon: iconDefault,
                 frame: windowConfig.frame,
@@ -1339,6 +1421,7 @@ async function createWindow() {
                 backgroundColor: '#232323',
                 width: 700,
                 height: 800,
+                alwaysOnTop: settingsProvider.get('settings-lyrics-always-top'),
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
@@ -1378,10 +1461,14 @@ async function createWindow() {
 
             lyrics.on('closed', () => {
                 lyrics = null
+                if (process.env.NODE_ENV === 'development') {
+                    lyrics.webContents.closeDevTools()
+                }
             })
 
-            // ENABLE FOR DEBUG
-            // lyrics.webContents.openDevTools();
+            if (process.env.NODE_ENV === 'development') {
+                lyrics.webContents.openDevTools({ mode: 'detach' })
+            }
         }
     }
 
@@ -1732,7 +1819,7 @@ async function createWindow() {
 
     async function loadMusicByUrl(videoUrl) {
         if (videoUrl.includes('music.youtube'))
-            await view.webContents.loadUrl(videoUrl)
+            await view.webContents.loadURL(videoUrl)
         else {
             let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)
@@ -1789,24 +1876,34 @@ else {
                 if (mainWindow.isMinimized()) mainWindow.restore()
                 else mainWindow.show()
 
-            mainWindow.focus()
+            mainWindow.show()
         }
     })
 
     app.whenReady().then(async () => {
-        checkWindowPosition(settingsProvider.get('window-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(
+            settingsProvider.get('window-position'),
+            settingsProvider.get('window-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('window-position', visiblePosition)
+        })
 
-        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('lyrics-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(settingsProvider.get('lyrics-position'), {
+            width: 700,
+            height: 800,
+        }).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('lyrics-position', visiblePosition)
+        })
+
+        checkWindowPosition(
+            settingsProvider.get('miniplayer-position'),
+            settingsProvider.get('settings-miniplayer-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('miniplayer-position', visiblePosition)
+        })
 
         await createWindow()
 
@@ -2054,6 +2151,12 @@ if (settingsProvider.get('settings-discord-rich-presence')) discordRPC.start()
 
 ipcMain.on('set-audio-output-list', (_, data) => {
     updateTrayAudioOutputs(data)
+    try {
+        // FIXME: For some reason neither the emit/send doesn't work
+        if (settingsRendererIPC) {
+            settingsRendererIPC.send('update-audio-output-devices', data)
+        }
+    } catch (e) {}
     audioDevices = data
 })
 
@@ -2089,7 +2192,10 @@ ipcMain.on('retrieve-sleep-timer', (e) => {
     e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
 })
 
-ipcMain.handle('get-audio-output-list', () => audioDevices)
+ipcMain.handle('get-audio-output-list', (e) => {
+    settingsRendererIPC = e.sender
+    return audioDevices
+})
 
 powerMonitor.on('suspend', () => {
     if (settingsProvider.get('settings-pause-on-suspend')) {

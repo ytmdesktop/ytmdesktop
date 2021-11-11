@@ -20,7 +20,6 @@
         />
         <link type="text/css" rel="stylesheet" href="./settings.css" />
     </head>
-
     <body>
         <div id="content" class="hide">
             <div class="row">
@@ -137,7 +136,10 @@
                     </div>
                 </div>
 
-                <div class="col s9 mt-1">
+                <div
+                    class="col s9 mt-1"
+                    style="height: 100vh; overflow-x: scroll"
+                >
                     <div class="row">
                         <div id="tab-general" class="tab-content">
                             <table class="table">
@@ -195,7 +197,6 @@
                                             </div>
                                         </td>
                                     </tr>
-
                                     <tr>
                                         <td>
                                             <span
@@ -214,7 +215,6 @@
                                             </div>
                                         </td>
                                     </tr>
-
                                     <tr>
                                         <td>
                                             <span
@@ -233,18 +233,35 @@
                                             </div>
                                         </td>
                                     </tr>
-
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_LYRICS_ALWAYS_ON_TOP"
+                                            ></span>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-lyrics-always-top"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td>
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_DISABLE_HARDWARE_ACCELERATION"
                                             ></span>
-                                            <sub
-                                                ><i
+                                            <sub>
+                                                <i
                                                     class="material-icons tiny grey-text"
                                                     >autorenew</i
-                                                ></sub
-                                            >
+                                                >
+                                            </sub>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -264,12 +281,12 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_SELECT_LANGUAGE"
                                             ></span>
-                                            <sub
-                                                ><i
+                                            <sub>
+                                                <i
                                                     class="material-icons tiny grey-text"
                                                     >autorenew</i
-                                                ></sub
-                                            >
+                                                >
+                                            </sub>
                                         </td>
                                         <td>
                                             <select id="settings-app-language">
@@ -306,6 +323,7 @@
                                                 <option value="pt">
                                                     Português
                                                 </option>
+                                                <option value="th">ไทย</option>
                                                 <option value="tr">
                                                     Türkçe
                                                 </option>
@@ -327,6 +345,9 @@
                                                 <option value="ko">
                                                     한국어
                                                 </option>
+                                                <option value="kz">
+                                                    Қазақша
+                                                </option>
                                                 <option value="cs">
                                                     Čeština
                                                 </option>
@@ -344,9 +365,20 @@
                                             ></span>
                                         </td>
                                         <td>
-                                            <select
-                                                id="settings-app-audio-output"
-                                            ></select>
+                                            <div style="display: inline-flex">
+                                                <select
+                                                    id="settings-app-audio-output"
+                                                ></select>
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-reload-audio-devices"
+                                                >
+                                                    <i
+                                                        class="material-icons tiny grey-text"
+                                                        >autorenew</i
+                                                    >
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -738,12 +770,12 @@
                                                     >
                                                 </button>
                                                 <!--label>
-                                        <input
-                                            type="checkbox"
-                                            id="settings-enable-shortcut-buttons"
-                                        />
-                                        <span class="lever"></span>
-                                    </label-->
+                                                <input
+                                                    type="checkbox"
+                                                    id="settings-enable-shortcut-buttons"
+                                                />
+                                                <span class="lever"></span>
+                                            </label-->
                                             </div>
                                         </td>
                                     </tr>
@@ -819,7 +851,14 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE"
                                             ></span>
+                                            <sub>
+                                                <i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                >
+                                            </sub>
                                         </td>
+
                                         <td class="right">
                                             <div class="switch">
                                                 <button
@@ -930,12 +969,12 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE"
                                             ></span>
-                                            <sub
-                                                ><i
+                                            <sub>
+                                                <i
                                                     class="material-icons tiny grey-text"
                                                     >autorenew</i
-                                                ></sub
-                                            >
+                                                >
+                                            </sub>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -960,12 +999,12 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_INTEGRATION_WINDOWS10_MEDIA_SERVICE_SHOW_INFO"
                                             ></span>
-                                            <sub
-                                                ><i
+                                            <sub>
+                                                <i
                                                     class="material-icons tiny grey-text"
                                                     >autorenew</i
-                                                ></sub
-                                            >
+                                                >
+                                            </sub>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -1025,18 +1064,21 @@
                                     <a
                                         id="disableAccelerator"
                                         class="modal-close waves-effect waves-red btn-flat btn-sm red left"
-                                        ><span i18n="i18n_LABEL_DISABLE"></span
-                                    ></a>
+                                    >
+                                        <span i18n="i18n_LABEL_DISABLE"></span>
+                                    </a>
                                     <a
                                         id="cancelAccelerator"
                                         class="modal-close waves-effect waves-red btn-flat btn-sm black-text"
-                                        ><span i18n="i18n_LABEL_CANCEL"></span
-                                    ></a>
+                                    >
+                                        <span i18n="i18n_LABEL_CANCEL"></span>
+                                    </a>
                                     <a
                                         id="saveAccelerator"
                                         class="modal-close waves-effect waves-green btn-flat btn-sm black-text"
-                                        ><span i18n="i18n_LABEL_SAVE"></span
-                                    ></a>
+                                    >
+                                        <span i18n="i18n_LABEL_SAVE"></span>
+                                    </a>
                                 </div>
                             </div>
 
@@ -1316,7 +1358,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div
                             id="tab-about"
                             class="tab-content center-align"
@@ -1374,7 +1415,6 @@
                 ><span i18n="i18n_LABEL_SETTINGS_RELAUNCH"></span>
             </button>
         </div>
-
         <script src="../../../src/assets/js/materialize.min.js"></script>
         <script>
             require('./settings.js')

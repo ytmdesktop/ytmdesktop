@@ -454,7 +454,7 @@ function setSeekbar(webContents, time) {
     webContents
         .executeJavaScript(
             `
-        var slider = document.querySelectorAll('.bar-container .paper-slider')[2];
+        var slider = document.querySelectorAll('.bar-container .tp-yt-paper-slider')[2];
         var sliderKnob = document.querySelectorAll('#progress-bar')[0];
 
         slider.click();
@@ -536,21 +536,27 @@ function addToPlaylist(webContents, index) {
 }
 
 function convertToHuman(time) {
-    let _aux = time
-    let _minutes = 0
-    let _seconds
+    let hours = Math.floor(time / 3600)
+    time %= 3600
+    let minutes = Math.floor(time / 60)
+    let seconds = Math.floor(time % 60)
 
-    while (_aux >= 60) {
-        _aux = _aux - 60
-        _minutes++
-    }
+    let final =
+        hours.toString().padStart(2, '0') +
+        ':' +
+        minutes.toString().padStart(2, '0') +
+        ':' +
+        seconds.toString().padStart(2, '0')
 
-    _seconds = _aux
+    final.startsWith('00:0')
+        ? (final = final.slice(4))
+        : final.startsWith('00:')
+        ? (final = final.slice(3))
+        : final.startsWith('0')
+        ? (final = final.slice(1))
+        : null
 
-    if (_seconds < 10) {
-        return _minutes + ':0' + _seconds
-    }
-    return _minutes + ':' + _seconds
+    return final
 }
 
 function setPercent(px, ptotal) {

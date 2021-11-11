@@ -43,9 +43,12 @@ let settingsAccelerators = settingsProvider.get('settings-accelerators')
 
 let typeAcceleratorSelected, keyBindings
 
-ipc.invoke('get-audio-output-list').then((devices) => {
+// FIXME: for some reason, this ipc update_audio_devices_callback could not be triggered
+// So we put a button there to allow positive refresh
+function update_audio_devices_callback(devices) {
     devices = JSON.parse(devices)
-
+    while (audioOutputSelect.firstChild)
+        audioOutputSelect.removeChild(audioOutputSelect.firstChild)
     if (devices.length) {
         devices.forEach((deviceInfo) => {
             let option = document.createElement('option')
@@ -55,10 +58,6 @@ ipc.invoke('get-audio-output-list').then((devices) => {
                     : `speaker ${audioOutputSelect.length + 1}`
             option.value = deviceInfo.label
             audioOutputSelect.appendChild(option)
-        })
-
-        initElement('settings-app-audio-output', 'change', () => {
-            ipc.send('change-audio-output', audioOutputSelect.value)
         })
 
         const defaultOuput = devices.find(
@@ -75,9 +74,50 @@ ipc.invoke('get-audio-output-list').then((devices) => {
         audioOutputSelect.appendChild(option)
         audioOutputSelect.disabled = true
     }
-
     mInit()
-})
+}
+
+ipc.on('update-audio-output-devices', update_audio_devices_callback)
+
+get_audio_output_list = () =>
+    ipc.invoke('get-audio-output-list').then((devices) => {
+        devices = JSON.parse(devices)
+        while (audioOutputSelect.firstChild)
+            audioOutputSelect.removeChild(audioOutputSelect.firstChild)
+        if (devices.length) {
+            devices.forEach((deviceInfo) => {
+                let option = document.createElement('option')
+                option.text =
+                    deviceInfo.label != null
+                        ? deviceInfo.label
+                        : `speaker ${audioOutputSelect.length + 1}`
+                option.value = deviceInfo.label
+                audioOutputSelect.appendChild(option)
+            })
+
+            initElement('settings-app-audio-output', 'change', () => {
+                ipc.send('change-audio-output', audioOutputSelect.value)
+            })
+
+            const defaultOuput = devices.find(
+                (audio) => audio.deviceId === 'default'
+            )
+            if (!audioOutputSelect.value.length)
+                audioOutputSelect.value = defaultOuput.label
+        } else {
+            let option = document.createElement('option')
+            option.text = __.trans(
+                'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+            )
+            option.value = '0'
+            audioOutputSelect.appendChild(option)
+            audioOutputSelect.disabled = true
+        }
+
+        mInit()
+    })
+
+get_audio_output_list()
 
 function checkCompanionStatus() {
     if (settingsProvider.get('settings-companion-server'))
@@ -116,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-show-notifications', 'click', null)
     initElement('settings-start-on-boot', 'click', null)
     initElement('settings-start-minimized', 'click', null)
+    initElement('settings-lyrics-always-top', 'click', null)
     initElement('settings-companion-server', 'click', checkCompanionStatus)
     initElement('settings-genius-auth-server', 'click', null)
     initElement('settings-companion-server-protect', 'click', null)
@@ -134,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-shiny-tray-song-title-rollable', 'click', () => {
         ipc.send('update-tray')
     })
-    initElement('settings-discord-rich-presence', 'click', null)
+    initElement('settings-discord-rich-presence', 'click', showRelaunchButton)
     initElement('settings-app-language', 'change', () => {
         ipc.send('language-updated')
         showRelaunchButton()
@@ -179,7 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-miniplayer-show-task', 'click', null)
     initElement('settings-miniplayer-always-show-controls', 'click', null)
     initElement('settings-miniplayer-paint-controls', 'click', null)
-    initElement('settings-enable-taskbar-progressbar', 'click', null)
+    initElement('settings-enable-taskbar-progressbar', 'click', () => {
+        ipc.send('refresh-progress')
+    })
     initElement('settings-enable-player-bgcolor', 'click', () => {
         ipc.send('set-accent-enabled-state')
     })
@@ -415,6 +458,9 @@ function replaceAcceleratorText(text) {
         if (isMac()) text = text.replace('CmdOrCtrl', 'Cmd')
         else text = text.replace('CmdOrCtrl', 'Ctrl')
 
+    if (text.indexOf('Meta') !== -1 && isWindows())
+        text = text.replace('Meta', 'Windows')
+
     text = text.replace('numadd', '+')
 
     text = text.replace('numsub', '-')
@@ -458,6 +504,7 @@ function validateKey(e) {
 
 function preventSpecialKeys(e) {
     return !(
+        e.key === 'Meta' ||
         e.key === 'Command' ||
         e.key === 'Control' ||
         e.key === 'Alt' ||
@@ -475,6 +522,8 @@ document
     .addEventListener('keyup', (e) => {
         if (preventSpecialKeys(e)) {
             keyBindings = ''
+
+            if (e.metaKey) keyBindings += 'Meta+'
 
             if (e.ctrlKey) keyBindings += 'CmdOrCtrl+'
 
@@ -593,6 +642,12 @@ document
     .addEventListener('click', () => {
         typeAcceleratorSelected = 'miniplayer-open-close'
         resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-reload-audio-devices')
+    .addEventListener('click', () => {
+        get_audio_output_list()
     })
 
 document.querySelector('#saveAccelerator').addEventListener('click', () => {

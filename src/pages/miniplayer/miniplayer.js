@@ -97,20 +97,29 @@ function setPlayerInfo(data) {
         body.classList.remove('showinfo')
     }
 
+    const btnLikeCL = btnLike.children.item(0).classList
+    const btnDislikeCL = btnDislike.children.item(0).classList
+
     switch (data.player.likeStatus) {
         case 'LIKE':
-            btnLike.children.item(0).classList.remove('outlined')
-            btnDislike.children.item(0).classList.add('outlined')
+            btnLikeCL.add('show-solid')
+            btnLikeCL.remove('hide-solid')
+            btnDislikeCL.add('hide-solid')
+            btnDislikeCL.remove('show-solid')
             break
 
         case 'DISLIKE':
-            btnLike.children.item(0).classList.add('outlined')
-            btnDislike.children.item(0).classList.remove('outlined')
+            btnLikeCL.add('hide-solid')
+            btnLikeCL.remove('show-solid')
+            btnDislikeCL.add('show-solid')
+            btnDislikeCL.remove('hide-solid')
             break
 
         case 'INDIFFERENT':
-            btnLike.children.item(0).classList.add('outlined')
-            btnDislike.children.item(0).classList.add('outlined')
+            btnDislikeCL.add('hide-solid')
+            btnDislikeCL.remove('show-solid')
+            btnLikeCL.add('hide-solid')
+            btnLikeCL.remove('show-solid')
             break
     }
 

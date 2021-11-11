@@ -41,9 +41,7 @@ async function setActivity(info) {
     if (isStarted() && info.track.title) {
         const now = Date.now()
         const activity = {}
-        const discordSettings = settingsProvider.get(
-            'discord-presence-settings'
-        )
+        const discordSettings = settingsProvider.get('discord-presence-settings')
 
         if (discordSettings.details) activity.details = info.track.title
 
@@ -70,10 +68,39 @@ async function setActivity(info) {
         activity.largeImageText = 'YouTube Music'
         activity.smallImageText = info.player.isPaused ? 'Paused' : 'Playing'
         activity.instance = false
+        if (discordSettings.details) {
+            activity.buttons = [
+                {
+                    label: 'Play on YouTube Music',
+                    url: 'https://music.youtube.com/watch?v=' + info.track.id,
+                },
+            ]
+        }
 
-        if (!discordSettings.hideIdle && info.player.isPaused)
+        if ((!discordSettings.hideIdle && info.player.isPaused) || info.track.isAdvertisement) {
             await client.clearActivity()
-        else client.setActivity(activity).catch((err) => console.log(err))
+        } else {
+            // As of writing this discord-rpc was not updated to support buttons with setActivity
+            await client.request('SET_ACTIVITY', {
+                pid: process.pid,
+                activity: {
+                    state: activity.state,
+                    details: activity.details,
+                    timestamps: {
+                        start: activity.startTimestamp,
+                        end: activity.endTimestamp,
+                    },
+                    assets: {
+                        large_image: activity.largeImageKey,
+                        large_text: activity.largeImageText,
+                        small_image: activity.smallImageKey,
+                        small_text: activity.smallImageText,
+                    },
+                    instance: activity.instance,
+                    buttons: activity.buttons,
+                },
+            })
+        }
     }
 }
 
