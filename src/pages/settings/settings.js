@@ -235,6 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-clipboard-always-ask-read', 'click', null)
     initElement('settings-tray-icon', 'click', showRelaunchButton)
     initElement('settings-pause-on-suspend', 'click', null)
+    initElement('settings-surround-sound', 'click', showRelaunchButton)
+
     mInit()
 
     document.getElementById('content').classList.remove('hide')

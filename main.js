@@ -108,6 +108,10 @@ if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
     app.setAsDefaultProtocolClient('ytmd', process.execPath)
 }
 
+if (settingsProvider.get('settings-surround-sound')) {
+    app.commandLine.appendSwitch('try-supported-channel-layouts', '1')
+}
+
 app.commandLine.appendSwitch('disable-http-cache')
 
 createCustomAppDir()
