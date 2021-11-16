@@ -119,3 +119,5 @@ settingsProvider.setInitialValue(
 
 settingsProvider.setInitialValue('settings-pause-on-suspend', false)
 settingsProvider.setInitialValue('settings-AutoClick_SkipAd', false)
+
+settingsProvider.setInitialValue('settings-surround-sound', false)

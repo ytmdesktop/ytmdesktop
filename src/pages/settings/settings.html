@@ -411,9 +411,20 @@
                                             ></span>
                                         </td>
                                         <td>
-                                            <select
-                                                id="settings-app-audio-output"
-                                            ></select>
+                                            <div style="display: inline-flex">
+                                                <select
+                                                    id="settings-app-audio-output"
+                                                ></select>
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-reload-audio-devices"
+                                                >
+                                                    <i
+                                                        class="material-icons tiny grey-text"
+                                                        >autorenew</i
+                                                    >
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -590,6 +601,14 @@
                                             <span
                                                 i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK_AUTOCLICK_SKIPAD"
                                             ></span>
+                                                i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK_SURROUND_SOUND"
+                                            ></span>
+                                            <sub>
+                                                <i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                >
+                                            </sub>
                                         </td>
                                         <td class="right">
                                             <div class="switch">
@@ -597,6 +616,7 @@
                                                     <input
                                                         type="checkbox"
                                                         id="settings-AutoClick_SkipAd"
+                                                        id="settings-surround-sound"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>

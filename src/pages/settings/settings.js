@@ -43,9 +43,12 @@ let settingsAccelerators = settingsProvider.get('settings-accelerators')
 
 let typeAcceleratorSelected, keyBindings
 
-ipc.invoke('get-audio-output-list').then((devices) => {
+// FIXME: for some reason, this ipc update_audio_devices_callback could not be triggered
+// So we put a button there to allow positive refresh
+function update_audio_devices_callback(devices) {
     devices = JSON.parse(devices)
-
+    while (audioOutputSelect.firstChild)
+        audioOutputSelect.removeChild(audioOutputSelect.firstChild)
     if (devices.length) {
         devices.forEach((deviceInfo) => {
             let option = document.createElement('option')
@@ -55,10 +58,6 @@ ipc.invoke('get-audio-output-list').then((devices) => {
                     : `speaker ${audioOutputSelect.length + 1}`
             option.value = deviceInfo.label
             audioOutputSelect.appendChild(option)
-        })
-
-        initElement('settings-app-audio-output', 'change', () => {
-            ipc.send('change-audio-output', audioOutputSelect.value)
         })
 
         const defaultOuput = devices.find(
@@ -75,9 +74,50 @@ ipc.invoke('get-audio-output-list').then((devices) => {
         audioOutputSelect.appendChild(option)
         audioOutputSelect.disabled = true
     }
-
     mInit()
-})
+}
+
+ipc.on('update-audio-output-devices', update_audio_devices_callback)
+
+get_audio_output_list = () =>
+    ipc.invoke('get-audio-output-list').then((devices) => {
+        devices = JSON.parse(devices)
+        while (audioOutputSelect.firstChild)
+            audioOutputSelect.removeChild(audioOutputSelect.firstChild)
+        if (devices.length) {
+            devices.forEach((deviceInfo) => {
+                let option = document.createElement('option')
+                option.text =
+                    deviceInfo.label != null
+                        ? deviceInfo.label
+                        : `speaker ${audioOutputSelect.length + 1}`
+                option.value = deviceInfo.label
+                audioOutputSelect.appendChild(option)
+            })
+
+            initElement('settings-app-audio-output', 'change', () => {
+                ipc.send('change-audio-output', audioOutputSelect.value)
+            })
+
+            const defaultOuput = devices.find(
+                (audio) => audio.deviceId === 'default'
+            )
+            if (!audioOutputSelect.value.length)
+                audioOutputSelect.value = defaultOuput.label
+        } else {
+            let option = document.createElement('option')
+            option.text = __.trans(
+                'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
+            )
+            option.value = '0'
+            audioOutputSelect.appendChild(option)
+            audioOutputSelect.disabled = true
+        }
+
+        mInit()
+    })
+
+get_audio_output_list()
 
 function checkCompanionStatus() {
     if (settingsProvider.get('settings-companion-server'))
@@ -196,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-tray-icon', 'click', showRelaunchButton)
     initElement('settings-pause-on-suspend', 'click', null)
     initElement('settings-AutoClick_SkipAd', 'click', null)
+    initElement('settings-surround-sound', 'click', showRelaunchButton)
     mInit()
 
     document.getElementById('content').classList.remove('hide')
@@ -271,8 +312,9 @@ if (!isMac()) {
 }
 
 if (!isWindows()) {
-    const windowsSpecificNodes =
-        document.getElementsByClassName('windows-specific')
+    const windowsSpecificNodes = document.getElementsByClassName(
+        'windows-specific'
+    )
     for (let i = 0; i < windowsSpecificNodes.length; i++)
         windowsSpecificNodes.item(i).classList.add('hide')
 }
@@ -280,8 +322,9 @@ if (!isWindows()) {
 if (isWindows()) {
     const os = require('os')
     if (!os.release().startsWith('10.')) {
-        const windows10SpecificNodes =
-            document.getElementsByClassName('windows10-specific')
+        const windows10SpecificNodes = document.getElementsByClassName(
+            'windows10-specific'
+        )
         for (let i = 0; i < windows10SpecificNodes.length; i++)
             windows10SpecificNodes.item(i).classList.add('hide')
     }
@@ -365,8 +408,9 @@ function loadSettings() {
         'settings-skip-track-shorter-than'
     )
     if (settingsSkipTrackShorterThan) {
-        document.getElementById('range-skip-track-shorter-than').value =
-            settingsSkipTrackShorterThan
+        document.getElementById(
+            'range-skip-track-shorter-than'
+        ).value = settingsSkipTrackShorterThan
         document.getElementById(
             'range-skip-track-shorter-than-value'
         ).innerText =
@@ -377,8 +421,9 @@ function loadSettings() {
 
     document.getElementById('app-version').innerText = remote.app.getVersion()
 
-    document.getElementById('label-settings-companion-server-token').innerText =
-        settingsProvider.get('settings-companion-server-token')
+    document.getElementById(
+        'label-settings-companion-server-token'
+    ).innerText = settingsProvider.get('settings-companion-server-token')
 
     // Disable unsupported platforms which may get an API later
     if (!['darwin', 'win32'].includes(process.platform)) {
@@ -489,8 +534,9 @@ document
             if (e.shiftKey) keyBindings += 'Shift+'
 
             keyBindings += validateKey(e)
-            document.querySelector('#modalEditAcceleratorKeys').innerText =
-                replaceAcceleratorText(keyBindings)
+            document.querySelector(
+                '#modalEditAcceleratorKeys'
+            ).innerText = replaceAcceleratorText(keyBindings)
         }
     })
 
@@ -521,8 +567,11 @@ function loadCustomKeys() {
         settingsAccelerators['media-track-dislike']
     )
 
-    document.querySelector('#settings-accelerators_media-volume-up').innerText =
-        replaceAcceleratorText(settingsAccelerators['media-volume-up'])
+    document.querySelector(
+        '#settings-accelerators_media-volume-up'
+    ).innerText = replaceAcceleratorText(
+        settingsAccelerators['media-volume-up']
+    )
     document.querySelector(
         '#settings-accelerators_media-volume-down'
     ).innerText = replaceAcceleratorText(
@@ -595,6 +644,12 @@ document
     .addEventListener('click', () => {
         typeAcceleratorSelected = 'miniplayer-open-close'
         resetAcceleratorsText()
+    })
+
+document
+    .querySelector('#btn-reload-audio-devices')
+    .addEventListener('click', () => {
+        get_audio_output_list()
     })
 
 document.querySelector('#saveAccelerator').addEventListener('click', () => {
