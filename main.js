@@ -1868,7 +1868,6 @@ function handleOpenUrl(url) {
         ipcMain.emit('window', { command: 'show-settings' })
 
     if (cmd.includes('play/')) {
-        console.log(cmd.split('/'))
         loadMusicByVideoId(cmd.split('/'))
         writeLog({ type: 'info', data: JSON.stringify(cmd) })
     }

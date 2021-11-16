@@ -12,7 +12,6 @@ const player = {
     statePercent: 0.0,
     likeStatus: 'INDIFFERENT',
     repeatType: 'NONE',
-    isSkippable: false,
 }
 
 const track = {
@@ -26,6 +25,7 @@ const track = {
     id: '',
     isVideo: false,
     isAdvertisement: false,
+    isAdSkippable: false,
     inLibrary: false,
 }
 
@@ -445,20 +445,20 @@ function canSkipAd(webContents) {
         .executeJavaScript(
             `document.querySelector(".ytp-ad-preview-slot").style.display`
         )
-        .then((isSkippable) => {
-            if (Boolean(isSkippable)) {
-                player.isSkippable = true
+        .then((isAdSkippable) => {
+            if (Boolean(isAdSkippable)) {
+                track.isAdSkippable = true
             } else {
-                player.isSkippable = false
+                track.isAdSkippable = false
             }
         })
         .catch((_) => {
-            player.isSkippable = false
+            track.isAdSkippable = false
         })
 }
 
 function skipAd(webContents) {
-    if (player.isSkippable) {
+    if (track.isAdSkippable) {
         webContents
             .executeJavaScript(
                 `document.querySelector(".ytp-ad-skip-button").click()`
@@ -514,28 +514,13 @@ function startPlaylist(webContents, playlistName) {
 }
 
 function playURL(url) {
-    if (url && url.includes('watch?v=')) {
+    if (url.includes('watch?v=')) {
         let video = url.split('watch?v=')
         let baseurl = 'ytmd://play/'
-        if (video[0] == 'https://music.youtube.com/' && false) {
-            if (video[1].includes('&list=')) {
-                console.log(baseurl + video[1].split('&list=')[0])
-                handleOpenUrl(baseurl + video[1].split('&list=')[0])
-            } else {
-                console.log(baseurl + video[1])
-                handleOpenUrl(baseurl + video[1])
-            }
+        if (video[0] == 'https://music.youtube.com/') {
+            console.log(baseurl + video[1])
+            handleOpenUrl(baseurl + video[1])
         }
-        webContents
-            .executeJavaScript(
-                `
-                window.location.assign("${url}");
-                `
-            )
-            .then(() => {
-                console.log('It should work...')
-            })
-            .catch((_) => console.log('error play URL'))
     }
 }
 
