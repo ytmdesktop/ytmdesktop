@@ -120,3 +120,6 @@ settingsProvider.setInitialValue(
 settingsProvider.setInitialValue('settings-pause-on-suspend', false)
 
 settingsProvider.setInitialValue('settings-disable-analytics', false)
+
+settingsProvider.setInitialValue('settings-surround-sound', false)
+

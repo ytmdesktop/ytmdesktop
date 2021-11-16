@@ -854,7 +854,8 @@ function createBottomPlayerBarContent() {
 
         document.getElementById(
             'sleep-timer-minutes'
-        ).onkeydown = document.getElementById( // use the same function when change/keydown
+        ).onkeydown = document.getElementById(
+            // use the same function when change/keydown
             'sleep-timer-minutes'
         ).onchange = (e) => {
             var radio = document.getElementById('sleep-timer-customized')
@@ -864,7 +865,8 @@ function createBottomPlayerBarContent() {
 
         document.getElementById(
             'sleep-timer-songs'
-        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = ( // use the same function when change/keydown
+        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = (
+            // use the same function when change/keydown
             e
         ) => {
             var radio = document.getElementById('sleep-timer-customized-c')
@@ -1041,3 +1043,5 @@ function loadAudioOutputList() {
         )
     })
 }
+
+navigator.mediaDevices.ondevicechange = loadAudioOutputList
