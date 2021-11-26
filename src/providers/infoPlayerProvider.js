@@ -437,13 +437,13 @@ function isAdvertisement(webContents) {
         .catch((_) => console.log('error isAdvertisement'))
 }
 
-function setVolume(webContents, time) {
+function setVolume(webContents, vol) {
     webContents
         .executeJavaScript(
             `
         var slider = document.querySelector('#volume-slider');
-        slider.value = ${time};
-        document.querySelector('.video-stream').volume = ${time / 100}
+        slider.value = ${vol};
+        slider.dispatchEvent(new Event("change"));
         `
         )
         .then()
