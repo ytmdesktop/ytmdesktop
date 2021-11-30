@@ -63,7 +63,8 @@ let mainWindow,
     updateTrackInfoTimeout,
     activityLikeStatus,
     windowsMediaProvider,
-    audioDevices
+    audioDevices,
+    settingsRendererIPC
 
 let isFirstTime = false
 
@@ -107,6 +108,10 @@ app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This k
 
 if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
     app.setAsDefaultProtocolClient('ytmd', process.execPath)
+}
+
+if (settingsProvider.get('settings-surround-sound')) {
+    app.commandLine.appendSwitch('try-supported-channel-layouts', '1')
 }
 
 app.commandLine.appendSwitch('disable-http-cache')
@@ -315,17 +320,15 @@ async function createWindow() {
 
     mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
 
+    let position = settingsProvider.get('window-position')
+    if (position !== undefined) mainWindow.setPosition(position.x, position.y)
+
     if (windowMaximized)
         setTimeout(() => {
             mainWindow.send('window-is-maximized', true)
             view.setBounds(calcYTViewSize(settingsProvider, mainWindow))
             mainWindow.maximize()
         }, 700)
-    else {
-        let position = settingsProvider.get('window-position')
-        if (position !== undefined)
-            mainWindow.setPosition(position.x, position.y)
-    }
 
     mainWindow.on('show', () => {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
@@ -334,6 +337,11 @@ async function createWindow() {
     mainWindow.on('closed', () => {
         view = null
         mainWindow = null
+    })
+
+    mainWindow.on('reload', () => {
+        view.webContents.forcefullyCrashRenderer()
+        view.webContents.reload()
     })
 
     view.webContents.on('new-window', (event, url) => {
@@ -909,9 +917,16 @@ async function createWindow() {
     })
 
     if (
-        !settingsProvider.get('settings-windows10-media-service-show-info') ||
-        !settingsProvider.get('settings-windows10-media-service')
+        (isWindows() &&
+            (!settingsProvider.get(
+                'settings-windows10-media-service-show-info'
+            ) ||
+                !settingsProvider.get('settings-windows10-media-service'))) ||
+        isMac() ||
+        isLinux()
     ) {
+        let settingsAccelerator = settingsProvider.get('settings-accelerators')
+
         globalShortcut.register('MediaPlayPause', () => {
             checkDoubleTapPlayPause()
         })
@@ -1855,19 +1870,29 @@ else {
     })
 
     app.whenReady().then(async () => {
-        checkWindowPosition(settingsProvider.get('window-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(
+            settingsProvider.get('window-position'),
+            settingsProvider.get('window-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('window-position', visiblePosition)
+        })
 
-        checkWindowPosition(settingsProvider.get('lyrics-position')).then(
-            (visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('lyrics-position', visiblePosition)
-            }
-        )
+        checkWindowPosition(settingsProvider.get('lyrics-position'), {
+            width: 700,
+            height: 800,
+        }).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('lyrics-position', visiblePosition)
+        })
+
+        checkWindowPosition(
+            settingsProvider.get('miniplayer-position'),
+            settingsProvider.get('settings-miniplayer-size')
+        ).then((visiblePosition) => {
+            console.log(visiblePosition)
+            settingsProvider.set('miniplayer-position', visiblePosition)
+        })
 
         await createWindow()
 
@@ -2089,6 +2114,12 @@ if (settingsProvider.get('settings-discord-rich-presence')) discordRPC.start()
 
 ipcMain.on('set-audio-output-list', (_, data) => {
     updateTrayAudioOutputs(data)
+    try {
+        // FIXME: For some reason neither the emit/send doesn't work
+        if (settingsRendererIPC) {
+            settingsRendererIPC.send('update-audio-output-devices', data)
+        }
+    } catch (e) {}
     audioDevices = data
 })
 
@@ -2124,7 +2155,10 @@ ipcMain.on('retrieve-sleep-timer', (e) => {
     e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
 })
 
-ipcMain.handle('get-audio-output-list', () => audioDevices)
+ipcMain.handle('get-audio-output-list', (e) => {
+    settingsRendererIPC = e.sender
+    return audioDevices
+})
 
 powerMonitor.on('suspend', () => {
     if (settingsProvider.get('settings-pause-on-suspend')) {
@@ -2133,16 +2167,23 @@ powerMonitor.on('suspend', () => {
     }
 })
 
+if (!settingsProvider.get('settings-disable-analytics')) {
+    const analytics = require('./src/providers/analyticsProvider')
+    analytics.setEvent(
+        'main',
+        'start',
+        'v' + app.getVersion(),
+        app.getVersion()
+    )
+    analytics.setEvent('main', 'os', process.platform, process.platform)
+    analytics.setScreen('main')
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
-const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
-
-analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
-analytics.setEvent('main', 'os', process.platform, process.platform)
-analytics.setScreen('main')

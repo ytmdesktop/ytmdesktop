@@ -16,6 +16,7 @@ if (store.get('titlebar-type', 'nice') !== 'nice') {
         .removeChild(document.getElementById('nice-titlebar').firstChild)
 
     document.getElementById('webview').style.height = '100vh'
+    document.getElementById('iframe').style.height = '100vh'
 } else {
     if (isMac()) {
         winElement.remove()

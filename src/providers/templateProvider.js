@@ -55,6 +55,7 @@ let statusBarMenu = [
                 label: 'Reload',
                 accelerator: 'CmdOrCtrl+R',
                 click(item, focusedWindow) {
+                    focusedWindow.emit('reload')
                     if (focusedWindow) focusedWindow.reload()
                 },
             },
