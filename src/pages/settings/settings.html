@@ -365,9 +365,20 @@
                                             ></span>
                                         </td>
                                         <td>
-                                            <select
-                                                id="settings-app-audio-output"
-                                            ></select>
+                                            <div style="display: inline-flex">
+                                                <select
+                                                    id="settings-app-audio-output"
+                                                ></select>
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-reload-audio-devices"
+                                                >
+                                                    <i
+                                                        class="material-icons tiny grey-text"
+                                                        >autorenew</i
+                                                    >
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -533,6 +544,30 @@
                                                     <input
                                                         type="checkbox"
                                                         id="settings-pause-on-suspend"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK_SURROUND_SOUND"
+                                            ></span>
+                                            <sub>
+                                                <i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                >
+                                            </sub>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-surround-sound"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>
@@ -1387,6 +1422,27 @@
                                         View on Github
                                     </a>
                                 </p>
+                            </div>
+                            <div class="row">
+                                <small>
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_ABOUT_DISABLE_ANALYTICS"
+                                    ></span>
+                                    <sub>
+                                        <i class="material-icons tiny grey-text"
+                                            >autorenew</i
+                                        >
+                                    </sub>
+                                </small>
+                                <div class="switch">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            id="settings-disable-analytics"
+                                        />
+                                        <span class="lever"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

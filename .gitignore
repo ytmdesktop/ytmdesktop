@@ -1,12 +1,22 @@
-node_modules
-.idea
-dist
-.DS_Store
+# distribution Folders
+dist/
+
+# Library & Library Manger files
+node_modules/
+
+.yarn/
 yarn-error.log
-.yarn
-# package-lock.json
+package-lock.json
+
+# IDE folders
+.idea/
+.vs/
+.vscode/
+
+# Other Files
+.cache/
+
+.DS_Store
 /youtube-music-desktop-app-*.tgz
-/.cache
-assets/custom-theme.css
 app-update.yml
 dev-app-update.yml

@@ -68,6 +68,9 @@ function setActivity(data) {
     if (data.player.likeStatus === 'LIKE') ws.send(`RATING:5`)
     else if (data.player.likeStatus === 'DISLIKE') ws.send(`RATING:1`)
     else ws.send(`RATING:0`)
+
+    // Store the Volume Percent for the Volume changing
+    volumePercent = data.player.volumePercent
 }
 
 function doAction(data) {
@@ -120,6 +123,8 @@ function doAction(data) {
             break
 
         case 'SetVolume':
+            // Technically this doesn't actually set the Volume to WebNowPlaying's Standards
+            // as we're letting the up/down volume set decide rather than a specific value.
             if (actionParams[0] >= volumePercent)
                 ipcMain.emit('media-command', {
                     command: 'media-volume-up',
