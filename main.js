@@ -37,13 +37,6 @@ const rainmeterNowPlaying = require('./src/providers/rainmeterNowPlaying')
 const companionServer = require('./src/providers/companionServer')
 const geniusAuthServer = require('./src/providers/geniusAuthServer')
 const discordRPC = require('./src/providers/discordRpcProvider')
-const mprisProvider = (() => {
-    if (isLinux()) {
-        return require('./src/providers/mprisProvider')
-    } else {
-        return null
-    }
-})()
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -62,9 +55,9 @@ let mainWindow,
     doublePressPlayPause,
     updateTrackInfoTimeout,
     activityLikeStatus,
-    windowsMediaProvider,
-    audioDevices,
-    settingsRendererIPC
+    settingsRendererIPC,
+    mediaServiceProvider,
+    audioDevices
 
 let isFirstTime = false
 
@@ -125,16 +118,16 @@ if (settingsProvider.get('has-updated') === true)
         ipcMain.emit('window', { command: 'show-changelog' })
     }, 2000)
 
-if (
+/*if (
     isWindows() &&
     os.release().startsWith('10.') &&
     settingsProvider.get('settings-windows10-media-service')
-)
-    try {
-        windowsMediaProvider = require('./src/providers/windowsMediaProvider')
-    } catch (error) {
-        console.log('error windowsMediaProvider > ' + error)
-    }
+)*/
+try {
+    mediaServiceProvider = require('./src/providers/mediaServiceProvider')
+} catch (error) {
+    console.log('error mediaServiceProvider > ' + error)
+}
 
 if (isMac()) {
     settingsProvider.set(
@@ -395,21 +388,9 @@ async function createWindow() {
     view.webContents.on('media-started-playing', () => {
         if (!infoPlayerProvider.hasInitialized()) {
             infoPlayerProvider.init(view)
-            if (isLinux()) {
-                if (!mprisProvider._isInitialized) {
-                    mprisProvider.start()
-                }
-                mprisProvider.setRealPlayer(infoPlayerProvider) //this lets us keep track of the current time in playback.
-            }
         }
 
-        if (
-            isWindows() &&
-            os.release().startsWith('10.') &&
-            settingsProvider.get('settings-windows10-media-service') &&
-            windowsMediaProvider !== undefined
-        )
-            windowsMediaProvider.init(view)
+        mediaServiceProvider.init(view)
 
         if (isMac()) {
             global.sharedObj.paused = false
@@ -459,9 +440,6 @@ async function createWindow() {
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
-            if (isLinux()) {
-                mprisProvider.setActivity(getAll())
-            }
 
             if (settingsProvider.get('settings-enable-taskbar-progressbar')) {
                 mediaControl.setProgress(
@@ -553,18 +531,12 @@ async function createWindow() {
                 )
                     tray.balloon(title, author, cover, iconDefault)
 
-                if (
-                    isWindows() &&
-                    os.release().startsWith('10.') &&
-                    settingsProvider.get('settings-windows10-media-service') &&
-                    windowsMediaProvider !== undefined
+                mediaServiceProvider.setPlaybackData(
+                    title,
+                    author,
+                    cover,
+                    album
                 )
-                    windowsMediaProvider.setPlaybackData(
-                        title,
-                        author,
-                        cover,
-                        album
-                    )
 
                 /**
                  * Update background color for Player
@@ -652,14 +624,7 @@ async function createWindow() {
                     infoPlayerProvider.getAllInfo()
                 )
 
-                if (
-                    isWindows() &&
-                    os.release().startsWith('10.') &&
-                    settingsProvider.get('settings-windows10-media-service') &&
-                    windowsMediaProvider !== undefined
-                ) {
-                    windowsMediaProvider.setPlaybackStatus(playerInfo.isPaused)
-                }
+                mediaServiceProvider.setPlaybackStatus(playerInfo.isPaused)
             }
 
             if (activityLikeStatus !== playerInfo.likeStatus) {
