@@ -14,6 +14,10 @@ const settingsOnDidChange = (key, cb) => {
     ipcRenderer.send('SETTINGS_SUBSCRIBE', key)
 }
 
+const isWindows = () => {
+    return process.platform === 'win32'
+}
+
 window.addEventListener('load', () => {
     createContextMenu()
     createPlayerColorRules()
@@ -62,9 +66,9 @@ function createContextMenu() {
 
                     -webkit-transition: opacity .2s ease-in-out;
                     transition: opacity .2s ease-in-out;
-                    
+
                     padding: 0 !important;
-                    
+
                     border: 1px solid rgba(255, 255, 255, .08) !important;
                     border-radius: 2px !important;
 
@@ -72,7 +76,7 @@ function createContextMenu() {
 
                     width: 144px;
                 }
-            
+
                 #ytmd-menu a {
                     color: #AAA;
                     display: inline-block;
@@ -160,7 +164,7 @@ function createContextMenu() {
                     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
                     overflow: hidden
                   }
-                  
+
                   /* Modal Content */
                   .ytmd-modal-content {
                     background: #232323;
@@ -189,7 +193,7 @@ function createContextMenu() {
                     font-size: 28px;
                     font-weight: bold;
                   }
-                  
+
                   .ytmd-modal-close:hover,
                   .ytmd-modal-close:focus {
                     color: #000;
@@ -370,22 +374,24 @@ function createTopRightContent() {
         const right_content = document.getElementById('right-content')
 
         //SHUTDOWN
-        const elementShutdown = document.createElement('i')
-        elementShutdown.id = 'ytmd_shutdown'
-        elementShutdown.title = translate('LABEL_SHUTDOWN')
-        elementShutdown.classList.add(
-            'material-icons',
-            'pointer',
-            'shine',
-            'ytmd-icons'
-        )
-        elementShutdown.innerText = 'power_settings_new'
+        if (!isWindows()) {
+            const elementShutdown = document.createElement('i')
+            elementShutdown.id = 'ytmd_shutdown'
+            elementShutdown.title = translate('LABEL_SHUTDOWN')
+            elementShutdown.classList.add(
+                'material-icons',
+                'pointer',
+                'shine',
+                'ytmd-icons'
+            )
+            elementShutdown.innerText = 'power_settings_new'
 
-        elementShutdown.addEventListener('click', function () {
-            ipcRenderer.send('closed')
-        })
+            elementShutdown.addEventListener('click', function () {
+                ipcRenderer.send('closed')
+            })
 
-        right_content.prepend(elementShutdown)
+            right_content.prepend(elementShutdown)
+        }
 
         // SETTINGS
         const elementSettings = document.createElement('i')
@@ -516,7 +522,7 @@ function createPlayerColorRules() {
                     background: var(--ytm-album-color-muted);
                 }
 
-                body[accent-enabled] #progress-bar.ytmusic-player-bar[focused], 
+                body[accent-enabled] #progress-bar.ytmusic-player-bar[focused],
                 body[accent-enabled] ytmusic-player-bar:hover #progress-bar.ytmusic-player-bar{
                     --paper-slider-knob-color: white;
                 }
@@ -766,7 +772,7 @@ function createBottomPlayerBarContent() {
                 <p class="ytmd-modal-content-title">${translate(
                     'SLEEPTIMER'
                 )}</p>
-                <div> ${translate('SLEEP_BY_TIME')} 
+                <div> ${translate('SLEEP_BY_TIME')}
                     <br/>
                     <input name='sleep_timer' type='radio' id='sleep-timer-30min' value='30'/>
                     <label for='sleep-timer-30min'> 30${translate(

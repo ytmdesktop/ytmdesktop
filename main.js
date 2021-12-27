@@ -271,8 +271,7 @@ async function createWindow() {
                 {},
                 details.requestHeaders || {},
                 {
-                    'User-Agent':
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+                    'User-Agent': settingsProvider.get('user-agent'),
                 }
             )
             callback({ requestHeaders: newRequestHeaders })
@@ -1888,26 +1887,32 @@ else {
         checkWindowPosition(
             settingsProvider.get('window-position'),
             settingsProvider.get('window-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('window-position', visiblePosition)
-        })
+        )
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('window-position', visiblePosition)
+            })
+            .catch(() => {})
 
         checkWindowPosition(settingsProvider.get('lyrics-position'), {
             width: 700,
             height: 800,
-        }).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('lyrics-position', visiblePosition)
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('lyrics-position', visiblePosition)
+            })
+            .catch(() => {})
 
-        checkWindowPosition(
-            settingsProvider.get('miniplayer-position'),
-            settingsProvider.get('settings-miniplayer-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('miniplayer-position', visiblePosition)
+        checkWindowPosition(settingsProvider.get('miniplayer-position'), {
+            width: settingsProvider.get('settings-miniplayer-size'),
+            height: settingsProvider.get('settings-miniplayer-size'),
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('miniplayer-position', visiblePosition)
+            })
+            .catch(() => {})
 
         await createWindow()
 

@@ -7,6 +7,11 @@ function create() {
 function checkWindowPosition(windowPosition, windowSize) {
     return new Promise((resolve, reject) => {
         try {
+            if (!windowPosition || !windowSize) {
+                reject(false)
+                return
+            }
+
             let nearestDisplay = screen.getDisplayMatching({
                 x: windowPosition.x,
                 y: windowPosition.y,
