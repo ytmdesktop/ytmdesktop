@@ -271,8 +271,7 @@ async function createWindow() {
                 {},
                 details.requestHeaders || {},
                 {
-                    'User-Agent':
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+                    'User-Agent': settingsProvider.get('user-agent'),
                 }
             )
             callback({ requestHeaders: newRequestHeaders })
@@ -1913,26 +1912,32 @@ else {
         checkWindowPosition(
             settingsProvider.get('window-position'),
             settingsProvider.get('window-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('window-position', visiblePosition)
-        })
+        )
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('window-position', visiblePosition)
+            })
+            .catch(() => {})
 
         checkWindowPosition(settingsProvider.get('lyrics-position'), {
             width: 700,
             height: 800,
-        }).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('lyrics-position', visiblePosition)
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('lyrics-position', visiblePosition)
+            })
+            .catch(() => {})
 
-        checkWindowPosition(
-            settingsProvider.get('miniplayer-position'),
-            settingsProvider.get('settings-miniplayer-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('miniplayer-position', visiblePosition)
+        checkWindowPosition(settingsProvider.get('miniplayer-position'), {
+            width: settingsProvider.get('settings-miniplayer-size'),
+            height: settingsProvider.get('settings-miniplayer-size'),
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('miniplayer-position', visiblePosition)
+            })
+            .catch(() => {})
 
         await createWindow()
 
@@ -2233,12 +2238,23 @@ powerMonitor.on('suspend', () => {
     }
 })
 
+if (!settingsProvider.get('settings-disable-analytics')) {
+    const analytics = require('./src/providers/analyticsProvider')
+    analytics.setEvent(
+        'main',
+        'start',
+        'v' + app.getVersion(),
+        app.getVersion()
+    )
+    analytics.setEvent('main', 'os', process.platform, process.platform)
+    analytics.setScreen('main')
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
-const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
