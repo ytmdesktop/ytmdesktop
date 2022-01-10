@@ -2238,18 +2238,6 @@ powerMonitor.on('suspend', () => {
     }
 })
 
-if (!settingsProvider.get('settings-disable-analytics')) {
-    const analytics = require('./src/providers/analyticsProvider')
-    analytics.setEvent(
-        'main',
-        'start',
-        'v' + app.getVersion(),
-        app.getVersion()
-    )
-    analytics.setEvent('main', 'os', process.platform, process.platform)
-    analytics.setScreen('main')
-}
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
@@ -2258,10 +2246,6 @@ const updater = require('./src/providers/updateProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
-
-analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
-analytics.setEvent('main', 'os', process.platform, process.platform)
-analytics.setScreen('main')
 
 module.exports = {
     handleOpenUrl: handleOpenUrl,
