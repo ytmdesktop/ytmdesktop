@@ -118,7 +118,7 @@ settingsProvider.setInitialValue(
 )
 
 settingsProvider.setInitialValue('settings-pause-on-suspend', false)
-settingsProvider.setInitialValue('settings-AutoClick_SkipAd', false)
+settingsProvider.setInitialValue('settings-autoclick-skipad', false)
 
 settingsProvider.setInitialValue('settings-disable-analytics', false)
 

@@ -503,7 +503,7 @@ async function createWindow() {
             /**
              * skip ad when SkipAd button shows
              */
-            if (settingsProvider.get('settings-AutoClick_SkipAd')) {
+            if (settingsProvider.get('settings-autoclick-skipad')) {
                 setTimeout(() => {
                     if (isAdPlaying) {
                         //console.log('trying to skip!')
