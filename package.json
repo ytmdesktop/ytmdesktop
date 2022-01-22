@@ -51,7 +51,7 @@
         "image-to-base64": "^2.1.1",
         "js-base64": "^3.4.3",
         "markdown": "^0.5.0",
-        "node-fetch": "^2.6.0",
+        "node-fetch": "^3.1.1",
         "node-vibrant": "^3.1.5",
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
