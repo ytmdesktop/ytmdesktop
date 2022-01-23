@@ -455,7 +455,7 @@ async function createWindow() {
         const duration = trackInfo.duration
         const cover = trackInfo.cover
         const nowPlaying = `${title} - ${author}`
-        const isAdPlaying = playerInfo.isSkippable
+        const isAdSkippable = trackInfo.isAdSkippable
 
         if (title && author) {
             rainmeterNowPlaying.setActivity(getAll())
@@ -505,7 +505,7 @@ async function createWindow() {
              */
             if (settingsProvider.get('settings-autoclick-skipad')) {
                 setTimeout(() => {
-                    if (isAdPlaying) {
+                    if (isAdSkippable) {
                         //console.log('trying to skip!')
                         mediaControl.skipAd(view)
                     }
@@ -581,7 +581,7 @@ async function createWindow() {
                 /**
                  * Update background color for Player
                  */
-                Vibrant.from(getTrackInfo().cover)
+                Vibrant.from(infoPlayerProvider.getTrackInfo().cover)
                     .getPalette()
                     .then((palette) => {
                         hue = palette.DarkVibrant.getHsl()[0] * 360
@@ -1396,7 +1396,8 @@ async function createWindow() {
                 './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
-                search: 'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
+                search:
+                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1426,7 +1427,8 @@ async function createWindow() {
                 './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
-                search: 'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
+                search:
+                    'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
     }
@@ -1803,8 +1805,7 @@ async function createWindow() {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
                     onTextChange: (text) => {
-                        let regExp =
-                            /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
+                        let regExp = /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
                         let match = text.match(regExp)
                         if (match) {
                             let videoUrl = match[0]
@@ -1848,8 +1849,7 @@ async function createWindow() {
         if (videoUrl.includes('music.youtube'))
             await view.webContents.loadURL(videoUrl)
         else {
-            let regExpYoutube =
-                /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
+            let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)
             await view.webContents.loadURL(
                 'https://music.youtube.com/watch?v=' + match[4]
@@ -2255,7 +2255,6 @@ if (!settingsProvider.get('settings-disable-analytics')) {
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
-const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
 
