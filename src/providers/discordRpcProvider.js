@@ -63,7 +63,7 @@ function setActivity(info) {
             }
         }
 
-        activity.largeImageKey = 'ytm_logo_512'
+        activity.largeImageKey = info.track.cover
         activity.smallImageKey = info.player.isPaused
             ? 'discordrpc-pause'
             : 'discordrpc-play'
