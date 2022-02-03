@@ -979,6 +979,17 @@ async function createWindow() {
         else companionServer.stop()
     })
 
+    settingsProvider.onDidChange('settings-companion-server-port', (data) => {
+        let port = data.newValue
+        let _port = companionServer.validatePort(data.newValue)
+        if (+_port !== +port)
+            settingsProvider.set(
+                'settings-companion-server-port',
+                data.oldValue
+            )
+        else companionServer.restart()
+    })
+
     settingsProvider.onDidChange('settings-genius-auth-server', (data) => {
         if (data.newValue) geniusAuthServer.start()
         else geniusAuthServer.stop()

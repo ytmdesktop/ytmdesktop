@@ -171,19 +171,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document
             .getElementById('settings-companion-server-port')
             .classList.remove('error')
-
         let port = settingsProvider.get('settings-companion-server-port')
         let _port = companionServer.validatePort(port)
 
         if (+_port !== +port) {
-            settingsProvider.set('settings-companion-server-port', _port)
             document.getElementById(
                 'settings-companion-server-port'
             ).value = _port
             document
                 .getElementById('settings-companion-server-port')
                 .classList.add('error')
-        } else companionServer.restart()
+        }
     })
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus()
