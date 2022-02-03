@@ -236,13 +236,14 @@ input[type=range]+.thumb {
     display: none;
 }
 
-.settings-item-last-child::before {
-    color: #666;
-    content: '└ ';
-}
 .settings-item-child::before {
     color: #666;
     content: '├ ';
+}
+
+.settings-item-last-child::before {
+    color: #666;
+    content: '└ ';
 }
 
 .text-disabled {
