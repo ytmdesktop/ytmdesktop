@@ -1,5 +1,5 @@
 const { screen, ipcMain } = require('electron')
-const { isWindows } = require('./systemInfo')
+const { isWindows, isMac } = require('./systemInfo')
 
 function create() {
     // for create window
@@ -55,7 +55,8 @@ async function checkWindowPosition(windowPosition, windowSize) {
                     (windowSize.height + 64 + (isWindows() ? 50 : 0))
 
             if (windowPosition.y < nearestDisplayBounds.y)
-                adjustedWindow.position.y = nearestDisplayBounds.y + 64
+                adjustedWindow.position.y =
+                    nearestDisplayBounds.y + 64 + (isMac() ? 36 : 0)
 
             if (adjustedWindow.size.height > nearestDisplayBounds.height)
                 adjustedWindow.size.height = nearestDisplay.height - 64 * 2
