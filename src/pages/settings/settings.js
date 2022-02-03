@@ -2,7 +2,6 @@ const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const companionServer = require('../../providers/companionServer')
-
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
 const fs = require('fs')
 
