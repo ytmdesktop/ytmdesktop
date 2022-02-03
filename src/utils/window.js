@@ -1,10 +1,11 @@
 const { screen, ipcMain } = require('electron')
+const { isWindows } = require('./systemInfo')
 
 function create() {
     // for create window
 }
 
-function checkWindowPosition(windowPosition, windowSize) {
+async function checkWindowPosition(windowPosition, windowSize) {
     return new Promise((resolve, reject) => {
         try {
             if (!windowPosition || !windowSize) {
@@ -20,49 +21,46 @@ function checkWindowPosition(windowPosition, windowSize) {
             })
             let nearestDisplayBounds = nearestDisplay.bounds
 
-            var position = {
-                x: windowPosition.x,
-                y: windowPosition.y,
+            var adjustedWindow = {
+                position: {
+                    x: windowPosition.x,
+                    y: windowPosition.y,
+                },
+                size: {
+                    width: windowSize.width,
+                    height: windowSize.height,
+                },
             }
 
             // The reason for + 64 in window sizes is because 1px inside nearest display is considered visible but not user friendly as it's quite well hidden and could prevent dragging
             if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.x - (windowSize.width + 64) >
-                    nearestDisplayBounds.x
-            ) {
-                position.x = windowPosition.x - nearestDisplayBounds.width
-            }
+                windowPosition.x + (windowSize.width - 64) >
+                nearestDisplayBounds.width
+            )
+                adjustedWindow.position.x =
+                    nearestDisplayBounds.width - (windowSize.width + 64)
+
+            if (windowPosition.x < nearestDisplayBounds.x)
+                adjustedWindow.position.x = nearestDisplayBounds.x + 64
+
+            if (windowSize.width > nearestDisplayBounds.width)
+                windowSize.width = nearestDisplay.width - 64 * 2
 
             if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.x + (windowSize.width + 64) <
-                    nearestDisplayBounds.x
-            ) {
-                position.x = windowPosition.x + nearestDisplayBounds.width
-            }
+                windowPosition.y + (windowSize.height + 64) >
+                nearestDisplayBounds.height
+            )
+                adjustedWindow.position.y =
+                    nearestDisplayBounds.height -
+                    (windowSize.height + 64 + (isWindows() ? 50 : 0))
 
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.y - (windowSize.height + 64) >
-                    nearestDisplayBounds.y
-            ) {
-                position.y = windowPosition.y - nearestDisplayBounds.height
-            }
+            if (windowPosition.y < nearestDisplayBounds.y)
+                adjustedWindow.position.y = nearestDisplayBounds.y + 64
 
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.y + (windowSize.height + 64) <
-                    nearestDisplayBounds.y
-            ) {
-                position.y = windowPosition.y + nearestDisplayBounds.height
-            }
+            if (adjustedWindow.size.height > nearestDisplayBounds.height)
+                adjustedWindow.size.height = nearestDisplay.height - 64 * 2
 
-            resolve(position)
+            resolve(adjustedWindow)
         } catch (err) {
             console.log('error -> checkWindowPosition', err)
             reject(false)
