@@ -397,10 +397,10 @@ function createListener(element, settingsName, eventType, fn) {
 
             case 'change':
                 settingsProvider.set(settingsName, e.target.value)
-                /* ipc.send('settings-value-changed', {
+                /*ipc.send('settings-value-changed', {
                     key: settingsName,
                     value: this.value,
-                }) */
+                })*/
                 break
         }
         fn && fn()
