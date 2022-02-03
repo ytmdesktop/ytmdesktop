@@ -236,9 +236,13 @@ input[type=range]+.thumb {
     display: none;
 }
 
-.settings-item-child::before {
+.settings-item-last-child::before {
     color: #666;
     content: '└ ';
+}
+.settings-item-child::before {
+    color: #666;
+    content: '├ ';
 }
 
 .text-disabled {
@@ -258,4 +262,18 @@ input[type=range]+.thumb {
 
 .icon-normalize {
     margin-top: 12px;
+}
+
+#settings-companion-server-port {
+    text-align: right;
+    width: 4em;
+    height: 1em;
+    margin: 0;
+    margin-right: 1em;
+    border: 0;
+    box-shadow: none;
+}
+
+.error {
+    color: #d32f2f !important;
 }

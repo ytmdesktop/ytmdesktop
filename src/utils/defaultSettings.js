@@ -29,6 +29,8 @@ settingsProvider.setInitialValue('settings-lyrics-always-top', false) // show on
 
 settingsProvider.setInitialValue('settings-companion-server-protect', true) // Yes
 
+settingsProvider.setInitialValue('settings-companion-server-port', '9864') // Yes
+
 settingsProvider.setInitialValue('settings-enable-player-bgcolor', false)
 
 settingsProvider.setInitialValue(

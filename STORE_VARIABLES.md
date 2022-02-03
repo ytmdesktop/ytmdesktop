@@ -15,6 +15,7 @@
 | `settings-companion-server`                | Boolean | `true` or `false`            | `false`                      | Companion Server to control the player remotely                                      |
 | `settings-companion-server-protect`        | Boolean | `true` or `false`            | `true`                       | Enable or disable protection of companion                                            |
 | `settings-companion-server-token`          | String  | `String token`               | GENERATED_TOKEN              | Token to prevent anonymous control of the player                                     |
+| `settings-companion-server-port`           | String  | `1024` ~ `65535`             | `9864`                       | Port on which to run the companion server                                            |
 | `settings-continue-where-left-of`          | Boolean | `true` or `false`            | `false`                      | When you close and open the app, will return where you stopped                       |
 | `settings-custom-css-page`                 | Boolean | `true` or `false`            | `false`                      | Custom css for web page                                                              |
 | `settings-decibel-volume`                  | Boolean | `true` or `false`            | `true`                       | Replace the volume control with a decibel based system                               |

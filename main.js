@@ -1890,7 +1890,10 @@ else {
         )
             .then((visiblePosition) => {
                 console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
+                settingsProvider.set('window-position', {
+                    x: Math.max(0, visiblePosition.x),
+                    y: Math.max(0, visiblePosition.y),
+                })
             })
             .catch(() => {})
 
