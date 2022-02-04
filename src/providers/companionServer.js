@@ -292,6 +292,7 @@ const serverFunction = (req, res) => {
 const server = http.createServer(serverFunction)
 
 function canConnect(socket) {
+    //socket.handshake.headers.password is only there for retro-compatibility. It should be considered deprecated as it's not guaranteed to be received depending on what transport method the client uses (the whole reason new versions of socket.io have a builtin auth system)
     let clientPassword =
         socket.handshake.auth.token || socket.handshake.headers.password || ''
     let clientHost = socket.handshake.address
