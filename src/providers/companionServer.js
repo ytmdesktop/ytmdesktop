@@ -292,7 +292,8 @@ const serverFunction = (req, res) => {
 const server = http.createServer(serverFunction)
 
 function canConnect(socket) {
-    let clientPassword = socket.handshake.auth.token || ''
+    let clientPassword =
+        socket.handshake.auth.token || socket.handshake.headers.password || ''
     let clientHost = socket.handshake.address
     let clientIsLocalhost = clientHost === '127.0.0.1'
 
