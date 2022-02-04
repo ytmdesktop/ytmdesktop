@@ -59,7 +59,7 @@
         "qrcode-generator": "^1.4.4",
         "register-scheme": "0.0.2",
         "scribble": "github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43",
-        "socket.io": "^2.3.0",
+        "socket.io": "^4.4.1",
         "uuid": "^8.3.2",
         "ws": "^7.4.2"
     },

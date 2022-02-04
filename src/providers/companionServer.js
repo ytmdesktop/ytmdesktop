@@ -7,10 +7,11 @@ const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
-const port = 9863
+const port = 9864
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
+const pattIgnoreInterface =
+    /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -291,12 +292,11 @@ const serverFunction = (req, res) => {
 const server = http.createServer(serverFunction)
 
 function canConnect(socket) {
-    let clientPassword = socket.handshake.headers.password || ''
+    let clientPassword = socket.handshake.auth.token || ''
     let clientHost = socket.handshake.address
     let clientIsLocalhost = clientHost === '127.0.0.1'
 
     let serverPassword = settingsProvider.get('settings-companion-server-token')
-
     return !(
         infoServer().isProtected &&
         clientIsLocalhost === false &&
