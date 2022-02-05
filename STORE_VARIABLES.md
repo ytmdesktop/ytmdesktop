@@ -18,6 +18,7 @@
 | `settings-continue-where-left-of`          | Boolean | `true` or `false`            | `false`                      | When you close and open the app, will return where you stopped                       |
 | `settings-custom-css-page`                 | Boolean | `true` or `false`            | `false`                      | Custom css for web page                                                              |
 | `settings-decibel-volume`                  | Boolean | `true` or `false`            | `true`                       | Replace the volume control with a decibel based system                               |
+| `settings-disable-analytics`               | Boolean | `true` or `false`            | `false`                      | Disables the Analytics which the Application sends to Google Analytics               |
 | `settings-discord-rich-presence`           | Boolean | `true` or `false`            | `false`                      | Integration with Discord Rich Presence                                               |
 | `settings-enable-double-tapping-show-hide` | Boolean | `true` or `false`            | `true`                       | Enable or disable double-tapping to show/hide main window                            |
 | `settings-enable-player-bgcolor`           | Boolean | `true` or `false`            | `false`                      | Enable or disable setting the background of the player to the color of the cover art |
@@ -36,6 +37,7 @@
 | `settings-volume`                          | String  | `0` ~ `100`                  | `100`                        | Playback volume                                                                      |
 | `settings-volume-media-keys`               | Boolean | `true` or `false`            | `false`                      | Enable media volume keys for the playback volume                                     |
 | `settings-pause-on-suspend`                | Boolean | `true` or `false`            | `false`                      | Pause media playback on `suspend` event triggered                                    |
+| `settings-surround-sound`                  | Boolean | `true` or `false`            | `false`                      | Enable Chromium Flag "try-supported-channel-layouts" for surround sound/Speaker Fill |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |
