@@ -19,6 +19,7 @@
             href="../../../src/assets/css/styles.css"
         />
         <link type="text/css" rel="stylesheet" href="./settings.css" />
+        <script type="text/javascript" src="../../../commit_hash.js"></script>
     </head>
     <body>
         <div id="content" class="hide">
@@ -1389,7 +1390,10 @@
                         >
                             <div class="row">
                                 <span style="color: #aaa">
-                                    v<span id="app-version"></span> <br /><br />
+                                    v<span id="app-version"></span> <br /><span
+                                        >Commit hash:
+                                        <span id="app-hash"></span></span
+                                    ><br /><br />
                                     <button
                                         id="release-notes"
                                         class="btn waves-effect waves-light red"
@@ -1463,6 +1467,9 @@
         <script src="../../../src/assets/js/materialize.min.js"></script>
         <script>
             require('./settings.js')
+        </script>
+        <script>
+            document.getElementById('app-hash').innerText = commit_hash
         </script>
     </body>
 </html>
