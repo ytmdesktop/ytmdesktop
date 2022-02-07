@@ -7,7 +7,7 @@ const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
-const port = 9864
+const default_port = 9864
 const hostname = os.hostname()
 
 const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
@@ -25,7 +25,7 @@ function infoServer() {
     return {
         name: hostname,
         listen: serverInterfaces,
-        port: port,
+        port: settingsProvider.get('settings-companion-server-port'),
         isProtected:
             settingsProvider.get('settings-companion-server-protect') || false,
         connections: totalConnections,
@@ -308,7 +308,10 @@ function canConnect(socket) {
 var sock
 function start() {
     try {
-        server.listen(port, ip)
+        server.listen(
+            settingsProvider.get('settings-companion-server-port'),
+            ip
+        )
         const io = require('socket.io')(server)
 
         timerTotalConections = setInterval(() => {
@@ -352,20 +355,41 @@ function start() {
 
         ipcMain.emit('log', {
             type: 'info',
-            data: `Companion Server listening on port ${port}`,
+            data: `Companion Server listening on port ${settingsProvider.get(
+                'settings-companion-server-port'
+            )}`,
         })
     } catch (_) {
         ipcMain.emit('log', {
             type: 'warn',
-            data: `Error to start server on port ${port}`,
+            data: `Error to start server on port ${settingsProvider.get(
+                'settings-companion-server-port'
+            )}`,
         })
     }
+}
+
+function restart() {
+    console.log('Restarting companion Server')
+    clearInterval(timerTotalConections)
+    server.close(() => {
+        start()
+    })
 }
 
 function stop() {
     clearInterval(timerTotalConections)
     server.close()
     console.log('Companion Server has stopped')
+}
+
+function validatePort(port) {
+    try {
+        let _port = parseInt(port)
+        return 1024 <= _port && _port <= 65535 ? _port : default_port
+    } catch {
+        return default_port
+    }
 }
 
 function execCmd(cmd, value) {
@@ -510,5 +534,7 @@ function execCmd(cmd, value) {
 
 module.exports = {
     start: start,
+    restart: restart,
     stop: stop,
+    validatePort: validatePort,
 }

@@ -324,6 +324,9 @@ async function createWindow() {
     let position = settingsProvider.get('window-position')
     if (position !== undefined) mainWindow.setPosition(position.x, position.y)
 
+    let size = settingsProvider.get('window-size')
+    if (size !== undefined) mainWindow.setSize(size.width, size.height)
+
     if (windowMaximized)
         setTimeout(() => {
             mainWindow.send('window-is-maximized', true)
@@ -977,6 +980,17 @@ async function createWindow() {
     settingsProvider.onDidChange('settings-companion-server', (data) => {
         if (data.newValue) companionServer.start()
         else companionServer.stop()
+    })
+
+    settingsProvider.onDidChange('settings-companion-server-port', (data) => {
+        let port = data.newValue
+        let _port = companionServer.validatePort(data.newValue)
+        if (+_port !== +port)
+            settingsProvider.set(
+                'settings-companion-server-port',
+                data.oldValue
+            )
+        else companionServer.restart()
     })
 
     settingsProvider.onDidChange('settings-genius-auth-server', (data) => {
@@ -1884,33 +1898,41 @@ else {
     })
 
     app.whenReady().then(async () => {
-        checkWindowPosition(
+        var adjustedWindow = await checkWindowPosition(
             settingsProvider.get('window-position'),
             settingsProvider.get('window-size')
         )
-            .then((visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('window-position', visiblePosition)
-            })
-            .catch(() => {})
+        if (adjustedWindow) {
+            console.log(adjustedWindow)
+            settingsProvider.set('window-position', adjustedWindow.position)
+            settingsProvider.set('window-size', adjustedWindow.size)
+        }
 
         checkWindowPosition(settingsProvider.get('lyrics-position'), {
             width: 700,
             height: 800,
         })
-            .then((visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('lyrics-position', visiblePosition)
+            .then((adjustedWindow) => {
+                console.log(adjustedWindow)
+                settingsProvider.set('lyrics-position', adjustedWindow.position)
+                settingsProvider.set('lyrics-size', adjustedWindow.size)
             })
             .catch(() => {})
 
         checkWindowPosition(settingsProvider.get('miniplayer-position'), {
-            width: settingsProvider.get('settings-miniplayer-size'),
-            height: settingsProvider.get('settings-miniplayer-size'),
+            width: settingsProvider.get('miniplayer-size'),
+            height: settingsProvider.get('miniplayer-size'),
         })
-            .then((visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('miniplayer-position', visiblePosition)
+            .then((adjustedWindow) => {
+                console.log(adjustedWindow)
+                settingsProvider.set(
+                    'miniplayer-position',
+                    adjustedWindow.position
+                )
+                settingsProvider.set(
+                    'miniplayer-size',
+                    adjustedWindow.size.width
+                )
             })
             .catch(() => {})
 
