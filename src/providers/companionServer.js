@@ -10,8 +10,7 @@ const ip = '0.0.0.0'
 const port = 9864
 const hostname = os.hostname()
 
-const pattIgnoreInterface =
-    /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
+const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -306,20 +305,21 @@ function canConnect(socket) {
     )
 }
 
+var sock
 function start() {
     try {
         server.listen(port, ip)
         const io = require('socket.io')(server)
 
         timerTotalConections = setInterval(() => {
-            totalConnections = Object.keys(io.sockets.sockets).length
-
+            totalConnections = io.sockets.sockets.size
             if (totalConnections)
                 io.emit('tick', infoPlayerProvider.getAllInfo())
         }, 500)
 
         io.on('connection', (socket) => {
             if (!canConnect(socket)) socket.disconnect()
+            else sock = socket
 
             socket.on('media-commands', (cmd, value) => execCmd(cmd, value))
 
