@@ -8,10 +8,10 @@
         "dev": "NODE_ENV=development nodemon --exec yarn start --dev --inspect",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
-        "build:win": "node script/inject_commit_hash.js; npx electron-builder --win --config electron-builder-deploy64.yml",
+        "build:win": "powershell -c \"node .\\script\\inject_commit_hash.js\"; npx electron-builder --win --config electron-builder-deploy64.yml",
         "build:mac": "node script/inject_commit_hash.js; npx electron-builder --mac --config electron-builder-deploy64.yml",
         "build:lin": "node script/inject_commit_hash.js; npx electron-builder --linux --config electron-builder-deploy64.yml",
-        "publish:win": "node script/inject_commit_hash.js; npx electron-builder --win -p always --config electron-builder64.yml",
+        "publish:win": "powershell -c \"node .\\script\\inject_commit_hash.js\"; npx electron-builder --win -p always --config electron-builder64.yml",
         "publish:mac": "node script/inject_commit_hash.js; npx electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "node script/inject_commit_hash.js; npx electron-builder --linux -p always --config electron-builder64.yml"
     },
