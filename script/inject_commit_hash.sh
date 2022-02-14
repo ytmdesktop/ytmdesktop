@@ -1,1 +1,0 @@
-command -v git > $null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js
