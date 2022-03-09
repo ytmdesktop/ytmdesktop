@@ -7,10 +7,10 @@
         "start": "electron .",
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
-        "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
+        "build:win": "npx electron-builder --win --config electron-builder-deploy.yml",
         "build:mac": "npx electron-builder --mac --config electron-builder-deploy64.yml",
         "build:lin": "npx electron-builder --linux --config electron-builder-deploy64.yml",
-        "publish:win": "npx electron-builder --win -p always --config electron-builder64.yml",
+        "publish:win": "npx electron-builder --win -p always --config electron-builder.yml",
         "publish:mac": "npx electron-builder --mac -p always --config electron-builder64.yml",
         "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml"
     },
