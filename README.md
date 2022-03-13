@@ -34,6 +34,8 @@
 
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
+If you are running Windows, you will need [Visual Studio 2015 (Community)](https://visualstudio.microsoft.com/vs/older-downloads/) installed for the NodeRT to be compiled successfully. The provided link requires you to create an Account (This is Microsoft official website) to be able to download the older version of Visual Studio which is really annoying.
+
 ```bash
 # Clone this repository
 git clone https://github.com/ytmdesktop/ytmdesktop
