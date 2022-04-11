@@ -52,6 +52,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnClose.addEventListener('click', () => {
         ipcRenderer.send('window', { command: 'restore-main-window' })
     })
+
+    btnDislike.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-vote-down' })
+    })
+
+    btnPrevious.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-track-previous' })
+    })
+
+    btnPlayPause.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-play-pause' })
+        body.classList.toggle('showinfo')
+    })
+
+    btnNext.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-track-next' })
+    })
+
+    btnLike.addEventListener('click', () => {
+        ipcRenderer.send('media-command', { command: 'media-vote-up' })
+    })
 })
 
 async function retrieveAllInfo() {
@@ -78,6 +99,23 @@ function setPlayerInfo(data) {
     } else {
         btnPlayPause.children.item(0).innerHTML = 'pause'
         body.classList.remove('showinfo')
+    }
+
+    switch (data.player.likeStatus) {
+        case 'LIKE':
+            btnLike.children.item(0).classList.remove('outlined')
+            btnDislike.children.item(0).classList.add('outlined')
+            break
+
+        case 'DISLIKE':
+            btnLike.children.item(0).classList.add('outlined')
+            btnDislike.children.item(0).classList.remove('outlined')
+            break
+
+        case 'INDIFFERENT':
+            btnLike.children.item(0).classList.add('outlined')
+            btnDislike.children.item(0).classList.add('outlined')
+            break
     }
 
     if (settingsProvider.get('settings-miniplayer-paint-controls')) {

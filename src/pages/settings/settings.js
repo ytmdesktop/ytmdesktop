@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-miniplayer-show-task', 'click', null)
     initElement('settings-miniplayer-always-show-controls', 'click', null)
     initElement('settings-miniplayer-paint-controls', 'click', null)
+    initElement('settings-miniplayer-stream-config', 'click', null)
     initElement('settings-enable-taskbar-progressbar', 'click', () => {
         ipc.send('refresh-progress')
     })
