@@ -1113,14 +1113,12 @@ function createWindow() {
                 modal: false,
                 frame: false,
                 center: false,
-                resizable: settingsProvider.get(
-                    'settings-miniplayer-resizable'
-                ),
+                resizable: false,
                 alwaysOnTop: settingsProvider.get(
                     'settings-miniplayer-always-top'
                 ),
-                width: settingsProvider.get('settings-miniplayer-size'),
-                height: settingsProvider.get('settings-miniplayer-size'),
+                width: 500,
+                height: 100,
                 backgroundColor: '#232323',
                 minWidth: 100,
                 minHeight: 100,
@@ -1170,13 +1168,6 @@ function createWindow() {
                     if (storeMiniplayerSizeTimer) {
                         clearTimeout(storeMiniplayerSizeTimer)
                     }
-                    storeMiniplayerSizeTimer = setTimeout(() => {
-                        settingsProvider.set(
-                            'settings-miniplayer-size',
-                            Math.min(...size)
-                        )
-                        miniplayer.setSize(Math.min(...size), Math.min(...size))
-                    }, 500)
                 } catch {
                     writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }

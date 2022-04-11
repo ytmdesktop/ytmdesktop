@@ -5,7 +5,19 @@ body.showinfo .cmd-btn {
     filter: none;
 }
 
+body:hover .progress-bar,
+body.showinfo .progress-bar {
+    margin-top: 0;
+    height: 2vmin;
+}
+
+body:hover #background,
+body.showinfo #background {
+    filter: blur(3px) brightness(0.7);
+}
+
 .player-info {
+    filter: opacity(0);
     height: 78vmin;
 }
 
@@ -21,6 +33,8 @@ body.showinfo .cmd-btn {
 .cmd-btn {
     width: 10vmin;
     height: 100%;
+    padding: 1.5vmin;
+    filter: opacity(0);
 }
 
 .cmd-btn i {
@@ -30,49 +44,36 @@ body.showinfo .cmd-btn {
 .title {
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: left;
     white-space: nowrap;
     font-weight: bold;
-    font-size: 22vmin;
-    margin-top: -12vmin;
-    margin-left: 22.5vmax;
-}
-
-.album {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-    white-space: nowrap;
-    font-size: 18vmin;
-    margin-top: -6vmin;
-    margin-left: 22.5vmax;
+    font-size: 8.5vmin;
+    padding: 0 2.5vmin;
+    margin-top: calc(10vmin - 4px);
 }
 
 .author {
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: left;
     white-space: nowrap;
-    font-size: 16vmin;
-    margin-top: -5vmin;
-    margin-left: 22.5vmax;
+    font-size: 7vmin;
+    padding: 0 10px;
+    margin-top: 0;
 }
 
 .duration {
-    text-align: left;
-    font-size: 14vmin;
-    margin-top: -4vmin;
-    margin-left: 22.5vmax;
+    font-size: 5.5vmin;
+    margin-top: 2vmin;
 }
 
 .controls {
     display: flex;
     justify-content: center;
-    margin-top: 100vmin;
+    margin-top: 10vmin;
 }
 
 .ctrl-btn {
     float: left;
+    padding: 1.5vmin;
     margin: 5vmin 1vmin;
     border-radius: 50%;
 }
@@ -81,11 +82,33 @@ body.showinfo .cmd-btn {
     font-size: 12vmin;
 }
 
+.ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#btn-play-pause {
+    margin: 0;
+}
+
+#btn-like,
+#btn-dislike {
+    margin: 5vmin 2.5vmin;
+}
+
+#btn-like i,
+#btn-dislike i {
+    font-size: 7vmin;
+    padding: 2.5vmin;
+}
+
+#btn-play-pause i {
+    font-size: 22vmin;
+}
+
 .progress-bar {
-    margin-top: 14vmin;
-    height: 5vmin;
-    width: 80vmax;
-    margin-left: 20vmax;
+    margin-top: 1.4vmin;
+    height: 0.6vmin;
+    width: 100vmin;
 }
 
 #progress {
@@ -98,7 +121,7 @@ body.showinfo .cmd-btn {
 #secondsEffect {
     position: absolute;
     top: 0;
-    width: 100vmax;
+    width: 100vmin;
     height: 100vmin;
     z-index: 1;
 }
@@ -109,11 +132,13 @@ body.showinfo .cmd-btn {
 
 #background {
     background-repeat: no-repeat;
-    background-size: 100px 100px;
+    background-size: cover;
     background-position: center;
     position: absolute;
-    width: 100vmin;
-    height: 100vmin;
+    top: -1vmin;
+    left: -1vmin;
+    width: 102vmin;
+    height: 102vmin;
     z-index: 0;
 }
 
@@ -139,4 +164,13 @@ body.showinfo .cmd-btn {
     right: -40vmin;
     transform: rotate(180deg);
     display: block;
+}
+
+/* transitions */
+.player-info,
+.cmd-btn,
+.progress-bar {
+    transition: filter, margin-top, height;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
 }
