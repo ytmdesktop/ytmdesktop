@@ -14,17 +14,27 @@ body.showinfo .cmd-btn {
     height: 10vmin;
 }
 
-#btn-drag {
-    filter: none !important;
-}
-
 .cmd-btn {
-    width: 10vmin;
-    height: 100%;
+    width: 20px;
+    height: 20px;
 }
 
 .cmd-btn i {
-    font-size: 7vmin;
+    font-size: 12vmin;
+    margin-right: -1vmin;
+}
+
+#btn-drag {
+    opacity: 0;
+}
+
+#btn-like,
+#btn-dislike,
+#btn-next,
+#btn-previous,
+#btn-play-pause {
+    margin-top: 100vmax;
+    opacity: 0;
 }
 
 .title {
@@ -34,7 +44,7 @@ body.showinfo .cmd-btn {
     white-space: nowrap;
     font-weight: bold;
     font-size: 22vmin;
-    margin-top: -12vmin;
+    margin-top: -13vmin;
     margin-left: 22.5vmax;
 }
 
@@ -66,7 +76,7 @@ body.showinfo .cmd-btn {
 }
 
 .progress-bar {
-    margin-top: 14vmin;
+    margin-top: 15vmin;
     height: 5vmin;
     width: 80vmax;
     margin-left: 20vmax;
