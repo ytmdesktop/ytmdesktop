@@ -66,6 +66,7 @@
     "LABEL_SETTINGS_TAB_MINIPLAYER_ALWAYS_SHOW_CONTROLS": "Always show controls",
     "LABEL_SETTINGS_TAB_MINIPLAYER_PAINT_CONTROLS": "Paint controls with album color",
     "LABEL_SETTINGS_TAB_MINIPLAYER_RESIZABLE": "Allow resizing",
+    "LABEL_SETTINGS_TAB_MINIPLAYER_STREAM_CONFIG": "Alternate layout for live streaming",
     "LABEL_SETTINGS_TAB_MINIPLAYER_SHOW_TASK": "Show on taskbar",
     "LABEL_SETTINGS_TAB_MINIPLAYER": "Miniplayer",
     "LABEL_SETTINGS_TAB_PLAYBACK": "Playback",
