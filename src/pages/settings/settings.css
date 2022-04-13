@@ -263,14 +263,13 @@ input[type=range]+.thumb {
 .tooltip {
     position: relative;
     display: inline-block;
-    width: 200px;
-    height: 100px;
     line-height: 15px;
     font-size: 14px;
 }
 
 .tooltip .tooltiptext {
     position: absolute;
+    width: 200px;
     margin-left: 5px;
     visibility: hidden;
     background-color: dimgray;

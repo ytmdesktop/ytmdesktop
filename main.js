@@ -1201,13 +1201,22 @@ function createWindow() {
 
             let storeMiniplayerSizeTimer
             miniplayer.on('resize', function (e) {
-                try {
-                    let size = miniplayer.getSize()
-                    if (storeMiniplayerSizeTimer) {
-                        clearTimeout(storeMiniplayerSizeTimer)
+                if(!settingsProvider.get('settings-miniplayer-stream-config')) {
+                    try {
+                        let size = miniplayer.getSize()
+                        if (storeMiniplayerSizeTimer) {
+                            clearTimeout(storeMiniplayerSizeTimer)
+                        }
+                        storeMiniplayerSizeTimer = setTimeout(() => {
+                            settingsProvider.set(
+                                'settings-miniplayer-size',
+                                Math.min(...size)
+                            )
+                            miniplayer.setSize(Math.min(...size), Math.min(...size))
+                        }, 500)
+                    } catch {
+                        writeLog({ type: 'warn', data: 'error miniplayer resize' })
                     }
-                } catch {
-                    writeLog({ type: 'warn', data: 'error miniplayer resize' })
                 }
             })
 
