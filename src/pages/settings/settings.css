@@ -259,3 +259,26 @@ input[type=range]+.thumb {
 .icon-normalize {
     margin-top: 12px;
 }
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    line-height: 15px;
+    font-size: 14px;
+}
+
+.tooltip .tooltiptext {
+    position: absolute;
+    width: 200px;
+    margin-left: 5px;
+    visibility: hidden;
+    background-color: dimgray;
+    color: black;
+    fill: dimgray;
+    border-radius: 10px;
+    padding: 5px 5px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
