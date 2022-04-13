@@ -1327,14 +1327,14 @@ async function createWindow() {
             }
 
             if (!settingsProvider.get('settings-miniplayer-stream-config')) {
-                miniplayer.loadFile(
+                await miniplayer.loadFile(
                     path.join(
                         app.getAppPath(),
                         '/src/pages/miniplayer/miniplayer.html'
                     )
                 )
             } else {
-                miniplayer.loadFile(
+                await miniplayer.loadFile(
                     path.join(
                         app.getAppPath(),
                         '/src/pages/miniplayer/streamPlayer.html'
