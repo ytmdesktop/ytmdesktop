@@ -29,7 +29,6 @@ window.addEventListener('load', () => {
         createBottomPlayerBarContent()
         playerBarScrollToChangeVolume()
         enableAVSwitcher()
-
     } else createOffTheRoadContent()
 
     // injectCast()
@@ -551,6 +550,66 @@ function createBottomPlayerBarContent() {
         const playerBarMiddleControls = document.querySelector(
             '.middle-controls-buttons.ytmusic-player-bar'
         )
+
+        const playerBarLeftControls = document.querySelector(
+            '#left-controls' // or '.left-controls.style-scope.ytmusic-player-bar' (both works)
+        )
+
+        // Left ////////////////////////////////////////////////////////////////////////////////////
+        // Change playback speed
+        const elementChangeSpeedDiv = document.createElement('div')
+        const elementChangeSpeedIcon = document.createElement('i')
+        const elementChangeSpeedInput = document.createElement('input')
+        const elementChangeSpeedLabel = document.createElement('label')
+
+        elementChangeSpeedIcon.id = 'ytmd_change_speed'
+        elementChangeSpeedIcon.title = translate('MEDIA_CONTROL_SPEED')
+        elementChangeSpeedIcon.classList.add('material-icons')
+        elementChangeSpeedIcon.innerText = 'speed'
+
+        elementChangeSpeedInput.id = 'ytmd_input_change_speed'
+        elementChangeSpeedInput.style.display = 'none'
+        elementChangeSpeedInput.type = 'range'
+        elementChangeSpeedInput.value = 1.0
+        elementChangeSpeedInput.min = 0.3
+        elementChangeSpeedInput.max = 2.0
+        elementChangeSpeedInput.step = 0.1
+
+        elementChangeSpeedLabel.setAttribute('for', 'ytmd_input_change_speed')
+        elementChangeSpeedLabel.innerHTML = `<span 
+            id="ytmd_value_change_speed"
+            class="time-info style-scope ytmusic-player-bar">
+            1.0
+            </span>`
+
+        elementChangeSpeedDiv.append(elementChangeSpeedIcon)
+        elementChangeSpeedDiv.append(elementChangeSpeedInput)
+        playerBarLeftControls.append(elementChangeSpeedDiv)
+        playerBarLeftControls.append(elementChangeSpeedLabel)
+
+        const speedLabel = document.getElementById('ytmd_value_change_speed')
+
+        elementChangeSpeedDiv.addEventListener(
+            'mouseover',
+            () => (elementChangeSpeedInput.style.display = 'block')
+        )
+        elementChangeSpeedDiv.addEventListener(
+            'mouseout',
+            () => (elementChangeSpeedInput.style.display = 'none')
+        )
+
+        elementChangeSpeedInput.onchange = function () {
+            let currentSpeed = elementChangeSpeedInput.value
+            speedLabel.innerText = currentSpeed
+            ipcRenderer.send('media-command', {
+                command: 'media-speed-set',
+                value: currentSpeed,
+            })
+        }
+        ipcRenderer.invoke('get-settings-speed').then((speed) => {
+            speedLabel.innerText = speed
+            elementChangeSpeedInput.value = speed
+        })
 
         // Middle ////////////////////////////////////////////////////////////////////////////////////
         // Add to Playlist

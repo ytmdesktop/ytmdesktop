@@ -6,6 +6,7 @@ const player = {
     hasSong: false,
     isPaused: true,
     volumePercent: 0,
+    playbackSpeed: 1.0,
     seekbarCurrentPosition: 0,
     seekbarCurrentPositionHuman: '0:00',
     statePercent: 0.0,
@@ -50,10 +51,15 @@ function init(view) {
     toggleMoreActions(webContents)
 
     initVolume()
+    initSpeed()
 }
 
 function initVolume() {
     setVolume(webContents, settingsProvider.get('settings-volume'))
+}
+
+function initSpeed() {
+    setSpeed(webContents, settingsProvider.get('settings-speed'))
 }
 
 function getAllInfo() {
@@ -453,6 +459,18 @@ function setVolume(webContents, vol) {
         .catch((_) => console.log('error changeVolume'))
 }
 
+function setSpeed(webContents, speed) {
+    webContents
+        .executeJavaScript(
+            `
+            var currentPlayer = document.querySelector('video');
+            currentPlayer.playbackRate = ${speed};
+        `
+        )
+        .then((playbackSpeed = speed))
+        .catch((_) => console.log('error changeSpeed'))
+}
+
 function setSeekbar(webContents, time) {
     webContents
         .executeJavaScript(
@@ -612,6 +630,8 @@ module.exports = {
     getLyricsInfo: getLyricsInfo,
 
     setVolume: setVolume,
+    setSpeed: setSpeed,
+    initializeSpeed: initSpeed,
     setSeekbar: setSeekbar,
     setQueueItem: setQueueItem,
 

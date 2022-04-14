@@ -633,6 +633,7 @@ async function createWindow() {
 
                 writeLog({ type: 'info', data: `Listen: ${title} - ${author}` })
                 discordRPC.setActivity(getAll())
+                infoPlayerProvider.initializeSpeed()
             }
 
             /**
@@ -1068,7 +1069,10 @@ async function createWindow() {
             case 'media-volume-set':
                 mediaControl.changeVolume(view, value)
                 break
-
+            case 'media-speed-set':
+                mediaControl.changeSpeed(view, value)
+                settingsProvider.set('settings-speed', value)
+                break
             case 'media-queue-set':
                 mediaControl.selectQueueItem(view, value)
                 break
@@ -2207,6 +2211,10 @@ ipcMain.on('retrieve-sleep-timer', (e) => {
 ipcMain.handle('get-audio-output-list', (e) => {
     settingsRendererIPC = e.sender
     return audioDevices
+})
+
+ipcMain.handle('get-settings-speed', (e) => {
+    return settingsProvider.get('settings-speed')
 })
 
 powerMonitor.on('suspend', () => {

@@ -104,6 +104,8 @@ settingsProvider.setInitialValue('settings-tray-icon', true)
 
 settingsProvider.setInitialValue('settings-volume', 100)
 
+settingsProvider.setInitialValue('settings-speed', 1.0)
+
 settingsProvider.setInitialValue('settings-volume-media-keys', false)
 
 settingsProvider.setInitialValue('settings-decibel-volume', true)

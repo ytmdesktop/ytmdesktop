@@ -74,6 +74,10 @@ function mediaChangeVolume(mainWindow, time) {
     infoPlayerProvider.setVolume(mainWindow.webContents, time)
 }
 
+function mediaChangeSpeed(mainWindow, value) {
+    infoPlayerProvider.setSpeed(mainWindow.webContents, value)
+}
+
 async function mediaSelectQueueItem(mainWindow, index) {
     await infoPlayerProvider.setQueueItem(mainWindow.webContents, index)
 }
@@ -241,6 +245,7 @@ exports.mediaForwardTenSeconds = (v) => guarder(v, mediaForwardTenSeconds)
 exports.mediaRewindTenSeconds = (v) => guarder(v, mediaRewindTenSeconds)
 exports.changeSeekbar = mediaChangeSeekbar
 exports.changeVolume = mediaChangeVolume
+exports.changeSpeed = mediaChangeSpeed
 exports.selectQueueItem = mediaSelectQueueItem
 exports.repeat = mediaRepeat
 exports.shuffle = mediaShuffle
