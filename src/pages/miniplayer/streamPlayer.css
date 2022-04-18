@@ -1,3 +1,7 @@
+:root {
+    --text-margin-left: 12px;
+}
+
 body:hover .player-info,
 body:hover .cmd-btn,
 body.showinfo .player-info,
@@ -6,12 +10,16 @@ body.showinfo .cmd-btn {
 }
 
 .player-info {
-    height: 78vmin;
+    height: 100vh;
+    margin-top: 10vh;
 }
 
 .cmd-bar {
     margin: 4px 4px 0;
-    height: 10vmin;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    width: calc(100% - 8px);
 }
 
 .cmd-btn {
@@ -45,7 +53,7 @@ body.showinfo .cmd-btn {
     font-weight: bold;
     font-size: 22vmin;
     margin-top: -13vmin;
-    margin-left: 22.5vmax;
+    margin-left: calc(100vh + var(--text-margin-left));
 }
 
 .album {
@@ -55,7 +63,7 @@ body.showinfo .cmd-btn {
     white-space: nowrap;
     font-size: 18vmin;
     margin-top: -6vmin;
-    margin-left: 22.5vmax;
+    margin-left: calc(100vh + var(--text-margin-left));
 }
 
 .author {
@@ -65,21 +73,23 @@ body.showinfo .cmd-btn {
     white-space: nowrap;
     font-size: 16vmin;
     margin-top: -5vmin;
-    margin-left: 22.5vmax;
+    margin-left: calc(100vh + var(--text-margin-left));
 }
 
 .duration {
     text-align: left;
     font-size: 14vmin;
     margin-top: -4vmin;
-    margin-left: 22.5vmax;
+    margin-left: calc(100vh + var(--text-margin-left));
 }
 
 .progress-bar {
     margin-top: 15vmin;
     height: 5vmin;
     width: 80vmax;
-    margin-left: 20vmax;
+    margin-left: calc(100vh);
+    position: absolute;
+    bottom: 0;
 }
 
 #progress {
@@ -103,11 +113,11 @@ body.showinfo .cmd-btn {
 
 #background {
     background-repeat: no-repeat;
-    background-size: 100px 100px;
+    background-size: 100vh 100vh;
     background-position: center;
     position: absolute;
-    width: 100vmin;
-    height: 100vmin;
+    width: 100vh;
+    height: 100vh;
     z-index: 0;
 }
 

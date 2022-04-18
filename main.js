@@ -1272,72 +1272,68 @@ async function createWindow() {
     async function windowMiniplayer() {
         if (miniplayer) miniplayer.show()
         else {
-            if (settingsProvider.get('settings-miniplayer-stream-config')) {
-                miniplayer = new BrowserWindow({
-                    title: __.trans('LABEL_MINIPLAYER'),
-                    icon: iconDefault,
-                    modal: false,
-                    frame: false,
-                    center: false,
+            var miniplayerConfig = {
+                title: __.trans('LABEL_MINIPLAYER'),
+                icon: iconDefault,
+                modal: false,
+                frame: false,
+                center: false,
 
-                    width: 500,
-                    height: 100,
-                    resizable: false,
-                    skipTaskbar: false,
+                resizable: settingsProvider.get(
+                    'settings-miniplayer-resizable'
+                ),
+                skipTaskbar: !settingsProvider.get(
+                    'settings-miniplayer-show-task'
+                ),
+                alwaysOnTop: settingsProvider.get(
+                    'settings-miniplayer-always-top'
+                ),
 
-                    alwaysOnTop: settingsProvider.get(
-                        'settings-miniplayer-always-top'
-                    ),
-
-                    backgroundColor: '#232323',
-                    minWidth: 100,
-                    minHeight: 100,
-                    autoHideMenuBar: true,
-                    webPreferences: {
-                        nodeIntegration: true,
-                        enableRemoteModule: true,
-                    },
-                })
-            } else {
-                miniplayer = new BrowserWindow({
-                    title: __.trans('LABEL_MINIPLAYER'),
-                    icon: iconDefault,
-                    modal: false,
-                    frame: false,
-                    center: false,
-
-                    resizable: settingsProvider.get('settings-miniplayer-resizable'),
-                    skipTaskbar: !settingsProvider.get('settings-miniplayer-show-task'),
-                    width: settingsProvider.get('settings-miniplayer-size'),
-                    height: settingsProvider.get('settings-miniplayer-size'),
-
-                    alwaysOnTop: settingsProvider.get(
-                        'settings-miniplayer-always-top'
-                    ),
-
-                    backgroundColor: '#232323',
-                    minWidth: 100,
-                    minHeight: 100,
-                    autoHideMenuBar: true,
-                    webPreferences: {
-                        nodeIntegration: true,
-                        enableRemoteModule: true,
-                    },
-                })
+                backgroundColor: '#232323',
+                autoHideMenuBar: true,
+                webPreferences: {
+                    nodeIntegration: true,
+                    enableRemoteModule: true,
+                },
             }
 
-            if (!settingsProvider.get('settings-miniplayer-stream-config')) {
-                await miniplayer.loadFile(
-                    path.join(
-                        app.getAppPath(),
-                        '/src/pages/miniplayer/miniplayer.html'
-                    )
+            if (settingsProvider.get('settings-miniplayer-stream-config')) {
+                var streamSize = settingsProvider.get(
+                    'settings-miniplayer-stream-size'
                 )
-            } else {
+                if (streamSize) {
+                    miniplayerConfig.width = streamSize.x
+                    miniplayerConfig.height = streamSize.y
+                } else {
+                    miniplayerConfig.width = 500
+                    miniplayerConfig.height = 100
+                }
+
+                miniplayerConfig.minWidth = 300
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
                 await miniplayer.loadFile(
                     path.join(
                         app.getAppPath(),
                         '/src/pages/miniplayer/streamPlayer.html'
+                    )
+                )
+            } else {
+                miniplayerConfig.width = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.height = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.minWidth = 100
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
+                await miniplayer.loadFile(
+                    path.join(
+                        app.getAppPath(),
+                        '/src/pages/miniplayer/miniplayer.html'
                     )
                 )
             }
@@ -1363,14 +1359,37 @@ async function createWindow() {
             })
 
             miniplayer.on('resize', (e) => {
-                if (!settingsProvider.get('settings-miniplayer-stream-config')) {
+                if (
+                    !settingsProvider.get('settings-miniplayer-stream-config')
+                ) {
+                    // Square Miniplayer
                     try {
                         let size = Math.min(...miniplayer.getSize())
                         miniplayer.setSize(size, size)
                         settingsProvider.set('settings-miniplayer-size', size)
                         e.preventDefault()
                     } catch (_) {
-                        writeLog({ type: 'warn', data: 'error miniplayer resize' })
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer resize',
+                        })
+                    }
+                } else {
+                    // Resized
+                    try {
+                        let size = miniplayer.getSize()
+                        settingsProvider.set(
+                            'settings-miniplayer-stream-size',
+                            {
+                                x: size[0],
+                                y: size[1],
+                            }
+                        )
+                    } catch (_) {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer (stream) resize',
+                        })
                     }
                 }
             })
