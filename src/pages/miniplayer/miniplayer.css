@@ -52,6 +52,24 @@ body.showinfo #background {
     margin-top: calc(10vmin - 4px);
 }
 
+/*
+    Album is a data call used in the stream player but not in the default.
+    Due to the .js file calling this data I maintain parity with these base files.
+    I have set the opacity to 0 and the position to absolute to not interfere.
+    Just get rid of those settings to add it to the default mini player.
+*/
+.album {
+    opacity: 0;
+    position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 18vmin;
+    margin-top: -6vmin;
+    margin-left: 22.5vmax;
+}
+
 .author {
     overflow: hidden;
     text-overflow: ellipsis;
