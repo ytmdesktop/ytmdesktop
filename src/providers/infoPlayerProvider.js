@@ -307,7 +307,7 @@ function getQueue(webContents) {
     webContents
         .executeJavaScript(
             `
-            var element = document.querySelector('ytmusic-player-queue #contents')
+            var element = document.querySelectorAll('ytmusic-player-queue #contents')[1]
             var children = element.children
 
             var arrChildren = Array.from(children)
