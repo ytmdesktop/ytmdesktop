@@ -1591,8 +1591,8 @@ async function createWindow() {
             backgroundColor: '#232323',
             width: 600,
             minWidth: 600,
-            height: 220,
-            minHeight: 220,
+            height: 240,
+            minHeight: 240,
             autoHideMenuBar: false,
             skipTaskbar: false,
             webPreferences: {

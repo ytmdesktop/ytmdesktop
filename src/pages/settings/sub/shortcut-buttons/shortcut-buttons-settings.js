@@ -15,20 +15,27 @@ function loadSettings() {
         shortcutSettings['add-to-library']
     document.getElementById('settings-shortcut-show-add-to-playlist').checked =
         shortcutSettings['add-to-playlist']
+    document.getElementById('settings-shortcut-change-playback-speed').checked =
+        shortcutSettings['change-playback-speed']
 }
 
 function save() {
     settingsProvider.set('settings-shortcut-buttons', {
-        miniplayer: document.getElementById('settings-shortcut-show-miniplayer')
+        miniplayer: document
+            .getElementById('settings-shortcut-show-miniplayer')
             .checked,
-        lyrics: document.getElementById('settings-shortcut-show-lyrics')
+        lyrics: document
+            .getElementById('settings-shortcut-show-lyrics')
             .checked,
-        'add-to-library': document.getElementById(
-            'settings-shortcut-show-add-to-library'
-        ).checked,
-        'add-to-playlist': document.getElementById(
-            'settings-shortcut-show-add-to-playlist'
-        ).checked,
+        'add-to-library': document
+            .getElementById('settings-shortcut-show-add-to-library')
+            .checked,
+        'add-to-playlist': document
+            .getElementById('settings-shortcut-show-add-to-playlist')
+            .checked,
+        'change-playback-speed': document
+            .getElementById('settings-shortcut-change-playback-speed')
+            .checked,
     })
 }
 

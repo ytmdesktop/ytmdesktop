@@ -562,6 +562,9 @@ function createBottomPlayerBarContent() {
         const elementChangeSpeedInput = document.createElement('input')
         const elementChangeSpeedLabel = document.createElement('label')
 
+        elementChangeSpeedDiv.id = 'ytmd_change_speed_div';
+        elementChangeSpeedDiv.classList = 'hide'
+
         elementChangeSpeedIcon.id = 'ytmd_change_speed'
         elementChangeSpeedIcon.title = translate('MEDIA_CONTROL_SPEED')
         elementChangeSpeedIcon.classList.add('material-icons')
@@ -576,9 +579,9 @@ function createBottomPlayerBarContent() {
         elementChangeSpeedInput.step = 0.1
 
         elementChangeSpeedLabel.setAttribute('for', 'ytmd_input_change_speed')
-        elementChangeSpeedLabel.innerHTML = `<span 
+        elementChangeSpeedLabel.innerHTML = `<span
             id="ytmd_value_change_speed"
-            class="time-info style-scope ytmusic-player-bar">
+            class="time-info style-scope ytmusic-player-bar hide">
             1.0
             </span>`
 
@@ -610,6 +613,37 @@ function createBottomPlayerBarContent() {
             speedLabel.innerText = speed
             elementChangeSpeedInput.value = speed
         })
+
+        if (shortcutButtons['change-playback-speed']) {
+            document
+                .querySelector('#ytmd_change_speed_div')
+                .classList.remove('hide')
+            document
+                .querySelector('#ytmd_value_change_speed')
+                .classList.remove('hide')
+        }
+
+        settingsOnDidChange(
+            'settings-shortcut-buttons.change-playback-speed',
+            (data) => {
+                if (data.newValue) {
+                    document
+                        .querySelector('#ytmd_change_speed_div')
+                        .classList.remove('hide')
+                    document
+                        .querySelector('#ytmd_value_change_speed')
+                        .classList.remove('hide')
+                }
+                else {
+                    document
+                        .querySelector('#ytmd_change_speed_div')
+                        .classList.add('hide')
+                    document
+                        .querySelector('#ytmd_value_change_speed')
+                        .classList.add('hide')
+                }
+            }
+        )
 
         // Middle ////////////////////////////////////////////////////////////////////////////////////
         // Add to Playlist

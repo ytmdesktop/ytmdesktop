@@ -93,6 +93,11 @@ settingsProvider.setInitialValue('settings-shortcut-buttons', {
     'add-to-library': true,
     'add-to-playlist': true,
 })
+var shortcut_buttons = settingsProvider.get('settings-shortcut-buttons');
+if (!shortcut_buttons['change-playback-speed']) {
+    shortcut_buttons['change-playback-speed'] = true;
+    settingsProvider.set('settings-shortcut-buttons', shortcut_buttons);
+}
 
 settingsProvider.setInitialValue('settings-skip-track-disliked', false)
 
