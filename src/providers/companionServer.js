@@ -7,7 +7,7 @@ const infoPlayerProvider = require('../providers/infoPlayerProvider')
 const settingsProvider = require('../providers/settingsProvider')
 
 const ip = '0.0.0.0'
-const default_port = 9864
+const default_port = 9865
 const hostname = os.hostname()
 
 const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
@@ -388,7 +388,10 @@ function stop() {
 function validatePort(port) {
     try {
         let _port = parseInt(port)
-        return 1024 <= _port && _port <= 65535 ? _port : default_port
+        //9864 is used for genius auth server
+        return 1024 <= _port && _port <= 65535 && _port !== 9864
+            ? _port
+            : default_port
     } catch {
         return default_port
     }

@@ -315,7 +315,7 @@ if (elementBtnShortcutButtonsSettings)
 
 if (elementBtnOpenCompanionServer)
     elementBtnOpenCompanionServer.addEventListener('click', async () => {
-        await shell.openExternal(`http://localhost:9863`)
+        await shell.openExternal(`http://localhost:9865`)
     })
 
 if (elementBtnOpenGeniusAuthServer)
