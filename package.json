@@ -1,6 +1,6 @@
 {
     "name": "youtube-music-desktop-app",
-    "version": "1.13.0",
+    "version": "1.14.2",
     "description": "YouTube Music Desktop App",
     "main": "main.js",
     "scripts": {
@@ -9,11 +9,11 @@
         "rebuild": "electron-rebuild -f",
         "postinstall": "npx electron-builder install-app-deps",
         "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
-        "build:mac": "npx electron-builder --mac --config electron-builder-deploy64.yml",
-        "build:lin": "npx electron-builder --linux --config electron-builder-deploy64.yml",
+        "build:mac": "command -v git > /dev/null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js; npx electron-builder --mac --config electron-builder-deploy64.yml",
+        "build:lin": "command -v git > /dev/null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js; npx electron-builder --linux --config electron-builder-deploy64.yml",
         "publish:win": "npx electron-builder --win -p always --config electron-builder64.yml",
-        "publish:mac": "npx electron-builder --mac -p always --config electron-builder64.yml",
-        "publish:lin": "npx electron-builder --linux -p always --config electron-builder64.yml"
+        "publish:mac": "command -v git > /dev/null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js; npx electron-builder --mac -p always --config electron-builder64.yml",
+        "publish:lin": "command -v git > /dev/null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js; npx electron-builder --linux -p always --config electron-builder64.yml"
     },
     "repository": "https://github.com/ytmdesktop/ytmdesktop",
     "keywords": [

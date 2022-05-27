@@ -23,6 +23,8 @@ settingsProvider.setInitialValue('settings-miniplayer-show-task', false) // hide
 
 settingsProvider.setInitialValue('settings-miniplayer-always-top', false) // show on top always
 
+settingsProvider.setInitialValue('settings-miniplayer-stream-config', false) // use base miniplayer
+
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
 settingsProvider.setInitialValue('settings-lyrics-always-top', false) // show on top always

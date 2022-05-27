@@ -28,6 +28,8 @@ window.addEventListener('load', () => {
         createTopRightContent()
         createBottomPlayerBarContent()
         playerBarScrollToChangeVolume()
+        enableAVSwitcher()
+
     } else createOffTheRoadContent()
 
     // injectCast()
@@ -937,6 +939,14 @@ function createBottomPlayerBarContent() {
             data: 'error on createBottomPlayerBarContent',
         })
     }
+}
+
+function enableAVSwitcher() {
+    const player = document.getElementById('player')
+    const player_page = document.getElementById('player-page')
+
+    player.setAttribute('has-av-switcher', '')
+    player_page.setAttribute('has-av-switcher', '')
 }
 
 function playerBarScrollToChangeVolume() {

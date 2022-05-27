@@ -1,0 +1,146 @@
+:root {
+    --text-margin-left: 12px;
+}
+
+body:hover .player-info,
+body:hover .cmd-btn,
+body.showinfo .player-info,
+body.showinfo .cmd-btn {
+    filter: none;
+}
+
+.player-info {
+    height: 100vh;
+    margin-top: 10vh;
+}
+
+.cmd-bar {
+    margin: 4px 4px 0;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    width: calc(100% - 8px);
+}
+
+.cmd-btn {
+    width: 20px;
+    height: 20px;
+}
+
+.cmd-btn i {
+    font-size: 12vmin;
+    margin-right: -1vmin;
+}
+
+#btn-drag {
+    opacity: 0;
+}
+
+#btn-like,
+#btn-dislike,
+#btn-next,
+#btn-previous,
+#btn-play-pause {
+    margin-top: 100vmax;
+    opacity: 0;
+}
+
+.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 22vmin;
+    margin-top: -13vmin;
+    margin-left: calc(100vh + var(--text-margin-left));
+}
+
+.album {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 18vmin;
+    margin-top: -6vmin;
+    margin-left: calc(100vh + var(--text-margin-left));
+}
+
+.author {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 16vmin;
+    margin-top: -5vmin;
+    margin-left: calc(100vh + var(--text-margin-left));
+}
+
+.duration {
+    text-align: left;
+    font-size: 14vmin;
+    margin-top: -4vmin;
+    margin-left: calc(100vh + var(--text-margin-left));
+}
+
+.progress-bar {
+    margin-top: 15vmin;
+    height: 5vmin;
+    width: 80vmax;
+    margin-left: calc(100vh);
+    position: absolute;
+    bottom: 0;
+}
+
+#progress {
+    height: 100%;
+    width: 0;
+    background: #fff;
+}
+
+#content,
+#secondsEffect {
+    position: absolute;
+    top: 0;
+    width: 100vmax;
+    height: 100vmin;
+    z-index: 1;
+}
+
+#content {
+    text-shadow: 0 0 3 #000;
+}
+
+#background {
+    background-repeat: no-repeat;
+    background-size: 100vh 100vh;
+    background-position: center;
+    position: absolute;
+    width: 100vh;
+    height: 100vh;
+    z-index: 0;
+}
+
+#loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+}
+
+#secondsEffect {
+    display: none;
+}
+
+#secondsEffect.left {
+    left: -40vmin;
+    display: block;
+}
+
+#secondsEffect.right {
+    right: -40vmin;
+    transform: rotate(180deg);
+    display: block;
+}
