@@ -17,6 +17,7 @@
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER": "Controllo remoto",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_INFO": "Clicca qui e scansiona il codice QR",
     "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PROTECT": "Proteggi companion app con password",
+    "LABEL_SETTINGS_TAB_GENERAL_COMPANION_SERVER_PORT": "Porta utilizzata dalla companion app",
     "LABEL_SETTINGS_TAB_GENERAL_CONTINUE_WHERE_LEFT_OF": "Continua da dove eri rimasto",
     "LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME": "Tema personalizzato",
     "LABEL_SETTINGS_TAB_GENERAL_DISCORD_RICH_PRESENCE": "Discord Rich Presence",

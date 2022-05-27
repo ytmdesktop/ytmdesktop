@@ -1,6 +1,7 @@
 const { remote, ipcRenderer: ipc, shell } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
+const companionServer = require('../../providers/companionServer')
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
 const fs = require('fs')
 
@@ -120,14 +121,19 @@ get_audio_output_list = () =>
 get_audio_output_list()
 
 function checkCompanionStatus() {
-    if (settingsProvider.get('settings-companion-server'))
+    if (settingsProvider.get('settings-companion-server')) {
         document
             .getElementById('companion-server-protect')
             .classList.remove('hide')
-    else
+        document
+            .getElementById('companion-server-port')
+            .classList.remove('hide')
+    } else {
         document
             .getElementById('companion-server-protect')
             .classList.add('hide')
+        document.getElementById('companion-server-port').classList.add('hide')
+    }
 }
 
 function checkClipboardWatcherStatus() {
@@ -160,6 +166,22 @@ document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-companion-server', 'click', checkCompanionStatus)
     initElement('settings-genius-auth-server', 'click', null)
     initElement('settings-companion-server-protect', 'click', null)
+    initElement('settings-companion-server-port', 'change', () => {
+        document
+            .getElementById('settings-companion-server-port')
+            .classList.remove('error')
+        let port = settingsProvider.get('settings-companion-server-port')
+        let _port = companionServer.validatePort(port)
+
+        if (+_port !== +port) {
+            document.getElementById(
+                'settings-companion-server-port'
+            ).value = _port
+            document
+                .getElementById('settings-companion-server-port')
+                .classList.add('error')
+        }
+    })
     initElement('settings-windows10-media-service', 'click', () => {
         checkWindows10ServiceStatus()
         showRelaunchButton()
@@ -293,7 +315,7 @@ if (elementBtnShortcutButtonsSettings)
 
 if (elementBtnOpenCompanionServer)
     elementBtnOpenCompanionServer.addEventListener('click', async () => {
-        await shell.openExternal(`http://localhost:9863`)
+        await shell.openExternal(`http://localhost:9865`)
     })
 
 if (elementBtnOpenGeniusAuthServer)
