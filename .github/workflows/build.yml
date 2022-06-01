@@ -19,6 +19,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
+      - name: Install libdbus
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get install libdbus-1-dev pkg-config -y 
       - run: yarn --frozen-lockfile
       - run: node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2
