@@ -318,7 +318,7 @@ async function createWindow() {
         updateAccentColorPref()
     })
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || true) {
         view.webContents.openDevTools({ mode: 'detach' })
     }
 
@@ -458,6 +458,10 @@ async function createWindow() {
                         : -1,
                     playerInfo.isPaused
                 )
+            }
+
+            if (!settingsProvider.get('discord-presence-settings').default) {
+                discordRPC.setActivity(getAll())
             }
 
             /**

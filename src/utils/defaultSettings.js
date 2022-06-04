@@ -71,6 +71,7 @@ if (!accelerators['miniplayer-open-close']) {
 settingsProvider.setInitialValue('has-updated', false)
 
 settingsProvider.setInitialValue('discord-presence-settings', {
+    default: true,
     details: true,
     state: true,
     time: true,

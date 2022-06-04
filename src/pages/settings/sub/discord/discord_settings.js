@@ -16,6 +16,8 @@ function loadSettings() {
         discordSettings.time
     document.getElementById('settings-discord-show-idle').checked =
         discordSettings.hideIdle
+    document.getElementById('settings-discord-use-default').checked =
+        discordSettings.default
 }
 
 function save() {
@@ -24,6 +26,8 @@ function save() {
         state: document.getElementById('settings-discord-show-artist').checked,
         time: document.getElementById('settings-discord-show-time').checked,
         hideIdle: document.getElementById('settings-discord-show-idle').checked,
+        default: document.getElementById('settings-discord-use-default')
+            .checked,
     })
 }
 
