@@ -318,7 +318,7 @@ async function createWindow() {
         updateAccentColorPref()
     })
 
-    if (process.env.NODE_ENV === 'development' || true) {
+    if (process.env.NODE_ENV === 'development') {
         view.webContents.openDevTools({ mode: 'detach' })
     }
 
