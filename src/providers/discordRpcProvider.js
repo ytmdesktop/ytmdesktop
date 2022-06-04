@@ -174,8 +174,7 @@ async function setActivity(info) {
 
 setInterval(async () => {
     if (
-        (!discordSettings.hideIdle && info.player.isPaused) ||
-        info.track.isAdvertisement
+        (!discordSettings.hideIdle
     )
         await client.clearActivity()
     else
