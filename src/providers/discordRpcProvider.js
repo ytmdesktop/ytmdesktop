@@ -153,37 +153,36 @@ async function setActivity(info) {
             }
         }
 
-        if (
-            (!discordSettings.hideIdle && info.player.isPaused) ||
-            info.track.isAdvertisement
-        ) {
-            await client.clearActivity()
-        } else {
-            discordActivity = {
-                state: activity.state,
-                details: activity.details,
-                timestamps: {
-                    start: activity.startTimestamp,
-                    end: activity.endTimestamp,
-                },
-                assets: {
-                    large_image: activity.largeImageKey,
-                    large_text: activity.largeImageText,
-                    small_image: activity.smallImageKey,
-                    small_text: activity.smallImageText,
-                },
-                instance: activity.instance,
-                buttons: activity.buttons,
-            }
+        discordActivity = {
+            state: activity.state,
+            details: activity.details,
+            timestamps: {
+                start: activity.startTimestamp,
+                end: activity.endTimestamp,
+            },
+            assets: {
+                large_image: activity.largeImageKey,
+                large_text: activity.largeImageText,
+                small_image: activity.smallImageKey,
+                small_text: activity.smallImageText,
+            },
+            instance: activity.instance,
+            buttons: activity.buttons,
         }
     }
 }
 
 setInterval(async () => {
-    await client?.request('SET_ACTIVITY', {
-        pid: process.pid,
-        activity: discordActivity,
-    })
+    if (
+        (!discordSettings.hideIdle && info.player.isPaused) ||
+        info.track.isAdvertisement
+    )
+        await client.clearActivity()
+    else
+        await client?.request('SET_ACTIVITY', {
+            pid: process.pid,
+            activity: discordActivity,
+        })
 }, 5000)
 
 module.exports = {
