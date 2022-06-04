@@ -25,6 +25,7 @@
     "LABEL_SETTINGS_DISCORD_SHOW_TIME": "Show track time",
     "LABEL_SETTINGS_DISCORD_SHOW_TITLE": "Show title",
     "LABEL_SETTINGS_DISCORD_USE_ALT_LAYOUT": "Use alternative layout",
+    "LABEL_SETTINGS_DISCORD_USE_ALT_LAYOUT_TOOLTIP": "Alternative layout includes a progress bar, but it may not visualy work with all Discord clients",
     "LABEL_SETTINGS_DISCORD": "Discord settings",
     "LABEL_SETTINGS_RELAUNCH": "Apply and restart",
     "LABEL_SETTINGS_SHOW_HIDE_WINDOW": "Show/Hide Main Window",
