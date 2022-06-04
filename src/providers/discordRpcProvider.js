@@ -2,9 +2,7 @@ const clientId = '495666957501071390'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
-let client
-let _isStarted
-let discordActivity
+let client, _isStarted, discordActivity, discordSettings, info
 
 function isStarted() {
     return _isStarted
@@ -15,9 +13,24 @@ function _setIsStarted(value) {
 }
 
 function start() {
+    let invervalId
     client = new RPC.Client({ transport: 'ipc' })
 
-    client.on('ready', () => _setIsStarted(true))
+    client.on('ready', () => {
+        _setIsStarted(true)
+        invervalId = setInterval(async () => {
+            if (
+                (!discordSettings.hideIdle && info.player.isPaused) ||
+                info.track.isAdvertisement
+            ) {
+                await client.clearActivity()
+            } else
+                await client?.request('SET_ACTIVITY', {
+                    pid: process.pid,
+                    activity: discordActivity,
+                })
+        }, 5000)
+    })
 
     client.login({ clientId }).catch(() => {
         if (!isStarted()) {
@@ -29,6 +42,7 @@ function start() {
 
     client.on('disconnected', () => {
         _setIsStarted(false)
+        clearInterval(invervalId)
         start()
     })
 }
@@ -38,15 +52,14 @@ function stop() {
     _setIsStarted(false)
 }
 
-async function setActivity(info) {
+async function setActivity(i) {
+    info = i
     if (isStarted() && info.track.title) {
         const now = Date.now()
         const activity = {}
-        const discordSettings = settingsProvider.get(
-            'discord-presence-settings'
-        )
+        discordSettings = settingsProvider.get('discord-presence-settings')
 
-        if (discordSettings.default) {
+        if (!discordSettings.altLayout) {
             if (discordSettings.details) activity.details = info.track.title
 
             if (discordSettings.state) activity.state = info.track.author
@@ -171,18 +184,6 @@ async function setActivity(info) {
         }
     }
 }
-
-setInterval(async () => {
-    if (
-        (!discordSettings.hideIdle
-    )
-        await client.clearActivity()
-    else
-        await client?.request('SET_ACTIVITY', {
-            pid: process.pid,
-            activity: discordActivity,
-        })
-}, 5000)
 
 module.exports = {
     isStarted: isStarted,

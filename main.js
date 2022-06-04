@@ -460,7 +460,7 @@ async function createWindow() {
                 )
             }
 
-            if (!settingsProvider.get('discord-presence-settings').default) {
+            if (settingsProvider.get('discord-presence-settings').altLayout) {
                 discordRPC.setActivity(getAll())
             }
 

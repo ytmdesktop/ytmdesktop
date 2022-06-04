@@ -70,8 +70,14 @@ if (!accelerators['miniplayer-open-close']) {
 
 settingsProvider.setInitialValue('has-updated', false)
 
+let discordSettings = settingsProvider.get('discord-presence-settings')
+if (!discordSettings.altLayout) {
+    discordSettings.altLayout = false
+    settingsProvider.set('discord-presence-settings', discordSettings)
+}
+
 settingsProvider.setInitialValue('discord-presence-settings', {
-    default: true,
+    altLayout: false,
     details: true,
     state: true,
     time: true,
