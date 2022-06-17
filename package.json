@@ -30,7 +30,7 @@
     },
     "devDependencies": {
         "@types/electron": "^1.6.10",
-        "electron": "^11.4.9",
+        "electron": "^15.5.5",
         "electron-builder": "^22.9.1",
         "electron-rebuild": "^2.3.4",
         "husky": "^4.3.7",
