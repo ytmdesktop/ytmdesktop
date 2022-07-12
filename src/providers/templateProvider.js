@@ -1,7 +1,68 @@
 const { ipcMain } = require('electron')
 const { doBehavior } = require('../utils/window')
+const hotkeys = require('./settingsProvider')
+
+let accelerators = hotkeys.get("settings-accelerators")
 
 let statusBarMenu = [
+    {
+        label: 'Controls',
+        submenu: [
+            {
+                label: 'Play/Pause',
+                accelerator: accelerators["media-play-pause"],
+                click(item,mainWindow) {
+                    ipcMain.emit('media-command', {
+                        command: 'media-play-pause',
+                        value: true,
+                    })
+                },
+            },
+            {
+                label: 'Next Track',
+                accelerator: accelerators["media-track-next"],
+                click(item,mainWindow) {
+                    ipcMain.emit('media-command', {
+                        command: 'media-track-next',
+                        value: true,
+                    })
+                },
+            },
+            {
+                label: 'Previous Track',
+                accelerator: accelerators["media-track-previous"],
+                click(item,mainWindow) {
+                    ipcMain.emit('media-command', {
+                        command: 'media-track-previous',
+                        value: true,
+                    })
+                },
+            },
+            {
+                type: 'separator',
+            },
+            {
+                label: 'Increase Volume',
+                accelerator: accelerators["media-volume-up"],
+                click(item,mainWindow) {
+                    ipcMain.emit('media-command', {
+                        command: 'media-volume-up',
+                        value: true,
+                    })
+                },
+            },
+            {
+                label: 'Decrease Volume',
+                accelerator: accelerators["media-volume-down"],
+                click(item,mainWindow) {
+                    ipcMain.emit('media-command', {
+                        command: 'media-volume-down',
+                        value: true,
+                    })
+                },
+            },
+        ]
+    },
     {
         label: 'Edit',
         submenu: [
