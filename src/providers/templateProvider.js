@@ -1,17 +1,18 @@
 const { ipcMain } = require('electron')
 const { doBehavior } = require('../utils/window')
 const hotkeys = require('./settingsProvider')
+const __ = require('./translateProvider')
 
-let accelerators = hotkeys.get("settings-accelerators")
+let accelerators = hotkeys.get('settings-accelerators')
 
 let statusBarMenu = [
     {
         label: 'Controls',
         submenu: [
             {
-                label: 'Play/Pause',
-                accelerator: accelerators["media-play-pause"],
-                click(item,mainWindow) {
+                label: __.trans('MEDIA_CONTROL_PLAY_PAUSE'),
+                accelerator: accelerators['media-play-pause'],
+                click(item, mainWindow) {
                     ipcMain.emit('media-command', {
                         command: 'media-play-pause',
                         value: true,
@@ -19,9 +20,9 @@ let statusBarMenu = [
                 },
             },
             {
-                label: 'Next Track',
-                accelerator: accelerators["media-track-next"],
-                click(item,mainWindow) {
+                label: __.trans('MEDIA_CONTROL_NEXT_TRACK'),
+                accelerator: accelerators['media-track-next'],
+                click(item, mainWindow) {
                     ipcMain.emit('media-command', {
                         command: 'media-track-next',
                         value: true,
@@ -29,9 +30,9 @@ let statusBarMenu = [
                 },
             },
             {
-                label: 'Previous Track',
-                accelerator: accelerators["media-track-previous"],
-                click(item,mainWindow) {
+                label: __.trans('MEDIA_CONTROL_PREVIOUS_TRACK'),
+                accelerator: accelerators['media-track-previous'],
+                click(item, mainWindow) {
                     ipcMain.emit('media-command', {
                         command: 'media-track-previous',
                         value: true,
@@ -42,9 +43,9 @@ let statusBarMenu = [
                 type: 'separator',
             },
             {
-                label: 'Increase Volume',
-                accelerator: accelerators["media-volume-up"],
-                click(item,mainWindow) {
+                label: __.trans('MEDIA_CONTROL_VOLUME_UP'),
+                accelerator: accelerators['media-volume-up'],
+                click(item, mainWindow) {
                     ipcMain.emit('media-command', {
                         command: 'media-volume-up',
                         value: true,
@@ -52,16 +53,16 @@ let statusBarMenu = [
                 },
             },
             {
-                label: 'Decrease Volume',
-                accelerator: accelerators["media-volume-down"],
-                click(item,mainWindow) {
+                label: __.trans('MEDIA_CONTROL_VOLUME_DOWN'),
+                accelerator: accelerators['media-volume-down'],
+                click(item, mainWindow) {
                     ipcMain.emit('media-command', {
                         command: 'media-volume-down',
                         value: true,
                     })
                 },
             },
-        ]
+        ],
     },
     {
         label: 'Edit',
