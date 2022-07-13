@@ -173,26 +173,8 @@ function quit() {
 
 function setShinyTray() {
     try {
-        if (systemInfo.isMac() && settingsProvider.get('settings-shiny-tray')) {
-            tray.setContextMenu(null)
-            tray.removeAllListeners()
-            tray.on('right-click', () => {
-                tray.popUpContextMenu(contextMenu)
-            })
-            tray.on('click', (event, bound, position) => {
-                if (position.x < 32) {
-                    // click at icon
-                    if (!saved_mainWindow.isVisible()) {
-                        saved_mainWindow.show()
-                    } else if (!saved_mainWindow.isFocused()) {
-                        saved_mainWindow.show()
-                    } else saved_mainWindow.hide()
-                } else if (position.x > 130)
-                    // click play/pause button
-                    mediaControl.playPauseTrack(
-                        saved_mainWindow.getBrowserView()
-                    )
-            })
+        if (systemInfo.isMac()) {
+            app.dock.setMenu(contextMenu)
         } else {
             // Shiny tray disabled ||| on onther platform
             tray.removeAllListeners()
