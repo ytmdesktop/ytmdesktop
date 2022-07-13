@@ -12,7 +12,7 @@ let statusBarMenu = [
             {
                 label: __.trans('MEDIA_CONTROL_PLAY_PAUSE'),
                 accelerator: accelerators['media-play-pause'],
-                click(item, mainWindow) {
+                click() {
                     ipcMain.emit('media-command', {
                         command: 'media-play-pause',
                         value: true,
@@ -22,7 +22,7 @@ let statusBarMenu = [
             {
                 label: __.trans('MEDIA_CONTROL_NEXT_TRACK'),
                 accelerator: accelerators['media-track-next'],
-                click(item, mainWindow) {
+                click() {
                     ipcMain.emit('media-command', {
                         command: 'media-track-next',
                         value: true,
@@ -32,7 +32,7 @@ let statusBarMenu = [
             {
                 label: __.trans('MEDIA_CONTROL_PREVIOUS_TRACK'),
                 accelerator: accelerators['media-track-previous'],
-                click(item, mainWindow) {
+                click() {
                     ipcMain.emit('media-command', {
                         command: 'media-track-previous',
                         value: true,
@@ -45,7 +45,7 @@ let statusBarMenu = [
             {
                 label: __.trans('MEDIA_CONTROL_VOLUME_UP'),
                 accelerator: accelerators['media-volume-up'],
-                click(item, mainWindow) {
+                click() {
                     ipcMain.emit('media-command', {
                         command: 'media-volume-up',
                         value: true,
@@ -55,7 +55,7 @@ let statusBarMenu = [
             {
                 label: __.trans('MEDIA_CONTROL_VOLUME_DOWN'),
                 accelerator: accelerators['media-volume-down'],
-                click(item, mainWindow) {
+                click() {
                     ipcMain.emit('media-command', {
                         command: 'media-volume-down',
                         value: true,
