@@ -20,7 +20,7 @@ let statusBarMenu = [
                 },
             },
             {
-                label: __.trans('MEDIA_CONTROL_NEXT_TRACK'),
+                label: __.trans('MEDIA_CONTROL_NEXT'),
                 accelerator: accelerators['media-track-next'],
                 click() {
                     ipcMain.emit('media-command', {
@@ -30,7 +30,7 @@ let statusBarMenu = [
                 },
             },
             {
-                label: __.trans('MEDIA_CONTROL_PREVIOUS_TRACK'),
+                label: __.trans('MEDIA_CONTROL_PREVIOUS'),
                 accelerator: accelerators['media-track-previous'],
                 click() {
                     ipcMain.emit('media-command', {
