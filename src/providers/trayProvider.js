@@ -62,8 +62,8 @@ function createTray(mainWindow) {
         }
 
         if (!systemInfo.isMac()) initVanillaTray()
-        else setShinyTray()
     }
+    if (systemInfo.isMac()) setShinyTray()
 }
 
 function updateTray(data) {
