@@ -92,6 +92,8 @@ global.sharedObj = {
     rollable: settingsProvider.get('settings-shiny-tray-song-title-rollable'),
 }
 
+let isAppQuitting = false
+
 let iconDefault = assetsProvider.getIcon('favicon')
 let iconTray = assetsProvider.getIcon('trayTemplate')
 let iconPlay = assetsProvider.getIcon('favicon_play')
@@ -227,9 +229,10 @@ async function createWindow() {
         maximizable: true,
         webPreferences: {
             nodeIntegration: true,
-            webviewTag: true,
             enableRemoteModule: true,
             contextIsolation: false,
+            nodeIntegrationInSubFrames: true,
+            webviewTag: true,
         },
     }
 
@@ -283,12 +286,7 @@ async function createWindow() {
 
     view = new BrowserView({
         webPreferences: {
-            nodeIntegration: false,
-            webviewTag: false,
-            enableRemoteModule: false,
-            contextIsolation: true,
-            sandbox: true,
-            nativeWindowOpen: true,
+            //nativeWindowOpen: true,
             preload: path.join(
                 app.getAppPath(),
                 '/src/utils/injectControls.js'
@@ -334,13 +332,13 @@ async function createWindow() {
             mainWindow.maximize()
         }, 700)
 
+    mainWindow.on('show', () => {
+        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+    })
+
     mainWindow.on('closed', () => {
         view = null
         mainWindow = null
-    })
-
-    mainWindow.on('show', () => {
-        mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
     })
 
     mainWindow.on('reload', () => {
@@ -678,7 +676,6 @@ async function createWindow() {
     }
 
     view.webContents.on('media-started-playing', () => {
-        logDebug('Playing')
         try {
             if (isMac()) {
                 updateStatusBar()
@@ -693,7 +690,6 @@ async function createWindow() {
     })
 
     view.webContents.on('media-paused', () => {
-        logDebug('Paused')
         try {
             if (isMac()) {
                 updateStatusBar()
@@ -743,6 +739,11 @@ async function createWindow() {
     })
 
     mainWindow.on('close', (e) => {
+        //The app.quit() will be prevented if we prevent this event in an effort to minimize the app to the tray
+        if (isAppQuitting) {
+            return
+        }
+
         if (settingsProvider.get('settings-keep-background')) {
             e.preventDefault()
             if (settingsProvider.get('settings-tray-icon')) {
@@ -751,7 +752,7 @@ async function createWindow() {
                 mainWindow.minimize()
             }
         } else {
-            app.exit()
+            app.quit()
         }
     })
 
@@ -1111,7 +1112,6 @@ async function createWindow() {
     })
 
     ipcMain.on('closed', (_) => {
-        mainWindow = null
         if (process.platform !== 'darwin') {
             app.quit()
         }
@@ -1238,12 +1238,10 @@ async function createWindow() {
                 skipTaskbar: false,
                 webPreferences: {
                     nodeIntegration: true,
-                    webviewTag: true,
                     enableRemoteModule: true,
                     contextIsolation: false,
                     nodeIntegrationInSubFrames: true,
-                    webSecurity: false,
-                    sandbox: false,
+                    webviewTag: true,
                 },
             })
 
@@ -1258,13 +1256,16 @@ async function createWindow() {
                         __.trans('LABEL_SETTINGS'),
                 }
             )
-
-            if (process.env.NODE_ENV === 'development') {
-                settings.webContents.openDevTools({ mode: 'detach' })
-            }
         }
 
-        settings.on('closed', () => {
+        if (process.env.NODE_ENV === 'development') {
+            settings.webContents.openDevTools({ mode: 'detach' })
+        }
+
+        settings.on('close', () => {
+            if (process.env.NODE_ENV === 'development') {
+                settings.webContents.closeDevTools()
+            }
             settings = null
         })
     }
@@ -1294,6 +1295,9 @@ async function createWindow() {
                 webPreferences: {
                     nodeIntegration: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webviewTag: true,
                 },
             }
 
@@ -1421,8 +1425,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1452,8 +1458,10 @@ async function createWindow() {
             minHeight: 800,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1472,9 +1480,6 @@ async function createWindow() {
     async function windowLyrics() {
         if (lyrics) {
             lyrics.show()
-            process.env.NODE_ENV === 'development'
-                ? lyrics.webContents.openDevTools({ mode: 'detach' })
-                : null
         } else {
             lyrics = new BrowserWindow({
                 icon: iconDefault,
@@ -1488,8 +1493,10 @@ async function createWindow() {
                 alwaysOnTop: settingsProvider.get('settings-lyrics-always-top'),
                 webPreferences: {
                     nodeIntegration: true,
-                    webviewTag: true,
                     enableRemoteModule: true,
+                    contextIsolation: false,
+                    nodeIntegrationInSubFrames: true,
+                    webviewTag: true,
                 },
             })
 
@@ -1523,47 +1530,21 @@ async function createWindow() {
                 }, 500)
             })
 
-            lyrics.on('closed', () => {
-                lyrics = null
+            lyrics.on('close', () => {
                 if (process.env.NODE_ENV === 'development') {
                     lyrics.webContents.closeDevTools()
                 }
+                lyrics = null
             })
+        }
 
-            if (process.env.NODE_ENV === 'development') {
-                lyrics.webContents.openDevTools({ mode: 'detach' })
-            }
+        if (process.env.NODE_ENV === 'development') {
+            lyrics.webContents.openDevTools({ mode: 'detach' })
         }
     }
 
     async function windowCompanion() {
         await shell.openExternal(`http://localhost:9863`)
-        return
-        //const x = mainWindow.getPosition()[0]
-        //const y = mainWindow.getPosition()[1]
-
-        /* Commented code since the return above blocks its execution
-        let size = screen.getPrimaryDisplay().workAreaSize;
-
-        const settings = new BrowserWindow({
-            // parent: mainWindow,
-            icon: iconDefault,
-            skipTaskbar: false,
-            frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
-            resizable: false,
-            backgroundColor: '#232323',
-            width: size.width - 450,
-            height: size.height - 450,
-            center: true,
-            title: 'companionWindowTitle',
-            webPreferences: {
-                nodeIntegration: false,
-                enableRemoteModule: true,
-            },
-            autoHideMenuBar: true,
-        });
-        await settings.loadURL('http://localhost:9863');*/
     }
 
     async function windowGuest() {
@@ -1585,6 +1566,9 @@ async function createWindow() {
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
                 partition: `guest-mode-${Date.now()}`,
             },
         })
@@ -1614,8 +1598,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1651,8 +1637,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1686,8 +1674,10 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
                 enableRemoteModule: true,
+                contextIsolation: false,
+                nodeIntegrationInSubFrames: true,
+                webviewTag: true,
             },
         })
 
@@ -1826,11 +1816,6 @@ async function createWindow() {
     }
 
     function switchClipboardWatcher() {
-        logDebug(
-            'Switch clipboard watcher: ' +
-                settingsProvider.get('settings-clipboard-read')
-        )
-
         if (isClipboardWatcherRunning) {
             // TODO: What is this? Doesn't make much sense
             clipboardWatcher !== null && clipboardWatcher.stop()
@@ -2020,27 +2005,9 @@ else {
     })
 
     app.on('before-quit', () => {
-        mainWindow = null
-        view = null
-        if (isMac()) app.exit()
-
+        isAppQuitting = true
         tray.quit()
     })
-
-    app.on('quit', () => {
-        mainWindow = null
-        view = null
-        tray.quit()
-    })
-}
-
-// TODO: Should this be removed?
-function logDebug(data) {
-    /*
-    Commented out since it's never going to be ran
-    if (false)
-        console.log(data);
-        */
 }
 
 function songInfo() {
@@ -2056,14 +2023,6 @@ function getAll() {
         track: songInfo(),
         player: playerInfo(),
     }
-}
-
-// TODO: Unused function
-function bytesToSize(bytes) {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-    if (bytes === 0) return '0 Byte'
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
 }
 
 function createCustomAppDir() {
