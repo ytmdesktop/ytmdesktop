@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -19,6 +19,7 @@
             href="../../../src/assets/css/styles.css"
         />
         <link type="text/css" rel="stylesheet" href="./settings.css" />
+        <script type="text/javascript" src="../../../commit_hash.js"></script>
     </head>
     <body>
         <div id="content" class="hide">
@@ -365,9 +366,20 @@
                                             ></span>
                                         </td>
                                         <td>
-                                            <select
-                                                id="settings-app-audio-output"
-                                            ></select>
+                                            <div style="display: inline-flex">
+                                                <select
+                                                    id="settings-app-audio-output"
+                                                ></select>
+                                                <button
+                                                    class="waves-effect waves-light btn-flat white-text btn-tiny"
+                                                    id="btn-reload-audio-devices"
+                                                >
+                                                    <i
+                                                        class="material-icons tiny grey-text"
+                                                        >autorenew</i
+                                                    >
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -539,6 +551,30 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_PLAYBACK_SURROUND_SOUND"
+                                            ></span>
+                                            <sub>
+                                                <i
+                                                    class="material-icons tiny grey-text"
+                                                    >autorenew</i
+                                                >
+                                            </sub>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-surround-sound"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -630,6 +666,34 @@
                                                     <input
                                                         type="checkbox"
                                                         id="settings-miniplayer-show-task"
+                                                    />
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span
+                                                i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER_STREAM_CONFIG"
+                                            ></span>
+                                            <sub class="tooltip">
+                                                <i
+                                                    class="material-icons tiny grey-text"
+                                                    >info</i
+                                                >
+                                                <span
+                                                    class="tooltiptext"
+                                                    i18n="i18n_LABEL_SETTINGS_TAB_MINIPLAYER_STREAM_CONFIG_TOOLTIP"
+                                                ></span>
+                                            </sub>
+                                        </td>
+                                        <td class="right">
+                                            <div class="switch">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="settings-miniplayer-stream-config"
                                                     />
                                                     <span class="lever"></span>
                                                 </label>
@@ -1354,7 +1418,10 @@
                         >
                             <div class="row">
                                 <span style="color: #aaa">
-                                    v<span id="app-version"></span> <br /><br />
+                                    v<span id="app-version"></span> <br /><span
+                                        >Commit hash:
+                                        <span id="app-hash"></span></span
+                                    ><br /><br />
                                     <button
                                         id="release-notes"
                                         class="btn waves-effect waves-light red"
@@ -1388,6 +1455,27 @@
                                     </a>
                                 </p>
                             </div>
+                            <div class="row">
+                                <small>
+                                    <span
+                                        i18n="i18n_LABEL_SETTINGS_TAB_ABOUT_DISABLE_ANALYTICS"
+                                    ></span>
+                                    <sub>
+                                        <i class="material-icons tiny grey-text"
+                                            >autorenew</i
+                                        >
+                                    </sub>
+                                </small>
+                                <div class="switch">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            id="settings-disable-analytics"
+                                        />
+                                        <span class="lever"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1407,6 +1495,9 @@
         <script src="../../../src/assets/js/materialize.min.js"></script>
         <script>
             require('./settings.js')
+        </script>
+        <script>
+            document.getElementById('app-hash').innerText = commit_hash
         </script>
     </body>
 </html>

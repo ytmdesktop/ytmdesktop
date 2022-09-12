@@ -12,6 +12,7 @@ let body = document.getElementsByTagName('body')[0]
 let background = document.getElementById('background')
 let title = document.getElementById('title')
 let author = document.getElementById('author')
+let album = document.getElementById('album')
 
 let current = document.getElementById('current')
 let duration = document.getElementById('duration')
@@ -86,6 +87,7 @@ function setPlayerInfo(data) {
     background.style.backgroundImage = `url(${data.track.cover})`
     title.innerHTML = data.track.title || 'Title'
     author.innerHTML = data.track.author || 'Author'
+    album.innerHTML = data.track.album || 'Album'
     current.innerHTML = data.player.seekbarCurrentPositionHuman || '0:00'
     duration.innerHTML = data.track.durationHuman || '0:00'
     progress.style.width = data.player.statePercent * 100 + '%'

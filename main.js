@@ -44,6 +44,9 @@ const mprisProvider = (() => {
         return null
     }
 })()
+
+const { commit_hash } = require('./commit_hash')
+
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -64,7 +67,8 @@ let mainWindow,
     activityLikeStatus,
     windowsMediaProvider,
     macMediaProvider,
-    audioDevices
+    audioDevices,
+    settingsRendererIPC
 
 let isFirstTime = false
 
@@ -106,6 +110,10 @@ app.commandLine.appendSwitch('disable-features', 'MediaSessionService') //This k
 
 if (!app.isDefaultProtocolClient('ytmd', process.execPath)) {
     app.setAsDefaultProtocolClient('ytmd', process.execPath)
+}
+
+if (settingsProvider.get('settings-surround-sound')) {
+    app.commandLine.appendSwitch('try-supported-channel-layouts', '1')
 }
 
 app.commandLine.appendSwitch('disable-http-cache')
@@ -269,8 +277,7 @@ async function createWindow() {
                 {},
                 details.requestHeaders || {},
                 {
-                    'User-Agent':
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+                    'User-Agent': settingsProvider.get('user-agent'),
                 }
             )
             callback({ requestHeaders: newRequestHeaders })
@@ -337,6 +344,11 @@ async function createWindow() {
 
     mainWindow.on('show', () => {
         mediaControl.createThumbar(mainWindow, infoPlayerProvider.getAllInfo())
+    })
+
+    mainWindow.on('reload', () => {
+        view.webContents.forcefullyCrashRenderer()
+        view.webContents.reload()
     })
 
     view.webContents.on('new-window', (event, url) => {
@@ -922,9 +934,16 @@ async function createWindow() {
     })
 
     if (
-        !settingsProvider.get('settings-windows10-media-service-show-info') ||
-        !settingsProvider.get('settings-windows10-media-service')
+        (isWindows() &&
+            (!settingsProvider.get(
+                'settings-windows10-media-service-show-info'
+            ) ||
+                !settingsProvider.get('settings-windows10-media-service'))) ||
+        isMac() ||
+        isLinux()
     ) {
+        let settingsAccelerator = settingsProvider.get('settings-accelerators')
+
         globalShortcut.register('MediaPlayPause', () => {
             checkDoubleTapPlayPause()
         })
@@ -1269,38 +1288,71 @@ async function createWindow() {
     async function windowMiniplayer() {
         if (miniplayer) miniplayer.show()
         else {
-            miniplayer = new BrowserWindow({
+            var miniplayerConfig = {
                 title: __.trans('LABEL_MINIPLAYER'),
                 icon: iconDefault,
                 modal: false,
                 frame: false,
                 center: false,
+
                 resizable: settingsProvider.get(
                     'settings-miniplayer-resizable'
+                ),
+                skipTaskbar: !settingsProvider.get(
+                    'settings-miniplayer-show-task'
                 ),
                 alwaysOnTop: settingsProvider.get(
                     'settings-miniplayer-always-top'
                 ),
-                width: settingsProvider.get('settings-miniplayer-size'),
-                height: settingsProvider.get('settings-miniplayer-size'),
+
                 backgroundColor: '#232323',
-                minWidth: 100,
-                minHeight: 100,
                 autoHideMenuBar: true,
-                skipTaskbar: !settingsProvider.get(
-                    'settings-miniplayer-show-task'
-                ),
                 webPreferences: {
                     nodeIntegration: true,
                     enableRemoteModule: true,
                 },
-            })
-            await miniplayer.loadFile(
-                path.join(
-                    app.getAppPath(),
-                    '/src/pages/miniplayer/miniplayer.html'
+            }
+
+            if (settingsProvider.get('settings-miniplayer-stream-config')) {
+                var streamSize = settingsProvider.get(
+                    'settings-miniplayer-stream-size'
                 )
-            )
+                if (streamSize) {
+                    miniplayerConfig.width = streamSize.x
+                    miniplayerConfig.height = streamSize.y
+                } else {
+                    miniplayerConfig.width = 500
+                    miniplayerConfig.height = 100
+                }
+
+                miniplayerConfig.minWidth = 300
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
+                await miniplayer.loadFile(
+                    path.join(
+                        app.getAppPath(),
+                        '/src/pages/miniplayer/streamPlayer.html'
+                    )
+                )
+            } else {
+                miniplayerConfig.width = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.height = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.minWidth = 100
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
+                await miniplayer.loadFile(
+                    path.join(
+                        app.getAppPath(),
+                        '/src/pages/miniplayer/miniplayer.html'
+                    )
+                )
+            }
 
             let miniplayerPosition = settingsProvider.get('miniplayer-position')
             if (miniplayerPosition !== undefined)
@@ -1323,13 +1375,38 @@ async function createWindow() {
             })
 
             miniplayer.on('resize', (e) => {
-                try {
-                    let size = Math.min(...miniplayer.getSize())
-                    miniplayer.setSize(size, size)
-                    settingsProvider.set('settings-miniplayer-size', size)
-                    e.preventDefault()
-                } catch (_) {
-                    writeLog({ type: 'warn', data: 'error miniplayer resize' })
+                if (
+                    !settingsProvider.get('settings-miniplayer-stream-config')
+                ) {
+                    // Square Miniplayer
+                    try {
+                        let size = Math.min(...miniplayer.getSize())
+                        miniplayer.setSize(size, size)
+                        settingsProvider.set('settings-miniplayer-size', size)
+                        e.preventDefault()
+                    } catch (_) {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer resize',
+                        })
+                    }
+                } else {
+                    // Resized
+                    try {
+                        let size = miniplayer.getSize()
+                        settingsProvider.set(
+                            'settings-miniplayer-stream-size',
+                            {
+                                x: size[0],
+                                y: size[1],
+                            }
+                        )
+                    } catch (_) {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer (stream) resize',
+                        })
+                    }
                 }
             })
 
@@ -1673,7 +1750,7 @@ async function createWindow() {
 
         const ytmdesktop_version = app.getVersion() || '-'
 
-        const template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment:%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
+        const template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment:%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version} ${commit_hash}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
         await shell.openExternal(
             `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
         )
@@ -1887,26 +1964,32 @@ else {
         checkWindowPosition(
             settingsProvider.get('window-position'),
             settingsProvider.get('window-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('window-position', visiblePosition)
-        })
+        )
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('window-position', visiblePosition)
+            })
+            .catch(() => {})
 
         checkWindowPosition(settingsProvider.get('lyrics-position'), {
             width: 700,
             height: 800,
-        }).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('lyrics-position', visiblePosition)
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('lyrics-position', visiblePosition)
+            })
+            .catch(() => {})
 
-        checkWindowPosition(
-            settingsProvider.get('miniplayer-position'),
-            settingsProvider.get('settings-miniplayer-size')
-        ).then((visiblePosition) => {
-            console.log(visiblePosition)
-            settingsProvider.set('miniplayer-position', visiblePosition)
+        checkWindowPosition(settingsProvider.get('miniplayer-position'), {
+            width: settingsProvider.get('settings-miniplayer-size'),
+            height: settingsProvider.get('settings-miniplayer-size'),
         })
+            .then((visiblePosition) => {
+                console.log(visiblePosition)
+                settingsProvider.set('miniplayer-position', visiblePosition)
+            })
+            .catch(() => {})
 
         await createWindow()
 
@@ -2154,6 +2237,12 @@ if (settingsProvider.get('settings-discord-rich-presence')) discordRPC.start()
 
 ipcMain.on('set-audio-output-list', (_, data) => {
     updateTrayAudioOutputs(data)
+    try {
+        // FIXME: For some reason neither the emit/send doesn't work
+        if (settingsRendererIPC) {
+            settingsRendererIPC.send('update-audio-output-devices', data)
+        }
+    } catch (e) {}
     audioDevices = data
 })
 
@@ -2189,7 +2278,10 @@ ipcMain.on('retrieve-sleep-timer', (e) => {
     e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
 })
 
-ipcMain.handle('get-audio-output-list', () => audioDevices)
+ipcMain.handle('get-audio-output-list', (e) => {
+    settingsRendererIPC = e.sender
+    return audioDevices
+})
 
 powerMonitor.on('suspend', () => {
     if (settingsProvider.get('settings-pause-on-suspend')) {
@@ -2198,16 +2290,23 @@ powerMonitor.on('suspend', () => {
     }
 })
 
+if (!settingsProvider.get('settings-disable-analytics')) {
+    const analytics = require('./src/providers/analyticsProvider')
+    analytics.setEvent(
+        'main',
+        'start',
+        'v' + app.getVersion(),
+        app.getVersion()
+    )
+    analytics.setEvent('main', 'os', process.platform, process.platform)
+    analytics.setScreen('main')
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
-const analytics = require('./src/providers/analyticsProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
 const { ipcRenderer } = require('electron/renderer')
 //const {UpdaterSignal} = require('electron-updater');
-
-analytics.setEvent('main', 'start', 'v' + app.getVersion(), app.getVersion())
-analytics.setEvent('main', 'os', process.platform, process.platform)
-analytics.setScreen('main')

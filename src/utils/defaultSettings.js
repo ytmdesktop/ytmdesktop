@@ -23,6 +23,8 @@ settingsProvider.setInitialValue('settings-miniplayer-show-task', false) // hide
 
 settingsProvider.setInitialValue('settings-miniplayer-always-top', false) // show on top always
 
+settingsProvider.setInitialValue('settings-miniplayer-stream-config', false) // use base miniplayer
+
 settingsProvider.setInitialValue('settings-lyrics-provider', '1') // OVH
 
 settingsProvider.setInitialValue('settings-lyrics-always-top', false) // show on top always
@@ -118,3 +120,18 @@ settingsProvider.setInitialValue(
 )
 
 settingsProvider.setInitialValue('settings-pause-on-suspend', false)
+
+settingsProvider.setInitialValue('settings-disable-analytics', false)
+
+settingsProvider.setInitialValue('settings-surround-sound', false)
+
+// Please note that this is a setting which is not displayed to the user, but will be used in the application.
+settingsProvider.setInitialValue(
+    'user-agent',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0'
+)
+
+// Update the User agent in the future via the Application side.
+// if (settingsProvider.get('user-agent') === 'previous-useragent') {
+// settingsProvider.setInitialValue('user-agent', 'Updated Useragent');
+// }

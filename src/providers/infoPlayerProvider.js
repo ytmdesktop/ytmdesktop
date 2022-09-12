@@ -202,7 +202,7 @@ function getAuthor(webContents) {
         .executeJavaScript(
             `
             var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
-                        
+
             if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
             title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
             } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
@@ -225,14 +225,14 @@ function getAlbum(webContents) {
             var album = '';
             var player_bar = document.getElementsByClassName("byline ytmusic-player-bar")[0].children;
             var arr_player_bar = Array.from(player_bar);
-            
+
             arr_player_bar.forEach( function(data, index) {
-            
+
             if (data.getAttribute('href') != null && data.getAttribute('href').includes('browse')) {
                 album = data.innerText;
             }
             } )
-            
+
             album
             `
         )
@@ -263,6 +263,9 @@ function getCover(webContents) {
         )
         .then((cover) => {
             debug(`Cover is: ${cover}`)
+            cover.split('?')[0]
+            cover.replace('sddefault.jpg', 'hq720.jpg')
+
             track.cover = cover
         })
         .catch((_) => console.log('error getCover'))
@@ -308,17 +311,17 @@ function getQueue(webContents) {
             var children = element.children
 
             var arrChildren = Array.from(children)
-            
+
             var queue = { automix: false, currentIndex: 0, list: [] };
 
-            arrChildren.forEach( (el, key) => { 
+            arrChildren.forEach( (el, key) => {
                 var songElement = el.querySelector('.song-info')
 
                 var songCover = songElement.parentElement.querySelector('.yt-img-shadow').getAttribute('src')
                 var songTitle = songElement.querySelector('.song-title').getAttribute('title')
                 var songAuthor = songElement.querySelector('.byline').getAttribute('title')
                 var duration = el.querySelector('.duration').getAttribute('title')
-                
+
                 if(el.hasAttribute('selected')) {
                     queue.currentIndex = key;
                 }
@@ -377,27 +380,27 @@ function getPlaylist(webContents) {
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
                 var dots = middleControlsButtons.querySelector('.dropdown-trigger')
-            
+
                 dots.click()
                 dots.click()
-                
+
                 setTimeout( resolve, 500)
             } )
-            .then((_) => { 
+            .then((_) => {
                 return new Promise( (resolve, reject) => {
                     var popup = document.querySelector('.ytmusic-menu-popup-renderer');
                     var addPlaylist = Array.from(popup.children)
                         .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                     addPlaylist.click()
                     addPlaylist.click()
-            
+
                     setTimeout( resolve, 3000);
                 } ).then( (_) => {
                     var popupPlaylist = document.querySelector('ytmusic-add-to-playlist-renderer');
                     var playlists = popupPlaylist.querySelector('#playlists')
-        
+
                     var titleList = playlists.querySelectorAll('#title')
-        
+
                     titleList.forEach( (element, index) => {
                         data.list.push(element.textContent)
                     } )
@@ -437,13 +440,13 @@ function isAdvertisement(webContents) {
         .catch((_) => console.log('error isAdvertisement'))
 }
 
-function setVolume(webContents, time) {
+function setVolume(webContents, vol) {
     webContents
         .executeJavaScript(
             `
         var slider = document.querySelector('#volume-slider');
-        slider.value = ${time};
-        document.querySelector('.video-stream').volume = ${time / 100}
+        slider.value = ${vol};
+        slider.dispatchEvent(new Event("change"));
         `
         )
         .then()
@@ -479,17 +482,17 @@ function isInLibrary() {
             new Promise( (resolve, reject) => {
                 var middleControlsButtons = document.querySelector('.middle-controls-buttons');
                 var dots = middleControlsButtons.querySelector('.dropdown-trigger')
-            
+
                 dots.click()
                 dots.click()
-                
+
                 setTimeout( resolve, 500)
             } )
             .then((_) => {
                 var popup = document.querySelector('.ytmusic-menu-popup-renderer');
                 var addLibrary = Array.from(popup.children)
                     .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.53 12L9 10.5l1.4-1.41 2.07 2.08L17.6 6 19 7.41 12.47 14zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" || value.querySelector('g path:not([fill])').getAttribute('d') == "M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" )[0]
-                
+
                 if(addLibrary != undefined) {
                     var _d = addLibrary.querySelector('g path:not([fill])').getAttribute('d')
 
@@ -521,12 +524,12 @@ function addToPlaylist(webContents, index) {
                     .filter( (value) => value.querySelector('g path:not([fill])').getAttribute('d') == "M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" )[0].querySelector('a')
                 addPlaylist.click()
                 addPlaylist.click()
-        
+
                 setTimeout( resolve, 500);
             } ).then( (_) => {
                 var popupPlaylist = document.querySelector('ytmusic-add-to-playlist-renderer');
                 var playlists = popupPlaylist.querySelectorAll('#playlists ytmusic-playlist-add-to-option-renderer button');
-        
+
                 playlists[${index}].click()
             })
             `
@@ -584,7 +587,7 @@ async function toggleMoreActions(webContents) {
         `
             var middleControlsButtons = document.querySelector('.middle-controls-buttons');
             var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')
-            
+
             moreActions.click()
             `,
         true
