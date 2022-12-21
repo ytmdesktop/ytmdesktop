@@ -20,3 +20,4 @@ package-lock.json
 /youtube-music-desktop-app-*.tgz
 app-update.yml
 dev-app-update.yml
+commit_hash.js

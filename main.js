@@ -44,6 +44,9 @@ const mprisProvider = (() => {
         return null
     }
 })()
+
+const { commit_hash } = require('./commit_hash')
+
 /* Variables =========================================================================== */
 const defaultUrl = 'https://music.youtube.com'
 
@@ -1294,38 +1297,71 @@ async function createWindow() {
     async function windowMiniplayer() {
         if (miniplayer) miniplayer.show()
         else {
-            miniplayer = new BrowserWindow({
+            var miniplayerConfig = {
                 title: __.trans('LABEL_MINIPLAYER'),
                 icon: iconDefault,
                 modal: false,
                 frame: false,
                 center: false,
+
                 resizable: settingsProvider.get(
                     'settings-miniplayer-resizable'
+                ),
+                skipTaskbar: !settingsProvider.get(
+                    'settings-miniplayer-show-task'
                 ),
                 alwaysOnTop: settingsProvider.get(
                     'settings-miniplayer-always-top'
                 ),
-                width: settingsProvider.get('settings-miniplayer-size'),
-                height: settingsProvider.get('settings-miniplayer-size'),
+
                 backgroundColor: '#232323',
-                minWidth: 100,
-                minHeight: 100,
                 autoHideMenuBar: true,
-                skipTaskbar: !settingsProvider.get(
-                    'settings-miniplayer-show-task'
-                ),
                 webPreferences: {
                     nodeIntegration: true,
                     enableRemoteModule: true,
                 },
-            })
-            await miniplayer.loadFile(
-                path.join(
-                    app.getAppPath(),
-                    '/src/pages/miniplayer/miniplayer.html'
+            }
+
+            if (settingsProvider.get('settings-miniplayer-stream-config')) {
+                var streamSize = settingsProvider.get(
+                    'settings-miniplayer-stream-size'
                 )
-            )
+                if (streamSize) {
+                    miniplayerConfig.width = streamSize.x
+                    miniplayerConfig.height = streamSize.y
+                } else {
+                    miniplayerConfig.width = 500
+                    miniplayerConfig.height = 100
+                }
+
+                miniplayerConfig.minWidth = 300
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
+                await miniplayer.loadFile(
+                    path.join(
+                        app.getAppPath(),
+                        '/src/pages/miniplayer/streamPlayer.html'
+                    )
+                )
+            } else {
+                miniplayerConfig.width = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.height = settingsProvider.get(
+                    'settings-miniplayer-size'
+                )
+                miniplayerConfig.minWidth = 100
+                miniplayerConfig.minHeight = 100
+
+                miniplayer = new BrowserWindow(miniplayerConfig)
+                await miniplayer.loadFile(
+                    path.join(
+                        app.getAppPath(),
+                        '/src/pages/miniplayer/miniplayer.html'
+                    )
+                )
+            }
 
             let miniplayerPosition = settingsProvider.get('miniplayer-position')
             if (miniplayerPosition !== undefined)
@@ -1348,13 +1384,38 @@ async function createWindow() {
             })
 
             miniplayer.on('resize', (e) => {
-                try {
-                    let size = Math.min(...miniplayer.getSize())
-                    miniplayer.setSize(size, size)
-                    settingsProvider.set('settings-miniplayer-size', size)
-                    e.preventDefault()
-                } catch (_) {
-                    writeLog({ type: 'warn', data: 'error miniplayer resize' })
+                if (
+                    !settingsProvider.get('settings-miniplayer-stream-config')
+                ) {
+                    // Square Miniplayer
+                    try {
+                        let size = Math.min(...miniplayer.getSize())
+                        miniplayer.setSize(size, size)
+                        settingsProvider.set('settings-miniplayer-size', size)
+                        e.preventDefault()
+                    } catch (_) {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer resize',
+                        })
+                    }
+                } else {
+                    // Resized
+                    try {
+                        let size = miniplayer.getSize()
+                        settingsProvider.set(
+                            'settings-miniplayer-stream-size',
+                            {
+                                x: size[0],
+                                y: size[1],
+                            }
+                        )
+                    } catch (_) {
+                        writeLog({
+                            type: 'warn',
+                            data: 'error miniplayer (stream) resize',
+                        })
+                    }
                 }
             })
 
@@ -1696,7 +1757,7 @@ async function createWindow() {
 
         const ytmdesktop_version = app.getVersion() || '-'
 
-        const template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment:%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
+        const template = `- [ ] I understand that %2A%2AYTMDesktop have NO affiliation with Google or YouTube%2A%2A.%0A- [ ] I verified that there is no open issue for the same subject.%0A%0A %2A%2ADescribe the bug%2A%2A%0A A clear and concise description of what the bug is.%0A%0A %2A%2ATo Reproduce%2A%2A%0A Steps to reproduce the behavior:%0A 1. Go to '...'%0A 2. Click on '....'%0A 3. See error%0A%0A %2A%2AExpected behavior%2A%2A%0A A clear and concise description of what you expected to happen.%0A%0A %2A%2AScreenshots%2A%2A%0A If applicable, add screenshots to help explain your problem.%0A%0A %2A%2AEnvironment:%2A%2A%0A %2A YTMDesktop version: %2A%2A%2Av${ytmdesktop_version} ${commit_hash}%2A%2A%2A%0A %2A OS: %2A%2A%2A${os_platform}%2A%2A%2A%0A %2A OS version: %2A%2A%2A${os_system_version}%2A%2A%2A%0A %2A Arch: %2A%2A%2A${os_arch}%2A%2A%2A%0A %2A Installation way: %2A%2A%2Alike .exe or snapcraft or another way%2A%2A%2A%0A`
         await shell.openExternal(
             `https://github.com/ytmdesktop/ytmdesktop/issues/new?body=${template}`
         )

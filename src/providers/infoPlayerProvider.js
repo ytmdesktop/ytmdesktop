@@ -265,6 +265,9 @@ function getCover(webContents) {
         )
         .then((cover) => {
             debug(`Cover is: ${cover}`)
+            cover.split('?')[0]
+            cover.replace('sddefault.jpg', 'hq720.jpg')
+
             track.cover = cover
         })
         .catch((_) => console.log('error getCover'))
