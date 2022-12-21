@@ -90,8 +90,8 @@ function mediaSkipAd(mainWindow) {
     infoPlayerProvider.skipAd(mainWindow.webContents)
 }
 
-function mediaStartplaylist(mainWindow, playlistName) {
-    infoPlayerProvider.startPlaylist(mainWindow.webContents, playlistName)
+function mediaStartplaylist(mainWindow, playlistId) {
+    infoPlayerProvider.startPlaylist(mainWindow.webContents, playlistId)
 }
 
 function mediaPlayURL(mainWindow, url) {

@@ -483,43 +483,48 @@ function setVolume(webContents, vol) {
         .catch((_) => console.log('error changeVolume'))
 }
 
-function startPlaylist(webContents, playlistName) {
-    webContents
-        .executeJavaScript(
-            `
-            new Promise((resolve, reject) => {
-                try {
-                    if (document.querySelector(".iron-selected").tabId !== "FEmusic_liked") {
-                        document.querySelector("[tab-id='FEmusic_liked']").click()
+async function startPlaylist(webContents, playlistId) {
+    await playURL(
+        webContents,
+        `https://music.youtube.com/watch?v=&list=${playlistId}`
+    )
+    // webContents
+    //     .executeJavaScript(
+    //         `
+    //         new Promise((resolve, reject) => {
+    //             try {
+    //                 if (document.querySelector(".iron-selected").tabId !== "FEmusic_liked") {
+    //                     document.querySelector("[tab-id='FEmusic_liked']").click()
 
-                    }
-                } catch (err) {
-                      document.querySelector("[tab-id='FEmusic_liked']").click()
-                }
-                setTimeout( resolve, 5000)
-            })
-            .then(() => {
-                document.querySelectorAll("div>ytmusic-two-row-item-renderer").forEach((playlist) => {
-                    let innerSpanText = playlist.querySelector("div>span>yt-formatted-string>span:nth-child(3)");
-                    if (playlist.querySelector("a").href !== "#" && innerSpanText !== null && innerSpanText.innerText !== "0 songs"){
-                        if (playlist.querySelector("div>div>yt-formatted-string>a").innerText === "${playlistName}"){
-                            let startPlay = playlist.querySelector("a>ytmusic-item-thumbnail-overlay-renderer>div>ytmusic-play-button-renderer")
-                            if (startPlay.getAttribute("state") === "default") { startPlay.click() } // Check if User is already playing this Playlist if Not start it
-                        }
-                    }
-                })
-            })
-            `
-        )
-        .then()
-        .catch((_) => console.log('error Playlist ' + _))
+    //                 }
+    //             } catch (err) {
+    //                   document.querySelector("[tab-id='FEmusic_liked']").click()
+    //             }
+    //             setTimeout( resolve, 5000)
+    //         })
+    //         .then(() => {
+    //             document.querySelectorAll("div>ytmusic-two-row-item-renderer").forEach((playlist) => {
+    //                 let innerSpanText = playlist.querySelector("div>span>yt-formatted-string>span:nth-child(3)");
+    //                 if (playlist.querySelector("a").href !== "#" && innerSpanText !== null && innerSpanText.innerText !== "0 songs"){
+    //                     if (playlist.querySelector("div>div>yt-formatted-string>a").innerText === "${playlistName}"){
+    //                         let startPlay = playlist.querySelector("a>ytmusic-item-thumbnail-overlay-renderer>div>ytmusic-play-button-renderer")
+    //                         if (startPlay.getAttribute("state") === "default") { startPlay.click() } // Check if User is already playing this Playlist if Not start it
+    //                     }
+    //                 }
+    //             })
+    //         })
+    //         `
+    //     )
+    //     .then()
+    //     .catch((_) => console.log('error Playlist ' + _))
 }
 
 async function playURL(webContents, url) {
     if (url.includes('watch?v=')) {
         let video = url.split('watch?v=')
         if (video[0] == 'https://music.youtube.com/') {
-            if (!isPaused(webContents)) {  // I noticed that if something is playing it won't work idk why
+            if (!isPaused(webContents)) {
+                // I noticed that if something is playing it won't work idk why
                 webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
             }
             await webContents.loadURL(url)
