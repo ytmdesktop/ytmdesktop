@@ -95,7 +95,7 @@ function mediaStartplaylist(mainWindow, playlistName) {
 }
 
 function mediaPlayURL(mainWindow, url) {
-    infoPlayerProvider.playURL(url)
+    infoPlayerProvider.playURL(mainWindow.webContents, url)
 }
 
 function createThumbar(mainWindow, mediaInfo) {

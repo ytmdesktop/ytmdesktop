@@ -512,13 +512,14 @@ function startPlaylist(webContents, playlistName) {
         .catch((_) => console.log('error Playlist ' + _))
 }
 
-function playURL(url) {
+async function playURL(webContents, url) {
     if (url.includes('watch?v=')) {
         let video = url.split('watch?v=')
-        let baseurl = 'ytmd://play/'
         if (video[0] == 'https://music.youtube.com/') {
-            // console.log(baseurl + video[1])
-            require('../../main').handleOpenUrl(baseurl + video[1])
+            if (!isPaused(webContents)) {  // I noticed that if something is playing it won't work idk why
+                webContents.sendInputEvent({ type: 'keydown', keyCode: ';' })
+            }
+            await webContents.loadURL(url)
         }
     }
 }

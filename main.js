@@ -1955,7 +1955,7 @@ else {
                 updater.checkUpdate(mainWindow, view)
             }, 24 * 60 * 60 * 1000)
         }
-
+        
         ipcMain.emit('ready', app)
     })
 
