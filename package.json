@@ -31,9 +31,11 @@
     "devDependencies": {
         "@types/electron": "^1.6.10",
         "electron": "^11.4.9",
-        "electron-builder": "^22.9.1",
+        "electron-builder": "^23.6.0",
         "electron-rebuild": "^2.3.4",
         "husky": "^4.3.7",
+        "lzma-native": "^8.0.6",
+        "node-gyp": "^9.3.1",
         "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
         "pretty-quick": "^2.0.2"
