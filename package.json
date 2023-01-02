@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "ace-builds": "^1.4.12",
-        "discord-rpc": "^3.1.4",
+        "discord-rpc": "^4.0.1",
         "electron-canvas-to-buffer": "^2.0.0",
         "electron-clipboard-watcher": "^1.0.1",
         "electron-google-analytics": "^1.0.2",
@@ -59,7 +59,6 @@
         "node-vibrant": "^3.1.5",
         "postscribe": "^2.0.8",
         "qrcode-generator": "^1.4.4",
-        "register-scheme": "0.0.2",
         "scribble": "github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43",
         "socket.io": "^2.3.0",
         "uuid": "^8.3.2",

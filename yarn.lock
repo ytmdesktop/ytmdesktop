@@ -1452,13 +1452,15 @@ dir-compare@^2.4.0:
     commander "2.9.0"
     minimatch "3.0.4"
 
-discord-rpc@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.npmjs.org/discord-rpc/-/discord-rpc-3.1.4.tgz"
-  integrity sha512-QaBu+gHica2SzgRAmTpuJ4J8DX9+fDwAqhvaie3hcbkU9WPqewEPh21pWdd/7vTI/JNuapU7PFm2ZKg3BTkbGg==
+discord-rpc@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/discord-rpc/-/discord-rpc-4.0.1.tgz#a89aa04a048aa83ad4f347d53fa0162501eae0d8"
+  integrity sha512-HOvHpbq5STRZJjQIBzwoKnQ0jHplbEWFWlPDwXXKm/bILh4nzjcg7mNqll0UY7RsjFoaXA7e/oYb/4lvpda2zA==
   dependencies:
     node-fetch "^2.6.1"
     ws "^7.3.1"
+  optionalDependencies:
+    register-scheme "github:devsnek/node-register-scheme"
 
 dmg-builder@23.6.0:
   version "23.6.0"
@@ -3961,9 +3963,9 @@ regexp.prototype.flags@^1.2.0:
     define-properties "^1.1.3"
     es-abstract "^1.17.0-next.1"
 
-register-scheme@0.0.2:
+"register-scheme@github:devsnek/node-register-scheme":
   version "0.0.2"
-  resolved "git+https://github.com/devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17"
+  resolved "https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17"
   dependencies:
     bindings "^1.3.0"
     node-addon-api "^1.3.0"
