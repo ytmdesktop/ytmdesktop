@@ -3963,7 +3963,7 @@ regexp.prototype.flags@^1.2.0:
 
 register-scheme@0.0.2:
   version "0.0.2"
-  resolved "git+ssh://git@github.com/devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17"
+  resolved "git+https://github.com/devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17"
   dependencies:
     bindings "^1.3.0"
     node-addon-api "^1.3.0"
@@ -4105,7 +4105,7 @@ sax@>=0.6.0, sax@^1.2.4:
 
 "scribble@github:dittodhole/node-scribble-js#a2b37f585c5382863319115db36201399477ed43":
   version "0.0.5"
-  resolved "git+ssh://git@github.com/dittodhole/node-scribble-js.git#a2b37f585c5382863319115db36201399477ed43"
+  resolved "git+https://github.com/dittodhole/node-scribble-js.git#a2b37f585c5382863319115db36201399477ed43"
   integrity sha512-eIAqWX3kJaDfuY0OXamO1D1BozOI0sfWeCxmMpYZDadyVgiL3Od0uqsgtmKZGzGlKYjHuuu+xHEvvWyweLLCoQ==
 
 semver-compare@^1.0.0:
@@ -4771,7 +4771,7 @@ win-node-env@^0.4.0:
 
 "windows.media.playback@git+https://github.com/NovusTheory/nodert-windows.media.playback.git":
   version "0.1.0"
-  resolved "git+ssh://git@github.com/NovusTheory/nodert-windows.media.playback.git#855edf625b2762caa89dc7aab0b686d535b79f34"
+  resolved "git+https://github.com/NovusTheory/nodert-windows.media.playback.git#855edf625b2762caa89dc7aab0b686d535b79f34"
   dependencies:
     nan latest
 
