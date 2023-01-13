@@ -522,6 +522,7 @@ function mInit() {
 }
 
 function replaceAcceleratorText(text) {
+    if (text === undefined) return text
     text = text.replace(/\+/g, ' + ')
 
     if (text.indexOf('CmdOrCtrl') !== -1)
