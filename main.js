@@ -832,65 +832,85 @@ async function createWindow() {
         if (dataMain.type !== undefined) args = dataMain
         else args = dataRenderer
 
+        let globalShortcutButton = settingsProvider.get(
+            'settings-enable-disable-media-control'
+        )
+
         try {
             globalShortcut.unregister(args.oldValue)
         } catch (_) {}
 
         switch (args.type) {
             case 'media-play-pause':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-play-pause']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-play-pause']
+                    )
+                }
                 break
 
             case 'media-track-next':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-track-next']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-track-next']
+                    )
+                }
                 break
 
             case 'media-track-previous':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-track-previous']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-track-previous']
+                    )
+                }
                 break
 
             case 'media-track-like':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-track-like']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-track-like']
+                    )
+                }
                 break
 
             case 'media-track-dislike':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-track-dislike']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-track-dislike']
+                    )
+                }
                 break
 
             case 'media-volume-up':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-volume-up']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-volume-up']
+                    )
+                }
                 break
 
             case 'media-volume-down':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['media-volume-down']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['media-volume-down']
+                    )
+                }
                 break
 
             case 'miniplayer-open-close':
-                registerGlobalShortcut(
-                    args.newValue,
-                    acceleratorFnMap['miniplayer-open-close']
-                )
+                if (globalShortcutButton) {
+                    registerGlobalShortcut(
+                        args.newValue,
+                        acceleratorFnMap['miniplayer-open-close']
+                    )
+                }
                 break
             case 'media-control-enable-disable':
                 if (args.oldValue == 'enable' && args.newValue == 'disabled') {
