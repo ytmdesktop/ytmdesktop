@@ -46,6 +46,8 @@ settingsProvider.setInitialValue(
 
 settingsProvider.setInitialValue('settings-enable-taskbar-progressbar', true) // Yes
 
+settingsProvider.setInitialValue('settings-enable-disable-media-control', true)
+
 settingsProvider.setInitialValue('settings-accelerators', {
     'media-play-pause': 'CmdOrCtrl+Shift+Space',
     'media-track-next': 'CmdOrCtrl+Shift+PageUp',

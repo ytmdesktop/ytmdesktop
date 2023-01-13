@@ -38,6 +38,7 @@
 | `settings-volume-media-keys`               | Boolean | `true` or `false`            | `false`                      | Enable media volume keys for the playback volume                                     |
 | `settings-pause-on-suspend`                | Boolean | `true` or `false`            | `false`                      | Pause media playback on `suspend` event triggered                                    |
 | `settings-surround-sound`                  | Boolean | `true` or `false`            | `false`                      | Enable Chromium Flag "try-supported-channel-layouts" for surround sound/Speaker Fill |
+| `settings-enable-disable-media-control`    | Boolean | `true` or `false`            | `true`                      | Enable or Disable All Global Shortcut                                                 |
 
 ## Window
 | Key                                   | Type    | Values                       | Default                      | Description                                   |

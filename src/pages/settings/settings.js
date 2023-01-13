@@ -151,6 +151,59 @@ checkCompanionStatus()
 checkClipboardWatcherStatus()
 checkWindows10ServiceStatus()
 
+function setMediaControllView(enableMediaControlKeys) {
+    let rootElement = document.querySelectorAll(
+        '#tab-shortcut > .row > .col > table > tbody > tr:nth-child(n+2)'
+    )
+    rootElement.forEach((row) => {
+        let labelMediaControl = row.querySelectorAll('td > span')
+        let actionMediaControl = row.querySelectorAll('th > *')
+        let switchMediaControl = row.querySelectorAll('th > div > label')
+
+        if (enableMediaControlKeys) {
+            labelMediaControl.forEach((label) => {
+                label.classList.remove('grey-text')
+                label.classList.remove('text-darken-3')
+            })
+
+            actionMediaControl.forEach((action) => {
+                action.classList.remove('grey-text')
+                action.classList.remove('text-darken-3')
+                action.classList.remove('disabled')
+            })
+
+            switchMediaControl.forEach((switchToggle) => {
+                switchToggle.firstElementChild.removeAttribute('disabled')
+                switchToggle.lastElementChild.classList.remove('grey')
+            })
+        } else {
+            labelMediaControl.forEach((label) => {
+                label.classList.add('grey-text')
+                label.classList.add('text-darken-3')
+            })
+
+            actionMediaControl.forEach((action) => {
+                action.classList.add('disabled')
+                action.classList.add('grey-text')
+                action.classList.add('text-darken-3')
+            })
+
+            switchMediaControl.forEach((switchToggle) => {
+                switchToggle.firstElementChild.setAttribute(
+                    'disabled',
+                    'disabled'
+                )
+                switchToggle.lastElementChild.classList.add('grey')
+            })
+        }
+    })
+}
+
+let enableMediaControlKeys = settingsProvider.get(
+    'settings-enable-disable-media-control'
+)
+setMediaControllView(enableMediaControlKeys)
+
 document.addEventListener('DOMContentLoaded', () => {
     initElement('settings-keep-background', 'click', null)
     initElement('settings-show-notifications', 'click', null)
@@ -193,6 +246,19 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     initElement('settings-rainmeter-web-now-playing', 'click', null)
     initElement('settings-enable-double-tapping-show-hide', 'click', null)
+    initElement('settings-enable-disable-media-control', 'click', () => {
+        let enableMediaControlKeys = settingsProvider.get(
+            'settings-enable-disable-media-control'
+        )
+
+        ipc.send('change-accelerator', {
+            type: 'media-control-enable-disable',
+            oldValue: enableMediaControlKeys ? 'disabled' : 'enable',
+            newValue: enableMediaControlKeys ? 'enable' : 'disabled',
+        })
+
+        setMediaControllView(enableMediaControlKeys)
+    })
     initElement('settings-volume-media-keys', 'click', () => {
         let enableVolumeMediaKeys = settingsProvider.get(
             'settings-volume-media-keys'

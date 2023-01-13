@@ -180,6 +180,71 @@ async function updateAccentColorPref() {
     }
 }
 
+// Map accelerator Key To Function
+let acceleratorFnMap = {
+    'media-play-pause': () => {
+        checkDoubleTapPlayPause()
+    },
+    'media-track-next': () => {
+        mediaControl.nextTrack(view)
+    },
+    'media-track-previous': () => {
+        mediaControl.previousTrack(view)
+    },
+    'media-volume-up': () => {
+        mediaControl.volumeUp(view)
+    },
+    'media-volume-down': () => {
+        mediaControl.volumeDown(view)
+    },
+    'media-track-like': () => {
+        if (infoPlayerProvider.getPlayerInfo().likeStatus !== 'LIKE') {
+            mediaControl.upVote(view)
+            if (settingsProvider.get('settings-show-notifications')) {
+                tray.balloonEvents({
+                    title: `${songInfo().title} - ${songInfo().author}`,
+                    content: __.trans('LABEL_NOTIFICATION_LIKED'),
+                    icon: assetsProvider.getLocal(
+                        'img/notification-thumbs-up.png'
+                    ),
+                })
+            }
+        }
+    },
+    'media-track-dislike': () => {
+        if (infoPlayerProvider.getPlayerInfo().likeStatus !== 'DISLIKE') {
+            mediaControl.downVote(view)
+            if (settingsProvider.get('settings-show-notifications')) {
+                tray.balloonEvents({
+                    title: `${songInfo().title} - ${songInfo().author}`,
+                    content: __.trans('LABEL_NOTIFICATION_DISLIKED'),
+                    icon: assetsProvider.getLocal(
+                        'img/notification-thumbs-down.png'
+                    ),
+                })
+            }
+        }
+    },
+    'miniplayer-open-close': () => {
+        try {
+            if (miniplayer) {
+                miniplayer.close()
+                miniplayer = undefined
+                mainWindow.show()
+            } else {
+                ipcMain.emit('window', {
+                    command: 'show-miniplayer',
+                })
+            }
+        } catch (_) {
+            writeLog({
+                type: 'warn',
+                data: 'error on try open/close miniplayer',
+            })
+        }
+    },
+}
+
 async function createWindow() {
     if (isMac() || isWindows()) {
         const execApp = path.basename(process.execPath)
@@ -773,103 +838,67 @@ async function createWindow() {
 
         switch (args.type) {
             case 'media-play-pause':
-                registerGlobalShortcut(args.newValue, () => {
-                    checkDoubleTapPlayPause()
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-play-pause']
+                )
                 break
 
             case 'media-track-next':
-                registerGlobalShortcut(args.newValue, () => {
-                    mediaControl.nextTrack(view)
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-track-next']
+                )
                 break
 
             case 'media-track-previous':
-                registerGlobalShortcut(args.newValue, () => {
-                    mediaControl.previousTrack(view)
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-track-previous']
+                )
                 break
 
             case 'media-track-like':
-                registerGlobalShortcut(args.newValue, () => {
-                    if (
-                        infoPlayerProvider.getPlayerInfo().likeStatus !== 'LIKE'
-                    ) {
-                        mediaControl.upVote(view)
-                        if (
-                            settingsProvider.get('settings-show-notifications')
-                        ) {
-                            tray.balloonEvents({
-                                title: `${songInfo().title} - ${
-                                    songInfo().author
-                                }`,
-                                content: __.trans('LABEL_NOTIFICATION_LIKED'),
-                                icon: assetsProvider.getLocal(
-                                    'img/notification-thumbs-up.png'
-                                ),
-                            })
-                        }
-                    }
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-track-like']
+                )
                 break
 
             case 'media-track-dislike':
-                registerGlobalShortcut(args.newValue, () => {
-                    if (
-                        infoPlayerProvider.getPlayerInfo().likeStatus !==
-                        'DISLIKE'
-                    ) {
-                        mediaControl.downVote(view)
-                        if (
-                            settingsProvider.get('settings-show-notifications')
-                        ) {
-                            tray.balloonEvents({
-                                title: `${songInfo().title} - ${
-                                    songInfo().author
-                                }`,
-                                content: __.trans(
-                                    'LABEL_NOTIFICATION_DISLIKED'
-                                ),
-                                icon: assetsProvider.getLocal(
-                                    'img/notification-thumbs-down.png'
-                                ),
-                            })
-                        }
-                    }
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-track-dislike']
+                )
                 break
 
             case 'media-volume-up':
-                registerGlobalShortcut(args.newValue, () => {
-                    mediaControl.volumeUp(view)
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-volume-up']
+                )
                 break
 
             case 'media-volume-down':
-                registerGlobalShortcut(args.newValue, () => {
-                    mediaControl.volumeDown(view)
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['media-volume-down']
+                )
                 break
 
             case 'miniplayer-open-close':
-                registerGlobalShortcut(args.newValue, () => {
-                    try {
-                        if (miniplayer) {
-                            miniplayer.close()
-                            miniplayer = undefined
-                            mainWindow.show()
-                        } else {
-                            ipcMain.emit('window', {
-                                command: 'show-miniplayer',
-                            })
-                        }
-                    } catch (_) {
-                        writeLog({
-                            type: 'warn',
-                            data: 'error on try open/close miniplayer',
-                        })
-                    }
-                })
+                registerGlobalShortcut(
+                    args.newValue,
+                    acceleratorFnMap['miniplayer-open-close']
+                )
+                break
+            case 'media-control-enable-disable':
+                if (args.oldValue == 'enable' && args.newValue == 'disabled') {
+                    unregisterAllGlobalShortcut()
+                } else {
+                    registerAllGlobalShortcut()
+                }
+
                 break
         }
     })
@@ -915,6 +944,11 @@ async function createWindow() {
     ipcMain.emit('change-accelerator', {
         type: 'miniplayer-open-close',
         newValue: settingsAccelerator['miniplayer-open-close'],
+    })
+
+    ipcMain.emit('change-accelerator', {
+        type: 'media-control-enable-disable',
+        newValue: settingsAccelerator['media-control-enable-disable'],
     })
 
     if (
@@ -2146,6 +2180,34 @@ function registerGlobalShortcut(value, fn) {
                 data: `Failed to register global shortcut ${value}`,
             })
         }
+    }
+}
+
+function unregisterAllGlobalShortcut() {
+    try {
+        globalShortcut.unregisterAll()
+    } catch (_) {
+        writeLog({
+            type: 'warn',
+            data: `Failed to unregister all global shortcut`,
+        })
+    }
+}
+
+function registerAllGlobalShortcut() {
+    try {
+        let settingsAccelerator = settingsProvider.get('settings-accelerators')
+        Object.keys(settingsAccelerator).forEach(function (key) {
+            registerGlobalShortcut(
+                settingsAccelerator[key],
+                acceleratorFnMap[key]
+            )
+        })
+    } catch (error) {
+        writeLog({
+            type: 'warn',
+            data: `Failed to register all global shortcut ${error}`,
+        })
     }
 }
 
