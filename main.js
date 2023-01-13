@@ -227,14 +227,20 @@ let acceleratorFnMap = {
     },
     'miniplayer-open-close': () => {
         try {
-            if (miniplayer) {
-                miniplayer.close()
-                miniplayer = undefined
-                mainWindow.show()
-            } else {
-                ipcMain.emit('window', {
-                    command: 'show-miniplayer',
-                })
+            let globalShortcutButton = settingsProvider.get(
+                'settings-enable-disable-media-control'
+            )
+
+            if (globalShortcutButton) {
+                if (miniplayer) {
+                    miniplayer.close()
+                    miniplayer = undefined
+                    mainWindow.show()
+                } else {
+                    ipcMain.emit('window', {
+                        command: 'show-miniplayer',
+                    })
+                }
             }
         } catch (_) {
             writeLog({
