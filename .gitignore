@@ -3,6 +3,7 @@ dist/
 
 # Library & Library Manger files
 node_modules/
+bin/
 
 .yarn/
 yarn-error.log
@@ -11,10 +12,12 @@ package-lock.json
 # IDE folders
 .idea/
 .vs/
-.vscode/
 
 # Other Files
 .cache/
+build/
+css/
+.npmrc
 
 .DS_Store
 /youtube-music-desktop-app-*.tgz

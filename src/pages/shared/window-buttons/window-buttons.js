@@ -1,8 +1,7 @@
-const { remote, ipcRenderer: ipc } = require('electron')
+const { ipcRenderer: ipc, ipcRenderer } = require('electron')
 const electronStore = require('electron-store')
 const store = new electronStore()
 const { isWindows, isMac, isLinux } = require('../../../utils/systemInfo')
-const currentWindow = remote.getCurrentWindow()
 
 const winElement = document.getElementById('win')
 const macElement = document.getElementById('mac')
@@ -33,8 +32,8 @@ if (store.get('titlebar-type', 'nice') !== 'nice') {
     document.getElementById('content').style.marginTop = '5vh'
 }
 
-ipc.on('window-is-maximized', (_, value) => {
-    if (value) {
+ipcRenderer.on('window-is-maximized', (_, isMaximized) => {
+    if (isMaximized) {
         document.getElementById('icon_maximize').classList.add('hide')
         document.getElementById('icon_restore').classList.remove('hide')
     } else {
@@ -52,24 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnMinimize)
         btnMinimize.addEventListener('click', () => {
-            currentWindow.minimize()
+            ipcRenderer.send('window-button-action-minimize')
         })
 
     if (btnMaximize)
         btnMaximize.addEventListener('click', () => {
-            if (!currentWindow.isMaximized()) currentWindow.maximize()
-            else currentWindow.unmaximize()
+            ipcRenderer.send('window-button-action-maximize')
         })
 
     if (btnClose) {
         btnClose.addEventListener('click', () => {
-            currentWindow.close()
+            ipcRenderer.send('window-button-action-close')
         })
     }
 
     document.getElementById('loading').classList.add('hide')
-
-    //ipc.send(`debug`, `webview ${webview.title}`)
 })
 
 // ENABLE FOR DEBUG
@@ -77,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkUrlParams() {
     const params = new URL(window.location).searchParams
+
+    console.log('checkUrlParams')
 
     let page = params.get('page')
     let icon = params.get('icon')

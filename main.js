@@ -1,4 +1,5 @@
 require('./src/utils/defaultSettings')
+require('@electron/remote/main').initialize()
 
 const {
     app,
@@ -66,8 +67,7 @@ let mainWindow,
     updateTrackInfoTimeout,
     activityLikeStatus,
     windowsMediaProvider,
-    audioDevices,
-    settingsRendererIPC
+    audioDevices
 
 let isFirstTime = false
 
@@ -116,6 +116,7 @@ if (settingsProvider.get('settings-surround-sound')) {
 }
 
 app.commandLine.appendSwitch('disable-http-cache')
+app.allowRendererProcessReuse = false
 
 createCustomAppDir()
 
@@ -246,7 +247,7 @@ async function createWindow() {
             browserWindowConfig.frame = true
 
             windowConfig.frame = true
-            windowConfig.titleBarStyle = 'hidden'
+            windowConfig.titleBarStyle = 'default'
             break
 
         case 'none':
@@ -762,6 +763,30 @@ async function createWindow() {
         () => ipcMain.emit('window', { command: 'show-settings' })
     )
 
+    ipcMain.on('settings-command-relaunch', () => {
+        app.relaunch()
+        app.exit(0)
+    })
+
+    ipcMain.on('window-button-action-minimize', () => {
+        BrowserWindow.getFocusedWindow().minimize()
+    })
+
+    ipcMain.on('window-button-action-maximize', (event) => {
+        var window = BrowserWindow.getFocusedWindow()
+        if (window.isMaximized()) {
+            window.unmaximize()
+        } else {
+            window.maximize()
+        }
+
+        event.reply('window-is-maximized', window.isMaximized())
+    })
+
+    ipcMain.on('window-button-action-close', () => {
+        BrowserWindow.getFocusedWindow().close()
+    })
+
     // GLOBAL
     ipcMain.on('change-accelerator', (dataMain, dataRenderer) => {
         if (dataMain.type !== undefined) args = dataMain
@@ -1222,24 +1247,25 @@ async function createWindow() {
             const yPos = mainWindowPosition[1] + 200
 
             settings = new BrowserWindow({
+                parent: mainWindow,
                 title: __.trans('LABEL_SETTINGS'),
                 icon: iconDefault,
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                resizable: true,
+                resizable: false,
                 width: 900,
                 minWidth: 900,
                 height: 550,
                 minHeight: 550,
                 x: xPos,
                 y: yPos,
+                alwaysOnTop: false,
                 autoHideMenuBar: false,
                 skipTaskbar: false,
                 webPreferences: {
                     nodeIntegration: true,
                     webviewTag: true,
-                    enableRemoteModule: true,
                     contextIsolation: false,
                     nodeIntegrationInSubFrames: true,
                     webSecurity: false,
@@ -1250,12 +1276,13 @@ async function createWindow() {
             await settings.loadFile(
                 path.join(
                     app.getAppPath(),
-                    '/src/pages/shared/window-buttons/window-buttons.html'
+                    './src/pages/shared/window-buttons/window-buttons.html'
                 ),
                 {
                     search:
                         'page=settings/settings&trusted=1&icon=settings&hide=btn-minimize,btn-maximize&title=' +
-                        __.trans('LABEL_SETTINGS'),
+                        __.trans('LABEL_SETTINGS') +
+                        '&hide=btn-minimize,btn-maximize',
                 }
             )
 
@@ -1293,6 +1320,7 @@ async function createWindow() {
                 autoHideMenuBar: true,
                 webPreferences: {
                     nodeIntegration: true,
+                    contextIsolation: false,
                     enableRemoteModule: true,
                 },
             }
@@ -1405,7 +1433,7 @@ async function createWindow() {
 
     async function windowLastFmLogin() {
         const lastfm = new BrowserWindow({
-            //parent: mainWindow,
+            parent: settings,
             icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
@@ -1421,6 +1449,7 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
+                contextIsolation: false,
                 webviewTag: true,
                 enableRemoteModule: true,
             },
@@ -1429,17 +1458,14 @@ async function createWindow() {
         await lastfm.loadFile(
             path.join(
                 __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
-            }
+                './src/pages/settings/sub/last-fm/last-fm-login.html'
+            )
         )
     }
 
     async function windowThemeEditor() {
         const editor = new BrowserWindow({
+            parent: settings,
             icon: iconDefault,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -1452,20 +1478,14 @@ async function createWindow() {
             minHeight: 800,
             webPreferences: {
                 nodeIntegration: true,
+                contextIsolation: false,
                 webviewTag: true,
                 enableRemoteModule: true,
             },
         })
 
         await editor.loadFile(
-            path.join(
-                __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
-            }
+            path.join(__dirname, './src/pages/editor/editor.html')
         )
     }
 
@@ -1477,6 +1497,7 @@ async function createWindow() {
                 : null
         } else {
             lyrics = new BrowserWindow({
+                parent: mainWindow,
                 icon: iconDefault,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
@@ -1488,8 +1509,8 @@ async function createWindow() {
                 alwaysOnTop: settingsProvider.get('settings-lyrics-always-top'),
                 webPreferences: {
                     nodeIntegration: true,
+                    contextIsolation: false,
                     webviewTag: true,
-                    enableRemoteModule: true,
                 },
             })
 
@@ -1498,15 +1519,7 @@ async function createWindow() {
                 lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
 
             await lyrics.loadFile(
-                path.join(
-                    __dirname,
-                    './src/pages/shared/window-buttons/window-buttons.html'
-                ),
-                {
-                    search:
-                        'page=lyrics/lyrics&icon=music_note&hide=btn-minimize,btn-maximize&title=' +
-                        __.trans('LABEL_LYRICS'),
-                }
+                path.join(__dirname, './src/pages/lyrics/lyrics.html')
             )
 
             let storeLyricsPositionTimer
@@ -1559,6 +1572,7 @@ async function createWindow() {
             title: 'companionWindowTitle',
             webPreferences: {
                 nodeIntegration: false,
+                contextIsolation: false,
                 enableRemoteModule: true,
             },
             autoHideMenuBar: true,
@@ -1584,7 +1598,7 @@ async function createWindow() {
             frame: true,
             webPreferences: {
                 nodeIntegration: true,
-                enableRemoteModule: true,
+                contextIsolation: false,
                 partition: `guest-mode-${Date.now()}`,
             },
         })
@@ -1598,15 +1612,17 @@ async function createWindow() {
 
     async function windowDiscordSettings() {
         const discord = new BrowserWindow({
-            //parent: mainWindow,
+            parent: settings,
             icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
+            titleBarStyle: 'default',
             center: true,
-            resizable: true,
+            resizable: false,
+            minimizable: false,
             backgroundColor: '#232323',
             width: 600,
+            modal: true,
             minWidth: 600,
             height: 220,
             minHeight: 220,
@@ -1614,34 +1630,29 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
-                enableRemoteModule: true,
+                contextIsolation: false,
+                webviewTag: false,
             },
         })
 
         await discord.loadFile(
             path.join(
                 __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=settings/sub/discord/discord_settings&icon=settings&title=' +
-                    __.trans('LABEL_SETTINGS_DISCORD') +
-                    '&hide=btn-minimize,btn-maximize',
-            }
+                'src/pages/settings/sub/discord/discord_settings.html'
+            )
         )
     }
 
     async function windowShortcutButtonsSettings() {
         const discord = new BrowserWindow({
-            //parent: mainWindow,
+            parent: settings,
             icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
+            titleBarStyle: 'default',
             center: true,
-            resizable: true,
+            resizable: false,
+            minimizable: false,
             backgroundColor: '#232323',
             width: 600,
             minWidth: 600,
@@ -1651,34 +1662,31 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
-                enableRemoteModule: true,
+                contextIsolation: false,
+                webviewTag: false,
+                additionalArguments: [app.getAppPath()],
             },
         })
 
         await discord.loadFile(
             path.join(
                 __dirname,
-                './src/pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search:
-                    'page=settings/sub/shortcut-buttons/shortcut-buttons-settings&icon=settings&title=' +
-                    __.trans('SHORTCUT_BUTTONS') +
-                    '&hide=btn-minimize,btn-maximize',
-            }
+                'src/pages/settings/sub/shortcut-buttons/shortcut-buttons-settings.html'
+            )
         )
     }
 
     async function windowChangelog() {
         let changelog = new BrowserWindow({
+            parent: settings,
             title: __.trans('LABEL_CHANGELOG'),
             icon: iconDefault,
             modal: false,
             frame: windowConfig.frame,
-            titleBarStyle: windowConfig.titleBarStyle,
+            titleBarStyle: 'default',
             center: true,
             resizable: false,
+            minimizable: false,
             backgroundColor: '#232323',
             width: 600,
             height: 580,
@@ -1686,23 +1694,19 @@ async function createWindow() {
             skipTaskbar: false,
             webPreferences: {
                 nodeIntegration: true,
-                webviewTag: true,
-                enableRemoteModule: true,
+                contextIsolation: false,
+                webviewTag: false,
             },
         })
 
         await changelog.loadFile(
-            path.join(
-                app.getAppPath(),
-                '/src/pages/shared/window-buttons/window-buttons.html'
-            ),
-            {
-                search: `title=${__.trans(
-                    'LABEL_CHANGELOG'
-                )}&page=changelog/changelog&hide=btn-minimize,btn-maximize`,
-            }
+            path.join(app.getAppPath(), 'src/pages/changelog/changelog.html')
         )
     }
+
+    ipcMain.on('is-dev', (event) => {
+        event.returnValue = isDev
+    })
 
     ipcMain.on('switch-clipboard-watcher', () => {
         switchClipboardWatcher()
@@ -1979,6 +1983,10 @@ else {
 
         tray.createTray(mainWindow)
 
+        if (isWindows()) {
+            app.setAppUserModelId('YouTube Music Desktop')
+        }
+
         ipcMain.on('updated-tray-image', (event, payload) => {
             if (settingsProvider.get('settings-shiny-tray'))
                 tray.updateImage(payload)
@@ -2221,12 +2229,6 @@ if (settingsProvider.get('settings-discord-rich-presence')) discordRPC.start()
 
 ipcMain.on('set-audio-output-list', (_, data) => {
     updateTrayAudioOutputs(data)
-    try {
-        // FIXME: For some reason neither the emit/send doesn't work
-        if (settingsRendererIPC) {
-            settingsRendererIPC.send('update-audio-output-devices', data)
-        }
-    } catch (e) {}
     audioDevices = data
 })
 
@@ -2258,13 +2260,16 @@ ipcMain.on('set-sleep-timer', (_, data) => {
     }
 })
 
-ipcMain.on('retrieve-sleep-timer', (e) => {
-    e.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
+ipcMain.on('retrieve-sleep-timer', (event) => {
+    event.sender.send('sleep-timer-info', sleepTimer.mode, sleepTimer.counter)
 })
 
-ipcMain.handle('get-audio-output-list', (e) => {
-    settingsRendererIPC = e.sender
-    return audioDevices
+ipcMain.on('get-audio-output-list', (event) => {
+    event.reply('get-audio-output-list-reply', audioDevices)
+})
+
+ipcMain.on('get-app-version', (event) => {
+    event.returnValue = app.getVersion()
 })
 
 powerMonitor.on('suspend', () => {
@@ -2292,5 +2297,4 @@ const mediaControl = require('./src/providers/mediaProvider')
 const tray = require('./src/providers/trayProvider')
 const updater = require('./src/providers/updateProvider')
 const { getTrackInfo } = require('./src/providers/infoPlayerProvider')
-const { ipcRenderer } = require('electron/renderer')
-//const {UpdaterSignal} = require('electron-updater');
+const { UpdaterSignal } = require('electron-updater')

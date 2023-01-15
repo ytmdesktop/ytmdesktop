@@ -1,9 +1,8 @@
 const { ipcRenderer } = require('electron')
 const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
-const infoPlayerProvider = require('electron').remote.require(
-    './src/providers/infoPlayerProvider'
-)
+const infoPlayerProvider = require('../../providers/infoPlayerProvider')
+
 const settingsProvider = require('../../providers/settingsProvider')
 
 const elementLyric = document.getElementById('lyric')

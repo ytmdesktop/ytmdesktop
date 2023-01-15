@@ -1,9 +1,9 @@
 const { ipcMain } = require('electron')
-const isDev = require('electron-is-dev')
 const i18n = require('i18n')
 var http = require('https')
 var fs = require('fs')
 const settingsProvider = require('./settingsProvider')
+const isRenderer = require('is-electron-renderer')
 
 const defaultLocale = settingsProvider.get('settings-app-language') || 'en'
 
@@ -18,9 +18,13 @@ console.log(
 console.log('[!] ' + localesPath + ' to modify the your locale file.')
 console.log('[!] Then kindly open a PR to ytmdesktop-locales repo. :)')
 
+function isDev() {
+    return require('electron-is-dev')
+}
+
 var updateLocaleFile = function (locale, cb, force = false) {
     // for developer, skip auto update to prevent data loss
-    if (isDev && !force) {
+    if (!isRenderer && isDev() && !force) {
         console.log('[!]Skip i18n auto-update in development mode')
         // updateLocaleFile(locale, cb, true)
         console.log(

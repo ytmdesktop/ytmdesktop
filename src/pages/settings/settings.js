@@ -1,4 +1,4 @@
-const { remote, ipcRenderer: ipc, shell } = require('electron')
+const { ipcRenderer: ipc, shell, ipcRenderer } = require('electron')
 const settingsProvider = require('../../providers/settingsProvider')
 const __ = require('../../providers/translateProvider')
 const { isLinux, isMac, isWindows } = require('../../utils/systemInfo')
@@ -77,45 +77,11 @@ function update_audio_devices_callback(devices) {
     mInit()
 }
 
-ipc.on('update-audio-output-devices', update_audio_devices_callback)
+ipcRenderer.on('get-audio-output-list-reply', (_event, devices) => {
+    update_audio_devices_callback(devices)
+})
 
-get_audio_output_list = () =>
-    ipc.invoke('get-audio-output-list').then((devices) => {
-        devices = JSON.parse(devices)
-        while (audioOutputSelect.firstChild)
-            audioOutputSelect.removeChild(audioOutputSelect.firstChild)
-        if (devices.length) {
-            devices.forEach((deviceInfo) => {
-                let option = document.createElement('option')
-                option.text =
-                    deviceInfo.label != null
-                        ? deviceInfo.label
-                        : `speaker ${audioOutputSelect.length + 1}`
-                option.value = deviceInfo.label
-                audioOutputSelect.appendChild(option)
-            })
-
-            initElement('settings-app-audio-output', 'change', () => {
-                ipc.send('change-audio-output', audioOutputSelect.value)
-            })
-
-            const defaultOuput = devices.find(
-                (audio) => audio.deviceId === 'default'
-            )
-            if (!audioOutputSelect.value.length)
-                audioOutputSelect.value = defaultOuput.label
-        } else {
-            let option = document.createElement('option')
-            option.text = __.trans(
-                'LABEL_SETTINGS_TAB_GENERAL_AUDIO_NO_DEVICES_FOUND'
-            )
-            option.value = '0'
-            audioOutputSelect.appendChild(option)
-            audioOutputSelect.disabled = true
-        }
-
-        mInit()
-    })
+get_audio_output_list = () => ipcRenderer.send('get-audio-output-list')
 
 get_audio_output_list()
 
@@ -421,7 +387,9 @@ function loadSettings() {
                 : settingsSkipTrackShorterThan
     }
 
-    document.getElementById('app-version').innerText = remote.app.getVersion()
+    document.getElementById('app-version').innerText = ipcRenderer.sendSync(
+        'get-app-version'
+    )
 
     document.getElementById(
         'label-settings-companion-server-token'
@@ -436,8 +404,7 @@ function loadSettings() {
 }
 
 function relaunch() {
-    remote.app.relaunch()
-    remote.app.exit(0)
+    ipcRenderer.send('settings-command-relaunch')
 }
 
 // TODO: Unused function?
