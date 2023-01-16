@@ -10,6 +10,7 @@ const {
     systemPreferences,
     nativeTheme,
     screen,
+    session,
     shell,
     dialog,
     powerMonitor,
@@ -118,7 +119,7 @@ if (settingsProvider.get('settings-surround-sound')) {
 app.commandLine.appendSwitch('disable-http-cache')
 
 createCustomAppDir()
-
+createCustomExtensionsDir()
 createCustomCSSDir()
 createCustomCSSPageFile()
 
@@ -1432,8 +1433,7 @@ async function createWindow() {
                 './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
-                search:
-                    'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
+                search: 'page=settings/sub/last-fm/last-fm-login&icon=music_note&hide=btn-minimize,btn-maximize&title=Last.FM Login',
             }
         )
     }
@@ -1463,8 +1463,7 @@ async function createWindow() {
                 './src/pages/shared/window-buttons/window-buttons.html'
             ),
             {
-                search:
-                    'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
+                search: 'page=editor/editor&icon=color_lens&hide=btn-minimize,btn-maximize',
             }
         )
     }
@@ -1825,6 +1824,23 @@ async function createWindow() {
         await view.webContents.removeInsertedCSS(customCSSPageKey)
     }
 
+    function loadCustomExtensions() {
+        const customExtensionsDir = path.join(
+            fileSystem.getAppDataPath(app),
+            '/custom/extensions'
+        )
+
+        for (const extension of fileSystem.getDir(customExtensionsDir)) {
+            let aboluteExtensionPath = path.join(customExtensionsDir, extension)
+
+            session.defaultSession
+                .loadExtension(aboluteExtensionPath)
+                .then(({ id }) => {
+                    console.log(`extension loaded: ${id}`)
+                })
+        }
+    }
+
     function switchClipboardWatcher() {
         logDebug(
             'Switch clipboard watcher: ' +
@@ -1841,7 +1857,8 @@ async function createWindow() {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
                     onTextChange: (text) => {
-                        let regExp = /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
+                        let regExp =
+                            /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
                         let match = text.match(regExp)
                         if (match) {
                             let videoUrl = match[0]
@@ -1885,7 +1902,8 @@ async function createWindow() {
         if (videoUrl.includes('music.youtube'))
             await view.webContents.loadURL(videoUrl)
         else {
-            let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
+            let regExpYoutube =
+                /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)
             await view.webContents.loadURL(
                 'https://music.youtube.com/watch?v=' + match[4]
@@ -1974,6 +1992,8 @@ else {
                 settingsProvider.set('miniplayer-position', visiblePosition)
             })
             .catch(() => {})
+
+        loadCustomExtensions()
 
         await createWindow()
 
@@ -2081,6 +2101,16 @@ function createCustomCSSDir() {
 
     if (!fileSystem.checkIfExists(dirCustomTheme))
         fileSystem.createDir(dirCustomTheme, { recursive: true })
+}
+
+function createCustomExtensionsDir() {
+    const dirCustomExtensions = path.join(
+        fileSystem.getAppDataPath(app),
+        '/custom/extensions'
+    )
+
+    if (!fileSystem.checkIfExists(dirCustomExtensions))
+        fileSystem.createDir(dirCustomExtensions, { recursive: true })
 }
 
 function createCustomCSSPageFile() {
