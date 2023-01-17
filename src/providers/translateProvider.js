@@ -26,7 +26,7 @@ var updateLocaleFile = function (locale, cb, force = false) {
     // for developer, skip auto update to prevent data loss
     if (!isRenderer && isDev() && !force) {
         console.log('[!]Skip i18n auto-update in development mode')
-        // updateLocaleFile(locale, cb, true)
+        updateLocaleFile(locale, cb, true)
         console.log(
             '[!]You may force update i18n by uncomment previous line in `src/providers/translateProvider`'
         )

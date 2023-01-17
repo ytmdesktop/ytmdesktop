@@ -4,6 +4,45 @@ function create() {
     // for create window
 }
 
+// lifted code from: https://dev.to/craftzdog/how-to-check-if-a-browser-window-is-inside-of-screens-on-electron-1eme
+function getMiniplayerWindowBounds(windowPosition, windowSize) {
+    return new Promise((resolve, reject) => {
+        try {
+            const displays = screen.getAllDisplays()
+            const isWithinDisplayBounds = displays.reduce((result, display) => {
+                const area = display.workArea
+                return (
+                    result ||
+                    (windowPosition.x >= area.x &&
+                        windowPosition.y >= area.y &&
+                        windowPosition.x < area.x + area.width &&
+                        windowPosition.y < area.y + area.height)
+                )
+            }, false)
+
+            if (!isWithinDisplayBounds) {
+                const primaryScreenBounds = screen.getPrimaryDisplay().bounds
+                const x = Math.floor(
+                    (primaryScreenBounds.width - windowSize.width) / 2
+                )
+                const y = Math.floor(
+                    (primaryScreenBounds.height - windowSize.height) / 2
+                )
+
+                resolve({
+                    x: x,
+                    y: y,
+                })
+            }
+
+            reject(null)
+        } catch (err) {
+            console.log('error -> getMiniplayerWindowBounds', err)
+            reject(false)
+        }
+    })
+}
+
 function checkWindowPosition(windowPosition, windowSize) {
     return new Promise((resolve, reject) => {
         try {
@@ -83,4 +122,5 @@ module.exports = {
     create: create,
     checkWindowPosition: checkWindowPosition,
     doBehavior: doBehavior,
+    getMiniplayerWindowBounds: getMiniplayerWindowBounds,
 }

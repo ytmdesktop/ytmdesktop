@@ -24,7 +24,11 @@ const os = require('os')
 
 const { calcYTViewSize } = require('./src/utils/calcYTViewSize')
 const { isWindows, isMac, isLinux } = require('./src/utils/systemInfo')
-const { checkWindowPosition, doBehavior } = require('./src/utils/window')
+const {
+    checkWindowPosition,
+    doBehavior,
+    getMiniplayerWindowBounds,
+} = require('./src/utils/window')
 const fileSystem = require('./src/utils/fileSystem')
 const Vibrant = require('node-vibrant')
 
@@ -768,6 +772,30 @@ async function createWindow() {
         app.exit(0)
     })
 
+    ipcMain.on('reset-miniplayer-position', () => {
+        if (settings) {
+            let miniplayerConfig = {
+                width: settingsProvider.get('settings-miniplayer-size'),
+                height: settingsProvider.get('settings-miniplayer-size'),
+            }
+            // Need to get center screen position
+            const display = screen.getPrimaryDisplay()
+            const position = [
+                Math.floor(
+                    display.workArea.width / 2 - miniplayerConfig.width / 2
+                ),
+                Math.floor(
+                    display.workArea.height / 2 - miniplayerConfig.height / 2
+                ),
+            ]
+
+            settingsProvider.set('miniplayer-position', {
+                x: position[0],
+                y: position[1],
+            })
+        }
+    })
+
     ipcMain.on('window-button-action-minimize', () => {
         BrowserWindow.getFocusedWindow().minimize()
     })
@@ -1253,7 +1281,7 @@ async function createWindow() {
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                resizable: false,
+                resizable: true,
                 width: 900,
                 minWidth: 900,
                 height: 550,
@@ -1969,15 +1997,22 @@ else {
             })
             .catch(() => {})
 
-        checkWindowPosition(settingsProvider.get('miniplayer-position'), {
-            width: settingsProvider.get('settings-miniplayer-size'),
-            height: settingsProvider.get('settings-miniplayer-size'),
+        getMiniplayerWindowBounds(
+            settingsProvider.get('miniplayer-position'),
+            settingsProvider.get('settings-miniplayer-size')
+        ).then((position) => {
+            if (position) {
+                console.log(
+                    'new minplayer position: ' + JSON.stringify(position)
+                )
+                settingsProvider.set('miniplayer-position', [
+                    position.x,
+                    position.y,
+                ])
+            } else {
+                console.error("can't set miniplayer position")
+            }
         })
-            .then((visiblePosition) => {
-                console.log(visiblePosition)
-                settingsProvider.set('miniplayer-position', visiblePosition)
-            })
-            .catch(() => {})
 
         await createWindow()
 

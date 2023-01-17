@@ -9,6 +9,9 @@ const fs = require('fs')
 )*/
 const elementRangeZoom = document.getElementById('range-zoom')
 const elementBtnAppRelaunch = document.getElementById('btn-relaunch')
+const elementBtnResetMiniplayerPosition = document.getElementById(
+    'reset-miniplayer-position'
+)
 const elementBtnOpenPageEditor = document.getElementById(
     'btn-editor-custom-css-page'
 )
@@ -271,6 +274,11 @@ if (elementBtnOpenGeniusAuthServer)
 if (elementBtnAppRelaunch)
     elementBtnAppRelaunch.addEventListener('click', () => {
         relaunch()
+    })
+
+if (elementBtnResetMiniplayerPosition)
+    elementBtnResetMiniplayerPosition.addEventListener('click', () => {
+        ipcRenderer.send('reset-miniplayer-position')
     })
 
 if (!isMac()) {
