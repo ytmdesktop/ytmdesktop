@@ -18,8 +18,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
-      - run: yarn --frozen-lockfile
+          node-version: 18
+      - run: yarn
       - run: node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2
         with:
