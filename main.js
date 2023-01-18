@@ -778,7 +778,7 @@ async function createWindow() {
                 width: settingsProvider.get('settings-miniplayer-size'),
                 height: settingsProvider.get('settings-miniplayer-size'),
             }
-            // Need to get center screen position
+            // Need to get center screen position and center miniplayer
             const display = screen.getPrimaryDisplay()
             const position = [
                 Math.floor(
