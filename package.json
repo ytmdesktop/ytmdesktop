@@ -7,7 +7,7 @@
         "start": "electron .",
         "dev": "NODE_ENV=development nodemon --exec yarn start --dev --inspect",
         "rebuild": "electron-rebuild -f",
-        "postinstall": "DEBUG=electron-rebuild; npx electron-builder install-app-deps",
+        "postinstall": "npx electron-builder install-app-deps",
         "build:win": "npx electron-builder --win --config electron-builder-deploy64.yml",
         "build:debug": "DEBUG=electron-rebuild; npx electron-builder --win --config electron-builder-deploy64.yml",
         "build:mac": "command -v git > /dev/null 2>&1 && sed -e  \"s/DEVELOPMENT_BUILD/`git rev-parse HEAD | cut -c1-8`/g\" commit_hash.js.tpl >commit_hash.js; npx electron-builder --mac --config electron-builder-deploy64.yml",
@@ -74,7 +74,7 @@
         "bufferutil": "^4.0.1",
         "mpris-service": "^2.1.0",
         "utf-8-validate": "^5.0.2",
-        "win-node-env": "^0.4.0",
+        "win-node-env": "^0.6.1",
         "windows.media.playback": "git+https://github.com/NovusTheory/nodert-windows.media.playback.git"
     }
 }
