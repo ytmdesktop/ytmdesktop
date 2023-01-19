@@ -62,7 +62,7 @@
         "node-vibrant": "^3.1.6",
         "postscribe": "^2.0.8",
         "qrcode-generator": "^1.4.4",
-        "scribble": "0.0.5",
+        "scribble": "^0.0.5",
         "socket.io": "^2.3.0",
         "uuid": "^8.3.2",
         "ws": "^7.4.2"
