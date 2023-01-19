@@ -60,6 +60,10 @@ function update_audio_devices_callback(devices) {
             audioOutputSelect.appendChild(option)
         })
 
+        initElement('settings-app-audio-output', 'change', () => {
+            ipcRenderer.send('change-audio-output', audioOutputSelect.value)
+        })
+
         const defaultOuput = devices.find(
             (audio) => audio.deviceId === 'default'
         )
