@@ -59,8 +59,8 @@ __metadata:
   linkType: hard
 
 "@electron/asar@npm:^3.2.1":
-  version: 3.2.2
-  resolution: "@electron/asar@npm:3.2.2"
+  version: 3.2.3
+  resolution: "@electron/asar@npm:3.2.3"
   dependencies:
     "@types/glob": ^7.1.1
     chromium-pickle-js: ^0.2.0
@@ -72,7 +72,7 @@ __metadata:
       optional: true
   bin:
     asar: bin/asar.js
-  checksum: 38a3b4a47180f2033a599421175f03706941ba05a32591a639127f6374e0007c6a7c8bde550129de394f4072a0bf39c24aea202540fe1faba6d74b4181c007a8
+  checksum: 67ce7170fc4fc1d4157c03e4d2a03cba461835f77df449d659a71eaf69a412a765bf27198935d8d4ce6c9070bb563dd9fe2a2618863830c0ec2708e53d48dc5c
   languageName: node
   linkType: hard
 
@@ -573,11 +573,11 @@ __metadata:
   linkType: hard
 
 "@types/yargs@npm:^17.0.16":
-  version: 17.0.19
-  resolution: "@types/yargs@npm:17.0.19"
+  version: 17.0.20
+  resolution: "@types/yargs@npm:17.0.20"
   dependencies:
     "@types/yargs-parser": "*"
-  checksum: 89a664ba6cef795a5b14a1b2cdc0e2a943cd654e61cc4286b6a704b944051bc30b0d7fec249dd2685cb6cfd17fdf0750d60ec69859aa5a5911c48a288284e842
+  checksum: dc2edbb0e4b6bfe5189b86c057bb6991139af02372b1d3591083e4ce8f9605b19d598e56413e30f41453733f7a048f732f899cb637f3938f90ed3eb13f23cc90
   languageName: node
   linkType: hard
 
@@ -2352,15 +2352,15 @@ __metadata:
   linkType: hard
 
 "glob@npm:^8.0.1":
-  version: 8.0.3
-  resolution: "glob@npm:8.0.3"
+  version: 8.1.0
+  resolution: "glob@npm:8.1.0"
   dependencies:
     fs.realpath: ^1.0.0
     inflight: ^1.0.4
     inherits: 2
     minimatch: ^5.0.1
     once: ^1.3.0
-  checksum: 50bcdea19d8e79d8de5f460b1939ffc2b3299eac28deb502093fdca22a78efebc03e66bf54f0abc3d3d07d8134d19a32850288b7440d77e072aa55f9d33b18c5
+  checksum: 92fbea3221a7d12075f26f0227abac435de868dd0736a17170663783296d0dd8d3d532a5672b4488a439bf5d7fb85cdd07c11185d6cd39184f0385cbdfb86a47
   languageName: node
   linkType: hard
 
@@ -3354,11 +3354,11 @@ __metadata:
   linkType: hard
 
 "minimatch@npm:^5.0.1, minimatch@npm:^5.1.1":
-  version: 5.1.2
-  resolution: "minimatch@npm:5.1.2"
+  version: 5.1.6
+  resolution: "minimatch@npm:5.1.6"
   dependencies:
     brace-expansion: ^2.0.1
-  checksum: 32ffda25b9fb8270a1c1beafdb7489dc0e411af553495136509a945691f63c9b6b000eeeaaf8bffe3efa609c1d6d3bc0f5a106f6c3443b5c05da649100ded964
+  checksum: 7564208ef81d7065a370f788d337cd80a689e981042cb9a1d0e6580b6c6a8c9279eba80010516e258835a988363f99f54a6f711a315089b8b42694f5da9d0d77
   languageName: node
   linkType: hard
 
@@ -4082,11 +4082,11 @@ __metadata:
   linkType: hard
 
 "prettier@npm:^2.2.1":
-  version: 2.8.2
-  resolution: "prettier@npm:2.8.2"
+  version: 2.8.3
+  resolution: "prettier@npm:2.8.3"
   bin:
     prettier: bin-prettier.js
-  checksum: 740c56c2128d587d656ea1dde9bc9c3503dfc94db4f3ac387259215eeb2e216680bdad9d18a0c9feecc6b42cfa188d6fa777df4c36c1d00cedd4199074fbfbd2
+  checksum: 92f2ceb522d454370e02082aa74ad27388672f7cee8975028b59517c069fe643bdc73e322675c8faf2ff173d7a626d1a6389f26b474000308e793aa25fff46e5
   languageName: node
   linkType: hard
 
@@ -4352,10 +4352,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scribble@npm:0.0.5":
+"scribble@npm:^0.0.5":
   version: 0.0.5
-  resolution: "scribble@https://github.com/dittodhole/node-scribble-js.git#commit=a2b37f585c5382863319115db36201399477ed43"
-  checksum: 6f1b3b12d72fba4b83d3daef9170f25027c4ae854e5656e2c70e9cec7d1cad93217a427b788c6b9f08cec09a2d4ffbacee016e44e16b3030d7c995208d024fee
+  resolution: "scribble@npm:0.0.5"
+  checksum: e5300c25979f5b887b4298622174c8750faf6c5607962b8cea4ac052fc923bcc06eec0ee640ab592c3655681412d4dcec64f7f866f49088abf9336432f699ec1
   languageName: node
   linkType: hard
 
@@ -4992,13 +4992,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"win-node-env@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "win-node-env@npm:0.4.0"
+"win-node-env@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "win-node-env@npm:0.6.1"
   bin:
     CHAI_JEST_SNAPSHOT_UPDATE_ALL: bin/CHAI_JEST_SNAPSHOT_UPDATE_ALL.js
     DEBUG: bin/DEBUG.js
     ENV: bin/ENV.js
+    NODE_DEBUG: bin/NODE_DEBUG.js
     NODE_ENV: bin/NODE_ENV.js
     NODE_OPTIONS: bin/NODE_OPTIONS.js
     PORT: bin/PORT.js
@@ -5008,7 +5009,7 @@ __metadata:
 
 "windows.media.playback@git+https://github.com/NovusTheory/nodert-windows.media.playback.git":
   version: 0.1.0
-  resolution: "windows.media.playback@https://github.com/NovusTheory/nodert-windows.media.playback.git#commit=855edf625b2762caa89dc7aab0b686d535b79f34"
+  resolution: "windows.media.playback@https://git@github.com/NovusTheory/nodert-windows.media.playback.git#commit=855edf625b2762caa89dc7aab0b686d535b79f34"
   dependencies:
     nan: latest
   checksum: 27236d5609d33e924fe0fe417345057e7423ccd60fb45b1ed52f134be1fac62bf379bf73ce9da7eb2e0c77630ab32950eaced121b04b713b1cfa5d45fb31dbb6
@@ -5225,11 +5226,11 @@ __metadata:
     prettier: ^2.2.1
     pretty-quick: ^2.0.2
     qrcode-generator: ^1.4.4
-    scribble: 0.0.5
+    scribble: ^0.0.5
     socket.io: ^2.3.0
     utf-8-validate: ^5.0.2
     uuid: ^8.3.2
-    win-node-env: ^0.4.0
+    win-node-env: ^0.6.1
     windows.media.playback: "git+https://github.com/NovusTheory/nodert-windows.media.playback.git"
     ws: ^7.4.2
   dependenciesMeta:

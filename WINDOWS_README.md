@@ -3,7 +3,7 @@ In order to install latest node-gyp run:
 npm install -g node-gyp
 ```
 
-Installation (what shoudl get Windows to build):
+Installation (what should get Windows to build):
 =============
 In order to install this module, run npm install:
 
@@ -29,4 +29,7 @@ Look for the value defined in the XML for the `WindowsTargetPlatformVersion`.  U
 
 1. Get the `Windows.winmd` file from `C:\Program Files (x86)\Windows Kits\10\UnionMetadata\<Windows Version from bindings>\` to `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\store\references` (verify this destination directory in the .vcxproj file)
 
-2. Copy the `platform.winmd` file from `C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Tools\MSVC\14.16.27023\lib\x86\store\references` to `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\store\references` (verify this destination directory in the .vcxproj file)
+  a. Use the command `mkdir "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\store\references"` to make the directory.
+  b. Also copy the `Windows.winmd` file to the above directory path.
+
+2. Copy the `platform.winmd` file from `C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Tools\MSVC\14.16.27023\lib\x86\store\references` to `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\store\references` (verify this destination directory in the .vcxproj file - this is the path that should have been created earlier)

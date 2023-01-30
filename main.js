@@ -1,5 +1,8 @@
 require('./src/utils/defaultSettings')
-require('@electron/remote/main').initialize()
+
+const remote = require('@electron/remote/main')
+
+remote.initialize()
 
 const {
     app,
@@ -285,6 +288,8 @@ async function createWindow() {
             callback({ requestHeaders: newRequestHeaders })
         }
     )
+
+    remote.enable(mainWindow.webContents)
 
     view = new BrowserView({
         webPreferences: {
