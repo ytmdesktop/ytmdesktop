@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 12
       - run: yarn --frozen-lockfile
-      - run: npm cache clean –force && node ./script/build-current-platform.js
+      - run: npm cache clean -–force && node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2
         with:
           name: dist-${{ matrix.os }}
