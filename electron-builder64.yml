@@ -58,6 +58,6 @@ linux:
     url: 'https://dl.ytmdesktop.app/lin'
     channel: latest
   target:
-  - target: "AppImage"
-  - target: "deb"
-  - target: "rpm"
+    - target: "AppImage"
+    - target: "deb"
+    - target: "rpm"
