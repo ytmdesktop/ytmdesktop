@@ -11,11 +11,10 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-2022]
+        os: [macos-latest, ubuntu-latest, windows-2019]
 
     steps:
       - uses: actions/checkout@v2
-      - uses: ilammy/msvc-dev-cmd@v1
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
