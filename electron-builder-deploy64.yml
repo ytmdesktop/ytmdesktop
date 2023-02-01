@@ -45,6 +45,10 @@ mac:
 linux:
   icon: src/assets/favicon.png
   category: AudioVideo
+    target:
+    - target: "AppImage"
+    - target: "deb"
+    - target: "rpm"
 
 snap:
   slots: 
