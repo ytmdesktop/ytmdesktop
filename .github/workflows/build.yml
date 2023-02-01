@@ -22,17 +22,6 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2
-        with
-          name: dist-merged
-          path: |
-            dist/*.dmg
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.blockmap
-            dist/*.yml
-            dist/*.deb
-            dist/*.rpm
-      - uses: actions/upload-artifact@v2
         with:
           name: dist-${{ matrix.os }}
           path: |
