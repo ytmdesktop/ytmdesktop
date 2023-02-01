@@ -19,8 +19,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: yarn --frozen-lockfile
-      - run: npm cache clean -–force && node ./script/build-current-platform.js
+      - run: yarn install --frozen-lockfile
+      - run: node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2
         with:
           name: dist-${{ matrix.os }}
