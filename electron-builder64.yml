@@ -61,6 +61,4 @@ linux:
     - target: "AppImage"
     - target: "deb"
     - target: "rpm"
-  fpm: [
-        "--rpm-rpmbuild-define '_build_id_links none'"
-      ],
+  fpm: ["--rpm-rpmbuild-define '_build_id_links none'"]
