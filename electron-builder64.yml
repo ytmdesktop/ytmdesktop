@@ -57,3 +57,7 @@ linux:
     provider: generic
     url: 'https://dl.ytmdesktop.app/lin'
     channel: latest
+  target:
+  - target: "AppImage"
+  - target: "deb"
+  - target: "rpm"
