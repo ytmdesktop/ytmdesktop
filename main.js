@@ -1831,10 +1831,13 @@ async function createWindow() {
         )
 
         for (const extension of fileSystem.getDir(customExtensionsDir)) {
-            let aboluteExtensionPath = path.join(customExtensionsDir, extension)
-
             session.defaultSession
-                .loadExtension(aboluteExtensionPath)
+                .loadExtension(
+                    path.join(
+                        customExtensionsDir,
+                        extension
+                    )
+                )
                 .then(({ id }) => {
                     console.log(`extension loaded: ${id}`)
                 })
