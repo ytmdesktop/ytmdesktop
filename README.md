@@ -1,4 +1,5 @@
 # YouTube Music Desktop App
+
 <img type="image/png" src="https://ytmdesktop.app/img/product/main_5.png" alt="window"/>
 
 [![Discord][discord-img]](discord-url)
@@ -8,30 +9,54 @@
 [![Download][download-img]][download-url]
 
 ##### Guide:
+
 1. [How to use](https://github.com/ytmdesktop/ytmdesktop/wiki/How-use)
 2. [FAQ](https://github.com/ytmdesktop/ytmdesktop/wiki/FAQ)
 
 # Available for
+
 <a href="https://repology.org/project/ytmdesktop/versions">
 	<img type="image/svg" align="right" src="https://repology.org/badge/vertical-allrepos/ytmdesktop.svg" alt="Packaging status"/>
 </a>
 
 #### Windows
-- Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
-- Chocolatey: ```choco install ytmdesktop```
-- Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
+
+-   Winget: `winget install "YouTube Music Desktop App"` or `winget install Ytmdesktop.Ytmdesktop`
+-   Chocolatey: `choco install ytmdesktop`
+-   Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Linux
-- Arch Linux (AUR): <https://aur.archlinux.org/packages/ytmdesktop-git>
-- Snap: <https://snapcraft.io/youtube-music-desktop-app>
-- Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
+
+-   Arch Linux (AUR): <https://aur.archlinux.org/packages/ytmdesktop-git>
+-   Snap: <https://snapcraft.io/youtube-music-desktop-app>
+-   Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Mac
-- Brew: ```brew install --cask ytmdesktop-youtube-music```
-- Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
-# Installing ytmdesktop
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+-   Brew: `brew install --cask ytmdesktop-youtube-music`
+-   Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
+
+# Contributing to ytmdesktop
+
+To clone and run this repository you'll need [Git](https://git-scm.com), [Node.js v14.0.0](https://nodejs.org/download/release/v14.0.0/) (which comes with [npm](http://npmjs.com)) and [Python 3.9.6](https://www.python.org/downloads/release/python-396/) installed on your computer.
+
+### Mac OS
+
+If you are on Mac, it's suggested to install python via brew:
+
+```sh
+brew install python@3.9
+```
+
+Then you must install Xcode via [App Store](https://apps.apple.com/it/app/xcode/id497799835?l=en&mt=12) and launch this command line to alias `python3` to `python`:
+
+```sh
+sudo ln -s /Library/Developer/CommandLineTools/usr/bin/python3 /Library/Developer/CommandLineTools/usr/bin/python
+```
+
+## All platforms
+
+From your command line:
 
 ```sh
 # Clone this repository
@@ -39,10 +64,30 @@ git clone https://github.com/ytmdesktop/ytmdesktop.git
 # Go into the directory
 cd ytmdesktop
 ```
-##### And:
+
+##### Be sure you are running the right node version:
+
+```sh
+node -v # v14.0.0
+```
+
+##### If not:
+
+```sh
+nvm install v14.0.0
+```
+
+##### Then each time you open a terminal in the root:
+
+```sh
+nvm use
+```
+
+### Bootstrapping the project
+
 ```sh
 # Install dependencies
-yarn install
+yarn
 # Run the app
 yarn start
 ```
@@ -50,9 +95,11 @@ yarn start
 **Note:** If you're using Linux Bash for Windows, [see this guide][more] or use `node` from the command prompt.
 
 ## To contribute for your own language
+
 Navigate to [ytmdesktop-locales](https://github.com/ytmdesktop/ytmdesktop-locales) and follow the instructions there.
 
 ## Contributors
+
 [<img alt="adlerluiz" src="https://github.com/adlerluiz.png?size=120" width="120px"/>](https://github.com/adlerluiz)
 [<img alt="mingjun97" src="https://github.com/mingjun97.png?size=120" width="120px"/>](https://github.com/mingjun97)
 [<img alt="kyjus25" src="https://github.com/kyjus25.png?size=120" width="120px"/>](https://github.com/kyjus25)
