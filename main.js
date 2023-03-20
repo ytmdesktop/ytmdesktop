@@ -66,6 +66,7 @@ let mainWindow,
     updateTrackInfoTimeout,
     activityLikeStatus,
     windowsMediaProvider,
+    macMediaProvider,
     audioDevices,
     settingsRendererIPC
 
@@ -156,6 +157,8 @@ if (isMac()) {
     )
     const menu = Menu.buildFromTemplate(statusBarMenu)
     Menu.setApplicationMenu(menu)
+
+    macMediaProvider = require('./src/providers/macMediaProvider')
 }
 
 if (settingsProvider.get('settings-disable-hardware-acceleration'))
@@ -416,6 +419,7 @@ async function createWindow() {
         if (isMac()) {
             global.sharedObj.paused = false
             updateStatusBar()
+            macMediaProvider.init(view)
         }
 
         if (infoPlayerInterval === undefined) {
@@ -472,6 +476,18 @@ async function createWindow() {
                         ? progress
                         : -1,
                     playerInfo.isPaused
+                )
+            }
+
+            if (isMac()) {
+                macMediaProvider.setPlaybackData(
+                    title,
+                    author,
+                    cover,
+                    album,
+                    seekbarCurrentPosition,
+                    duration,
+                    !playerInfo.isPaused
                 )
             }
 
