@@ -1,3 +1,5 @@
+# This is a desktop application which is my fav. Keep up the good development work!
+
 # YouTube Music Desktop App
 <img type="image/png" src="https://ytmdesktop.app/img/product/main_5.png" alt="window"/>
 
