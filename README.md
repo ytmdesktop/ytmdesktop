@@ -1,5 +1,7 @@
 # YouTube Music Desktop App
+## The team is working on a V2 version of YTM Desktop which is a complete re-write of the project. Please see [this issue](https://github.com/ytmdesktop/ytmdesktop/issues/1139) for more details
 <img type="image/png" src="https://ytmdesktop.app/img/product/main_5.png" alt="window"/>
+
 
 [![Discord][discord-img]](discord-url)
 [![Gitmoji][gitmoji-img]][gitmoji-url]
