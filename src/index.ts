@@ -43,7 +43,9 @@ const store = new ElectronStore<StoreSchema>({
       hideToTrayOnClose: false,
       showNotificationOnSongChange: false,
       startOnBoot: false,
-      startMinimized: false,
+      startMinimized: false
+    },
+    appearance: {
       alwaysShowVolumeSlider: false
     },
     playback: {

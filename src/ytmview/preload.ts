@@ -683,7 +683,7 @@ window.addEventListener('load', async () => {
         }
     }
 
-    const alwaysShowVolumeSlider = (await store.get('general')).alwaysShowVolumeSlider;
+    const alwaysShowVolumeSlider = (await store.get('appearance')).alwaysShowVolumeSlider;
     if (alwaysShowVolumeSlider) {
         document.querySelector("#volume-slider").classList.add("ytmd-persist-volume-slider");
     }
@@ -818,15 +818,15 @@ window.addEventListener('load', async () => {
     });
 
     store.onDidAnyChange((newState) => {
-        if (newState.general.alwaysShowVolumeSlider) {
+        if (newState.appearance.alwaysShowVolumeSlider) {
             const volumeSlider = document.querySelector("#volume-slider")
-            if (!volumeSlider.classList.contains("persist-volume-slider")) {
-                volumeSlider.classList.add("persist-volume-slider")
+            if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+                volumeSlider.classList.add("ytmd-persist-volume-slider")
             }
         } else {
             const volumeSlider = document.querySelector("#volume-slider")
-            if (volumeSlider.classList.contains("persist-volume-slider")) {
-                volumeSlider.classList.remove("persist-volume-slider")
+            if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+                volumeSlider.classList.remove("ytmd-persist-volume-slider")
             }
         }
     });

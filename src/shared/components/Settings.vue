@@ -9,6 +9,7 @@ const store = window.ytmd.store;
 const safeStorage = window.ytmd.safeStorage;
 
 const general: StoreSchema['general'] = await store.get('general');
+const appearance: StoreSchema['appearance'] = await store.get('appearance');
 const playback: StoreSchema['playback'] = await store.get('playback');
 const integrations: StoreSchema['integrations'] = await store.get('integrations');
 const shortcuts: StoreSchema['shortcuts'] = await store.get('shortcuts');
@@ -17,7 +18,7 @@ const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
 const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
-const alwaysShowVolumeSlider = ref<boolean>(general.alwaysShowVolumeSlider);
+const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
@@ -40,7 +41,7 @@ store.onDidAnyChange(async (newState, oldState) => {
     showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
     startOnBoot.value = newState.general.startOnBoot;
     startMinimized.value = newState.general.startMinimized;
-    alwaysShowVolumeSlider.value = newState.general.alwaysShowVolumeSlider;
+    alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
 
     continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
     continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
@@ -64,7 +65,8 @@ async function settingsChanged() {
     store.set('general.showNotificationOnSongChange', showNotificationOnSongChange.value);
     store.set('general.startOnBoot', startOnBoot.value);
     store.set('general.startMinimized', startMinimized.value);
-    store.set("general.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
+
+    store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
 
     store.set('playback.continueWhereYouLeftOff', continueWhereYouLeftOff.value);
     store.set('playback.continueWhereYouLeftOffPaused', continueWhereYouLeftOffPaused.value);

@@ -4,6 +4,8 @@ export type StoreSchema = {
         showNotificationOnSongChange: boolean,
         startOnBoot: boolean,
         startMinimized: boolean,
+    },
+    appearance: {
         alwaysShowVolumeSlider: boolean
     },
     playback: {
