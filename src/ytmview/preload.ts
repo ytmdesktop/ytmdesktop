@@ -667,12 +667,13 @@ window.addEventListener('load', async () => {
             if (continueWhereYouLeftOffPaused) {
                 webFrame.executeJavaScript(`
                     // The reason we wait for video data to appear before pausing instead of pausing immediately is because the YTM UI will have a missing play/pause button icon
-                    let listener = window.ytmdPlayerBar.playerApi_.addEventListener('onVideoDataChange', (event) => {
+                    let callback = (event) => {
                         if (event.type === 'dataloaded' && event.playertype === 1) {
                             window.ytmdPlayerBar.playerApi_.pauseVideo();
-                            window.ytmdPlayerBar.playerApi_.removeEventListener('onVideoDataChange', listener);
+                            window.ytmdPlayerBar.playerApi_.removeEventListener('onVideoDataChange', callback);
                         }
-                    });
+                    }
+                    window.ytmdPlayerBar.playerApi_.addEventListener('onVideoDataChange', callback);
                 `);
             }
         } else {
