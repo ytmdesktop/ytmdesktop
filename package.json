@@ -9,7 +9,11 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx,.vue .",
+    "lint:fix": "eslint --ext .ts,.tsx,.vue .",
+    "prettier": "prettier --check *.{ts,tsx,vue}",
+    "prettier:fix": "prettier --write *.{ts,tsx,vue}",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": {
@@ -32,9 +36,14 @@
     "css-loader": "^6.0.0",
     "electron": "22.0.0",
     "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.25.0",
+    "eslint-plugin-vue": "^9.15.1",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "node-loader": "^2.0.0",
+    "prettier": "^3.0.0",
     "style-loader": "^3.0.0",
     "ts-loader": "^9.2.2",
     "ts-node": "^10.0.0",
@@ -51,5 +60,16 @@
     "material-symbols": "^0.4.2",
     "socket.io": "^4.5.4",
     "vue": "^3.2.45"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,vue}": [
+      "prettier --write",
+      "eslint --cache --fix"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

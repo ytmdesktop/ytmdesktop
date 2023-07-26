@@ -26,10 +26,10 @@
  * ```
  */
 
-import 'material-symbols/outlined.css';
+import "material-symbols/outlined.css";
 
-import { createApp } from 'vue';
-import App from './Index.vue';
+import { createApp } from "vue";
+import App from "./Index.vue";
 
-const app = createApp(App)
+const app = createApp(App);
 app.mount("#app");
