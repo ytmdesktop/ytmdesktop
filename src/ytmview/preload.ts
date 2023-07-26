@@ -653,17 +653,6 @@ window.addEventListener('load', async () => {
     if (continueWhereYouLeftOff) {
         // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
         if (!state.lastUrl.startsWith("https://music.youtube.com/watch") && state.lastVideoId) {
-            document.dispatchEvent(new CustomEvent('yt-navigate', {
-                detail: {
-                    endpoint: {
-                        watchEndpoint: {
-                            videoId: state.lastVideoId,
-                            playlistId: state.lastPlaylistId
-                        }
-                    }
-                }
-            }));
-
             if (continueWhereYouLeftOffPaused) {
                 webFrame.executeJavaScript(`
                     // The reason we wait for video data to appear before pausing instead of pausing immediately is because the YTM UI will have a missing play/pause button icon
@@ -676,7 +665,25 @@ window.addEventListener('load', async () => {
                     window.ytmdPlayerBar.playerApi_.addEventListener('onVideoDataChange', callback);
                 `);
             }
+
+            document.dispatchEvent(new CustomEvent('yt-navigate', {
+                detail: {
+                    endpoint: {
+                        watchEndpoint: {
+                            videoId: state.lastVideoId,
+                            playlistId: state.lastPlaylistId
+                        }
+                    }
+                }
+            }));
         } else {
+            if (continueWhereYouLeftOffPaused) {
+                webFrame.executeJavaScript(`
+                    // This is different from the above because loading a watch page means all the video data is already available and would be playing
+                    window.ytmdPlayerBar.playerApi_.pauseVideo();
+                `);
+            }
+
             webFrame.executeJavaScript(`
                 window.ytmd.sendVideoData(window.ytmdPlayerBar.playerApi_.getPlayerResponse().videoDetails, window.ytmdPlayerBar.playerApi_.getPlaylistId());
             `);
