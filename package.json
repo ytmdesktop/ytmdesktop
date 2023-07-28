@@ -52,10 +52,11 @@
     "vue-template-compiler": "^2.7.14"
   },
   "dependencies": {
+    "@fastify/rate-limit": "^8.0.3",
     "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
-    "fastify": "^4.11.0",
+    "fastify": "^4.16.0",
     "fastify-socket.io": "^4.0.0",
     "material-symbols": "^0.4.2",
     "socket.io": "^4.5.4",

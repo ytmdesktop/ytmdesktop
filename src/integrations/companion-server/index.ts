@@ -5,14 +5,14 @@ import FastifyIO from "fastify-socket.io";
 import CompanionServerAPIv1 from "./api/v1";
 import { StoreSchema } from "../../shared/store/schema";
 import ElectronStore from "electron-store";
+import { BrowserView } from "electron";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
   private listenPort = 9863;
   private fastifyServer: FastifyInstance;
   private store: ElectronStore<StoreSchema>;
-
-  private eventEmitter = new EventEmitter();
+  private ytmView: BrowserView;
 
   constructor() {
     this.createServer();
@@ -26,7 +26,9 @@ export default class CompanionServer implements IIntegration {
     });
     this.fastifyServer.register(CompanionServerAPIv1, {
       prefix: "/api/v1",
-      remoteCommandEmitter: (command: string, ...args: any[]) => this.eventEmitter.emit("executeRemoteCommand", command, ...args),
+      getYtmView: () => {
+        return this.ytmView;
+      },
       getStore: () => {
         return this.store;
       }
@@ -38,16 +40,9 @@ export default class CompanionServer implements IIntegration {
     });
   }
 
-  public addEventListener(listener: (...args: any[]) => void) {
-    this.eventEmitter.addListener("executeRemoteCommand", listener);
-  }
-
-  public removeEventListener(listener: (...args: any[]) => void) {
-    this.eventEmitter.removeListener("executeRemoteCommand", listener);
-  }
-
-  public provide(store: ElectronStore<StoreSchema>): void {
+  public provide(store: ElectronStore<StoreSchema>, ytmView: BrowserView): void {
     this.store = store;
+    this.ytmView = ytmView;
   }
 
   public enable() {

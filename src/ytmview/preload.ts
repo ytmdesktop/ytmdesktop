@@ -9,7 +9,9 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: any, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
   sendAdState: (adRunning: boolean) => ipcRenderer.send("ytmView:adStateChanged", adRunning),
-  sendStoreUpdate: (queueState: any) => ipcRenderer.send("ytmView:storeStateChanged", queueState)
+  sendStoreUpdate: (queueState: any) => ipcRenderer.send("ytmView:storeStateChanged", queueState),
+  sendCreatePlaylistObservation: (playlist: any) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
+  sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
 
 function createStyleSheet() {
@@ -602,8 +604,34 @@ function hookPlayerApiEvents() {
             // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
             let state = window.ytmdPlayerBar.store.getState();
             window.ytmd.sendStoreUpdate(state.queue)
-        })
+        });
+        window.addEventListener('yt-action', e => {
+          if (e.detail.actionName === 'yt-service-request') {
+            if (e.detail.args[1].createPlaylistServiceEndpoint) {
+              let title = e.detail.args[2].create_playlist_title;
+              let returnValue = e.detail.returnValue;
+              returnValue[0].ajaxPromise.then(response => {
+                let id = response.data.playlistId
+                window.ytmd.sendCreatePlaylistObservation({
+                  title,
+                  id
+                });
+              })
+            }
+          } else if (e.detail.actionName === 'yt-handle-playlist-deletion-command') {
+            let playlistId = e.detail.args[0].handlePlaylistDeletionCommand.playlistId;
+            window.ytmd.sendDeletePlaylistObservation(playlistId);
+          }
+        });
     `);
+}
+
+function getYTMTextRun(runs: any[]) {
+  let final = "";
+  for (const run of runs) {
+    final += run.text;
+  }
+  return final;
 }
 
 window.addEventListener("load", async () => {
@@ -697,40 +725,40 @@ window.addEventListener("load", async () => {
     document.querySelector("#volume-slider").classList.add("ytmd-persist-volume-slider");
   }
 
-  ipcRenderer.on("remoteControl:execute", async (event, command, value) => {
+  ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
     switch (command) {
       case "playPause": {
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playing_ ? window.ytmdPlayerBar.playerApi_.pauseVideo() : window.ytmdPlayerBar.playerApi_.playVideo();
-                `);
+          window.ytmdPlayerBar.playing_ ? window.ytmdPlayerBar.playerApi_.pauseVideo() : window.ytmdPlayerBar.playerApi_.playVideo();
+        `);
         break;
       }
 
       case "play": {
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.playVideo();
-                `);
+          window.ytmdPlayerBar.playerApi_.playVideo();
+        `);
         break;
       }
 
       case "pause": {
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.pauseVideo();
-                `);
+          window.ytmdPlayerBar.playerApi_.pauseVideo();
+        `);
         break;
       }
 
       case "next": {
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.nextVideo();
-                `);
+          window.ytmdPlayerBar.playerApi_.nextVideo();
+        `);
         break;
       }
 
       case "previous": {
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.previousVideo();
-                `);
+          window.ytmdPlayerBar.playerApi_.previousVideo();
+        `);
         break;
       }
 
@@ -744,33 +772,33 @@ window.addEventListener("load", async () => {
 
       case "volumeUp": {
         const currentVolumeUp: number = await webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.getVolume();
-                `);
+          window.ytmdPlayerBar.playerApi_.getVolume();
+        `);
 
         let newVolumeUp = currentVolumeUp + 10;
         if (currentVolumeUp > 100) {
           newVolumeUp = 100;
         }
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.setVolume(${newVolumeUp});
-                    window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${newVolumeUp} });
-                `);
+          window.ytmdPlayerBar.playerApi_.setVolume(${newVolumeUp});
+          window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${newVolumeUp} });
+        `);
         break;
       }
 
       case "volumeDown": {
         const currentVolumeDown: number = await webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.getVolume();
-                `);
+          window.ytmdPlayerBar.playerApi_.getVolume();
+        `);
 
         let newVolumeDown = currentVolumeDown - 10;
         if (currentVolumeDown < 0) {
           newVolumeDown = 0;
         }
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.setVolume(${newVolumeDown});
-                    window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${newVolumeDown} });
-                `);
+          window.ytmdPlayerBar.playerApi_.setVolume(${newVolumeDown});
+          window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${newVolumeDown} });
+        `);
         break;
       }
 
@@ -782,24 +810,24 @@ window.addEventListener("load", async () => {
         }
 
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.setVolume(${valueInt});
-                    window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${valueInt} });
-                `);
+          window.ytmdPlayerBar.playerApi_.setVolume(${valueInt});
+          window.ytmdPlayerBar.store.dispatch({ type: 'SET_VOLUME', payload: ${valueInt} });
+        `);
         break;
       }
 
       case "mute":
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.mute();
-                    window.ytmdPlayerBar.store.dispatch({ type: 'SET_MUTED', payload: true });
-                `);
+          window.ytmdPlayerBar.playerApi_.mute();
+          window.ytmdPlayerBar.store.dispatch({ type: 'SET_MUTED', payload: true });
+        `);
         break;
 
       case "unmute":
         webFrame.executeJavaScript(`
-                    window.ytmdPlayerBar.playerApi_.unMute();
-                    window.ytmdPlayerBar.store.dispatch({ type: 'SET_MUTED', payload: false });
-                `);
+          window.ytmdPlayerBar.playerApi_.unMute();
+          window.ytmdPlayerBar.store.dispatch({ type: 'SET_MUTED', payload: false });
+        `);
         break;
 
       case "navigate": {
@@ -814,6 +842,48 @@ window.addEventListener("load", async () => {
         break;
       }
     }
+  });
+
+  ipcRenderer.on('ytmView:getPlaylists', async (_event, requestId) => {
+    const rawPlaylists = await webFrame.executeJavaScript(`
+      new Promise((resolve, reject) => {
+        var returnValue = []
+        var serviceRequestEvent = {
+            bubbles: true,
+            cancelable: false,
+            composed: true,
+            detail: {
+                actionName: 'yt-service-request',
+                args: [
+                    window.ytmdPlayerBar,
+                    {
+                        addToPlaylistEndpoint: {
+                            videoId: window.ytmdPlayerBar.playerApi_.getPlayerResponse().videoDetails.videoId
+                        }
+                    }
+                ],
+                optionalAction: false,
+                returnValue
+            }
+        };
+        window.ytmdPlayerBar.dispatchEvent(new CustomEvent('yt-action', serviceRequestEvent));
+        returnValue[0].ajaxPromise.then((response) => {
+          resolve(response.data.contents[0].addToPlaylistRenderer.playlists);
+        }, () => {
+          reject();
+        });
+      });
+    `);
+
+    const playlists = [];
+    for (const rawPlaylist of rawPlaylists) {
+      const playlist = rawPlaylist.playlistAddToOptionRenderer;
+      playlists.push({
+        id: playlist.playlistId,
+        title: getYTMTextRun(playlist.title.runs)
+      })
+    }
+    ipcRenderer.send(`ytmView:getPlaylists:response:${requestId}`, playlists);
   });
 
   store.onDidAnyChange(newState => {

@@ -72,8 +72,8 @@ export function createAuthToken(store: ElectronStore<StoreSchema>, appName: stri
   return token;
 }
 
-export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string) {
-  if (!authToken) return false;
+export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string): [boolean, string] {
+  if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
@@ -86,18 +86,20 @@ export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string
   }
 
   let validSession = false;
+  let id = null;
   for (const authSession of authTokens) {
     if (authSession.token == authTokenHash) {
+      id = authSession.id;
       validSession = true;
       break;
     }
   }
 
   if (validSession) {
-    return true;
+    return [true, id];
   }
 
-  return false;
+  return [false, null];
 }
 
 export function isAuthValidMiddleware(store: ElectronStore<StoreSchema>, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
@@ -110,9 +112,10 @@ export function isAuthValidMiddleware(store: ElectronStore<StoreSchema>, request
     return;
   }
 
-  const validSession = isAuthValid(store, authToken);
+  const [validSession, tokenId] = isAuthValid(store, authToken);
 
   if (validSession) {
+    request.authId = tokenId;
     next();
   } else {
     response.code(401);

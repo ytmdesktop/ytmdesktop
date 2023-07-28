@@ -103,7 +103,7 @@ store.onDidAnyChange((newState, oldState) => {
   }
 
   if (newState.integrations.companionServerEnabled) {
-    companionServer.provide(store);
+    companionServer.provide(store, ytmView);
     companionServer.enable();
   } else {
     companionServer.disable();
@@ -139,11 +139,11 @@ store.onDidAnyChange((newState, oldState) => {
 
 // Integrations setup
 // CompanionServer
-companionServer.addEventListener((command, value) => {
+/*companionServer.addEventListener((command, value) => {
   ytmView.webContents.send("remoteControl:execute", command, value);
-});
+});*/
 if (store.get("integrations").companionServerEnabled) {
-  companionServer.provide(store);
+  companionServer.provide(store, ytmView);
   companionServer.enable();
 }
 
@@ -474,6 +474,7 @@ const createMainWindow = (): void => {
       preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY
     }
   });
+  companionServer.provide(store, ytmView);
   // This block of code adding the browser view setting the bounds and removing it is a temporary fix for a bug in YTMs UI
   // where a small window size will lock the scrollbar and have difficulty unlocking it without changing the guide bar collapse state
   if (ytmView !== null && mainWindow !== null) {
