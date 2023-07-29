@@ -4,6 +4,7 @@ import KeybindInput from "../../shared/components/KeybindInput.vue";
 import { StoreSchema } from "../store/schema";
 
 const currentTab = ref(1);
+const requiresRestart = ref(false);
 
 const store = window.ytmd.store;
 const safeStorage = window.ytmd.safeStorage;
@@ -18,11 +19,14 @@ const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
 const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
+const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
+
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
+const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthWindowEnabled = ref<boolean>(
@@ -43,11 +47,14 @@ store.onDidAnyChange(async (newState, oldState) => {
   showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
   startOnBoot.value = newState.general.startOnBoot;
   startMinimized.value = newState.general.startMinimized;
+  disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
+
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
 
   continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
+  enableSpeakerFill.value = newState.playback.enableSpeakerFill;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
@@ -67,12 +74,14 @@ async function settingsChanged() {
   store.set("general.showNotificationOnSongChange", showNotificationOnSongChange.value);
   store.set("general.startOnBoot", startOnBoot.value);
   store.set("general.startMinimized", startMinimized.value);
+  store.set("general.disableHardwareAcceleration", disableHardwareAcceleration.value);
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
 
   store.set("playback.continueWhereYouLeftOff", continueWhereYouLeftOff.value);
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
+  store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString(companionServerAuthWindowEnabled.value.toString()));
@@ -87,8 +96,17 @@ async function settingsChanged() {
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
 }
 
+async function settingChangedRequiresRestart() {
+  requiresRestart.value = true;
+  settingsChanged();
+}
+
 function changeTab(newTab: number) {
   currentTab.value = newTab;
+}
+
+function restartApplication() {
+  window.ytmd.restartApplication();
 }
 </script>
 
@@ -100,6 +118,12 @@ function changeTab(newTab: number) {
       <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
       <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
       <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+
+      <li v-if="requiresRestart" @click="restartApplication" >
+        <span class="material-symbols-outlined">autorenew</span>
+        Restart app<br/>
+        to apply
+      </li>
     </ul>
     <div class="content">
       <div v-if="currentTab === 1" class="general-tab">
@@ -120,13 +144,19 @@ function changeTab(newTab: number) {
           <p>Start minimized</p>
           <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
         </div>-->
+        <div class="setting">
+          <p>Disable hardware acceleration <span class="reload-required material-symbols-outlined">autorenew</span></p>
+          <input v-model="disableHardwareAcceleration" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
+        </div>
       </div>
+
       <div v-if="currentTab === 2" class="appearance-tab">
         <div class="setting">
           <p>Always show volume slider</p>
           <input v-model="alwaysShowVolumeSlider" class="toggle" type="checkbox" @change="settingsChanged" />
         </div>
       </div>
+
       <div v-if="currentTab === 3" class="playback-tab">
         <div class="setting">
           <p>Continue where you left off</p>
@@ -140,7 +170,13 @@ function changeTab(newTab: number) {
           <p>Show track progress on taskbar</p>
           <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
         </div>
+        <!-- enableSpeakerFill -->
+        <div class="setting">
+          <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
+          <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
+        </div>       
       </div>
+
       <div v-if="currentTab === 4" class="integrations-tab">
         <div class="setting">
           <p>Companion server</p>
@@ -158,6 +194,7 @@ function changeTab(newTab: number) {
           <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
         </div>
       </div>
+
       <div v-if="currentTab === 5" class="shortcuts-tab">
         <div class="setting">
           <p>Play/Pause</p>
@@ -193,6 +230,10 @@ function changeTab(newTab: number) {
 </template>
 
 <style scoped>
+body, * {
+  user-select: none;
+}
+
 .content-container {
   height: 100%;
   display: flex;
@@ -305,5 +346,9 @@ function changeTab(newTab: number) {
 
 .toggle:checked:before {
   left: 32px;
+}
+
+.reload-required {
+  vertical-align: middle;
 }
 </style>

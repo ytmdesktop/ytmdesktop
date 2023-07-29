@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld("ytmd", {
     decryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:decryptString", value),
     encryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:encryptString", value)
   },
+  restartApplication: () => ipcRenderer.send("settingsWindow:restartapplication"),
   minimizeWindow: () => ipcRenderer.send("settingsWindow:minimize"),
   maximizeWindow: () => ipcRenderer.send("settingsWindow:maximize"),
   restoreWindow: () => ipcRenderer.send("settingsWindow:restore"),

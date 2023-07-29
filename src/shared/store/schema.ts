@@ -4,6 +4,7 @@ export type StoreSchema = {
     showNotificationOnSongChange: boolean;
     startOnBoot: boolean;
     startMinimized: boolean;
+    disableHardwareAcceleration: boolean;
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
@@ -12,6 +13,7 @@ export type StoreSchema = {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
     progressInTaskbar: boolean;
+    enableSpeakerFill: boolean;
   };
   integrations: {
     companionServerEnabled: boolean;

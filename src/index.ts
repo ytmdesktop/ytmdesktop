@@ -35,6 +35,22 @@ let lastPlaylistId = "";
 
 let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
 
+// Single Instances Lock
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (mainWindow) {
+      mainWindow.show();
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+      mainWindow.focus();
+    }
+  });
+}
+
 // Create the persistent config store
 const store = new ElectronStore<StoreSchema>({
   watch: true,
@@ -43,15 +59,17 @@ const store = new ElectronStore<StoreSchema>({
       hideToTrayOnClose: false,
       showNotificationOnSongChange: false,
       startOnBoot: false,
-      startMinimized: false
+      startMinimized: false,
+      disableHardwareAcceleration: false
     },
     appearance: {
-      alwaysShowVolumeSlider: false
+      alwaysShowVolumeSlider: false,
     },
     playback: {
       continueWhereYouLeftOff: true,
       continueWhereYouLeftOffPaused: true,
-      progressInTaskbar: false
+      progressInTaskbar: false,
+      enableSpeakerFill: false
     },
     integrations: {
       companionServerEnabled: false,
@@ -136,6 +154,14 @@ store.onDidAnyChange((newState, oldState) => {
 
   registerShortcuts();
 });
+
+if (store.get('general').disableHardwareAcceleration) {
+  app.disableHardwareAcceleration();
+}
+
+if (store.get('playback').enableSpeakerFill) {
+  app.commandLine.appendSwitch('try-supported-channel-layouts');
+}
 
 // Integrations setup
 // CompanionServer
@@ -632,6 +658,11 @@ app.on("ready", () => {
     if (settingsWindow !== null) {
       settingsWindow.close();
     }
+  });
+
+  ipcMain.on('settingsWindow:restartapplication', () => {
+    app.relaunch();
+    app.exit(0);
   });
 
   // Handle ytm view ipc

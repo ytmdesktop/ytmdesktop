@@ -11,6 +11,7 @@ declare global {
         encryptString(value: string): Buffer;
       };
       openSettingsWindow(): void;
+      restartApplication(): void;
 
       // Companion Authorization specific
       sendResult(authorized: boolean);
