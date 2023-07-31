@@ -6,6 +6,7 @@ import playerStateStore from "../../../../player-state-store";
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../shared/auth";
 import fastifyRateLimit from '@fastify/rate-limit';
 import crypto from 'crypto';
+import createError from "@fastify/error";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -20,6 +21,14 @@ const mapThumbnails = (thumbnail: any) => {
   };
 };
 
+function getYTMTextRun(runs: any[]) {
+  let final = "";
+  for (const run of runs) {
+    final += run.text;
+  }
+  return final;
+}
+
 const mapQueueItems = (item: any) => {
   let playlistPanelVideoRenderer;
   if (item.playlistPanelVideoRenderer) playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
@@ -31,13 +40,15 @@ const mapQueueItems = (item: any) => {
 
   return {
     thubmnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapThumbnails),
-    title: playlistPanelVideoRenderer.title.runs[0].text,
-    author: playlistPanelVideoRenderer.shortBylineText.runs[0].text,
-    duration: playlistPanelVideoRenderer.lengthText.runs[0].text
+    title: getYTMTextRun(playlistPanelVideoRenderer.title.runs),
+    author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText.runs),
+    duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText.runs),
+    selected: playlistPanelVideoRenderer.selected
   };
 };
 
 const transformPlayerState = (state: any) => {
+  const queueItems = state.queue ? state.queue.items.map(mapQueueItems) : null;
   return {
     player: {
       trackState: state.trackState,
@@ -46,15 +57,17 @@ const transformPlayerState = (state: any) => {
         ? {
             autoplay: state.queue.autoplay,
             shuffleEnabled: state.queue.shuffleEnabled,
-            items: state.queue.items.map(mapQueueItems),
+            items: queueItems,
+            // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
             automixItems: state.queue.automixItems.map(mapQueueItems),
             isGenerating: state.queue.isGenerating,
+            // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
             isInfinite: state.queue.isInfinite,
             repeatMode: state.queue.repeatMode,
-            // Developer note:
-            //  selectedItemIndex can be 0 when the current video is not 0 in the queue.
-            //  YouTube Music usually only does this on first navigations if going directly to a video + playlist (possibly within new queues as well on a playlist)
-            selectedItemIndex: state.queue.selectedItemIndex
+            // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
+            selectedItemIndex: queueItems.findIndex((item: any) => {
+              return item.selected
+            })
           }
         : null
     },
@@ -77,10 +90,13 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
   getYtmView: () => BrowserView;
 }
 
-type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "mute" | "unmute" | "next" | "previous";
+const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
+const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' is invalid", 400);
+
+type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options, next) => {
-  const sendCommand = (command: RemoteCommand) => {
+  const sendCommand = (command: RemoteCommand, value: any) => {
     const ytmView = options.getYtmView();
     if (ytmView) {
       switch (command) {
@@ -109,6 +125,17 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           break;
         }
 
+        case "setVolume": {
+          const valueInt: number = parseInt(value);
+          // Check if Volume is a number and between 0 and 100
+          if (isNaN(valueInt) || valueInt < 0 || valueInt > 100) {
+            throw new Error("Invalid volume");
+          }
+
+          ytmView.webContents.send("remoteControl:execute", "setVolume", valueInt);
+          break;
+        }
+
         case "mute": {
           ytmView.webContents.send("remoteControl:execute", "mute");
           break;
@@ -127,6 +154,31 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         case "previous": {
           ytmView.webContents.send("remoteControl:execute", "previous");
           break;
+        }
+
+        case "repeatMode": {
+          switch (value) {
+            case "NONE": {
+              ytmView.webContents.send("remoteControl:execute", "repeatMode", "NONE");
+              break;
+            }
+            case "ALL": {
+              ytmView.webContents.send("remoteControl:execute", "repeatMode", "ALL");
+              break;
+            }
+            case "ONE": {
+              ytmView.webContents.send("remoteControl:execute", "repeatMode", "ONE");
+              break;
+            }
+            default: {
+              throw new InvalidRepeatModeError(value);
+            }
+          }
+          break;
+        }
+
+        default: {
+          throw new InvalidCommandError(command);
         }
       }
     }
@@ -341,11 +393,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.post<{ Body: { command: RemoteCommand } }>(
+  fastify.post<{ Body: { command: RemoteCommand, data: any } }>(
     "/command",
     {
       config: {
-        // API users: You may also use the websocket to perform remote command options
         rateLimit: {
           hook: 'preHandler',
           max: 2,
@@ -360,7 +411,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     (request, response) => {
-      sendCommand(request.body.command);
+      sendCommand(request.body.command, request.body.data);
       response.code(204).send();
     }
   );

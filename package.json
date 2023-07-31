@@ -52,6 +52,7 @@
     "vue-template-compiler": "^2.7.14"
   },
   "dependencies": {
+    "@fastify/error": "^3.3.0",
     "@fastify/rate-limit": "^8.0.3",
     "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0",
