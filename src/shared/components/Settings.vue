@@ -48,7 +48,7 @@ const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 
-store.onDidAnyChange(async (newState) => {
+store.onDidAnyChange(async newState => {
   hideToTrayOnClose.value = newState.general.hideToTrayOnClose;
   showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
   startOnBoot.value = newState.general.startOnBoot;
@@ -117,106 +117,105 @@ function restartApplication() {
 </script>
 
 <template>
-  <div class="content-container">
-    <ul class="sidebar">
-      <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
-      <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
-      <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
-      <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
-      <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
-      <span class="push"></span>
-      <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
-
-      <li v-if="requiresRestart" @click="restartApplication" >
-        <span class="material-symbols-outlined">autorenew</span>
-        Restart app<br/>
-        to apply
-      </li>
-    </ul>
-    <div class="content">
-      <div v-if="currentTab === 1" class="general-tab">
-        <div class="setting">
-          <p>Hide to tray on close</p>
-          <input v-model="hideToTrayOnClose" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <!--<div class="setting">
+  <div class="settings-container">
+    <div v-if="requiresRestart" class="restart-banner">
+      <p class="message"><span class="material-symbols-outlined">autorenew</span> Restart app to apply changes</p>
+      <button class="restart-button" @click="restartApplication">Restart</button>
+    </div>
+    <div class="content-container">
+      <ul class="sidebar">
+        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
+        <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
+        <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
+        <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
+        <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <span class="push"></span>
+        <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
+      </ul>
+      <div class="content">
+        <div v-if="currentTab === 1" class="general-tab">
+          <div class="setting">
+            <p>Hide to tray on close</p>
+            <input v-model="hideToTrayOnClose" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <!--<div class="setting">
           <p>Show notification on song change</p>
           <input v-model="showNotificationOnSongChange" @change="settingsChanged" class="toggle"
               type="checkbox" />
         </div>-->
-        <div class="setting">
-          <p>Start on boot</p>
-          <input v-model="startOnBoot" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <!--<div class="setting">
+          <div class="setting">
+            <p>Start on boot</p>
+            <input v-model="startOnBoot" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <!--<div class="setting">
           <p>Start minimized</p>
           <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
         </div>-->
-        <div class="setting">
-          <p>Disable hardware acceleration <span class="reload-required material-symbols-outlined">autorenew</span></p>
-          <input v-model="disableHardwareAcceleration" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-        </div>
-      </div>
-
-      <div v-if="currentTab === 2" class="appearance-tab">
-        <div class="setting">
-          <p>Always show volume slider</p>
-          <input v-model="alwaysShowVolumeSlider" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-      </div>
-
-      <div v-if="currentTab === 3" class="playback-tab">
-        <div class="setting">
-          <p>Continue where you left off</p>
-          <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <div v-if="continueWhereYouLeftOff" class="setting indented">
-          <p>Pause on application launch</p>
-          <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <div class="setting">
-          <p>Show track progress on taskbar</p>
-          <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <!-- enableSpeakerFill -->
-        <div class="setting">
-          <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
-          <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-        </div>       
-      </div>
-
-      <div v-if="currentTab === 4" class="integrations-tab">
-        <div class="setting">
-          <p>Companion server</p>
-          <input v-model="companionServerEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <div v-if="companionServerEnabled" class="setting indented">
-          <div class="name-with-description">
-            <p class="name">Enable companion authorization</p>
-            <p class="description">Automatically disables after the first successful authorization or 5 minutes has passed</p>
+          <div class="setting">
+            <p>Disable hardware acceleration <span class="reload-required material-symbols-outlined">autorenew</span></p>
+            <input v-model="disableHardwareAcceleration" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
           </div>
-          <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
         </div>
-        <div class="setting">
-          <p>Discord rich presence</p>
-          <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-      </div>
 
-      <div v-if="currentTab === 5" class="shortcuts-tab">
-        <div class="setting">
-          <p>Play/Pause</p>
-          <KeybindInput v-model="shortcutPlayPause" @change="settingsChanged" />
+        <div v-if="currentTab === 2" class="appearance-tab">
+          <div class="setting">
+            <p>Always show volume slider</p>
+            <input v-model="alwaysShowVolumeSlider" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
         </div>
-        <div class="setting">
-          <p>Next</p>
-          <KeybindInput v-model="shortcutNext" @change="settingsChanged" />
+
+        <div v-if="currentTab === 3" class="playback-tab">
+          <div class="setting">
+            <p>Continue where you left off</p>
+            <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="continueWhereYouLeftOff" class="setting indented">
+            <p>Pause on application launch</p>
+            <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Show track progress on taskbar</p>
+            <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <!-- enableSpeakerFill -->
+          <div class="setting">
+            <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
+            <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
+          </div>
         </div>
-        <div class="setting">
-          <p>Previous</p>
-          <KeybindInput v-model="shortcutPrevious" @change="settingsChanged" />
+
+        <div v-if="currentTab === 4" class="integrations-tab">
+          <div class="setting">
+            <p>Companion server</p>
+            <input v-model="companionServerEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="companionServerEnabled" class="setting indented">
+            <div class="name-with-description">
+              <p class="name">Enable companion authorization</p>
+              <p class="description">Automatically disables after the first successful authorization or 5 minutes has passed</p>
+            </div>
+            <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Discord rich presence</p>
+            <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
         </div>
-        <!--<div class="setting">
+
+        <div v-if="currentTab === 5" class="shortcuts-tab">
+          <div class="setting">
+            <p>Play/Pause</p>
+            <KeybindInput v-model="shortcutPlayPause" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Next</p>
+            <KeybindInput v-model="shortcutNext" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Previous</p>
+            <KeybindInput v-model="shortcutPrevious" @change="settingsChanged" />
+          </div>
+          <!--<div class="setting">
                     <p>Thumbs Up</p>
                     <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
                 </div> 
@@ -224,25 +223,26 @@ function restartApplication() {
                     <p>Thumbs Down</p>
                     <KeybindInput v-model="shortcutThumbsDown" @change="settingsChanged" />
                 </div>-->
-        <div class="setting">
-          <p>Increase Volume</p>
-          <KeybindInput v-model="shortcutVolumeUp" @change="settingsChanged" />
+          <div class="setting">
+            <p>Increase Volume</p>
+            <KeybindInput v-model="shortcutVolumeUp" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Decrease Volume</p>
+            <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
+          </div>
         </div>
-        <div class="setting">
-          <p>Decrease Volume</p>
-          <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
-        </div>
-      </div>
 
-      <div v-if="currentTab === 99" class="about-tab">
-        <img class="icon" src="../../assets/icons/ytmd.png" />
-        <h2 class="app-name">YouTube Music Desktop Player</h2>
-        <p class="made-by">Made by YTMDesktop Team</p>
-        <p class="version">Version: {{ ytmdVersion }}</p>
-        <p class="branch">Branch: {{ ytmdBranch }}</p>
-        <div class="links">
-          <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
-          <a href="https://ytmdesktop.app" target="_blank">Website</a>
+        <div v-if="currentTab === 99" class="about-tab">
+          <img class="icon" src="../../assets/icons/ytmd.png" />
+          <h2 class="app-name">YouTube Music Desktop Player</h2>
+          <p class="made-by">Made by YTMDesktop Team</p>
+          <p class="version">Version: {{ ytmdVersion }}</p>
+          <p class="branch">Branch: {{ ytmdBranch }}</p>
+          <div class="links">
+            <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
+            <a href="https://ytmdesktop.app" target="_blank">Website</a>
+          </div>
         </div>
       </div>
     </div>
@@ -250,13 +250,20 @@ function restartApplication() {
 </template>
 
 <style scoped>
-body, * {
+body,
+* {
   user-select: none;
 }
 
-.content-container {
+.settings-container {
   height: calc(100% - 36px);
   display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  display: flex;
+  flex-grow: 1;
 }
 
 .content {
@@ -396,7 +403,8 @@ body, * {
   margin: 0;
 }
 
-.version,.branch {
+.version,
+.branch {
   margin: 4px 0;
   color: #bbbbbb;
 }
@@ -414,5 +422,30 @@ body, * {
 
 .links a {
   color: #bbbbbb;
+}
+
+.restart-banner {
+  background-color: #f44336;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.restart-banner .message {
+  display: flex;
+  align-items: center;
+}
+
+.restart-banner .message .material-symbols-outlined {
+  margin: 0 8px;
+}
+
+.restart-banner .restart-button {
+  margin: 0 8px;
+  background-color: transparent;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
 }
 </style>
