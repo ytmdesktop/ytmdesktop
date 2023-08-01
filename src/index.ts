@@ -14,8 +14,11 @@ declare const SETTINGS_WINDOW_WEBPACK_ENTRY: string;
 declare const SETTINGS_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const YTM_VIEW_PRELOAD_WEBPACK_ENTRY: string;
 
+let applicationQuitting = false;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
+  applicationQuitting = true;
   app.quit();
 }
 
@@ -38,6 +41,7 @@ let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
 // Single Instances Lock
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
+  applicationQuitting = true;
   app.quit();
 } else {
   app.on("second-instance", () => {
@@ -583,10 +587,11 @@ const createMainWindow = (): void => {
   mainWindow.on("unmaximize", sendMainWindowStateIpc);
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
-  mainWindow.on("close", () => {
-    store.set("state.lastUrl", lastUrl);
-    store.set("state.lastVideoId", lastVideoId);
-    store.set("state.lastPlaylistId", lastPlaylistId);
+  mainWindow.on("close", event => {
+    if (!applicationQuitting && store.get("general").hideToTrayOnClose) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
 
     store.set("state.windowBounds", mainWindow.getNormalBounds());
     store.set("state.windowMaximized", mainWindow.isMaximized());
@@ -634,6 +639,7 @@ app.on("ready", () => {
       if (store.get("general").hideToTrayOnClose) {
         mainWindow.hide();
       } else {
+        applicationQuitting = true;
         app.quit();
       }
     }
@@ -812,7 +818,10 @@ app.on("ready", () => {
     {
       label: "Quit",
       type: "normal",
-      role: "quit"
+      click: () => {
+        applicationQuitting = true;
+        app.quit();
+      }
     }
   ]);
   tray.setToolTip("YouTube Music Desktop");
@@ -829,11 +838,18 @@ app.on("ready", () => {
   setupTaskbarFeatures();
 });
 
+app.on('before-quit', () => {
+  store.set("state.lastUrl", lastUrl);
+  store.set("state.lastVideoId", lastVideoId);
+  store.set("state.lastPlaylistId", lastPlaylistId);
+})
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    applicationQuitting = true;
     app.quit();
   }
 });
