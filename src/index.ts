@@ -312,7 +312,7 @@ function setupTaskbarFeatures() {
     }
 
     if (store.get("playback.progressInTaskbar")) {
-      mainWindow.setProgressBar(hasVideo ? state.videoProgress / parseInt(state.videoDetails.lengthSeconds) : -1, {
+      mainWindow.setProgressBar(hasVideo ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
         mode: isPlaying ? "normal" : "paused"
       });
     }

@@ -93,7 +93,7 @@ export default class DiscordPresence implements IIntegration {
         buttons: [
           {
             label: "Play on YouTube Music",
-            url: `https://music.youtube.com/watch?v=${state.videoDetails.videoId}`
+            url: `https://music.youtube.com/watch?v=${state.videoDetails.id}`
           }
         ]
       });
