@@ -87,7 +87,7 @@ window.ytmd.handleWindowEvents((event, state) => {
   margin-left: 4px;
 }
 
-.titlebar .right {
+.titlebar .right .app-buttons {
   margin-right: 4px;
 }
 
