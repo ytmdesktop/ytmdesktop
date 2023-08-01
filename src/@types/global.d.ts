@@ -1,3 +1,4 @@
+import { WindowsEventArguments } from "../shared/types";
 import Store from "../shared/store/renderer";
 import { StoreSchema } from "../shared/store/schema";
 
@@ -26,8 +27,15 @@ declare global {
       maximizeWindow(): void;
       restoreWindow(): void;
       closeWindow(): void;
-      handleWindowEvents(callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void);
+      handleWindowEvents(callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void);
       requestWindowState(): void;
     };
+  }
+
+  // Fixes the navigator type to include windowControlsOverlay
+  interface Navigator {
+    windowControlsOverlay: {
+      visible: boolean
+    }
   }
 }

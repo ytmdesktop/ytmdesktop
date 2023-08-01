@@ -17,10 +17,10 @@ const store = new Store<StoreSchema>();
 contextBridge.exposeInMainWorld("ytmd", {
   sendVideoProgress: (volume: number) => ipcRenderer.send("ytmView:videoProgressChanged", volume),
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
-  sendVideoData: (videoDetails: any, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
+  sendVideoData: (videoDetails: unknown, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
   sendAdState: (adRunning: boolean) => ipcRenderer.send("ytmView:adStateChanged", adRunning),
-  sendStoreUpdate: (queueState: any) => ipcRenderer.send("ytmView:storeStateChanged", queueState),
-  sendCreatePlaylistObservation: (playlist: any) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
+  sendStoreUpdate: (queueState: unknown) => ipcRenderer.send("ytmView:storeStateChanged", queueState),
+  sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
 
@@ -642,7 +642,7 @@ function hookPlayerApiEvents() {
   `);
 }
 
-function getYTMTextRun(runs: any[]) {
+function getYTMTextRun(runs: { text: string }[]) {
   let final = "";
   for (const run of runs) {
     final += run.text;
@@ -896,7 +896,7 @@ window.addEventListener("load", async () => {
     }
   });
 
-  ipcRenderer.on('ytmView:getPlaylists', async (_event, requestId) => {
+  ipcRenderer.on("ytmView:getPlaylists", async (_event, requestId) => {
     const rawPlaylists = await webFrame.executeJavaScript(`
       {
         new Promise((resolve, reject) => {
@@ -935,7 +935,7 @@ window.addEventListener("load", async () => {
       playlists.push({
         id: playlist.playlistId,
         title: getYTMTextRun(playlist.title.runs)
-      })
+      });
     }
     ipcRenderer.send(`ytmView:getPlaylists:response:${requestId}`, playlists);
   });

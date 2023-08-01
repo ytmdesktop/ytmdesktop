@@ -2,7 +2,7 @@ import { BrowserView, BrowserWindow, ipcMain, safeStorage } from "electron";
 import ElectronStore from "electron-store";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "../../../../shared/store/schema";
-import playerStateStore from "../../../../player-state-store";
+import playerStateStore, { PlayerState } from "../../../../player-state-store";
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../shared/auth";
 import fastifyRateLimit from '@fastify/rate-limit';
 import crypto from 'crypto';
@@ -11,44 +11,7 @@ import createError from "@fastify/error";
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-const mapThumbnails = (thumbnail: any) => {
-  // Explicit mapping to keep a consistent API
-  // If YouTube Music changes how this is presented internally then it's easier to update without breaking the API
-  return {
-    url: thumbnail.url,
-    width: thumbnail.width,
-    height: thumbnail.height
-  };
-};
-
-function getYTMTextRun(runs: any[]) {
-  let final = "";
-  for (const run of runs) {
-    final += run.text;
-  }
-  return final;
-}
-
-const mapQueueItems = (item: any) => {
-  let playlistPanelVideoRenderer;
-  if (item.playlistPanelVideoRenderer) playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
-  else if (item.playlistPanelVideoWrapperRenderer)
-    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
-
-  // This probably shouldn't happen but in the off chance it does we need to return nothing
-  if (!playlistPanelVideoRenderer) return null;
-
-  return {
-    thubmnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapThumbnails),
-    title: getYTMTextRun(playlistPanelVideoRenderer.title.runs),
-    author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText.runs),
-    duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText.runs),
-    selected: playlistPanelVideoRenderer.selected
-  };
-};
-
-const transformPlayerState = (state: any) => {
-  const queueItems = state.queue ? state.queue.items.map(mapQueueItems) : null;
+const transformPlayerState = (state: PlayerState) => {
   return {
     player: {
       trackState: state.trackState,
@@ -56,18 +19,12 @@ const transformPlayerState = (state: any) => {
       queue: state.queue
         ? {
             autoplay: state.queue.autoplay,
-            shuffleEnabled: state.queue.shuffleEnabled,
-            items: queueItems,
-            // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
-            automixItems: state.queue.automixItems.map(mapQueueItems),
+            items: state.queue.items,
+            automixItems: state.queue.automixItems,
             isGenerating: state.queue.isGenerating,
-            // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
             isInfinite: state.queue.isInfinite,
             repeatMode: state.queue.repeatMode,
-            // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
-            selectedItemIndex: queueItems.findIndex((item: any) => {
-              return item.selected
-            })
+            selectedItemIndex: state.queue.selectedItemIndex
           }
         : null
     },
@@ -76,27 +33,32 @@ const transformPlayerState = (state: any) => {
           author: state.videoDetails.author,
           title: state.videoDetails.title,
           album: state.videoDetails.album,
-          thumbnails: state.videoDetails.thumbnail.thumbnails.map(mapThumbnails),
-          duration: parseInt(state.videoDetails.lengthSeconds),
-          id: state.videoDetails.videoId
+          thumbnails: state.videoDetails.thumbnails,
+          durationSeconds: state.videoDetails.durationSeconds,
+          id: state.videoDetails.id
         }
       : null
   };
 };
 
 interface CompanionServerAPIv1Options extends FastifyPluginOptions {
-  //remoteCommandEmitter: (command: string, ...args: any[]) => void;
   getStore: () => ElectronStore<StoreSchema>;
   getYtmView: () => BrowserView;
 }
 
 const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
+const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
 const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' is invalid", 400);
 
 type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
+type Playlist = {
+  id: string,
+  title: string
+}
+
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options, next) => {
-  const sendCommand = (command: RemoteCommand, value: any) => {
+  const sendCommand = (command: RemoteCommand, value: unknown) => {
     const ytmView = options.getYtmView();
     if (ytmView) {
       switch (command) {
@@ -126,13 +88,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
 
         case "setVolume": {
-          const valueInt: number = parseInt(value);
+          const volume = value as number;
           // Check if Volume is a number and between 0 and 100
-          if (isNaN(valueInt) || valueInt < 0 || valueInt > 100) {
-            throw new Error("Invalid volume");
+          if (isNaN(volume) || volume < 0 || volume > 100) {
+            throw new InvalidVolumeError("Invalid volume");
           }
 
-          ytmView.webContents.send("remoteControl:execute", "setVolume", valueInt);
+          ytmView.webContents.send("remoteControl:execute", "setVolume", volume);
           break;
         }
 
@@ -157,7 +119,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
 
         case "repeatMode": {
-          switch (value) {
+          const repeatMode = value as string;
+          switch (repeatMode) {
             case "NONE": {
               ytmView.webContents.send("remoteControl:execute", "repeatMode", "NONE");
               break;
@@ -171,7 +134,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
               break;
             }
             default: {
-              throw new InvalidRepeatModeError(value);
+              throw new InvalidRepeatModeError(repeatMode);
             }
           }
           break;
@@ -348,7 +311,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       if (ytmView) {
         const requestId = crypto.randomUUID();
 
-        const playlistsResponseListener = (_event: Electron.IpcMainEvent, playlists: any) => {
+        const playlistsResponseListener = (_event: Electron.IpcMainEvent, playlists: Playlist[]) => {
           response.send(playlists);
         }
         ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
@@ -393,7 +356,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.post<{ Body: { command: RemoteCommand, data: any } }>(
+  fastify.post<{ Body: { command: RemoteCommand, data: unknown } }>(
     "/command",
     {
       config: {
@@ -430,19 +393,17 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       });
     });*/
 
-    const stateStoreListener = (state: any) => {
+    const stateStoreListener = (state: PlayerState) => {
       fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
     };
     playerStateStore.addEventListener(stateStoreListener);
 
-    const createPlaylistObservedListener = (_event: Electron.IpcMainEvent, playlist: any) => {
-      console.log("Create playlist observed", playlist);
+    const createPlaylistObservedListener = (_event: Electron.IpcMainEvent, playlist: Playlist) => {
       fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
     };
     ipcMain.on('ytmView:createPlaylistObserved', createPlaylistObservedListener);
     
     const deletePlaylistObservedListener = (_event: Electron.IpcMainEvent, playlistId: string) => {
-      console.log("Delete playlist observed", playlistId);
       fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
     };
     ipcMain.on('ytmView:deletePlaylistObserved', deletePlaylistObservedListener);

@@ -1,10 +1,10 @@
 import DiscordRPC from "discord-rpc";
-import playerStateStore from "../../player-state-store";
+import playerStateStore, { PlayerState, Thumbnail } from "../../player-state-store";
 import IIntegration from "../integration";
 
 const DISCORD_CLIENT_ID = "495666957501071390";
 
-function getHighestResThumbnail(thumbnails: any[]) {
+function getHighestResThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 0;
   let currentHeight = 0;
   let url = null;
@@ -69,18 +69,18 @@ export default class DiscordPresence implements IIntegration {
   private discordClient: DiscordRPC.Client = null;
   private ready = false;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
-  private previousProgress: any = null;
-  private endTimestamp: any = null;
+  private previousProgress: number | null = null;
+  private endTimestamp: number | null = null;
 
-  private playerStateChanged(state: any) {
+  private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
       if (!this.previousProgress) {
         this.endTimestamp =
-          state.trackState === 1 ? Math.floor(Date.now() / 1000) + (parseInt(state.videoDetails.lengthSeconds) - Math.round(state.videoProgress)) : undefined;
+          state.trackState === 1 ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.round(state.videoProgress)) : undefined;
         this.previousProgress = state.videoProgress;
       }
 
-      const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnail.thumbnails);
+      const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       this.discordClient.setActivity({
         details: stringLimit(state.videoDetails.title, 128),
         state: stringLimit(state.videoDetails.author, 128),
@@ -121,8 +121,8 @@ export default class DiscordPresence implements IIntegration {
     }
   }
 
-  public provide(...args: any[]): void {
-    throw new Error("Method not implemented.");
+  public provide(): void {
+    throw new Error("Discord Presence integration does not need provide");
   }
 
   public enable(): void {
@@ -137,7 +137,7 @@ export default class DiscordPresence implements IIntegration {
         this.ready = false;
       });
       this.discordClient.connect(DISCORD_CLIENT_ID);
-      playerStateStore.addEventListener((state: any) => this.playerStateChanged(state));
+      playerStateStore.addEventListener((state: PlayerState) => this.playerStateChanged(state));
     }
   }
 

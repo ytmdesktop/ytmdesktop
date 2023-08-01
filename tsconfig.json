@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "es2017",
     "allowJs": true,
-    "module": "commonjs",
+    "module": "node16",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,

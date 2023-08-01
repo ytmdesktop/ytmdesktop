@@ -4,7 +4,13 @@ import ElectronStore from "electron-store";
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import { StoreSchema } from "../../../shared/store/schema";
 
-const temporaryCodeMap: { [code: string]: any } = {};
+const temporaryCodeMap: { [code: string]: { appName: string } } = {};
+
+type AuthToken = {
+  appName: string,
+  id: string,
+  token: string
+}
 
 async function getUnusedCode() {
   return new Promise<string>(resolve => {
@@ -52,7 +58,7 @@ export function getIsTemporaryAuthCodeValidAndRemove(appName: string, code: stri
 }
 
 export function createAuthToken(store: ElectronStore<StoreSchema>, appName: string) {
-  let authTokens: object[] = [];
+  let authTokens: AuthToken[] = [];
   try {
     authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex")));
   } catch {
@@ -77,7 +83,7 @@ export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
-  let authTokens: any[] = [];
+  let authTokens: AuthToken[] = [];
   try {
     const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex"));
     authTokens = JSON.parse(decryptedAuthTokens);

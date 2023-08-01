@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
+import { WindowsEventArguments } from "../../shared/types";
 
 contextBridge.exposeInMainWorld("ytmd", {
   sendResult: (result: boolean) => ipcRenderer.send("companionAuthorization:result", result),
@@ -11,5 +12,5 @@ contextBridge.exposeInMainWorld("ytmd", {
   maximizeWindow: () => ipcRenderer.send("companionWindow:maximize"),
   restoreWindow: () => ipcRenderer.send("companionWindow:restore"),
   closeWindow: () => ipcRenderer.send("companionWindow:close"),
-  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("companionWindow:stateChanged", callback)
+  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void) => ipcRenderer.on("companionWindow:stateChanged", callback)
 });

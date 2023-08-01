@@ -5,7 +5,7 @@ if (process.type !== "renderer") {
 }
 
 export default class Store<TSchema> {
-  public set(key: string, value?: any) {
+  public set(key: string, value?: unknown) {
     return ipcRenderer.send("settings:set", key, value);
   }
 

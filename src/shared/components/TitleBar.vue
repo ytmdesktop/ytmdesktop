@@ -22,7 +22,7 @@ const closeWindow = window.ytmd.closeWindow;
 
 const openSettingsWindow = window.ytmd.openSettingsWindow;
 
-const wcoVisible = ref((window.navigator as any).windowControlsOverlay.visible);
+const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 
 const windowMaximized = ref(false);
 
@@ -41,7 +41,7 @@ window.ytmd.handleWindowEvents((event, state) => {
     </div>
     <div class="right">
       <div class="app-buttons">
-        <button v-if="hasSettingsButton" class="app-button" @click="openSettingsWindow" tabindex="1">
+        <button v-if="hasSettingsButton" class="app-button" tabindex="1" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
