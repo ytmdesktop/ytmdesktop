@@ -11,5 +11,5 @@ contextBridge.exposeInMainWorld("ytmd", {
   maximizeWindow: () => ipcRenderer.send("companionWindow:maximize"),
   restoreWindow: () => ipcRenderer.send("companionWindow:restore"),
   closeWindow: () => ipcRenderer.send("companionWindow:close"),
-  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("settingsWindow:stateChanged", callback)
+  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("companionWindow:stateChanged", callback)
 });
