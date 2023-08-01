@@ -74,6 +74,7 @@ window.ytmd.handleWindowEvents((event, state) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .titlebar .left,
