@@ -7,14 +7,14 @@ import Settings from "../../shared/components/Settings.vue";
   <div class="container">
     <TitleBar class="titlebar" title="Settings" icon="settings" />
     <Suspense>
-      <Settings />
+      <Settings class="settings" />
     </Suspense>
   </div>
 </template>
 
 <style scoped>
-.titlebar {
-  border-bottom: 1px solid #212121;
+.settings {
+    border-top: 1px solid #212121;
 }
 
 .container {
