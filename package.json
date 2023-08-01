@@ -40,6 +40,7 @@
     "eslint-plugin-import": "^2.25.0",
     "eslint-plugin-vue": "^9.15.1",
     "fork-ts-checker-webpack-plugin": "^8.0.0",
+    "git-revision-webpack-plugin": "5.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "node-loader": "^2.0.0",

@@ -3,6 +3,12 @@ import { ref } from "vue";
 import KeybindInput from "../../shared/components/KeybindInput.vue";
 import { StoreSchema } from "../store/schema";
 
+declare const YTMD_GIT_VERSION: string;
+declare const YTMD_GIT_BRANCH: string;
+
+const ytmdVersion = YTMD_GIT_VERSION;
+const ytmdBranch = YTMD_GIT_BRANCH;
+
 const currentTab = ref(1);
 const requiresRestart = ref(false);
 
@@ -118,6 +124,8 @@ function restartApplication() {
       <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
       <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
       <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+      <span class="push"></span>
+      <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
 
       <li v-if="requiresRestart" @click="restartApplication" >
         <span class="material-symbols-outlined">autorenew</span>
@@ -225,6 +233,18 @@ function restartApplication() {
           <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
         </div>
       </div>
+
+      <div v-if="currentTab === 99" class="about-tab">
+        <img class="icon" src="../../assets/icons/ytmd.png" />
+        <h2 class="app-name">YouTube Music Desktop Player</h2>
+        <p class="made-by">Made by YTMDesktop Team</p>
+        <p class="version">Version: {{ ytmdVersion }}</p>
+        <p class="branch">Branch: {{ ytmdBranch }}</p>
+        <div class="links">
+          <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
+          <a href="https://ytmdesktop.app" target="_blank">Website</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -235,7 +255,7 @@ body, * {
 }
 
 .content-container {
-  height: 100%;
+  height: calc(100% - 36px);
   display: flex;
 }
 
@@ -253,6 +273,8 @@ body, * {
   padding: unset;
   height: 100%;
   border-right: 1px solid #212121;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar li {
@@ -283,6 +305,10 @@ body, * {
 
 .sidebar li .material-symbols-outlined {
   margin-right: 8px;
+}
+
+.sidebar .push {
+  flex-grow: 1;
 }
 
 .setting {
@@ -350,5 +376,43 @@ body, * {
 
 .reload-required {
   vertical-align: middle;
+}
+
+.about-tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.icon {
+  width: 128px;
+  height: 128px;
+  margin-bottom: 16px;
+}
+
+.app-name {
+  margin: 0;
+}
+
+.version,.branch {
+  margin: 4px 0;
+  color: #bbbbbb;
+}
+
+.made-by {
+  margin: 16px 0;
+}
+
+.links {
+  margin-top: 32px;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.links a {
+  color: #bbbbbb;
 }
 </style>

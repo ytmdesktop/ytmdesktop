@@ -467,6 +467,13 @@ const createOrShowSettingsWindow = (): void => {
     settingsWindow = null;
   });
 
+  settingsWindow.webContents.setWindowOpenHandler(details => {
+    shell.openExternal(details.url);
+    return {
+      action: "deny"
+    };
+  });
+
   // and load the index.html of the app.
   settingsWindow.loadURL(SETTINGS_WINDOW_WEBPACK_ENTRY);
 
