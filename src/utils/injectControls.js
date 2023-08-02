@@ -24,12 +24,11 @@ window.addEventListener('load', () => {
 
     const { hostname } = window.location
     if (hostname === 'music.youtube.com') {
-        createTopMiddleContent()
+        createHistoryButtons()
         createTopRightContent()
         createBottomPlayerBarContent()
         playerBarScrollToChangeVolume()
         enableAVSwitcher()
-
     } else createOffTheRoadContent()
 
     // injectCast()
@@ -115,6 +114,11 @@ function createContextMenu() {
 
                 .ytmd-icons {
                     margin: 0 18px 0 2px !important;
+                    color: rgba(255, 255, 255, 0.5) !important;
+                }
+
+                .history-icons {
+                    margin: 0 7px 0 7px !important;
                     color: rgba(255, 255, 255, 0.5) !important;
                 }
 
@@ -318,11 +322,10 @@ function createContextMenu() {
     }
 }
 
-function createTopMiddleContent() {
+function createHistoryButtons() {
     try {
-        const center_content = document.getElementsByTagName(
-            'ytmusic-pivot-bar-renderer'
-        )[0]
+        const search_box = document.getElementsByClassName('search-box')[0]
+        // const search_box = document.getElementsByTagName('ytmusic-search-box')[0]
 
         // HISTORY BACK
         const back_element = document.createElement('i')
@@ -331,8 +334,7 @@ function createTopMiddleContent() {
             'material-icons',
             'pointer',
             'shine',
-            'ytmd-icons',
-            'center-content'
+            'history-icons'
         )
         back_element.innerText = 'keyboard_backspace'
 
@@ -347,8 +349,7 @@ function createTopMiddleContent() {
             'material-icons',
             'pointer',
             'shine',
-            'ytmd-icons',
-            'center-content'
+            'history-icons'
         )
         forward_element.style.cssText = 'transform: rotate(180deg);'
         forward_element.innerText = 'keyboard_backspace'
@@ -357,13 +358,13 @@ function createTopMiddleContent() {
             history.forward()
         })
 
-        center_content.prepend(forward_element)
-        center_content.prepend(back_element)
+        search_box.prepend(forward_element)
+        search_box.prepend(back_element)
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {
             type: 'warn',
-            data: 'error on createTopMiddleContent',
+            data: 'error on createBackButton',
         })
     }
 }
@@ -678,15 +679,13 @@ function createBottomPlayerBarContent() {
                 ) {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'check'
-                    document.querySelector(
-                        '#ytmd_add_to_library'
-                    ).title = translate('REMOVE_FROM_LIBRARY')
+                    document.querySelector('#ytmd_add_to_library').title =
+                        translate('REMOVE_FROM_LIBRARY')
                 } else {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'library_add'
-                    document.querySelector(
-                        '#ytmd_add_to_library'
-                    ).title = translate('ADD_TO_LIBRARY')
+                    document.querySelector('#ytmd_add_to_library').title =
+                        translate('ADD_TO_LIBRARY')
                 }
                 document
                     .querySelector('#btn_ytmd_add_to_library')
@@ -860,27 +859,25 @@ function createBottomPlayerBarContent() {
         playerBarRightControls.append(elementSleepTimer)
         document.body.append(elementSleepTimerModal)
 
-        document.getElementById(
-            'sleep-timer-minutes'
-        ).onkeydown = document.getElementById(
-            // use the same function when change/keydown
-            'sleep-timer-minutes'
-        ).onchange = (e) => {
-            var radio = document.getElementById('sleep-timer-customized')
-            radio.checked = true
-            radio.value = parseInt(e.target.value)
-        }
+        document.getElementById('sleep-timer-minutes').onkeydown =
+            document.getElementById(
+                // use the same function when change/keydown
+                'sleep-timer-minutes'
+            ).onchange = (e) => {
+                var radio = document.getElementById('sleep-timer-customized')
+                radio.checked = true
+                radio.value = parseInt(e.target.value)
+            }
 
-        document.getElementById(
-            'sleep-timer-songs'
-        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = (
-            // use the same function when change/keydown
-            e
-        ) => {
-            var radio = document.getElementById('sleep-timer-customized-c')
-            radio.checked = true
-            radio.value = parseInt(e.target.value) + 'c'
-        }
+        document.getElementById('sleep-timer-songs').onkeydown =
+            document.getElementById('sleep-timer-songs').onchange = (
+                // use the same function when change/keydown
+                e
+            ) => {
+                var radio = document.getElementById('sleep-timer-customized-c')
+                radio.checked = true
+                radio.value = parseInt(e.target.value) + 'c'
+            }
 
         ipcRenderer.on('sleep-timer-info', (_, mode, counter) => {
             if (mode == 'time') {

@@ -10,7 +10,8 @@ const ip = '0.0.0.0'
 const port = 9863
 const hostname = os.hostname()
 
-const pattIgnoreInterface = /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
+const pattIgnoreInterface =
+    /(Loopback|lo$|virtual|wsl|vEthernet|Default Switch|VMware|Adapter|Hamachi)\w*/gim
 
 let totalConnections = 0
 let timerTotalConections
@@ -185,9 +186,9 @@ const serverFunction = (req, res) => {
             let data = {
                 player: infoPlayerProvider.getPlayerInfo(),
                 track: infoPlayerProvider.getTrackInfo(),
-                /*queue: infoPlayerProvider.getQueueInfo(),
+                queue: infoPlayerProvider.getQueueInfo(),
                 playlist: infoPlayerProvider.getPlaylistInfo(),
-                lyrics: infoPlayerProvider.getLyricsInfo(),*/
+                lyrics: infoPlayerProvider.getLyricsInfo(),
             }
             res.write(JSON.stringify(data))
             res.end()

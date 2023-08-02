@@ -1345,9 +1345,6 @@ async function createWindow() {
                 skipTaskbar: !settingsProvider.get(
                     'settings-miniplayer-show-task'
                 ),
-                alwaysOnTop: settingsProvider.get(
-                    'settings-miniplayer-always-top'
-                ),
 
                 backgroundColor: '#232323',
                 autoHideMenuBar: true,
@@ -1418,6 +1415,11 @@ async function createWindow() {
                     })
                 }, 1000)
             })
+
+            miniplayer.setAlwaysOnTop(
+                settingsProvider.get('settings-miniplayer-always-top'),
+                'normal'
+            )
 
             miniplayer.on('resize', (e) => {
                 if (
@@ -1746,7 +1748,7 @@ async function createWindow() {
     })
 
     ipcMain.on('miniplayer-toggle-ontop', () => {
-        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop())
+        miniplayer.setAlwaysOnTop(!miniplayer.isAlwaysOnTop(), 'normal')
     })
 
     ipcMain.on('reset-url', async () => {
@@ -1878,7 +1880,8 @@ async function createWindow() {
                 clipboardWatcher = ClipboardWatcher({
                     watchDelay: 1000,
                     onTextChange: (text) => {
-                        let regExp = /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
+                        let regExp =
+                            /(https?:\/\/)(www.)?(music.youtube|youtube|youtu.be).*/
                         let match = text.match(regExp)
                         if (match) {
                             let videoUrl = match[0]
@@ -1922,7 +1925,8 @@ async function createWindow() {
         if (videoUrl.includes('music.youtube'))
             await view.webContents.loadURL(videoUrl)
         else {
-            let regExpYoutube = /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
+            let regExpYoutube =
+                /^.*(https?:\/\/)?(www.)?(music.youtube|youtube|youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
             let match = videoUrl.match(regExpYoutube)
             await view.webContents.loadURL(
                 'https://music.youtube.com/watch?v=' + match[4]
