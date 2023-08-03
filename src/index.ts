@@ -442,6 +442,7 @@ const createOrShowSettingsWindow = (): void => {
     maximizable: false,
     resizable: false,
     frame: false,
+    show: false,
     parent: mainWindow,
     modal: true,
     titleBarStyle: 'hidden',
@@ -475,6 +476,10 @@ const createOrShowSettingsWindow = (): void => {
     };
   });
 
+  settingsWindow.on("ready-to-show", () => {
+    settingsWindow.show();
+  })
+
   // and load the index.html of the app.
   settingsWindow.loadURL(SETTINGS_WINDOW_WEBPACK_ENTRY);
 
@@ -492,6 +497,7 @@ const createMainWindow = (): void => {
     width: 1280,
     height: 720,
     frame: false,
+    show: false,
     icon: './assets/icons/ytmd.png',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
@@ -635,6 +641,10 @@ const createMainWindow = (): void => {
 
     store.set("state.windowBounds", mainWindow.getNormalBounds());
     store.set("state.windowMaximized", mainWindow.isMaximized());
+  });
+
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
   });
 
   // and load the index.html of the app.

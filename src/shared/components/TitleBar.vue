@@ -23,13 +23,16 @@ const closeWindow = window.ytmd.closeWindow;
 const openSettingsWindow = window.ytmd.openSettingsWindow;
 
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
-
 const windowMaximized = ref(false);
 const windowFullscreen = ref(false);
 
 window.ytmd.handleWindowEvents((event, state) => {
   windowMaximized.value = state.maximized;
   windowFullscreen.value = state.fullscreen;
+});
+
+window.navigator.windowControlsOverlay.addEventListener("geometrychange", event => {
+  wcoVisible.value = event.visible;
 });
 </script>
 

@@ -36,6 +36,7 @@ declare global {
   interface Navigator {
     windowControlsOverlay: {
       visible: boolean
-    }
+      addEventListener: (event: "geometrychange", listener: (event: { visible: boolean }) => void)
+    },
   }
 }
