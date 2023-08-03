@@ -393,7 +393,8 @@ function sendMainWindowStateIpc() {
   if (mainWindow !== null) {
     mainWindow.webContents.send("mainWindow:stateChanged", {
       minimized: mainWindow.isMinimized(),
-      maximized: mainWindow.isMaximized()
+      maximized: mainWindow.isMaximized(),
+      fullscreen: mainWindow.isFullScreen()
     });
   }
 }
@@ -570,6 +571,16 @@ const createMainWindow = (): void => {
   });
   ytmView.webContents.on("did-navigate", ytmViewNavigated);
   ytmView.webContents.on("did-navigate-in-page", ytmViewNavigated);
+  ytmView.webContents.on("enter-html-full-screen", () => {
+    if (mainWindow) {
+      mainWindow.setFullScreen(true);
+    }
+  });
+  ytmView.webContents.on("leave-html-full-screen", () => {
+    if (mainWindow) {
+      mainWindow.setFullScreen(false);
+    }
+  });
 
   ytmView.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url);
@@ -590,6 +601,28 @@ const createMainWindow = (): void => {
     });
   });
 
+  mainWindow.on("enter-full-screen", () => {
+    setTimeout(() => {
+      ytmView.setBounds({
+        x: 0,
+        y: 0,
+        width: mainWindow.getContentBounds().width,
+        height: mainWindow.getContentBounds().height
+      });
+    });
+    sendMainWindowStateIpc();
+  });
+  mainWindow.on("leave-full-screen", () => {
+    setTimeout(() => {
+      ytmView.setBounds({
+        x: 0,
+        y: 36,
+        width: mainWindow.getContentBounds().width,
+        height: mainWindow.getContentBounds().height - 36
+      });
+    });
+    sendMainWindowStateIpc();
+  });
   mainWindow.on("maximize", sendMainWindowStateIpc);
   mainWindow.on("unmaximize", sendMainWindowStateIpc);
   mainWindow.on("minimize", sendMainWindowStateIpc);
@@ -774,6 +807,10 @@ app.on("ready", () => {
 
   // Create the permission handlers
   session.fromPartition("persist:ytmview").setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === "fullscreen") {
+      return callback(true);
+    }
+
     return callback(false);
   });
 

@@ -25,14 +25,16 @@ const openSettingsWindow = window.ytmd.openSettingsWindow;
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 
 const windowMaximized = ref(false);
+const windowFullscreen = ref(false);
 
 window.ytmd.handleWindowEvents((event, state) => {
   windowMaximized.value = state.maximized;
+  windowFullscreen.value = state.fullscreen;
 });
 </script>
 
 <template>
-  <div class="titlebar">
+  <div v-if="!windowFullscreen" class="titlebar">
     <div class="left">
       <div v-if="title" class="title">
         <span v-if="icon" class="icon material-symbols-outlined">{{ icon }}</span>

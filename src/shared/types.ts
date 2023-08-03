@@ -1,5 +1,6 @@
 export type WindowsEventArguments = {
   minimized: boolean,
-  maximized: boolean
+  maximized: boolean,
+  fullscreen: boolean
 };
 
