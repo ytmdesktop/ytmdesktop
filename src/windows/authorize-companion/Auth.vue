@@ -17,7 +17,7 @@ function allowCompanion() {
   <div class="container-wrapper">
     <div class="container">
       <h1 class="title">Companion Authorization Request</h1>
-      <p class="subtitle">{{ appName }} would like to control YouTube Music Desktop Player</p>
+      <p class="subtitle">{{ appName }} would like to control YouTube Music Desktop App</p>
       <p class="code-confirm">Please ensure the code below matches what {{ appName }} is showing</p>
       <p class="code">{{ code }}</p>
       <div class="buttons">

@@ -235,7 +235,7 @@ function restartApplication() {
 
         <div v-if="currentTab === 99" class="about-tab">
           <img class="icon" src="../../assets/icons/ytmd.png" />
-          <h2 class="app-name">YouTube Music Desktop Player</h2>
+          <h2 class="app-name">YouTube Music Desktop App</h2>
           <p class="made-by">Made by YTMDesktop Team</p>
           <p class="version">Version: {{ ytmdVersion }}</p>
           <p class="branch">Branch: {{ ytmdBranch }}</p>
