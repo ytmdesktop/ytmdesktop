@@ -687,7 +687,8 @@ app.on("ready", () => {
 
   ipcMain.on('settingsWindow:restartapplication', () => {
     app.relaunch();
-    app.exit(0);
+    applicationQuitting = true;
+    app.quit();
   });
 
   // Handle ytm view ipc
