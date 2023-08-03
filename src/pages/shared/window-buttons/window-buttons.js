@@ -1,4 +1,4 @@
-const { ipcRenderer: ipc, ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron')
 const electronStore = require('electron-store')
 const store = new electronStore()
 const { isWindows, isMac, isLinux } = require('../../../utils/systemInfo')
@@ -73,8 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkUrlParams() {
     const params = new URL(window.location).searchParams
-
-    console.log('checkUrlParams')
 
     let page = params.get('page')
     let icon = params.get('icon')

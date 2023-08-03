@@ -118,7 +118,7 @@ function createContextMenu() {
                 }
 
                 .history-icons {
-                    margin: 0 7px 0 7px !important;
+                    margin: 0 10px 0 0 !important;
                     color: rgba(255, 255, 255, 0.5) !important;
                 }
 
@@ -324,8 +324,7 @@ function createContextMenu() {
 
 function createHistoryButtons() {
     try {
-        const search_box = document.getElementsByClassName('search-box')[0]
-        // const search_box = document.getElementsByTagName('ytmusic-search-box')[0]
+        const search_box = document.getElementsByClassName('center-content')[0]
 
         // HISTORY BACK
         const back_element = document.createElement('i')

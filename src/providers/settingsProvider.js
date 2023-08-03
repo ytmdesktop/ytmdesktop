@@ -20,14 +20,6 @@ function set(settingName, value) {
 }
 
 /**
- * Clear the specified setting
- * @param {string} settingName
- */
-function clear(settingName) {
-    store.delete(settingName)
-}
-
-/**
  * Set initial value for setting if it not setted
  * @param {string} settingName
  * @param {*} initialValue
@@ -83,5 +75,4 @@ module.exports = {
     get: get,
     set: set,
     setInitialValue: setInitialValue,
-    clear: clear,
 }

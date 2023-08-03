@@ -123,7 +123,9 @@ if (settingsProvider.get('settings-surround-sound')) {
 }
 
 app.commandLine.appendSwitch('disable-http-cache')
-app.allowRendererProcessReuse = false
+if (isWindows()) {
+    app.setAppUserModelId('YouTube Music Desktop')
+}
 
 createCustomAppDir()
 
@@ -2026,10 +2028,6 @@ else {
         await createWindow()
 
         tray.createTray(mainWindow)
-
-        if (isWindows()) {
-            app.setAppUserModelId('YouTube Music Desktop')
-        }
 
         ipcMain.on('updated-tray-image', (event, payload) => {
             if (settingsProvider.get('settings-shiny-tray'))
