@@ -7,7 +7,7 @@ import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuth
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
 import createError from "@fastify/error";
-import { APIV1CommandRequestBody, APIV1CommandRequestBodyType } from "../../shared/schemas";
+import { APIV1CommandRequestBody, APIV1CommandRequestBodyType, APIV1RequestCodeBody, APIV1RequestCodeBodyType, APIV1RequestTokenBody, APIV1RequestTokenBodyType } from "../../shared/schemas";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -152,7 +152,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     timeWindow: 1000 * 60
   });
 
-  fastify.post<{ Body: { appName: string } }>(
+  fastify.post<{ Body: APIV1RequestCodeBodyType }>(
     "/auth/requestcode",
     {
       config: {
@@ -160,10 +160,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           max: 5,
           timeWindow: 1000 * 60
         }
+      },
+      schema: {
+        body: APIV1RequestCodeBody
       }
     },
     async (request, response) => {
-      const code = await getTemporaryAuthCode(request.body.appName);
+      const code = await getTemporaryAuthCode(request.body.appId, request.body.appVersion, request.body.appName);
       if (code) {
         response.send({
           code
@@ -176,7 +179,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.post<{ Body: { appName: string; code: string } }>(
+  fastify.post<{ Body: APIV1RequestTokenBodyType }>(
     "/auth/request",
     {
       config: {
@@ -184,6 +187,9 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           max: 5,
           timeWindow: 1000 * 60
         }
+      },
+      schema: {
+        body: APIV1RequestTokenBody
       }
     },
     async (request, response) => {
@@ -213,7 +219,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
 
       // API Users: Make sure you /requestcode above
-      if (!getIsTemporaryAuthCodeValidAndRemove(request.body.appName, request.body.code)) {
+      const authData = getIsTemporaryAuthCodeValidAndRemove(request.body.appId, request.body.code)
+      if (!authData) {
         response.code(400).send({
           error: "AUTHORIZATION_INVALID"
         });
@@ -223,7 +230,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       const requestId = crypto.randomUUID();
 
       ipcMain.handle(`companionAuthorization:getAppName:${requestId}`, () => {
-        return request.body.appName;
+        return authData.appName;
       });
 
       ipcMain.handle(`companionAuthorization:getCode:${requestId}`, () => {
@@ -303,7 +310,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
 
         if (authorized) {
-          const token = createAuthToken(options.getStore(), request.body.appName);
+          const token = createAuthToken(options.getStore(), authData.appId, authData.appVersion, authData.appName);
 
           response.send({
             token
