@@ -4,13 +4,16 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { WindowsEventArguments } from "../../shared/types";
 
+const requestId = process.argv[process.argv.length - 1];
+
 contextBridge.exposeInMainWorld("ytmd", {
-  sendResult: (result: boolean) => ipcRenderer.send("companionAuthorization:result", result),
-  getAppName: async () => await ipcRenderer.invoke("companionAuthorization:getAppName"),
-  getCode: async () => await ipcRenderer.invoke("companionAuthorization:getCode"),
-  minimizeWindow: () => ipcRenderer.send("companionWindow:minimize"),
-  maximizeWindow: () => ipcRenderer.send("companionWindow:maximize"),
-  restoreWindow: () => ipcRenderer.send("companionWindow:restore"),
-  closeWindow: () => ipcRenderer.send("companionWindow:close"),
-  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void) => ipcRenderer.on("companionWindow:stateChanged", callback)
+  sendResult: (result: boolean) => ipcRenderer.send(`companionAuthorization:result:${requestId}`, result),
+  getAppName: async () => await ipcRenderer.invoke(`companionAuthorization:getAppName:${requestId}`),
+  getCode: async () => await ipcRenderer.invoke(`companionAuthorization:getCode:${requestId}`),
+  minimizeWindow: () => ipcRenderer.send(`companionWindow:minimize:${requestId}`),
+  maximizeWindow: () => ipcRenderer.send(`companionWindow:maximize:${requestId}`),
+  restoreWindow: () => ipcRenderer.send(`companionWindow:restore:${requestId}`),
+  closeWindow: () => ipcRenderer.send(`companionWindow:close:${requestId}`),
+  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void) =>
+    ipcRenderer.on(`companionWindow:stateChanged:${requestId}`, callback)
 });

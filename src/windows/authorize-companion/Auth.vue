@@ -29,10 +29,6 @@ function allowCompanion() {
 </template>
 
 <style scoped>
-.titlebar {
-  border-bottom: 1px solid #212121;
-}
-
 .container-wrapper {
   width: 100%;
   height: calc(100% - 36px);

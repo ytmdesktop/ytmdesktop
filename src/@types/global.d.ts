@@ -35,8 +35,8 @@ declare global {
   // Fixes the navigator type to include windowControlsOverlay
   interface Navigator {
     windowControlsOverlay: {
-      visible: boolean
-      addEventListener: (event: "geometrychange", listener: (event: { visible: boolean }) => void)
-    },
+      visible: boolean;
+      addEventListener(event: "geometrychange", listener: (event: { visible: boolean }) => void);
+    };
   }
 }

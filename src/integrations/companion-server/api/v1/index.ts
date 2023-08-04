@@ -4,8 +4,8 @@ import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "../../../../shared/store/schema";
 import playerStateStore, { PlayerState } from "../../../../player-state-store";
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../shared/auth";
-import fastifyRateLimit from '@fastify/rate-limit';
-import crypto from 'crypto';
+import fastifyRateLimit from "@fastify/rate-limit";
+import crypto from "crypto";
 import createError from "@fastify/error";
 import { APIV1CommandRequestBody, APIV1CommandRequestBodyType } from "../../shared/schemas";
 
@@ -54,9 +54,11 @@ const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '
 //type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
 type Playlist = {
-  id: string,
-  title: string
-}
+  id: string;
+  title: string;
+};
+
+const authorizationWindows: BrowserWindow[] = [];
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options, next) => {
   const sendCommand = (commandRequest: APIV1CommandRequestBodyType) => {
@@ -142,7 +144,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
       }
     }
-  }
+  };
 
   await fastify.register(fastifyRateLimit, {
     global: true,
@@ -150,139 +152,176 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     timeWindow: 1000 * 60
   });
 
-  fastify.post<{ Body: { appName: string } }>("/auth/requestcode", {
-    config: {
-      rateLimit: {
-        max: 5,
-        timeWindow: 1000 * 60
+  fastify.post<{ Body: { appName: string } }>(
+    "/auth/requestcode",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 1000 * 60
+        }
+      }
+    },
+    async (request, response) => {
+      const code = await getTemporaryAuthCode(request.body.appName);
+      if (code) {
+        response.send({
+          code
+        });
+      } else {
+        response.code(504).send({
+          error: "AUTHORIZATION_TIMEOUT"
+        });
       }
     }
-  }, async (request, response) => {
-    const code = await getTemporaryAuthCode(request.body.appName);
-    if (code) {
-      response.send({
-        code
-      });
-    } else {
-      response.code(504).send({
-        error: "AUTHORIZATION_TIMEOUT"
-      });
-    }
-  });
+  );
 
-  fastify.post<{ Body: { appName: string; code: string } }>("/auth/request", {
-    config: {
-      rateLimit: {
-        max: 5,
-        timeWindow: 1000 * 60
+  fastify.post<{ Body: { appName: string; code: string } }>(
+    "/auth/request",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 1000 * 60
+        }
       }
-    }
-  }, async (request, response) => {
-    let companionServerAuthWindowEnabled = false;
-    try {
-      companionServerAuthWindowEnabled =
-        safeStorage.decryptString(Buffer.from(options.getStore().get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
-    } catch {
-      /* do nothing, value is false */
-    }
-
-    if (!companionServerAuthWindowEnabled) {
-      response.code(403).send({
-        error: "AUTHORIZATION_DISABLED"
-      });
-      return;
-    }
-
-    if (!getIsTemporaryAuthCodeValidAndRemove(request.body.appName, request.body.code)) {
-      response.code(400).send({
-        error: "AUTHORIZATION_INVALID"
-      });
-      return;
-    }
-
-    ipcMain.handle("companionAuthorization:getAppName", () => {
-      return request.body.appName;
-    });
-
-    ipcMain.handle("companionAuthorization:getCode", () => {
-      return request.body.code;
-    });
-
-    // Create the authorization browser window.
-    const authorizationWindow = new BrowserWindow({
-      width: 640,
-      height: 480,
-      minimizable: false,
-      maximizable: false,
-      resizable: false,
-      frame: false,
-      webPreferences: {
-        sandbox: true,
-        contextIsolation: true,
-        preload: AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY
+    },
+    async (request, response) => {
+      let companionServerAuthWindowEnabled = false;
+      try {
+        companionServerAuthWindowEnabled =
+          safeStorage.decryptString(Buffer.from(options.getStore().get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
+      } catch {
+        /* do nothing, value is false */
       }
-    });
-    authorizationWindow.loadURL(AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY);
-    authorizationWindow.show();
 
-    // Open the DevTools.
-    if (process.env.NODE_ENV === "development") {
-      authorizationWindow.webContents.openDevTools({
-        mode: "detach"
+      // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
+      // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
+      if (authorizationWindows.length >= 5) {
+        response.code(503).send({
+          error: "AUTHORIZATION_TOO_MANY"
+        });
+        return;
+      }
+
+      // API Users: The user has companion server authorization disabled, show a feedback error accordingly
+      if (!companionServerAuthWindowEnabled) {
+        response.code(403).send({
+          error: "AUTHORIZATION_DISABLED"
+        });
+        return;
+      }
+
+      // API Users: Make sure you /requestcode above
+      if (!getIsTemporaryAuthCodeValidAndRemove(request.body.appName, request.body.code)) {
+        response.code(400).send({
+          error: "AUTHORIZATION_INVALID"
+        });
+        return;
+      }
+
+      const requestId = crypto.randomUUID();
+
+      ipcMain.handle(`companionAuthorization:getAppName:${requestId}`, () => {
+        return request.body.appName;
       });
-    }
 
-    let promiseResolve: (value: boolean | PromiseLike<boolean>) => void;
-    let promiseInterval: string | number | NodeJS.Timeout;
+      ipcMain.handle(`companionAuthorization:getCode:${requestId}`, () => {
+        return request.body.code;
+      });
 
-    function resultListener(_event: Electron.IpcMainEvent, authorized: boolean) {
-      clearInterval(promiseInterval);
-      promiseResolve(authorized);
-    }
+      // Create the authorization browser window.
+      const authorizationWindow = new BrowserWindow({
+        width: 640,
+        height: 480,
+        minimizable: false,
+        maximizable: false,
+        resizable: false,
+        frame: false,
+        titleBarStyle: "hidden",
+        titleBarOverlay: {
+          color: "#000000",
+          symbolColor: "#BBBBBB",
+          height: 36
+        },
+        webPreferences: {
+          sandbox: true,
+          contextIsolation: true,
+          preload: AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY,
+          additionalArguments: [requestId]
+        }
+      });
+      authorizationWindow.loadURL(AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY);
+      authorizationWindow.show();
 
-    function closeListener() {
-      clearInterval(promiseInterval);
-      promiseResolve(false);
-    }
+      authorizationWindows.push(authorizationWindow);
 
-    const startTime = Date.now();
-    const authorized = await new Promise<boolean>(resolve => {
-      promiseResolve = resolve;
-      promiseInterval = setInterval(() => {
-        if (request.connection.destroyed) {
-          clearInterval(promiseInterval);
-          resolve(false);
+      try {
+        // Open the DevTools.
+        if (process.env.NODE_ENV === "development") {
+          authorizationWindow.webContents.openDevTools({
+            mode: "detach"
+          });
         }
 
-        if (Date.now() - startTime > 30 * 1000) {
+        let promiseResolve: (value: boolean | PromiseLike<boolean>) => void;
+        let promiseInterval: string | number | NodeJS.Timeout;
+
+        const resultListener = (_event: Electron.IpcMainEvent, authorized: boolean) => {
           clearInterval(promiseInterval);
-          resolve(false);
+          promiseResolve(authorized);
+        };
+
+        const closeListener = () => {
+          clearInterval(promiseInterval);
+          promiseResolve(false);
+        };
+
+        const startTime = Date.now();
+        const authorized = await new Promise<boolean>(resolve => {
+          promiseResolve = resolve;
+          promiseInterval = setInterval(() => {
+            if (request.connection.destroyed) {
+              clearInterval(promiseInterval);
+              resolve(false);
+            }
+
+            if (Date.now() - startTime > 30 * 1000) {
+              clearInterval(promiseInterval);
+              resolve(false);
+            }
+          }, 250);
+
+          ipcMain.once(`companionAuthorization:result:${requestId}`, resultListener);
+          ipcMain.once(`companionWindow:close:${requestId}`, closeListener);
+        });
+
+        authorizationWindow.close();
+        ipcMain.removeHandler(`companionAuthorization:getAppName:${requestId}`);
+        ipcMain.removeHandler(`companionAuthorization:getCode:${requestId}`);
+        ipcMain.removeListener(`companionAuthorization:result:${requestId}`, resultListener);
+        ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
+
+        if (authorized) {
+          const token = createAuthToken(options.getStore(), request.body.appName);
+
+          response.send({
+            token
+          });
+          options.getStore().set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString("false"));
+        } else {
+          response.code(403).send({
+            error: "AUTHORIZATION_DENIED"
+          });
         }
-      }, 250);
-
-      ipcMain.once("companionAuthorization:result", resultListener);
-      ipcMain.once("companionWindow:close", closeListener);
-    });
-
-    authorizationWindow.close();
-    ipcMain.removeHandler("companionAuthorization:getAppName");
-    ipcMain.removeHandler("companionAuthorization:getCode");
-    ipcMain.removeListener("companionAuthorization:result", resultListener);
-    ipcMain.removeListener("companionWindow:close", closeListener);
-
-    if (authorized) {
-      const token = createAuthToken(options.getStore(), request.body.appName);
-
-      response.send({
-        token
-      });
-      options.getStore().set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString("false"));
-    } else {
-      response.code(403).send({
-        error: "AUTHORIZATION_DENIED"
-      });
+      } finally {
+        const index = authorizationWindows.indexOf(authorizationWindow);
+        if (index > -1) {
+          authorizationWindows.splice(index, 1);
+        }
+      }
     }
-  });
+  );
 
   fastify.get(
     "/playlists",
@@ -291,10 +330,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         // This endpoint sends a real API request to YTM which allows to fetch playlists.
         // API users: Please cache playlists, they are unlikely to change often. A websocket event will be emitted if a playlist is created or deleted
         rateLimit: {
-          hook: 'preHandler',
+          hook: "preHandler",
           max: 1,
           timeWindow: 1000 * 30,
-          keyGenerator: (request) => {
+          keyGenerator: request => {
             return request.authId || request.ip;
           }
         }
@@ -310,13 +349,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
         const playlistsResponseListener = (_event: Electron.IpcMainEvent, playlists: Playlist[]) => {
           response.send(playlists);
-        }
+        };
         ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
 
         setTimeout(() => {
           ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
           response.code(504).send({
-            error: 'YTM_RESULT_TIMEOUT'
+            error: "YTM_RESULT_TIMEOUT"
           });
         }, 1000 * 5);
 
@@ -324,7 +363,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         //response.send(transformPlayerState(playerStateStore.getState()));
       } else {
         response.code(503).send({
-          error: 'YTM_UNAVAILABLE'
+          error: "YTM_UNAVAILABLE"
         });
       }
     }
@@ -336,10 +375,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       config: {
         // API users: Please utilize the realtime websocket to get the state. Request this endpoint as necessary, such as initial state fetching.
         rateLimit: {
-          hook: 'preHandler',
+          hook: "preHandler",
           max: 1,
           timeWindow: 1000 * 5,
-          keyGenerator: (request) => {
+          keyGenerator: request => {
             return request.authId || request.ip;
           }
         }
@@ -358,10 +397,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     {
       config: {
         rateLimit: {
-          hook: 'preHandler',
+          hook: "preHandler",
           max: 2,
           timeWindow: 1000 * 1,
-          keyGenerator: (request) => {
+          keyGenerator: request => {
             return request.authId || request.ip;
           }
         }
@@ -401,19 +440,19 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     const createPlaylistObservedListener = (_event: Electron.IpcMainEvent, playlist: Playlist) => {
       fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
     };
-    ipcMain.on('ytmView:createPlaylistObserved', createPlaylistObservedListener);
-    
+    ipcMain.on("ytmView:createPlaylistObserved", createPlaylistObservedListener);
+
     const deletePlaylistObservedListener = (_event: Electron.IpcMainEvent, playlistId: string) => {
       fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
     };
-    ipcMain.on('ytmView:deletePlaylistObserved', deletePlaylistObservedListener);
+    ipcMain.on("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
 
-    fastify.addHook('onClose', () => {
+    fastify.addHook("onClose", () => {
       // This should normally close on its own but we'll make sure it's closed out
       fastify.io.close();
       playerStateStore.removeEventListener(stateStoreListener);
-      ipcMain.off('ytmView:createPlaylistObserved', createPlaylistObservedListener);
-      ipcMain.off('ytmView:deletePlaylistObserved', deletePlaylistObservedListener);
+      ipcMain.off("ytmView:createPlaylistObserved", createPlaylistObservedListener);
+      ipcMain.off("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
     });
   });
 

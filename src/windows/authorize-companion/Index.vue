@@ -7,14 +7,16 @@ import Auth from "./Auth.vue";
   <div class="container">
     <TitleBar class="titlebar" />
     <Suspense>
-      <Auth></Auth>
+      <Auth class="auth"></Auth>
     </Suspense>
   </div>
 </template>
 
 <style scoped>
-.titlebar {
-  border-bottom: 1px solid #212121;
+.auth {
+  border-top: 1px solid #212121;
+  background-color: #000000;
+  height: calc(100% - 36px);
 }
 
 .container {
