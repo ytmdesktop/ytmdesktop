@@ -87,3 +87,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Contributors Export
+scripts/CONTRIBUTORS.md

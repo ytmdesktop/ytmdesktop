@@ -93,10 +93,39 @@ Navigate to [ytmdesktop-locales](https://github.com/ytmdesktop/ytmdesktop-locale
 -->
 
 ## Contributors
+
 A Thank you to all the contributors throughout the project, without their work this project would have just been a small project and never expanded to where it is now.
-<a href="https://github.com/ytmdesktop/ytmdesktop/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ytmdesktop/ytmdesktop&columns=8&max=48" style="width:100%;" />
-</a>
+
+[<img alt="adlerluiz" src="https://avatars.githubusercontent.com/u/2112638?v=4&s=120" width="120" height="120">](https://github.com/adlerluiz)
+[<img alt="rickpalmeira" src="https://avatars.githubusercontent.com/u/4140033?v=4&s=120" width="120" height="120">](https://github.com/rickpalmeira)
+[<img alt="mingjun97" src="https://avatars.githubusercontent.com/u/15214491?v=4&s=120" width="120" height="120">](https://github.com/mingjun97)
+[<img alt="Alipoodle" src="https://avatars.githubusercontent.com/u/17199186?v=4&s=120" width="120" height="120">](https://github.com/Alipoodle)
+[<img alt="NovusTheory" src="https://avatars.githubusercontent.com/u/3434404?v=4&s=120" width="120" height="120">](https://github.com/NovusTheory)
+[<img alt="flleeppyy" src="https://avatars.githubusercontent.com/u/18307183?v=4&s=120" width="120" height="120">](https://github.com/flleeppyy)
+[<img alt="zagoruev" src="https://avatars.githubusercontent.com/u/986243?v=4&s=120" width="120" height="120">](https://github.com/zagoruev)
+[<img alt="Venipa" src="https://avatars.githubusercontent.com/u/17952364?v=4&s=120" width="120" height="120">](https://github.com/Venipa)
+[<img alt="serzhan-nasredin" src="https://avatars.githubusercontent.com/u/67647968?v=4&s=120" width="120" height="120">](https://github.com/serzhan-nasredin)
+[<img alt="TotalChris" src="https://avatars.githubusercontent.com/u/41809916?v=4&s=120" width="120" height="120">](https://github.com/TotalChris)
+[<img alt="ArnyminerZ" src="https://avatars.githubusercontent.com/u/12086466?v=4&s=120" width="120" height="120">](https://github.com/ArnyminerZ)
+[<img alt="TotallyNotInUse" src="https://avatars.githubusercontent.com/u/56458705?v=4&s=120" width="120" height="120">](https://github.com/TotallyNotInUse)
+[<img alt="pinkiesky" src="https://avatars.githubusercontent.com/u/7098424?v=4&s=120" width="120" height="120">](https://github.com/pinkiesky)
+[<img alt="ddarkr" src="https://avatars.githubusercontent.com/u/6638675?v=4&s=120" width="120" height="120">](https://github.com/ddarkr)
+[<img alt="NNowakowski" src="https://avatars.githubusercontent.com/u/16933892?v=4&s=120" width="120" height="120">](https://github.com/NNowakowski)
+[<img alt="Vistaus" src="https://avatars.githubusercontent.com/u/1716229?v=4&s=120" width="120" height="120">](https://github.com/Vistaus)
+[<img alt="smarquespt" src="https://avatars.githubusercontent.com/u/1302668?v=4&s=120" width="120" height="120">](https://github.com/smarquespt)
+[<img alt="peter9811" src="https://avatars.githubusercontent.com/u/22783445?v=4&s=120" width="120" height="120">](https://github.com/peter9811)
+[<img alt="andrew000" src="https://avatars.githubusercontent.com/u/11490628?v=4&s=120" width="120" height="120">](https://github.com/andrew000)
+[<img alt="adiologydev" src="https://avatars.githubusercontent.com/u/9266227?v=4&s=120" width="120" height="120">](https://github.com/adiologydev)
+[<img alt="chaoky" src="https://avatars.githubusercontent.com/u/9826702?v=4&s=120" width="120" height="120">](https://github.com/chaoky)
+[<img alt="nattadasu" src="https://avatars.githubusercontent.com/u/49780229?v=4&s=120" width="120" height="120">](https://github.com/nattadasu)
+[<img alt="Nerogar" src="https://avatars.githubusercontent.com/u/3390934?v=4&s=120" width="120" height="120">](https://github.com/Nerogar)
+[<img alt="nils-kt" src="https://avatars.githubusercontent.com/u/34674720?v=4&s=120" width="120" height="120">](https://github.com/nils-kt)
+[<img alt="andia89" src="https://avatars.githubusercontent.com/u/6475757?v=4&s=120" width="120" height="120">](https://github.com/andia89)
+[<img alt="tbvjaos510" src="https://avatars.githubusercontent.com/u/32216112?v=4&s=120" width="120" height="120">](https://github.com/tbvjaos510)
+[<img alt="danparidae" src="https://avatars.githubusercontent.com/u/7272087?v=4&s=120" width="120" height="120">](https://github.com/danparidae)
+[<img alt="asuetin" src="https://avatars.githubusercontent.com/u/37500046?v=4&s=120" width="120" height="120">](https://github.com/asuetin)
+[<img alt="PHNX-Arcanus" src="https://avatars.githubusercontent.com/u/23439665?v=4&s=120" width="120" height="120">](https://github.com/PHNX-Arcanus)
+[<img alt="austonpramodh" src="https://avatars.githubusercontent.com/u/5049050?v=4&s=120" width="120" height="120">](https://github.com/austonpramodh)
 
 [discord-img]: https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord
 [discord-url]: https://discord.gg/88P2n2a
