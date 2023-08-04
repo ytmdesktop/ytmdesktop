@@ -39,7 +39,15 @@ const transformPlayerState = (state: PlayerState) => {
           durationSeconds: state.videoDetails.durationSeconds,
           id: state.videoDetails.id
         }
-      : null
+      : null,
+    // API Users:
+    // WARNING! WARNING! WARNING! WARNING!
+    // playlistId may not be what you expect it to be.
+    // - If the song playing comes from a randomly generated radio queue then this will be the id of that random queue (YTM does not persist these, pretend these IDs don't exist on the YTM backend)
+    // - If you add an album/playlist to queue once those songs start playing then playlistId will be the id of that album/playlist
+    // - Play Next for individual songs have a null playlistId when reached in a queue. Does not apply for Play Next to an entire album/playlist.
+    // In summary, this property doesn't reliably tell you this video belongs to the specified playlistId. Do not treat it as such. Use it as a state if something may be playing from a known playlistId
+    playlistId: state.playlistId
   };
 };
 
