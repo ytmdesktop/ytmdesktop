@@ -7,6 +7,7 @@ import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuth
 import fastifyRateLimit from '@fastify/rate-limit';
 import crypto from 'crypto';
 import createError from "@fastify/error";
+import { APIV1CommandRequestBody, APIV1CommandRequestBodyType } from "../../shared/schemas";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -46,11 +47,11 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
   getYtmView: () => BrowserView;
 }
 
-const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
+//const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
 const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
 const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' is invalid", 400);
 
-type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
+//type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
 type Playlist = {
   id: string,
@@ -58,10 +59,10 @@ type Playlist = {
 }
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options, next) => {
-  const sendCommand = (command: RemoteCommand, value: unknown) => {
+  const sendCommand = (commandRequest: APIV1CommandRequestBodyType) => {
     const ytmView = options.getYtmView();
     if (ytmView) {
-      switch (command) {
+      switch (commandRequest.command) {
         case "playPause": {
           ytmView.webContents.send("remoteControl:execute", "playPause");
           break;
@@ -88,10 +89,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
 
         case "setVolume": {
-          const volume = value as number;
+          const volume = commandRequest.data;
           // Check if Volume is a number and between 0 and 100
           if (isNaN(volume) || volume < 0 || volume > 100) {
-            throw new InvalidVolumeError("Invalid volume");
+            throw new InvalidVolumeError(volume);
           }
 
           ytmView.webContents.send("remoteControl:execute", "setVolume", volume);
@@ -119,7 +120,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
 
         case "repeatMode": {
-          const repeatMode = value as string;
+          const repeatMode = commandRequest.data;
           switch (repeatMode) {
             case "NONE": {
               ytmView.webContents.send("remoteControl:execute", "repeatMode", "NONE");
@@ -138,10 +139,6 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
             }
           }
           break;
-        }
-
-        default: {
-          throw new InvalidCommandError(command);
         }
       }
     }
@@ -356,7 +353,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.post<{ Body: { command: RemoteCommand, data: unknown } }>(
+  fastify.post<{ Body: APIV1CommandRequestBodyType }>(
     "/command",
     {
       config: {
@@ -369,12 +366,15 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           }
         }
       },
+      schema: {
+        body: APIV1CommandRequestBody
+      },
       preHandler: (request, response, next) => {
         return isAuthValidMiddleware(options.getStore(), request, response, next);
       }
     },
     (request, response) => {
-      sendCommand(request.body.command, request.body.data);
+      sendCommand(request.body);
       response.code(204).send();
     }
   );

@@ -5,6 +5,7 @@ import CompanionServerAPIv1 from "./api/v1";
 import { StoreSchema } from "../../shared/store/schema";
 import ElectronStore from "electron-store";
 import { BrowserView } from "electron";
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -18,7 +19,7 @@ export default class CompanionServer implements IIntegration {
   }
 
   private createServer() {
-    this.fastifyServer = Fastify();
+    this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
     this.fastifyServer.register(FastifyIO, {
       transports: ["websocket"],
       allowUpgrades: false

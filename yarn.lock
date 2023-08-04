@@ -397,6 +397,11 @@
     ms "^2.1.3"
     tiny-lru "^11.0.0"
 
+"@fastify/type-provider-typebox@^3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@fastify/type-provider-typebox/-/type-provider-typebox-3.4.0.tgz#9a5ce55fed9a5d4bb89b9860c215c3fc881f6496"
+  integrity sha512-wy1ihi8WtH00sW4YlaA0lZ0nIz/mVVh4stQQ68AtNYTgXI9LPKWylNYDTP2lcXO9az9w902CvqRc8BBwOUTo7w==
+
 "@gar/promisify@^1.1.3":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -545,6 +550,11 @@
   dependencies:
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
+
+"@sinclair/typebox@^0.30.2":
+  version "0.30.2"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.30.2.tgz#6036b17f2ccf0ef8a308d8c352e3081075c43c57"
+  integrity sha512-PNEojrBZGQL+llfGfGn6EZNHUXxyvA3LeySMUxMk+i+GrtuT1nBBP3BPzzgJKW9b7lUMa9KxHVx+CIPEy5bL5w==
 
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"

@@ -56,6 +56,8 @@
   "dependencies": {
     "@fastify/error": "^3.3.0",
     "@fastify/rate-limit": "^8.0.3",
+    "@fastify/type-provider-typebox": "^3.4.0",
+    "@sinclair/typebox": "^0.30.2",
     "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
