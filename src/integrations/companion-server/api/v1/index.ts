@@ -2,7 +2,7 @@ import { BrowserView, BrowserWindow, ipcMain, safeStorage } from "electron";
 import ElectronStore from "electron-store";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "../../../../shared/store/schema";
-import playerStateStore, { PlayerState } from "../../../../player-state-store";
+import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-state-store";
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
@@ -49,7 +49,7 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
 
 //const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
 const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
-const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' is invalid", 400);
+const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' cannot be set", 400);
 
 //type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
@@ -124,15 +124,15 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         case "repeatMode": {
           const repeatMode = commandRequest.data;
           switch (repeatMode) {
-            case "NONE": {
+            case RepeatMode.None: {
               ytmView.webContents.send("remoteControl:execute", "repeatMode", "NONE");
               break;
             }
-            case "ALL": {
+            case RepeatMode.All: {
               ytmView.webContents.send("remoteControl:execute", "repeatMode", "ALL");
               break;
             }
-            case "ONE": {
+            case RepeatMode.One: {
               ytmView.webContents.send("remoteControl:execute", "repeatMode", "ONE");
               break;
             }

@@ -1,34 +1,40 @@
 import { EventEmitter } from "events";
 
 export enum VideoState {
-  UnknownNegativeOne = -1,
+  Unknown = -1,
+  Paused = 0,
   Playing = 1,
-  Paused = 2,
-  Buffering = 3,
-  UnknownFive = 5
+  Buffering = 2
+}
+
+export enum RepeatMode {
+  Unknown = -1,
+  None = 0,
+  All = 1,
+  One = 2
 }
 
 export type Thumbnail = {
   height: number;
   url: string;
   width: number;
-}
+};
 
 export type VideoDetails = {
-  album: string,
-  author: string,
-  durationSeconds: number,
-  thumbnails: Thumbnail[],
-  title: string,
-  id: string
+  album: string;
+  author: string;
+  durationSeconds: number;
+  thumbnails: Thumbnail[];
+  title: string;
+  id: string;
 };
 
 export type PlayerQueueItem = {
-  thumbnails: Thumbnail[],
-  title: string,
-  author: string,
-  duration: string,
-  selected: boolean
+  thumbnails: Thumbnail[];
+  title: string;
+  author: string;
+  duration: string;
+  selected: boolean;
 };
 
 export type PlayerQueue = {
@@ -37,7 +43,7 @@ export type PlayerQueue = {
   isGenerating: boolean;
   isInfinite: boolean;
   items: PlayerQueueItem[];
-  repeatMode: "NONE" | "ALL" | "ONE";
+  repeatMode: RepeatMode;
   selectedItemIndex: number;
 };
 
@@ -48,6 +54,14 @@ export type PlayerState = {
   queue: PlayerQueue;
   videoProgress: number;
 };
+
+enum YTMVideoState {
+  UnknownNegativeOne = -1,
+  Playing = 1,
+  Paused = 2,
+  Buffering = 3,
+  UnknownFive = 5
+}
 
 type YTMThumbnail = {
   height: number;
@@ -83,25 +97,27 @@ type YTMPlayerQueueItem = {
   } | null;
 };
 
+type YTMRepeatMode = "NONE" | "ALL" | "ONE";
+
 type YTMPlayerQueue = {
   automixItems: YTMPlayerQueueItem[];
   autoplay: boolean;
   isGenerating: boolean;
   isInfinite: boolean;
   items: YTMPlayerQueueItem[];
-  repeatMode: "NONE" | "ALL" | "ONE";
+  repeatMode: YTMRepeatMode;
 };
 
 type YTMVideoDetails = {
-  album: string,
-  author: string,
-  lengthSeconds: string,
+  album: string;
+  author: string;
+  lengthSeconds: string;
   thumbnail: {
-    thumbnails: YTMThumbnail[]
-  },
-  title: string,
-  videoId: string
-}
+    thumbnails: YTMThumbnail[];
+  };
+  title: string;
+  videoId: string;
+};
 
 function getYTMTextRun(runs: YTMTextRun[]) {
   let final = "";
@@ -139,6 +155,27 @@ function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem {
   };
 }
 
+// This may seem redundant but we do this in case YTM changes its own data to accomodate and prevent severe breaking of things
+function transformRepeatMode(repeatMode: YTMRepeatMode) {
+  switch (repeatMode) {
+    case "NONE": {
+      return RepeatMode.None;
+    }
+    
+    case "ALL": {
+      return RepeatMode.All;
+    }
+
+    case "ONE": {
+      return RepeatMode.One;
+    }
+
+    default: {
+      return RepeatMode.Unknown;
+    }
+  }
+}
+
 class PlayerStateStore {
   private videoProgress = 0;
   private state: VideoState = -1;
@@ -170,8 +207,28 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateVideoState(state: VideoState) {
-    this.state = state;
+  public updateVideoState(state: YTMVideoState) {
+    switch (state) {
+      case YTMVideoState.Paused: {
+        this.state = VideoState.Paused;
+        break;
+      }
+
+      case YTMVideoState.Playing: {
+        this.state = VideoState.Playing;
+        break;
+      }
+
+      case YTMVideoState.Buffering: {
+        this.state = VideoState.Buffering;
+        break;
+      }
+
+      default: {
+        this.state = VideoState.Unknown;
+        break;
+      }
+    }
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
@@ -199,7 +256,7 @@ class PlayerStateStore {
           // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
           isInfinite: queueState.isInfinite,
           items: queueState.items.map(mapYTMQueueItems),
-          repeatMode: queueState.repeatMode,
+          repeatMode: transformRepeatMode(queueState.repeatMode),
           // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
           selectedItemIndex: queueItems.findIndex(item => {
             return item.selected;

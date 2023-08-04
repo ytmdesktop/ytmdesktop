@@ -1,4 +1,5 @@
 import { Static, Type } from "@sinclair/typebox";
+import { RepeatMode } from "../../../player-state-store";
 
 export const APIV1CommandRequestBody = Type.Union([
   Type.Object({
@@ -37,7 +38,7 @@ export const APIV1CommandRequestBody = Type.Union([
   }),
   Type.Object({
     command: Type.Literal("repeatMode"),
-    data: Type.Union([Type.Literal("NONE"), Type.Literal("ALL"), Type.Literal("ONE")])
+    data: Type.Enum(RepeatMode)
   })
 ]);
 export type APIV1CommandRequestBodyType = Static<typeof APIV1CommandRequestBody>;
