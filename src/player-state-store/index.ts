@@ -23,6 +23,7 @@ export type Thumbnail = {
 export type VideoDetails = {
   album: string;
   author: string;
+  channelId: string;
   durationSeconds: number;
   thumbnails: Thumbnail[];
   title: string;
@@ -111,6 +112,7 @@ type YTMPlayerQueue = {
 type YTMVideoDetails = {
   album: string;
   author: string;
+  channelId: string;
   lengthSeconds: string;
   thumbnail: {
     thumbnails: YTMThumbnail[];
@@ -235,6 +237,7 @@ class PlayerStateStore {
   public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string) {
     this.videoDetails = {
       author: videoDetails.author,
+      channelId: videoDetails.channelId,
       title: videoDetails.title,
       album: videoDetails.album,
       thumbnails: videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails),

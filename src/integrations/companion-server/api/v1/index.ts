@@ -32,6 +32,7 @@ const transformPlayerState = (state: PlayerState) => {
     video: state.videoDetails
       ? {
           author: state.videoDetails.author,
+          channelId: state.videoDetails.channelId,
           title: state.videoDetails.title,
           album: state.videoDetails.album,
           thumbnails: state.videoDetails.thumbnails,
