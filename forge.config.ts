@@ -11,10 +11,25 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     icon: "./src/assets/icons/ytmd",
-    extraResource: ["./src/assets/icons"]
+    extraResource: ["./src/assets/icons"],
+    protocols: [
+      {
+        name: "YouTube Music Desktop App",
+        schemes: ["ytmd"]
+      }
+    ]
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ["darwin"]), new MakerRpm({}), new MakerDeb({})],
+  makers: [
+    new MakerSquirrel({}),
+    new MakerZIP({}, ["darwin"]),
+    new MakerRpm({}),
+    new MakerDeb({
+      options: {
+        mimeType: ["x-scheme-handler/ytmd"]
+      }
+    })
+  ],
   plugins: [
     new WebpackPlugin({
       mainConfig,

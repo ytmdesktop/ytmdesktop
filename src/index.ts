@@ -41,10 +41,9 @@ let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
 // Single Instances Lock
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
-  applicationQuitting = true;
-  app.quit();
+  app.exit(0);
 } else {
-  app.on("second-instance", () => {
+  app.on("second-instance", (_, commandLine) => {
     if (mainWindow) {
       mainWindow.show();
       if (mainWindow.isMinimized()) {
@@ -52,7 +51,44 @@ if (!gotTheLock) {
       }
       mainWindow.focus();
     }
+
+    handleProtocol(commandLine[commandLine.length-1])
   });
+}
+
+// Protocol handler
+function handleProtocol(url: string) {
+  const urlPaths = url.split('://')[1];
+  if (urlPaths) {
+    const paths = urlPaths.split("/");
+    if (paths.length > 0) {
+      switch (paths[0]) {
+        case "play": {
+          if (paths.length >= 2) {
+            const videoId = paths[1];
+            const playlistId = paths[2];
+            
+            if (ytmView) {
+              ytmView.webContents.send("remoteControl:execute", "navigate", {
+                watchEndpoint: {
+                  videoId: videoId,
+                  playlistId: playlistId
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient("ytmd", process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient("ytmd", process.execPath);
 }
 
 // Create the persistent config store
@@ -897,6 +933,10 @@ app.on('before-quit', () => {
   store.set("state.lastUrl", lastUrl);
   store.set("state.lastVideoId", lastVideoId);
   store.set("state.lastPlaylistId", lastPlaylistId);
+})
+
+app.on('open-url', (_, url) => {
+  handleProtocol(url);
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
