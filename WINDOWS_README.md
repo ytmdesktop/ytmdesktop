@@ -8,7 +8,10 @@ Installation (what should get Windows to build):
 In order to install this module, run npm install:
 
 ```
+npm install @nodert-win10-rs4/windows.foundation
+npm install @nodert-win10-rs4/windows.media
 npm install @nodert-win10-rs4/windows.storage.streams
+npm install https://github.com/NovusTheory/nodert-windows.media.playback.git
 ```
 
 If you wish to rebuild this module using node-gyp, make sure to use the appropriate VS version using --msvs_version=2012/2013/2015/2017 flag:
