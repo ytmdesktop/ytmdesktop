@@ -435,7 +435,7 @@ function isAdvertisement(webContents) {
             `document.querySelector('.advertisement') ? document.querySelector('.advertisement').hasAttribute('hidden') : false`
         )
         .then((isAdvertisement) => {
-            track.isAdvertisement = !isAdvertisement
+            track.isAdvertisement = isAdvertisement
             debug(`Is advertisement: ${track.isAdvertisement}`)
         })
         .catch((_) => console.log('error isAdvertisement'))
