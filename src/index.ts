@@ -915,9 +915,20 @@ app.on("ready", () => {
   })
 
   // Create the permission handlers
+  session.fromPartition("persist:ytmview").setPermissionCheckHandler((webContents, permission) => {
+    if (webContents == ytmView.webContents) {
+      if (permission === "fullscreen") {
+        return true;
+      }
+    }
+
+    return false;
+  });
   session.fromPartition("persist:ytmview").setPermissionRequestHandler((webContents, permission, callback) => {
-    if (permission === "fullscreen") {
-      return callback(true);
+    if (webContents == ytmView.webContents) {
+      if (permission === "fullscreen") {
+        return callback(true);
+      }
     }
 
     return callback(false);
