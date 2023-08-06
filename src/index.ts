@@ -87,9 +87,12 @@ autoUpdater.on("update-downloaded", () => {
     settingsWindow.webContents.send("app:updateDownloaded");
   }
 });
+/*
+TEMPORARY UPDATE CHECK DISABLE WHILE DEVELOPMENT OCCURS (This will always have errors for now until a release occurs)
 setInterval(() => {
   autoUpdater.checkForUpdates()
 }, 1000 * 60 * 10);
+*/
 
 // Protocol handler
 function handleProtocol(url: string) {
