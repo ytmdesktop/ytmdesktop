@@ -30,6 +30,17 @@ const config: ForgeConfig = {
       }
     })
   ],
+  publishers: [
+    {
+      name: "@electron-forge/publisher-github",
+      config: {
+        repository: {
+          owner: "ytmdesktop",
+          name: "ytmdesktop"
+        }
+      }
+    }
+  ],
   plugins: [
     new WebpackPlugin({
       mainConfig,

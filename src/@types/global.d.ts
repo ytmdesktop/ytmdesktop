@@ -13,6 +13,7 @@ declare global {
       };
       openSettingsWindow(): void;
       restartApplication(): void;
+      restartApplicationForUpdate(): void;
 
       // Companion Authorization specific
       sendResult(authorized: boolean);
@@ -29,6 +30,16 @@ declare global {
       closeWindow(): void;
       handleWindowEvents(callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void);
       requestWindowState(): void;
+
+      // App specific
+      getAppVersion(): string;
+      checkForUpdates(): void;
+      handleCheckingForUpdate(callback: (event: Electron.IpcRendererEvent) => void);
+      handleUpdateAvailable(callback: (event: Electron.IpcRendererEvent) => void);
+      handleUpdateNotAvailable(callback: (event: Electron.IpcRendererEvent) => void);
+      handleUpdateDownloaded(callback: (event: Electron.IpcRendererEvent) => void);
+      isAppUpdateAvailable(): Promise<boolean>;
+      isAppUpdateDownloaded(): Promise<boolean>;
     };
   }
 
