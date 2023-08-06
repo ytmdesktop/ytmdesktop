@@ -36,6 +36,8 @@ export type PlayerQueueItem = {
   author: string;
   duration: string;
   selected: boolean;
+  videoId: string;
+  counterparts: PlayerQueueItem[];
 };
 
 export type PlayerQueue = {
@@ -89,12 +91,19 @@ type YTMPlayerQueueItemVideoRenderer = {
   videoId: string;
 };
 
+type YTMPlayerQueueItemCounterpart = {
+  counterpartRenderer: {
+    playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer;
+  };
+}
+
 type YTMPlayerQueueItem = {
   playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer | null;
   playlistPanelVideoWrapperRenderer: {
     primaryRenderer: {
       playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer;
     };
+    counterpart: YTMPlayerQueueItemCounterpart[];
   } | null;
 };
 
@@ -139,22 +148,38 @@ function mapYTMThumbnails(thumbnail: YTMThumbnail) {
   };
 }
 
-function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem {
-  let playlistPanelVideoRenderer;
-  if (item.playlistPanelVideoRenderer) playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
-  else if (item.playlistPanelVideoWrapperRenderer)
-    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
+function mapCounterpart(counterpart: YTMPlayerQueueItemCounterpart) {
+  // Explicit mapping to keep a consistent API
+  // If YouTube Music changes how this is presented internally then it's easier to update without breaking the API
+  return transformPlaylistPanelVideoRenderer(counterpart.counterpartRenderer.playlistPanelVideoRenderer);
+}
 
-  // This probably shouldn't happen but in the off chance it does we need to return nothing
-  if (!playlistPanelVideoRenderer) return null;
-
+function transformPlaylistPanelVideoRenderer(playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer, counterpart?: YTMPlayerQueueItemCounterpart[]): PlayerQueueItem {
   return {
     thumbnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails),
     title: getYTMTextRun(playlistPanelVideoRenderer.title.runs),
     author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText.runs),
     duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText.runs),
-    selected: playlistPanelVideoRenderer.selected
-  };
+    selected: playlistPanelVideoRenderer.selected,
+    videoId: playlistPanelVideoRenderer.videoId,
+    counterparts: counterpart ? counterpart.map(mapCounterpart) : null
+  }
+}
+
+function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem {
+  let playlistPanelVideoRenderer;
+  let counterpart;
+  if (item.playlistPanelVideoRenderer) {
+    playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
+  } else if (item.playlistPanelVideoWrapperRenderer) {
+    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
+    counterpart = item.playlistPanelVideoWrapperRenderer.counterpart
+  }
+
+  // This probably shouldn't happen but in the off chance it does we need to return nothing
+  if (!playlistPanelVideoRenderer) return null;
+
+  return transformPlaylistPanelVideoRenderer(playlistPanelVideoRenderer, counterpart);
 }
 
 // This may seem redundant but we do this in case YTM changes its own data to accomodate and prevent severe breaking of things
@@ -163,7 +188,7 @@ function transformRepeatMode(repeatMode: YTMRepeatMode) {
     case "NONE": {
       return RepeatMode.None;
     }
-    
+
     case "ALL": {
       return RepeatMode.All;
     }
