@@ -137,7 +137,7 @@ export default class DiscordPresence implements IIntegration {
         this.ready = false;
       });
       this.discordClient.connect(DISCORD_CLIENT_ID);
-      playerStateStore.addEventListener((state: PlayerState) => this.playerStateChanged(state));
+      playerStateStore.addEventListener(this.playerStateChanged);
     }
   }
 
@@ -147,5 +147,6 @@ export default class DiscordPresence implements IIntegration {
       this.discordClient.destroy();
       this.discordClient = null;
     }
+    playerStateStore.removeEventListener(this.playerStateChanged);
   }
 }
