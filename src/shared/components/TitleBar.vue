@@ -10,9 +10,14 @@ defineProps({
     type: String,
     default: null
   },
+  iconFile: {
+    type: String,
+    default: null
+  },
   hasSettingsButton: Boolean,
   hasMinimizeButton: Boolean,
-  hasMaximizeButton: Boolean
+  hasMaximizeButton: Boolean,
+  centerTitleText: Boolean
 });
 
 const minimizeWindow = window.ytmd.minimizeWindow;
@@ -39,10 +44,14 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
 <template>
   <div v-if="!windowFullscreen" class="titlebar">
     <div class="left">
-      <div v-if="title" class="title">
+      <div class="title">
         <span v-if="icon" class="icon material-symbols-outlined">{{ icon }}</span>
-        {{ title }}
+        <img v-if="iconFile" class="icon" :src="iconFile" />
+        <p v-if="title && !centerTitleText" class="title-text">{{ title }}</p>
       </div>
+    </div>
+    <div v-if="title && centerTitleText" class="center">
+      <p class="title-text">{{ title }}</p>
     </div>
     <div class="right">
       <div class="app-buttons">
@@ -112,6 +121,8 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
     "wght" 100,
     "GRAD" 0,
     "opsz" 24;
+  width: 24px;
+  height: 24px;
 }
 
 .app-button {
