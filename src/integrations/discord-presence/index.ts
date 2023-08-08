@@ -71,7 +71,7 @@ export default class DiscordPresence implements IIntegration {
   private pauseTimeout: string | number | NodeJS.Timeout = null;
   private previousProgress: number | null = null;
   private endTimestamp: number | null = null;
-  private stateCallback: (event: PlayerState) => void;
+  private stateCallback: (event: PlayerState) => void = null;
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
@@ -151,6 +151,8 @@ export default class DiscordPresence implements IIntegration {
       this.discordClient.destroy();
       this.discordClient = null;
     }
-    playerStateStore.removeEventListener(this.stateCallback);
+    if (this.stateCallback) {
+      playerStateStore.removeEventListener(this.stateCallback);
+    }
   }
 }
