@@ -71,6 +71,7 @@ export default class DiscordPresence implements IIntegration {
   private pauseTimeout: string | number | NodeJS.Timeout = null;
   private previousProgress: number | null = null;
   private endTimestamp: number | null = null;
+  private stateCallback: (event: PlayerState) => void;
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
@@ -137,7 +138,10 @@ export default class DiscordPresence implements IIntegration {
         this.ready = false;
       });
       this.discordClient.connect(DISCORD_CLIENT_ID);
-      playerStateStore.addEventListener(this.playerStateChanged);
+      this.stateCallback = (event) => {
+        this.playerStateChanged(event);
+      }
+      playerStateStore.addEventListener(this.stateCallback);
     }
   }
 
@@ -147,6 +151,6 @@ export default class DiscordPresence implements IIntegration {
       this.discordClient.destroy();
       this.discordClient = null;
     }
-    playerStateStore.removeEventListener(this.playerStateChanged);
+    playerStateStore.removeEventListener(this.stateCallback);
   }
 }
