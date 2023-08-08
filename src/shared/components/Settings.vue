@@ -292,9 +292,11 @@ window.ytmd.handleUpdateDownloaded(() => {
             <span class="material-symbols-outlined">progress_activity</span>Downloading update...
           </p>
           <p v-if="updateNotAvailable" class="no-update">Update not available</p>
-          <p class="version">Version: {{ ytmdVersion }}</p>
-          <p class="branch">Branch: {{ ytmdBranch }}</p>
-          <p class="commit">Commit: {{ ytmdCommitHash }}</p>
+          <span class="version-info">
+            <p class="version">Version: {{ ytmdVersion }}</p>
+            <p class="branch">Branch: {{ ytmdBranch }}</p>
+            <p class="commit">Commit: {{ ytmdCommitHash }}</p>
+          </span>
           <div class="links">
             <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
             <a href="https://ytmdesktop.app" target="_blank">Website</a>
@@ -306,15 +308,11 @@ window.ytmd.handleUpdateDownloaded(() => {
 </template>
 
 <style scoped>
-body,
-* {
-  user-select: none;
-}
-
 .settings-container {
   height: calc(100% - 36px);
   display: flex;
   flex-direction: column;
+  user-select: none;
 }
 
 .content-container {
@@ -553,5 +551,9 @@ body,
 .updating .material-symbols-outlined,
 .update-button .material-symbols-outlined {
   margin-right: 4px;
+}
+
+.version-info {
+  user-select: text;
 }
 </style>
