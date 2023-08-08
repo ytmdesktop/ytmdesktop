@@ -1,5 +1,5 @@
 import DiscordRPC from "discord-rpc";
-import playerStateStore, { PlayerState, Thumbnail } from "../../player-state-store";
+import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 
 const DISCORD_CLIENT_ID = "495666957501071390";
@@ -20,15 +20,15 @@ function getHighestResThumbnail(thumbnails: Thumbnail[]) {
 
 function getSmallImageKey(state: number) {
   switch (state) {
-    case 1: {
+    case VideoState.Playing: {
       return "discordrpc-play";
     }
 
-    case 2: {
+    case VideoState.Paused: {
       return "discordrpc-pause";
     }
 
-    case 3: {
+    case VideoState.Buffering: {
       return "discordrpc-play";
     }
 
@@ -40,15 +40,15 @@ function getSmallImageKey(state: number) {
 
 function getSmallImageText(state: number) {
   switch (state) {
-    case 1: {
+    case VideoState.Playing: {
       return "Playing";
     }
 
-    case 2: {
+    case VideoState.Paused: {
       return "Paused";
     }
 
-    case 3: {
+    case VideoState.Buffering: {
       return "Buffering";
     }
 
@@ -77,7 +77,7 @@ export default class DiscordPresence implements IIntegration {
     if (this.ready && state.videoDetails) {
       if (!this.previousProgress) {
         this.endTimestamp =
-          state.trackState === 1 ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.round(state.videoProgress)) : undefined;
+          state.trackState === VideoState.Playing ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.round(state.videoProgress)) : undefined;
         this.previousProgress = state.videoProgress;
       }
 
@@ -90,7 +90,7 @@ export default class DiscordPresence implements IIntegration {
         smallImageKey: getSmallImageKey(state.trackState),
         smallImageText: getSmallImageText(state.trackState),
         instance: false,
-        endTimestamp: state.trackState === 1 ? this.endTimestamp : undefined,
+        endTimestamp: state.trackState === VideoState.Playing ? this.endTimestamp : undefined,
         buttons: [
           {
             label: "Play on YouTube Music",
@@ -99,7 +99,7 @@ export default class DiscordPresence implements IIntegration {
         ]
       });
 
-      if (state.trackState === 2) {
+      if (state.trackState === VideoState.Buffering || state.trackState === VideoState.Paused) {
         if (this.pauseTimeout) {
           clearTimeout(this.pauseTimeout);
           this.pauseTimeout = null;
