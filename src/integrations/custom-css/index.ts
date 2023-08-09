@@ -27,6 +27,10 @@ export default class CustomCSS implements IIntegration {
     this.ytmView = ytmView;
     this.store = store;
 
+    if (ytmViewChanged) {
+      this.customCSSKey = null;
+    }
+
     if ((this.isEnabled && !this.hasInjectedOnce) || (this.isEnabled && ytmViewChanged)) {
       this.enable();
     }
