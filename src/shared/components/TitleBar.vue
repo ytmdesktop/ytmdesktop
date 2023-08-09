@@ -125,6 +125,10 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
   height: 24px;
 }
 
+.title-text {
+  font-family: 'Open Sans', sans-serif;
+}
+
 .app-button {
   width: 28px;
   height: 28px;
