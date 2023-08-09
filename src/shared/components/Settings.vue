@@ -10,12 +10,13 @@ const ytmdVersion = await window.ytmd.getAppVersion();
 const ytmdCommitHash = YTMD_GIT_COMMIT_HASH.substring(0, 6);
 const ytmdBranch = YTMD_GIT_BRANCH;
 
-const currentTab = ref(1);
+const currentTab = ref(2);
 const requiresRestart = ref(false);
 const checkingForUpdate = ref(false);
 const updateAvailable = ref(await window.ytmd.isAppUpdateAvailable());
 const updateNotAvailable = ref(false);
 const updateDownloaded = ref(await window.ytmd.isAppUpdateDownloaded());
+const cssPathFileInput = ref(null);
 
 const store = window.ytmd.store;
 const safeStorage = window.ytmd.safeStorage;
@@ -134,6 +135,12 @@ async function settingChangedFile(event: Event) {
       ? target.files[0].path
       : null
   );
+
+  target.value = null;
+}
+
+function removeCustomCSSPath() {
+  store.set("appearance.customCSSPath", null);
 }
 
 function changeTab(newTab: number) {
@@ -227,9 +234,16 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p>Custom CSS</p>
             <input v-model="customCSSEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
-          <div class="setting indented">
+          <div v-if="customCSSEnabled" class="setting indented">
             <p>Custom CSS File Path</p>
-            <input type="file" accept=".css" data-setting="appearance.customCSSPath" @change="settingChangedFile"  />
+            <div class="file-picker">
+              <input ref="cssPathFileInput" type="file" accept=".css" data-setting="appearance.customCSSPath" @change="settingChangedFile"  />
+              <div class="file-input-button">
+                <button class="choose" @click="cssPathFileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
+                <input type="text" readonly :title="customCSSPath" class="path" placeholder="No file chosen" :value="customCSSPath" />
+                <button class="remove" @click="removeCustomCSSPath"><span class="material-symbols-outlined">delete</span></button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -590,5 +604,65 @@ window.ytmd.handleUpdateDownloaded(() => {
 
 .version-info {
   user-select: text;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-picker {
+  background-color: #212121;
+  border-radius: 4px;
+}
+
+.file-input-button {
+  width: 216px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.file-input-button button {
+  padding: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.file-input-button button.choose {
+  background-color: #f44336;
+  border-radius: 4px 0 0 4px;
+}
+
+.file-input-button button.remove {
+  background-color: transparent;
+  border-left: 1px solid #323232;
+  border-radius: 0 4px 4px 0;
+}
+
+.file-input-button button .material-symbols-outlined {
+  margin-right: 4px;
+  font-size: 18px;
+}
+
+.file-input-button input[type="text"] {
+  margin: 0;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+}
+
+.file-input-button input[type="text"]:focus,
+.file-input-button input[type="text"]:active {
+  outline: none;
+}
+
+.file-input-button p {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

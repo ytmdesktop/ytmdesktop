@@ -199,17 +199,21 @@ store.onDidAnyChange((newState, oldState) => {
 
   if (newState.appearance.customCSSEnabled) {
     customCss.provide(store, ytmView);
+  }
+  if (newState.appearance.customCSSEnabled && !oldState.appearance.customCSSEnabled) {
     customCss.enable();
   }
-  else {
+  else if (!newState.appearance.customCSSEnabled) {
     customCss.disable();
   }
 
   if (newState.playback.ratioVolume) {
     ratioVolume.provide(ytmView);
+  }
+  if (newState.playback.ratioVolume && !oldState.playback.ratioVolume) {
     ratioVolume.enable();
   }
-  else {
+  else if (!newState.playback.ratioVolume) {
     ratioVolume.disable();
   }
 
@@ -223,8 +227,10 @@ store.onDidAnyChange((newState, oldState) => {
 
   if (newState.integrations.companionServerEnabled) {
     companionServer.provide(store, ytmView);
+  }
+  if (newState.integrations.companionServerEnabled && !oldState.integrations.companionServerEnabled) {
     companionServer.enable();
-  } else {
+  } else if (!newState.integrations.companionServerEnabled) {
     companionServer.disable();
 
     if (companionServerAuthWindowEnabled) {

@@ -10,17 +10,24 @@ export default class CustomCSS implements IIntegration {
   private ytmView: BrowserView;
   private store: ElectronStore<StoreSchema>;
   private isEnabled = false;
+  private hasInjectedOnce = false;
 
   private customCSSKey: string|null = null;
-  private fileListener: fs.StatsListener|null = null;
   private storeListener: Unsubscribe|null = null;
   private ipcListener: () => void|null = null;
 
+  private currentWatcher: fs.FSWatcher|null = null;
+
   public provide(store: ElectronStore<StoreSchema>, ytmView: BrowserView): void {
+    let ytmViewChanged = false;
+    if (ytmView !== this.ytmView) {
+      ytmViewChanged = true;
+    }
+
     this.ytmView = ytmView;
     this.store = store;
 
-    if (this.isEnabled && !this.customCSSKey) {
+    if ((this.isEnabled && !this.hasInjectedOnce) || (this.isEnabled && ytmViewChanged)) {
       this.enable();
     }
   }
@@ -32,11 +39,13 @@ export default class CustomCSS implements IIntegration {
     this.injectCSS();
 
     // Listen to updates to the custom CSS file
+    if (this.storeListener) {
+      this.storeListener();
+      this.storeListener = null;
+    }
     this.storeListener = this.store.onDidChange('appearance', (oldState, newState) => {
       if (newState.customCSSEnabled && oldState.customCSSPath != newState.customCSSPath) {
         this.updateCSS();
-
-        this.watchCSSFile(newState.customCSSPath, oldState.customCSSPath);
       }
     });
   }
@@ -44,10 +53,11 @@ export default class CustomCSS implements IIntegration {
   public disable(): void {
     this.removeCSS();
     this.isEnabled = false;
+    this.hasInjectedOnce = false;
 
-    if (this.fileListener) {
-      fs.unwatchFile(this.store.get('appearance.customCSSPath'), this.fileListener);
-      this.fileListener = null;
+    if (this.currentWatcher) {
+      this.currentWatcher.close();
+      this.currentWatcher = null;
     }
 
     if (this.storeListener) {
@@ -72,6 +82,7 @@ export default class CustomCSS implements IIntegration {
 
   private injectCSS() {
     if (!this.ytmView) { return; }
+    this.hasInjectedOnce = true;
 
     const cssPath: string|null = this.store.get('appearance.customCSSPath');
     if (cssPath && fs.existsSync(cssPath)) {
@@ -81,6 +92,9 @@ export default class CustomCSS implements IIntegration {
         Have an alternative means of checking if YTM has loaded
         as I'd rather keep away from constantly having an event for if `ytmView:loaded` is emitted
         and only needed for the initial load of the app */
+      if (this.ipcListener) {
+        ipcMain.removeListener('ytmView:loaded', this.ipcListener);
+      }
       this.ipcListener = () => {
         this.ytmView.webContents.insertCSS(content).then((customCssRef) => {
           this.customCSSKey = customCssRef
@@ -95,9 +109,6 @@ export default class CustomCSS implements IIntegration {
 
       this.watchCSSFile(cssPath);
     }
-    else {
-      console.error("Custom CSS file not found");
-    }
   }
 
   private async removeCSS() {
@@ -107,20 +118,27 @@ export default class CustomCSS implements IIntegration {
     this.customCSSKey = null;
   }
 
-  private async watchCSSFile(newFile: string, oldFile?: string) {
+  private async watchCSSFile(newFile?: string) {
     // Reset the file listener if it exists
-    if (this.fileListener && oldFile) {
-      fs.unwatchFile(oldFile, this.fileListener);
-      this.fileListener = null;
+    if (this.currentWatcher) {
+      this.currentWatcher.close();
+      this.currentWatcher = null;
     }
+
+    if (newFile === null) return;
 
     // Watch for changes to the custom CSS file
     // and update the CSS when it changes
-    this.fileListener = (curr: fs.Stats, prev: fs.Stats) => {
-      if (curr.mtimeMs != prev.mtimeMs) {
+    this.currentWatcher = fs.watch(newFile, {}, (type, filename) => {
+      if (type === 'change') {
         this.updateCSS();
+      } else if (type === 'rename') {
+        if (filename) {
+          this.store.set('appearance.customCSSPath', null);
+          this.removeCSS();
+          this.currentWatcher.close();
+        }
       }
-    }
-    fs.watchFile(newFile, { interval: 5000 }, this.fileListener);
+    });
   }
 }
