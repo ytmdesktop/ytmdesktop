@@ -2,6 +2,7 @@ import { app, autoUpdater, BrowserView, BrowserWindow, globalShortcut, ipcMain, 
 import ElectronStore from "electron-store";
 import path from "path";
 import CompanionServer from "./integrations/companion-server";
+import CustomCSS from "./integrations/custom-css";
 import DiscordPresence from "./integrations/discord-presence";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
 import { StoreSchema } from "./shared/store/schema";
@@ -26,6 +27,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 const companionServer = new CompanionServer();
+const customCss = new CustomCSS();
 const discordPresence = new DiscordPresence();
 const ratioVolume = new VolumeRatio();
 
@@ -144,6 +146,8 @@ const store = new ElectronStore<StoreSchema>({
     },
     appearance: {
       alwaysShowVolumeSlider: false,
+      customCSSEnabled: false,
+      customCSSPath: null
     },
     playback: {
       continueWhereYouLeftOff: true,
@@ -191,6 +195,14 @@ store.onDidAnyChange((newState, oldState) => {
     app.setLoginItemSettings({
       openAtLogin: newState.general.startOnBoot
     });
+  }
+
+  if (newState.appearance.customCSSEnabled) {
+    customCss.provide(store, ytmView);
+    customCss.enable();
+  }
+  else {
+    customCss.disable();
   }
 
   if (newState.playback.ratioVolume) {
@@ -246,6 +258,11 @@ store.onDidAnyChange((newState, oldState) => {
 
 if (store.get('general').disableHardwareAcceleration) {
   app.disableHardwareAcceleration();
+}
+
+if (store.get('appearance').customCSSEnabled) {
+  customCss.provide(store, ytmView);
+  customCss.enable();
 }
 
 if (store.get('playback').enableSpeakerFill) {
@@ -621,6 +638,7 @@ const createMainWindow = (): void => {
     }
   });
   companionServer.provide(store, ytmView);
+  customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
 
   // This block of code adding the browser view setting the bounds and removing it is a temporary fix for a bug in YTMs UI

@@ -8,6 +8,8 @@ export type StoreSchema = {
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
+    customCSSEnabled: boolean;
+    customCSSPath: string | null;
   };
   playback: {
     continueWhereYouLeftOff: boolean;
