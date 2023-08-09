@@ -21,6 +21,10 @@ rules.push({
   test: /\.png$/,
   type: "asset/resource"
 });
+rules.push({
+  test: /\.ttf$/,
+  type: "asset/resource"
+});
 
 export const rendererConfig: Configuration = {
   module: {
