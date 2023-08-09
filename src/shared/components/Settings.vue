@@ -38,6 +38,7 @@ const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
+const ratioVolume = ref<boolean>(playback.ratioVolume);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthWindowEnabled = ref<boolean>(
@@ -66,6 +67,7 @@ store.onDidAnyChange(async newState => {
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
+  ratioVolume.value = newState.playback.ratioVolume;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
@@ -93,6 +95,7 @@ async function settingsChanged() {
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
+  store.set("playback.ratioVolume", ratioVolume.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString(companionServerAuthWindowEnabled.value.toString()));
@@ -201,25 +204,28 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
         </div>
 
-        <div v-if="currentTab === 3" class="playback-tab">
-          <div class="setting">
-            <p>Continue where you left off</p>
-            <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div v-if="continueWhereYouLeftOff" class="setting indented">
-            <p>Pause on application launch</p>
-            <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Show track progress on taskbar</p>
-            <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <!-- enableSpeakerFill -->
-          <div class="setting">
-            <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
-            <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-          </div>
+      <div v-if="currentTab === 3" class="playback-tab">
+        <div class="setting">
+          <p>Continue where you left off</p>
+          <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
         </div>
+        <div v-if="continueWhereYouLeftOff" class="setting indented">
+          <p>Pause on application launch</p>
+          <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
+        </div>
+        <div class="setting">
+          <p>Show track progress on taskbar</p>
+          <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
+        </div>
+        <div class="setting">
+          <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
+          <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
+        </div>
+        <div class="setting">
+          <p>Ratio Volume</p>
+          <input v-model="ratioVolume" class="toggle" type="checkbox" @change="settingsChanged" />
+        </div>
+      </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
           <div class="setting">
