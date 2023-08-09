@@ -241,7 +241,7 @@ window.ytmd.handleUpdateDownloaded(() => {
               <div class="file-input-button">
                 <button class="choose" @click="cssPathFileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
                 <input type="text" readonly :title="customCSSPath" class="path" placeholder="No file chosen" :value="customCSSPath" />
-                <button class="remove" @click="removeCustomCSSPath"><span class="material-symbols-outlined">delete</span></button>
+                <button v-if="customCSSPath" class="remove" @click="removeCustomCSSPath"><span class="material-symbols-outlined">delete</span></button>
               </div>
             </div>
           </div>
