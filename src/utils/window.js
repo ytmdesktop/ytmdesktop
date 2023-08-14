@@ -11,13 +11,17 @@ function getMiniplayerWindowBounds(windowPosition, windowSize) {
             const displays = screen.getAllDisplays()
             const isWithinDisplayBounds = displays.reduce((result, display) => {
                 const area = display.workArea
-                return (
-                    result ||
-                    (windowPosition.x >= area.x &&
-                        windowPosition.y >= area.y &&
-                        windowPosition.x < area.x + area.width &&
-                        windowPosition.y < area.y + area.height)
-                )
+                if (windowPosition === undefined) {
+                    return false
+                } else {
+                    return (
+                        result ||
+                        (windowPosition.x >= area.x &&
+                            windowPosition.y >= area.y &&
+                            windowPosition.x < area.x + area.width &&
+                            windowPosition.y < area.y + area.height)
+                    )
+                }
             }, false)
 
             if (!isWithinDisplayBounds) {

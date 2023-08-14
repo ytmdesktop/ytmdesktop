@@ -226,7 +226,7 @@ function createContextMenu() {
     try {
         const menuDiv = document.createElement('div')
         menuDiv.setAttribute('id', 'ytmd-menu')
-        menuDiv.innerHTML = quickShortcuts
+        menuDiv.innerHTML = getTrustedHTML(quickShortcuts)
         document.body.prepend(menuDiv)
     } catch (err) {
         console.error(err)
@@ -320,6 +320,13 @@ function createContextMenu() {
             data: 'error on createContextMenu listeners',
         })
     }
+}
+
+function getTrustedHTML(htmlText) {
+    const escapeHTMLPolicy = trustedTypes.createPolicy('forceInner', {
+        createHTML: (to_escape) => to_escape,
+    })
+    return escapeHTMLPolicy.createHTML(htmlText)
 }
 
 function createHistoryButtons() {
@@ -768,7 +775,7 @@ function createBottomPlayerBarContent() {
         elementSleepTimerModal.id = 'ytmd_sleeptimer_modal'
         elementSleepTimerModal.append(elementSleepTimerModalContent)
 
-        elementSleepTimerModalContent.innerHTML = `
+        elementSleepTimerModalContent.innerHTML = getTrustedHTML(`
                 <p class="ytmd-modal-content-title">${translate(
                     'SLEEPTIMER'
                 )}</p>
@@ -806,7 +813,7 @@ function createBottomPlayerBarContent() {
                         'SLEEPTIMER_SONGS'
                     )}</>
                 </div>
-        `
+        `)
         elementSleepTimerModalContent.append(elementSleepTimerSet)
         elementSleepTimerModalContent.append(elementSleepTimerClear)
 
@@ -825,7 +832,7 @@ function createBottomPlayerBarContent() {
             }, 10) // animation
         })
 
-        elementSleepTimerCloseModal.innerHTML = '&times;'
+        elementSleepTimerCloseModal.innerHTML = getTrustedHTML('&times;')
         elementSleepTimerCloseModal.classList.add('ytmd-modal-close')
         elementSleepTimerCloseModal.addEventListener('click', () => {
             elementSleepTimerModal.style.display = 'none'

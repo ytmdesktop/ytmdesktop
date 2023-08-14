@@ -201,14 +201,15 @@ function getAuthor(webContents) {
     webContents
         .executeJavaScript(
             `
+            var author = '';
             var bar = document.getElementsByClassName('subtitle ytmusic-player-bar')[0];
 
             if (bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0]) {
-            title = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
+                author = bar.getElementsByClassName('yt-simple-endpoint yt-formatted-string')[0].textContent;
             } else if (bar.getElementsByClassName('byline ytmusic-player-bar')[0]) {
-            title = bar.getElementsByClassName('byline ytmusic-player-bar')[0].textContent;
+                author = bar.getElementsByClassName('byline ytmusic-player-bar')[0].textContent;
             }
-            title;
+            author
             `
         )
         .then((author) => {

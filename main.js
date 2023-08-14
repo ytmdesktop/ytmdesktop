@@ -712,10 +712,12 @@ async function createWindow() {
             }
 
             global.sharedObj.paused = true
-            mediaControl.createThumbar(
-                mainWindow,
-                infoPlayerProvider.getAllInfo()
-            )
+            if (mainWindow !== null) {
+                mediaControl.createThumbar(
+                    mainWindow,
+                    infoPlayerProvider.getAllInfo()
+                )
+            }
         } catch (_) {}
     })
 

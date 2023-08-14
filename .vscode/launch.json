@@ -13,8 +13,12 @@
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             },
-            "args": [".", "NODE_ENV=development"],
-            "runtimeArgs": [".", "--trace-warnings"],
+            "args": [
+                "--trace-warnings",
+                "main.js",
+                "--inspect",
+                "NODE_ENV=development"
+            ],
             "outputCapture": "std"
         }
     ]

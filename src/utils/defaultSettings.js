@@ -1,8 +1,10 @@
 const settingsProvider = require('../providers/settingsProvider')
-const { isLinux, isWindows } = require('./systemInfo')
+const { isLinux } = require('./systemInfo')
 const { app } = require('electron')
 
-settingsProvider.setInitialValue('titlebar-type', 'nice') // Without system title bar
+if (isLinux()) {
+    settingsProvider.setInitialValue('titlebar-type', 'nice') // Without system title bar
+}
 
 settingsProvider.setInitialValue('settings-page-zoom', 100) // 100
 
