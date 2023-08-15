@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../shared/components/KeybindInput.vue";
 import { StoreSchema } from "../store/schema";
+import { AuthToken } from "../../integrations/companion-server/shared/auth";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
 declare const YTMD_GIT_BRANCH: string;
@@ -10,7 +11,7 @@ const ytmdVersion = await window.ytmd.getAppVersion();
 const ytmdCommitHash = YTMD_GIT_COMMIT_HASH.substring(0, 6);
 const ytmdBranch = YTMD_GIT_BRANCH;
 
-const currentTab = ref(2);
+const currentTab = ref(1);
 const requiresRestart = ref(false);
 const checkingForUpdate = ref(false);
 const updateAvailable = ref(await window.ytmd.isAppUpdateAvailable());
@@ -47,6 +48,9 @@ const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled)
 const companionServerAuthWindowEnabled = ref<boolean>(
   (await safeStorage.decryptString(integrations.companionServerAuthWindowEnabled)) === "true" ? true : false
 );
+const companionServerAuthTokens = ref<AuthToken[]>(
+  JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens))
+);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
@@ -76,6 +80,7 @@ store.onDidAnyChange(async newState => {
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
+  companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens));
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
@@ -137,6 +142,15 @@ async function settingChangedFile(event: Event) {
   );
 
   target.value = null;
+}
+
+async function deleteCompanionAuthToken(appId: string) {
+  const index = companionServerAuthTokens.value.findIndex(token => token.appId === appId);
+  if (index > -1) {
+    companionServerAuthTokens.value.splice(index, 1);
+  }
+
+  store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
 }
 
 function removeCustomCSSPath() {
@@ -282,6 +296,33 @@ window.ytmd.handleUpdateDownloaded(() => {
             </div>
             <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
+          <div v-if="companionServerEnabled" class="setting indented authorized-companions">
+            <div class="name-with-description">
+              <p class="name">Authorized companions</p>
+              <p class="description">This is a list of companions that currently have access to the companion server</p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th class="id">ID</th>
+                  <th class="name">Name</th>
+                  <th class="version">Version</th>
+                  <th class="controls"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
+                  <td class="id">{{ authToken.appId }}</td>
+                  <td class="name">{{ authToken.appName }}</td>
+                  <td class="version">{{ authToken.appVersion }}</td>
+                  <td class="controls"><button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="no-companions" v-if="companionServerAuthTokens.length === 0">
+              <td>No authorized companions</td>
+            </div>
+          </div>
           <div class="setting">
             <p>Discord rich presence</p>
             <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
@@ -358,15 +399,12 @@ window.ytmd.handleUpdateDownloaded(() => {
 
 <style scoped>
 .settings-container {
-  height: calc(100% - 36px);
-  display: flex;
-  flex-direction: column;
   user-select: none;
 }
 
 .content-container {
   display: flex;
-  flex-grow: 1;
+  height: 100%;
 }
 
 .content {
@@ -506,9 +544,9 @@ window.ytmd.handleUpdateDownloaded(() => {
   margin: 0;
 }
 
-.version,
-.branch,
-.commit {
+.version-info .version,
+.version-info .branch,
+.version-info .commit {
   margin: 4px 0;
   color: #bbbbbb;
 }
@@ -664,5 +702,53 @@ input[type="file"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.setting.indented.authorized-companions {
+  display: flex;
+  flex-direction: column;
+  align-items: initial;
+  justify-content: initial;
+}
+
+.setting.indented.authorized-companions table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.setting.indented.authorized-companions table tr .name {
+  width: 50%;
+}
+
+.setting.indented.authorized-companions table tr th,
+.setting.indented.authorized-companions table tr td {
+  padding: 4px;
+}
+
+.setting.indented.authorized-companions table th {
+  text-align: left;
+}
+
+.setting.indented.authorized-companions table thead tr th {
+  border-bottom: 1px solid #212121;
+}
+
+.setting.indented.authorized-companions table thead tr .controls {
+  width: 48px;
+}
+
+.setting.indented.authorized-companions table tbody button {
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  background-color: #212121;
+  cursor: pointer;
+  border: none;
+}
+
+.setting.indented.authorized-companions .no-companions {
+  color: #bbbbbb;
+  padding: 4px;
 }
 </style>

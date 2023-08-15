@@ -6,12 +6,15 @@ import { StoreSchema } from "../../../shared/store/schema";
 
 const temporaryCodeMap: { [code: string]: { appId: string, appVersion: string, appName: string } } = {};
 
-type AuthToken = {
+export type AuthToken = {
   appId: string,
   appVersion: string,
   appName: string,
   id: string,
-  token: string
+  token: string,
+  metadata: {
+    version: number
+  }
 }
 
 async function getUnusedCode() {
@@ -82,7 +85,10 @@ export function createAuthToken(store: ElectronStore<StoreSchema>, appId: string
     appName,
     appVersion,
     id: tokenId,
-    token: crypto.createHash("sha256").update(token).digest("hex")
+    token: crypto.createHash("sha256").update(token).digest("hex"),
+    metadata: {
+      version: 1
+    }
   });
 
   store.set("integrations.companionServerAuthTokens", safeStorage.encryptString(JSON.stringify(authTokens)).toString("hex"));

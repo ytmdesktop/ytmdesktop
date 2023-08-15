@@ -4,8 +4,11 @@ import FastifyIO from "fastify-socket.io";
 import CompanionServerAPIv1 from "./api/v1";
 import { StoreSchema } from "../../shared/store/schema";
 import ElectronStore from "electron-store";
-import { BrowserView } from "electron";
+import { BrowserView, safeStorage } from "electron";
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import { AuthToken } from "./shared/auth";
+import { RemoteSocket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -13,6 +16,7 @@ export default class CompanionServer implements IIntegration {
   private fastifyServer: FastifyInstance;
   private store: ElectronStore<StoreSchema>;
   private ytmView: BrowserView;
+  private storeListener: () => void | null = null;
 
   constructor() {
     this.createServer();
@@ -52,10 +56,31 @@ export default class CompanionServer implements IIntegration {
         host: this.listenIp,
         port: this.listenPort
       });
+      this.storeListener = this.store.onDidChange("integrations", async (newState) => {
+        const validTokenIds: string[] = JSON.parse(safeStorage.decryptString(Buffer.from(newState.companionServerAuthTokens, "hex"))).map((authToken: AuthToken) => authToken.id);
+        if (this.fastifyServer.server.listening) {
+          const namespaces = this.fastifyServer.io._nsps.keys();
+          let sockets: RemoteSocket<DefaultEventsMap, { tokenId: string }>[] = [];
+
+          for (const namespace of namespaces) {
+            const namespacedSockets = await this.fastifyServer.io.of(namespace).fetchSockets();
+            sockets = sockets.concat(namespacedSockets);
+          }
+
+          for (const socket of sockets) {
+            if (!validTokenIds.includes(socket.data.tokenId)) {
+              socket.disconnect(true);
+            }
+          }
+        }
+      });
     }
   }
 
   public disable() {
     this.fastifyServer.close();
+    if (this.storeListener) {
+      this.storeListener();
+    }
   }
 }
