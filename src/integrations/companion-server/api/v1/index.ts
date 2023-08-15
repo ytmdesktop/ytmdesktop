@@ -7,7 +7,14 @@ import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuth
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
 import createError from "@fastify/error";
-import { APIV1CommandRequestBody, APIV1CommandRequestBodyType, APIV1RequestCodeBody, APIV1RequestCodeBodyType, APIV1RequestTokenBody, APIV1RequestTokenBodyType } from "../../shared/schemas";
+import {
+  APIV1CommandRequestBody,
+  APIV1CommandRequestBodyType,
+  APIV1RequestCodeBody,
+  APIV1RequestCodeBodyType,
+  APIV1RequestTokenBody,
+  APIV1RequestTokenBodyType
+} from "../../shared/schemas";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -228,7 +235,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
 
       // API Users: Make sure you /requestcode above
-      const authData = getIsTemporaryAuthCodeValidAndRemove(request.body.appId, request.body.code)
+      const authData = getIsTemporaryAuthCodeValidAndRemove(request.body.appId, request.body.code);
       if (!authData) {
         response.code(400).send({
           error: "AUTHORIZATION_INVALID"
@@ -269,6 +276,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       });
       authorizationWindow.loadURL(AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY);
       authorizationWindow.show();
+      authorizationWindow.flashFrame(true);
 
       authorizationWindows.push(authorizationWindow);
 
