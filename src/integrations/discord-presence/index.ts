@@ -69,17 +69,15 @@ export default class DiscordPresence implements IIntegration {
   private discordClient: DiscordRPC.Client = null;
   private ready = false;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
-  private previousProgress: number | null = null;
   private endTimestamp: number | null = null;
   private stateCallback: (event: PlayerState) => void = null;
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
-      if (!this.previousProgress) {
-        this.endTimestamp =
-          state.trackState === VideoState.Playing ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.round(state.videoProgress)) : undefined;
-        this.previousProgress = state.videoProgress;
-      }
+      this.endTimestamp =
+        state.trackState === VideoState.Playing
+          ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.floor(state.videoProgress))
+          : undefined;
 
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       this.discordClient.setActivity({
@@ -95,6 +93,10 @@ export default class DiscordPresence implements IIntegration {
           {
             label: "Play on YouTube Music",
             url: `https://music.youtube.com/watch?v=${state.videoDetails.id}`
+          },
+          {
+            label: "Play on YouTube Music Desktop",
+            url: `ytmd://play/${state.videoDetails.id}`
           }
         ]
       });
@@ -138,9 +140,9 @@ export default class DiscordPresence implements IIntegration {
         this.ready = false;
       });
       this.discordClient.connect(DISCORD_CLIENT_ID);
-      this.stateCallback = (event) => {
+      this.stateCallback = event => {
         this.playerStateChanged(event);
-      }
+      };
       playerStateStore.addEventListener(this.stateCallback);
     }
   }
