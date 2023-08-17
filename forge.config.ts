@@ -4,8 +4,8 @@ import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
-import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
-import { ElectronegativityPlugin } from '@electron-forge/plugin-electronegativity';
+import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
+import { ElectronegativityPlugin } from "@electron-forge/plugin-electronegativity";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
@@ -20,7 +20,7 @@ const config: ForgeConfig = {
         schemes: ["ytmd"]
       }
     ],
-    asar: true,
+    asar: true
   },
   rebuildConfig: {},
   makers: [
