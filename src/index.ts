@@ -137,6 +137,9 @@ if (process.defaultApp) {
 const store = new ElectronStore<StoreSchema>({
   watch: true,
   defaults: {
+    metadata: {
+      version: 1
+    },
     general: {
       hideToTrayOnClose: false,
       showNotificationOnSongChange: false,

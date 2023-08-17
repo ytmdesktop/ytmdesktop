@@ -1,4 +1,7 @@
 export type StoreSchema = {
+  metadata: {
+    version: 1
+  }
   general: {
     hideToTrayOnClose: boolean;
     showNotificationOnSongChange: boolean;
