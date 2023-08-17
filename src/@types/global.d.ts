@@ -6,6 +6,9 @@ declare global {
   interface Window {
     ytmd: {
       // Settings specific
+      isDarwin: boolean;
+      isLinux: boolean;
+      isWindows: boolean;
       store: Store<StoreSchema>;
       safeStorage: {
         decryptString(value: string): string;

@@ -11,6 +11,8 @@ const ytmdVersion = await window.ytmd.getAppVersion();
 const ytmdCommitHash = YTMD_GIT_COMMIT_HASH.substring(0, 6);
 const ytmdBranch = YTMD_GIT_BRANCH;
 
+const isDarwin = window.ytmd.isDarwin;
+
 const currentTab = ref(1);
 const requiresRestart = ref(false);
 const checkingForUpdate = ref(false);
@@ -216,7 +218,7 @@ window.ytmd.handleUpdateDownloaded(() => {
       </ul>
       <div class="content">
         <div v-if="currentTab === 1" class="general-tab">
-          <div class="setting">
+          <div v-if="!isDarwin" class="setting">
             <p>Hide to tray on close</p>
             <input v-model="hideToTrayOnClose" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>

@@ -427,7 +427,7 @@ function setupTaskbarFeatures() {
       ]);
     }
 
-    if (store.get("playback.progressInTaskbar")) {
+    if (mainWindow && store.get("playback.progressInTaskbar")) {
       mainWindow.setProgressBar(hasVideo ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
         mode: isPlaying ? "normal" : "paused"
       });
@@ -435,7 +435,7 @@ function setupTaskbarFeatures() {
   });
 
   store.onDidChange("playback", (newValue, oldValue) => {
-    if (newValue.progressInTaskbar !== oldValue.progressInTaskbar && !newValue.progressInTaskbar) {
+    if (mainWindow && newValue.progressInTaskbar !== oldValue.progressInTaskbar && !newValue.progressInTaskbar) {
       mainWindow.setProgressBar(-1);
     }
   });
@@ -571,7 +571,7 @@ const createOrShowSettingsWindow = (): void => {
     frame: false,
     show: false,
     parent: mainWindow,
-    modal: true,
+    modal: (process.platform !== 'darwin'),
     titleBarStyle: 'hidden',
     titleBarOverlay: {
       color: '#000000',
@@ -773,7 +773,7 @@ const createMainWindow = (): void => {
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
   mainWindow.on("close", event => {
-    if (!applicationQuitting && store.get("general").hideToTrayOnClose) {
+    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || process.platform === "darwin")) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -835,7 +835,7 @@ app.on("ready", () => {
 
   ipcMain.on("mainWindow:close", () => {
     if (mainWindow !== null) {
-      if (store.get("general").hideToTrayOnClose) {
+      if (store.get("general").hideToTrayOnClose || process.platform === "darwin") {
         mainWindow.hide();
       } else {
         applicationQuitting = true;
@@ -1019,7 +1019,7 @@ app.on("ready", () => {
   tray = new Tray(
     path.join(
       process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath,
-      process.platform === "win32" ? "icons/tray.ico" : "icons/tray.png"
+      process.platform === "win32" ? "icons/tray.ico" : "icons/trayTemplate.png"
     )
   );
   trayContextMenu = Menu.buildFromTemplate([
