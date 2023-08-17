@@ -9,6 +9,9 @@ import { WindowsEventArguments } from "../../shared/types";
 const store = new Store<StoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
+  isDarwin: process.platform === 'darwin',
+  isLinux: process.platform === 'linux',
+  isWindows: process.platform === 'win32',
   store: {
     set: (key: string, value: unknown) => store.set(key, value),
     get: async (key: keyof StoreSchema) => await store.get(key),
