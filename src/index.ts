@@ -536,6 +536,17 @@ function sendSettingsWindowStateIpc() {
   }
 }
 
+// Handles any navigation or window opening from ytmView
+function openExternalFromYtmView(urlString: string) {
+  const url = new URL(urlString);
+  const domainSplit = url.hostname.split(".");
+  domainSplit.reverse();
+  const domain = `${domainSplit[1]}.${domainSplit[0]}`;
+  if (domain === "google.com" || domain === "youtube.com") {
+    shell.openExternal(urlString);
+  }
+}
+
 const createOrShowSettingsWindow = (): void => {
   if (mainWindow === null) {
     return;
@@ -586,10 +597,17 @@ const createOrShowSettingsWindow = (): void => {
   });
 
   settingsWindow.webContents.setWindowOpenHandler(details => {
-    shell.openExternal(details.url);
+    if (details.url === "https://github.com/ytmdesktop/ytmdesktop" || details.url === "https://ytmdesktop.app/") {
+      shell.openExternal(details.url);
+    }
+
     return {
       action: "deny"
     };
+  });
+
+  settingsWindow.webContents.on("will-navigate", event => {
+    event.preventDefault();
   });
 
   settingsWindow.on("ready-to-show", () => {
@@ -682,16 +700,17 @@ const createMainWindow = (): void => {
   }
 
   // Attach events to ytm view
-  ytmView.webContents.on("will-navigate", (event, url) => {
+  ytmView.webContents.on("will-navigate", (event) => {
     if (
-      !url.startsWith("https://consent.youtube.com/") &&
-      !url.startsWith("https://accounts.google.com/") &&
-      !url.startsWith("https://accounts.youtube.com/") &&
-      !url.startsWith("https://music.youtube.com/") &&
-      !url.startsWith("https://www.youtube.com/signin")
+      !event.url.startsWith("https://consent.youtube.com/") &&
+      !event.url.startsWith("https://accounts.google.com/") &&
+      !event.url.startsWith("https://accounts.youtube.com/") &&
+      !event.url.startsWith("https://music.youtube.com/") &&
+      !event.url.startsWith("https://www.youtube.com/signin")
     ) {
       event.preventDefault();
-      shell.openExternal(url);
+
+      openExternalFromYtmView(event.url);
     }
   });
   ytmView.webContents.on("did-navigate", ytmViewNavigated);
@@ -708,7 +727,8 @@ const createMainWindow = (): void => {
   });
 
   ytmView.webContents.setWindowOpenHandler(details => {
-    shell.openExternal(details.url);
+    openExternalFromYtmView(details.url);
+    
     return {
       action: "deny"
     };
@@ -760,6 +780,16 @@ const createMainWindow = (): void => {
 
     store.set("state.windowBounds", mainWindow.getNormalBounds());
     store.set("state.windowMaximized", mainWindow.isMaximized());
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return {
+      action: "deny"
+    };
+  });
+
+  mainWindow.webContents.on("will-navigate", event => {
+    event.preventDefault();
   });
 
   mainWindow.on("ready-to-show", () => {

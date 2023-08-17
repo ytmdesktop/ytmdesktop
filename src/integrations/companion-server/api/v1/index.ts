@@ -279,6 +279,16 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       authorizationWindow.show();
       authorizationWindow.flashFrame(true);
 
+      authorizationWindow.webContents.setWindowOpenHandler(() => {
+        return {
+          action: "deny"
+        };
+      });
+      
+      authorizationWindow.webContents.on("will-navigate", event => {
+        event.preventDefault();
+      });
+
       authorizationWindows.push(authorizationWindow);
 
       try {
