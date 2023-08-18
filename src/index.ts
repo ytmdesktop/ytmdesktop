@@ -181,6 +181,9 @@ const store = new ElectronStore<StoreSchema>({
       companionServerAuthWindowEnableTime: null,
       windowBounds: null,
       windowMaximized: false
+    },
+    developer: {
+      enableDevTools: false
     }
   }
 });
@@ -582,7 +585,7 @@ const createOrShowSettingsWindow = (): void => {
       sandbox: true,
       contextIsolation: true,
       preload: SETTINGS_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      devTools: !app.isPackaged
+      devTools: store.get("developer.enableDevTools")
     }
   });
 
@@ -643,7 +646,7 @@ const createMainWindow = (): void => {
       sandbox: true,
       contextIsolation: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      devTools: !app.isPackaged
+      devTools: store.get("developer.enableDevTools")
     }
   });
   const windowBounds = store.get("state").windowBounds;

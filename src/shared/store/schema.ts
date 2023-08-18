@@ -44,4 +44,7 @@ export type StoreSchema = {
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
   };
+  developer: {
+    enableDevTools: boolean
+  }
 };
