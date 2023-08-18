@@ -4,7 +4,6 @@ import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
-import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { ElectronegativityPlugin } from "@electron-forge/plugin-electronegativity";
 
 import { mainConfig } from "./webpack.main.config";
@@ -19,8 +18,7 @@ const config: ForgeConfig = {
         name: "YouTube Music Desktop App",
         schemes: ["ytmd"]
       }
-    ],
-    asar: true
+    ]
   },
   rebuildConfig: {},
   makers: [
@@ -83,7 +81,6 @@ const config: ForgeConfig = {
         ]
       }
     }),
-    new AutoUnpackNativesPlugin({}),
     new ElectronegativityPlugin({
       isSarif: true,
       parserPlugins: []
