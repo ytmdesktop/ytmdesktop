@@ -125,12 +125,14 @@ function handleProtocol(url: string) {
   }
 }
 
-if (process.defaultApp) {
-  if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient("ytmd", process.execPath, [path.resolve(process.argv[1])]);
+if (app.isPackaged && !app.isDefaultProtocolClient("ytmd")) {
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient("ytmd", process.execPath, [path.resolve(process.argv[1])]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient("ytmd", process.execPath);
   }
-} else {
-  app.setAsDefaultProtocolClient("ytmd", process.execPath);
 }
 
 // Create the persistent config store
