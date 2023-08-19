@@ -67,6 +67,9 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
 const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
 const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' cannot be set", 400);
 const UnauthenticatedError = createError("UNAUTHENTICATED", "Authentication not provided or invalid", 401);
+const AuthorizationDisabled = createError("AUTHORIZATION_DISABLED", "Authorization requests are disabled", 403);
+const AuthorizationInvalid = createError("AUTHORIZATION_INVALID", "Authorization invalid", 400);
+const AuthorizationTimeOut = createError("AUTHORIZATION_TIME_OUT", "Authorization timed out", 504);
 
 //type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
@@ -183,15 +186,26 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
+      let companionServerAuthWindowEnabled = false;
+      try {
+        companionServerAuthWindowEnabled =
+          safeStorage.decryptString(Buffer.from(options.getStore().get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
+      } catch {
+        /* do nothing, value is false */
+      }
+
+      // API Users: The user has companion server authorization disabled, show a feedback error accordingly
+      if (!companionServerAuthWindowEnabled) {
+        throw new AuthorizationDisabled();
+      }
+
       const code = await getTemporaryAuthCode(request.body.appId, request.body.appVersion, request.body.appName);
       if (code) {
         response.send({
           code
         });
       } else {
-        response.code(504).send({
-          error: "AUTHORIZATION_TIMEOUT"
-        });
+        throw new AuthorizationTimeOut();
       }
     }
   );
@@ -229,19 +243,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
-        response.code(403).send({
-          error: "AUTHORIZATION_DISABLED"
-        });
-        return;
+        throw new AuthorizationDisabled();
       }
 
       // API Users: Make sure you /requestcode above
       const authData = getIsTemporaryAuthCodeValidAndRemove(request.body.appId, request.body.code);
       if (!authData) {
-        response.code(400).send({
-          error: "AUTHORIZATION_INVALID"
-        });
-        return;
+        throw new AuthorizationInvalid();
       }
 
       const requestId = crypto.randomUUID();
