@@ -70,6 +70,9 @@ const UnauthenticatedError = createError("UNAUTHENTICATED", "Authentication not 
 const AuthorizationDisabled = createError("AUTHORIZATION_DISABLED", "Authorization requests are disabled", 403);
 const AuthorizationInvalid = createError("AUTHORIZATION_INVALID", "Authorization invalid", 400);
 const AuthorizationTimeOut = createError("AUTHORIZATION_TIME_OUT", "Authorization timed out", 504);
+const AuthorizationDenied = createError("AUTHORIZATION_DENIED", "Authorization request denied", 403);
+const YouTubeMusicUnavailable = createError("YOUTUBE_MUSIC_UNVAILABLE", "YouTube Music is currently unvailable", 503);
+const YouTubeMusicTimeOut = createError("YOUTUBE_MUSIC_TIME_OUT", "Response from YouTube Music took too long", 504);
 
 //type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
@@ -353,9 +356,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           });
           options.getStore().set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString("false"));
         } else {
-          response.code(403).send({
-            error: "AUTHORIZATION_DENIED"
-          });
+          throw new AuthorizationDenied();
         }
       } finally {
         const index = authorizationWindows.indexOf(authorizationWindow);
@@ -397,17 +398,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
         setTimeout(() => {
           ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-          response.code(504).send({
-            error: "YTM_RESULT_TIMEOUT"
-          });
+          throw new YouTubeMusicTimeOut();
         }, 1000 * 5);
 
         ytmView.webContents.send(`ytmView:getPlaylists`, requestId);
         //response.send(transformPlayerState(playerStateStore.getState()));
       } else {
-        response.code(503).send({
-          error: "YTM_UNAVAILABLE"
-        });
+        throw new YouTubeMusicUnavailable();
       }
     }
   );
