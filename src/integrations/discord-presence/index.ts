@@ -71,13 +71,35 @@ export default class DiscordPresence implements IIntegration {
   private pauseTimeout: string | number | NodeJS.Timeout = null;
   private endTimestamp: number | null = null;
   private stateCallback: (event: PlayerState) => void = null;
+  
+  private lastTimeSeconds: number | null = null;
+  private lastDuration: number | null = null;
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
-      this.endTimestamp =
-        state.trackState === VideoState.Playing
-          ? Math.floor(Date.now() / 1000) + (state.videoDetails.durationSeconds - Math.floor(state.videoProgress))
-          : undefined;
+      const date = Date.now();
+      const timeSeconds = Math.floor(date / 1000);
+      const videoProgress = Math.floor(state.videoProgress);
+      const duration = state.videoDetails.durationSeconds - videoProgress;
+
+      let adjustedTimeSeconds = timeSeconds;
+
+      if (!this.lastTimeSeconds) this.lastTimeSeconds = timeSeconds;
+      if (!this.lastDuration) this.lastDuration = duration;
+      if (timeSeconds - this.lastTimeSeconds > 0) {
+        if (this.lastDuration === duration) {
+          // The time changed seconds but the duration hasn't. We use the old timestamp to prevent weird deviations
+          adjustedTimeSeconds = this.lastTimeSeconds;
+        } else {
+          this.lastDuration = duration;
+          this.lastTimeSeconds = timeSeconds;
+        }
+      } else {
+        this.lastDuration = duration;
+        this.lastTimeSeconds = timeSeconds;
+      }
+
+      this.endTimestamp = state.trackState === VideoState.Playing ? adjustedTimeSeconds + (state.videoDetails.durationSeconds - videoProgress) : undefined;
 
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       this.discordClient.setActivity({
