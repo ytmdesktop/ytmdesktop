@@ -2,7 +2,7 @@ import DiscordRPC from "discord-rpc";
 import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 
-const DISCORD_CLIENT_ID = "495666957501071390";
+const DISCORD_CLIENT_ID = "1143202598460076053";
 
 function getHighestResThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 0;
@@ -19,21 +19,23 @@ function getHighestResThumbnail(thumbnails: Thumbnail[]) {
 }
 
 function getSmallImageKey(state: number) {
+  // Developer Note:
+  // You can add "-invert" to the end of the image key to invert (Black with White Border)
   switch (state) {
     case VideoState.Playing: {
-      return "discordrpc-play";
+      return "play-border";
     }
 
     case VideoState.Paused: {
-      return "discordrpc-pause";
+      return "pause-border";
     }
 
     case VideoState.Buffering: {
-      return "discordrpc-play";
+      return "play-outline-border";
     }
 
     default: {
-      return "discordrpc-pause";
+      return "pause-border";
     }
   }
 }
