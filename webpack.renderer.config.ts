@@ -26,6 +26,10 @@ rules.push({
   test: /\.ttf$/,
   type: "asset/resource"
 });
+rules.push({
+  test: /\.script\.(ts|js)$/,
+  type: "asset/source",
+});
 
 export const rendererConfig: Configuration = {
   module: {
