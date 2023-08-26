@@ -274,7 +274,7 @@ class PlayerStateStore {
   }
 
   public updateQueue(queueState: YTMPlayerQueue | null) {
-    const queueItems = queueState ? queueState.items.map(mapYTMQueueItems) : null;
+    const queueItems = queueState ? queueState.items.map(mapYTMQueueItems) : [];
     this.queue = queueState
       ? {
           // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
@@ -283,7 +283,7 @@ class PlayerStateStore {
           isGenerating: queueState.isGenerating,
           // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
           isInfinite: queueState.isInfinite,
-          items: queueState.items.map(mapYTMQueueItems),
+          items: queueItems,
           repeatMode: transformRepeatMode(queueState.repeatMode),
           // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
           selectedItemIndex: queueItems.findIndex(item => {
