@@ -1,10 +1,17 @@
 const settingsProvider = require('../../../../providers/settingsProvider')
 const __ = require('../../../../providers/translateProvider')
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../../../utils/window')
 
 //var, because we have to re-assign the variable
 var discordSettings = null
 
 __.loadi18n()
+
+handleWindowButtonsInit()
+updateWindowTitle()
 
 function loadSettings() {
     discordSettings = settingsProvider.get('discord-presence-settings')

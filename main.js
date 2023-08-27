@@ -252,19 +252,21 @@ async function createWindow() {
             windowConfig.titleBarStyle = 'hidden'
             break
 
-        case 'system':
-            browserWindowConfig.frame = true
-
-            windowConfig.frame = true
-            windowConfig.titleBarStyle = 'default'
-            break
-
         case 'none':
             browserWindowConfig.frame = false
             browserWindowConfig.titleBarStyle = 'hidden'
 
             windowConfig.frame = false
             windowConfig.titleBarStyle = 'hidden'
+            break
+
+        case 'system':
+        default:
+            browserWindowConfig.frame = true
+            browserWindowConfig.titleBarStyle = 'default'
+
+            windowConfig.frame = true
+            windowConfig.titleBarStyle = 'default'
             break
     }
 
@@ -1290,7 +1292,7 @@ async function createWindow() {
                 modal: false,
                 frame: windowConfig.frame,
                 titleBarStyle: windowConfig.titleBarStyle,
-                resizable: true,
+                resizable: false,
                 width: 900,
                 minWidth: 900,
                 height: 550,
@@ -1318,8 +1320,7 @@ async function createWindow() {
                 {
                     search:
                         'page=settings/settings&trusted=1&icon=settings&hide=btn-minimize,btn-maximize&title=' +
-                        __.trans('LABEL_SETTINGS') +
-                        '&hide=btn-minimize,btn-maximize',
+                        __.trans('LABEL_SETTINGS'),
                 }
             )
 
@@ -1330,6 +1331,7 @@ async function createWindow() {
 
         settings.on('closed', () => {
             settings = null
+            mainWindow.focus()
         })
     }
 
@@ -1401,7 +1403,11 @@ async function createWindow() {
             }
 
             let miniplayerPosition = settingsProvider.get('miniplayer-position')
-            if (miniplayerPosition !== undefined)
+            if (
+                miniplayerPosition !== undefined &&
+                miniplayerPosition.x &&
+                miniplayerPosition.y
+            )
                 miniplayer.setPosition(
                     miniplayerPosition.x,
                     miniplayerPosition.y
@@ -1477,13 +1483,14 @@ async function createWindow() {
             modal: false,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
+            title: __.trans('Last.FM Login'),
             center: true,
             resizable: true,
             backgroundColor: '#232323',
             width: 300,
             minWidth: 300,
-            height: 260,
-            minHeight: 260,
+            height: 275,
+            minHeight: 275,
             autoHideMenuBar: false,
             skipTaskbar: false,
             webPreferences: {
@@ -1496,7 +1503,7 @@ async function createWindow() {
 
         await lastfm.loadFile(
             path.join(
-                __dirname,
+                app.getAppPath(),
                 './src/pages/settings/sub/last-fm/last-fm-login.html'
             )
         )
@@ -1505,6 +1512,8 @@ async function createWindow() {
     async function windowThemeEditor() {
         const editor = new BrowserWindow({
             parent: settings,
+            modal: true,
+            title: __.trans('LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME'),
             icon: iconDefault,
             frame: windowConfig.frame,
             titleBarStyle: windowConfig.titleBarStyle,
@@ -1558,7 +1567,7 @@ async function createWindow() {
                 lyrics.setPosition(lyricsPosition.x, lyricsPosition.y)
 
             await lyrics.loadFile(
-                path.join(__dirname, './src/pages/lyrics/lyrics.html')
+                path.join(app.getAppPath(), './src/pages/lyrics/lyrics.html')
             )
 
             let storeLyricsPositionTimer
@@ -1578,7 +1587,8 @@ async function createWindow() {
             lyrics.on('closed', () => {
                 lyrics = null
                 if (process.env.NODE_ENV === 'development') {
-                    lyrics.webContents.closeDevTools()
+                    if (lyrics && lyrics.webContents)
+                        lyrics.webContents.closeDevTools()
                 }
             })
 
@@ -1676,7 +1686,7 @@ async function createWindow() {
 
         await discord.loadFile(
             path.join(
-                __dirname,
+                app.getAppPath(),
                 'src/pages/settings/sub/discord/discord_settings.html'
             )
         )
@@ -1998,34 +2008,52 @@ else {
                 console.log(visiblePosition)
                 settingsProvider.set('window-position', visiblePosition)
             })
-            .catch(() => {})
+            .catch((err) => {
+                console.error('Error checking window position:' + err)
+            })
 
         checkWindowPosition(settingsProvider.get('lyrics-position'), {
             width: 700,
             height: 800,
         })
             .then((visiblePosition) => {
-                console.log(visiblePosition)
+                console.log(
+                    'lyrics position: ' + JSON.stringify(visiblePosition)
+                )
                 settingsProvider.set('lyrics-position', visiblePosition)
             })
-            .catch(() => {})
+            .catch((err) => {
+                console.error('Error checking lyrics window position: ' + err)
+            })
 
         getMiniplayerWindowBounds(
             settingsProvider.get('miniplayer-position'),
-            settingsProvider.get('settings-miniplayer-size')
-        ).then((position) => {
-            if (position) {
-                console.log(
-                    'new minplayer position: ' + JSON.stringify(position)
-                )
-                settingsProvider.set('miniplayer-position', [
-                    position.x,
-                    position.y,
-                ])
-            } else {
-                console.error("can't set miniplayer position")
-            }
-        })
+            parseInt(settingsProvider.get('settings-miniplayer-size'))
+        )
+            .then(
+                (position) => {
+                    if (position != null) {
+                        console.log(
+                            'new miniplayer position: ' +
+                                JSON.stringify(position)
+                        )
+                        settingsProvider.set('miniplayer-position', [
+                            position.x,
+                            position.y,
+                        ])
+                    } else {
+                        console.error("can't set miniplayer position")
+                    }
+                },
+                (notSavedReason) => {
+                    console.log(
+                        "Didn't set miniplayer position: " + notSavedReason
+                    )
+                }
+            )
+            .catch((err) => {
+                console.error('Error getting miniplayer window bounds: ' + err)
+            })
 
         await createWindow()
 

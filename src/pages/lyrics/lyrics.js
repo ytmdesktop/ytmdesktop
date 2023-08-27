@@ -1,7 +1,13 @@
 const { ipcRenderer } = require('electron')
+const electronStore = require('electron-store')
+const store = new electronStore()
 const fetch = require('node-fetch')
 const __ = require('../../providers/translateProvider')
 const infoPlayerProvider = require('../../providers/infoPlayerProvider')
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../utils/window')
 
 const settingsProvider = require('../../providers/settingsProvider')
 
@@ -11,6 +17,8 @@ const elementLyricSource = document.getElementById('lyric-source')
 let lastId, target, toggled, geniusAuth
 
 loadingLyrics()
+handleWindowButtonsInit()
+updateWindowTitle()
 
 document.getElementById('content').addEventListener('dblclick', (_) => {
     document.getElementById('content').scrollTo(0, target)

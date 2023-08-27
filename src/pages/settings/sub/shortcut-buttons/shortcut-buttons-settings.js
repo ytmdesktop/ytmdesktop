@@ -1,9 +1,16 @@
 const settingsProvider = require('../../../../providers/settingsProvider')
 const __ = require('../../../../providers/translateProvider')
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../../../utils/window')
 
 var shortcutSettings = null
 
 __.loadi18n()
+
+handleWindowButtonsInit()
+updateWindowTitle()
 
 function loadSettings() {
     shortcutSettings = settingsProvider.get('settings-shortcut-buttons')

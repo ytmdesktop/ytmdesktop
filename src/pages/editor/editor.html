@@ -1,37 +1,104 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
-    <link
-        type="text/css"
-        rel="stylesheet"
-        href="../../../src/assets/css/materialize.min.css"
-        media="screen,projection"
-    />
-    <link
-        type="text/css"
-        href="../../../src/assets/css/material_icons.css"
-        rel="stylesheet"
-    />
-    <link
-        type="text/css"
-        rel="stylesheet"
-        href="../../../src/assets/css/styles.css"
-    />
-    <link type="text/css" rel="stylesheet" href="./editor.css" />
-</head>
-<body>
-    <pre id="editor"></pre>
-    <a
-        class="btn-floating btn waves-effect waves-light red bottom"
-        id="btn-save"
-        ><i class="material-icons">save</i></a
-    >
-    <script
-        src="../../../node_modules/ace-builds/src-noconflict/ace.js"
-        type="text/javascript"
-    ></script>
-    <!--===================================================-->
-    <script type="text/javascript" src="./editor.js"></script>
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link
+            type="text/css"
+            href="../../../src/assets/css/material_icons.css"
+            rel="stylesheet"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/styles.css"
+        />
+        <link type="text/css" rel="stylesheet" href="./editor.css" />
+    </head>
+
+    <body>
+        <div id="nice-titlebar" class="bar drag">
+            <div id="mac" class="hide no-drag">
+                <span id="window-title" class="hide"></span>
+                <!-- <div class="col s6 center">
+                <div class="title">
+                    <i class="material-icons tiny" id="icon"></i>
+                </div>
+            </div> -->
+            </div>
+
+            <div id="win" class="hide">
+                <div class="row">
+                    <div class="col s9 left-align">
+                        <div class="title">
+                            <i
+                                class="material-icons tiny tiny-margin left"
+                                id="icon"
+                                >color_lens</i
+                            >
+                            <span id="window-title"
+                                >LABEL_SETTINGS_TAB_GENERAL_CUSTOM_THEME</span
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col s3 right-align">
+                        <div class="no-drag pointer cmd-btn" id="btn-minimize">
+                            <i class="material-icons tiny" title="Minimize"
+                                >remove</i
+                            >
+                        </div>
+                        <div class="no-drag pointer cmd-btn" id="btn-maximize">
+                            <i
+                                id="icon_maximize"
+                                class="material-icons tiny"
+                                title="Maximize"
+                                >crop_square</i
+                            >
+                            <i
+                                id="icon_restore"
+                                class="material-icons tiny hide"
+                                title="Restore"
+                                style="
+                                    transform: rotate(180deg);
+                                    font-size: 13px;
+                                "
+                                >filter_none</i
+                            >
+                        </div>
+                        <div
+                            class="no-drag pointer cmd-btn hover-red"
+                            id="btn-close"
+                        >
+                            <i class="material-icons tiny" title="Close"
+                                >close</i
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <pre id="editor"></pre>
+            <a
+                class="btn-floating btn waves-effect waves-light red bottom"
+                id="btn-save"
+                ><i class="material-icons">save</i></a
+            >
+        </div>
+        <script
+            src="../../../node_modules/ace-builds/src-noconflict/ace.js"
+            type="text/javascript"
+        ></script>
+        <!--===================================================-->
+        <script>
+            require('../shared/window-buttons/window-buttons.js')
+            require('./editor.js')
+        </script>
+    </body>
 </html>

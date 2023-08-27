@@ -1,6 +1,14 @@
 const __ = require('../../../../providers/translateProvider')
 const scrobbleProvider = require('../../../../providers/scrobblerProvider')
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../../../utils/window')
+
 __.loadi18n()
+
+handleWindowButtonsInit()
+updateWindowTitle()
 
 var login = scrobbleProvider.getLogin()
 

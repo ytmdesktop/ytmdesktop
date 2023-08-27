@@ -1,36 +1,9 @@
 const { ipcRenderer } = require('electron')
-const electronStore = require('electron-store')
-const store = new electronStore()
-const { isWindows, isMac, isLinux } = require('../../../utils/systemInfo')
+const { handleWindowButtonsInit } = require('../../../utils/window')
 
-const winElement = document.getElementById('win')
-const macElement = document.getElementById('mac')
+handleWindowButtonsInit()
 
 let webview = document.querySelector('webview')
-
-if (store.get('titlebar-type', 'nice') !== 'nice') {
-    document.getElementById('nice-titlebar').style.height = '15px'
-    document
-        .getElementById('nice-titlebar')
-        .removeChild(document.getElementById('nice-titlebar').firstChild)
-
-    document.getElementById('webview').style.height = '100vh'
-    document.getElementById('iframe').style.height = '100vh'
-} else {
-    if (isMac()) {
-        winElement.remove()
-        macElement.classList.remove('hide')
-    } else if (isWindows()) {
-        macElement.remove()
-        winElement.classList.remove('hide')
-    } else if (isLinux()) {
-        winElement.remove()
-        macElement.remove()
-    }
-    document.getElementById('webview').style.height = '95vh'
-    document.getElementById('iframe').style.height = '95vh'
-    document.getElementById('content').style.marginTop = '5vh'
-}
 
 ipcRenderer.on('window-is-maximized', (_, isMaximized) => {
     if (isMaximized) {
@@ -65,11 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    document.getElementById('loading').classList.add('hide')
+    if (document.getElementById('loading'))
+        document.getElementById('loading').classList.add('hide')
 })
 
 // ENABLE FOR DEBUG
-// webview.addEventListener("did-start-loading", () => { webview.openDevTools(); });
+// webview.addEventListener("did-start-loading", () => { webview.openDevTools({ mode: 'detach'}); });
 
 function checkUrlParams() {
     const params = new URL(window.location).searchParams
@@ -87,7 +61,9 @@ function checkUrlParams() {
         webview.classList.remove('hide')
     }
 
-    if (page) webview.src = `../../${page}.html`
+    if (page) {
+        webview.src = `../../${page}.html`
+    }
 
     if (script) {
         script = script.split(',')

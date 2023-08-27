@@ -1,24 +1,71 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <title>Changelog</title>
-    <link
-        type="text/css"
-        rel="stylesheet"
-        href="../../../src/assets/css/styles.css"
-    />
-    <link type="text/css" rel="stylesheet" href="./changelog.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body>
-    <div id="version"></div>
-    <div id="content">
-        <div id="changelog"></div>
-    </div>
+    <head>
+        <meta charset="utf-8" />
+        <title>Changelog</title>
+        <link
+            href="../../../src/assets/css/material_icons.css"
+            rel="stylesheet"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../../../src/assets/css/styles.css"
+        />
+        <link type="text/css" rel="stylesheet" href="./changelog.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
 
-    <script>
-        require('./changelog.js');
-    </script>
-</body>
+    <body>
+        <div id="nice-titlebar" class="bar drag">
+            <div id="mac" class="hide no-drag">
+                <span id="window-title" class="hide"></span>
+                <!-- <div class="col s6 center">
+                    <div class="title">
+                        <i class="material-icons tiny" id="icon"></i>
+                    </div>
+                </div> -->
+            </div>
+
+            <div id="win" class="hide">
+                <div class="row">
+                    <div class="col s9 left-align">
+                        <div class="title">
+                            <i
+                                class="material-icons tiny tiny-margin left"
+                                id="icon"
+                                >history</i
+                            >
+                            <span id="window-title">LABEL_CHANGELOG</span>
+                        </div>
+                    </div>
+
+                    <div class="col s3 right-align">
+                        <div
+                            class="no-drag pointer cmd-btn hover-red"
+                            id="btn-close"
+                        >
+                            <i class="material-icons tiny" title="Close"
+                                >close</i
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <div id="version"></div>
+            <div id="changelog"></div>
+        </div>
+
+        <script>
+            require('../shared/window-buttons/window-buttons.js')
+            require('./changelog.js')
+        </script>
+    </body>
 </html>

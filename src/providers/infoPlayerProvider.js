@@ -46,8 +46,6 @@ const _lyrics = {
 function init(view) {
     webContents = view.webContents
     initialized = true
-    toggleMoreActions(webContents)
-    toggleMoreActions(webContents)
 
     initVolume()
 }
@@ -224,15 +222,18 @@ function getAlbum(webContents) {
         .executeJavaScript(
             `
             var album = '';
-            var player_bar = document.getElementsByClassName("byline ytmusic-player-bar")[0].children;
-            var arr_player_bar = Array.from(player_bar);
+            var player_bar = document.getElementsByClassName("byline ytmusic-player-bar")[0];
+            
+            if (player_bar != null && player_bar.children != null) {
+                var arr_player_bar = Array.from(player_bar.children);
 
-            arr_player_bar.forEach( function(data, index) {
+                arr_player_bar.forEach( function(data, index) {
 
-            if (data.getAttribute('href') != null && data.getAttribute('href').includes('browse')) {
-                album = data.innerText;
+                    if (data.getAttribute('href') != null && data.getAttribute('href').includes('browse')) {
+                        album = data.innerText;
+                    }
+                } )
             }
-            } )
 
             album
             `
@@ -241,7 +242,7 @@ function getAlbum(webContents) {
             debug(`Album is: ${album}`)
             track.album = album
         })
-        .catch((_) => console.log('error getAlbum'))
+        .catch((err) => console.log('error getAlbum: ' + err))
 }
 
 function getCover(webContents) {
@@ -588,8 +589,9 @@ function firstPlay(webContents) {
 async function toggleMoreActions(webContents) {
     await webContents.executeJavaScript(
         `
-            var middleControlsButtons = document.querySelector('.middle-controls-buttons');
-            var moreActions = middleControlsButtons.querySelector('.dropdown-trigger')
+            var middleControlsButtons = document.querySelector('.middle-controls-buttons')
+            var moreActionsTopLevel = middleControlsButtons.querySelector('ytmusic-menu-renderer')
+            var moreActions = moreActionsTopLevel.querySelector('.dropdown-trigger')
 
             moreActions.click()
             `,

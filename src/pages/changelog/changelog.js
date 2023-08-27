@@ -1,12 +1,22 @@
+const __ = require('../../providers/translateProvider')
 const { ipcRenderer } = require('electron')
 const markdown = require('markdown').markdown
 const fetch = require('node-fetch')
 const settingsProvider = require('../../providers/settingsProvider')
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../utils/window')
+
+__.loadi18n()
+
+handleWindowButtonsInit()
+updateWindowTitle()
 
 fetch(`https://api.github.com/repos/ytmdesktop/ytmdesktop/releases`)
     .then((res) => res.json())
     .then((json) => {
-        let tag = ipcRenderer.sendSync('get-app-version')
+        let tag = 'v' + ipcRenderer.sendSync('get-app-version')
 
         let filtered = json.filter((value) => value.tag_name === tag)
         let changelog = filtered[0]

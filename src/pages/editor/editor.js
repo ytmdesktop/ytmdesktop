@@ -1,8 +1,30 @@
 const { ipcRenderer } = require('electron')
 const path = require('path')
+const electronStore = require('electron-store')
+const store = new electronStore()
+const {
+    handleWindowButtonsInit,
+    updateWindowTitle,
+} = require('../../utils/window')
 
 const __ = require('../../../src/providers/translateProvider')
 const fileSystem = require('../../../src/utils/fileSystem')
+
+handleWindowButtonsInit()
+updateWindowTitle()
+updateForTitlebar()
+
+function updateForTitlebar() {
+    // Specifically add margins for the 'nice' titlebar
+    const contentElem = document.getElementById('content')
+
+    contentElem.style.marginTop = ''
+    contentElem.classList.add(
+        store.get('titlebar-type', 'nice') == 'nice'
+            ? 'content-with-titlebar'
+            : 'content-with-default-titlebar'
+    )
+}
 
 const appDataPath = window.process.argv
     .filter((val) => val.includes('--app-path'))
