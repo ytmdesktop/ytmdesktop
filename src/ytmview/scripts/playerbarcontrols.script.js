@@ -316,6 +316,14 @@
   };
   rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
 
+  const humanizeTime = (time) => {
+    // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
+    if (time === 1) return `${time} minute`;
+    if (time > 1 && time < 60) return `${time} minutes`;
+    if (time >= 60 && time < 120) return `${time/60} hour`;
+    if (time >= 120) return `${time/60} hours`;
+  }
+
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
       if (e.detail.args[1].ytmdSleepTimerServiceEndpoint) {
@@ -331,8 +339,42 @@
         if (e.detail.args[1].ytmdSleepTimerServiceEndpoint.time > 0) {
           if (!sleepTimerButton.classList.contains("active")) {
             sleepTimerButton.classList.add("active");
-            sleepTimerButton.setAttribute("title", "Sleep timer " + e.detail.args[1].ytmdSleepTimerServiceEndpoint.time + " minutes");
+            sleepTimerButton.setAttribute("title", `Sleep timer ${humanizeTime(e.detail.args[1].ytmdSleepTimerServiceEndpoint.time)}`);
           }
+
+          document.body.dispatchEvent(
+            new CustomEvent("yt-action", {
+              bubbles: true,
+              cancelable: false,
+              composed: true,
+              detail: {
+                actionName: "yt-open-popup-action",
+                args: [
+                  // Endpoint details
+                  {
+                    openPopupAction: {
+                      popup: {
+                        notificationActionRenderer: {
+                          responseText: {
+                            runs: [
+                              {
+                                text: `Sleep timer set to ${humanizeTime(e.detail.args[1].ytmdSleepTimerServiceEndpoint.time)}`
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      popupType: "TOAST",
+                      uniqueId: crypto.randomUUID()
+                    }
+                  },
+                  document.querySelector("ytmusic-app")
+                ],
+                optionalAction: false,
+                returnValue: []
+              }
+            })
+          );
 
           sleepTimerTimeout = setTimeout(
             () => {
@@ -386,6 +428,40 @@
               }
             },
             e.detail.args[1].ytmdSleepTimerServiceEndpoint.time * 1000 * 60
+          );
+        } else {
+          document.body.dispatchEvent(
+            new CustomEvent("yt-action", {
+              bubbles: true,
+              cancelable: false,
+              composed: true,
+              detail: {
+                actionName: "yt-open-popup-action",
+                args: [
+                  // Endpoint details
+                  {
+                    openPopupAction: {
+                      popup: {
+                        notificationActionRenderer: {
+                          responseText: {
+                            runs: [
+                              {
+                                text: `Sleep timer cleared`
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      popupType: "TOAST",
+                      uniqueId: crypto.randomUUID()
+                    }
+                  },
+                  document.querySelector("ytmusic-app")
+                ],
+                optionalAction: false,
+                returnValue: []
+              }
+            })
           );
         }
       }
