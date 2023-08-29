@@ -1,7 +1,7 @@
 import { shell, safeStorage } from "electron";
 import ElectronStore from "electron-store";
 import fetch from "node-fetch";
-import md5 from "md5";
+import cypto from "crypto";
 
 import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
 
@@ -292,4 +292,8 @@ export default class LastFM implements IIntegration {
       // Do nothing, the values are not valid and can be ignored
     }
   }
+}
+
+function md5(string: string): string {
+  return cypto.createHash('md5').update(string).digest('hex');
 }

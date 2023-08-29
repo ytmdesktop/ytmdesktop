@@ -72,7 +72,6 @@
     "fastify": "^4.16.0",
     "fastify-socket.io": "^4.0.0",
     "material-symbols": "^0.10.2",
-    "md5": "^2.3.0",
     "node-fetch": "^3.3.2",
     "socket.io": "^4.5.4",
     "vue": "^3.2.45"
