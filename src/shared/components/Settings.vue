@@ -29,6 +29,7 @@ const appearance: StoreSchema["appearance"] = await store.get("appearance");
 const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
+const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
 
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
@@ -55,6 +56,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 );
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
+const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -63,6 +65,8 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+
+const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 
 store.onDidAnyChange(async newState => {
   hideToTrayOnClose.value = newState.general.hideToTrayOnClose;
@@ -86,6 +90,7 @@ store.onDidAnyChange(async newState => {
   companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens));
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
+  lastFMEnabled.value = newState.integrations.lastFMEnabled;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -116,6 +121,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString(companionServerAuthWindowEnabled.value.toString()));
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
+  store.set("integrations.lastFMEnabled", lastFMEnabled.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -339,7 +345,20 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p>Discord rich presence</p>
             <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
-        </div>
+          <div class="setting">
+            <p>Last.fm scrobbling</p>
+            <input v-model="lastFMEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="lastFMEnabled" class="setting indented">
+            <div class="name-with-description">
+              <p class="name">
+                User is Authenticated:
+                <span v-if="lastFMSessionKey" style="color: #4caf50;">Yes</span>
+                <span v-else style="color: #ff1100;">No</span> 
+              </p>
+            </div>
+          </div>
+        </div>  
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
           <div class="setting">

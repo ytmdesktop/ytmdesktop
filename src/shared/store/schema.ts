@@ -27,6 +27,7 @@ export type StoreSchema = {
     companionServerAuthTokens: string | null; // array[object] | Encrypted for security
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
+    lastFMEnabled: boolean;
   };
   shortcuts: {
     playPause: string;
@@ -44,6 +45,12 @@ export type StoreSchema = {
     companionServerAuthWindowEnableTime: string | null; // string (ISO8601) | Encrypted for security
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
+  };
+  lastfm: {
+    api_key: string;
+    secret: string;
+    token: string | null;
+    sessionKey: string | null;
   };
   developer: {
     enableDevTools: boolean

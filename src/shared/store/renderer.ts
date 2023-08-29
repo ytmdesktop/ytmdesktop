@@ -13,6 +13,10 @@ export default class Store<TSchema> {
     return await ipcRenderer.invoke("settings:get", key);
   }
 
+  public reset(key: keyof TSchema) {
+    return ipcRenderer.send("settings:reset", key);
+  }
+
   public onDidAnyChange(callback: (newState: TSchema, oldState: TSchema) => void) {
     return ipcRenderer.on("settings:stateChanged", (event, newState, oldState) => {
       callback(newState, oldState);
