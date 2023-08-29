@@ -60,6 +60,7 @@
     "webpack": "^5.88.2"
   },
   "dependencies": {
+    "@fastify/cors": "^8.3.0",
     "@fastify/error": "^3.3.0",
     "@fastify/rate-limit": "^8.0.3",
     "@fastify/type-provider-typebox": "^3.4.0",

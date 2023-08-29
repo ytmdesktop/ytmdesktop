@@ -9,6 +9,7 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { AuthToken } from "./shared/auth";
 import { RemoteSocket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import cors from "@fastify/cors";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -18,15 +19,18 @@ export default class CompanionServer implements IIntegration {
   private ytmView: BrowserView;
   private storeListener: () => void | null = null;
 
-  constructor() {
-    this.createServer();
-  }
-
   private createServer() {
     this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
+    this.fastifyServer.register(cors, {
+      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : undefined
+    });
     this.fastifyServer.register(FastifyIO, {
       transports: ["websocket"],
-      allowUpgrades: false
+      allowUpgrades: false,
+      // While this is websocket only we still apply cors just in case
+      cors: {
+        origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : undefined
+      }
     });
     this.fastifyServer.register(CompanionServerAPIv1, {
       prefix: "/api/v1",
@@ -50,7 +54,7 @@ export default class CompanionServer implements IIntegration {
   }
 
   public enable() {
-    if (!this.fastifyServer.server.listening) {
+    if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
       this.createServer();
       this.fastifyServer.listen({
         host: this.listenIp,

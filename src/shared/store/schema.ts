@@ -25,6 +25,7 @@ export type StoreSchema = {
     companionServerEnabled: boolean;
     companionServerAuthWindowEnabled: string | null; // boolean | Encrypted for security
     companionServerAuthTokens: string | null; // array[object] | Encrypted for security
+    companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
   };
   shortcuts: {

@@ -165,6 +165,7 @@ const store = new ElectronStore<StoreSchema>({
       companionServerEnabled: false,
       companionServerAuthWindowEnabled: null,
       companionServerAuthTokens: null,
+      companionServerCORSWildcardEnabled: false,
       discordPresenceEnabled: false
     },
     shortcuts: {
@@ -258,6 +259,14 @@ store.onDidAnyChange((newState, oldState) => {
         companionAuthWindowEnableTimeout = null;
       }, 300 * 1000);
       store.set("state.companionServerAuthWindowEnableTime", safeStorage.encryptString(new Date().toISOString()).toString("hex"));
+    }
+  }
+
+  if (newState.integrations.companionServerCORSWildcardEnabled && !oldState.integrations.companionServerCORSWildcardEnabled) {
+    // Check if the companion server has been enabled and needs a restart from CORS wildcard change
+    if (newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
+      companionServer.disable();
+      companionServer.enable();
     }
   }
 

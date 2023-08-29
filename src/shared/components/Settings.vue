@@ -53,6 +53,7 @@ const companionServerAuthWindowEnabled = ref<boolean>(
 const companionServerAuthTokens = ref<AuthToken[]>(
   JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens))
 );
+const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
@@ -83,6 +84,7 @@ store.onDidAnyChange(async newState => {
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
   companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens));
+  companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
@@ -112,6 +114,7 @@ async function settingsChanged() {
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString(companionServerAuthWindowEnabled.value.toString()));
+  store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
@@ -290,6 +293,13 @@ window.ytmd.handleUpdateDownloaded(() => {
           <div class="setting">
             <p>Companion server</p>
             <input v-model="companionServerEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="companionServerEnabled" class="setting indented">
+            <div class="name-with-description">
+              <p class="name">Allow browser communication</p>
+              <p class="description">This setting could be dangerous as it allows any website you visit to communicate with the companion server</p>
+            </div>
+            <input v-model="companionServerCORSWildcardEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
           <div v-if="companionServerEnabled" class="setting indented">
             <div class="name-with-description">
