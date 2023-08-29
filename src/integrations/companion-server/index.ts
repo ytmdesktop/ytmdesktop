@@ -82,9 +82,11 @@ export default class CompanionServer implements IIntegration {
   }
 
   public disable() {
-    this.fastifyServer.close();
-    if (this.storeListener) {
-      this.storeListener();
+    if (this.fastifyServer) {
+      this.fastifyServer.close();
+      if (this.storeListener) {
+        this.storeListener();
+      }
     }
   }
 }
