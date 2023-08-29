@@ -203,7 +203,7 @@ const store = new ElectronStore<StoreSchema>({
     }
   }
 });
-store.onDidAnyChange((newState, oldState) => {
+store.onDidAnyChange(async (newState, oldState) => {
   if (settingsWindow !== null) {
     settingsWindow.webContents.send("settings:stateChanged", newState, oldState);
   }
@@ -278,8 +278,14 @@ store.onDidAnyChange((newState, oldState) => {
   if (newState.integrations.companionServerCORSWildcardEnabled && !oldState.integrations.companionServerCORSWildcardEnabled) {
     // Check if the companion server has been enabled and needs a restart from CORS wildcard change
     if (newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
-      companionServer.disable();
-      companionServer.enable();
+      await companionServer.disable();
+      await companionServer.enable();
+    }
+  } else if (!newState.integrations.companionServerCORSWildcardEnabled) {
+    // Check if the companion server has been enabled and needs a restart from CORS wildcard change
+    if (newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
+      await companionServer.disable();
+      await companionServer.enable();
     }
   }
 

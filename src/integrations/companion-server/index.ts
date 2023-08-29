@@ -22,14 +22,14 @@ export default class CompanionServer implements IIntegration {
   private createServer() {
     this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
     this.fastifyServer.register(cors, {
-      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : undefined
+      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
     });
     this.fastifyServer.register(FastifyIO, {
       transports: ["websocket"],
       allowUpgrades: false,
       // While this is websocket only we still apply cors just in case
       cors: {
-        origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : undefined
+        origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
       }
     });
     this.fastifyServer.register(CompanionServerAPIv1, {
@@ -53,10 +53,10 @@ export default class CompanionServer implements IIntegration {
     this.ytmView = ytmView;
   }
 
-  public enable() {
+  public async enable() {
     if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
       this.createServer();
-      this.fastifyServer.listen({
+      await this.fastifyServer.listen({
         host: this.listenIp,
         port: this.listenPort
       });
@@ -81,9 +81,9 @@ export default class CompanionServer implements IIntegration {
     }
   }
 
-  public disable() {
+  public async disable() {
     if (this.fastifyServer) {
-      this.fastifyServer.close();
+      await this.fastifyServer.close();
       if (this.storeListener) {
         this.storeListener();
       }

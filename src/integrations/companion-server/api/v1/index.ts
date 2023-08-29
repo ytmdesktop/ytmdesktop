@@ -66,6 +66,7 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
 //const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
 const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
 const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' cannot be set", 400);
+const InvalidPositionError = createError("INVALID_SEEK_POSITION", "Seek position '%s' is invalid", 400);
 const UnauthenticatedError = createError("UNAUTHENTICATED", "Authentication not provided or invalid", 401);
 const AuthorizationDisabled = createError("AUTHORIZATION_DISABLED", "Authorization requests are disabled", 403);
 const AuthorizationInvalid = createError("AUTHORIZATION_INVALID", "Authorization invalid", 400);
@@ -134,6 +135,15 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           break;
         }
 
+        case "seekTo": {
+          const position = commandRequest.data;
+          if (isNaN(position) || position < 0 || position > playerStateStore.getState().videoDetails.durationSeconds) {
+            throw new InvalidPositionError(position);
+          }
+          ytmView.webContents.send("remoteControl:execute", "seekTo", position);
+          break;
+        }
+
         case "next": {
           ytmView.webContents.send("remoteControl:execute", "next");
           break;
@@ -164,6 +174,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
             }
           }
           break;
+        }
+
+        case "shuffle": {
+          ytmView.webContents.send("remoteControl:execute", "shuffle");
         }
       }
     }

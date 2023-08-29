@@ -31,6 +31,12 @@ export const APIV1CommandRequestBody = Type.Union([
     command: Type.Literal("unmute")
   }),
   Type.Object({
+    command: Type.Literal("seekTo"),
+    data: Type.Number({
+      minimum: 0
+    })
+  }),
+  Type.Object({
     command: Type.Literal("next")
   }),
   Type.Object({
@@ -39,7 +45,10 @@ export const APIV1CommandRequestBody = Type.Union([
   Type.Object({
     command: Type.Literal("repeatMode"),
     data: Type.Enum(RepeatMode)
-  })
+  }),
+  Type.Object({
+    command: Type.Literal("shuffle")
+  }),
 ]);
 export type APIV1CommandRequestBodyType = Static<typeof APIV1CommandRequestBody>;
 

@@ -413,6 +413,22 @@ window.addEventListener("load", async () => {
         `);
         break;
 
+      case "seekTo":
+        webFrame.executeJavaScript(`
+          {
+            document.querySelector("ytmusic-player-bar").playerApi_.seekTo(${value});
+          }
+        `);
+        break;
+      
+      case "shuffle":
+        webFrame.executeJavaScript(`
+          {
+            document.querySelector("ytmusic-player-bar").queue_.shuffle();
+          }
+        `);
+        break;
+
       case "navigate": {
         const endpoint = value;
         document.dispatchEvent(
