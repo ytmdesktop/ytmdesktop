@@ -245,11 +245,10 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p>Hide to tray on close</p>
             <input v-model="hideToTrayOnClose" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
-          <!--<div class="setting">
-          <p>Show notification on song change</p>
-          <input v-model="showNotificationOnSongChange" @change="settingsChanged" class="toggle"
-              type="checkbox" />
-        </div>-->
+          <div class="setting">
+            <p>Show notification on song change</p>
+            <input v-model="showNotificationOnSongChange" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
           <div class="setting">
             <p>Start on boot</p>
             <input v-model="startOnBoot" class="toggle" type="checkbox" @change="settingsChanged" />
