@@ -865,6 +865,10 @@ const createMainWindow = (): void => {
     store.set("state.windowBounds", mainWindow.getNormalBounds());
     store.set("state.windowMaximized", mainWindow.isMaximized());
   });
+  
+  mainWindow.once("closed", () => {
+    mainWindow = null;
+  });
 
   mainWindow.webContents.setWindowOpenHandler(() => {
     return {
