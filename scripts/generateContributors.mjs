@@ -41,7 +41,7 @@ function fetchContributors() {
 function generateMarkdown(contributors) {
   const markdownContent = contributors.map(contributor => {
     return (
-      `[<img alt="${contributor.login}" src="${contributor.avatar_url}&s=120" width="120" height="120">]`+
+      `[<img alt="${contributor.login}" src="${contributor.avatar_url}&s=240" width="120" height="120">]`+
       `(${contributor.html_url})`
     );
   }).join('\n');
