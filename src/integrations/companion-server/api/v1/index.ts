@@ -356,6 +356,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
           ipcMain.once(`companionAuthorization:result:${requestId}`, resultListener);
           ipcMain.once(`companionWindow:close:${requestId}`, closeListener);
+          authorizationWindow.once("closed", closeListener);
         });
 
         authorizationWindow.close();
