@@ -33,6 +33,7 @@ const config: ForgeConfig = {
           'AudioVideo',
           'Audio',
         ],
+        mimeType: ["x-scheme-handler/ytmd"]
       },
     }),
     new MakerDeb({
