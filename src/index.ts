@@ -744,7 +744,8 @@ const createMainWindow = (): void => {
       sandbox: true,
       contextIsolation: true,
       partition: "persist:ytmview",
-      preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY
+      preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY,
+      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "user-gesture-required" : "no-user-gesture-required"
     }
   });
   companionServer.provide(store, ytmView);
