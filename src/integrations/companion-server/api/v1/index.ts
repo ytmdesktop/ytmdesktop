@@ -72,6 +72,7 @@ const AuthorizationDisabled = createError("AUTHORIZATION_DISABLED", "Authorizati
 const AuthorizationInvalid = createError("AUTHORIZATION_INVALID", "Authorization invalid", 400);
 const AuthorizationTimeOut = createError("AUTHORIZATION_TIME_OUT", "Authorization timed out", 504);
 const AuthorizationDenied = createError("AUTHORIZATION_DENIED", "Authorization request denied", 403);
+const AuthorizationTooMany = createError("AUTHORIZATION_TOO_MANY", "Too many authorization requests currently active", 503);
 const YouTubeMusicUnavailable = createError("YOUTUBE_MUSIC_UNVAILABLE", "YouTube Music is currently unvailable", 503);
 const YouTubeMusicTimeOut = createError("YOUTUBE_MUSIC_TIME_OUT", "Response from YouTube Music took too long", 504);
 
@@ -252,10 +253,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
       // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
       if (authorizationWindows.length >= 5) {
-        response.code(503).send({
-          error: "AUTHORIZATION_TOO_MANY"
-        });
-        return;
+        throw new AuthorizationTooMany();
       }
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
