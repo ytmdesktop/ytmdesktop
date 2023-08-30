@@ -168,7 +168,7 @@ export default class DiscordPresence implements IIntegration {
           if (this.discordClient) {
             this.discordClient.connect(DISCORD_CLIENT_ID).catch(() => this.retryDiscordConnection());
           }
-        }, 5 * 50);
+        }, 5 * 1000);
       } else {
         this.memoryStore.set("discordPresenceConnectionFailed", true);
       }
