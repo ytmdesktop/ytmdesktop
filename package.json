@@ -65,7 +65,6 @@
     "@fastify/rate-limit": "^8.0.3",
     "@fastify/type-provider-typebox": "^3.4.0",
     "@sinclair/typebox": "^0.30.2",
-    "@types/md5": "^2.3.2",
     "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
