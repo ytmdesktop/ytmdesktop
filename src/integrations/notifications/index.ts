@@ -68,6 +68,7 @@ function getUrlContents(url: string) {
 export default class NowPlayingNotifications implements IIntegration {
   private isEnabled = false;
   private lastDetails: VideoDetails = null;
+  private playerStateFunction: (state: PlayerState) => void;
 
   private async updateVideoDetails(state: PlayerState): Promise<void> {
     if (!this.isEnabled) { return; }
@@ -101,13 +102,14 @@ export default class NowPlayingNotifications implements IIntegration {
 
   public enable(): void {
     if (!this.isEnabled) {
-      playerStateStore.addEventListener((state: PlayerState) => this.updateVideoDetails(state));
+      this.playerStateFunction = (state: PlayerState) => this.updateVideoDetails(state)
+      playerStateStore.addEventListener(this.playerStateFunction);
       this.isEnabled = true;
     }
   }
   public disable(): void {
     if (this.isEnabled) {
-      playerStateStore.removeEventListener((state: PlayerState) => this.updateVideoDetails(state));
+      playerStateStore.removeEventListener(this.playerStateFunction);
       this.isEnabled = false;
     }
   }
