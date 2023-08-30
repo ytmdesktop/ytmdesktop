@@ -11,6 +11,7 @@ import { rendererConfig } from "./webpack.renderer.config";
 
 const config: ForgeConfig = {
   packagerConfig: {
+    executableName: 'youtube-music-desktop-app',
     icon: "./src/assets/icons/ytmd",
     extraResource: ["./src/assets/icons"],
     protocols: [
@@ -18,16 +19,30 @@ const config: ForgeConfig = {
         name: "YouTube Music Desktop App",
         schemes: ["ytmd"]
       }
-    ]
+    ],
+    appCategoryType: 'public.app-category.music',
+
   },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({}),
     new MakerZIP({}, ["darwin"]),
-    new MakerRpm({}),
+    new MakerRpm({
+      options: {
+        categories: [
+          'AudioVideo',
+          'Audio',
+        ],
+      },
+    }),
     new MakerDeb({
       options: {
-        mimeType: ["x-scheme-handler/ytmd"]
+        categories: [
+          'AudioVideo',
+          'Audio',
+        ],
+        mimeType: ["x-scheme-handler/ytmd"],
+        section: 'sound',
       }
     })
   ],

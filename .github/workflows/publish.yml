@@ -1,0 +1,51 @@
+---
+name: Application Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [
+            { name: 'linux',   image: 'ubuntu-latest' },
+            { name: 'windows', image: 'windows-latest' },
+            { name: 'macos',   image: 'macos-latest' },
+          ]
+
+    runs-on: ${{ matrix.os.image }}
+
+    steps:
+      - name: Github checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node (v18)
+        uses: actions/setup-node@v3
+        with:
+          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
+          cache: 'yarn'
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Publish Dry (x64)
+        run: yarn publish:dry
+
+      - name: Publish From Dry (x64)
+        run: yarn publish:fromdry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish Dry (arm64)
+        if: matrix.os.image == 'macos-latest'
+        run: yarn publish:dry --arch arm64
+
+      - name: Publish From Dry (arm64)
+        if: matrix.os.image == 'macos-latest'
+        run: yarn publish:fromdry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

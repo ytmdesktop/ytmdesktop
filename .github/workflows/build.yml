@@ -1,0 +1,60 @@
+---
+name: Application Build
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [
+            { name: 'linux',   image: 'ubuntu-latest' },
+            { name: 'windows', image: 'windows-latest' },
+            { name: 'macos',   image: 'macos-latest' },
+          ]
+
+    runs-on: ${{ matrix.os.image }}
+
+    steps:
+      - name: Github checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node (v18)
+        uses: actions/setup-node@v3
+        with:
+          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
+          cache: 'yarn'
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build (x64)
+        run: yarn make
+
+      - name: Build (arm64)
+        if: matrix.os.image == 'macos-latest'
+        run: yarn make --arch arm64
+
+      - name: Upload artifacts (x64)
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ matrix.os.name }}-x64
+          path: |
+            out/make/squirrel.windows/x64/*.exe
+            out/make/deb/x64/*.deb
+            out/make/rpm/x64/*.rpm
+            out/make/zip/darwin/x64/*.zip
+
+      - name: Upload artifacts (arm64)
+        if: matrix.os.image == 'macos-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ matrix.os.name }}-arm64
+          path: |
+            out/make/squirrel.windows/arm64/*.exe
+            out/make/deb/arm64/*.deb
+            out/make/rpm/arm64/*.rpm
+            out/make/zip/darwin/arm64/*.zip
