@@ -225,10 +225,6 @@ window.ytmd.handleUpdateDownloaded(() => {
 
 <template>
   <div class="settings-container">
-    <div v-if="requiresRestart" class="restart-banner">
-      <p class="message"><span class="material-symbols-outlined">autorenew</span> Restart app to apply changes</p>
-      <button class="restart-button" @click="restartApplication">Restart</button>
-    </div>
     <div class="content-container">
       <ul class="sidebar">
         <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
@@ -240,6 +236,10 @@ window.ytmd.handleUpdateDownloaded(() => {
         <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
       </ul>
       <div class="content">
+        <div v-if="requiresRestart" class="restart-banner">
+          <p class="message"><span class="material-symbols-outlined">autorenew</span> Restart app to apply changes</p>
+          <button class="restart-button" @click="restartApplication">Restart</button>
+        </div>
         <div v-if="currentTab === 1" class="general-tab">
           <div v-if="!isDarwin" class="setting">
             <p>Hide to tray on close</p>
