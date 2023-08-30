@@ -311,6 +311,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       });
       
       authorizationWindow.webContents.on("will-navigate", event => {
+        if (process.env.NODE_ENV === "development") 
+          if (event.url.startsWith("http://localhost")) 
+            return;
+
         event.preventDefault();
       });
 

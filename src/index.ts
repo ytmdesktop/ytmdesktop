@@ -655,6 +655,10 @@ const createOrShowSettingsWindow = (): void => {
   });
 
   settingsWindow.webContents.on("will-navigate", event => {
+    if (process.env.NODE_ENV === "development") 
+      if (event.url.startsWith("http://localhost")) 
+        return;
+      
     event.preventDefault();
   });
 
@@ -837,6 +841,10 @@ const createMainWindow = (): void => {
   });
 
   mainWindow.webContents.on("will-navigate", event => {
+    if (process.env.NODE_ENV === "development") 
+      if (event.url.startsWith("http://localhost")) 
+        return;
+
     event.preventDefault();
   });
 
