@@ -11,7 +11,8 @@ function getLowestResThumbnail(thumbnails: Thumbnail[]) {
   let currentHeight = 1024;
   let url = null;
   for (const thumbnail of thumbnails) {
-    if (thumbnail.width < currentWidth && thumbnail.height < currentHeight) {
+    // If the thumbnail is smaller than the current one, but bigger than 100x100
+    if (thumbnail.width < currentWidth && thumbnail.height < currentHeight && thumbnail.width > 100 && thumbnail.height > 100) {
       currentWidth = thumbnail.width;
       currentHeight = thumbnail.height;
       url = thumbnail.url;
