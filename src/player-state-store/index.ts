@@ -211,6 +211,12 @@ class PlayerStateStore {
   private queue: PlayerQueue | null = null;
   private eventEmitter = new EventEmitter();
 
+  constructor() {
+    this.eventEmitter.on("error", (error) => {
+      console.log("PlayerStateStore EventEmitter threw an error", error);
+    });
+  }
+
   public getState(): PlayerState {
     return {
       videoDetails: this.videoDetails,

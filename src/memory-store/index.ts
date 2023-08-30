@@ -6,6 +6,9 @@ export default class MemoryStore<T extends Record<string, unknown>> {
 
   constructor() {
     this.state = {};
+    this.eventEmitter.on("error", (error) => {
+      console.log("MemoryStore EventEmitter threw an error", error);
+    });
   }
 
   public get(key: string): unknown {
