@@ -56,3 +56,7 @@ export type StoreSchema = {
     enableDevTools: boolean
   }
 };
+
+export type MemoryStoreSchema = {
+  discordPresenceConnectionFailed: boolean
+};

@@ -1,6 +1,8 @@
 import DiscordRPC from "discord-rpc";
 import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
+import MemoryStore from "../../memory-store";
+import { MemoryStoreSchema } from "../../shared/store/schema";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
@@ -68,14 +70,20 @@ function stringLimit(str: string, limit: number) {
 }
 
 export default class DiscordPresence implements IIntegration {
+  private memoryStore: MemoryStore<MemoryStoreSchema>;
+
   private discordClient: DiscordRPC.Client = null;
+  private enabled = false;
   private ready = false;
+  private connectionRetryTimeout: string | number | NodeJS.Timeout = null;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
   private endTimestamp: number | null = null;
   private stateCallback: (event: PlayerState) => void = null;
   
   private lastTimeSeconds: number | null = null;
   private lastDuration: number | null = null;
+
+  private connectionRetries: number = 0;
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
@@ -148,22 +156,41 @@ export default class DiscordPresence implements IIntegration {
     }
   }
 
-  public provide(): void {
-    throw new Error("Discord Presence integration does not need provide");
+  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
+    this.memoryStore = memoryStore;
+  }
+
+  private retryDiscordConnection() {
+    if (this.enabled) {
+      if (this.connectionRetries < 30) {
+        this.connectionRetries++;
+        this.connectionRetryTimeout = setTimeout(() => {
+          if (this.discordClient) {
+            this.discordClient.connect(DISCORD_CLIENT_ID).catch(() => this.retryDiscordConnection());
+          }
+        }, 5 * 50);
+      } else {
+        this.memoryStore.set("discordPresenceConnectionFailed", true);
+      }
+    }
   }
 
   public enable(): void {
+    this.enabled = true;
     if (!this.discordClient) {
       this.discordClient = new DiscordRPC.Client({
         transport: "ipc"
       });
       this.discordClient.on("connected", () => {
         this.ready = true;
+        this.connectionRetries = 0;
+        this.memoryStore.set("discordPresenceConnectionFailed", false);
       });
       this.discordClient.on("disconnected", () => {
         this.ready = false;
+        this.retryDiscordConnection();
       });
-      this.discordClient.connect(DISCORD_CLIENT_ID);
+      this.discordClient.connect(DISCORD_CLIENT_ID).catch(() => this.retryDiscordConnection());
       this.stateCallback = event => {
         this.playerStateChanged(event);
       };
@@ -172,9 +199,16 @@ export default class DiscordPresence implements IIntegration {
   }
 
   public disable(): void {
+    this.enabled = false;
+    this.connectionRetries = 0;
+    this.memoryStore.set("discordPresenceConnectionFailed", false);
+    if (this.connectionRetryTimeout) {
+      clearTimeout(this.connectionRetryTimeout);
+      this.connectionRetryTimeout = null;
+    }
     if (this.discordClient) {
       this.ready = false;
-      this.discordClient.destroy();
+      this.discordClient.destroy().catch(() => {});
       this.discordClient = null;
     }
     if (this.stateCallback) {

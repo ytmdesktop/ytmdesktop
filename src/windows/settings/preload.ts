@@ -3,15 +3,22 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import Store from "../../shared/store/renderer";
-import { StoreSchema } from "../../shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "../../shared/store/schema";
 import { WindowsEventArguments } from "../../shared/types";
+import MemoryStore from "../../shared/memory-store/renderer";
 
 const store = new Store<StoreSchema>();
+const memoryStore = new MemoryStore<MemoryStoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
   isDarwin: process.platform === 'darwin',
   isLinux: process.platform === 'linux',
   isWindows: process.platform === 'win32',
+  memoryStore: {
+    set: (key: string, value: unknown) => memoryStore.set(key, value),
+    get: async (key: keyof MemoryStoreSchema) => await memoryStore.get(key),
+    onStateChanged: (callback: (newState: MemoryStoreSchema, oldState: MemoryStoreSchema) => void) => memoryStore.onStateChanged(callback)
+  },
   store: {
     set: (key: string, value: unknown) => store.set(key, value),
     get: async (key: keyof StoreSchema) => await store.get(key),

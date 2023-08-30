@@ -22,6 +22,7 @@ const updateDownloaded = ref(await window.ytmd.isAppUpdateDownloaded());
 const cssPathFileInput = ref(null);
 
 const store = window.ytmd.store;
+const memoryStore = window.ytmd.memoryStore;
 const safeStorage = window.ytmd.safeStorage;
 
 const general: StoreSchema["general"] = await store.get("general");
@@ -101,6 +102,12 @@ store.onDidAnyChange(async newState => {
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
 });
 
+const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
+
+memoryStore.onStateChanged((newState) => {
+  discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
+});
+
 async function settingsChanged() {
   store.set("general.hideToTrayOnClose", hideToTrayOnClose.value);
   store.set("general.showNotificationOnSongChange", showNotificationOnSongChange.value);
@@ -153,6 +160,13 @@ async function settingChangedFile(event: Event) {
   );
 
   target.value = null;
+}
+
+async function restartDiscordPresence() {
+  discordPresenceEnabled.value = false;
+  await settingsChanged();
+  discordPresenceEnabled.value = true;
+  await settingsChanged();
 }
 
 async function deleteCompanionAuthToken(appId: string) {
@@ -344,6 +358,10 @@ window.ytmd.handleUpdateDownloaded(() => {
           <div class="setting">
             <p>Discord rich presence</p>
             <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
+            <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
+            <button @click="restartDiscordPresence">Retry</button>
           </div>
           <div class="setting">
             <p>Last.fm scrobbling</p>
@@ -781,5 +799,21 @@ input[type="file"] {
 .setting.indented.authorized-companions .no-companions {
   color: #bbbbbb;
   padding: 4px;
+}
+
+.discord-failure {
+  margin: 0;
+  color: #969696;
+}
+
+button {
+  margin: 3px 3px 3px 4px;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  background-color: #212121;
+  cursor: pointer;
+  border: none;
 }
 </style>

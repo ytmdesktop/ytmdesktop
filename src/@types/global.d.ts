@@ -1,6 +1,7 @@
 import { WindowsEventArguments } from "../shared/types";
 import Store from "../shared/store/renderer";
-import { StoreSchema } from "../shared/store/schema";
+import { StoreSchema, MemoryStoreSchema } from "../shared/store/schema";
+import MemoryStore from "../shared/memory-store/renderer";
 
 declare global {
   interface Window {
@@ -10,6 +11,7 @@ declare global {
       isLinux: boolean;
       isWindows: boolean;
       store: Store<StoreSchema>;
+      memoryStore: MemoryStore<MemoryStoreSchema>;
       safeStorage: {
         decryptString(value: string): string;
         encryptString(value: string): Buffer;

@@ -55,6 +55,7 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
     </div>
     <div class="right">
       <div class="app-buttons">
+        <slot name="app-buttons"></slot>
         <button v-if="hasSettingsButton" class="app-button" tabindex="1" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
@@ -104,6 +105,8 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
 
 .titlebar .right .app-buttons {
   margin-right: 4px;
+  display: flex;
+  flex-direction: row;
 }
 
 .title {
@@ -146,6 +149,10 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
     "GRAD" 0,
     "opsz" 28;
   cursor: pointer;
+}
+
+.app-button:not(:last-child) {
+  margin-right: 4px;
 }
 
 .app-button:hover {
