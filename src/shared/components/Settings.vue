@@ -53,7 +53,7 @@ const companionServerAuthWindowEnabled = ref<boolean>(
   (await safeStorage.decryptString(integrations.companionServerAuthWindowEnabled)) === "true" ? true : false
 );
 const companionServerAuthTokens = ref<AuthToken[]>(
-  JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens))
+  JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? []
 );
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
@@ -88,7 +88,7 @@ store.onDidAnyChange(async newState => {
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
-  companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens));
+  companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens)) ?? [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
