@@ -470,40 +470,42 @@ function setupTaskbarFeatures() {
         taskbarFlags.push("disabled");
       }
 
-      mainWindow.setThumbarButtons([
-        {
-          tooltip: "Previous",
-          icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-previous-button.png")),
-          flags: taskbarFlags,
-          click() {
-            if (ytmView) {
-              ytmView.webContents.send("remoteControl:execute", "previous");
+      if (mainWindow) {
+        mainWindow.setThumbarButtons([
+          {
+            tooltip: "Previous",
+            icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-previous-button.png")),
+            flags: taskbarFlags,
+            click() {
+              if (ytmView) {
+                ytmView.webContents.send("remoteControl:execute", "previous");
+              }
+            }
+          },
+          {
+            tooltip: "Play/Pause",
+            icon: isPlaying
+              ? nativeImage.createFromPath(path.join(assetFolder, "icons/controls/pause-button.png"))
+              : nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-button.png")),
+            flags: taskbarFlags,
+            click() {
+              if (ytmView) {
+                ytmView.webContents.send("remoteControl:execute", "playPause");
+              }
+            }
+          },
+          {
+            tooltip: "Next",
+            icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-next-button.png")),
+            flags: taskbarFlags,
+            click() {
+              if (ytmView) {
+                ytmView.webContents.send("remoteControl:execute", "next");
+              }
             }
           }
-        },
-        {
-          tooltip: "Play/Pause",
-          icon: isPlaying
-            ? nativeImage.createFromPath(path.join(assetFolder, "icons/controls/pause-button.png"))
-            : nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-button.png")),
-          flags: taskbarFlags,
-          click() {
-            if (ytmView) {
-              ytmView.webContents.send("remoteControl:execute", "playPause");
-            }
-          }
-        },
-        {
-          tooltip: "Next",
-          icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-next-button.png")),
-          flags: taskbarFlags,
-          click() {
-            if (ytmView) {
-              ytmView.webContents.send("remoteControl:execute", "next");
-            }
-          }
-        }
-      ]);
+        ]);
+      }
     }
 
     if (mainWindow && store.get("playback.progressInTaskbar")) {
