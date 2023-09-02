@@ -47,6 +47,7 @@ crashReporter.start({ uploadToServer: false });
 
 log.transports.console.format = "[{processType}][{level}]{text}";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{level}]{text}";
+log.eventLogger.format = 'Electron event {eventSource}#{eventName} observed';
 
 log.initialize({
   preload: true,
@@ -82,6 +83,7 @@ log.errorHandler.startCatching({
     app.exit(1);
   }
 });
+log.eventLogger.startLogging();
 
 Object.assign(console, log.functions);
 
@@ -825,37 +827,7 @@ const createOrShowSettingsWindow = (): void => {
   }
 };
 
-const createMainWindow = (): void => {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    frame: false,
-    show: false,
-    icon: "./assets/icons/ytmd.png",
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#000000",
-      symbolColor: "#BBBBBB",
-      height: 36
-    },
-    webPreferences: {
-      sandbox: true,
-      contextIsolation: true,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      devTools: store.get("developer.enableDevTools")
-    }
-  });
-  const windowBounds = store.get("state").windowBounds;
-  const windowMaximized = store.get("state").windowMaximized;
-  if (windowBounds) {
-    mainWindow.setBounds(windowBounds);
-  }
-  if (windowMaximized) {
-    mainWindow.maximize();
-  }
-
-  // Create the YouTube Music view
+const createYTMView = (): void => {
   ytmView = new BrowserView({
     webPreferences: {
       sandbox: true,
@@ -926,6 +898,9 @@ const createMainWindow = (): void => {
       mainWindow.setFullScreen(false);
     }
   });
+  ytmView.webContents.on("render-process-gone", () => {
+    createYTMView();
+  });
 
   ytmView.webContents.setWindowOpenHandler(details => {
     openExternalFromYtmView(details.url);
@@ -934,6 +909,46 @@ const createMainWindow = (): void => {
       action: "deny"
     };
   });
+
+  if (process.env.NODE_ENV === "development") {
+    ytmView.webContents.openDevTools({
+      mode: "detach"
+    });
+  }
+}
+
+const createMainWindow = (): void => {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    frame: false,
+    show: false,
+    icon: "./assets/icons/ytmd.png",
+    titleBarStyle: "hidden",
+    titleBarOverlay: {
+      color: "#000000",
+      symbolColor: "#BBBBBB",
+      height: 36
+    },
+    webPreferences: {
+      sandbox: true,
+      contextIsolation: true,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      devTools: store.get("developer.enableDevTools")
+    }
+  });
+  const windowBounds = store.get("state").windowBounds;
+  const windowMaximized = store.get("state").windowMaximized;
+  if (windowBounds) {
+    mainWindow.setBounds(windowBounds);
+  }
+  if (windowMaximized) {
+    mainWindow.maximize();
+  }
+
+  // Create the YouTube Music view
+  createYTMView();
 
   // Attach events to main window
   mainWindow.on("resize", () => {
@@ -1009,9 +1024,6 @@ const createMainWindow = (): void => {
   // Open the DevTools.
   if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools({
-      mode: "detach"
-    });
-    ytmView.webContents.openDevTools({
       mode: "detach"
     });
   }
