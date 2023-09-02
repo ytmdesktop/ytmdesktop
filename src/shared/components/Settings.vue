@@ -401,7 +401,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <KeybindInput v-model="shortcutPlayPause" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>
+            <p class="shortcut-title">
               Next<span
                 v-if="shortcutsNextRegisterFailed"
                 class="material-symbols-outlined register-error"
@@ -412,7 +412,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <KeybindInput v-model="shortcutNext" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>
+            <p class="shortcut-title">
               Previous<span
                 v-if="shortcutsPreviousRegisterFailed"
                 class="material-symbols-outlined register-error"
@@ -431,7 +431,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <KeybindInput v-model="shortcutThumbsDown" @change="settingsChanged" />
           </div>-->
           <div class="setting">
-            <p>
+            <p class="shortcut-title">
               Increase Volume<span
                 v-if="shortcutsVolumeUpRegisterFailed"
                 class="material-symbols-outlined register-error"
@@ -442,7 +442,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <KeybindInput v-model="shortcutVolumeUp" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>
+            <p class="shortcut-title">
               Decrease Volume<span
                 v-if="shortcutsVolumeDownRegisterFailed"
                 class="material-symbols-outlined register-error"
