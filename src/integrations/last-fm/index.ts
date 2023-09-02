@@ -8,6 +8,7 @@ import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../p
 import IIntegration from "../integration";
 import { StoreSchema } from "../../shared/store/schema";
 import { LastfmErrorResponse, LastfmRequestBody, LastfmSessionResponse, LastfmTokenResponse } from "./schemas";
+import log from "electron-log";
 
 export default class LastFM implements IIntegration {
   private store: ElectronStore<StoreSchema>;
@@ -266,7 +267,7 @@ export default class LastFM implements IIntegration {
       }
       catch (e) {
         decryptedValues.sessionKey = null;
-        console.log(e);
+        log.error(e);
       }
     }
 
@@ -276,7 +277,7 @@ export default class LastFM implements IIntegration {
       }
       catch (e) {
         decryptedValues.token = null;
-        console.log(e);
+        log.error(e);
       }
     }
 

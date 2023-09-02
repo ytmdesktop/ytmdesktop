@@ -66,6 +66,7 @@
     "@fastify/type-provider-typebox": "^3.4.0",
     "@sinclair/typebox": "^0.30.2",
     "discord-rpc": "^4.0.1",
+    "electron-log": "5.0.0-beta.28",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "fastify": "^4.16.0",

@@ -96,8 +96,6 @@ function keybindInputKeyDown(event: KeyboardEvent) {
   if (event.altKey) newKeybind += "Alt+";
   if (event.shiftKey) newKeybind += "Shift+";
 
-  console.log(event);
-
   newKeybind += validateKey(event);
   keybindInput.value.blur();
 
