@@ -52,9 +52,7 @@ const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled)
 const companionServerAuthWindowEnabled = ref<boolean>(
   (await safeStorage.decryptString(integrations.companionServerAuthWindowEnabled)) === "true" ? true : false
 );
-const companionServerAuthTokens = ref<AuthToken[]>(
-  JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? []
-);
+const companionServerAuthTokens = ref<AuthToken[]>(JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? []);
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
@@ -104,8 +102,24 @@ store.onDidAnyChange(async newState => {
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
 
-memoryStore.onStateChanged((newState) => {
+const shortcutsPlayPauseRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsPlayPauseRegisterFailed"));
+const shortcutsNextRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNextRegisterFailed"));
+const shortcutsPreviousRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsPreviousRegisterFailed"));
+const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsUpRegisterFailed"));
+const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsDownRegisterFailed"));
+const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
+const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
+
+memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
+
+  shortcutsPlayPauseRegisterFailed.value = newState.shortcutsPlayPauseRegisterFailed;
+  shortcutsNextRegisterFailed.value = newState.shortcutsNextRegisterFailed;
+  shortcutsPreviousRegisterFailed.value = newState.shortcutsPreviousRegisterFailed;
+  shortcutsThumbsUpRegisterFailed.value = newState.shortcutsThumbsUpRegisterFailed;
+  shortcutsThumbsDownRegisterFailed.value = newState.shortcutsThumbsDownRegisterFailed;
+  shortcutsVolumeUpRegisterFailed.value = newState.shortcutsVolumeUpRegisterFailed;
+  shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
 });
 
 async function settingsChanged() {
@@ -152,12 +166,7 @@ async function settingChangedFile(event: Event) {
     throw new Error("No setting specified in File Input");
   }
 
-  store.set(
-    setting,
-    target.files.length > 0
-      ? target.files[0].path
-      : null
-  );
+  store.set(setting, target.files.length > 0 ? target.files[0].path : null);
 
   target.value = null;
 }
@@ -275,7 +284,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           <div v-if="customCSSEnabled" class="setting indented">
             <p>Custom CSS File Path</p>
             <div class="file-picker">
-              <input ref="cssPathFileInput" type="file" accept=".css" data-setting="appearance.customCSSPath" @change="settingChangedFile"  />
+              <input ref="cssPathFileInput" type="file" accept=".css" data-setting="appearance.customCSSPath" @change="settingChangedFile" />
               <div class="file-input-button">
                 <button class="choose" @click="cssPathFileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
                 <input type="text" readonly :title="customCSSPath" class="path" placeholder="No file chosen" :value="customCSSPath" />
@@ -285,28 +294,28 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
         </div>
 
-      <div v-if="currentTab === 3" class="playback-tab">
-        <div class="setting">
-          <p>Continue where you left off</p>
-          <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
+        <div v-if="currentTab === 3" class="playback-tab">
+          <div class="setting">
+            <p>Continue where you left off</p>
+            <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div v-if="continueWhereYouLeftOff" class="setting indented">
+            <p>Pause on application launch</p>
+            <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Show track progress on taskbar</p>
+            <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
+            <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
+          </div>
+          <div class="setting">
+            <p>Ratio Volume</p>
+            <input v-model="ratioVolume" class="toggle" type="checkbox" @change="settingsChanged" />
+          </div>
         </div>
-        <div v-if="continueWhereYouLeftOff" class="setting indented">
-          <p>Pause on application launch</p>
-          <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <div class="setting">
-          <p>Show track progress on taskbar</p>
-          <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-        <div class="setting">
-          <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
-          <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-        </div>
-        <div class="setting">
-          <p>Ratio Volume</p>
-          <input v-model="ratioVolume" class="toggle" type="checkbox" @change="settingsChanged" />
-        </div>
-      </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
           <div class="setting">
@@ -346,7 +355,9 @@ window.ytmd.handleUpdateDownloaded(() => {
                   <td class="id">{{ authToken.appId }}</td>
                   <td class="name">{{ authToken.appName }}</td>
                   <td class="version">{{ authToken.appVersion }}</td>
-                  <td class="controls"><button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button></td>
+                  <td class="controls">
+                    <button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -370,40 +381,75 @@ window.ytmd.handleUpdateDownloaded(() => {
             <div class="name-with-description">
               <p class="name">
                 User is Authenticated:
-                <span v-if="lastFMSessionKey" style="color: #4caf50;">Yes</span>
-                <span v-else style="color: #ff1100;">No</span> 
+                <span v-if="lastFMSessionKey" style="color: #4caf50">Yes</span>
+                <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
           </div>
-        </div>  
+        </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
           <div class="setting">
-            <p>Play/Pause</p>
+            <p class="shortcut-title">
+              Play/Pause<span
+                v-if="shortcutsPlayPauseRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutPlayPause" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>Next</p>
+            <p>
+              Next<span
+                v-if="shortcutsNextRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutNext" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>Previous</p>
+            <p>
+              Previous<span
+                v-if="shortcutsPreviousRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutPrevious" @change="settingsChanged" />
           </div>
           <!--<div class="setting">
-                    <p>Thumbs Up</p>
-                    <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
-                </div> 
-                <div class="setting">
-                    <p>Thumbs Down</p>
-                    <KeybindInput v-model="shortcutThumbsDown" @change="settingsChanged" />
-                </div>-->
+            <p>Thumbs Up</p>
+            <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
+          </div> 
           <div class="setting">
-            <p>Increase Volume</p>
+            <p>Thumbs Down</p>
+            <KeybindInput v-model="shortcutThumbsDown" @change="settingsChanged" />
+          </div>-->
+          <div class="setting">
+            <p>
+              Increase Volume<span
+                v-if="shortcutsVolumeUpRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutVolumeUp" @change="settingsChanged" />
           </div>
           <div class="setting">
-            <p>Decrease Volume</p>
+            <p>
+              Decrease Volume<span
+                v-if="shortcutsVolumeDownRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
           </div>
         </div>
@@ -814,5 +860,16 @@ button {
   background-color: #212121;
   cursor: pointer;
   border: none;
+}
+
+.shortcuts-tab .shortcut-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.shortcuts-tab .shortcut-title .register-error {
+  margin-left: 4px;
+  color: #f44336;
 }
 </style>

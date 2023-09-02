@@ -529,59 +529,101 @@ function registerShortcuts() {
   globalShortcut.unregisterAll();
 
   if (shortcuts.playPause) {
-    globalShortcut.register(shortcuts.playPause, () => {
+    const registered = globalShortcut.register(shortcuts.playPause, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "playPause");
       }
     });
+
+    if (!registered) {
+      memoryStore.set("shortcutsPlayPauseRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
+    }
   }
 
   if (shortcuts.next) {
-    globalShortcut.register(shortcuts.next, () => {
+    const registered = globalShortcut.register(shortcuts.next, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "next");
       }
     });
+
+    if (!registered) {
+      memoryStore.set("shortcutsNextRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsNextRegisterFailed", false);
+    }
   }
 
   if (shortcuts.previous) {
-    globalShortcut.register(shortcuts.previous, () => {
+    const registered = globalShortcut.register(shortcuts.previous, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "previous");
       }
     });
+
+    if (!registered) {
+      memoryStore.set("shortcutsPreviousRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsPreviousRegisterFailed", false);
+    }
   }
 
   if (shortcuts.thumbsUp) {
-    globalShortcut.register(shortcuts.thumbsUp, () => {
+    const registered = globalShortcut.register(shortcuts.thumbsUp, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "thumbsUp");
       }
     });
+    
+    if (!registered) {
+      memoryStore.set("shortcutsThumbsUpRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
+    }
   }
 
   if (shortcuts.thumbsDown) {
-    globalShortcut.register(shortcuts.thumbsDown, () => {
+    const registered = globalShortcut.register(shortcuts.thumbsDown, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "thumbsDown");
       }
     });
+    
+    if (!registered) {
+      memoryStore.set("shortcutsThumbsDownRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
+    }
   }
 
   if (shortcuts.volumeUp) {
-    globalShortcut.register(shortcuts.volumeUp, () => {
+    const registered = globalShortcut.register(shortcuts.volumeUp, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "volumeUp");
       }
     });
+
+    if (!registered) {
+      memoryStore.set("shortcutsVolumeUpRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
+    }
   }
 
   if (shortcuts.volumeDown) {
-    globalShortcut.register(shortcuts.volumeDown, () => {
+    const registered = globalShortcut.register(shortcuts.volumeDown, () => {
       if (ytmView) {
         ytmView.webContents.send("remoteControl:execute", "volumeDown");
       }
     });
+
+    if (!registered) {
+      memoryStore.set("shortcutsVolumeDownRegisterFailed", true);
+    } else {
+      memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
+    }
   }
 }
 

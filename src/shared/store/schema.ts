@@ -59,4 +59,11 @@ export type StoreSchema = {
 
 export type MemoryStoreSchema = {
   discordPresenceConnectionFailed: boolean
+  shortcutsPlayPauseRegisterFailed: boolean;
+  shortcutsNextRegisterFailed: boolean;
+  shortcutsPreviousRegisterFailed: boolean;
+  shortcutsThumbsUpRegisterFailed: boolean;
+  shortcutsThumbsDownRegisterFailed: boolean;
+  shortcutsVolumeUpRegisterFailed: boolean;
+  shortcutsVolumeDownRegisterFailed: boolean;
 };
