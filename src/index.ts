@@ -47,7 +47,7 @@ crashReporter.start({ uploadToServer: false });
 
 log.transports.console.format = "[{processType}][{level}]{text}";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{level}]{text}";
-log.eventLogger.format = 'Electron event {eventSource}#{eventName} observed';
+log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
 log.initialize({
   preload: true,
@@ -64,19 +64,27 @@ log.errorHandler.startCatching({
     if (!app.isReady()) {
       dialog.showErrorBox(
         `YouTube Music Desktop App Crashed`,
-        `Application crashed before ready\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${error.name}\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`
+        `Application crashed before ready\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${
+          error.name
+        }\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`
       );
     } else {
       const result = dialog.showMessageBoxSync({
         title: "Error",
         message: "YouTube Music Desktop App Crashed",
-        detail: `Environment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${error.name}\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`,
+        detail: `Environment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${error.name}\nMessage: ${
+          error.message
+        }\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`,
         type: "error",
         buttons: ["Copy to Clipboard and Exit", "Exit"]
       });
 
       if (result === 0) {
-        clipboard.writeText(`YouTube Music Desktop App Crashed\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${error.name}\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`);
+        clipboard.writeText(
+          `YouTube Music Desktop App Crashed\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${
+            error.name
+          }\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`
+        );
       }
     }
 
@@ -915,7 +923,7 @@ const createYTMView = (): void => {
       mode: "detach"
     });
   }
-}
+};
 
 const createMainWindow = (): void => {
   // Create the browser window.
@@ -953,23 +961,36 @@ const createMainWindow = (): void => {
   // Attach events to main window
   mainWindow.on("resize", () => {
     setTimeout(() => {
-      ytmView.setBounds({
-        x: 0,
-        y: 36,
-        width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height - 36
-      });
+      if (ytmView) {
+        if (mainWindow.fullScreen) {
+          ytmView.setBounds({
+            x: 0,
+            y: 0,
+            width: mainWindow.getContentBounds().width,
+            height: mainWindow.getContentBounds().height
+          });
+        } else {
+          ytmView.setBounds({
+            x: 0,
+            y: 36,
+            width: mainWindow.getContentBounds().width,
+            height: mainWindow.getContentBounds().height - 36
+          });
+        }
+      }
     });
   });
 
   mainWindow.on("enter-full-screen", () => {
     setTimeout(() => {
-      ytmView.setBounds({
-        x: 0,
-        y: 0,
-        width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height
-      });
+      if (ytmView) {
+        ytmView.setBounds({
+          x: 0,
+          y: 0,
+          width: mainWindow.getContentBounds().width,
+          height: mainWindow.getContentBounds().height
+        });
+      }
     });
     sendMainWindowStateIpc();
   });
