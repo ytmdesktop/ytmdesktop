@@ -310,7 +310,7 @@ store.onDidAnyChange(async (newState, oldState) => {
 
   if (newState.general.showNotificationOnSongChange) {
     nowPlayingNotifications.enable();
-  } else {
+  } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) {
     nowPlayingNotifications.disable();
   }
 
@@ -319,7 +319,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.appearance.customCSSEnabled && !oldState.appearance.customCSSEnabled) {
     customCss.enable();
-  } else if (!newState.appearance.customCSSEnabled) {
+  } else if (!newState.appearance.customCSSEnabled && oldState.appearance.customCSSEnabled) {
     customCss.disable();
   }
 
@@ -328,7 +328,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.playback.ratioVolume && !oldState.playback.ratioVolume) {
     ratioVolume.enable();
-  } else if (!newState.playback.ratioVolume) {
+  } else if (!newState.playback.ratioVolume && oldState.playback.ratioVolume) {
     ratioVolume.disable();
   }
 
@@ -345,7 +345,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.integrations.companionServerEnabled && !oldState.integrations.companionServerEnabled) {
     companionServer.enable();
-  } else if (!newState.integrations.companionServerEnabled) {
+  } else if (!newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
     companionServer.disable();
 
     if (companionServerAuthWindowEnabled) {
@@ -374,7 +374,7 @@ store.onDidAnyChange(async (newState, oldState) => {
       await companionServer.disable();
       await companionServer.enable();
     }
-  } else if (!newState.integrations.companionServerCORSWildcardEnabled) {
+  } else if (!newState.integrations.companionServerCORSWildcardEnabled && oldState.integrations.companionServerCORSWildcardEnabled) {
     // Check if the companion server has been enabled and needs a restart from CORS wildcard change
     if (newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
       await companionServer.disable();
@@ -382,19 +382,21 @@ store.onDidAnyChange(async (newState, oldState) => {
     }
   }
 
-  if (newState.integrations.companionServerEnabled) {
+  if (newState.integrations.discordPresenceEnabled) {
     discordPresence.provide(memoryStore);
   }
-  if (newState.integrations.discordPresenceEnabled) {
+  if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) {
     discordPresence.enable();
-  } else {
+  } else if (!newState.integrations.discordPresenceEnabled && oldState.integrations.discordPresenceEnabled) {
     discordPresence.disable();
   }
 
   if (newState.integrations.lastFMEnabled) {
     lastFMScrobbler.provide(store);
+  }
+  if (newState.integrations.lastFMEnabled && !oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.enable();
-  } else {
+  } else if (!newState.integrations.lastFMEnabled && oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.disable();
   }
 
