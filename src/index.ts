@@ -375,7 +375,7 @@ store.onDidAnyChange(async (newState, oldState) => {
       await companionServer.enable();
     }
   } else if (!newState.integrations.companionServerCORSWildcardEnabled && oldState.integrations.companionServerCORSWildcardEnabled) {
-    // Check if the companion server has been enabled and needs a restart from CORS wildcard change
+    // Check if the companion server has been disabled and needs a restart from CORS wildcard change
     if (newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
       await companionServer.disable();
       await companionServer.enable();
