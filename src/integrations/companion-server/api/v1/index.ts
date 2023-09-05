@@ -204,13 +204,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      let companionServerAuthWindowEnabled = false;
-      try {
-        companionServerAuthWindowEnabled =
-          safeStorage.decryptString(Buffer.from(options.getStore().get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
-      } catch {
-        /* do nothing, value is false */
-      }
+      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
@@ -242,13 +236,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      let companionServerAuthWindowEnabled = false;
-      try {
-        companionServerAuthWindowEnabled =
-          safeStorage.decryptString(Buffer.from(options.getStore().get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
-      } catch {
-        /* do nothing, value is false */
-      }
+      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
 
       // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
       // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
@@ -269,13 +257,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       const requestId = crypto.randomUUID();
 
-      ipcMain.handle(`companionAuthorization:getAppName:${requestId}`, () => {
-        return authData.appName;
-      });
-
-      ipcMain.handle(`companionAuthorization:getCode:${requestId}`, () => {
-        return request.body.code;
-      });
+      let authorizationWindowClosed = false;
 
       // Create the authorization browser window.
       const authorizationWindow = new BrowserWindow({
@@ -295,7 +277,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           sandbox: true,
           contextIsolation: true,
           preload: AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY,
-          additionalArguments: [requestId]
+          additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });
       authorizationWindow.loadURL(AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY);
@@ -356,12 +338,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
           ipcMain.once(`companionAuthorization:result:${requestId}`, resultListener);
           ipcMain.once(`companionWindow:close:${requestId}`, closeListener);
-          authorizationWindow.once("closed", closeListener);
+          authorizationWindow.once("closed", () => {authorizationWindowClosed = true; closeListener()});
         });
 
-        authorizationWindow.close();
-        ipcMain.removeHandler(`companionAuthorization:getAppName:${requestId}`);
-        ipcMain.removeHandler(`companionAuthorization:getCode:${requestId}`);
+        if (!authorizationWindowClosed) {
+          authorizationWindow.removeListener("closed", closeListener);
+          authorizationWindow.close();
+        }
         ipcMain.removeListener(`companionAuthorization:result:${requestId}`, resultListener);
         ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
 
@@ -371,7 +354,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           response.send({
             token
           });
-          options.getStore().set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString("false"));
+          options.getMemoryStore().set("companionServerAuthWindowEnabled", false);
         } else {
           throw new AuthorizationDenied();
         }

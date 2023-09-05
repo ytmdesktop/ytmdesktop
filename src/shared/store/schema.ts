@@ -23,7 +23,6 @@ export type StoreSchema = {
   };
   integrations: {
     companionServerEnabled: boolean;
-    companionServerAuthWindowEnabled: string | null; // boolean | Encrypted for security
     companionServerAuthTokens: string | null; // array[object] | Encrypted for security
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
@@ -42,7 +41,6 @@ export type StoreSchema = {
     lastUrl: string;
     lastVideoId: string;
     lastPlaylistId: string;
-    companionServerAuthWindowEnableTime: string | null; // string (ISO8601) | Encrypted for security
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
   };
@@ -66,4 +64,5 @@ export type MemoryStoreSchema = {
   shortcutsThumbsDownRegisterFailed: boolean;
   shortcutsVolumeUpRegisterFailed: boolean;
   shortcutsVolumeDownRegisterFailed: boolean;
+  companionServerAuthWindowEnabled: boolean;
 };

@@ -258,7 +258,6 @@ const store = new ElectronStore<StoreSchema>({
     },
     integrations: {
       companionServerEnabled: false,
-      companionServerAuthWindowEnabled: null,
       companionServerAuthTokens: null,
       companionServerCORSWildcardEnabled: false,
       discordPresenceEnabled: false,
@@ -277,7 +276,6 @@ const store = new ElectronStore<StoreSchema>({
       lastUrl: "https://music.youtube.com/",
       lastVideoId: "",
       lastPlaylistId: "",
-      companionServerAuthWindowEnableTime: null,
       windowBounds: null,
       windowMaximized: false
     },
@@ -332,16 +330,10 @@ store.onDidAnyChange(async (newState, oldState) => {
     ratioVolume.disable();
   }
 
-  let companionServerAuthWindowEnabled = false;
-  try {
-    companionServerAuthWindowEnabled =
-      safeStorage.decryptString(Buffer.from(newState.integrations.companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
-  } catch {
-    /* do nothing, value is false */
-  }
+  let companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
 
   if (newState.integrations.companionServerEnabled) {
-    companionServer.provide(store, ytmView);
+    companionServer.provide(store, memoryStore, ytmView);
   }
   if (newState.integrations.companionServerEnabled && !oldState.integrations.companionServerEnabled) {
     companionServer.enable();
@@ -349,8 +341,7 @@ store.onDidAnyChange(async (newState, oldState) => {
     companionServer.disable();
 
     if (companionServerAuthWindowEnabled) {
-      store.set("integrations.companionServerAuthWindowEnabled", null);
-      store.set("state.companionServerAuthWindowEnableTime", null);
+      memoryStore.set("companionServerAuthWindowEnabled", false);
       clearInterval(companionAuthWindowEnableTimeout);
       companionAuthWindowEnableTimeout = null;
       companionServerAuthWindowEnabled = false;
@@ -360,11 +351,9 @@ store.onDidAnyChange(async (newState, oldState) => {
   if (companionServerAuthWindowEnabled) {
     if (!companionAuthWindowEnableTimeout) {
       companionAuthWindowEnableTimeout = setTimeout(() => {
-        store.set("integrations.companionServerAuthWindowEnabled", null);
-        store.set("state.companionServerAuthWindowEnableTime", null);
+        memoryStore.set("companionServerAuthWindowEnabled", null);
         companionAuthWindowEnableTimeout = null;
       }, 300 * 1000);
-      store.set("state.companionServerAuthWindowEnableTime", safeStorage.encryptString(new Date().toISOString()).toString("hex"));
     }
   }
 
@@ -431,7 +420,7 @@ if (store.get("playback").ratioVolume) {
   ytmView.webContents.send("remoteControl:execute", command, value);
 });*/
 if (store.get("integrations").companionServerEnabled) {
-  companionServer.provide(store, ytmView);
+  companionServer.provide(store, memoryStore, ytmView);
   companionServer.enable();
 }
 
@@ -448,48 +437,6 @@ app.whenReady().then(function () {
     lastFMScrobbler.enable();
   }
 });
-
-function integrationsSetupAppReady() {
-  let companionServerAuthWindowEnabled = false;
-  try {
-    companionServerAuthWindowEnabled =
-      safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthWindowEnabled, "hex")) === "true" ? true : false;
-  } catch {
-    /* do nothing, value is false */
-  }
-
-  if (companionServerAuthWindowEnabled) {
-    let companionAuthEnableTimeSate = null;
-    try {
-      companionAuthEnableTimeSate = safeStorage.decryptString(Buffer.from(store.get("state").companionServerAuthWindowEnableTime, "hex"));
-    } catch {
-      /* do nothing, value is not valid */
-    }
-
-    if (companionAuthEnableTimeSate) {
-      const currentDateTime = new Date();
-      const enableDateTime = new Date(companionAuthEnableTimeSate);
-
-      const timeDifference = currentDateTime.getTime() - enableDateTime.getTime();
-      if (timeDifference >= 300 * 1000) {
-        store.set("integrations.companionServerAuthWindowEnabled", null);
-        store.set("state.companionServerAuthWindowEnableTime", null);
-      } else {
-        companionAuthWindowEnableTimeout = setTimeout(
-          () => {
-            store.set("integrations.companionServerAuthWindowEnabled", null);
-            store.set("state.companionServerAuthWindowEnableTime", null);
-            companionAuthWindowEnableTimeout = null;
-          },
-          300 * 1000 - timeDifference
-        );
-      }
-    } else {
-      store.set("integrations.companionServerAuthWindowEnabled", null);
-      store.set("state.companionServerAuthWindowEnableTime", null);
-    }
-  }
-}
 
 function setupTaskbarFeatures() {
   if (!store.get("playback.progressInTaskbar") && process.platform !== "win32") {
@@ -847,7 +794,7 @@ const createYTMView = (): void => {
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
-  companionServer.provide(store, ytmView);
+  companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
 
@@ -1266,9 +1213,6 @@ app.on("ready", () => {
 
   // Register global shortcuts
   registerShortcuts();
-
-  // Run functions which rely on ready event
-  integrationsSetupAppReady();
 
   // Create the tray
   tray = new Tray(

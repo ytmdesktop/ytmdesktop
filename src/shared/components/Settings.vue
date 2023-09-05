@@ -49,9 +49,6 @@ const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
-const companionServerAuthWindowEnabled = ref<boolean>(
-  (await safeStorage.decryptString(integrations.companionServerAuthWindowEnabled)) === "true" ? true : false
-);
 const companionServerAuthTokens = ref<AuthToken[]>(JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? []);
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
@@ -85,7 +82,6 @@ store.onDidAnyChange(async newState => {
   ratioVolume.value = newState.playback.ratioVolume;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
-  companionServerAuthWindowEnabled.value = (await safeStorage.decryptString(newState.integrations.companionServerAuthWindowEnabled)) === "true" ? true : false;
   companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens)) ?? [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
@@ -110,6 +106,8 @@ const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("sh
 const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
 const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
 
+const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
+
 memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
 
@@ -120,7 +118,13 @@ memoryStore.onStateChanged(newState => {
   shortcutsThumbsDownRegisterFailed.value = newState.shortcutsThumbsDownRegisterFailed;
   shortcutsVolumeUpRegisterFailed.value = newState.shortcutsVolumeUpRegisterFailed;
   shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
+
+  companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
 });
+
+async function memorySettingsChanged() {
+  memoryStore.set("companionServerAuthWindowEnabled", companionServerAuthWindowEnabled.value);
+}
 
 async function settingsChanged() {
   store.set("general.hideToTrayOnClose", hideToTrayOnClose.value);
@@ -139,7 +143,6 @@ async function settingsChanged() {
   store.set("playback.ratioVolume", ratioVolume.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
-  store.set("integrations.companionServerAuthWindowEnabled", await safeStorage.encryptString(companionServerAuthWindowEnabled.value.toString()));
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
@@ -334,7 +337,7 @@ window.ytmd.handleUpdateDownloaded(() => {
               <p class="name">Enable companion authorization</p>
               <p class="description">Automatically disables after the first successful authorization or 5 minutes has passed</p>
             </div>
-            <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+            <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="memorySettingsChanged" />
           </div>
           <div v-if="companionServerEnabled" class="setting indented authorized-companions">
             <div class="name-with-description">
@@ -361,7 +364,7 @@ window.ytmd.handleUpdateDownloaded(() => {
                 </tr>
               </tbody>
             </table>
-            <div class="no-companions" v-if="companionServerAuthTokens.length === 0">
+            <div v-if="companionServerAuthTokens.length === 0" class="no-companions">
               <td>No authorized companions</td>
             </div>
           </div>
