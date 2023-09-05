@@ -1287,6 +1287,19 @@ app.on("ready", () => {
       type: "separator"
     },
     {
+      label: "Show/Hide Window",
+      type: "normal",
+      click: () => {
+        if (mainWindow) {
+          if (mainWindow.isVisible()) {
+            mainWindow.hide();
+          } else {
+            mainWindow.show();
+          }
+        }
+      }
+    },
+    {
       label: "Play/Pause",
       type: "normal",
       click: () => {
