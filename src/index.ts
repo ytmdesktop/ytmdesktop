@@ -97,8 +97,6 @@ log.eventLogger.startLogging();
 
 Object.assign(console, log.functions);
 
-throw new Error("Test");
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   applicationQuitting = true;
