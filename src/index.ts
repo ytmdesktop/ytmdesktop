@@ -61,6 +61,8 @@ log.errorHandler.startCatching({
       return;
     }
 
+    log.error(error);
+
     if (!app.isReady()) {
       dialog.showErrorBox(
         `YouTube Music Desktop App Crashed`,
@@ -94,6 +96,8 @@ log.errorHandler.startCatching({
 log.eventLogger.startLogging();
 
 Object.assign(console, log.functions);
+
+throw new Error("Test");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -154,6 +158,7 @@ autoUpdater.on("checking-for-update", () => {
   }
 });
 autoUpdater.on("update-available", () => {
+  log.info("Application update available");
   appUpdateAvailable = true;
   if (settingsWindow) {
     settingsWindow.webContents.send("app:updateAvailable");
@@ -165,11 +170,13 @@ autoUpdater.on("update-not-available", () => {
   }
 });
 autoUpdater.on("update-downloaded", () => {
+  log.info("Application update downloaded");
   appUpdateDownloaded = true;
   if (settingsWindow) {
     settingsWindow.webContents.send("app:updateDownloaded");
   }
 });
+log.info("Setup application updater");
 /*
 TEMPORARY UPDATE CHECK DISABLE WHILE DEVELOPMENT OCCURS (This will always have errors for now until a release occurs)
 setInterval(() => {
@@ -229,6 +236,7 @@ memoryStore.onStateChanged((newState, oldState) => {
     ytmView.webContents.send("memoryStore:stateChanged", newState, oldState);
   }
 });
+log.info("Created memory store");
 
 // Create the persistent config store
 const store = new ElectronStore<StoreSchema>({
@@ -289,6 +297,9 @@ const store = new ElectronStore<StoreSchema>({
       enableDevTools: false
     }
   },
+  beforeEachMigration: (store, context) => {
+    log.info(`Performing store migration from ${context.fromVersion} to ${context.toVersion}`);
+  },
   migrations: {
     ">=2.0.0-rc.2": store => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -316,10 +327,12 @@ store.onDidAnyChange(async (newState, oldState) => {
     });
   }
 
-  if (newState.general.showNotificationOnSongChange) {
+  if (newState.general.showNotificationOnSongChange) { 
     nowPlayingNotifications.enable();
-  } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) {
+    log.info("Integration enabled: Now playing notifications");
+  } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) { 
     nowPlayingNotifications.disable();
+    log.info("Integration disabled: Now playing notifications");
   }
 
   if (newState.appearance.customCSSEnabled) {
@@ -327,8 +340,10 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.appearance.customCSSEnabled && !oldState.appearance.customCSSEnabled) {
     customCss.enable();
-  } else if (!newState.appearance.customCSSEnabled && oldState.appearance.customCSSEnabled) {
+    log.info("Integration enabled: Custom CSS");
+  } else if (!newState.appearance.customCSSEnabled && oldState.appearance.customCSSEnabled) { 
     customCss.disable();
+    log.info("Integration disabled: Custom CSS");
   }
 
   if (newState.playback.ratioVolume) {
@@ -336,8 +351,10 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.playback.ratioVolume && !oldState.playback.ratioVolume) {
     ratioVolume.enable();
+    log.info("Integration enabled: Ratio volume");
   } else if (!newState.playback.ratioVolume && oldState.playback.ratioVolume) {
     ratioVolume.disable();
+    log.info("Integration disabled: Ratio volume");
   }
 
   let companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
@@ -347,8 +364,10 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.integrations.companionServerEnabled && !oldState.integrations.companionServerEnabled) {
     companionServer.enable();
+    log.info("Integration enabled: Companion server");
   } else if (!newState.integrations.companionServerEnabled && oldState.integrations.companionServerEnabled) {
     companionServer.disable();
+    log.info("Integration disabled: Companion server");
 
     if (companionServerAuthWindowEnabled) {
       memoryStore.set("companionServerAuthWindowEnabled", false);
@@ -384,10 +403,12 @@ store.onDidAnyChange(async (newState, oldState) => {
   if (newState.integrations.discordPresenceEnabled) {
     discordPresence.provide(memoryStore);
   }
-  if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) {
+  if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) { 
     discordPresence.enable();
+    log.info("Integration enabled: Discord presence");
   } else if (!newState.integrations.discordPresenceEnabled && oldState.integrations.discordPresenceEnabled) {
     discordPresence.disable();
+    log.info("Integration disabled: Discord presence");
   }
 
   if (newState.integrations.lastFMEnabled) {
@@ -395,24 +416,29 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
   if (newState.integrations.lastFMEnabled && !oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.enable();
+    log.info("Integration enabled: Last.fm");
   } else if (!newState.integrations.lastFMEnabled && oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.disable();
+    log.info("Integration disabled: Last.fm");
   }
 
   registerShortcuts();
 });
+log.info("Created electron store");
 
 if (store.get("general").disableHardwareAcceleration) {
   app.disableHardwareAcceleration();
 }
 
-if (store.get("general").showNotificationOnSongChange) {
+if (store.get("general").showNotificationOnSongChange) { 
   nowPlayingNotifications.enable();
+  log.info("Integration enabled: Now playing notifications");
 }
 
 if (store.get("appearance").customCSSEnabled) {
   customCss.provide(store, ytmView);
   customCss.enable();
+  log.info("Integration enabled: Custom CSS");
 }
 
 if (store.get("playback").enableSpeakerFill) {
@@ -422,6 +448,7 @@ if (store.get("playback").enableSpeakerFill) {
 if (store.get("playback").ratioVolume) {
   ratioVolume.provide(ytmView);
   ratioVolume.enable();
+  log.info("Integration enabled: Ratio volume");
 }
 
 // Integrations setup
@@ -432,12 +459,14 @@ if (store.get("playback").ratioVolume) {
 if (store.get("integrations").companionServerEnabled) {
   companionServer.provide(store, memoryStore, ytmView);
   companionServer.enable();
+  log.info("Integration enabled: Companion server");
 }
 
 // DiscordPresence
 if (store.get("integrations").discordPresenceEnabled) {
   discordPresence.provide(memoryStore);
   discordPresence.enable();
+  log.info("Integration enabled: Discord presence");
 }
 
 // Integrations which require to be started AFTER the app is ready
@@ -445,6 +474,7 @@ app.whenReady().then(function () {
   if (store.get("integrations").lastFMEnabled) {
     lastFMScrobbler.provide(store);
     lastFMScrobbler.enable();
+    log.info("Integration enabled: Last.fm");
   }
 });
 
@@ -665,6 +695,8 @@ function registerShortcuts() {
       memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
     }
   }
+
+  log.info("Registered shortcuts");
 }
 
 // Functions which call to mainWindow renderer
@@ -915,6 +947,7 @@ const createMainWindow = (): void => {
 
   // Create the YouTube Music view
   createYTMView();
+  log.info("Created YTM view");
 
   // Attach events to main window
   mainWindow.on("resize", () => {
@@ -1012,6 +1045,7 @@ const createMainWindow = (): void => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
+  log.info("Application ready");
   // Handle main window ipc
   ipcMain.on("mainWindow:minimize", () => {
     if (mainWindow !== null) {
@@ -1200,6 +1234,8 @@ app.on("ready", () => {
     return appUpdateDownloaded;
   });
 
+  log.info("Setup IPC handlers");
+
   // Create the permission handlers
   session.fromPartition("persist:ytmview").setPermissionCheckHandler((webContents, permission) => {
     if (webContents == ytmView.webContents) {
@@ -1219,6 +1255,8 @@ app.on("ready", () => {
 
     return callback(false);
   });
+
+  log.info("Setup permission handlers");
 
   // Register global shortcuts
   registerShortcuts();
@@ -1293,10 +1331,14 @@ app.on("ready", () => {
     }
   });
 
+  log.info("Created tray icon");
+
   createMainWindow();
+  log.info("Created main window");
 
   // Setup taskbar features
   setupTaskbarFeatures();
+  log.info("Setup taskbar features");
 });
 
 app.on("before-quit", () => {
