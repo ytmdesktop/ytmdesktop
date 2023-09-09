@@ -315,7 +315,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
           </div>
           <div class="setting">
-            <p>Ratio Volume</p>
+            <p>Ratio volume</p>
             <input v-model="ratioVolume" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
         </div>
