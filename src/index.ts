@@ -449,13 +449,9 @@ app.whenReady().then(function () {
 });
 
 function setupTaskbarFeatures() {
-  if (!store.get("playback.progressInTaskbar") && process.platform !== "win32") {
-    return;
-  }
-
   // Setup Taskbar Icons
   const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
-  if (process.platform === "win32") {
+  if (mainWindow && mainWindow.isVisible() && process.platform === "win32") {
     mainWindow.setThumbarButtons([
       {
         tooltip: "Previous",
@@ -499,7 +495,7 @@ function setupTaskbarFeatures() {
         taskbarFlags.push("disabled");
       }
 
-      if (mainWindow) {
+      if (mainWindow && mainWindow.isVisible()) {
         mainWindow.setThumbarButtons([
           {
             tooltip: "Previous",
@@ -1290,7 +1286,11 @@ app.on("ready", () => {
   tray.setContextMenu(trayContextMenu);
   tray.on("click", () => {
     if (mainWindow) {
-      mainWindow.show();
+      if (mainWindow.isVisible()) {
+        mainWindow.hide();
+      } else {
+        mainWindow.show();
+      }
     }
   });
 
