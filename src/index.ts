@@ -862,6 +862,9 @@ const createYTMView = (): void => {
     }
   });
   ytmView.webContents.on("render-process-gone", () => {
+    store.set("state.lastUrl", lastUrl);
+    store.set("state.lastVideoId", lastVideoId);
+    store.set("state.lastPlaylistId", lastPlaylistId);
     createYTMView();
   });
 
