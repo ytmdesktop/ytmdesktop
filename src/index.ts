@@ -288,6 +288,16 @@ const store = new ElectronStore<StoreSchema>({
     developer: {
       enableDevTools: false
     }
+  },
+  migrations: {
+    ">=2.0.0-rc.2": store => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      store.delete("integrations.companionServerAuthWindowEnabled");
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      store.delete("state.companionServerAuthWindowEnableTime");
+    }
   }
 });
 store.onDidAnyChange(async (newState, oldState) => {
