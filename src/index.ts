@@ -1286,11 +1286,7 @@ app.on("ready", () => {
   tray.setContextMenu(trayContextMenu);
   tray.on("click", () => {
     if (mainWindow) {
-      if (mainWindow.isVisible()) {
-        mainWindow.hide();
-      } else {
-        mainWindow.show();
-      }
+      mainWindow.show();
     }
   });
 
