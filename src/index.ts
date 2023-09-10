@@ -326,10 +326,10 @@ store.onDidAnyChange(async (newState, oldState) => {
     });
   }
 
-  if (newState.general.showNotificationOnSongChange) { 
+  if (newState.general.showNotificationOnSongChange) {
     nowPlayingNotifications.enable();
     log.info("Integration enabled: Now playing notifications");
-  } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) { 
+  } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) {
     nowPlayingNotifications.disable();
     log.info("Integration disabled: Now playing notifications");
   }
@@ -340,7 +340,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   if (newState.appearance.customCSSEnabled && !oldState.appearance.customCSSEnabled) {
     customCss.enable();
     log.info("Integration enabled: Custom CSS");
-  } else if (!newState.appearance.customCSSEnabled && oldState.appearance.customCSSEnabled) { 
+  } else if (!newState.appearance.customCSSEnabled && oldState.appearance.customCSSEnabled) {
     customCss.disable();
     log.info("Integration disabled: Custom CSS");
   }
@@ -402,7 +402,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   if (newState.integrations.discordPresenceEnabled) {
     discordPresence.provide(memoryStore);
   }
-  if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) { 
+  if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) {
     discordPresence.enable();
     log.info("Integration enabled: Discord presence");
   } else if (!newState.integrations.discordPresenceEnabled && oldState.integrations.discordPresenceEnabled) {
@@ -411,7 +411,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
 
   if (newState.integrations.lastFMEnabled) {
-    lastFMScrobbler.provide(store);
+    lastFMScrobbler.provide(store, memoryStore);
   }
   if (newState.integrations.lastFMEnabled && !oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.enable();
@@ -429,51 +429,51 @@ if (store.get("general").disableHardwareAcceleration) {
   app.disableHardwareAcceleration();
 }
 
-if (store.get("general").showNotificationOnSongChange) { 
-  nowPlayingNotifications.enable();
-  log.info("Integration enabled: Now playing notifications");
-}
-
-if (store.get("appearance").customCSSEnabled) {
-  customCss.provide(store, ytmView);
-  customCss.enable();
-  log.info("Integration enabled: Custom CSS");
-}
-
 if (store.get("playback").enableSpeakerFill) {
   app.commandLine.appendSwitch("try-supported-channel-layouts");
 }
 
-if (store.get("playback").ratioVolume) {
-  ratioVolume.provide(ytmView);
-  ratioVolume.enable();
-  log.info("Integration enabled: Ratio volume");
-}
-
-// Integrations setup
-// CompanionServer
-/*companionServer.addEventListener((command, value) => {
-  ytmView.webContents.send("remoteControl:execute", command, value);
-});*/
-if (store.get("integrations").companionServerEnabled) {
-  companionServer.provide(store, memoryStore, ytmView);
-  companionServer.enable();
-  log.info("Integration enabled: Companion server");
-}
-
-// DiscordPresence
-if (store.get("integrations").discordPresenceEnabled) {
-  discordPresence.provide(memoryStore);
-  discordPresence.enable();
-  log.info("Integration enabled: Discord presence");
-}
-
 // Integrations which require to be started AFTER the app is ready
 app.whenReady().then(function () {
+  // LastFM
   if (store.get("integrations").lastFMEnabled) {
-    lastFMScrobbler.provide(store);
+    lastFMScrobbler.provide(store, memoryStore);
     lastFMScrobbler.enable();
     log.info("Integration enabled: Last.fm");
+  }
+
+  // RatioVolume
+  if (store.get("playback").ratioVolume) {
+    ratioVolume.provide(ytmView);
+    ratioVolume.enable();
+    log.info("Integration enabled: Ratio volume");
+  }
+  
+  // CompanionServer
+  if (store.get("integrations").companionServerEnabled) {
+    companionServer.provide(store, memoryStore, ytmView);
+    companionServer.enable();
+    log.info("Integration enabled: Companion server");
+  }
+  
+  // DiscordPresence
+  if (store.get("integrations").discordPresenceEnabled) {
+    discordPresence.provide(memoryStore);
+    discordPresence.enable();
+    log.info("Integration enabled: Discord presence");
+  }
+
+  // NowPlayingNotifications
+  if (store.get("general").showNotificationOnSongChange) {
+    nowPlayingNotifications.enable();
+    log.info("Integration enabled: Now playing notifications");
+  }
+  
+  // CustomCSS
+  if (store.get("appearance").customCSSEnabled) {
+    customCss.provide(store, ytmView);
+    customCss.enable();
+    log.info("Integration enabled: Custom CSS");
   }
 });
 
@@ -1049,6 +1049,13 @@ const createMainWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   log.info("Application ready");
+
+  if (!safeStorage.isEncryptionAvailable()) {
+    memoryStore.set("safeStorageAvailable", false);
+  } else {
+    memoryStore.set("safeStorageAvailable", true);
+  }
+
   // Handle main window ipc
   ipcMain.on("mainWindow:minimize", () => {
     if (mainWindow !== null) {
@@ -1206,6 +1213,8 @@ app.on("ready", () => {
 
   // Handle safeStorage ipc
   ipcMain.handle("safeStorage:decryptString", (event, value: string) => {
+    if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
+
     if (value) {
       return safeStorage.decryptString(Buffer.from(value, "hex"));
     } else {
@@ -1214,6 +1223,7 @@ app.on("ready", () => {
   });
 
   ipcMain.handle("safeStorage:encryptString", (event, value: string) => {
+    if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
     return safeStorage.encryptString(value).toString("hex");
   });
 

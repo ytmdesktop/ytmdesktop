@@ -4,14 +4,16 @@ import fetch from "node-fetch";
 import cypto from "crypto";
 
 import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
+import MemoryStore from "../../memory-store";
 
 import IIntegration from "../integration";
-import { StoreSchema } from "../../shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "../../shared/store/schema";
 import { LastfmErrorResponse, LastfmRequestBody, LastfmSessionResponse, LastfmTokenResponse } from "./schemas";
 import log from "electron-log";
 
 export default class LastFM implements IIntegration {
   private store: ElectronStore<StoreSchema>;
+  private memoryStore: MemoryStore<MemoryStoreSchema>;
 
   private isEnabled = false;
   private lastDetails: VideoDetails = null;
@@ -175,11 +177,17 @@ export default class LastFM implements IIntegration {
 
   // ----------------------------------------------------------
 
-  public provide(store: ElectronStore<StoreSchema>): void {
+  public provide(store: ElectronStore<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
     this.store = store;
+    this.memoryStore = memoryStore;
   }
 
   public enable(): void {
+    if (!this.memoryStore.get("safeStorageAvailable")) {
+      log.info("Refusing to enable LastFM Integration with reason: safeStorage unavailable");
+      return;
+    }
+
     if (this.isEnabled) { return; }
     this.isEnabled = true;
 

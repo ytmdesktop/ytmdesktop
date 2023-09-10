@@ -1,4 +1,4 @@
-import { BrowserView, BrowserWindow, ipcMain, safeStorage } from "electron";
+import { BrowserView, BrowserWindow, ipcMain } from "electron";
 import ElectronStore from "electron-store";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "../../../../shared/store/schema";

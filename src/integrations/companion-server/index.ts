@@ -71,6 +71,11 @@ export default class CompanionServer implements IIntegration {
   }
 
   public async enable() {
+    if (!this.memoryStore.get("safeStorageAvailable")) {
+      log.info("Refusing to enable Companion Server Integration with reason: safeStorage unavailable");
+      return;
+    }
+
     if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
       this.createServer();
       await this.fastifyServer.listen({

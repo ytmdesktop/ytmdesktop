@@ -25,6 +25,8 @@ const store = window.ytmd.store;
 const memoryStore = window.ytmd.memoryStore;
 const safeStorage = window.ytmd.safeStorage;
 
+const safeStorageAvailable = ref<boolean>(await memoryStore.get("safeStorageAvailable"));
+
 const general: StoreSchema["general"] = await store.get("general");
 const appearance: StoreSchema["appearance"] = await store.get("appearance");
 const playback: StoreSchema["playback"] = await store.get("playback");
@@ -49,7 +51,9 @@ const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
-const companionServerAuthTokens = ref<AuthToken[]>(JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? []);
+const companionServerAuthTokens = ref<AuthToken[]>(
+  safeStorageAvailable.value ? JSON.parse(await safeStorage.decryptString(integrations.companionServerAuthTokens)) ?? [] : []
+);
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
@@ -82,7 +86,9 @@ store.onDidAnyChange(async newState => {
   ratioVolume.value = newState.playback.ratioVolume;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
-  companionServerAuthTokens.value = JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens)) ?? [];
+  companionServerAuthTokens.value = safeStorageAvailable.value
+    ? JSON.parse(await safeStorage.decryptString(newState.integrations.companionServerAuthTokens)) ?? []
+    : [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
@@ -120,6 +126,8 @@ memoryStore.onStateChanged(newState => {
   shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
 
   companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
+
+  safeStorageAvailable.value = newState.safeStorageAvailable;
 });
 
 async function memorySettingsChanged() {
@@ -187,7 +195,8 @@ async function deleteCompanionAuthToken(appId: string) {
     companionServerAuthTokens.value.splice(index, 1);
   }
 
-  store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
+  if (safeStorageAvailable.value)
+    store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
 }
 
 function removeCustomCSSPath() {
@@ -321,25 +330,29 @@ window.ytmd.handleUpdateDownloaded(() => {
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
-          <div class="setting">
-            <p>Companion server</p>
-            <input v-model="companionServerEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          <div :class="{ setting: true, disabled: !safeStorageAvailable }">
+            <p v-if="safeStorageAvailable">Companion server</p>
+            <div v-else class="name-with-description">
+              <p class="name">Companion server</p>
+              <p class="description">This integration cannot be enabled due to safeStorage being unvailable</p>
+            </div>
+            <input v-model="companionServerEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
-          <div v-if="companionServerEnabled" class="setting indented">
+          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented">
             <div class="name-with-description">
               <p class="name">Allow browser communication</p>
               <p class="description">This setting could be dangerous as it allows any website you visit to communicate with the companion server</p>
             </div>
             <input v-model="companionServerCORSWildcardEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
-          <div v-if="companionServerEnabled" class="setting indented">
+          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented">
             <div class="name-with-description">
               <p class="name">Enable companion authorization</p>
               <p class="description">Automatically disables after the first successful authorization or 5 minutes has passed</p>
             </div>
             <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="memorySettingsChanged" />
           </div>
-          <div v-if="companionServerEnabled" class="setting indented authorized-companions">
+          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented authorized-companions">
             <div class="name-with-description">
               <p class="name">Authorized companions</p>
               <p class="description">This is a list of companions that currently have access to the companion server</p>
@@ -376,9 +389,13 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
             <button @click="restartDiscordPresence">Retry</button>
           </div>
-          <div class="setting">
-            <p>Last.fm scrobbling</p>
-            <input v-model="lastFMEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
+          <div :class="{ setting: true, disabled: !safeStorageAvailable }">
+            <p v-if="safeStorageAvailable">Last.fm scrobbling</p>
+            <div v-else class="name-with-description">
+              <p class="name">Last.fm scrobbling</p>
+              <p class="description">This integration cannot be enabled due to safeStorage being unvailable</p>
+            </div>
+            <input v-model="lastFMEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
           <div v-if="lastFMEnabled" class="setting indented">
             <div class="name-with-description">
@@ -799,6 +816,19 @@ input[type="file"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.setting.disabled {
+  color: #c6c6c6;
+}
+
+.toggle:disabled {
+  background-color: #212121;
+  cursor: not-allowed;
+}
+
+.toggle:disabled::before {
+  background-color: #969696;
 }
 
 .setting.indented.authorized-companions {
