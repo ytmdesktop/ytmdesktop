@@ -433,50 +433,6 @@ if (store.get("playback").enableSpeakerFill) {
   app.commandLine.appendSwitch("try-supported-channel-layouts");
 }
 
-// Integrations which require to be started AFTER the app is ready
-app.whenReady().then(function () {
-  // LastFM
-  if (store.get("integrations").lastFMEnabled) {
-    lastFMScrobbler.provide(store, memoryStore);
-    lastFMScrobbler.enable();
-    log.info("Integration enabled: Last.fm");
-  }
-
-  // RatioVolume
-  if (store.get("playback").ratioVolume) {
-    ratioVolume.provide(ytmView);
-    ratioVolume.enable();
-    log.info("Integration enabled: Ratio volume");
-  }
-  
-  // CompanionServer
-  if (store.get("integrations").companionServerEnabled) {
-    companionServer.provide(store, memoryStore, ytmView);
-    companionServer.enable();
-    log.info("Integration enabled: Companion server");
-  }
-  
-  // DiscordPresence
-  if (store.get("integrations").discordPresenceEnabled) {
-    discordPresence.provide(memoryStore);
-    discordPresence.enable();
-    log.info("Integration enabled: Discord presence");
-  }
-
-  // NowPlayingNotifications
-  if (store.get("general").showNotificationOnSongChange) {
-    nowPlayingNotifications.enable();
-    log.info("Integration enabled: Now playing notifications");
-  }
-  
-  // CustomCSS
-  if (store.get("appearance").customCSSEnabled) {
-    customCss.provide(store, ytmView);
-    customCss.enable();
-    log.info("Integration enabled: Custom CSS");
-  }
-});
-
 function setupTaskbarFeatures() {
   // Setup Taskbar Icons
   const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
@@ -1352,6 +1308,50 @@ app.on("ready", () => {
   // Setup taskbar features
   setupTaskbarFeatures();
   log.info("Setup taskbar features");
+
+  // Integrations setup
+  log.info("Starting enabled integrations");
+
+  // LastFM
+  if (store.get("integrations").lastFMEnabled) {
+    lastFMScrobbler.provide(store, memoryStore);
+    lastFMScrobbler.enable();
+    log.info("Integration enabled: Last.fm");
+  }
+
+  // RatioVolume
+  if (store.get("playback").ratioVolume) {
+    ratioVolume.provide(ytmView);
+    ratioVolume.enable();
+    log.info("Integration enabled: Ratio volume");
+  }
+  
+  // CompanionServer
+  if (store.get("integrations").companionServerEnabled) {
+    companionServer.provide(store, memoryStore, ytmView);
+    companionServer.enable();
+    log.info("Integration enabled: Companion server");
+  }
+  
+  // DiscordPresence
+  if (store.get("integrations").discordPresenceEnabled) {
+    discordPresence.provide(memoryStore);
+    discordPresence.enable();
+    log.info("Integration enabled: Discord presence");
+  }
+
+  // NowPlayingNotifications
+  if (store.get("general").showNotificationOnSongChange) {
+    nowPlayingNotifications.enable();
+    log.info("Integration enabled: Now playing notifications");
+  }
+  
+  // CustomCSS
+  if (store.get("appearance").customCSSEnabled) {
+    customCss.provide(store, ytmView);
+    customCss.enable();
+    log.info("Integration enabled: Custom CSS");
+  }
 });
 
 app.on("before-quit", () => {
