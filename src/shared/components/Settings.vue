@@ -334,7 +334,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p v-if="safeStorageAvailable">Companion server</p>
             <div v-else class="name-with-description">
               <p class="name">Companion server</p>
-              <p class="description">This integration cannot be enabled due to safeStorage being unvailable</p>
+              <p class="description">This integration cannot be enabled due to safeStorage being unavailable</p>
             </div>
             <input v-model="companionServerEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
@@ -393,7 +393,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p v-if="safeStorageAvailable">Last.fm scrobbling</p>
             <div v-else class="name-with-description">
               <p class="name">Last.fm scrobbling</p>
-              <p class="description">This integration cannot be enabled due to safeStorage being unvailable</p>
+              <p class="description">This integration cannot be enabled due to safeStorage being unavailable</p>
             </div>
             <input v-model="lastFMEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
           </div>
