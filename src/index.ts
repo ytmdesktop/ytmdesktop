@@ -11,6 +11,7 @@ import {
   Menu,
   nativeImage,
   safeStorage,
+  screen,
   session,
   shell,
   Tray
@@ -915,9 +916,13 @@ const createYTMView = (): void => {
 
 const createMainWindow = (): void => {
   // Create the browser window.
+  const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
+  const windowBounds = store.get("state").windowBounds;
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: windowBounds?.width ?? 1280 / scaleFactor,
+    height: windowBounds?.height ?? 720 / scaleFactor,
+    x: windowBounds?.x,
+    y: windowBounds?.y,
     frame: false,
     show: false,
     icon: "./assets/icons/ytmd.png",
@@ -934,8 +939,8 @@ const createMainWindow = (): void => {
       devTools: store.get("developer.enableDevTools")
     }
   });
-  const windowBounds = store.get("state").windowBounds;
   const windowMaximized = store.get("state").windowMaximized;
+  // Even though bounds are set when creating the main window we set the bounds again to fix scaling issues. This is classified as an upstream chromium bug.
   if (windowBounds) {
     mainWindow.setBounds(windowBounds);
   }
