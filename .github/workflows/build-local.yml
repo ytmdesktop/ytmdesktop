@@ -1,0 +1,41 @@
+---
+name: BuildLocal
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        os: [macos-11, ubuntu-latest, windows-2019]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - run: yarn
+      - run: node ./script/build-current-platform.js
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist-merged
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.blockmap
+            dist/*.yml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.blockmap
+            dist/*.yml
