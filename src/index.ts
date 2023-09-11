@@ -64,34 +64,42 @@ log.errorHandler.startCatching({
 
     log.error(error);
 
+    let result = 1;  // Default to Exit
+
+    const dialogMessage =
+      `Environment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\n` +
+      `Name: ${error.name}\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n` +
+      `${error.stack}`;
+
     if (!app.isReady()) {
       dialog.showErrorBox(
         `YouTube Music Desktop App Crashed`,
-        `Application crashed before ready\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${
-          error.name
-        }\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`
+        `Application crashed before ready\n\n${dialogMessage}`
       );
     } else {
-      const result = dialog.showMessageBoxSync({
+      const options = ["Copy to Clipboard and Exit", "Exit"];
+      if (!app.isPackaged) {
+        options.push("Copy to Clipboard and Continue", "Continue");
+      }
+
+      result = dialog.showMessageBoxSync({
         title: "Error",
         message: "YouTube Music Desktop App Crashed",
-        detail: `Environment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${error.name}\nMessage: ${
-          error.message
-        }\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`,
+        detail: dialogMessage,
         type: "error",
-        buttons: ["Copy to Clipboard and Exit", "Exit"]
+        buttons: options
       });
 
-      if (result === 0) {
-        clipboard.writeText(
-          `YouTube Music Desktop App Crashed\n\nEnvironment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\nName: ${
-            error.name
-          }\nMessage: ${error.message}\nCause: ${error.cause ?? "Unknown"}\n\n${error.stack}`
-        );
+      // Copy to Clipboard
+      if (result === 0 || result === 2) {
+        clipboard.writeText(`YouTube Music Desktop App Crashed\n\n${dialogMessage}`);
       }
     }
 
-    app.exit(1);
+    // Exit
+    if (result === 0 || result === 1) {
+      app.exit(1);
+    }
   }
 });
 log.eventLogger.startLogging();
