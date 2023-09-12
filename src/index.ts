@@ -799,19 +799,6 @@ const createYTMView = (): void => {
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
 
-  // This block of code adding the browser view setting the bounds and removing it is a temporary fix for a bug in YTMs UI
-  // where a small window size will lock the scrollbar and have difficulty unlocking it without changing the guide bar collapse state
-  if (ytmView !== null && mainWindow !== null) {
-    mainWindow.addBrowserView(ytmView);
-    ytmView.setBounds({
-      x: 0,
-      y: 0,
-      width: 1920,
-      height: 1080
-    });
-    mainWindow.removeBrowserView(ytmView);
-  }
-
   let navigateDefault = true;
 
   const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
