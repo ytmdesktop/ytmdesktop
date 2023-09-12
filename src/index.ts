@@ -772,17 +772,16 @@ const createOrShowSettingsWindow = (): void => {
 
   settingsWindow.on("ready-to-show", () => {
     settingsWindow.show();
+    // Open the DevTools.
+    if (process.env.NODE_ENV === "development") {
+      settingsWindow.webContents.openDevTools({
+        mode: "detach"
+      });
+    }
   });
 
   // and load the index.html of the app.
   settingsWindow.loadURL(SETTINGS_WINDOW_WEBPACK_ENTRY);
-
-  // Open the DevTools.
-  if (process.env.NODE_ENV === "development") {
-    settingsWindow.webContents.openDevTools({
-      mode: "detach"
-    });
-  }
 };
 
 const createYTMView = (): void => {
@@ -792,7 +791,7 @@ const createYTMView = (): void => {
       contextIsolation: true,
       partition: "persist:ytmview",
       preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY,
-      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
+      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required",
     }
   });
   companionServer.provide(store, memoryStore, ytmView);
@@ -857,12 +856,6 @@ const createYTMView = (): void => {
       action: "deny"
     };
   });
-
-  if (process.env.NODE_ENV === "development") {
-    ytmView.webContents.openDevTools({
-      mode: "detach"
-    });
-  }
 };
 
 const createMainWindow = (): void => {
@@ -982,17 +975,16 @@ const createMainWindow = (): void => {
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
-  });
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-  // Open the DevTools.
+    // Open the DevTools.
   if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools({
       mode: "detach"
     });
   }
+  });
+
+  // and load the index.html of the app.
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
 // This method will be called when Electron has finished
@@ -1091,6 +1083,11 @@ app.on("ready", () => {
         width: mainWindow.getContentBounds().width,
         height: mainWindow.getContentBounds().height - 36
       });
+      if (process.env.NODE_ENV === "development") {
+        ytmView.webContents.openDevTools({
+          mode: "detach"
+        });
+      }
     }
   });
 
