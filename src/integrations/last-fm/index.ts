@@ -16,20 +16,19 @@ export default class LastFM implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
   private isEnabled = false;
-  private lastDetails: VideoDetails = null;
 
-  private possibleVideoIds: string[]|null;
+  private possibleVideoIds: string[] | null;
   private lastfmDetails: StoreSchema["lastfm"] = null;
-  private scrobbleTimer: NodeJS.Timer|null = null;
+  private scrobbleTimer: NodeJS.Timer | null = null;
   private playerStateFunction: (state: PlayerState) => void;
 
   private async createToken(): Promise<string> {
     const data: LastfmRequestBody = {
-      method: 'auth.gettoken',
-      format: 'json',
+      method: "auth.gettoken",
+      format: "json",
 
-      api_key: this.lastfmDetails.api_key,
-    }
+      api_key: this.lastfmDetails.api_key
+    };
     const api_sig = this.createApiSig(data, this.lastfmDetails.secret);
 
     const response = await fetch(
@@ -46,16 +45,16 @@ export default class LastFM implements IIntegration {
     this.saveSettings();
 
     shell.openExternal(
-      `https://www.last.fm/api/auth/`+
-        `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}`+
+      `https://www.last.fm/api/auth/` +
+        `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}` +
         `&token=${encodeURIComponent(this.lastfmDetails.token)}`
     );
   }
 
   private async getSession() {
     const params: LastfmRequestBody = {
-      method: 'auth.getSession',
-      format: 'json',
+      method: "auth.getSession",
+      format: "json",
       api_key: this.lastfmDetails.api_key,
       token: this.lastfmDetails.token
     };
@@ -63,16 +62,15 @@ export default class LastFM implements IIntegration {
     const api_sig = this.createApiSig(params, this.lastfmDetails.secret);
 
     const response = await fetch(
-      `https://ws.audioscrobbler.com/2.0/`+
-        `?${this.createQueryString(params, api_sig)}`
+      `https://ws.audioscrobbler.com/2.0/` +
+      `?${this.createQueryString(params, api_sig)}`
     );
 
     const json = (await response.json()) as LastfmSessionResponse;
 
     if (json.error) {
       await this.authenticateUser();
-    }
-    else if (json.session) {
+    } else if (json.session) {
       this.lastfmDetails.sessionKey = json.session.key;
       this.saveSettings();
     }
@@ -81,19 +79,22 @@ export default class LastFM implements IIntegration {
   // ----------------------------------------------------------
 
   private async updatePlayerState(state: PlayerState): Promise<void> {
-    if (!this.isEnabled) { return; }
+    if (!this.isEnabled) {
+      return;
+    }
 
     if (state.videoDetails && state.trackState === VideoState.Playing) {
       // Check if the video has changed (TO DO: Fix song on repeat not scrobbling)
 
-      if (this.possibleVideoIds && this.possibleVideoIds.indexOf(state.videoDetails.id) !== -1)
-      {
+      const videoIsPrepped = this.possibleVideoIds && this.possibleVideoIds.indexOf(state.videoDetails.id) !== -1;
+      const queueExists = state.queue && state.queue.items && state.queue.items.length > 0;
+
+      if (videoIsPrepped && queueExists) {
         return;
       }
-      this.lastDetails = state.videoDetails;
 
       // Store all the IDs of videos for this song.
-      this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map((item) => item.videoId) || [];
+      this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map(item => item.videoId) || [];
       this.possibleVideoIds.push(state.queue.items[state.queue.selectedItemIndex]?.videoId);
 
       if (!this.lastfmDetails || !this.lastfmDetails.sessionKey) {
@@ -105,10 +106,10 @@ export default class LastFM implements IIntegration {
 
       this.updateNowPlaying(state.videoDetails);
 
-      // Scrobble the track if it has been played for more than 50% of its duration
-      // OR if it has been played for more than 4 minutes
       const scrobbleTimeRequired = Math.min(
+        // Scrobble the track if it has been played for more than 50% of its duration
         Math.round(state.videoDetails.durationSeconds / 2),
+        // OR if it has been played for more than 4 minutes
         240
       );
       const scrobbleTime = new Date().getTime();
@@ -121,17 +122,17 @@ export default class LastFM implements IIntegration {
 
   private async updateNowPlaying(videoDetails: VideoDetails): Promise<void> {
     const data = {
-      method: 'track.updateNowPlaying',
-    }
+      method: "track.updateNowPlaying"
+    };
 
     this.sendToLastFM(videoDetails, data);
   }
 
   private async scrobbleSong(videoDetails: VideoDetails, scrobbleTime: number): Promise<void> {
     const data: Partial<LastfmRequestBody> = {
-      method: 'track.scrobble',
-      timestamp: Math.floor(scrobbleTime / 1000),
-    }
+      method: "track.scrobble",
+      timestamp: Math.floor(scrobbleTime / 1000)
+    };
 
     this.sendToLastFM(videoDetails, data);
   }
@@ -147,23 +148,23 @@ export default class LastFM implements IIntegration {
       duration: videoDetails.durationSeconds,
       // albumArtist, trackNumber, chosenByUser
 
-      format: 'json',
+      format: "json",
       api_key: this.lastfmDetails.api_key,
-      sk: this.lastfmDetails.sessionKey,
-    }
+      sk: this.lastfmDetails.sessionKey
+    };
     data.api_sig = this.createApiSig(data, this.lastfmDetails.secret);
 
     const response = fetch(
       `https://ws.audioscrobbler.com/2.0/`,
       {
-        method: 'POST',
+        method: "POST",
         body: this.createBody(data)
       }
     );
 
     response.catch((error: LastfmErrorResponse) => {
       // Check Errors against https://www.last.fm/api/show/track.scrobble#errors
-      switch(error.code) {
+      switch (error.code) {
         case 9: // Invalid session key
           this.lastfmDetails.sessionKey = null;
           this.authenticateUser();
@@ -188,7 +189,9 @@ export default class LastFM implements IIntegration {
       return;
     }
 
-    if (this.isEnabled) { return; }
+    if (this.isEnabled) {
+      return;
+    }
     this.isEnabled = true;
 
     this.lastfmDetails = this.getSettings();
@@ -222,18 +225,22 @@ export default class LastFM implements IIntegration {
 
     for (const key in params) {
       const value = params[key as keyof LastfmRequestBody];
-      if (!value) { continue; }
+      if (!value) {
+        continue;
+      }
 
       data.push(`${encodeURIComponent(key)}=${encodeURIComponent(value.toString())}`);
     }
-    return data.join('&');
+    return data.join("&");
   }
 
   private createBody(params: Partial<LastfmRequestBody>) {
     const data = new URLSearchParams();
     for (const key in params) {
       const value = params[key as keyof LastfmRequestBody];
-      if (value === null || value=== undefined) { continue; }
+      if (value === null || value === undefined) {
+        continue;
+      }
 
       data.append(key, value.toString());
     }
@@ -253,27 +260,30 @@ export default class LastFM implements IIntegration {
 
     for (const key of keys) {
       // Ignore format and callback parameters
-      if (key === 'format' || key === 'callback') { continue; }
+      if (key === "format" || key === "callback") {
+        continue;
+      }
 
       const value = params[key as keyof LastfmRequestBody];
-      if (!value) { continue; }
+      if (!value) {
+        continue;
+      }
 
       data.push(`${key}${value.toString()}`);
     }
 
     data.push(secret);
-    return md5(data.join(''));
+    return md5(data.join(""));
   }
 
-  private getSettings(): StoreSchema['lastfm'] {
-    const decryptedValues = this.store.get('lastfm');
+  private getSettings(): StoreSchema["lastfm"] {
+    const decryptedValues = this.store.get("lastfm");
 
     // Grab the session key and token from the store and decrypt them
     if (decryptedValues.sessionKey) {
       try {
-        decryptedValues.sessionKey =  safeStorage.decryptString(Buffer.from(decryptedValues.sessionKey, "hex"));
-      }
-      catch (e) {
+        decryptedValues.sessionKey = safeStorage.decryptString(Buffer.from(decryptedValues.sessionKey, "hex"));
+      } catch (e) {
         decryptedValues.sessionKey = null;
         log.error(e);
       }
@@ -282,8 +292,7 @@ export default class LastFM implements IIntegration {
     if (decryptedValues.token) {
       try {
         decryptedValues.token = safeStorage.decryptString(Buffer.from(decryptedValues.token, "hex"));
-      }
-      catch (e) {
+      } catch (e) {
         decryptedValues.token = null;
         log.error(e);
       }
@@ -294,15 +303,14 @@ export default class LastFM implements IIntegration {
 
   private async saveSettings(): Promise<void> {
     try {
-      this.store.set('lastfm.sessionKey', safeStorage.encryptString(this.lastfmDetails.sessionKey).toString('hex'));
-      this.store.set('lastfm.token', safeStorage.encryptString(this.lastfmDetails.token).toString('hex'));
-    }
-    catch {
+      this.store.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
+      this.store.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+    } catch {
       // Do nothing, the values are not valid and can be ignored
     }
   }
 }
 
 function md5(string: string): string {
-  return cypto.createHash('md5').update(string).digest('hex');
+  return cypto.createHash("md5").update(string).digest("hex");
 }
