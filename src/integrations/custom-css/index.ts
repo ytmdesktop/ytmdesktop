@@ -107,6 +107,7 @@ export default class CustomCSS implements IIntegration {
       ipcMain.once('ytmView:loaded', this.ipcListener);
 
       this.ytmView.webContents.insertCSS(content).then((customCssRef) => {
+        this.refitYTMPopups();
         this.customCSSKey = customCssRef
       });
 
@@ -120,6 +121,7 @@ export default class CustomCSS implements IIntegration {
 
     await this.ytmView.webContents.removeInsertedCSS(this.customCSSKey);
     this.customCSSKey = null;
+    this.refitYTMPopups();
   }
 
   private async watchCSSFile(newFile?: string) {
@@ -144,5 +146,11 @@ export default class CustomCSS implements IIntegration {
         }
       }
     });
+  }
+
+  private async refitYTMPopups() {
+    if (this.ytmView) {
+      this.ytmView.webContents.send("ytmView:refitPopups");
+    }
   }
 }

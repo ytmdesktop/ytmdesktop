@@ -465,5 +465,13 @@ window.addEventListener("load", async () => {
     }
   });
 
+  ipcRenderer.on("ytmView:refitPopups", () => {
+    webFrame.executeJavaScript(`
+      {
+        document.querySelector("ytmusic-popup-container").refitPopups_();
+      }
+    `);
+  });
+
   ipcRenderer.send("ytmView:loaded");
 });
