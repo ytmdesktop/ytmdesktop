@@ -40,7 +40,7 @@ declare const SETTINGS_WINDOW_WEBPACK_ENTRY: string;
 declare const SETTINGS_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const YTM_VIEW_PRELOAD_WEBPACK_ENTRY: string;
 
-let applicationExited = true;
+let applicationExited = false;
 let applicationQuitting = false;
 let appUpdateAvailable = false;
 let appUpdateDownloaded = false;
