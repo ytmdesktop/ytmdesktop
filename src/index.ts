@@ -40,6 +40,7 @@ declare const SETTINGS_WINDOW_WEBPACK_ENTRY: string;
 declare const SETTINGS_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const YTM_VIEW_PRELOAD_WEBPACK_ENTRY: string;
 
+let applicationExited = true;
 let applicationQuitting = false;
 let appUpdateAvailable = false;
 let appUpdateDownloaded = false;
@@ -58,13 +59,12 @@ log.initialize({
 log.errorHandler.startCatching({
   showDialog: false,
   onError({ error, processType, versions }) {
-    if (processType === "renderer") {
-      return;
-    }
+    if (applicationExited) return;
+    if (processType === "renderer") return;
 
     log.error(error);
 
-    let result = 1;  // Default to Exit
+    let result = 1; // Default to Exit
 
     const dialogMessage =
       `Environment Details:\n    ${versions.app}\n    ${versions.electron}\n    ${versions.os}\n\n` +
@@ -72,10 +72,7 @@ log.errorHandler.startCatching({
       `${error.stack}`;
 
     if (!app.isReady()) {
-      dialog.showErrorBox(
-        `YouTube Music Desktop App Crashed`,
-        `Application crashed before ready\n\n${dialogMessage}`
-      );
+      dialog.showErrorBox(`YouTube Music Desktop App Crashed`, `Application crashed before ready\n\n${dialogMessage}`);
     } else {
       const options = ["Copy to Clipboard and Exit", "Exit"];
       if (!app.isPackaged) {
@@ -98,6 +95,7 @@ log.errorHandler.startCatching({
 
     // Exit
     if (result === 0 || result === 1) {
+      applicationExited = true;
       app.exit(1);
     }
   }
@@ -791,7 +789,7 @@ const createYTMView = (): void => {
       contextIsolation: true,
       partition: "persist:ytmview",
       preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY,
-      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required",
+      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
   companionServer.provide(store, memoryStore, ytmView);
@@ -976,11 +974,11 @@ const createMainWindow = (): void => {
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
     // Open the DevTools.
-  if (process.env.NODE_ENV === "development") {
-    mainWindow.webContents.openDevTools({
-      mode: "detach"
-    });
-  }
+    if (process.env.NODE_ENV === "development") {
+      mainWindow.webContents.openDevTools({
+        mode: "detach"
+      });
+    }
   });
 
   // and load the index.html of the app.
@@ -1317,14 +1315,14 @@ app.on("ready", () => {
     ratioVolume.enable();
     log.info("Integration enabled: Ratio volume");
   }
-  
+
   // CompanionServer
   if (store.get("integrations").companionServerEnabled) {
     companionServer.provide(store, memoryStore, ytmView);
     companionServer.enable();
     log.info("Integration enabled: Companion server");
   }
-  
+
   // DiscordPresence
   if (store.get("integrations").discordPresenceEnabled) {
     discordPresence.provide(memoryStore);
@@ -1337,7 +1335,7 @@ app.on("ready", () => {
     nowPlayingNotifications.enable();
     log.info("Integration enabled: Now playing notifications");
   }
-  
+
   // CustomCSS
   if (store.get("appearance").customCSSEnabled) {
     customCss.provide(store, ytmView);
