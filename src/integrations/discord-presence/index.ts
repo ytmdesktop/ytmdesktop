@@ -62,10 +62,15 @@ function getSmallImageText(state: number) {
   }
 }
 
-function stringLimit(str: string, limit: number) {
+function stringLimit(str: string, limit: number, minimum: number) {
   if (str.length > limit) {
     return str.substring(0, limit - 3) + "...";
   }
+
+  if (str.length < minimum) {
+    return str.padEnd(minimum, "​") // There's a zero width space here
+  }
+  
   return str;
 }
 
@@ -113,10 +118,10 @@ export default class DiscordPresence implements IIntegration {
 
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       this.discordClient.setActivity({
-        details: stringLimit(state.videoDetails.title, 128),
-        state: stringLimit(state.videoDetails.author, 128),
+        details: stringLimit(state.videoDetails.title, 128, 2),
+        state: stringLimit(state.videoDetails.author, 128, 2),
         largeImageKey: thumbnail,
-        largeImageText: stringLimit(state.videoDetails.title, 128),
+        largeImageText: stringLimit(state.videoDetails.title, 128, 2),
         smallImageKey: getSmallImageKey(state.trackState),
         smallImageText: getSmallImageText(state.trackState),
         instance: false,
