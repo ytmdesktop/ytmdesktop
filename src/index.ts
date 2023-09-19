@@ -45,6 +45,8 @@ let applicationQuitting = false;
 let appUpdateAvailable = false;
 let appUpdateDownloaded = false;
 
+let stateSaverInterval: NodeJS.Timeout | null = null;
+
 crashReporter.start({ uploadToServer: false });
 
 log.transports.console.format = "[{processType}][{level}]{text}";
@@ -61,6 +63,8 @@ log.errorHandler.startCatching({
   onError({ error, processType, versions }) {
     if (applicationExited) return;
     if (processType === "renderer") return;
+
+    if (stateSaverInterval) clearInterval(stateSaverInterval);
 
     log.error(error);
 
@@ -438,6 +442,17 @@ if (store.get("general").disableHardwareAcceleration) {
 if (store.get("playback").enableSpeakerFill) {
   app.commandLine.appendSwitch("try-supported-channel-layouts");
 }
+
+function saveState() {
+  store.set("state.lastUrl", lastUrl);
+  store.set("state.lastVideoId", lastVideoId);
+  store.set("state.lastPlaylistId", lastPlaylistId);
+}
+
+// Automatic background state saving every 5 minutes
+stateSaverInterval = setInterval(() => {
+  saveState();
+}, 5 * 60 * 1000);
 
 function setupTaskbarFeatures() {
   // Setup Taskbar Icons
@@ -1346,9 +1361,7 @@ app.on("ready", () => {
 
 app.on("before-quit", () => {
   log.info("Application quitting\n\n");
-  store.set("state.lastUrl", lastUrl);
-  store.set("state.lastVideoId", lastVideoId);
-  store.set("state.lastPlaylistId", lastPlaylistId);
+  saveState();
 });
 
 app.on("open-url", (_, url) => {
