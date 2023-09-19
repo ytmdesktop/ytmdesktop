@@ -157,9 +157,9 @@ function mapCounterpart(counterpart: YTMPlayerQueueItemCounterpart) {
 function transformPlaylistPanelVideoRenderer(playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer, counterpart?: YTMPlayerQueueItemCounterpart[]): PlayerQueueItem {
   return {
     thumbnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails),
-    title: getYTMTextRun(playlistPanelVideoRenderer.title.runs),
-    author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText.runs),
-    duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText.runs),
+    title: getYTMTextRun(playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }]),
+    author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }]),
+    duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }]),
     selected: playlistPanelVideoRenderer.selected,
     videoId: playlistPanelVideoRenderer.videoId,
     counterparts: counterpart ? counterpart.map(mapCounterpart) : null
