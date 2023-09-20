@@ -1155,6 +1155,12 @@ app.on("ready", () => {
     }
   });
 
+  ipcMain.on("ytmView:navigateDefault", () => {
+    if (ytmView) {
+      ytmView.webContents.loadURL("https://music.youtube.com/");
+    }
+  })
+
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {
     memoryStore.set(key, value);

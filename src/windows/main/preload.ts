@@ -12,5 +12,6 @@ contextBridge.exposeInMainWorld("ytmd", {
   handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void) => ipcRenderer.on("mainWindow:stateChanged", callback),
   requestWindowState: () => ipcRenderer.send("mainWindow:requestWindowState"),
   openSettingsWindow: () => ipcRenderer.send("settingsWindow:open"),
-  switchFocus: (context: string) => ipcRenderer.send("ytmView:switchFocus", context)
+  switchFocus: (context: string) => ipcRenderer.send("ytmView:switchFocus", context),
+  ytmViewNavigateDefault: () => ipcRenderer.send("ytmView:navigateDefault")
 });

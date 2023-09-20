@@ -14,6 +14,7 @@ defineProps({
     type: String,
     default: null
   },
+  hasHomeButton: Boolean,
   hasSettingsButton: Boolean,
   hasMinimizeButton: Boolean,
   hasMaximizeButton: Boolean,
@@ -26,6 +27,7 @@ const restoreWindow = window.ytmd.restoreWindow;
 const closeWindow = window.ytmd.closeWindow;
 
 const openSettingsWindow = window.ytmd.openSettingsWindow;
+const navigateToDefault = window.ytmd.ytmViewNavigateDefault;
 
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
@@ -56,6 +58,10 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
     <div class="right">
       <div class="app-buttons">
         <slot name="app-buttons"></slot>
+        <button v-if="hasHomeButton" class="app-button" tabindex="1" @click="navigateToDefault">
+          <span class="material-symbols-outlined">home</span>
+        </button>
+        <span class="divider"></span>
         <button v-if="hasSettingsButton" class="app-button" tabindex="1" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
@@ -161,6 +167,24 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
 
 .app-button > .material-symbols-outlined {
   font-size: 28px;
+}
+
+.app-buttons .divider {
+  margin: 2px 4px;
+  position: relative;
+}
+
+.app-buttons .divider:not(:last-child) {
+  margin: 2px 4px 2px 1px;
+  position: relative;
+}
+
+.app-buttons .divider:after {
+  content: "";
+  position: absolute;
+  border-left: 1px solid #666666;
+  right: 0;
+  height: 100%;
 }
 
 .action-button {

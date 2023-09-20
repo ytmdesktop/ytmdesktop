@@ -28,6 +28,9 @@ declare global {
       // Main window specific
       switchFocus(context: "main" | "ytm"): void;
 
+      // YTM view specific
+      ytmViewNavigateDefault(): void;
+
       // Window control
       minimizeWindow(): void;
       maximizeWindow(): void;
