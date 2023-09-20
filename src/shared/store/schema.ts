@@ -66,4 +66,5 @@ export type MemoryStoreSchema = {
   shortcutsVolumeDownRegisterFailed: boolean;
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
+  autoUpdaterDisabled: boolean;
 };

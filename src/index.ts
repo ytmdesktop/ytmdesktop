@@ -154,45 +154,6 @@ if (!gotTheLock) {
   });
 }
 
-// Configure the autoupdater
-const updateServer = "https://update.electronjs.org";
-const updateFeed = `${updateServer}/ytmdesktop/ytmdesktop/${process.platform}-${process.arch}/${app.getVersion()}`;
-
-autoUpdater.setFeedURL({
-  url: updateFeed
-});
-autoUpdater.on("checking-for-update", () => {
-  if (settingsWindow) {
-    settingsWindow.webContents.send("app:checkingForUpdates");
-  }
-});
-autoUpdater.on("update-available", () => {
-  log.info("Application update available");
-  appUpdateAvailable = true;
-  if (settingsWindow) {
-    settingsWindow.webContents.send("app:updateAvailable");
-  }
-});
-autoUpdater.on("update-not-available", () => {
-  if (settingsWindow) {
-    settingsWindow.webContents.send("app:updateNotAvailable");
-  }
-});
-autoUpdater.on("update-downloaded", () => {
-  log.info("Application update downloaded");
-  appUpdateDownloaded = true;
-  if (settingsWindow) {
-    settingsWindow.webContents.send("app:updateDownloaded");
-  }
-});
-log.info("Setup application updater");
-/*
-TEMPORARY UPDATE CHECK DISABLE WHILE DEVELOPMENT OCCURS (This will always have errors for now until a release occurs)
-setInterval(() => {
-  autoUpdater.checkForUpdates()
-}, 1000 * 60 * 10);
-*/
-
 // Protocol handler
 function handleProtocol(url: string) {
   log.info("Handling protocol url", url);
@@ -246,6 +207,50 @@ memoryStore.onStateChanged((newState, oldState) => {
   }
 });
 log.info("Created memory store");
+
+// Configure the autoupdater
+// macOS cannot use the autoUpdater without a code signature at this time
+if (process.platform !== "darwin") {
+  const updateServer = "https://update.electronjs.org";
+  const updateFeed = `${updateServer}/ytmdesktop/ytmdesktop/${process.platform}-${process.arch}/${app.getVersion()}`;
+
+  autoUpdater.setFeedURL({
+    url: updateFeed
+  });
+  autoUpdater.on("checking-for-update", () => {
+    if (settingsWindow) {
+      settingsWindow.webContents.send("app:checkingForUpdates");
+    }
+  });
+  autoUpdater.on("update-available", () => {
+    log.info("Application update available");
+    appUpdateAvailable = true;
+    if (settingsWindow) {
+      settingsWindow.webContents.send("app:updateAvailable");
+    }
+  });
+  autoUpdater.on("update-not-available", () => {
+    if (settingsWindow) {
+      settingsWindow.webContents.send("app:updateNotAvailable");
+    }
+  });
+  autoUpdater.on("update-downloaded", () => {
+    log.info("Application update downloaded");
+    appUpdateDownloaded = true;
+    if (settingsWindow) {
+      settingsWindow.webContents.send("app:updateDownloaded");
+    }
+  });
+  log.info("Setup application updater");
+  /*
+  TEMPORARY UPDATE CHECK DISABLE WHILE DEVELOPMENT OCCURS (This will always have errors for now until a release occurs)
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 1000 * 60 * 10);
+  */
+} else {
+  memoryStore.set("autoUpdaterDisabled", true);
+}
 
 // Create the persistent config store
 const store = new ElectronStore<StoreSchema>({

@@ -114,6 +114,8 @@ const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("sh
 
 const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
 
+const autoUpdaterDisabled = ref<boolean>(await memoryStore.get("autoUpdaterDisabled"));
+
 memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
 
@@ -128,6 +130,8 @@ memoryStore.onStateChanged(newState => {
   companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
 
   safeStorageAvailable.value = newState.safeStorageAvailable;
+
+  autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
 });
 
 async function memorySettingsChanged() {
@@ -478,24 +482,35 @@ window.ytmd.handleUpdateDownloaded(() => {
           <img class="icon" src="../../assets/icons/ytmd.png" />
           <h2 class="app-name">YouTube Music Desktop App</h2>
           <p class="made-by">Made by YTMDesktop Team</p>
-          <button
-            v-if="!updateDownloaded"
-            :disabled="!(!checkingForUpdate && !updateAvailable && !updateDownloaded)"
-            class="update-check-button"
-            @click="checkForUpdates"
-          >
-            <span class="material-symbols-outlined">update</span>Check for updates
-          </button>
-          <button v-if="updateDownloaded" class="update-button" @click="restartApplicationForUpdate">
-            <span class="material-symbols-outlined">upgrade</span>Restart to update
-          </button>
-          <p v-if="checkingForUpdate && !updateAvailable && !updateDownloaded" class="updating">
-            <span class="material-symbols-outlined">progress_activity</span>Checking for updates...
-          </p>
-          <p v-if="updateAvailable && !updateDownloaded" class="updating">
-            <span class="material-symbols-outlined">progress_activity</span>Downloading update...
-          </p>
-          <p v-if="updateNotAvailable" class="no-update">Update not available</p>
+          <template v-if="!autoUpdaterDisabled">
+            <button
+              v-if="!updateDownloaded"
+              :disabled="!(!checkingForUpdate && !updateAvailable && !updateDownloaded)"
+              class="update-check-button"
+              @click="checkForUpdates"
+            >
+              <span class="material-symbols-outlined">update</span>Check for updates
+            </button>
+            <button v-if="updateDownloaded" class="update-button" @click="restartApplicationForUpdate">
+              <span class="material-symbols-outlined">upgrade</span>Restart to update
+            </button>
+            <p v-if="checkingForUpdate && !updateAvailable && !updateDownloaded" class="updating">
+              <span class="material-symbols-outlined">progress_activity</span>Checking for updates...
+            </p>
+            <p v-if="updateAvailable && !updateDownloaded" class="updating">
+              <span class="material-symbols-outlined">progress_activity</span>Downloading update...
+            </p>
+            <p v-if="updateNotAvailable" class="no-update">Update not available</p>
+          </template>
+          <template v-if="autoUpdaterDisabled">
+            <button
+              disabled
+              class="update-check-button"
+            >
+              <span class="material-symbols-outlined">update</span>Check for updates
+            </button>
+            <p class="no-auto-updater">Auto updater unavailable for your system at this time</p>
+          </template>
           <span class="version-info">
             <p class="version">Version: {{ ytmdVersion }}</p>
             <p class="branch">Branch: {{ ytmdBranch }}</p>
@@ -716,8 +731,20 @@ window.ytmd.handleUpdateDownloaded(() => {
   cursor: pointer;
 }
 
+.update-check-button:disabled {
+  border: 1px solid #888888;
+  cursor: not-allowed;
+}
+
 .updating,
 .no-update {
+  display: flex;
+  align-items: center;
+  color: #888888;
+  margin: 0 0 8px 0;
+}
+
+.no-auto-updater {
   display: flex;
   align-items: center;
   color: #888888;
