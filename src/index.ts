@@ -867,6 +867,27 @@ const createYTMView = (): void => {
     createYTMView();
   });
 
+  ytmView.webContents.on('will-prevent-unload', (event) => {
+    if (mainWindow) {
+      if (ytmView.webContents.getURL().startsWith("https://music.youtube.com/")) {
+        const choice = dialog.showMessageBoxSync(mainWindow, {
+          type: 'question',
+          buttons: ['Leave', 'Stay'],
+          title: 'Navigation',
+          message: 'YouTube Music is preventing navigation. Do you want to leave or stay?',
+          defaultId: 0,
+          cancelId: 1
+        })
+
+        if (choice !== 0) {
+          return;
+        }
+      }
+    }
+
+    event.preventDefault();
+  })
+
   ytmView.webContents.setWindowOpenHandler(details => {
     openExternalFromYtmView(details.url);
 
