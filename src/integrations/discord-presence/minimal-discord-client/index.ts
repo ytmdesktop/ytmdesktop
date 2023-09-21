@@ -101,6 +101,7 @@ export default class DiscordClient extends EventEmitter {
   }
 
   public destroy() {
+    this.connected = false;
     this.removeAllListeners();
     this.ipcClient.destroy();
   }
