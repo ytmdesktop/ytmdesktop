@@ -1,8 +1,10 @@
-import DiscordRPC from "discord-rpc";
 import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 import MemoryStore from "../../memory-store";
 import { MemoryStoreSchema } from "../../shared/store/schema";
+import DiscordClient from "./minimal-discord-client";
+import log from "electron-log";
+import { DiscordActivityType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
@@ -77,7 +79,7 @@ function stringLimit(str: string, limit: number, minimum: number) {
 export default class DiscordPresence implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
-  private discordClient: DiscordRPC.Client = null;
+  private discordClient: DiscordClient = null;
   private enabled = false;
   private ready = false;
   private connectionRetryTimeout: string | number | NodeJS.Timeout = null;
@@ -118,14 +120,21 @@ export default class DiscordPresence implements IIntegration {
 
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       this.discordClient.setActivity({
+        // Discord accepts Playing, Listening, and Watching. But ignores it and sets it to 0 (Playing)
+        // We'll still send a type in case Discord at some point updates to allow this
+        type: DiscordActivityType.Listening,
         details: stringLimit(state.videoDetails.title, 128, 2),
         state: stringLimit(state.videoDetails.author, 128, 2),
-        largeImageKey: thumbnail,
-        largeImageText: stringLimit(state.videoDetails.title, 128, 2),
-        smallImageKey: getSmallImageKey(state.trackState),
-        smallImageText: getSmallImageText(state.trackState),
+        timestamps: {
+          end: state.trackState === VideoState.Playing ? this.endTimestamp : undefined,
+        },
+        assets: {
+          large_image: thumbnail,
+          large_text: stringLimit(state.videoDetails.title, 128, 2),
+          small_image: getSmallImageKey(state.trackState),
+          small_text: getSmallImageText(state.trackState),
+        },
         instance: false,
-        endTimestamp: state.trackState === VideoState.Playing ? this.endTimestamp : undefined,
         buttons: [
           {
             label: "Play on YouTube Music",
@@ -166,12 +175,13 @@ export default class DiscordPresence implements IIntegration {
   }
 
   private retryDiscordConnection() {
+    log.info(`Connecting to Discord attempt ${this.connectionRetries}/30`);
     if (this.enabled) {
       if (this.connectionRetries < 30) {
         this.connectionRetries++;
         this.connectionRetryTimeout = setTimeout(() => {
           if (this.discordClient) {
-            this.discordClient.connect(DISCORD_CLIENT_ID).catch(() => this.retryDiscordConnection());
+            this.discordClient.connect().catch(() => this.retryDiscordConnection());
           }
         }, 5 * 1000);
       } else {
@@ -183,19 +193,19 @@ export default class DiscordPresence implements IIntegration {
   public enable(): void {
     this.enabled = true;
     if (!this.discordClient) {
-      this.discordClient = new DiscordRPC.Client({
-        transport: "ipc"
-      });
-      this.discordClient.on("connected", () => {
+      this.discordClient = new DiscordClient(DISCORD_CLIENT_ID);
+
+      this.discordClient.on("connect", () => {
         this.ready = true;
         this.connectionRetries = 0;
         this.memoryStore.set("discordPresenceConnectionFailed", false);
       });
-      this.discordClient.on("disconnected", () => {
+      this.discordClient.on("close", () => {
+        log.info("Discord connection closed");
         this.ready = false;
         this.retryDiscordConnection();
       });
-      this.discordClient.connect(DISCORD_CLIENT_ID).catch(() => this.retryDiscordConnection());
+      this.discordClient.connect().catch(() => this.retryDiscordConnection());
       this.stateCallback = event => {
         this.playerStateChanged(event);
       };
@@ -213,7 +223,7 @@ export default class DiscordPresence implements IIntegration {
     }
     if (this.discordClient) {
       this.ready = false;
-      this.discordClient.destroy().catch(() => {});
+      this.discordClient.destroy();
       this.discordClient = null;
     }
     if (this.stateCallback) {
