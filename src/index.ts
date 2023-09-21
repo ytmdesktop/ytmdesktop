@@ -455,9 +455,12 @@ function saveState() {
 }
 
 // Automatic background state saving every 5 minutes
-stateSaverInterval = setInterval(() => {
-  saveState();
-}, 5 * 60 * 1000);
+stateSaverInterval = setInterval(
+  () => {
+    saveState();
+  },
+  5 * 60 * 1000
+);
 
 function setupTaskbarFeatures() {
   // Setup Taskbar Icons
@@ -870,26 +873,28 @@ const createYTMView = (): void => {
     createYTMView();
   });
 
-  ytmView.webContents.on('will-prevent-unload', (event) => {
+  ytmView.webContents.on("will-prevent-unload", event => {
     if (mainWindow) {
-      if (ytmView.webContents.getURL().startsWith("https://music.youtube.com/")) {
-        const choice = dialog.showMessageBoxSync(mainWindow, {
-          type: 'question',
-          buttons: ['Leave', 'Stay'],
-          title: 'Navigation',
-          message: 'YouTube Music is preventing navigation. Do you want to leave or stay?',
-          defaultId: 0,
-          cancelId: 1
-        })
+      if (!applicationQuitting) {
+        if (ytmView.webContents.getURL().startsWith("https://music.youtube.com/")) {
+          const choice = dialog.showMessageBoxSync(mainWindow, {
+            type: "question",
+            buttons: ["Leave", "Stay"],
+            title: "Navigation",
+            message: "YouTube Music is preventing navigation. Do you want to leave or stay?",
+            defaultId: 0,
+            cancelId: 1
+          });
 
-        if (choice !== 0) {
-          return;
+          if (choice !== 0) {
+            return;
+          }
         }
       }
     }
 
     event.preventDefault();
-  })
+  });
 
   ytmView.webContents.setWindowOpenHandler(details => {
     openExternalFromYtmView(details.url);
@@ -1183,7 +1188,7 @@ app.on("ready", () => {
     if (ytmView) {
       ytmView.webContents.loadURL("https://music.youtube.com/");
     }
-  })
+  });
 
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {
