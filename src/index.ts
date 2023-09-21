@@ -694,11 +694,14 @@ function sendMainWindowStateIpc() {
 // Functions with call to ytmView renderer
 function ytmViewNavigated() {
   if (ytmView !== null) {
-    lastUrl = ytmView.webContents.getURL();
-    ytmView.webContents.send("ytmView:navigationStateChanged", {
-      canGoBack: ytmView.webContents.canGoBack(),
-      canGoForward: ytmView.webContents.canGoForward()
-    });
+    const url = ytmView.webContents.getURL();
+    if (url.startsWith("https://music.youtube.com/")) {
+      lastUrl = ytmView.webContents.getURL();
+      ytmView.webContents.send("ytmView:navigationStateChanged", {
+        canGoBack: ytmView.webContents.canGoBack(),
+        canGoForward: ytmView.webContents.canGoForward()
+      });
+    }
   }
 }
 
