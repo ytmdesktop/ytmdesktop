@@ -30,7 +30,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Publish Dry (x64)
         run: yarn publish:dry
