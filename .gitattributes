@@ -1,1 +1,4 @@
 * text eol=lf
+
+/.yarn/releases/** binary
+/.yarn/plugins/** binary
