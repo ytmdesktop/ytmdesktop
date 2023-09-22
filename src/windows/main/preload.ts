@@ -3,6 +3,10 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { WindowsEventArguments } from "../../shared/types";
+import { MemoryStoreSchema } from "../../shared/store/schema";
+import MemoryStore from "../../memory-store";
+
+const memoryStore = new MemoryStore<MemoryStoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
   minimizeWindow: () => ipcRenderer.send("mainWindow:minimize"),
@@ -13,5 +17,11 @@ contextBridge.exposeInMainWorld("ytmd", {
   requestWindowState: () => ipcRenderer.send("mainWindow:requestWindowState"),
   openSettingsWindow: () => ipcRenderer.send("settingsWindow:open"),
   switchFocus: (context: string) => ipcRenderer.send("ytmView:switchFocus", context),
-  ytmViewNavigateDefault: () => ipcRenderer.send("ytmView:navigateDefault")
+  ytmViewNavigateDefault: () => ipcRenderer.send("ytmView:navigateDefault"),
+  ytmViewRecreate: () => ipcRenderer.send("ytmView:recreate"),
+  memoryStore: {
+    set: (key: string, value: unknown) => memoryStore.set(key, value),
+    get: async (key: keyof MemoryStoreSchema) => await memoryStore.get(key),
+    onStateChanged: (callback: (newState: MemoryStoreSchema, oldState: MemoryStoreSchema) => void) => memoryStore.onStateChanged(callback)
+  },
 });

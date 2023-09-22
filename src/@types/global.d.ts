@@ -30,6 +30,7 @@ declare global {
 
       // YTM view specific
       ytmViewNavigateDefault(): void;
+      ytmViewRecreate(): void;
 
       // Window control
       minimizeWindow(): void;

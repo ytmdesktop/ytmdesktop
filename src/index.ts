@@ -135,6 +135,7 @@ let lastVideoId = "";
 let lastPlaylistId = "";
 
 let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
+let ytmViewLoadTimeout: NodeJS.Timeout | null = null;
 
 // Single Instances Lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -809,6 +810,8 @@ const createOrShowSettingsWindow = (): void => {
 };
 
 const createYTMView = (): void => {
+  memoryStore.set("ytmViewLoadTimedout", false);
+
   ytmView = new BrowserView({
     webPreferences: {
       sandbox: true,
@@ -903,6 +906,10 @@ const createYTMView = (): void => {
       action: "deny"
     };
   });
+
+  ytmViewLoadTimeout = setTimeout(() => {
+    memoryStore.set("ytmViewLoadTimedout", true);
+  }, 30 * 1000);
 };
 
 const createMainWindow = (): void => {
@@ -1123,6 +1130,7 @@ app.on("ready", () => {
   // Handle ytm view ipc
   ipcMain.on("ytmView:loaded", () => {
     if (ytmView !== null && mainWindow !== null) {
+      clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
       ytmView.setBounds({
         x: 0,
@@ -1189,6 +1197,18 @@ app.on("ready", () => {
       ytmView.webContents.loadURL("https://music.youtube.com/");
     }
   });
+
+  ipcMain.on("ytmView:recreate", () => {
+    if (ytmView) {
+      if (mainWindow) {
+        mainWindow.removeBrowserView(ytmView);
+      }
+
+      (ytmView.webContents as any).destroy();
+      ytmView = null;
+      createYTMView();
+    }
+  })
 
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {

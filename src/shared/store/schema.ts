@@ -67,4 +67,5 @@ export type MemoryStoreSchema = {
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;
+  ytmViewLoadTimedout: boolean;
 };
