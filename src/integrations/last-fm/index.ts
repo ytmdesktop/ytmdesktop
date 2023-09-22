@@ -1,6 +1,5 @@
 import { shell, safeStorage } from "electron";
 import ElectronStore from "electron-store";
-import fetch from "node-fetch";
 import cypto from "crypto";
 
 import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
