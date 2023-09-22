@@ -14,7 +14,7 @@ import {
   APIV1RequestTokenBody,
   APIV1RequestTokenBodyType
 } from "../../shared/schemas";
-import { AuthorizationDeniedError, AuthorizationDisabledError, AuthorizationInvalidError, AuthorizationTimeOutError, AuthorizationTooManyError, InvalidPositionError, InvalidRepeatModeError, InvalidVolumeError, UnauthenticatedError, YouTubeMusicTimeOutError, YouTubeMusicUnavailableError } from "../../shared/errors";
+import { AuthorizationDeniedError, AuthorizationDisabledError, AuthorizationInvalidError, AuthorizationTimeOutError, AuthorizationTooManyError, InvalidPositionError, InvalidQueueIndexError, InvalidRepeatModeError, InvalidVolumeError, UnauthenticatedError, YouTubeMusicTimeOutError, YouTubeMusicUnavailableError } from "../../shared/errors";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -164,6 +164,19 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
         case "shuffle": {
           ytmView.webContents.send("remoteControl:execute", "shuffle");
+          break;
+        }
+
+        case "playQueueIndex": {
+          const index = commandRequest.data;
+          const state = playerStateStore.getState();
+
+          if (isNaN(index) || index > (state.queue.items.length + state.queue.automixItems.length) - 1) {
+            throw new InvalidQueueIndexError(index);
+          }
+
+          ytmView.webContents.send("remoteControl:execute", "playQueueIndex", index);
+          break;
         }
       }
     }

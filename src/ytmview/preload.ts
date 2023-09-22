@@ -423,6 +423,53 @@ window.addEventListener("load", async () => {
         `);
         break;
 
+      case "playQueueIndex": {
+        const index: number = parseInt(value);
+
+        webFrame.executeJavaScript(`
+          {
+            let index = ${index};
+            const state = document.querySelector("ytmusic-player-bar").store.getState();
+            const queue = state.queue;
+
+            const maxQueueIndex = state.queue.items.length - 1;
+            const maxAutoMixQueueIndex = Math.max(state.queue.automixItems.length - 1, 0);
+
+            let useAutoMix = false;
+            if (index > maxQueueIndex) {
+              index = index - state.queue.items.length;
+              useAutoMix = true;
+            }
+
+            let song = null;
+            if (!useAutoMix) {
+              song = queue.items[index];
+            } else {
+              song = queue.automixItems[index];
+            }
+
+            let playlistPanelVideoRenderer;
+            if (song.playlistPanelVideoRenderer) {
+              playlistPanelVideoRenderer = song.playlistPanelVideoRenderer;
+            } else if (song.playlistPanelVideoWrapperRenderer) {
+              playlistPanelVideoRenderer = song.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
+            }
+
+            document.dispatchEvent(
+              new CustomEvent("yt-navigate", {
+                detail: {
+                  endpoint: {
+                    watchEndpoint: playlistPanelVideoRenderer.navigationEndpoint.watchEndpoint
+                  }
+                }
+              })
+            );
+          }
+        `);
+
+        break;
+      }
+
       case "navigate": {
         const endpoint = value;
         document.dispatchEvent(

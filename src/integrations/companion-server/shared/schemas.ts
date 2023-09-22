@@ -49,6 +49,12 @@ export const APIV1CommandRequestBody = Type.Union([
   Type.Object({
     command: Type.Literal("shuffle")
   }),
+  Type.Object({
+    command: Type.Literal("playQueueIndex"),
+    data: Type.Number({
+      minimum: 0
+    })
+  })
 ]);
 export type APIV1CommandRequestBodyType = Static<typeof APIV1CommandRequestBody>;
 

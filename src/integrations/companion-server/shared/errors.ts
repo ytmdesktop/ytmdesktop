@@ -5,6 +5,7 @@ const errorCodes = [
   "INVALID_VOLUME",
   "INVALID_REPEAT_MODE",
   "INVALID_SEEK_POSITION",
+  "INVALID_QUEUE_INDEX",
   "UNAUTHENTICATED",
   "AUTHORIZATION_DISABLED",
   "AUTHORIZATION_INVALID",
@@ -19,6 +20,7 @@ const errorCodes = [
 export const InvalidVolumeError = createError<[number]>("INVALID_VOLUME", "Volume '%s' is invalid", 400);
 export const InvalidRepeatModeError = createError<[RepeatMode]>("INVALID_REPEAT_MODE", "Repeat mode '%s' cannot be set", 400);
 export const InvalidPositionError = createError<[number]>("INVALID_SEEK_POSITION", "Seek position '%s' is invalid", 400);
+export const InvalidQueueIndexError = createError<[number]>("INVALID_QUEUE_INDEX", "'%s' is an invalid queue index for the current queue", 400);
 export const UnauthenticatedError = createError<[]>("UNAUTHENTICATED", "Authentication not provided or invalid", 401);
 export const AuthorizationDisabledError = createError<[]>("AUTHORIZATION_DISABLED", "Authorization requests are disabled", 403);
 export const AuthorizationInvalidError = createError<[]>("AUTHORIZATION_INVALID", "Authorization invalid", 400);
