@@ -15,12 +15,19 @@ export default class IPCClient extends EventEmitter {
   constructor() {
     super();
 
+    this.createSocket();
+  }
+
+  private createSocket() {
     this.socket = new Socket();
     this.socket.on("connect", () => {
       this.emit("connect");
     });
     this.socket.on("close", (hadError: boolean) => {
       this.emit("close", hadError);
+    });
+    this.socket.on("error", (error) => {
+      this.emit("error", error);
     });
     this.socket.on("data", (buffer: Buffer) => {
       try {
@@ -37,6 +44,9 @@ export default class IPCClient extends EventEmitter {
   }
 
   public connect(ipcPath: string) {
+    if (this.socket.destroyed) {
+      this.createSocket();
+    }
     this.socket.connect(ipcPath);
   }
 

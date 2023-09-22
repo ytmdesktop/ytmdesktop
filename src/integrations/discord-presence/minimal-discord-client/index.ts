@@ -44,6 +44,9 @@ export default class DiscordClient extends EventEmitter {
               log.debug("dipc: failed to connect to discord at", ipcPath);
               ipcReject();
             });
+            this.ipcClient.once("error", (error) => {
+              log.error("dipc: socket error connecting to discord", error);
+            });
             this.ipcClient.once("connect", () => {
               log.debug("dipc: connected to discord at", ipcPath);
               this.ipcClient.removeAllListeners();
@@ -85,6 +88,7 @@ export default class DiscordClient extends EventEmitter {
         }
       }
 
+      this.connectionPromise = null;
       reject();
     });
 
