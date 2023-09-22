@@ -6,7 +6,6 @@ import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-st
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
-import createError from "@fastify/error";
 import {
   APIV1CommandRequestBody,
   APIV1CommandRequestBodyType,
@@ -15,6 +14,7 @@ import {
   APIV1RequestTokenBody,
   APIV1RequestTokenBodyType
 } from "../../shared/schemas";
+import { AuthorizationDeniedError, AuthorizationDisabledError, AuthorizationInvalidError, AuthorizationTimeOutError, AuthorizationTooManyError, InvalidPositionError, InvalidRepeatModeError, InvalidVolumeError, UnauthenticatedError, YouTubeMusicTimeOutError, YouTubeMusicUnavailableError } from "../../shared/errors";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -62,21 +62,6 @@ interface CompanionServerAPIv1Options extends FastifyPluginOptions {
   getStore: () => ElectronStore<StoreSchema>;
   getYtmView: () => BrowserView;
 }
-
-//const InvalidCommandError = createError("INVALID_COMMAND", "Command '%s' is invalid", 400);
-const InvalidVolumeError = createError("INVALID_VOLUME", "Volume '%s' is invalid", 400);
-const InvalidRepeatModeError = createError("INVALID_REPEAT_MODE", "Repeat mode '%s' cannot be set", 400);
-const InvalidPositionError = createError("INVALID_SEEK_POSITION", "Seek position '%s' is invalid", 400);
-const UnauthenticatedError = createError("UNAUTHENTICATED", "Authentication not provided or invalid", 401);
-const AuthorizationDisabled = createError("AUTHORIZATION_DISABLED", "Authorization requests are disabled", 403);
-const AuthorizationInvalid = createError("AUTHORIZATION_INVALID", "Authorization invalid", 400);
-const AuthorizationTimeOut = createError("AUTHORIZATION_TIME_OUT", "Authorization timed out", 504);
-const AuthorizationDenied = createError("AUTHORIZATION_DENIED", "Authorization request denied", 403);
-const AuthorizationTooMany = createError("AUTHORIZATION_TOO_MANY", "Too many authorization requests currently active", 503);
-const YouTubeMusicUnavailable = createError("YOUTUBE_MUSIC_UNVAILABLE", "YouTube Music is currently unvailable", 503);
-const YouTubeMusicTimeOut = createError("YOUTUBE_MUSIC_TIME_OUT", "Response from YouTube Music took too long", 504);
-
-//type RemoteCommand = "playPause" | "play" | "pause" | "volumeUp" | "volumeDown" | "setVolume" | "mute" | "unmute" | "next" | "previous" | "repeatMode";
 
 type Playlist = {
   id: string;
@@ -208,7 +193,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
-        throw new AuthorizationDisabled();
+        throw new AuthorizationDisabledError();
       }
 
       const code = await getTemporaryAuthCode(request.body.appId, request.body.appVersion, request.body.appName);
@@ -217,7 +202,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           code
         });
       } else {
-        throw new AuthorizationTimeOut();
+        throw new AuthorizationTimeOutError();
       }
     }
   );
@@ -241,18 +226,18 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
       // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
       if (authorizationWindows.length >= 5) {
-        throw new AuthorizationTooMany();
+        throw new AuthorizationTooManyError();
       }
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
-        throw new AuthorizationDisabled();
+        throw new AuthorizationDisabledError();
       }
 
       // API Users: Make sure you /requestcode above
       const authData = getIsTemporaryAuthCodeValidAndRemove(request.body.appId, request.body.code);
       if (!authData) {
-        throw new AuthorizationInvalid();
+        throw new AuthorizationInvalidError();
       }
 
       const requestId = crypto.randomUUID();
@@ -356,7 +341,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           });
           options.getMemoryStore().set("companionServerAuthWindowEnabled", false);
         } else {
-          throw new AuthorizationDenied();
+          throw new AuthorizationDeniedError();
         }
       } finally {
         const index = authorizationWindows.indexOf(authorizationWindow);
@@ -386,7 +371,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         return isAuthValidMiddleware(options.getStore(), request, response, next);
       }
     },
-    (request, response) => {
+    async (request, response) => {
       const ytmView = options.getYtmView();
       if (ytmView) {
         const requestId = crypto.randomUUID();
@@ -395,16 +380,15 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           response.send(playlists);
         };
         ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-
-        setTimeout(() => {
-          ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-          throw new YouTubeMusicTimeOut();
-        }, 1000 * 5);
-
+        
         ytmView.webContents.send(`ytmView:getPlaylists`, requestId);
-        //response.send(transformPlayerState(playerStateStore.getState()));
+        
+        await new Promise((_resolve, reject) => setTimeout(() => {
+          ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
+          reject(new YouTubeMusicTimeOutError());
+        }, 1000 * 5));
       } else {
-        throw new YouTubeMusicUnavailable();
+        throw new YouTubeMusicUnavailableError();
       }
     }
   );

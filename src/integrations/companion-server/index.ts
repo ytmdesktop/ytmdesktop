@@ -12,6 +12,7 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import cors from "@fastify/cors";
 import MemoryStore from "../../memory-store";
 import log from "electron-log";
+import { isDefinedAPIError } from "./shared/errors";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -50,12 +51,15 @@ export default class CompanionServer implements IIntegration {
       }
     });
     this.fastifyServer.setErrorHandler((error, request, reply) => {
-      if (!error.statusCode || error.statusCode >= 500) {
-        log.error(error);
-        reply.send(new Error("An internal server error occurred"));
-      } else {
-        reply.send(error);
+      if (!isDefinedAPIError(error)) {
+        if (!error.statusCode || error.statusCode >= 500) {
+          log.error(error);
+          reply.send(new Error("An internal server error occurred"));
+          return;
+        }
       }
+
+      reply.send(error);
     });
 
     // Disconnect connections to the default namespace
