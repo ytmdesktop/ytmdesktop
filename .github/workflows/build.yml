@@ -12,8 +12,10 @@ jobs:
         os: [
             { name: 'linux',   image: 'ubuntu-latest' },
             { name: 'windows', image: 'windows-latest' },
-            { name: 'macos',   image: 'macos-latest' },
+            { name: 'macos',   image: 'macos-latest' }
           ]
+        arch: [ 'x64', 'arm64' ]
+          
 
     runs-on: ${{ matrix.os.image }}
 
@@ -31,30 +33,16 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: Build (x64)
-        run: yarn make
-
-      - name: Build (arm64)
+      - name: Build (${{ matrix.arch }})
         if: matrix.os.image == 'macos-latest'
-        run: yarn make --arch arm64
+        run: yarn make --arch ${{ matrix.arch }}
 
-      - name: Upload artifacts (x64)
+      - name: Upload artifacts (${{ matrix.arch }})
         uses: actions/upload-artifact@v3
         with:
-          name: dist-${{ matrix.os.name }}-x64
+          name: dist-${{ matrix.os.name }}-${{ matrix.arch }}
           path: |
-            out/make/squirrel.windows/x64/*.exe
-            out/make/deb/x64/*.deb
-            out/make/rpm/x64/*.rpm
-            out/make/zip/darwin/x64/*.zip
-
-      - name: Upload artifacts (arm64)
-        if: matrix.os.image == 'macos-latest'
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-${{ matrix.os.name }}-arm64
-          path: |
-            out/make/squirrel.windows/arm64/*.exe
-            out/make/deb/arm64/*.deb
-            out/make/rpm/arm64/*.rpm
-            out/make/zip/darwin/arm64/*.zip
+            out/make/squirrel.windows/${{ matrix.arch }}/*.exe
+            out/make/deb/${{ matrix.arch }}/*.deb
+            out/make/rpm/${{ matrix.arch }}/*.rpm
+            out/make/zip/darwin/${{ matrix.arch }}/*.zip
