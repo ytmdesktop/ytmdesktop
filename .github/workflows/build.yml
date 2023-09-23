@@ -15,6 +15,7 @@ jobs:
             { name: 'macos',   image: 'macos-latest' }
           ]
         arch: [ 'x64', 'arm64' ]
+      fail-fast: false
           
 
     runs-on: ${{ matrix.os.image }}
@@ -34,7 +35,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build (${{ matrix.arch }})
-        if: matrix.os.image == 'macos-latest'
+        # if: matrix.os.image == 'macos-latest'
         run: yarn make --arch ${{ matrix.arch }}
 
       - name: Upload artifacts (${{ matrix.arch }})
