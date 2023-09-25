@@ -183,8 +183,14 @@ function getYTMTextRun(runs: { text: string }[]) {
 
 window.addEventListener("load", async () => {
   if (window.location.hostname !== "music.youtube.com") {
-    if (window.location.hostname === "consent.youtube.com") {
+    if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
+    }
+    if (window.location.hostname === "youtube.com" || window.location.hostname === "www.youtube.com") {
+      if (window.location.pathname === "/premium") {
+        // This users region requires a premium subscription to use YTM
+        window.location.replace("https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F")
+      }
     }
     return;
   }

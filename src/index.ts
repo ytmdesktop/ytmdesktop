@@ -700,7 +700,7 @@ function ytmViewNavigated() {
   if (ytmView !== null) {
     const url = ytmView.webContents.getURL();
     if (url.startsWith("https://music.youtube.com/")) {
-      lastUrl = ytmView.webContents.getURL();
+      lastUrl = url;
       ytmView.webContents.send("ytmView:navigationStateChanged", {
         canGoBack: ytmView.webContents.canGoBack(),
         canGoForward: ytmView.webContents.canGoForward()
@@ -850,11 +850,28 @@ const createYTMView = (): void => {
       !event.url.startsWith("https://accounts.google.com/") &&
       !event.url.startsWith("https://accounts.youtube.com/") &&
       !event.url.startsWith("https://music.youtube.com/") &&
-      !event.url.startsWith("https://www.youtube.com/signin")
+      !event.url.startsWith("https://www.youtube.com/signin") &&
+      !event.url.startsWith("https://youtube.com/signin") &&
+      !event.url.startsWith("https://www.youtube.com/premium") &&
+      !event.url.startsWith("https://youtube.com/premium")
     ) {
       event.preventDefault();
 
       openExternalFromYtmView(event.url);
+    }
+  });
+  ytmView.webContents.on("will-redirect", (event) => {
+    if (
+      !event.url.startsWith("https://consent.youtube.com/") &&
+      !event.url.startsWith("https://accounts.google.com/") &&
+      !event.url.startsWith("https://accounts.youtube.com/") &&
+      !event.url.startsWith("https://music.youtube.com/") &&
+      !event.url.startsWith("https://www.youtube.com/signin") &&
+      !event.url.startsWith("https://youtube.com/signin") &&
+      !event.url.startsWith("https://www.youtube.com/premium") &&
+      !event.url.startsWith("https://youtube.com/premium")
+    ) {
+      event.preventDefault();
     }
   });
   ytmView.webContents.on("did-navigate", ytmViewNavigated);
