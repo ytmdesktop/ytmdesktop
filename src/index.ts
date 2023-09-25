@@ -873,6 +873,11 @@ const createYTMView = (): void => {
     ) {
       event.preventDefault();
     }
+
+    if (event.url.startsWith("https://www.youtube.com/premium") || event.url.startsWith("https://youtube.com/premium")) {
+      // This users region requires a premium subscription to use YTM
+      ytmView.webContents.loadURL("https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F");
+    }
   });
   ytmView.webContents.on("did-navigate", ytmViewNavigated);
   ytmView.webContents.on("did-navigate-in-page", ytmViewNavigated);
