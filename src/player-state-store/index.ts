@@ -22,6 +22,7 @@ export type Thumbnail = {
 
 export type VideoDetails = {
   album: string;
+  albumId: string;
   author: string;
   channelId: string;
   durationSeconds: number;
@@ -270,7 +271,8 @@ class PlayerStateStore {
       author: videoDetails.author,
       channelId: videoDetails.channelId,
       title: videoDetails.title,
-      album: videoDetails.album,
+      album: null,
+      albumId: null,
       thumbnails: videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails),
       durationSeconds: parseInt(videoDetails.lengthSeconds),
       id: videoDetails.videoId
@@ -279,7 +281,7 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateQueue(queueState: YTMPlayerQueue | null) {
+  public updateFromStore(queueState: YTMPlayerQueue | null, album: { id: string, text: YTMText } | null) {
     const queueItems = queueState ? queueState.items.map(mapYTMQueueItems) : [];
     this.queue = queueState
       ? {
@@ -297,6 +299,11 @@ class PlayerStateStore {
           })
         }
       : null;
+    if (this.videoDetails) {
+      this.videoDetails.album = album ? getYTMTextRun(album.text.runs) : "";
+      this.videoDetails.albumId = album?.id;
+    }
+    this.eventEmitter.emit("stateChanged", this.getState());
   }
 
   public addEventListener(listener: (state: PlayerState) => void) {

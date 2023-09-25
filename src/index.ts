@@ -1198,8 +1198,8 @@ app.on("ready", () => {
     playerStateStore.updateVideoDetails(videoDetails, playlistId);
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue) => {
-    playerStateStore.updateQueue(queue);
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, album) => {
+    playerStateStore.updateFromStore(queue, album);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {

@@ -22,7 +22,27 @@
   document.querySelector("ytmusic-player-bar").store.subscribe(() => {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = document.querySelector("ytmusic-player-bar").store.getState();
-    window.ytmd.sendStoreUpdate(state.queue);
+
+    let album = null;
+    if (state.playerPage.playerOverlay) {
+      album = {
+        id: null,
+        text: state.playerPage.playerOverlay.playerOverlayRenderer.browserMediaSession.browserMediaSessionRenderer.album
+      }
+      const currentMenu = document.querySelector("ytmusic-player-bar").getMenuRenderer();
+      if (currentMenu) {
+        for (let i = 0; i < currentMenu.items.length; i++) {
+          const item = currentMenu.items[i];
+          if (item.menuNavigationItemRenderer) {
+            if (item.menuNavigationItemRenderer.icon.iconType === "ALBUM") {
+              album.id = item.menuNavigationItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+            }
+          }
+        }
+      }
+    }
+
+    window.ytmd.sendStoreUpdate(state.queue, album);
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
