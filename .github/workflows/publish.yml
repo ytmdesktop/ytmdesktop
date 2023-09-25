@@ -39,13 +39,3 @@ jobs:
         run: yarn publish:fromdry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Publish Dry (arm64)
-        if: matrix.os.image == 'macos-latest'
-        run: yarn publish:dry --arch arm64
-
-      - name: Publish From Dry (arm64)
-        if: matrix.os.image == 'macos-latest'
-        run: yarn publish:fromdry
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
