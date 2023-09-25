@@ -300,7 +300,7 @@ class PlayerStateStore {
         }
       : null;
     if (this.videoDetails) {
-      this.videoDetails.album = album ? getYTMTextRun(album.text.runs) : "";
+      this.videoDetails.album = album?.text ? getYTMTextRun(album.text.runs) : "";
       this.videoDetails.albumId = album?.id;
     }
     this.eventEmitter.emit("stateChanged", this.getState());
