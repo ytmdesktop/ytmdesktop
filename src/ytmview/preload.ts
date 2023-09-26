@@ -15,6 +15,8 @@ import { StoreSchema } from "../shared/store/schema";
 import playerBarControlsScript from "./scripts/playerbarcontrols.script";
 import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script";
 import getPlaylistsScript from "./scripts/getplaylists.script";
+import toggleLikeScript from "./scripts/togglelike.script";
+import toggleDislikeScript from "./scripts/toggledislike.script";
 
 const store = new Store<StoreSchema>();
 
@@ -319,13 +321,15 @@ window.addEventListener("load", async () => {
         break;
       }
 
-      case "thumbsUp":
-        // TODO
+      case "toggleLike": {
+        webFrame.executeJavaScript(toggleLikeScript);
         break;
+      }
 
-      case "thumbsDown":
-        // TODO
+      case "toggleDislike": {
+        webFrame.executeJavaScript(toggleDislikeScript);
         break;
+      }
 
       case "volumeUp": {
         const currentVolumeUp: number = await webFrame.executeJavaScript(`

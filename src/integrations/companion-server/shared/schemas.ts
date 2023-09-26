@@ -54,7 +54,13 @@ export const APIV1CommandRequestBody = Type.Union([
     data: Type.Number({
       minimum: 0
     })
-  })
+  }),
+  Type.Object({
+    command: Type.Literal("toggleLike")
+  }),
+  Type.Object({
+    command: Type.Literal("toggleDislike")
+  }),
 ]);
 export type APIV1CommandRequestBodyType = Static<typeof APIV1CommandRequestBody>;
 
