@@ -57,7 +57,9 @@ export const rendererConfig: Configuration = {
   plugins: [
     new DefinePlugin({
       YTMD_GIT_COMMIT_HASH: JSON.stringify(gitCommitHash),
-      YTMD_GIT_BRANCH: JSON.stringify(gitBranch)
+      YTMD_GIT_BRANCH: JSON.stringify(gitBranch),
+      __VUE_OPTIONS_API__: false,
+      __VUE_PROD_DEVTOOLS__: false
     }),
     new VueLoaderPlugin(),
     ...plugins
