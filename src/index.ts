@@ -856,6 +856,7 @@ const createYTMView = (): void => {
       !event.url.startsWith("https://youtube.com/premium")
     ) {
       event.preventDefault();
+      log.info(`Blocking YTM View navigation to ${event.url}`);
 
       openExternalFromYtmView(event.url);
     }
@@ -872,6 +873,7 @@ const createYTMView = (): void => {
       !event.url.startsWith("https://youtube.com/premium")
     ) {
       event.preventDefault();
+      log.info(`Blocking YTM View redirect to ${event.url}`);
     }
 
     if (event.url.startsWith("https://www.youtube.com/premium") || event.url.startsWith("https://youtube.com/premium")) {
