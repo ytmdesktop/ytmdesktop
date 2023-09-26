@@ -854,7 +854,6 @@ const createYTMView = (): void => {
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
     const url = new URL(event.url);
-    console.log(url.hostname, url.pathname);
     if (
       url.hostname !== "consent.youtube.com" &&
       url.hostname !== "accounts.youtube.com" &&
