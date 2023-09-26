@@ -886,7 +886,7 @@ const createYTMView = (): void => {
       log.info(`Blocking YTM View redirect to ${event.url}`);
     }
 
-    if (event.url.startsWith("https://www.youtube.com/premium") || event.url.startsWith("https://youtube.com/premium")) {
+    if ((url.hostname === "www.youtube.com" && url.pathname === "/premium") || (url.hostname === "youtube.com" && url.pathname === "/premium")) {
       // This users region requires a premium subscription to use YTM
       ytmView.webContents.loadURL("https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F");
     }
