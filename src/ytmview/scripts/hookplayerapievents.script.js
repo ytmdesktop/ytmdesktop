@@ -6,7 +6,7 @@
     window.ytmd.sendVideoState(state);
   });
   document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onVideoDataChange", event => {
-    if (event.type === "dataloaded" && event.playertype === 1) {
+    if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
       window.ytmd.sendVideoData(
         document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse().videoDetails,
         document.querySelector("ytmusic-player-bar").playerApi_.getPlaylistId()
@@ -42,7 +42,15 @@
       }
     }
 
-    window.ytmd.sendStoreUpdate(state.queue, album);
+    const videoId = document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse()?.videoDetails?.videoId;
+    const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+
+    const storeLikeStatus = state.likeStatus.videos[videoId];
+    
+    const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
+
+    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus);
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
