@@ -14,6 +14,13 @@ export enum RepeatMode {
   One = 2
 }
 
+export enum LikeStatus {
+  Unknown = -1,
+  Dislike = 0,
+  Indifferent = 1,
+  Like = 2
+}
+
 export type Thumbnail = {
   height: number;
   url: string;
@@ -29,6 +36,7 @@ export type VideoDetails = {
   thumbnails: Thumbnail[];
   title: string;
   id: string;
+  likeStatus: LikeStatus;
 };
 
 export type PlayerQueueItem = {
@@ -109,6 +117,8 @@ type YTMPlayerQueueItem = {
 };
 
 type YTMRepeatMode = "NONE" | "ALL" | "ONE";
+
+type YTMLikeStatus = "INDIFFERENT" | "DISLIKE" | "LIKE";
 
 type YTMPlayerQueue = {
   automixItems: YTMPlayerQueueItem[];
@@ -204,6 +214,26 @@ function transformRepeatMode(repeatMode: YTMRepeatMode) {
   }
 }
 
+function transformLikeStatus(likeStatus: YTMLikeStatus) {
+  switch (likeStatus) {
+    case "DISLIKE": {
+      return LikeStatus.Dislike;
+    }
+
+    case "INDIFFERENT": {
+      return LikeStatus.Indifferent;
+    }
+
+     case "LIKE": {
+      return LikeStatus.Like;
+     }
+
+     default: {
+      return LikeStatus.Unknown;
+     }
+  }
+}
+
 class PlayerStateStore {
   private videoProgress = 0;
   private state: VideoState = -1;
@@ -273,6 +303,7 @@ class PlayerStateStore {
       title: videoDetails.title,
       album: null,
       albumId: null,
+      likeStatus: LikeStatus.Unknown,
       thumbnails: videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails),
       durationSeconds: parseInt(videoDetails.lengthSeconds),
       id: videoDetails.videoId
@@ -281,7 +312,7 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateFromStore(queueState: YTMPlayerQueue | null, album: { id: string, text: YTMText } | null) {
+  public updateFromStore(queueState: YTMPlayerQueue | null, album: { id: string, text: YTMText } | null, likeStatus: YTMLikeStatus | null) {
     const queueItems = queueState ? queueState.items.map(mapYTMQueueItems) : [];
     this.queue = queueState
       ? {
@@ -302,6 +333,7 @@ class PlayerStateStore {
     if (this.videoDetails) {
       this.videoDetails.album = album?.text ? getYTMTextRun(album.text.runs) : null;
       this.videoDetails.albumId = album?.id;
+      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
     }
     this.eventEmitter.emit("stateChanged", this.getState());
   }

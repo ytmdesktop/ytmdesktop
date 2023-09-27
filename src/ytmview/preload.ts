@@ -25,7 +25,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: unknown, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
   sendAdState: (adRunning: boolean) => ipcRenderer.send("ytmView:adStateChanged", adRunning),
-  sendStoreUpdate: (queueState: unknown, album: unknown) => ipcRenderer.send("ytmView:storeStateChanged", queueState, album),
+  sendStoreUpdate: (queueState: unknown, album: unknown, likeStatus: string) => ipcRenderer.send("ytmView:storeStateChanged", queueState, album, likeStatus),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
