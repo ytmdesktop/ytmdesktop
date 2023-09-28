@@ -1088,26 +1088,34 @@ app.on("ready", () => {
   }
 
   // Handle main window ipc
-  ipcMain.on("mainWindow:minimize", () => {
+  ipcMain.on("mainWindow:minimize", (event) => {
     if (mainWindow !== null) {
+      if (event.sender !== mainWindow.webContents) return;
+
       mainWindow.minimize();
     }
   });
 
-  ipcMain.on("mainWindow:maximize", () => {
+  ipcMain.on("mainWindow:maximize", (event) => {
     if (mainWindow !== null) {
+      if (event.sender !== mainWindow.webContents) return;
+
       mainWindow.maximize();
     }
   });
 
-  ipcMain.on("mainWindow:restore", () => {
+  ipcMain.on("mainWindow:restore", (event) => {
     if (mainWindow !== null) {
+      if (event.sender !== mainWindow.webContents) return;
+
       mainWindow.restore();
     }
   });
 
-  ipcMain.on("mainWindow:close", () => {
+  ipcMain.on("mainWindow:close", (event) => {
     if (mainWindow !== null) {
+      if (event.sender !== mainWindow.webContents) return;
+
       if (store.get("general").hideToTrayOnClose || process.platform === "darwin") {
         mainWindow.hide();
       } else {
@@ -1117,53 +1125,71 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("mainWindow:requestWindowState", () => {
+  ipcMain.on("mainWindow:requestWindowState", (event) => {
+    if (event.sender !== mainWindow.webContents) return;
+
     sendMainWindowStateIpc();
   });
 
   // Handle settings window ipc
-  ipcMain.on("settingsWindow:open", () => {
+  ipcMain.on("settingsWindow:open", (event) => {
+    if (event.sender !== mainWindow.webContents) return;
+
     createOrShowSettingsWindow();
   });
 
-  ipcMain.on("settingsWindow:minimize", () => {
+  ipcMain.on("settingsWindow:minimize", (event) => {
     if (settingsWindow !== null) {
+      if (event.sender !== settingsWindow.webContents) return;
+
       settingsWindow.minimize();
     }
   });
 
-  ipcMain.on("settingsWindow:maximize", () => {
+  ipcMain.on("settingsWindow:maximize", (event) => {
     if (settingsWindow !== null) {
+      if (event.sender !== settingsWindow.webContents) return;
+
       settingsWindow.maximize();
     }
   });
 
-  ipcMain.on("settingsWindow:restore", () => {
+  ipcMain.on("settingsWindow:restore", (event) => {
     if (settingsWindow !== null) {
+      if (event.sender !== settingsWindow.webContents) return;
+
       settingsWindow.restore();
     }
   });
 
-  ipcMain.on("settingsWindow:close", () => {
+  ipcMain.on("settingsWindow:close", (event) => {
     if (settingsWindow !== null) {
+      if (event.sender !== settingsWindow.webContents) return;
+
       settingsWindow.close();
     }
   });
 
-  ipcMain.on("settingsWindow:restartapplication", () => {
+  ipcMain.on("settingsWindow:restartapplication", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     app.relaunch();
     applicationQuitting = true;
     app.quit();
   });
 
-  ipcMain.on("settingsWindow:restartApplicationForUpdate", () => {
+  ipcMain.on("settingsWindow:restartApplicationForUpdate", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     applicationQuitting = true;
     autoUpdater.quitAndInstall();
   });
 
   // Handle ytm view ipc
-  ipcMain.on("ytmView:loaded", () => {
+  ipcMain.on("ytmView:loaded", (event) => {
     if (ytmView !== null && mainWindow !== null) {
+      if (event.sender !== ytmView.webContents) return;
+
       clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
       ytmView.setBounds({
@@ -1181,10 +1207,14 @@ app.on("ready", () => {
   });
 
   ipcMain.on("ytmView:videoProgressChanged", (event, progress) => {
+    if (event.sender !== ytmView.webContents) return;
+
     playerStateStore.updateVideoProgress(progress);
   });
 
   ipcMain.on("ytmView:videoStateChanged", (event, state) => {
+    if (event.sender !== ytmView.webContents) return;
+
     // ytm state mapping definitions
     // -1 -> Unknown (Seems tied to no buffer data, but cannot confirm)
     // 1 -> Playing
@@ -1204,6 +1234,8 @@ app.on("ready", () => {
   });
 
   ipcMain.on("ytmView:videoDataChanged", (event, videoDetails, playlistId) => {
+    if (event.sender !== ytmView.webContents) return;
+
     lastVideoId = videoDetails.videoId;
     lastPlaylistId = playlistId;
 
@@ -1211,10 +1243,14 @@ app.on("ready", () => {
   });
 
   ipcMain.on("ytmView:storeStateChanged", (event, queue, album, likeStatus) => {
+    if (event.sender !== ytmView.webContents) return;
+
     playerStateStore.updateFromStore(queue, album, likeStatus);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {
+    if (event.sender !== ytmView.webContents && event.sender !== mainWindow.webContents) return;
+
     if (context === "main") {
       if (mainWindow && ytmView.webContents.isFocused()) {
         mainWindow.webContents.focus();
@@ -1226,13 +1262,17 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("ytmView:navigateDefault", () => {
+  ipcMain.on("ytmView:navigateDefault", (event) => {
     if (ytmView) {
+      if (event.sender !== mainWindow.webContents) return;
+
       ytmView.webContents.loadURL("https://music.youtube.com/");
     }
   });
 
-  ipcMain.on("ytmView:recreate", () => {
+  ipcMain.on("ytmView:recreate", (event) => {
+    if (event.sender !== mainWindow.webContents) return;
+
     if (ytmView) {
       if (mainWindow) {
         mainWindow.removeBrowserView(ytmView);
@@ -1246,29 +1286,40 @@ app.on("ready", () => {
 
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     memoryStore.set(key, value);
   });
 
   ipcMain.handle("memoryStore:get", (event, key: string) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     return memoryStore.get(key);
   });
 
   // Handle settings store ipc
   ipcMain.on("settings:set", (event, key: string, value?: string) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     store.set(key, value);
   });
 
   ipcMain.handle("settings:get", (event, key: string) => {
+    if (event.sender !== mainWindow?.webContents && event.sender !== settingsWindow?.webContents && event.sender !== ytmView?.webContents) return;
+
     return store.get(key);
   });
 
   ipcMain.handle("settings:reset", (event, key: keyof StoreSchema) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     store.reset(key);
   });
 
   // Handle safeStorage ipc
   ipcMain.handle("safeStorage:decryptString", (event, value: string) => {
     if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
+    if (event.sender !== settingsWindow.webContents) return;
 
     if (value) {
       return safeStorage.decryptString(Buffer.from(value, "hex"));
@@ -1279,26 +1330,36 @@ app.on("ready", () => {
 
   ipcMain.handle("safeStorage:encryptString", (event, value: string) => {
     if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
+    if (event.sender !== settingsWindow.webContents) return;
+
     return safeStorage.encryptString(value).toString("hex");
   });
 
   // Handle app ipc
-  ipcMain.handle("app:getVersion", () => {
+  ipcMain.handle("app:getVersion", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     return app.getVersion();
   });
 
-  ipcMain.on("app:checkForUpdates", () => {
+  ipcMain.on("app:checkForUpdates", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     // autoUpdater downloads automatically and calling checkForUpdates causes duplicate install
     if (!appUpdateAvailable || !appUpdateDownloaded) {
       autoUpdater.checkForUpdates();
     }
   });
 
-  ipcMain.handle("app:isUpdateAvailable", () => {
+  ipcMain.handle("app:isUpdateAvailable", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     return appUpdateAvailable;
   });
 
-  ipcMain.handle("app:isUpdateDownloaded", () => {
+  ipcMain.handle("app:isUpdateDownloaded", (event) => {
+    if (event.sender !== settingsWindow.webContents) return;
+
     return appUpdateDownloaded;
   });
 
