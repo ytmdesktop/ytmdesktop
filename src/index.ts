@@ -1395,7 +1395,11 @@ app.on("ready", () => {
   tray.setContextMenu(trayContextMenu);
   tray.on("click", () => {
     if (mainWindow) {
-      mainWindow.show();
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      } else {
+        mainWindow.show();
+      }
     }
   });
 
