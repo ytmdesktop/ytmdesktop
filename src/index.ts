@@ -620,7 +620,7 @@ function registerShortcuts() {
   if (shortcuts.thumbsUp) {
     const registered = globalShortcut.register(shortcuts.thumbsUp, () => {
       if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "thumbsUp");
+        ytmView.webContents.send("remoteControl:execute", "toggleLike");
       }
     });
 
@@ -636,7 +636,7 @@ function registerShortcuts() {
   if (shortcuts.thumbsDown) {
     const registered = globalShortcut.register(shortcuts.thumbsDown, () => {
       if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "thumbsDown");
+        ytmView.webContents.send("remoteControl:execute", "toggleDislike");
       }
     });
 

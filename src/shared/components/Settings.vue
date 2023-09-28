@@ -446,14 +446,28 @@ window.ytmd.handleUpdateDownloaded(() => {
             </p>
             <KeybindInput v-model="shortcutPrevious" @change="settingsChanged" />
           </div>
-          <!--<div class="setting">
-            <p>Thumbs Up</p>
-            <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
-          </div> 
           <div class="setting">
-            <p>Thumbs Down</p>
+            <p class="shortcut-title">
+              Thumbs Up<span
+                v-if="shortcutsThumbsUpRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Thumbs Down<span
+                v-if="shortcutsThumbsDownRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
             <KeybindInput v-model="shortcutThumbsDown" @change="settingsChanged" />
-          </div>-->
+          </div>
           <div class="setting">
             <p class="shortcut-title">
               Increase Volume<span
@@ -503,12 +517,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p v-if="updateNotAvailable" class="no-update">Update not available</p>
           </template>
           <template v-if="autoUpdaterDisabled">
-            <button
-              disabled
-              class="update-check-button"
-            >
-              <span class="material-symbols-outlined">update</span>Check for updates
-            </button>
+            <button disabled class="update-check-button"><span class="material-symbols-outlined">update</span>Check for updates</button>
             <p class="no-auto-updater">Auto updater unavailable for your system at this time</p>
           </template>
           <span class="version-info">
