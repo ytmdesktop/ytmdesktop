@@ -30,22 +30,12 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Publish Dry (x64)
         run: yarn publish:dry
 
       - name: Publish From Dry (x64)
-        run: yarn publish:fromdry
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Publish Dry (arm64)
-        if: matrix.os.image == 'macos-latest'
-        run: yarn publish:dry --arch arm64
-
-      - name: Publish From Dry (arm64)
-        if: matrix.os.image == 'macos-latest'
         run: yarn publish:fromdry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

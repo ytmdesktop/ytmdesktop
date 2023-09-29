@@ -15,6 +15,8 @@ import { StoreSchema } from "../shared/store/schema";
 import playerBarControlsScript from "./scripts/playerbarcontrols.script";
 import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script";
 import getPlaylistsScript from "./scripts/getplaylists.script";
+import toggleLikeScript from "./scripts/togglelike.script";
+import toggleDislikeScript from "./scripts/toggledislike.script";
 
 const store = new Store<StoreSchema>();
 
@@ -23,7 +25,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: unknown, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
   sendAdState: (adRunning: boolean) => ipcRenderer.send("ytmView:adStateChanged", adRunning),
-  sendStoreUpdate: (queueState: unknown) => ipcRenderer.send("ytmView:storeStateChanged", queueState),
+  sendStoreUpdate: (queueState: unknown, album: unknown, likeStatus: string) => ipcRenderer.send("ytmView:storeStateChanged", queueState, album, likeStatus),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
@@ -183,7 +185,7 @@ function getYTMTextRun(runs: { text: string }[]) {
 
 window.addEventListener("load", async () => {
   if (window.location.hostname !== "music.youtube.com") {
-    if (window.location.hostname === "consent.youtube.com") {
+    if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
     }
     return;
@@ -224,38 +226,40 @@ window.addEventListener("load", async () => {
 
   if (continueWhereYouLeftOff) {
     // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
-    if (!state.lastUrl.startsWith("https://music.youtube.com/watch") && state.lastVideoId) {
-      // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
-      let heightTransitionCount = 0;
-      const transitionEnd = (e: TransitionEvent) => {
-        if (e.target === document.querySelector("ytmusic-player-bar")) {
-          if (e.propertyName === "height") {
-            webFrame.executeJavaScript(`
-              {
-                document.querySelector("ytmusic-popup-container").refitPopups_();
+    if (!state.lastUrl.startsWith("https://music.youtube.com/watch")) {
+      if (state.lastVideoId) {
+        // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
+        let heightTransitionCount = 0;
+        const transitionEnd = (e: TransitionEvent) => {
+          if (e.target === document.querySelector("ytmusic-player-bar")) {
+            if (e.propertyName === "height") {
+              webFrame.executeJavaScript(`
+                {
+                  document.querySelector("ytmusic-popup-container").refitPopups_();
+                }
+              `)
+              heightTransitionCount++;
+              if (heightTransitionCount >= 2) {
+                document.querySelector("ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
               }
-            `)
-            heightTransitionCount++;
-            if (heightTransitionCount >= 2) {
-              document.querySelector("ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
             }
           }
         }
-      }
-      document.querySelector("ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+        document.querySelector("ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
 
-      document.dispatchEvent(
-        new CustomEvent("yt-navigate", {
-          detail: {
-            endpoint: {
-              watchEndpoint: {
-                videoId: state.lastVideoId,
-                playlistId: state.lastPlaylistId
+        document.dispatchEvent(
+          new CustomEvent("yt-navigate", {
+            detail: {
+              endpoint: {
+                watchEndpoint: {
+                  videoId: state.lastVideoId,
+                  playlistId: state.lastPlaylistId
+                }
               }
             }
-          }
-        })
-      );
+          })
+        );
+      }
     } else {
       webFrame.executeJavaScript(`
         {
@@ -317,13 +321,15 @@ window.addEventListener("load", async () => {
         break;
       }
 
-      case "thumbsUp":
-        // TODO
+      case "toggleLike": {
+        webFrame.executeJavaScript(toggleLikeScript);
         break;
+      }
 
-      case "thumbsDown":
-        // TODO
+      case "toggleDislike": {
+        webFrame.executeJavaScript(toggleDislikeScript);
         break;
+      }
 
       case "volumeUp": {
         const currentVolumeUp: number = await webFrame.executeJavaScript(`

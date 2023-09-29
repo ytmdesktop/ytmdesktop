@@ -32,7 +32,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Build (${{ matrix.arch }})
         # if: matrix.os.image == 'macos-latest'

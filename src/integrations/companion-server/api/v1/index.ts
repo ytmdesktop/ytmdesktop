@@ -42,6 +42,8 @@ const transformPlayerState = (state: PlayerState) => {
           channelId: state.videoDetails.channelId,
           title: state.videoDetails.title,
           album: state.videoDetails.album,
+          albumId: state.videoDetails.albumId,
+          likeStatus: state.videoDetails.likeStatus,
           thumbnails: state.videoDetails.thumbnails,
           durationSeconds: state.videoDetails.durationSeconds,
           id: state.videoDetails.id
@@ -178,6 +180,16 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           ytmView.webContents.send("remoteControl:execute", "playQueueIndex", index);
           break;
         }
+
+        case "toggleLike": {
+          ytmView.webContents.send("remoteControl:execute", "toggleLike");
+          break;
+        }
+
+        case "toggleDislike": {
+          ytmView.webContents.send("remoteControl:execute", "toggleDislike");
+          break;
+        }
       }
     }
   };
@@ -309,12 +321,16 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         let promiseResolve: (value: boolean | PromiseLike<boolean>) => void;
         let promiseInterval: string | number | NodeJS.Timeout;
 
-        const resultListener = (_event: Electron.IpcMainEvent, authorized: boolean) => {
+        const resultListener = (event: Electron.IpcMainEvent, authorized: boolean) => {
+          if (event.sender !== authorizationWindow.webContents) return;
+
           clearInterval(promiseInterval);
           promiseResolve(authorized);
         };
 
-        const closeListener = () => {
+        const closeListener = (event: Electron.IpcMainEvent) => {
+          if (event && event.sender !== authorizationWindow.webContents) return;
+
           clearInterval(promiseInterval);
           promiseResolve(false);
         };
@@ -336,7 +352,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
           ipcMain.once(`companionAuthorization:result:${requestId}`, resultListener);
           ipcMain.once(`companionWindow:close:${requestId}`, closeListener);
-          authorizationWindow.once("closed", () => {authorizationWindowClosed = true; closeListener()});
+          authorizationWindow.once("closed", () => {authorizationWindowClosed = true; closeListener(null)});
         });
 
         if (!authorizationWindowClosed) {
@@ -389,7 +405,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       if (ytmView) {
         const requestId = crypto.randomUUID();
 
-        const playlistsResponseListener = (_event: Electron.IpcMainEvent, playlists: Playlist[]) => {
+        const playlistsResponseListener = (event: Electron.IpcMainEvent, playlists: Playlist[]) => {
+          if (event.sender !== ytmView.webContents) return;
           response.send(playlists);
         };
         ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
@@ -478,12 +495,18 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     };
     playerStateStore.addEventListener(stateStoreListener);
 
-    const createPlaylistObservedListener = (_event: Electron.IpcMainEvent, playlist: Playlist) => {
+    const createPlaylistObservedListener = (event: Electron.IpcMainEvent, playlist: Playlist) => {
+      const ytmView = options.getYtmView();
+      if (event.sender !== ytmView.webContents) return;
+
       fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
     };
     ipcMain.on("ytmView:createPlaylistObserved", createPlaylistObservedListener);
 
-    const deletePlaylistObservedListener = (_event: Electron.IpcMainEvent, playlistId: string) => {
+    const deletePlaylistObservedListener = (event: Electron.IpcMainEvent, playlistId: string) => {
+      const ytmView = options.getYtmView();
+      if (event.sender !== ytmView.webContents) return;
+
       fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
     };
     ipcMain.on("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
