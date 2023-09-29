@@ -46,7 +46,10 @@ function isDisallowedKey(key: string) {
     key === "MediaTrackPrevious" ||
     key === "MediaTrackNext" ||
     key === "MediaStop" ||
-    key === "Tab"
+    key === "Tab" ||
+    key === "AudioVolumeUp" ||
+    key === "AudioVolumeDown" ||
+    key === "AudioVolumeMute"
   );
 }
 
