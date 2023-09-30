@@ -3,22 +3,23 @@ export type StoreSchema = {
     version: 1
   }
   general: {
+    disableHardwareAcceleration: boolean;
     hideToTrayOnClose: boolean;
     showNotificationOnSongChange: boolean;
     startOnBoot: boolean;
     startMinimized: boolean;
-    disableHardwareAcceleration: boolean;
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
     customCSSEnabled: boolean;
     customCSSPath: string | null;
+    zoom: number;
   };
   playback: {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
-    progressInTaskbar: boolean;
     enableSpeakerFill: boolean;
+    progressInTaskbar: boolean;
     ratioVolume: boolean;
   };
   integrations: {
@@ -39,8 +40,8 @@ export type StoreSchema = {
   };
   state: {
     lastUrl: string;
-    lastVideoId: string;
     lastPlaylistId: string;
+    lastVideoId: string;
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
   };

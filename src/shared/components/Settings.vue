@@ -34,20 +34,21 @@ const integrations: StoreSchema["integrations"] = await store.get("integrations"
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
 
+const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
 const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
-const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
 const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
 const customCSSPath = ref<string>(appearance.customCSSPath);
+const zoom = ref<number>(appearance.zoom);
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
-const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
+const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
@@ -69,20 +70,21 @@ const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 
 store.onDidAnyChange(async newState => {
+  disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
   hideToTrayOnClose.value = newState.general.hideToTrayOnClose;
   showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
   startOnBoot.value = newState.general.startOnBoot;
   startMinimized.value = newState.general.startMinimized;
-  disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
 
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
   customCSSEnabled.value = newState.appearance.customCSSEnabled;
   customCSSPath.value = newState.appearance.customCSSPath;
+  zoom.value = newState.appearance.zoom;
 
   continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
-  progressInTaskbar.value = newState.playback.progressInTaskbar;
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
+  progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
@@ -147,6 +149,7 @@ async function settingsChanged() {
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
   store.set("appearance.customCSSEnabled", customCSSEnabled.value);
+  store.set("appearance.zoom", zoom.value);
 
   store.set("playback.continueWhereYouLeftOff", continueWhereYouLeftOff.value);
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
@@ -306,6 +309,13 @@ window.ytmd.handleUpdateDownloaded(() => {
                 <input type="text" readonly :title="customCSSPath" class="path" placeholder="No file chosen" :value="customCSSPath" />
                 <button v-if="customCSSPath" class="remove" @click="removeCustomCSSPath"><span class="material-symbols-outlined">delete</span></button>
               </div>
+            </div>
+          </div>
+          <div class="setting">
+            <p>Zoom</p>
+            <div class="range-selector">
+              <span class="range-value">{{ zoom }}</span>
+              <input v-model="zoom" class="range" type="range" max="300" min="30" step="10" @change="settingsChanged"  />
             </div>
           </div>
         </div>
@@ -658,6 +668,29 @@ window.ytmd.handleUpdateDownloaded(() => {
 
 .toggle:checked:before {
   left: 32px;
+}
+
+.range {
+  -webkit-appearance: none;
+  height: 15px;
+  border-radius: 5px;  
+  background: #212121;
+  outline: none;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; 
+  background: #F44336;
+  cursor: pointer;
+}
+
+.range-value {
+  vertical-align: top;
+  margin-right: 8px;
 }
 
 .reload-required {
