@@ -33,7 +33,8 @@ const config: ForgeConfig = {
           'AudioVideo',
           'Audio',
         ],
-        mimeType: ["x-scheme-handler/ytmd"]
+        mimeType: ["x-scheme-handler/ytmd"],
+        icon: "./src/assets/icons/ytmd.png"
       },
     }),
     new MakerDeb({
@@ -44,6 +45,7 @@ const config: ForgeConfig = {
         ],
         mimeType: ["x-scheme-handler/ytmd"],
         section: 'sound',
+        icon: "./src/assets/icons/ytmd.png"
       }
     })
   ],
