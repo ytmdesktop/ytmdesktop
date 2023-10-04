@@ -15,6 +15,8 @@ jobs:
             { name: 'windows', image: 'windows-latest' },
             { name: 'macos',   image: 'macos-latest' },
           ]
+        arch: [ 'x64', 'arm64' ]
+      fail-fast: true # Explicitly failing fast because this is a publish. We want to bail the entire release if something went wrong with another build
 
     runs-on: ${{ matrix.os.image }}
 
@@ -32,10 +34,10 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
 
-      - name: Publish Dry (x64)
-        run: yarn publish:dry
+      - name: Publish Dry (${{ matrix.arch }})
+        run: yarn publish:dry --arch ${{ matrix.arch }}
 
-      - name: Publish From Dry (x64)
+      - name: Publish From Dry (${{ matrix.arch }})
         run: yarn publish:fromdry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
