@@ -925,7 +925,36 @@ const createYTMView = (): void => {
     store.set("state.lastPlaylistId", lastPlaylistId);
     createYTMView();
   });
-
+  ytmView.webContents.on("context-menu", (_event, params) => {
+    if (store.get("developer.enableDevTools")) {
+      Menu.buildFromTemplate([
+        {
+          label: "YouTube Music Desktop",
+          type: "normal",
+          enabled: false
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: "Open Developer Tools",
+          type: "normal",
+          click: () => {
+            if (ytmView) {
+              ytmView.webContents.openDevTools({
+                mode: "detach"
+              })
+            }
+          }
+        },
+      ]).popup({
+        window: mainWindow,
+        x: params.x,
+        y: params.y,
+        sourceType: params.menuSourceType
+      })
+    }
+  })
   ytmView.webContents.on("will-prevent-unload", event => {
     if (mainWindow) {
       if (!applicationQuitting) {
