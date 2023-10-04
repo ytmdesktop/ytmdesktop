@@ -925,6 +925,11 @@ const createYTMView = (): void => {
     store.set("state.lastPlaylistId", lastPlaylistId);
     createYTMView();
   });
+  ytmView.webContents.on("page-title-updated", (_event, title) => {
+    if (mainWindow) {
+      mainWindow.setTitle(`${title} | YouTube Music Desktop App`);
+    }
+  });
   ytmView.webContents.on("context-menu", (_event, params) => {
     if (store.get("developer.enableDevTools")) {
       Menu.buildFromTemplate([
