@@ -14,5 +14,6 @@ export const mainConfig: Configuration = {
   },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".json"]
-  }
+  },
+  devtool: process.env.NODE_ENV === "development" ? "eval-source-map" : false
 };

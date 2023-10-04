@@ -66,5 +66,6 @@ export const rendererConfig: Configuration = {
   ],
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css"]
-  }
+  },
+  devtool: process.env.NODE_ENV === "development" ? "eval-source-map" : false
 };
