@@ -3,6 +3,7 @@ import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
+import { MakerFlatpak } from "@electron-forge/maker-flatpak";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 import { ElectronegativityPlugin } from "@electron-forge/plugin-electronegativity";
 
@@ -11,7 +12,7 @@ import { rendererConfig } from "./webpack.renderer.config";
 
 const config: ForgeConfig = {
   packagerConfig: {
-    executableName: 'youtube-music-desktop-app',
+    executableName: "youtube-music-desktop-app",
     icon: "./src/assets/icons/ytmd",
     extraResource: ["./src/assets/icons"],
     protocols: [
@@ -20,8 +21,7 @@ const config: ForgeConfig = {
         schemes: ["ytmd"]
       }
     ],
-    appCategoryType: 'public.app-category.music',
-
+    appCategoryType: "public.app-category.music"
   },
   rebuildConfig: {},
   makers: [
@@ -29,23 +29,58 @@ const config: ForgeConfig = {
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({
       options: {
-        categories: [
-          'AudioVideo',
-          'Audio',
-        ],
+        categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
         icon: "./src/assets/icons/ytmd.png"
-      },
+      }
     }),
     new MakerDeb({
       options: {
-        categories: [
-          'AudioVideo',
-          'Audio',
-        ],
+        categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
-        section: 'sound',
+        section: "sound",
         icon: "./src/assets/icons/ytmd.png"
+      }
+    }),
+    new MakerFlatpak({
+      options: {
+        id: "app.ytmdesktop.ytmdesktop",
+        categories: ["AudioVideo", "Audio"],
+        mimeType: ["x-scheme-handler/ytmd"],
+        files: [],
+        baseVersion: "22.08",
+        runtimeVersion: "22.08",
+        modules: [
+          {
+            name: "zypak",
+            sources: [
+              {
+                type: "git",
+                url: "https://github.com/refi64/zypak",
+                tag: "v2022.04"
+              }
+            ]
+          }
+        ],
+        finishArgs: [
+          // X Rendering
+          "--socket=x11",
+          "--share=ipc",
+          // OpenGL
+          "--device=dri",
+          // Audio output
+          "--socket=pulseaudio",
+          // Read/write home directory access
+          "--filesystem=home",
+          // Chromium uses a socket in tmp for its singleton check
+          "--env=TMPDIR=/var/tmp",
+          // Allow communication with network
+          "--share=network",
+          // System notifications with libnotify
+          "--talk-name=org.freedesktop.Notifications",
+          // MPRIS (Chromium uses chromium.instance{PID})
+          "--own-name=org.mpris.MediaPlayer2.chromium.*",
+        ]
       }
     })
   ],
