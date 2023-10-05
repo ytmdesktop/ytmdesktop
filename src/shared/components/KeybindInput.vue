@@ -76,6 +76,7 @@ function validateKey(event: KeyboardEvent) {
   if (event.code === "ArrowDown") return "Down";
   if (event.code === "ArrowLeft") return "Left";
   if (event.code === "ArrowRight") return "Right";
+  if (event.shiftKey && event.code === "Equal") return "Plus";
   if (event.keyCode >= 65 && event.keyCode <= 90) return event.key.toUpperCase();
 
   return event.key;
