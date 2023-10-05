@@ -31,6 +31,10 @@ jobs:
           cache: 'yarn'
           node-version: 18
 
+      - name: Setup Flatpak
+        if: matrix.os.image == 'ubuntu-latest'
+        run: sudo apt-get install -y flatpak-builder
+
       - name: Install dependencies
         run: yarn --immutable
 
