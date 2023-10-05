@@ -315,7 +315,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             <p>Zoom</p>
             <div class="range-selector">
               <span class="range-value">{{ zoom }}</span>
-              <input v-model="zoom" class="range" type="range" max="300" min="30" step="10" @change="settingsChanged"  />
+              <input v-model.number="zoom" class="range" type="range" max="300" min="30" step="10" @change="settingsChanged"  />
             </div>
           </div>
         </div>

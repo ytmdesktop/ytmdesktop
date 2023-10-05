@@ -1363,7 +1363,7 @@ app.on("ready", () => {
   })
 
   // Handle memory store ipc
-  ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {
+  ipcMain.on("memoryStore:set", (event, key: string, value?: unknown) => {
     if ((settingsWindow && event.sender !== settingsWindow.webContents) && event.sender !== mainWindow.webContents) return;
 
     memoryStore.set(key, value);
@@ -1376,7 +1376,7 @@ app.on("ready", () => {
   });
 
   // Handle settings store ipc
-  ipcMain.on("settings:set", (event, key: string, value?: string) => {
+  ipcMain.on("settings:set", (event, key: string, value?: unknown) => {
     if ((settingsWindow && event.sender !== settingsWindow.webContents)) return;
 
     store.set(key, value);
