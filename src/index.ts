@@ -203,6 +203,10 @@ if (!app.isDefaultProtocolClient("ytmd")) {
 // Create the in-memory store for state within the UI
 const memoryStore = new MemoryStore<MemoryStoreSchema>();
 memoryStore.onStateChanged((newState, oldState) => {
+  if (mainWindow !== null) {
+    mainWindow.webContents.send("memoryStore:stateChanged", newState, oldState);
+  }
+
   if (settingsWindow !== null) {
     settingsWindow.webContents.send("memoryStore:stateChanged", newState, oldState);
   }
@@ -836,6 +840,8 @@ function urlIsGoogleAccountsDomain(url: URL): boolean {
 
 const createYTMView = (): void => {
   memoryStore.set("ytmViewLoadTimedout", false);
+  memoryStore.set("ytmViewLoading", true);
+  memoryStore.set("ytmViewLoadingStatus", "Initializing...");
 
   ytmView = new BrowserView({
     webPreferences: {
@@ -849,24 +855,6 @@ const createYTMView = (): void => {
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
-
-  let navigateDefault = true;
-
-  const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
-  if (continueWhereYouLeftOff) {
-    const lastUrl: string = store.get("state.lastUrl");
-    if (lastUrl) {
-      if (lastUrl.startsWith("https://music.youtube.com/")) {
-        ytmView.webContents.loadURL(lastUrl);
-        navigateDefault = false;
-      }
-    }
-  }
-
-  if (navigateDefault) {
-    ytmView.webContents.loadURL("https://music.youtube.com/");
-    store.set("state.lastUrl", "https://music.youtube.com/");
-  }
 
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
@@ -991,6 +979,44 @@ const createYTMView = (): void => {
       action: "deny"
     };
   });
+
+  // Loading status event handlers
+  ytmView.webContents.on("did-start-loading", () => {
+    memoryStore.set("ytmViewLoadingStatus", "Loading YouTube Music...");
+  });
+
+  ytmView.webContents.on("did-stop-loading", () => {
+    memoryStore.set("ytmViewLoadingStatus", "Loaded YouTube Music");
+  });
+
+  ytmView.webContents.on("did-fail-load", (_event, errorCode, errorDescription, _validatedURL, isMainFrame) => {
+    if (isMainFrame) {
+      if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+
+      memoryStore.set("ytmViewLoadingError", true);
+      memoryStore.set("ytmViewLoadingStatus", `Failed to load YouTube Music: ${errorDescription} (${errorCode})`);
+    }
+  });
+
+  memoryStore.set("ytmViewLoadingStatus", "Initialized");
+
+  let navigateDefault = true;
+
+  const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
+  if (continueWhereYouLeftOff) {
+    const lastUrl: string = store.get("state.lastUrl");
+    if (lastUrl) {
+      if (lastUrl.startsWith("https://music.youtube.com/")) {
+        ytmView.webContents.loadURL(lastUrl);
+        navigateDefault = false;
+      }
+    }
+  }
+
+  if (navigateDefault) {
+    ytmView.webContents.loadURL("https://music.youtube.com/");
+    store.set("state.lastUrl", "https://music.youtube.com/");
+  }
 
   ytmViewLoadTimeout = setTimeout(() => {
     memoryStore.set("ytmViewLoadTimedout", true);
@@ -1240,7 +1266,8 @@ app.on("ready", () => {
   ipcMain.on("ytmView:loaded", (event) => {
     if (ytmView !== null && mainWindow !== null) {
       if (event.sender !== ytmView.webContents) return;
-
+      
+      memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
       ytmView.setBounds({
@@ -1337,26 +1364,26 @@ app.on("ready", () => {
 
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: string) => {
-    if (event.sender !== settingsWindow.webContents) return;
+    if ((settingsWindow && event.sender !== settingsWindow.webContents) && event.sender !== mainWindow.webContents) return;
 
     memoryStore.set(key, value);
   });
 
   ipcMain.handle("memoryStore:get", (event, key: string) => {
-    if (event.sender !== settingsWindow.webContents) return;
+    if ((settingsWindow && event.sender !== settingsWindow.webContents)) return;
 
     return memoryStore.get(key);
   });
 
   // Handle settings store ipc
   ipcMain.on("settings:set", (event, key: string, value?: string) => {
-    if (event.sender !== settingsWindow.webContents) return;
+    if ((settingsWindow && event.sender !== settingsWindow.webContents)) return;
 
     store.set(key, value);
   });
 
   ipcMain.handle("settings:get", (event, key: string) => {
-    if (event.sender !== mainWindow?.webContents && event.sender !== settingsWindow?.webContents && event.sender !== ytmView?.webContents) return;
+    if ((mainWindow && event.sender !== mainWindow.webContents) && (settingsWindow && event.sender !== settingsWindow.webContents) && (ytmView && event.sender !== ytmView.webContents)) return;
 
     return store.get(key);
   });

@@ -69,4 +69,7 @@ export type MemoryStoreSchema = {
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;
   ytmViewLoadTimedout: boolean;
+  ytmViewLoading: boolean;
+  ytmViewLoadingError: boolean;
+  ytmViewLoadingStatus: string;
 };

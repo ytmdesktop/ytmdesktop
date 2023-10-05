@@ -4,7 +4,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { WindowsEventArguments } from "../../shared/types";
 import { MemoryStoreSchema } from "../../shared/store/schema";
-import MemoryStore from "../../memory-store";
+import MemoryStore from "../../shared/memory-store/renderer";
 
 const memoryStore = new MemoryStore<MemoryStoreSchema>();
 
