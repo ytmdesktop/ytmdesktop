@@ -42,6 +42,7 @@ function isDisallowedKey(key: string) {
     key === "Alt" ||
     key === "Shift" ||
     key === "AltGraph" ||
+    key === "Pause" ||
     key === "MediaPlayPause" ||
     key === "MediaTrackPrevious" ||
     key === "MediaTrackNext" ||
