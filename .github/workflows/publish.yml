@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Github checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node (v18)
         uses: actions/setup-node@v3
