@@ -166,7 +166,7 @@ export default class DiscordPresence implements IIntegration {
         });
       }
 
-      if (state.trackState === VideoState.Buffering || state.trackState === VideoState.Paused) {
+      if (state.trackState === VideoState.Buffering || state.trackState === VideoState.Paused || state.trackState === VideoState.Unknown) {
         if (this.pauseTimeout) {
           clearTimeout(this.pauseTimeout);
           this.pauseTimeout = null;
