@@ -987,6 +987,12 @@ const createYTMView = (): void => {
 
     event.preventDefault();
   });
+  ytmView.webContents.on("unresponsive", () => {
+    memoryStore.set("ytmViewUnresponsive", true);
+  });
+  ytmView.webContents.on("responsive", () => {
+    memoryStore.set("ytmViewUnresponsive", false);
+  });
 
   ytmView.webContents.setWindowOpenHandler(details => {
     openExternalFromYtmView(details.url);

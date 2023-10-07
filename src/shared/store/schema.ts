@@ -72,4 +72,5 @@ export type MemoryStoreSchema = {
   ytmViewLoading: boolean;
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
+  ytmViewUnresponsive: boolean;
 };

@@ -5,7 +5,9 @@ import Settings from "../../shared/components/Settings.vue";
 
 <template>
   <div class="container">
-    <TitleBar class="titlebar" title="Settings" icon="settings" />
+    <Suspense>
+      <TitleBar class="titlebar" title="Settings" icon="settings" />
+    </Suspense>
     <Suspense>
       <Settings class="settings" />
     </Suspense>

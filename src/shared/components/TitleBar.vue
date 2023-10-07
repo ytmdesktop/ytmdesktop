@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     default: null
@@ -18,7 +18,11 @@ defineProps({
   hasSettingsButton: Boolean,
   hasMinimizeButton: Boolean,
   hasMaximizeButton: Boolean,
-  centerTitleText: Boolean
+  centerTitleText: Boolean,
+  isMainWindow: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const minimizeWindow = window.ytmd.minimizeWindow;
@@ -41,6 +45,18 @@ window.ytmd.handleWindowEvents((event, state) => {
 window.navigator.windowControlsOverlay.addEventListener("geometrychange", event => {
   wcoVisible.value = event.visible;
 });
+
+const ytmViewUnresponsive = ref<boolean>(false);
+
+if (props.isMainWindow) {
+  const memoryStore = window.ytmd.memoryStore;
+
+  ytmViewUnresponsive.value = await memoryStore.get("ytmViewUnresponsive") ?? false;
+
+  memoryStore.onStateChanged(newState => {
+    ytmViewUnresponsive.value = newState.ytmViewUnresponsive;
+  });
+}
 </script>
 
 <template>
@@ -49,11 +65,11 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
       <div class="title">
         <span v-if="icon" class="icon material-symbols-outlined">{{ icon }}</span>
         <img v-if="iconFile" class="icon" :src="iconFile" />
-        <p v-if="title && !centerTitleText" class="title-text">{{ title }}</p>
+        <p v-if="title && !centerTitleText" class="title-text">{{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}</p>
       </div>
     </div>
     <div v-if="title && centerTitleText" class="center">
-      <p class="title-text">{{ title }}</p>
+      <p class="title-text">{{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}</p>
     </div>
     <div class="right">
       <div class="app-buttons">
