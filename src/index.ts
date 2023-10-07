@@ -265,6 +265,18 @@ if (process.platform !== "darwin") {
   memoryStore.set("autoUpdaterDisabled", true);
 }
 
+function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema>) {
+  if (newState.shortcuts.next !== oldState.shortcuts.next) return true;
+  if (newState.shortcuts.playPause !== oldState.shortcuts.playPause) return true;
+  if (newState.shortcuts.previous !== oldState.shortcuts.previous) return true;
+  if (newState.shortcuts.thumbsDown !== oldState.shortcuts.thumbsDown) return true;
+  if (newState.shortcuts.thumbsUp !== oldState.shortcuts.thumbsUp) return true;
+  if (newState.shortcuts.volumeDown !== oldState.shortcuts.volumeDown) return true;
+  if (newState.shortcuts.volumeUp !== oldState.shortcuts.volumeUp) return true;
+
+  return false;
+}
+
 // Create the persistent config store
 const store = new ElectronStore<StoreSchema>({
   watch: true,
@@ -462,7 +474,7 @@ store.onDidAnyChange(async (newState, oldState) => {
     log.info("Integration disabled: Last.fm");
   }
 
-  registerShortcuts();
+  if (anyShortcutChanged(newState, oldState)) registerShortcuts();
 });
 log.info("Created electron store");
 
