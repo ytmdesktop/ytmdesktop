@@ -120,6 +120,10 @@ if (require("electron-squirrel-startup")) {
 
 log.info("Application launched");
 
+// Disabling the application menu improves performance, but we're disabling it to patch out default hotkeys for now
+// TODO: Come back to this at a future point in time to determine the necessary need for an application menu
+Menu.setApplicationMenu(null)
+
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
 const discordPresence = new DiscordPresence();
