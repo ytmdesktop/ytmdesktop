@@ -46,15 +46,22 @@ window.navigator.windowControlsOverlay.addEventListener("geometrychange", event 
   wcoVisible.value = event.visible;
 });
 
+function restartApplicationForUpdate() {
+  window.ytmd.restartApplicationForUpdate();
+}
+
 const ytmViewUnresponsive = ref<boolean>(false);
+const appUpdateDownloaded = ref<boolean>(false);
 
 if (props.isMainWindow) {
   const memoryStore = window.ytmd.memoryStore;
 
   ytmViewUnresponsive.value = await memoryStore.get("ytmViewUnresponsive") ?? false;
+  appUpdateDownloaded.value = await memoryStore.get("appUpdateDownloaded") ?? false;
 
   memoryStore.onStateChanged(newState => {
     ytmViewUnresponsive.value = newState.ytmViewUnresponsive;
+    appUpdateDownloaded.value = newState.appUpdateDownloaded;
   });
 }
 </script>
@@ -72,27 +79,32 @@ if (props.isMainWindow) {
       <p class="title-text">{{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}</p>
     </div>
     <div class="right">
+      <div v-if="isMainWindow" class="update-buttons">
+        <button v-if="appUpdateDownloaded" class="app-button update-button" tabindex="1" title="Update ready! Click to restart" @click="restartApplicationForUpdate">
+          <span class="material-symbols-outlined">upgrade</span>
+        </button>
+      </div>
       <div class="app-buttons">
         <slot name="app-buttons"></slot>
-        <button v-if="hasHomeButton" class="app-button" tabindex="1" @click="navigateToDefault">
+        <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
           <span class="material-symbols-outlined">home</span>
         </button>
         <span class="divider"></span>
-        <button v-if="hasSettingsButton" class="app-button" tabindex="1" @click="openSettingsWindow">
+        <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
       <div v-if="!wcoVisible" class="windows-action-buttons">
-        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="2" @click="minimizeWindow">
+        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="4" @click="minimizeWindow">
           <span class="material-symbols-outlined">remove</span>
         </button>
-        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="3" @click="maximizeWindow">
+        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="5" @click="maximizeWindow">
           <span class="material-symbols-outlined">square</span>
         </button>
-        <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="4" @click="restoreWindow">
+        <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="6" @click="restoreWindow">
           <span class="material-symbols-outlined">filter_none</span>
         </button>
-        <button class="action-button window-close" tabindex="5" @click="closeWindow">
+        <button class="action-button window-close" tabindex="7" @click="closeWindow">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -239,5 +251,10 @@ if (props.isMainWindow) {
 
 .window-close:hover {
   background-color: #e81123;
+}
+
+.update-button {
+  color: #F44336;
+  margin-right: 24px;
 }
 </style>

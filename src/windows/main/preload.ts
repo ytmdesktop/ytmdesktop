@@ -24,4 +24,5 @@ contextBridge.exposeInMainWorld("ytmd", {
     get: async (key: keyof MemoryStoreSchema) => await memoryStore.get(key),
     onStateChanged: (callback: (newState: MemoryStoreSchema, oldState: MemoryStoreSchema) => void) => memoryStore.onStateChanged(callback)
   },
+  restartApplicationForUpdate: () => ipcRenderer.send("app:restartApplicationForUpdate"),
 });

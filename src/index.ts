@@ -240,6 +240,7 @@ if (process.platform !== "darwin") {
   });
   autoUpdater.on("update-available", () => {
     log.info("Application update available");
+    memoryStore.set("appUpdateAvailable", true);
     appUpdateAvailable = true;
     if (settingsWindow) {
       settingsWindow.webContents.send("app:updateAvailable");
@@ -253,6 +254,7 @@ if (process.platform !== "darwin") {
   autoUpdater.on("update-downloaded", () => {
     log.info("Application update downloaded");
     appUpdateDownloaded = true;
+    memoryStore.set("appUpdateDownloaded", true);
     if (settingsWindow) {
       settingsWindow.webContents.send("app:updateDownloaded");
     }
@@ -1280,13 +1282,6 @@ app.on("ready", () => {
     app.quit();
   });
 
-  ipcMain.on("settingsWindow:restartApplicationForUpdate", (event) => {
-    if (event.sender !== settingsWindow.webContents) return;
-
-    applicationQuitting = true;
-    autoUpdater.quitAndInstall();
-  });
-
   // Handle ytm view ipc
   ipcMain.on("ytmView:loaded", (event) => {
     if (ytmView !== null && mainWindow !== null) {
@@ -1464,6 +1459,13 @@ app.on("ready", () => {
     if (event.sender !== settingsWindow.webContents) return;
 
     return appUpdateDownloaded;
+  });
+
+  ipcMain.on("app:restartApplicationForUpdate", (event) => {
+    if ((mainWindow && event.sender !== mainWindow.webContents) && (settingsWindow && event.sender !== settingsWindow.webContents)) return;
+
+    applicationQuitting = true;
+    autoUpdater.quitAndInstall();
   });
 
   log.info("Setup IPC handlers");
