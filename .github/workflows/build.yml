@@ -46,4 +46,4 @@ jobs:
             out/make/squirrel.windows/${{ matrix.arch }}/*.exe
             out/make/deb/${{ matrix.arch }}/*.deb
             out/make/rpm/${{ matrix.arch }}/*.rpm
-            out/make/zip/darwin/${{ matrix.arch }}/*.zip
+            out/make/dmg/${{ matrix.arch }}/*.dmg
