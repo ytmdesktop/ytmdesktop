@@ -1018,7 +1018,9 @@ const createYTMView = (): void => {
   });
 
   ytmView.webContents.on("did-stop-loading", () => {
-    memoryStore.set("ytmViewLoadingStatus", "Loaded YouTube Music");
+    if (!memoryStore.get("ytmViewLoadingError")) {
+      memoryStore.set("ytmViewLoadingStatus", "Loaded YouTube Music");
+    }
   });
 
   ytmView.webContents.on("did-fail-load", (_event, errorCode, errorDescription, _validatedURL, isMainFrame) => {
