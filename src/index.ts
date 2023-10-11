@@ -125,7 +125,7 @@ app.enableSandbox();
 
 // Disabling the application menu improves performance, but we're disabling it to patch out default hotkeys for now
 // TODO: Come back to this at a future point in time to determine the necessary need for an application menu
-Menu.setApplicationMenu(null)
+Menu.setApplicationMenu(null);
 
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
@@ -394,7 +394,7 @@ store.onDidAnyChange(async (newState, oldState) => {
     }
   }
 
-  // Appearance 
+  // Appearance
   if (newState.appearance.customCSSEnabled) {
     customCss.provide(store, ytmView);
   }
@@ -858,7 +858,195 @@ const createOrShowSettingsWindow = (): void => {
 
 function urlIsGoogleAccountsDomain(url: URL): boolean {
   // https://www.google.com/supported_domains
-  const supportedDomains = [".google.com",".google.ad",".google.ae",".google.com.af",".google.com.ag",".google.al",".google.am",".google.co.ao",".google.com.ar",".google.as",".google.at",".google.com.au",".google.az",".google.ba",".google.com.bd",".google.be",".google.bf",".google.bg",".google.com.bh",".google.bi",".google.bj",".google.com.bn",".google.com.bo",".google.com.br",".google.bs",".google.bt",".google.co.bw",".google.by",".google.com.bz",".google.ca",".google.cd",".google.cf",".google.cg",".google.ch",".google.ci",".google.co.ck",".google.cl",".google.cm",".google.cn",".google.com.co",".google.co.cr",".google.com.cu",".google.cv",".google.com.cy",".google.cz",".google.de",".google.dj",".google.dk",".google.dm",".google.com.do",".google.dz",".google.com.ec",".google.ee",".google.com.eg",".google.es",".google.com.et",".google.fi",".google.com.fj",".google.fm",".google.fr",".google.ga",".google.ge",".google.gg",".google.com.gh",".google.com.gi",".google.gl",".google.gm",".google.gr",".google.com.gt",".google.gy",".google.com.hk",".google.hn",".google.hr",".google.ht",".google.hu",".google.co.id",".google.ie",".google.co.il",".google.im",".google.co.in",".google.iq",".google.is",".google.it",".google.je",".google.com.jm",".google.jo",".google.co.jp",".google.co.ke",".google.com.kh",".google.ki",".google.kg",".google.co.kr",".google.com.kw",".google.kz",".google.la",".google.com.lb",".google.li",".google.lk",".google.co.ls",".google.lt",".google.lu",".google.lv",".google.com.ly",".google.co.ma",".google.md",".google.me",".google.mg",".google.mk",".google.ml",".google.com.mm",".google.mn",".google.com.mt",".google.mu",".google.mv",".google.mw",".google.com.mx",".google.com.my",".google.co.mz",".google.com.na",".google.com.ng",".google.com.ni",".google.ne",".google.nl",".google.no",".google.com.np",".google.nr",".google.nu",".google.co.nz",".google.com.om",".google.com.pa",".google.com.pe",".google.com.pg",".google.com.ph",".google.com.pk",".google.pl",".google.pn",".google.com.pr",".google.ps",".google.pt",".google.com.py",".google.com.qa",".google.ro",".google.ru",".google.rw",".google.com.sa",".google.com.sb",".google.sc",".google.se",".google.com.sg",".google.sh",".google.si",".google.sk",".google.com.sl",".google.sn",".google.so",".google.sm",".google.sr",".google.st",".google.com.sv",".google.td",".google.tg",".google.co.th",".google.com.tj",".google.tl",".google.tm",".google.tn",".google.to",".google.com.tr",".google.tt",".google.com.tw",".google.co.tz",".google.com.ua",".google.co.ug",".google.co.uk",".google.com.uy",".google.co.uz",".google.com.vc",".google.co.ve",".google.co.vi",".google.com.vn",".google.vu",".google.ws",".google.rs",".google.co.za",".google.co.zm",".google.co.zw",".google.cat"]
+  const supportedDomains = [
+    ".google.com",
+    ".google.ad",
+    ".google.ae",
+    ".google.com.af",
+    ".google.com.ag",
+    ".google.al",
+    ".google.am",
+    ".google.co.ao",
+    ".google.com.ar",
+    ".google.as",
+    ".google.at",
+    ".google.com.au",
+    ".google.az",
+    ".google.ba",
+    ".google.com.bd",
+    ".google.be",
+    ".google.bf",
+    ".google.bg",
+    ".google.com.bh",
+    ".google.bi",
+    ".google.bj",
+    ".google.com.bn",
+    ".google.com.bo",
+    ".google.com.br",
+    ".google.bs",
+    ".google.bt",
+    ".google.co.bw",
+    ".google.by",
+    ".google.com.bz",
+    ".google.ca",
+    ".google.cd",
+    ".google.cf",
+    ".google.cg",
+    ".google.ch",
+    ".google.ci",
+    ".google.co.ck",
+    ".google.cl",
+    ".google.cm",
+    ".google.cn",
+    ".google.com.co",
+    ".google.co.cr",
+    ".google.com.cu",
+    ".google.cv",
+    ".google.com.cy",
+    ".google.cz",
+    ".google.de",
+    ".google.dj",
+    ".google.dk",
+    ".google.dm",
+    ".google.com.do",
+    ".google.dz",
+    ".google.com.ec",
+    ".google.ee",
+    ".google.com.eg",
+    ".google.es",
+    ".google.com.et",
+    ".google.fi",
+    ".google.com.fj",
+    ".google.fm",
+    ".google.fr",
+    ".google.ga",
+    ".google.ge",
+    ".google.gg",
+    ".google.com.gh",
+    ".google.com.gi",
+    ".google.gl",
+    ".google.gm",
+    ".google.gr",
+    ".google.com.gt",
+    ".google.gy",
+    ".google.com.hk",
+    ".google.hn",
+    ".google.hr",
+    ".google.ht",
+    ".google.hu",
+    ".google.co.id",
+    ".google.ie",
+    ".google.co.il",
+    ".google.im",
+    ".google.co.in",
+    ".google.iq",
+    ".google.is",
+    ".google.it",
+    ".google.je",
+    ".google.com.jm",
+    ".google.jo",
+    ".google.co.jp",
+    ".google.co.ke",
+    ".google.com.kh",
+    ".google.ki",
+    ".google.kg",
+    ".google.co.kr",
+    ".google.com.kw",
+    ".google.kz",
+    ".google.la",
+    ".google.com.lb",
+    ".google.li",
+    ".google.lk",
+    ".google.co.ls",
+    ".google.lt",
+    ".google.lu",
+    ".google.lv",
+    ".google.com.ly",
+    ".google.co.ma",
+    ".google.md",
+    ".google.me",
+    ".google.mg",
+    ".google.mk",
+    ".google.ml",
+    ".google.com.mm",
+    ".google.mn",
+    ".google.com.mt",
+    ".google.mu",
+    ".google.mv",
+    ".google.mw",
+    ".google.com.mx",
+    ".google.com.my",
+    ".google.co.mz",
+    ".google.com.na",
+    ".google.com.ng",
+    ".google.com.ni",
+    ".google.ne",
+    ".google.nl",
+    ".google.no",
+    ".google.com.np",
+    ".google.nr",
+    ".google.nu",
+    ".google.co.nz",
+    ".google.com.om",
+    ".google.com.pa",
+    ".google.com.pe",
+    ".google.com.pg",
+    ".google.com.ph",
+    ".google.com.pk",
+    ".google.pl",
+    ".google.pn",
+    ".google.com.pr",
+    ".google.ps",
+    ".google.pt",
+    ".google.com.py",
+    ".google.com.qa",
+    ".google.ro",
+    ".google.ru",
+    ".google.rw",
+    ".google.com.sa",
+    ".google.com.sb",
+    ".google.sc",
+    ".google.se",
+    ".google.com.sg",
+    ".google.sh",
+    ".google.si",
+    ".google.sk",
+    ".google.com.sl",
+    ".google.sn",
+    ".google.so",
+    ".google.sm",
+    ".google.sr",
+    ".google.st",
+    ".google.com.sv",
+    ".google.td",
+    ".google.tg",
+    ".google.co.th",
+    ".google.com.tj",
+    ".google.tl",
+    ".google.tm",
+    ".google.tn",
+    ".google.to",
+    ".google.com.tr",
+    ".google.tt",
+    ".google.com.tw",
+    ".google.co.tz",
+    ".google.com.ua",
+    ".google.co.ug",
+    ".google.co.uk",
+    ".google.com.uy",
+    ".google.co.uz",
+    ".google.com.vc",
+    ".google.co.ve",
+    ".google.co.vi",
+    ".google.com.vn",
+    ".google.vu",
+    ".google.ws",
+    ".google.rs",
+    ".google.co.za",
+    ".google.co.zm",
+    ".google.co.zw",
+    ".google.cat"
+  ];
   const domain = url.hostname.split("accounts")[1];
   if (supportedDomains.includes(domain)) return true;
   return false;
@@ -901,7 +1089,7 @@ const createYTMView = (): void => {
       openExternalFromYtmView(event.url);
     }
   });
-  ytmView.webContents.on("will-redirect", (event) => {
+  ytmView.webContents.on("will-redirect", event => {
     const url = new URL(event.url);
     if (
       url.hostname !== "consent.youtube.com" &&
@@ -919,7 +1107,9 @@ const createYTMView = (): void => {
 
     if ((url.hostname === "www.youtube.com" && url.pathname === "/premium") || (url.hostname === "youtube.com" && url.pathname === "/premium")) {
       // This users region requires a premium subscription to use YTM
-      ytmView.webContents.loadURL("https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F");
+      ytmView.webContents.loadURL(
+        "https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F"
+      );
     }
   });
   ytmView.webContents.on("did-navigate", ytmViewNavigated);
@@ -963,18 +1153,18 @@ const createYTMView = (): void => {
             if (ytmView) {
               ytmView.webContents.openDevTools({
                 mode: "detach"
-              })
+              });
             }
           }
-        },
+        }
       ]).popup({
         window: mainWindow,
         x: params.x,
         y: params.y,
         sourceType: params.menuSourceType
-      })
+      });
     }
-  })
+  });
   ytmView.webContents.on("will-prevent-unload", event => {
     if (mainWindow) {
       if (!applicationQuitting) {
@@ -1199,7 +1389,7 @@ app.on("ready", () => {
   }
 
   // Handle main window ipc
-  ipcMain.on("mainWindow:minimize", (event) => {
+  ipcMain.on("mainWindow:minimize", event => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
@@ -1207,7 +1397,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("mainWindow:maximize", (event) => {
+  ipcMain.on("mainWindow:maximize", event => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
@@ -1215,7 +1405,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("mainWindow:restore", (event) => {
+  ipcMain.on("mainWindow:restore", event => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
@@ -1223,7 +1413,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("mainWindow:close", (event) => {
+  ipcMain.on("mainWindow:close", event => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
@@ -1236,20 +1426,20 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("mainWindow:requestWindowState", (event) => {
+  ipcMain.on("mainWindow:requestWindowState", event => {
     if (event.sender !== mainWindow.webContents) return;
 
     sendMainWindowStateIpc();
   });
 
   // Handle settings window ipc
-  ipcMain.on("settingsWindow:open", (event) => {
+  ipcMain.on("settingsWindow:open", event => {
     if (event.sender !== mainWindow.webContents) return;
 
     createOrShowSettingsWindow();
   });
 
-  ipcMain.on("settingsWindow:minimize", (event) => {
+  ipcMain.on("settingsWindow:minimize", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;
 
@@ -1257,7 +1447,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("settingsWindow:maximize", (event) => {
+  ipcMain.on("settingsWindow:maximize", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;
 
@@ -1265,7 +1455,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("settingsWindow:restore", (event) => {
+  ipcMain.on("settingsWindow:restore", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;
 
@@ -1273,7 +1463,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("settingsWindow:close", (event) => {
+  ipcMain.on("settingsWindow:close", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;
 
@@ -1281,7 +1471,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("settingsWindow:restartapplication", (event) => {
+  ipcMain.on("settingsWindow:restartapplication", event => {
     if (event.sender !== settingsWindow.webContents) return;
 
     app.relaunch();
@@ -1290,10 +1480,10 @@ app.on("ready", () => {
   });
 
   // Handle ytm view ipc
-  ipcMain.on("ytmView:loaded", (event) => {
+  ipcMain.on("ytmView:loaded", event => {
     if (ytmView !== null && mainWindow !== null) {
       if (event.sender !== ytmView.webContents) return;
-      
+
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
@@ -1367,7 +1557,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("ytmView:navigateDefault", (event) => {
+  ipcMain.on("ytmView:navigateDefault", event => {
     if (ytmView) {
       if (event.sender !== mainWindow.webContents) return;
 
@@ -1375,7 +1565,7 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.on("ytmView:recreate", (event) => {
+  ipcMain.on("ytmView:recreate", event => {
     if (event.sender !== mainWindow.webContents) return;
 
     if (ytmView) {
@@ -1383,34 +1573,43 @@ app.on("ready", () => {
         mainWindow.removeBrowserView(ytmView);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ytmView.webContents as any).destroy();
       ytmView = null;
       createYTMView();
     }
-  })
+  });
 
   // Handle memory store ipc
   ipcMain.on("memoryStore:set", (event, key: string, value?: unknown) => {
-    if ((settingsWindow && event.sender !== settingsWindow.webContents) && event.sender !== mainWindow.webContents) return;
+    if (settingsWindow && event.sender !== settingsWindow.webContents && event.sender !== mainWindow.webContents) return;
 
     memoryStore.set(key, value);
   });
 
   ipcMain.handle("memoryStore:get", (event, key: string) => {
-    if ((settingsWindow && event.sender !== settingsWindow.webContents)) return;
+    if (settingsWindow && event.sender !== settingsWindow.webContents) return;
 
     return memoryStore.get(key);
   });
 
   // Handle settings store ipc
   ipcMain.on("settings:set", (event, key: string, value?: unknown) => {
-    if ((settingsWindow && event.sender !== settingsWindow.webContents)) return;
+    if (settingsWindow && event.sender !== settingsWindow.webContents) return;
 
     store.set(key, value);
   });
 
   ipcMain.handle("settings:get", (event, key: string) => {
-    if ((mainWindow && event.sender !== mainWindow.webContents) && (settingsWindow && event.sender !== settingsWindow.webContents) && (ytmView && event.sender !== ytmView.webContents)) return;
+    if (
+      mainWindow &&
+      event.sender !== mainWindow.webContents &&
+      settingsWindow &&
+      event.sender !== settingsWindow.webContents &&
+      ytmView &&
+      event.sender !== ytmView.webContents
+    )
+      return;
 
     return store.get(key);
   });
@@ -1441,13 +1640,13 @@ app.on("ready", () => {
   });
 
   // Handle app ipc
-  ipcMain.handle("app:getVersion", (event) => {
+  ipcMain.handle("app:getVersion", event => {
     if (event.sender !== settingsWindow.webContents) return;
 
     return app.getVersion();
   });
 
-  ipcMain.on("app:checkForUpdates", (event) => {
+  ipcMain.on("app:checkForUpdates", event => {
     if (event.sender !== settingsWindow.webContents) return;
 
     // autoUpdater downloads automatically and calling checkForUpdates causes duplicate install
@@ -1456,20 +1655,20 @@ app.on("ready", () => {
     }
   });
 
-  ipcMain.handle("app:isUpdateAvailable", (event) => {
+  ipcMain.handle("app:isUpdateAvailable", event => {
     if (event.sender !== settingsWindow.webContents) return;
 
     return appUpdateAvailable;
   });
 
-  ipcMain.handle("app:isUpdateDownloaded", (event) => {
+  ipcMain.handle("app:isUpdateDownloaded", event => {
     if (event.sender !== settingsWindow.webContents) return;
 
     return appUpdateDownloaded;
   });
 
-  ipcMain.on("app:restartApplicationForUpdate", (event) => {
-    if ((mainWindow && event.sender !== mainWindow.webContents) && (settingsWindow && event.sender !== settingsWindow.webContents)) return;
+  ipcMain.on("app:restartApplicationForUpdate", event => {
+    if (mainWindow && event.sender !== mainWindow.webContents && settingsWindow && event.sender !== settingsWindow.webContents) return;
 
     applicationQuitting = true;
     autoUpdater.quitAndInstall();
@@ -1585,11 +1784,10 @@ app.on("ready", () => {
   setupTaskbarFeatures();
   log.info("Setup taskbar features");
 
-  if (store.get('appearance').zoom) {
+  if (store.get("appearance").zoom) {
     log.info("Integration update: Zoom Factor");
-    ytmView.webContents.setZoomFactor(store.get('appearance').zoom / 100);
+    ytmView.webContents.setZoomFactor(store.get("appearance").zoom / 100);
   }
-
 
   // Integrations setup
   log.info("Starting enabled integrations");

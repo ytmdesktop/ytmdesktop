@@ -5,23 +5,22 @@ import { VueLoaderPlugin } from "vue-loader";
 import { rules } from "./webpack.rules";
 import { plugins } from "./webpack.plugins";
 
-import ChildProcess from 'child_process';
+import ChildProcess from "child_process";
 
-let gitBranch: string = '';
-let gitCommitHash: string = '';
+let gitBranch: string = "";
+let gitCommitHash: string = "";
 try {
   gitBranch = ChildProcess.execSync("git rev-parse --abbrev-ref HEAD").toString();
   gitCommitHash = ChildProcess.execSync("git rev-parse HEAD").toString();
-}
-catch (e) {
+} catch (e) {
   // User has likely downloaded from the YTM Desktop via the "Download ZIP".
   // We don't plan to support this, but at least provide users with a bit of improved UX
   // by providing them with what to do rather than just leaving them in the dust.
 
   e.message =
-    " ======= Failed to get Git Info. ======= \n"+
-    "Please make sure that when building this application you are cloning the repository from GitHub rather than using the Download ZIP option.\n"+
-    "Follow the instructions in the README.md file to clone the repository and build the application from there.\n"+
+    " ======= Failed to get Git Info. ======= \n" +
+    "Please make sure that when building this application you are cloning the repository from GitHub rather than using the Download ZIP option.\n" +
+    "Follow the instructions in the README.md file to clone the repository and build the application from there.\n" +
     " ======= Failed to get Git Info. ======= \n\n" +
     e.message;
 
@@ -47,7 +46,7 @@ rules.push({
 });
 rules.push({
   test: /\.script\.(ts|js)$/,
-  type: "asset/source",
+  type: "asset/source"
 });
 
 export const rendererConfig: Configuration = {

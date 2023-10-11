@@ -1,4 +1,4 @@
-import { BrowserView, ipcMain, ipcRenderer } from "electron";
+import { BrowserView, ipcMain } from "electron";
 import fs from "fs";
 import ElectronStore from "electron-store";
 
@@ -12,11 +12,11 @@ export default class CustomCSS implements IIntegration {
   private isEnabled = false;
   private hasInjectedOnce = false;
 
-  private customCSSKey: string|null = null;
-  private storeListener: Unsubscribe|null = null;
-  private ipcListener: () => void|null = null;
+  private customCSSKey: string | null = null;
+  private storeListener: Unsubscribe | null = null;
+  private ipcListener: () => void | null = null;
 
-  private currentWatcher: fs.FSWatcher|null = null;
+  private currentWatcher: fs.FSWatcher | null = null;
 
   public provide(store: ElectronStore<StoreSchema>, ytmView: BrowserView): void {
     let ytmViewChanged = false;
@@ -47,7 +47,7 @@ export default class CustomCSS implements IIntegration {
       this.storeListener();
       this.storeListener = null;
     }
-    this.storeListener = this.store.onDidChange('appearance', (oldState, newState) => {
+    this.storeListener = this.store.onDidChange("appearance", (oldState, newState) => {
       if (newState.customCSSEnabled && oldState.customCSSPath != newState.customCSSPath) {
         this.updateCSS();
       }
@@ -70,7 +70,7 @@ export default class CustomCSS implements IIntegration {
     }
 
     if (this.ipcListener) {
-      ipcMain.removeListener('ytmView:loaded', this.ipcListener);
+      ipcMain.removeListener("ytmView:loaded", this.ipcListener);
       this.ipcListener = null;
     }
   }
@@ -85,10 +85,12 @@ export default class CustomCSS implements IIntegration {
   // --------------------------------------------------
 
   private injectCSS() {
-    if (!this.ytmView) { return; }
+    if (!this.ytmView) {
+      return;
+    }
     this.hasInjectedOnce = true;
 
-    const cssPath: string|null = this.store.get('appearance.customCSSPath');
+    const cssPath: string | null = this.store.get("appearance.customCSSPath");
     if (cssPath && fs.existsSync(cssPath)) {
       const content: string = fs.readFileSync(cssPath, "utf8");
 
@@ -97,20 +99,19 @@ export default class CustomCSS implements IIntegration {
         as I'd rather keep away from constantly having an event for if `ytmView:loaded` is emitted
         and only needed for the initial load of the app */
       if (this.ipcListener) {
-        ipcMain.removeListener('ytmView:loaded', this.ipcListener);
+        ipcMain.removeListener("ytmView:loaded", this.ipcListener);
       }
       this.ipcListener = () => {
-        this.ytmView.webContents.insertCSS(content).then((customCssRef) => {
-          this.customCSSKey = customCssRef
+        this.ytmView.webContents.insertCSS(content).then(customCssRef => {
+          this.customCSSKey = customCssRef;
         });
-      }
-      ipcMain.once('ytmView:loaded', this.ipcListener);
+      };
+      ipcMain.once("ytmView:loaded", this.ipcListener);
 
-      this.ytmView.webContents.insertCSS(content).then((customCssRef) => {
+      this.ytmView.webContents.insertCSS(content).then(customCssRef => {
         this.refitYTMPopups();
-        this.customCSSKey = customCssRef
+        this.customCSSKey = customCssRef;
       });
-
 
       this.watchCSSFile(cssPath);
     }
@@ -136,11 +137,11 @@ export default class CustomCSS implements IIntegration {
     // Watch for changes to the custom CSS file
     // and update the CSS when it changes
     this.currentWatcher = fs.watch(newFile, {}, (type, filename) => {
-      if (type === 'change') {
+      if (type === "change") {
         this.updateCSS();
-      } else if (type === 'rename') {
+      } else if (type === "rename") {
         if (filename) {
-          this.store.set('appearance.customCSSPath', null);
+          this.store.set("appearance.customCSSPath", null);
           this.removeCSS();
           this.currentWatcher.close();
         }
