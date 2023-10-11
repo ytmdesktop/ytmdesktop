@@ -135,9 +135,9 @@
   });
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onVideoDataChange", event => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
     if (event.type === "dataloaded" && event.playertype === 1) {
-      currentVideoId = document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse().videoDetails.videoId;
+      currentVideoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
     }
   });
 
@@ -382,8 +382,8 @@
               sleepTimerButton.classList.remove("active");
               sleepTimerButton.setAttribute("title", "Sleep timer off");
 
-              if (document.querySelector("ytmusic-player-bar").playing_) {
-                document.querySelector("ytmusic-player-bar").playerApi_.pauseVideo();
+              if (document.querySelector("ytmusic-player-bar").playing) {
+                document.querySelector("ytmusic-player-bar").playerApi.pauseVideo();
 
                 document.body.dispatchEvent(
                   new CustomEvent("yt-action", {

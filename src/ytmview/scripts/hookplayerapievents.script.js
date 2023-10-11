@@ -1,22 +1,22 @@
 {
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onVideoProgress", progress => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
     window.ytmd.sendVideoProgress(progress);
   });
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onStateChange", state => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onStateChange", state => {
     window.ytmd.sendVideoState(state);
   });
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onVideoDataChange", event => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
       window.ytmd.sendVideoData(
-        document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse().videoDetails,
-        document.querySelector("ytmusic-player-bar").playerApi_.getPlaylistId()
+        document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails,
+        document.querySelector("ytmusic-player-bar").playerApi.getPlaylistId()
       );
     }
   });
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onAdStart", () => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onAdStart", () => {
     window.ytmd.sendAdState(true);
   });
-  document.querySelector("ytmusic-player-bar").playerApi_.addEventListener("onAdEnd", () => {
+  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onAdEnd", () => {
     window.ytmd.sendAdState(false);
   });
   document.querySelector("ytmusic-player-bar").store.subscribe(() => {
@@ -42,7 +42,7 @@
       }
     }
 
-    const videoId = document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse()?.videoDetails?.videoId;
+    const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
     const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
 

@@ -24,8 +24,9 @@ export default class VolumeRatio implements IIntegration {
     this.isEnabled = true;
     if ((this.isEnabled && this.hasInjected) || this.ytmView === null) return;
 
-    this.ytmView.webContents.executeJavaScript(enableScript)
-    .catch((err) => { console.log(err); });
+    this.ytmView.webContents.executeJavaScript(enableScript).catch(err => {
+      console.log(err);
+    });
 
     this.forceUpdateVolume();
 
@@ -36,7 +37,9 @@ export default class VolumeRatio implements IIntegration {
     this.isEnabled = false;
     if (!this.hasInjected) return;
 
-    this.ytmView.webContents.executeJavaScript(`
+    this.ytmView.webContents
+      .executeJavaScript(
+        `
       {
         if (typeof window.HTMLMediaElement_volume !== 'undefined' &&
             typeof window.HTMLMediaElement_volume.get !== 'undefined' &&
@@ -54,23 +57,31 @@ export default class VolumeRatio implements IIntegration {
 
       // Electron is not happy with whatever is returned, so we just give it an empty string.
       '';
-    `)
-    .catch((err) => { err; });
+    `
+      )
+      .catch(err => {
+        err;
+      });
 
     this.forceUpdateVolume();
     this.hasInjected = false;
   }
 
   private forceUpdateVolume(): void {
-    this.ytmView.webContents.executeJavaScript(`
+    this.ytmView.webContents
+      .executeJavaScript(
+        `
       {
-        let volume = document.querySelector("ytmusic-player-bar").playerApi_.getVolume();
-        document.querySelector("ytmusic-player-bar").playerApi_.setVolume(volume);
+        let volume = document.querySelector("ytmusic-player-bar").playerApi.getVolume();
+        document.querySelector("ytmusic-player-bar").playerApi.setVolume(volume);
         document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_VOLUME', payload: volume });
         
         volume;
       }
-    `)
-    .catch((err) => { err; });
+    `
+      )
+      .catch(err => {
+        err;
+      });
   }
-} 
+}

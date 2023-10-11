@@ -11,7 +11,7 @@
           document.querySelector("ytmusic-player-bar"),
           {
             addToPlaylistEndpoint: {
-              videoId: document.querySelector("ytmusic-player-bar").playerApi_.getPlayerResponse().videoDetails.videoId
+              videoId: document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId
             }
           }
         ],
