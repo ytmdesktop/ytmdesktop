@@ -16,7 +16,7 @@
     "lint:fix": "eslint --ext .ts,.tsx,.vue .",
     "prettier": "prettier --check *.{ts,tsx,vue}",
     "prettier:fix": "prettier --write *.{ts,tsx,vue}",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "keywords": [],
   "author": {
@@ -47,7 +47,7 @@
     "eslint-plugin-vue": "^9.15.1",
     "fork-ts-checker-webpack-plugin": "^8.0.0",
     "git-revision-webpack-plugin": "5.0.0",
-    "husky": "^8.0.3",
+    "husky": "^8.0.0",
     "lint-staged": "^13.2.3",
     "node-loader": "^2.0.0",
     "prettier": "^3.0.0",
@@ -79,11 +79,6 @@
       "prettier --write",
       "eslint --cache --fix"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "packageManager": "yarn@3.6.3"
 }

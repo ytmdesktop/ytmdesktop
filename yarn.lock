@@ -6081,7 +6081,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^8.0.3":
+"husky@npm:^8.0.0":
   version: 8.0.3
   resolution: "husky@npm:8.0.3"
   bin:
@@ -11063,7 +11063,7 @@ __metadata:
     fastify-socket.io: ^4.0.0
     fork-ts-checker-webpack-plugin: ^8.0.0
     git-revision-webpack-plugin: 5.0.0
-    husky: ^8.0.3
+    husky: ^8.0.0
     lint-staged: ^13.2.3
     material-symbols: ^0.10.2
     node-loader: ^2.0.0
