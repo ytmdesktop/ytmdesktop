@@ -19,7 +19,8 @@ const config: ForgeConfig = {
         schemes: ["ytmd"]
       }
     ],
-    appCategoryType: "public.app-category.music"
+    appCategoryType: "public.app-category.music",
+    asar: true
   },
   rebuildConfig: {},
   makers: [
