@@ -12,7 +12,17 @@ const config: ForgeConfig = {
   packagerConfig: {
     executableName: "youtube-music-desktop-app",
     icon: "./src/assets/icons/ytmd",
-    extraResource: ["./src/assets/icons"],
+    extraResource: [
+      "./src/assets/icons/tray.ico",
+      "./src/assets/icons/trayTemplate.png",
+      "./src/assets/icons/trayTemplate@2x.png",
+      "./src/assets/icons/ytmd.png",
+
+      "./src/assets/icons/controls/pause-button.png",
+      "./src/assets/icons/controls/play-button.png",
+      "./src/assets/icons/controls/play-next-button.png",
+      "./src/assets/icons/controls/play-previous-button.png"
+    ],
     protocols: [
       {
         name: "YouTube Music Desktop App",

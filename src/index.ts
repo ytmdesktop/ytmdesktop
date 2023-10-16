@@ -516,7 +516,7 @@ function setupTaskbarFeatures() {
     mainWindow.setThumbarButtons([
       {
         tooltip: "Previous",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-previous-button.png")),
+        icon: nativeImage.createFromPath(path.join(assetFolder, "play-previous-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -526,7 +526,7 @@ function setupTaskbarFeatures() {
       },
       {
         tooltip: "Play/Pause",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-button.png")),
+        icon: nativeImage.createFromPath(path.join(assetFolder, "play-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -536,7 +536,7 @@ function setupTaskbarFeatures() {
       },
       {
         tooltip: "Next",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-next-button.png")),
+        icon: nativeImage.createFromPath(path.join(assetFolder, "play-next-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -560,7 +560,7 @@ function setupTaskbarFeatures() {
         mainWindow.setThumbarButtons([
           {
             tooltip: "Previous",
-            icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-previous-button.png")),
+            icon: nativeImage.createFromPath(path.join(assetFolder, "play-previous-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -571,8 +571,8 @@ function setupTaskbarFeatures() {
           {
             tooltip: "Play/Pause",
             icon: isPlaying
-              ? nativeImage.createFromPath(path.join(assetFolder, "icons/controls/pause-button.png"))
-              : nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-button.png")),
+              ? nativeImage.createFromPath(path.join(assetFolder, "pause-button.png"))
+              : nativeImage.createFromPath(path.join(assetFolder, "play-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -582,7 +582,7 @@ function setupTaskbarFeatures() {
           },
           {
             tooltip: "Next",
-            icon: nativeImage.createFromPath(path.join(assetFolder, "icons/controls/play-next-button.png")),
+            icon: nativeImage.createFromPath(path.join(assetFolder, "play-next-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -799,7 +799,7 @@ const createOrShowSettingsWindow = (): void => {
     resizable: false,
     frame: false,
     show: false,
-    icon: path.join(assetFolder, "icons/ytmd.png"),
+    icon: path.join(assetFolder, "ytmd.png"),
     parent: mainWindow,
     modal: process.platform !== "darwin",
     titleBarStyle: "hidden",
@@ -1258,7 +1258,7 @@ const createMainWindow = (): void => {
     y: windowBounds?.y,
     frame: false,
     show: false,
-    icon: path.join(assetFolder, "icons/ytmd.png"),
+    icon: path.join(assetFolder, "ytmd.png"),
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#000000",
@@ -1705,7 +1705,7 @@ app.on("ready", () => {
   tray = new Tray(
     path.join(
       process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath,
-      process.platform === "win32" ? "icons/tray.ico" : "icons/trayTemplate.png"
+      process.platform === "win32" ? "tray.ico" : "trayTemplate.png"
     )
   );
   trayContextMenu = Menu.buildFromTemplate([
