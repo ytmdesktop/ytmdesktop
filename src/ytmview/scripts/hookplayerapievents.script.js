@@ -1,4 +1,4 @@
-{
+(function() {
   document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
     window.ytmd.sendVideoProgress(progress);
   });
@@ -70,4 +70,4 @@
       window.ytmd.sendDeletePlaylistObservation(playlistId);
     }
   });
-}
+})

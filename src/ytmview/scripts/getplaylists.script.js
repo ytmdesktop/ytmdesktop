@@ -1,5 +1,5 @@
-{
-  new Promise((resolve, reject) => {
+(function() {
+  return new Promise((resolve, reject) => {
     var returnValue = [];
     var serviceRequestEvent = {
       bubbles: true,
@@ -29,4 +29,4 @@
       }
     );
   });
-}
+})

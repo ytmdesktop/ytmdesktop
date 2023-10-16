@@ -1,4 +1,4 @@
-{
+(function() {
   let ytmdControlButtons = {};
 
   let currentVideoId = "";
@@ -532,4 +532,4 @@
   });
 
   ytmdControlButtons.libraryButton = libraryButton;
-}
+})

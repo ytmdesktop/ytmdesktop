@@ -1,4 +1,4 @@
-{
+(function() {
   const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
   const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
   
@@ -54,4 +54,4 @@
   }
 
   if (serviceEvent) document.querySelector("ytmusic-like-button-renderer").dispatchEvent(new CustomEvent("yt-action", serviceEvent));
-}
+})
