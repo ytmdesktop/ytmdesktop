@@ -14,7 +14,20 @@ import {
   APIV1RequestTokenBody,
   APIV1RequestTokenBodyType
 } from "../../shared/schemas";
-import { AuthorizationDeniedError, AuthorizationDisabledError, AuthorizationInvalidError, AuthorizationTimeOutError, AuthorizationTooManyError, InvalidPositionError, InvalidQueueIndexError, InvalidRepeatModeError, InvalidVolumeError, UnauthenticatedError, YouTubeMusicTimeOutError, YouTubeMusicUnavailableError } from "../../shared/errors";
+import {
+  AuthorizationDeniedError,
+  AuthorizationDisabledError,
+  AuthorizationInvalidError,
+  AuthorizationTimeOutError,
+  AuthorizationTooManyError,
+  InvalidPositionError,
+  InvalidQueueIndexError,
+  InvalidRepeatModeError,
+  InvalidVolumeError,
+  UnauthenticatedError,
+  YouTubeMusicTimeOutError,
+  YouTubeMusicUnavailableError
+} from "../../shared/errors";
 
 declare const AUTHORIZE_COMPANION_WINDOW_WEBPACK_ENTRY: string;
 declare const AUTHORIZE_COMPANION_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -173,7 +186,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           const index = commandRequest.data;
           const state = playerStateStore.getState();
 
-          if (isNaN(index) || index > (state.queue.items.length + state.queue.automixItems.length) - 1) {
+          if (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1) {
             throw new InvalidQueueIndexError(index);
           }
 
@@ -299,11 +312,9 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           action: "deny"
         };
       });
-      
+
       authorizationWindow.webContents.on("will-navigate", event => {
-        if (process.env.NODE_ENV === "development") 
-          if (event.url.startsWith("http://localhost")) 
-            return;
+        if (process.env.NODE_ENV === "development") if (event.url.startsWith("http://localhost")) return;
 
         event.preventDefault();
       });
@@ -352,7 +363,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
           ipcMain.once(`companionAuthorization:result:${requestId}`, resultListener);
           ipcMain.once(`companionWindow:close:${requestId}`, closeListener);
-          authorizationWindow.once("closed", () => {authorizationWindowClosed = true; closeListener(null)});
+          authorizationWindow.once("closed", () => {
+            authorizationWindowClosed = true;
+            closeListener(null);
+          });
         });
 
         if (!authorizationWindowClosed) {
@@ -410,13 +424,15 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           response.send(playlists);
         };
         ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-        
+
         ytmView.webContents.send(`ytmView:getPlaylists`, requestId);
-        
-        await new Promise((_resolve, reject) => setTimeout(() => {
-          ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-          reject(new YouTubeMusicTimeOutError());
-        }, 1000 * 5));
+
+        await new Promise((_resolve, reject) =>
+          setTimeout(() => {
+            ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
+            reject(new YouTubeMusicTimeOutError());
+          }, 1000 * 30)
+        );
       } else {
         throw new YouTubeMusicUnavailableError();
       }
