@@ -270,6 +270,13 @@ if (process.platform !== "darwin") {
   memoryStore.set("autoUpdaterDisabled", true);
 }
 
+function getIconPath(icon: string) {
+  return path.join(assetFolder, `${process.env.NODE_ENV === "development" ? "icons/" : ""}${icon}`);
+}
+function getControlsIconPath(icon: string) {
+  return getIconPath(`${process.env.NODE_ENV === "development" ? "controls/" : ""}${icon}`);
+}
+
 function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema>) {
   if (newState.shortcuts.next !== oldState.shortcuts.next) return true;
   if (newState.shortcuts.playPause !== oldState.shortcuts.playPause) return true;
@@ -516,7 +523,7 @@ function setupTaskbarFeatures() {
     mainWindow.setThumbarButtons([
       {
         tooltip: "Previous",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "play-previous-button.png")),
+        icon: nativeImage.createFromPath(getControlsIconPath("play-previous-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -526,7 +533,7 @@ function setupTaskbarFeatures() {
       },
       {
         tooltip: "Play/Pause",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "play-button.png")),
+        icon: nativeImage.createFromPath(getControlsIconPath("play-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -536,7 +543,7 @@ function setupTaskbarFeatures() {
       },
       {
         tooltip: "Next",
-        icon: nativeImage.createFromPath(path.join(assetFolder, "play-next-button.png")),
+        icon: nativeImage.createFromPath(getControlsIconPath("play-next-button.png")),
         flags: ["disabled"],
         click() {
           if (ytmView) {
@@ -560,7 +567,7 @@ function setupTaskbarFeatures() {
         mainWindow.setThumbarButtons([
           {
             tooltip: "Previous",
-            icon: nativeImage.createFromPath(path.join(assetFolder, "play-previous-button.png")),
+            icon: nativeImage.createFromPath(getControlsIconPath("play-previous-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -571,8 +578,8 @@ function setupTaskbarFeatures() {
           {
             tooltip: "Play/Pause",
             icon: isPlaying
-              ? nativeImage.createFromPath(path.join(assetFolder, "pause-button.png"))
-              : nativeImage.createFromPath(path.join(assetFolder, "play-button.png")),
+              ? nativeImage.createFromPath(getControlsIconPath("pause-button.png"))
+              : nativeImage.createFromPath(getControlsIconPath("play-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -582,7 +589,7 @@ function setupTaskbarFeatures() {
           },
           {
             tooltip: "Next",
-            icon: nativeImage.createFromPath(path.join(assetFolder, "play-next-button.png")),
+            icon: nativeImage.createFromPath(getControlsIconPath("play-next-button.png")),
             flags: taskbarFlags,
             click() {
               if (ytmView) {
@@ -799,7 +806,7 @@ const createOrShowSettingsWindow = (): void => {
     resizable: false,
     frame: false,
     show: false,
-    icon: path.join(assetFolder, "ytmd.png"),
+    icon: getIconPath("ytmd.png"),
     parent: mainWindow,
     modal: process.platform !== "darwin",
     titleBarStyle: "hidden",
@@ -1071,7 +1078,7 @@ const createMainWindow = (): void => {
     y: windowBounds?.y,
     frame: false,
     show: false,
-    icon: path.join(assetFolder, "ytmd.png"),
+    icon: getIconPath("ytmd.png"),
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#000000",
@@ -1517,7 +1524,7 @@ app.on("ready", () => {
   // Create the tray
   tray = new Tray(
     path.join(
-      process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath,
+      process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets/icons") : process.resourcesPath,
       process.platform === "win32" ? "tray.ico" : "trayTemplate.png"
     )
   );
