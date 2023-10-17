@@ -14,10 +14,13 @@
     "paths": {
       "*": [
         "node_modules/*"
+      ],
+      "~shared/*": [
+        "src/shared/*"
+      ],
+      "~assets/*": [
+        "src/assets/*"
       ]
     }
-  },
-  "include": [
-    "src/**/*"
-  ]
+  }
 }

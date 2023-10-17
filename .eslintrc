@@ -25,5 +25,10 @@
   },
   "rules": {
     "vue/multi-word-component-names": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }

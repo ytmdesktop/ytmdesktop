@@ -42,6 +42,7 @@
     "electron": "27.0.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.25.0",
     "eslint-plugin-vue": "^9.15.1",
     "fork-ts-checker-webpack-plugin": "^8.0.0",

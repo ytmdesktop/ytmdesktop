@@ -1,11 +1,11 @@
 import { DefinePlugin, type Configuration } from "webpack";
 
 import { VueLoaderPlugin } from "vue-loader";
+import ChildProcess from "child_process";
+import path from "path";
 
 import { rules } from "./webpack.rules";
 import { plugins } from "./webpack.plugins";
-
-import ChildProcess from "child_process";
 
 let gitBranch: string = "";
 let gitCommitHash: string = "";
@@ -45,8 +45,16 @@ rules.push({
   type: "asset/resource"
 });
 rules.push({
-  test: /\.script\.(ts|js)$/,
-  type: "asset/source"
+  test: /\.tsx?$/,
+  exclude: /(node_modules|\.webpack)/,
+  use: {
+    loader: "ts-loader",
+    options: {
+      transpileOnly: true,
+      configFile: path.join(__dirname, "src/renderer/tsconfig.json"),
+      appendTsSuffixTo: [/\.vue$/]
+    }
+  }
 });
 
 export const rendererConfig: Configuration = {
@@ -64,6 +72,10 @@ export const rendererConfig: Configuration = {
     ...plugins
   ],
   resolve: {
+    alias: {
+      "~shared": path.resolve(__dirname, "src/shared"),
+      "~assets": path.resolve(__dirname, "src/assets")
+    },
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css"]
   },
   devtool: process.env.NODE_ENV === "development" ? "eval-source-map" : false

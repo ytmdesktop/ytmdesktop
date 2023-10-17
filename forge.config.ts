@@ -74,33 +74,33 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: "./src/windows/main/index.html",
-            js: "./src/windows/main/renderer.ts",
+            html: "./src/renderer/windows/main/index.html",
+            js: "./src/renderer/windows/main/renderer.ts",
             name: "main_window",
             preload: {
-              js: "./src/windows/main/preload.ts"
+              js: "./src/renderer/windows/main/preload.ts"
             }
           },
           {
-            html: "./src/windows/settings/index.html",
-            js: "./src/windows/settings/renderer.ts",
+            html: "./src/renderer/windows/settings/index.html",
+            js: "./src/renderer/windows/settings/renderer.ts",
             name: "settings_window",
             preload: {
-              js: "./src/windows/settings/preload.ts"
+              js: "./src/renderer/windows/settings/preload.ts"
             }
           },
           {
-            html: "./src/windows/authorize-companion/index.html",
-            js: "./src/windows/authorize-companion/renderer.ts",
+            html: "./src/renderer/windows/authorize-companion/index.html",
+            js: "./src/renderer/windows/authorize-companion/renderer.ts",
             name: "authorize_companion_window",
             preload: {
-              js: "./src/windows/authorize-companion/preload.ts"
+              js: "./src/renderer/windows/authorize-companion/preload.ts"
             }
           },
           {
             name: "ytm_view",
             preload: {
-              js: "./src/ytmview/preload.ts"
+              js: "./src/renderer/ytmview/preload.ts"
             }
           }
         ]
