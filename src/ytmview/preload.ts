@@ -205,7 +205,7 @@ window.addEventListener("load", async () => {
     const interval = setInterval(async () => {
       const playerApiReady: boolean = (
         await webFrame.executeJavaScript(`
-          (function() {2
+          (function() {
             return document.querySelector("ytmusic-player-bar").playerApi.isReady();
           })
         `)
