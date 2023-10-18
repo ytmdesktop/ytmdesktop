@@ -10,15 +10,16 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [
-            { name: 'linux',   image: 'ubuntu-latest' },
-            { name: 'windows', image: 'windows-latest' },
-            { name: 'macos',   image: 'macos-latest' },
-          ]
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         arch: [ 'x64', 'arm64' ]
+        exclude:
+          # Mitigation for Electron Forge naming conflict. See #1183.
+          - os: 'windows-latest'
+            arch: 'arm64'
+        
       fail-fast: true # Explicitly failing fast because this is a publish. We want to bail the entire release if something went wrong with another build
 
-    runs-on: ${{ matrix.os.image }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Github checkout
