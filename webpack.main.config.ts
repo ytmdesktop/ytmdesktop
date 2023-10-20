@@ -1,4 +1,4 @@
-import type { Configuration } from "webpack";
+import { DefinePlugin, type Configuration } from "webpack";
 
 import path from "path";
 
@@ -26,6 +26,11 @@ export const mainConfig: Configuration = {
   module: {
     rules
   },
+  plugins: [
+    new DefinePlugin({
+      YTMD_DISABLE_UPDATES: true
+    })
+  ],
   resolve: {
     alias: {
       "~shared": path.resolve(__dirname, "src/shared"),
