@@ -3382,16 +3382,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:27.0.0":
-  version: 27.0.0
-  resolution: "electron@npm:27.0.0"
+"electron@npm:27.0.2":
+  version: 27.0.2
+  resolution: "electron@npm:27.0.2"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^18.11.18
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 4a84cb894d5f626fe7a2b5171693e903ce82a7673aabc419e5d3d0d2f9cc8441e5088524ecd86a046beab4ba7dd13820b7a94c361c3e7bc2f0959d1a1a860df5
+  checksum: 89118fbe1891233e6c3e393f9e7e7a1c463617a9c783dc7aad2ac238c4c483dbcf5222fe791d911727ac0970aa11abf028868a0d10271d1279360cd58f5cfb1d
   languageName: node
   linkType: hard
 
@@ -9643,7 +9643,7 @@ __metadata:
     "@typescript-eslint/parser": ^6.2.1
     "@vercel/webpack-asset-relocator-loader": 1.7.3
     css-loader: ^6.0.0
-    electron: 27.0.0
+    electron: 27.0.2
     electron-log: 5.0.0-beta.28
     electron-squirrel-startup: ^1.0.0
     electron-store: ^8.1.0
