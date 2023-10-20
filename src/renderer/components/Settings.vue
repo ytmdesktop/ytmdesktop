@@ -528,7 +528,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           </template>
           <template v-if="autoUpdaterDisabled">
             <button disabled class="update-check-button"><span class="material-symbols-outlined">update</span>Check for updates</button>
-            <p class="no-auto-updater">Auto updater unavailable for your system at this time</p>
+            <p class="no-auto-updater">Auto updater disabled</p>
           </template>
           <span class="version-info">
             <p class="version">Version: {{ ytmdVersion }}</p>
