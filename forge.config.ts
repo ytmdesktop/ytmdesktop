@@ -1,6 +1,6 @@
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
-import { MakerDMG } from "@electron-forge/maker-dmg";
+import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
@@ -37,9 +37,7 @@ const config: ForgeConfig = {
     new MakerSquirrel({
       iconUrl: "https://raw.githubusercontent.com/ytmdesktop/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico"
     }),
-    new MakerDMG({
-      icon: "./src/assets/icons/ytmd.png"
-    }),
+    new MakerZIP({}, ["darwin"]),
     new MakerRpm({
       options: {
         categories: ["AudioVideo", "Audio"],
