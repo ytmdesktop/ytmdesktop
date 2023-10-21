@@ -1324,6 +1324,8 @@ app.on("ready", async () => {
 
       // TODO: this is just a hack fix for ratio volume to run the enable script
       ratioVolume.ytmViewLoaded();
+      // TODO: this is just a hack fix for custom css to update CSS when the view loads
+      customCss.updateCSS();
     }
   });
 
