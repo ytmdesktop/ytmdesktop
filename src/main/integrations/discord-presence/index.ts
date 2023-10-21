@@ -249,4 +249,8 @@ export default class DiscordPresence implements IIntegration {
       playerStateStore.removeEventListener(this.stateCallback);
     }
   }
+
+  public getYTMScripts(): { name: string; script: string }[] {
+    return [];
+  }
 }

@@ -75,6 +75,10 @@ export default class CustomCSS implements IIntegration {
     }
   }
 
+  public getYTMScripts(): { name: string; script: string }[] {
+    return [];
+  }
+
   public updateCSS(): void {
     if (this.isEnabled) {
       this.removeCSS();
