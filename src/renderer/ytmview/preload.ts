@@ -225,6 +225,8 @@ window.addEventListener("load", async () => {
   await hideChromecastButton();
   await hookPlayerApiEvents();
 
+  const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
+
   const state = await store.get("state");
   const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
 
@@ -565,6 +567,16 @@ window.addEventListener("load", async () => {
         })
       `)
     )();
+  });
+
+  ipcRenderer.on("ytmView:executeScript", async (_event, integrationName, scriptName) => {
+    const scripts = integrationScripts[integrationName];
+    if (scripts) {
+      const script = scripts[scriptName];
+      if (script) {
+        (await webFrame.executeJavaScript(script))();
+      }
+    }
   });
 
   ipcRenderer.send("ytmView:loaded");

@@ -137,6 +137,8 @@ const lastFMScrobbler = new LastFM();
 const nowPlayingNotifications = new NowPlayingNotifications();
 const ratioVolume = new VolumeRatio();
 
+const ytmViewIntegrationScripts: { [name: string]: { [name: string]: string } } = {};
+
 let mainWindow: BrowserWindow = null;
 let settingsWindow: BrowserWindow = null;
 let ytmView: BrowserView = null;
@@ -1319,6 +1321,9 @@ app.on("ready", async () => {
           mode: "detach"
         });
       }
+
+      // TODO: this is just a hack fix for ratio volume to run the enable script
+      ratioVolume.ytmViewLoaded();
     }
   });
 
@@ -1399,6 +1404,12 @@ app.on("ready", async () => {
       ytmView = null;
       createYTMView();
     }
+  });
+
+  ipcMain.handle("ytmView:getIntegrationScripts", event => {
+    if (event.sender !== ytmView.webContents) return;
+
+    return ytmViewIntegrationScripts;
   });
 
   // Handle memory store ipc
@@ -1615,6 +1626,12 @@ app.on("ready", async () => {
   } else {
     appLaunchUpdateCheck = false;
   }
+
+  // Integrations preflight initialization
+  ytmViewIntegrationScripts["ratioVolume"] = ratioVolume.getYTMScripts().reduce<{ [name: string]: string }>((map, obj) => {
+    map[obj.name] = obj.script;
+    return map;
+  }, {});
 
   // Create the YouTube Music view
   createYTMView();

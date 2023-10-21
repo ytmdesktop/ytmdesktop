@@ -2,6 +2,8 @@ import { BrowserView } from "electron";
 import IIntegration from "../integration";
 
 import enableScript from "./script/enable.script";
+import disableScript from "./script/disable.script";
+import forceUpdateVolume from "./script/forceupdatevolume.script";
 
 export default class VolumeRatio implements IIntegration {
   // This integration is based upon the following GreasyFork script:
@@ -11,8 +13,14 @@ export default class VolumeRatio implements IIntegration {
   private ytmView: BrowserView;
   private hasInjected = false;
   private isEnabled = false;
+  private waitForYTMView = true;
 
   public provide(ytmView: BrowserView): void {
+    if (ytmView !== this.ytmView) {
+      // The YTM view object has changed from what we knew it was. Invalidate the state as the YTM view was recreated
+      this.hasInjected = false;
+      this.waitForYTMView = true;
+    }
     this.ytmView = ytmView;
 
     if (this.isEnabled && !this.hasInjected) {
@@ -22,11 +30,9 @@ export default class VolumeRatio implements IIntegration {
 
   public enable(): void {
     this.isEnabled = true;
-    if ((this.isEnabled && this.hasInjected) || this.ytmView === null) return;
+    if ((this.isEnabled && this.hasInjected) || this.waitForYTMView || this.ytmView === null) return;
 
-    this.ytmView.webContents.executeJavaScript(enableScript).catch(err => {
-      console.log(err);
-    });
+    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "enable");
 
     this.forceUpdateVolume();
 
@@ -37,51 +43,35 @@ export default class VolumeRatio implements IIntegration {
     this.isEnabled = false;
     if (!this.hasInjected) return;
 
-    this.ytmView.webContents
-      .executeJavaScript(
-        `
-      {
-        if (typeof window.HTMLMediaElement_volume !== 'undefined' &&
-            typeof window.HTMLMediaElement_volume.get !== 'undefined' &&
-            typeof window.HTMLMediaElement_volume.set !== 'undefined')
-        {
-          console.log("Removing VolumeRatio script")
-  
-          // Restore the original volume property
-          Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
-            get: window.HTMLMediaElement_volume.get,
-            set: window.HTMLMediaElement_volume.set
-          });
-        }
-      }
-
-      // Electron is not happy with whatever is returned, so we just give it an empty string.
-      '';
-    `
-      )
-      .catch(err => {
-        err;
-      });
+    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "disable");
 
     this.forceUpdateVolume();
     this.hasInjected = false;
   }
 
-  private forceUpdateVolume(): void {
-    this.ytmView.webContents
-      .executeJavaScript(
-        `
+  public getYTMScripts(): { name: string; script: string }[] {
+    return [
       {
-        let volume = document.querySelector("ytmusic-player-bar").playerApi.getVolume();
-        document.querySelector("ytmusic-player-bar").playerApi.setVolume(volume);
-        document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_VOLUME', payload: volume });
-        
-        volume;
+        name: "enable",
+        script: enableScript
+      },
+      {
+        name: "disable",
+        script: disableScript
+      },
+      {
+        name: "forceUpdateVolume",
+        script: forceUpdateVolume
       }
-    `
-      )
-      .catch(err => {
-        err;
-      });
+    ];
+  }
+
+  private forceUpdateVolume(): void {
+    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "forceUpdateVolume");
+  }
+
+  public ytmViewLoaded(): void {
+    this.waitForYTMView = false;
+    this.enable();
   }
 }

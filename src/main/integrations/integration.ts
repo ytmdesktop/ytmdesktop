@@ -5,4 +5,5 @@ export default interface IIntegration {
   provide(...args: unknown[]): void;
   enable(): void;
   disable(): void;
+  getYTMScripts(): { name: string; script: string }[];
 }

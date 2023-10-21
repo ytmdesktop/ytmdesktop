@@ -2,7 +2,7 @@
 // https://greasyfork.org/en/scripts/397686-youtube-music-fix-volume-ratio
 // Made by: Marco Pfeiffer <git@marco.zone>
 
-{
+(function() {
   // manipulation exponent, higher value = lower volume
   // 3 is the value used by pulseaudio, which Barteks2x figured out this gist here: https://gist.github.com/Barteks2x/a4e189a36a10c159bb1644ffca21c02a
   // 0.05 (or 5%) is the lowest you can select in the UI which with an exponent of 3 becomes 0.000125 or 0.0125%
@@ -39,4 +39,4 @@
 
   // Electron is not happy with returning the element, so we just give it an empty string.
   '';
-}
+})
