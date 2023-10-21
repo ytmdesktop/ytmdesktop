@@ -1,0 +1,17 @@
+#home {
+    height: calc(100vh - 16px);
+}
+
+#home > div {
+    width: max-content;
+}
+
+@media screen and (max-width: 600px) {
+    #home {
+        height: calc(100vh - 96px);
+    }
+
+    #home > div {
+        width: 100%;
+    }
+}
