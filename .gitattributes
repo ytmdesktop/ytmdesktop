@@ -2,3 +2,4 @@
 
 /.yarn/releases/** binary
 /.yarn/plugins/** binary
+/src/assets/** binary
