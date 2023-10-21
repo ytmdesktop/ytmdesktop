@@ -1,3 +1,10 @@
+header nav {
+    z-index: 100;
+}
+header nav .chip {
+    border: none;
+}
+
 #home {
     height: calc(100vh - 16px);
 }
@@ -14,4 +21,8 @@
     #home > div {
         width: 100%;
     }
+}
+
+#download, #features, #images {
+    height: 1000px;
 }
