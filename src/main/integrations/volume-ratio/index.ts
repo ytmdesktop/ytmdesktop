@@ -72,6 +72,6 @@ export default class VolumeRatio implements IIntegration {
 
   public ytmViewLoaded(): void {
     this.waitForYTMView = false;
-    this.enable();
+    if (this.isEnabled) this.enable();
   }
 }
