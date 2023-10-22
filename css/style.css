@@ -10,10 +10,14 @@ header nav .chip {
 }
 
 #home > div {
-    width: max-content;
+    width: min(800px, 100%)
 }
 
 @media screen and (max-width: 600px) {
+    body:has(nav.s.bottom) {
+        margin-bottom: 80px;
+    }
+
     #home {
         height: calc(100vh - 96px);
     }
@@ -21,8 +25,15 @@ header nav .chip {
     #home > div {
         width: 100%;
     }
+
+
 }
 
-#download, #features, #images {
-    height: 1000px;
+.features .badge {
+  inset-inline-end: 8px;
+  inset-block-start: 4px;
+}
+
+.features article {
+  margin-block-start: var(--gap);
 }

@@ -16,7 +16,7 @@
 </head>
 
 <body class="dark">
-  <header>
+  <header class="m l">
     <nav class="responsive fixed padding surface-container" style="margin-left: -16px;">
       <img class="circle" src="favicon.png">
 
@@ -54,7 +54,7 @@
         </i>
         <span>Images</span>
       </a>
-      <a class="chip" href="https://github.com/ytmdesktop/ytmdesktop">
+      <a class="chip" href="#contribute">
         <i class="large">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path
@@ -103,7 +103,7 @@
       </i>
       <span>Images</span>
     </a>
-    <a href="https://github.com/ytmdesktop/ytmdesktop">
+    <a href="#contribute">
       <i>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path
@@ -114,7 +114,7 @@
     </a>
   </nav>
 
-  <main class="responsive">
+  <main class="responsive padding">
     <!-- Home -->
     <section id="home">
       <div class="absolute center middle">
@@ -129,16 +129,172 @@
     <!-- Download -->
     <section id="download">
       <h1>Download</h1>
+
+      <h2>Latest release</h2>
+      <div class="latest">
+        <h3 class="release-tag"></h3>
+        <div class="grid center-align"> 
+          <div class="s12 m6 l4 margin windows">
+            <a class="button windows-x64">Windows x64</a>
+            <br />
+            <a class="button windows-arm" disabled>Windows ARM (Coming Soon)</a>
+          </div>
+          <div class="s12 m6 l4 margin macos">
+            <a class="button macos-x64">macOS x64</a>
+            <br />
+            <a  class="button macos-arm" disabled>macOS ARM (Coming Soon)</a>
+          </div>
+          <div class="s12 m6 l4 margin linux">
+            <a class="button linux-x64-deb">Linux x64 (deb)</a>
+            <a class="button linux-x64-rpm">Linux x64 (rpm)</a>
+            <br />
+            <a class="button linux-arm" disabled>Linux ARM (Coming Soon)</a>
+          </div>
+        </div>
+      </div>
+
+      <details class="large-margin">
+        <summary class="none">
+          <article class="round primary no-elevate">
+            <nav>
+              <div class="max">Pre-release builds</div>
+              <i><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Expand</title><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" /></svg></i>
+            </nav>
+          </article>
+        </summary>
+        <div class="pre-release padding">
+          <h2>Latest pre-release builds </h2>
+          <h3 class="release-tag"></h3>
+          <small>
+            Pre-release builds generally are in a stable condition, however include new features which may not have
+            had as much testing, potencially having more bugs + issues may occur in these builds. We greatly
+            appriciate it if you could try these, and report any issues you may have with them.
+          </small>
+          <div class="grid center-align">   
+            <div class="m4 windows">
+              <a class="button windows-x64">Windows x64</a>
+              <br />
+              <a class="button windows-arm" disabled>Windows ARM (Coming Soon)</a>
+            </div>
+            <div class="m4 macos">
+              <a class="button macos-x64">macOS x64</a>
+              <br />
+              <a  class="button macos-arm" disabled>macOS ARM (Coming Soon)</a>
+            </div>
+            <div class="m4 linux">
+              <a class="button linux-x64-deb">Linux x64 (deb)</a>
+              <a class="button linux-x64-rpm">Linux x64 (rpm)</a>
+              <br />
+              <a class="button linux-arm" disabled>Linux ARM (Coming Soon)</a>
+            </div>
+          </div>
+        </div>
+      </details>
+
     </section>
 
     <!-- Features -->
     <section id="features">
       <h1>Features</h1>
+
+      <div class="grid features padding">
+        <article class="l4 m6 s12">
+          <h5>Easy 1 Click Install</h5>
+          <p>Simply install, and you're ready to listen to Music!</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Hide to Tray</h5>
+          <p>Have YTM Desktop App hide away into your Tray to keep it nice and tidy as music plays in the background</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Start On boot</h5>
+          <p>Make sure that you're Music is ready to listen as soon as your Computer starts up</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Continue where you left off</h5>
+          <span class="badge border">Updated</span>
+          <p>Continue listening from where you finished from your previous session.</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Custom Shortcuts</h5>
+          <p>Select whatever keybinds you want for Pause, Play, Volume, Like/Dislike and Skipping tracks.</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Taskbar Integration</h5>
+          <p>From Quick access to controls (Windows Only) or View the progress of your current song</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Ratio Volume</h5>
+          <span class="badge border">Updated</span>
+          <p>Improved the volume scale which YouTube Music has, to give lower volumes at lower levels.</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Notifications</h5>
+          <p>Give a notification for each new track which plays.</p>
+        </article>
+        <article class="l4 m6 s12">
+          <h5>Quick access buttons</h5>
+          <p>If it's adding to your Library, or to a playlist, the buttons are now super easy to access</p>
+        </article>
+
+        <article class="l4 m6 s12">
+          <h5>Sleep Timer</h5>
+          <span class="badge border">New</span>
+          <p>Automatically stop playing your music after a specific amount of time.</p>
+        </article>
+
+        <article class="l4 m6 s12">
+          <h5>Companion Server</h5>
+          <span class="badge border">Updated</span>
+          <p>For those developers, an API + Websocket to get Control and Get infomation.</p>
+        </article>
+
+        <article class="l4 m6 s12">
+          <h5>Typescript Source code</h5>
+          <span class="badge border">New</span>
+          <p>Improved source code to make it easier for Developers to work on! (Why not <a href="#contribute">contribute</a>)</p>
+        </article>
+
+      </div>
+
+      <h2>Integrations with:</h2>
+
+      <div class="chip large">
+        <i>
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -28.5 256 256" version="1.1" preserveAspectRatio="xMidYMid">
+            <path d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"  fill-rule="nonzero" />
+          </svg>
+        </i>
+        <span>Discord</span>
+      </div>
+
+      <div class="chip large">
+        <i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M20.2973911,10.9243705 C20.0872375,10.8554597 19.8839266,10.7919248 19.688435,10.7298553 C18.1943918,10.2601877 17.2936635,9.97672434 17.2936635,8.81403954 C17.2936635,7.87079223 18.0208923,7.18706171 19.0242528,7.18706171 C19.7925339,7.18706171 20.3653248,7.50571246 20.8789776,8.22463246 C20.9268734,8.29158903 21.0172889,8.31553554 21.0920633,8.27594857 L22.5993031,7.5066896 C22.6403568,7.48665166 22.6706571,7.44950857 22.6833641,7.40552274 C22.6965593,7.3615376 22.6921611,7.31461966 22.6691911,7.27454377 C21.8618119,5.83963589 20.6971701,5.14222057 19.1088027,5.14222057 C16.6920391,5.14222057 15.1290843,6.60449737 15.1290843,8.86731063 C15.1290843,11.1809525 16.6402347,12.117357 19.4274535,13.0347001 C21.0427015,13.57328 21.7567344,13.8586969 21.7567344,15.0076983 C21.7567344,16.2994078 20.5920946,17.2279931 19.001771,17.1737435 C17.336184,17.1175403 16.8313269,16.2344075 16.1964679,14.7882587 C15.1227312,12.3387509 13.9009097,9.47919886 13.8891806,9.45134171 C12.6624706,6.6216032 10.2315353,5 7.21852183,5 C3.23831589,5 0,8.23880549 0,12.2204782 C0,16.2001959 3.23831589,19.4390007 7.21852183,19.4390007 C9.38945417,19.4390007 11.4245211,18.4766933 12.8007813,16.7979111 C12.8408585,16.7490375 12.8506313,16.6835477 12.8257063,16.6248999 L11.9152059,14.5248327 C11.8893017,14.4666745 11.8311429,14.4275771 11.7671198,14.4246437 C11.701141,14.4217088 11.642005,14.4578782 11.6126825,14.5145696 C10.7534976,16.1562094 9.06982697,17.1756971 7.21754537,17.1756971 C4.48603954,17.1756971 2.26428,14.953448 2.26428,12.2204775 C2.26428,9.48750629 4.48652846,7.26525783 7.2180336,7.26525783 C9.20667086,7.26525783 11.0286514,8.44553669 11.7524578,10.206427 L14.0030537,15.3400325 L14.2625685,15.9167326 C15.2801019,18.2870679 16.7751237,19.3490754 19.1166226,19.3578725 C21.9009093,19.3578725 24,17.5129205 24,15.0673225 C24,12.6099954 22.6418215,11.6892299 20.2973911,10.9243698 L20.2973911,10.9243705 Z"/>
+          </svg>
+        </i>
+        <span>Last.fm</span>
+      </div>
+
+      <div class="chip large">
+        <i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" />
+          </svg>
+        </i>
+        <span>Community made, via Companion Server</span>
+      </div>
     </section>
 
     <!-- Images -->
     <section id="images">
       <h1>Images</h1>
+    </section>
+
+    <!-- Contribute -->
+    <section id="contribute">
+      <h1>Contribute</h1>
     </section>
   </main>
 </body>
