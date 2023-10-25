@@ -15,7 +15,7 @@
     focused: false,
     iconPosition: "icon-only",
     onTap: function () {
-      var closePopoupEvent = {
+      var closePopupEvent = {
         bubbles: true,
         cancelable: false,
         composed: true,
@@ -44,7 +44,7 @@
           returnValue: []
         }
       };
-      this.dispatchEvent(new CustomEvent("yt-action", closePopoupEvent));
+      this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
       this.dispatchEvent(new CustomEvent("yt-action", feedbackEvent));
       document.querySelector("ytmusic-player-bar").store.dispatch({
         type: "SET_FEEDBACK_TOGGLE_STATE",
@@ -65,7 +65,7 @@
     focused: false,
     iconPosition: "icon-only",
     onTap: function () {
-      var closePopoupEvent = {
+      var closePopupEvent = {
         bubbles: true,
         cancelable: false,
         composed: true,
@@ -95,7 +95,7 @@
           returnValue
         }
       };
-      this.dispatchEvent(new CustomEvent("yt-action", closePopoupEvent));
+      this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
       this.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
       returnValue[0].ajaxPromise.then(
         response => {
@@ -121,7 +121,7 @@
             }
           };
           this.dispatchEvent(new CustomEvent("yt-action", addToPlaylistEvent));
-          this.dispatchEvent(new CustomEvent("yt-action", closePopoupEvent));
+          this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
         },
         () => {
           // service request errored
