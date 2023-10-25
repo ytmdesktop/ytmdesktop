@@ -37,6 +37,7 @@ const transformPlayerState = (state: PlayerState) => {
     player: {
       trackState: state.trackState,
       videoProgress: state.videoProgress,
+      volume: state.volume,
       queue: state.queue
         ? {
             autoplay: state.queue.autoplay,

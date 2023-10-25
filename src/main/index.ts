@@ -1365,10 +1365,10 @@ app.on("ready", async () => {
     playerStateStore.updateVideoDetails(videoDetails, playlistId);
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue, album, likeStatus) => {
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, album, likeStatus, volume) => {
     if (event.sender !== ytmView.webContents) return;
 
-    playerStateStore.updateFromStore(queue, album, likeStatus);
+    playerStateStore.updateFromStore(queue, album, likeStatus, volume);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {

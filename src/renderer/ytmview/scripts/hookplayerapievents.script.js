@@ -49,8 +49,10 @@
     const storeLikeStatus = state.likeStatus.videos[videoId];
     
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
+    
+    const volume = state.player.volume;
 
-    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus);
+    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus, volume);
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
