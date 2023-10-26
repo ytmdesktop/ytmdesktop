@@ -1,6 +1,6 @@
 import IIntegration from "../integration";
 import Fastify, { FastifyInstance } from "fastify";
-import FastifyIO from "fastify-socket.io";
+import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import ElectronStore from "electron-store";

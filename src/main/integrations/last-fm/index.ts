@@ -18,7 +18,7 @@ export default class LastFM implements IIntegration {
 
   private possibleVideoIds: string[] | null;
   private lastfmDetails: StoreSchema["lastfm"] = null;
-  private scrobbleTimer: NodeJS.Timer | null = null;
+  private scrobbleTimer: NodeJS.Timeout | null = null;
   private playerStateFunction: (state: PlayerState) => void;
 
   private async createToken(): Promise<string> {
