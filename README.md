@@ -53,8 +53,8 @@ cd ytmdesktop
 ```
 ##### And:
 ```sh
-# If you do not have Yarn Installed / New to Node as a whole please install Yarn with:
-npm install yarn --global
+# If you do not have Yarn Installed / New to Node as a whole you can enable Yarn with:
+corepack enable
 
 # Install dependencies
 yarn install
