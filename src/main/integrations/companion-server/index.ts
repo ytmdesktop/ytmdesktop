@@ -4,7 +4,7 @@ import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import ElectronStore from "electron-store";
-import { BrowserView, app, safeStorage } from "electron";
+import { BrowserView, safeStorage } from "electron";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import { RemoteSocket } from "socket.io";
@@ -63,7 +63,6 @@ export default class CompanionServer implements IIntegration {
     });
     this.fastifyServer.get("/metadata", (request, reply) => {
       reply.send({
-        appVersion: app.getVersion(),
         apiVersions: ["v1"]
       });
     });
