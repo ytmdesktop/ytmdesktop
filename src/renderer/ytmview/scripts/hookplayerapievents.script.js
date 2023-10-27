@@ -13,12 +13,6 @@
       );
     }
   });
-  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onAdStart", () => {
-    window.ytmd.sendAdState(true);
-  });
-  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onAdEnd", () => {
-    window.ytmd.sendAdState(false);
-  });
   document.querySelector("ytmusic-player-bar").store.subscribe(() => {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = document.querySelector("ytmusic-player-bar").store.getState();
@@ -45,14 +39,13 @@
     const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
     const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-
     const storeLikeStatus = state.likeStatus.videos[videoId];
     
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
-    
     const volume = state.player.volume;
+    const adPlaying = state.player.adPlaying;
 
-    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus, volume);
+    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus, volume, adPlaying);
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {

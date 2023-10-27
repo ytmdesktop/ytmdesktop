@@ -66,6 +66,7 @@ export type PlayerState = {
   queue: PlayerQueue;
   videoProgress: number;
   volume: number;
+  adPlaying: boolean;
 };
 
 enum YTMVideoState {
@@ -245,6 +246,7 @@ class PlayerStateStore {
   private playlistId: string | null = null;
   private queue: PlayerQueue | null = null;
   private volume: number = 0;
+  private adPlaying: boolean = false;
   private eventEmitter = new EventEmitter();
 
   constructor() {
@@ -260,7 +262,8 @@ class PlayerStateStore {
       trackState: this.state,
       queue: this.queue,
       videoProgress: this.videoProgress,
-      volume: this.volume
+      volume: this.volume,
+      adPlaying: this.adPlaying
     };
   }
 
@@ -322,7 +325,8 @@ class PlayerStateStore {
     queueState: YTMPlayerQueue | null,
     album: { id: string; text: YTMText } | null,
     likeStatus: YTMLikeStatus | null,
-    volume: number | null
+    volume: number | null,
+    adPlaying: boolean | null
   ) {
     const queueItems = queueState ? queueState.items.map(mapYTMQueueItems) : [];
     this.queue = queueState
@@ -346,9 +350,9 @@ class PlayerStateStore {
       this.videoDetails.albumId = album?.id;
       this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
     }
-    if (volume) {
-      this.volume = volume;
-    }
+    if (volume) this.volume = volume;
+    if (adPlaying) this.adPlaying = adPlaying;
+
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
