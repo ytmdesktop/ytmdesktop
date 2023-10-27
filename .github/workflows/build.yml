@@ -27,7 +27,7 @@ jobs:
       - name: Corepack Enable Yarn
         run: corepack enable yarn
 
-      - name: Setup Node (v18)
+      - name: Setup Node (v20)
         uses: actions/setup-node@v4
         with:
           # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
