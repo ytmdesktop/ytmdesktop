@@ -41,7 +41,7 @@ declare global {
       requestWindowState(): void;
 
       // App specific
-      getAppVersion(): string;
+      getAppVersion(): Promise<string>;
       checkForUpdates(): void;
       handleCheckingForUpdate(callback: (event: Electron.IpcRendererEvent) => void);
       handleUpdateAvailable(callback: (event: Electron.IpcRendererEvent) => void);
