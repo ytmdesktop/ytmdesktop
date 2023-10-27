@@ -43,7 +43,7 @@
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 # Developing
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js (v18)](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js (v20)](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
 ```sh
 # Clone this repository
