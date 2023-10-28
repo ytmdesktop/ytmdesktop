@@ -76,7 +76,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/cli@npm:^6.3.0":
+"@electron-forge/cli@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/cli@npm:6.3.0"
   dependencies:
@@ -167,7 +167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-deb@npm:^6.3.0":
+"@electron-forge/maker-deb@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/maker-deb@npm:6.3.0"
   dependencies:
@@ -181,7 +181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-rpm@npm:^6.3.0":
+"@electron-forge/maker-rpm@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/maker-rpm@npm:6.3.0"
   dependencies:
@@ -195,7 +195,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-squirrel@npm:^6.3.0":
+"@electron-forge/maker-squirrel@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/maker-squirrel@npm:6.3.0"
   dependencies:
@@ -210,7 +210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-zip@npm:^6.3.0":
+"@electron-forge/maker-zip@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/maker-zip@npm:6.3.0"
   dependencies:
@@ -223,7 +223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-auto-unpack-natives@npm:^6.3.0":
+"@electron-forge/plugin-auto-unpack-natives@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/plugin-auto-unpack-natives@npm:6.3.0"
   dependencies:
@@ -242,28 +242,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-base@npm:6.4.2":
-  version: 6.4.2
-  resolution: "@electron-forge/plugin-base@npm:6.4.2"
+"@electron-forge/plugin-fuses@npm:~6.3.0":
+  version: 6.3.0
+  resolution: "@electron-forge/plugin-fuses@npm:6.3.0"
   dependencies:
-    "@electron-forge/shared-types": "npm:6.4.2"
-  checksum: 3ee417c0b589a8e27433a3fb770e473650b4a26abcd3ddbd8bfa47c85839d9cd022b862a1d0d0a614c0c2c8dd54163e0b21c302bf2b483dabc4093d5415d422c
-  languageName: node
-  linkType: hard
-
-"@electron-forge/plugin-fuses@npm:^6.3.0":
-  version: 6.4.2
-  resolution: "@electron-forge/plugin-fuses@npm:6.4.2"
-  dependencies:
-    "@electron-forge/plugin-base": "npm:6.4.2"
-    "@electron-forge/shared-types": "npm:6.4.2"
+    "@electron-forge/plugin-base": "npm:6.3.0"
+    "@electron-forge/shared-types": "npm:6.3.0"
   peerDependencies:
     "@electron/fuses": ">=1.0.0"
-  checksum: 09dda04324dca9ce348b28cbaf4989508234010ed336ce2e8c78c2a747cd4a781cae73e0df81f7f14cc2f5621a0d4dfe82e4e73a7aceaf349b36f9dcc8846a8a
+  checksum: 88d5f363bc02d00517e27951537bf3a9c48be9d0a8a893f26680c843efcf9f87277eef2a7d3970e1f526be151daa87e19013aae1d2f2d49142763bc19f13d87c
   languageName: node
   linkType: hard
 
-"@electron-forge/plugin-webpack@npm:^6.3.0":
+"@electron-forge/plugin-webpack@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/plugin-webpack@npm:6.3.0"
   dependencies:
@@ -291,7 +282,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/publisher-github@npm:^6.3.0":
+"@electron-forge/publisher-github@npm:~6.3.0":
   version: 6.3.0
   resolution: "@electron-forge/publisher-github@npm:6.3.0"
   dependencies:
@@ -316,17 +307,6 @@ __metadata:
     electron-packager: "npm:^17.1.1"
     listr2: "npm:^5.0.3"
   checksum: 32a6e520c9fe14c5d915c77ba4603f092563a5860f6f278f4a9ddd7b5b45b955d50fc87fb76f39d39e5c3a9888a02ac42a6ceb69e613199e91076959f82e859b
-  languageName: node
-  linkType: hard
-
-"@electron-forge/shared-types@npm:6.4.2":
-  version: 6.4.2
-  resolution: "@electron-forge/shared-types@npm:6.4.2"
-  dependencies:
-    "@electron/rebuild": "npm:^3.2.10"
-    electron-packager: "npm:^17.1.2"
-    listr2: "npm:^5.0.3"
-  checksum: 06bb07ea8e0b3945fe51c89dfc8a29c99736f54c7d01d5d579939b0be310b3f9eccbf0c36c0ea16df8f017d98ee1c1da736adf3946eca1db3335b3944163a57d
   languageName: node
   linkType: hard
 
@@ -459,23 +439,6 @@ __metadata:
     electron-osx-flat: bin/electron-osx-flat.js
     electron-osx-sign: bin/electron-osx-sign.js
   checksum: 03435b338e53ee063225913ca879dfc2cd46014b35fc2b3d71052b9562e8660c5e76d4eb6b571597ba59f04d994811265cfc0a735c0b61167fd981365cbdfcba
-  languageName: node
-  linkType: hard
-
-"@electron/osx-sign@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "@electron/osx-sign@npm:1.0.5"
-  dependencies:
-    compare-version: "npm:^0.1.2"
-    debug: "npm:^4.3.4"
-    fs-extra: "npm:^10.0.0"
-    isbinaryfile: "npm:^4.0.8"
-    minimist: "npm:^1.2.6"
-    plist: "npm:^3.0.5"
-  bin:
-    electron-osx-flat: bin/electron-osx-flat.js
-    electron-osx-sign: bin/electron-osx-sign.js
-  checksum: 9b1099858cfe32c2d9329c16e832c003e246cf14356e541342e91876dcbb7a9bab27c89d1f521c3192d1a1d0fd06a186fa101b45341608c434fe850a3053bfb0
   languageName: node
   linkType: hard
 
@@ -3421,35 +3384,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-packager@npm:^17.1.2":
-  version: 17.1.2
-  resolution: "electron-packager@npm:17.1.2"
-  dependencies:
-    "@electron/asar": "npm:^3.2.1"
-    "@electron/get": "npm:^2.0.0"
-    "@electron/notarize": "npm:^1.2.3"
-    "@electron/osx-sign": "npm:^1.0.5"
-    "@electron/universal": "npm:^1.3.2"
-    cross-spawn-windows-exe: "npm:^1.2.0"
-    debug: "npm:^4.0.1"
-    extract-zip: "npm:^2.0.0"
-    filenamify: "npm:^4.1.0"
-    fs-extra: "npm:^11.1.0"
-    galactus: "npm:^1.0.0"
-    get-package-info: "npm:^1.0.0"
-    junk: "npm:^3.1.0"
-    parse-author: "npm:^2.0.0"
-    plist: "npm:^3.0.0"
-    rcedit: "npm:^3.0.1"
-    resolve: "npm:^1.1.6"
-    semver: "npm:^7.1.3"
-    yargs-parser: "npm:^21.1.1"
-  bin:
-    electron-packager: bin/electron-packager.js
-  checksum: afcb7520f35267ea69af187c93bc0d4f9a0cad95e588b37c593d6d0a01faa188d6f3b6e9398f602c978499c48f312fe318b0585ed61b58ecb4a30a3ca4998809
-  languageName: node
-  linkType: hard
-
 "electron-squirrel-startup@npm:^1.0.0":
   version: 1.0.0
   resolution: "electron-squirrel-startup@npm:1.0.0"
@@ -4410,16 +4344,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flora-colossus@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "flora-colossus@npm:2.0.0"
-  dependencies:
-    debug: "npm:^4.3.4"
-    fs-extra: "npm:^10.1.0"
-  checksum: ea50e6ff38fd089f536cbec57da9a3a311efe5a97c21a2c0ae8cc1a85a71c9301b10168693b6389e257c7dbccc3723cc4f0d98377e29b6b65e6f45a929fe5d54
-  languageName: node
-  linkType: hard
-
 "follow-redirects@npm:^1.0.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
@@ -4494,17 +4418,6 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 5f579466e7109719d162a9249abbeffe7f426eb133ea486e020b89bc6d67a741134076bf439983f2eb79276ceaf6bd7b7c1e43c3fd67fe889863e69072fb0a5e
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:^11.1.0":
-  version: 11.1.1
-  resolution: "fs-extra@npm:11.1.1"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: a2480243d7dcfa7d723c5f5b24cf4eba02a6ccece208f1524a2fbde1c629492cfb9a59e4b6d04faff6fbdf71db9fdc8ef7f396417a02884195a625f5d8dc9427
   languageName: node
   linkType: hard
 
@@ -4645,17 +4558,6 @@ __metadata:
     flora-colossus: "npm:^1.0.0"
     fs-extra: "npm:^4.0.0"
   checksum: e82a96580b12d8c33fe043aeafeaf482ec8d2943e38a4bb4fe31cf3cd9b6891092b592d4434945482b3e81e772afd9f06599e09812e6a3d8ce323e97f3536bf7
-  languageName: node
-  linkType: hard
-
-"galactus@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "galactus@npm:1.0.0"
-  dependencies:
-    debug: "npm:^4.3.4"
-    flora-colossus: "npm:^2.0.0"
-    fs-extra: "npm:^10.1.0"
-  checksum: 8422109720515f71b40c60275e05f0a65957bdf15498775ac610df9a254ffe36b10e31d239d88d60c2b348b86d213170d3cfa46562e89c8d860067a80b20ad46
   languageName: node
   linkType: hard
 
@@ -9868,15 +9770,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "youtube-music-desktop-app@workspace:."
   dependencies:
-    "@electron-forge/cli": "npm:^6.3.0"
-    "@electron-forge/maker-deb": "npm:^6.3.0"
-    "@electron-forge/maker-rpm": "npm:^6.3.0"
-    "@electron-forge/maker-squirrel": "npm:^6.3.0"
-    "@electron-forge/maker-zip": "npm:^6.3.0"
-    "@electron-forge/plugin-auto-unpack-natives": "npm:^6.3.0"
-    "@electron-forge/plugin-fuses": "npm:^6.3.0"
-    "@electron-forge/plugin-webpack": "npm:^6.3.0"
-    "@electron-forge/publisher-github": "npm:^6.3.0"
+    "@electron-forge/cli": "npm:~6.3.0"
+    "@electron-forge/maker-deb": "npm:~6.3.0"
+    "@electron-forge/maker-rpm": "npm:~6.3.0"
+    "@electron-forge/maker-squirrel": "npm:~6.3.0"
+    "@electron-forge/maker-zip": "npm:~6.3.0"
+    "@electron-forge/plugin-auto-unpack-natives": "npm:~6.3.0"
+    "@electron-forge/plugin-fuses": "npm:~6.3.0"
+    "@electron-forge/plugin-webpack": "npm:~6.3.0"
+    "@electron-forge/publisher-github": "npm:~6.3.0"
     "@electron/fuses": "npm:^1.6.2"
     "@fastify/cors": "npm:^8.4.0"
     "@fastify/error": "npm:^3.4.0"
