@@ -4,9 +4,21 @@ import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
+import { FusesPlugin } from "@electron-forge/plugin-fuses";
+
+import { FuseV1Options, FuseVersion } from "@electron/fuses/dist/index";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
+
+// There is probably a better way to do this, such as fetching it directly from forge
+let makerArch = null;
+for (let i = 0; i < process.argv.length; i++) {
+  const arg = process.argv[i];
+  if (arg === "--arch") {
+    makerArch = process.argv[i + 1];
+  }
+}
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -103,6 +115,11 @@ const config: ForgeConfig = {
           }
         ]
       }
+    }),
+    new FusesPlugin({
+      version: FuseVersion.V1,
+      resetAdHocDarwinSignature: process.platform === "darwin" && makerArch == "arm64",
+      [FuseV1Options.EnableCookieEncryption]: true
     })
   ]
 };
