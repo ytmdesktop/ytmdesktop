@@ -117,7 +117,6 @@ Object.assign(console, log.functions);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
-  applicationQuitting = true;
   app.quit();
 }
 
@@ -1243,7 +1242,6 @@ app.on("ready", async () => {
       if (store.get("general").hideToTrayOnClose || process.platform === "darwin") {
         mainWindow.hide();
       } else {
-        applicationQuitting = true;
         app.quit();
       }
     }
@@ -1298,7 +1296,6 @@ app.on("ready", async () => {
     if (event.sender !== settingsWindow.webContents) return;
 
     app.relaunch();
-    applicationQuitting = true;
     app.quit();
   });
 
@@ -1504,6 +1501,7 @@ app.on("ready", async () => {
   ipcMain.on("app:restartApplicationForUpdate", event => {
     if (mainWindow && event.sender !== mainWindow.webContents && settingsWindow && event.sender !== settingsWindow.webContents) return;
 
+    // Electron explicitly will not call before-quit until after all the windows have closed, requiring us to have set that the application is quitting before hand
     applicationQuitting = true;
     autoUpdater.quitAndInstall();
   });
@@ -1592,7 +1590,6 @@ app.on("ready", async () => {
       label: "Quit",
       type: "normal",
       click: () => {
-        applicationQuitting = true;
         app.quit();
       }
     }
@@ -1695,6 +1692,7 @@ app.on("ready", async () => {
 
 app.on("before-quit", () => {
   log.info("Application quitting\n\n");
+  applicationQuitting = true;
   saveState();
 });
 
@@ -1707,7 +1705,6 @@ app.on("open-url", (_, url) => {
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    applicationQuitting = true;
     app.quit();
   }
 });
