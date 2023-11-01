@@ -55,13 +55,12 @@ async function setActivity(info) {
                 activity.startTimestamp =
                     now + info.player.seekbarCurrentPosition * 1000
                 activity.endTimestamp =
-                    now +
-                    (info.track.duration - info.player.seekbarCurrentPosition) *
-                        1000
+                    now + (info.track.duration - info.player.seekbarCurrentPosition) * 1000
             }
         }
 
         // activity.largeImageKey = 'ytm_logo_512'
+        activity.type = 2
         activity.largeImageKey = info.track.cover
         activity.smallImageKey = info.player.isPaused
             ? 'discordrpc-pause'
@@ -73,8 +72,8 @@ async function setActivity(info) {
             activity.buttons = [
                 {
                     label: 'Play on YouTube Music',
-                    url: 'https://music.youtube.com/watch?v=' + info.track.id,
-                },
+                    url: 'https://music.youtube.com/watch?v=' + info.track.id
+                }
             ]
         }
 
@@ -87,6 +86,7 @@ async function setActivity(info) {
                 activity: {
                     state: activity.state,
                     details: activity.details,
+                    type: activity.type,
                     timestamps: {
                         start: activity.startTimestamp,
                         end: activity.endTimestamp,
@@ -99,7 +99,7 @@ async function setActivity(info) {
                     },
                     instance: activity.instance,
                     buttons: activity.buttons,
-                },
+                }
             })
         }
     }
@@ -109,5 +109,5 @@ module.exports = {
     isStarted: isStarted,
     start: start,
     stop: stop,
-    setActivity: setActivity,
+    setActivity: setActivity
 }
