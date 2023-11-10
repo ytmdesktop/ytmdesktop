@@ -7331,7 +7331,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.0.3":
+"prettier@npm:3.0.3":
   version: 3.0.3
   resolution: "prettier@npm:3.0.3"
   bin:
@@ -9804,7 +9804,7 @@ __metadata:
     lint-staged: "npm:^15.0.2"
     material-symbols: "npm:^0.12.0"
     node-loader: "npm:^2.0.0"
-    prettier: "npm:^3.0.3"
+    prettier: "npm:3.0.3"
     socket.io: "npm:^4.7.2"
     style-loader: "npm:^3.3.3"
     ts-loader: "npm:^9.5.0"
