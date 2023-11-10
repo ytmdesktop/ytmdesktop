@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import KeybindInput from "./KeybindInput.vue";
-import YTMDSetting from "./YTMDSetting.vue";
+import KeybindInput from "../../components/KeybindInput.vue";
+import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 
@@ -392,7 +392,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           />
           <div v-if="lastFMEnabled" class="setting indented">
             <div class="name-with-description">
-              <p class="name">
+              <p class="description">
                 User is Authenticated:
                 <span v-if="lastFMSessionKey" style="color: #4caf50">Yes</span>
                 <span v-else style="color: #ff1100">No</span>

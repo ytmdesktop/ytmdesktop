@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TitleBar from "../../components/TitleBar.vue";
-import Settings from "../../components/Settings.vue";
+import Settings from "./Settings.vue";
 </script>
 
 <template>
