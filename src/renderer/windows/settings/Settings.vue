@@ -541,6 +541,18 @@ window.ytmd.handleUpdateDownloaded(() => {
   padding: 4px 16px;
 }
 
+.content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: #212121;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #414141;
+}
+
 .sidebar {
   width: 25%;
   min-width: 25%;
