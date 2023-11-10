@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import KeybindInput from "./KeybindInput.vue";
+import YTMDSetting from "./YTMDSetting.vue";
 import { StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 
@@ -19,7 +20,6 @@ const checkingForUpdate = ref(false);
 const updateAvailable = ref(await window.ytmd.isAppUpdateAvailable());
 const updateNotAvailable = ref(false);
 const updateDownloaded = ref(await window.ytmd.isAppUpdateDownloaded());
-const cssPathFileInput = ref(null);
 
 const store = window.ytmd.store;
 const memoryStore = window.ytmd.memoryStore;
@@ -179,6 +179,8 @@ async function settingChangedRequiresRestart() {
 async function settingChangedFile(event: Event) {
   const target = event.target as HTMLInputElement;
 
+  console.log(event);
+
   const setting = target.dataset.setting;
   if (!setting) {
     throw new Error("No setting specified in File Input");
@@ -269,109 +271,89 @@ window.ytmd.handleUpdateDownloaded(() => {
           <button class="restart-button" @click="restartApplication">Restart</button>
         </div>
         <div v-if="currentTab === 1" class="general-tab">
-          <div v-if="!isDarwin" class="setting">
-            <p>Hide to tray on close</p>
-            <input v-model="hideToTrayOnClose" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Show notification on song change</p>
-            <input v-model="showNotificationOnSongChange" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Start on boot</p>
-            <input v-model="startOnBoot" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
+          <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" name="Hide to tray on close" @change="settingsChanged" />
+          <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" name="Show notification on song change" @change="settingsChanged" />
+          <YTMDSetting v-model="startOnBoot" type="checkbox" name="Start on boot" @change="settingsChanged" />
           <!--<div class="setting">
-          <p>Start minimized</p>
-          <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
-        </div>-->
-          <div class="setting">
-            <p>Disable hardware acceleration <span class="reload-required material-symbols-outlined">autorenew</span></p>
-            <input v-model="disableHardwareAcceleration" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-          </div>
+            <p>Start minimized</p>
+            <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
+          </div>-->
+          <YTMDSetting
+            v-model="disableHardwareAcceleration"
+            type="checkbox"
+            restart-required
+            name="Disable hardware acceleration"
+            @change="settingChangedRequiresRestart"
+          />
         </div>
 
         <div v-if="currentTab === 2" class="appearance-tab">
-          <div class="setting">
-            <p>Always show volume slider</p>
-            <input v-model="alwaysShowVolumeSlider" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Custom CSS</p>
-            <input v-model="customCSSEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div v-if="customCSSEnabled" class="setting indented">
-            <p>Custom CSS File Path</p>
-            <div class="file-picker">
-              <input ref="cssPathFileInput" type="file" accept=".css" data-setting="appearance.customCSSPath" @change="settingChangedFile" />
-              <div class="file-input-button">
-                <button class="choose" @click="cssPathFileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
-                <input type="text" readonly :title="customCSSPath" class="path" placeholder="No file chosen" :value="customCSSPath" />
-                <button v-if="customCSSPath" class="remove" @click="removeCustomCSSPath"><span class="material-symbols-outlined">delete</span></button>
-              </div>
-            </div>
-          </div>
-          <div class="setting">
-            <p>Zoom</p>
-            <div class="range-selector">
-              <span class="range-value">{{ zoom }}</span>
-              <input v-model.number="zoom" class="range" type="range" max="300" min="30" step="10" @change="settingsChanged" />
-            </div>
-          </div>
+          <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" name="Always show volume slider" @change="settingsChanged" />
+          <YTMDSetting v-model="customCSSEnabled" type="checkbox" name="Custom CSS" @change="settingsChanged" />
+          <YTMDSetting
+            v-if="customCSSEnabled"
+            v-model="customCSSPath"
+            type="file"
+            indented
+            bind-setting="appearance.customCSSPath"
+            name="Custom CSS file path"
+            @file-change="settingChangedFile"
+            @clear="removeCustomCSSPath"
+          />
+          <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 3" class="playback-tab">
-          <div class="setting">
-            <p>Continue where you left off</p>
-            <input v-model="continueWhereYouLeftOff" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div v-if="continueWhereYouLeftOff" class="setting indented">
-            <p>Pause on application launch</p>
-            <input v-model="continueWhereYouLeftOffPaused" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Show track progress on taskbar</p>
-            <input v-model="progressInTaskbar" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div class="setting">
-            <p>Enable speaker fill <span class="reload-required material-symbols-outlined">autorenew</span></p>
-            <input v-model="enableSpeakerFill" class="toggle" type="checkbox" @change="settingChangedRequiresRestart" />
-          </div>
-          <div class="setting">
-            <p>Ratio volume</p>
-            <input v-model="ratioVolume" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
+          <YTMDSetting v-model="continueWhereYouLeftOff" name="Continue where you left off" type="checkbox" @change="settingsChanged" />
+          <YTMDSetting
+            v-if="continueWhereYouLeftOff"
+            v-model="continueWhereYouLeftOffPaused"
+            type="checkbox"
+            name="Pause on application launch"
+            @change="settingsChanged"
+          />
+          <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
+          <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
+          <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
-          <div :class="{ setting: true, disabled: !safeStorageAvailable }">
-            <p v-if="safeStorageAvailable">Companion server</p>
-            <div v-else class="name-with-description">
-              <p class="name">Companion server</p>
-              <p class="description">This integration cannot be enabled due to safeStorage being unavailable</p>
-            </div>
-            <input v-model="companionServerEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented">
-            <div class="name-with-description">
-              <p class="name">Allow browser communication</p>
-              <p class="description">This setting could be dangerous as it allows any website you visit to communicate with the companion server</p>
-            </div>
-            <input v-model="companionServerCORSWildcardEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
-          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented">
-            <div class="name-with-description">
-              <p class="name">Enable companion authorization</p>
-              <p class="description">Automatically disables after the first successful authorization or 5 minutes has passed</p>
-            </div>
-            <input v-model="companionServerAuthWindowEnabled" class="toggle" type="checkbox" @change="memorySettingsChanged" />
-          </div>
-          <div v-if="companionServerEnabled && safeStorageAvailable" class="setting indented authorized-companions">
-            <div class="name-with-description">
-              <p class="name">Authorized companions</p>
-              <p class="description">This is a list of companions that currently have access to the companion server</p>
-            </div>
-            <table>
+          <YTMDSetting
+            v-model="companionServerEnabled"
+            type="checkbox"
+            name="Companion server"
+            :disabled="!safeStorageAvailable"
+            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="companionServerEnabled && safeStorageAvailable"
+            v-model="companionServerCORSWildcardEnabled"
+            type="checkbox"
+            indented
+            name="Allow browser communication"
+            description="This setting could be dangerous as it allows any website you visit to communicate with the companion server"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="companionServerEnabled && safeStorageAvailable"
+            v-model="companionServerAuthWindowEnabled"
+            type="checkbox"
+            indented
+            name="Enable companion authorization"
+            description="Automatically disables after the first successful authorization or 5 minutes has passed"
+            @change="memorySettingsChanged"
+          />
+          <YTMDSetting
+            v-if="companionServerEnabled && safeStorageAvailable"
+            type="custom"
+            flex-column
+            indented
+            name="Authorized companions"
+            description="This is a list of companions that currently have access to the companion server"
+            @change="settingsChanged"
+          >
+            <table class="authorized-companions-table">
               <thead>
                 <tr>
                   <th class="id">ID</th>
@@ -391,26 +373,23 @@ window.ytmd.handleUpdateDownloaded(() => {
                 </tr>
               </tbody>
             </table>
-            <div v-if="companionServerAuthTokens.length === 0" class="no-companions">
+            <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
               <td>No authorized companions</td>
             </div>
-          </div>
-          <div class="setting">
-            <p>Discord rich presence</p>
-            <input v-model="discordPresenceEnabled" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
+          </YTMDSetting>
+          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
           <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
             <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
             <button @click="restartDiscordPresence">Retry</button>
           </div>
-          <div :class="{ setting: true, disabled: !safeStorageAvailable }">
-            <p v-if="safeStorageAvailable">Last.fm scrobbling</p>
-            <div v-else class="name-with-description">
-              <p class="name">Last.fm scrobbling</p>
-              <p class="description">This integration cannot be enabled due to safeStorage being unavailable</p>
-            </div>
-            <input v-model="lastFMEnabled" :disabled="!safeStorageAvailable" class="toggle" type="checkbox" @change="settingsChanged" />
-          </div>
+          <YTMDSetting
+            v-model="lastFMEnabled"
+            type="checkbox"
+            name="Last.fm scrobbling"
+            :disabled="!safeStorageAvailable"
+            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            @change="settingsChanged"
+          />
           <div v-if="lastFMEnabled" class="setting indented">
             <div class="name-with-description">
               <p class="name">
@@ -628,75 +607,6 @@ window.ytmd.handleUpdateDownloaded(() => {
   color: #969696;
 }
 
-.toggle {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  min-width: 62px;
-  min-height: 32px;
-  width: 62px;
-  height: 32px;
-  display: inline-block;
-  position: relative;
-  border-radius: 50px;
-  overflow: hidden;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  background-color: #212121;
-  transition: background-color ease 0.3s;
-}
-
-.toggle:before {
-  content: "";
-  display: block;
-  position: absolute;
-  z-index: 2;
-  width: 28px;
-  height: 28px;
-  background: #fff;
-  left: 2px;
-  top: 2px;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all ease 0.3s;
-}
-
-.toggle:checked {
-  background-color: #f44336;
-}
-
-.toggle:checked:before {
-  left: 32px;
-}
-
-.range {
-  -webkit-appearance: none;
-  height: 15px;
-  border-radius: 5px;
-  background: #212121;
-  outline: none;
-}
-
-.range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #f44336;
-  cursor: pointer;
-}
-
-.range-value {
-  vertical-align: top;
-  margin-right: 8px;
-}
-
-.reload-required {
-  vertical-align: middle;
-}
-
 .about-tab {
   display: flex;
   justify-content: center;
@@ -827,113 +737,36 @@ window.ytmd.handleUpdateDownloaded(() => {
   user-select: text;
 }
 
-input[type="file"] {
-  display: none;
-}
-
-.file-picker {
-  background-color: #212121;
-  border-radius: 4px;
-}
-
-.file-input-button {
-  width: 216px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.file-input-button button {
-  padding: 8px;
-  border: none;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.file-input-button button.choose {
-  background-color: #f44336;
-  border-radius: 4px 0 0 4px;
-}
-
-.file-input-button button.remove {
-  background-color: transparent;
-  border-left: 1px solid #323232;
-  border-radius: 0 4px 4px 0;
-}
-
-.file-input-button button .material-symbols-outlined {
-  margin-right: 4px;
-  font-size: 18px;
-}
-
-.file-input-button input[type="text"] {
-  margin: 0;
-  padding: 8px;
-  width: 100%;
-  border: none;
-  background-color: transparent;
-}
-
-.file-input-button input[type="text"]:focus,
-.file-input-button input[type="text"]:active {
-  outline: none;
-}
-
-.file-input-button p {
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .setting.disabled {
   color: #c6c6c6;
 }
 
-.toggle:disabled {
-  background-color: #212121;
-  cursor: not-allowed;
-}
-
-.toggle:disabled::before {
-  background-color: #969696;
-}
-
-.setting.indented.authorized-companions {
-  display: flex;
-  flex-direction: column;
-  align-items: initial;
-  justify-content: initial;
-}
-
-.setting.indented.authorized-companions table {
+.authorized-companions-table {
   width: 100%;
   table-layout: fixed;
 }
 
-.setting.indented.authorized-companions table tr .name {
+.authorized-companions-table tr .name {
   width: 50%;
 }
 
-.setting.indented.authorized-companions table tr th,
-.setting.indented.authorized-companions table tr td {
+.authorized-companions-table tr th,
+.authorized-companions-table tr td {
   padding: 4px;
 }
 
-.setting.indented.authorized-companions table th {
+.authorized-companions-table th {
   text-align: left;
 }
 
-.setting.indented.authorized-companions table thead tr th {
+.authorized-companions-table thead tr th {
   border-bottom: 1px solid #212121;
 }
-
-.setting.indented.authorized-companions table thead tr .controls {
+.authorized-companions-table thead tr .controls {
   width: 48px;
 }
 
-.setting.indented.authorized-companions table tbody button {
+.authorized-companions-table tbody button {
   border-radius: 4px;
   padding: 4px;
   display: flex;
@@ -943,7 +776,7 @@ input[type="file"] {
   border: none;
 }
 
-.setting.indented.authorized-companions .no-companions {
+.no-authorized-companions {
   color: #bbbbbb;
   padding: 4px;
 }
