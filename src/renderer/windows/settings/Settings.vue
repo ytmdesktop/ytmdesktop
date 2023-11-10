@@ -309,6 +309,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-if="continueWhereYouLeftOff"
             v-model="continueWhereYouLeftOffPaused"
             type="checkbox"
+            indented
             name="Pause on application launch"
             @change="settingsChanged"
           />
