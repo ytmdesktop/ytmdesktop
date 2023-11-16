@@ -90,7 +90,7 @@ const config: ForgeConfig = {
             preload: {
               js: "./src/renderer/windows/main/preload.ts"
             },
-            additionalChunks: ["shared", "vueSharedComponents", "storeRendererIpc", "vendorVue"]
+            additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
           },
           {
             html: "./src/renderer/windows/settings/index.html",
@@ -99,7 +99,7 @@ const config: ForgeConfig = {
             preload: {
               js: "./src/renderer/windows/settings/preload.ts"
             },
-            additionalChunks: ["shared", "vueSharedComponents", "storeRendererIpc", "vendorVue"]
+            additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
           },
           {
             html: "./src/renderer/windows/authorize-companion/index.html",
@@ -108,14 +108,13 @@ const config: ForgeConfig = {
             preload: {
               js: "./src/renderer/windows/authorize-companion/preload.ts"
             },
-            additionalChunks: ["shared", "vueSharedComponents", "storeRendererIpc", "vendorVue"]
+            additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
           },
           {
             name: "ytm_view",
             preload: {
               js: "./src/renderer/ytmview/preload.ts"
-            },
-            additionalChunks: ["shared", "storeRendererIpc"]
+            }
           }
         ]
       }
