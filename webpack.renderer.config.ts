@@ -61,6 +61,27 @@ export const rendererConfig: Configuration = {
   module: {
     rules
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        shared: {
+          name: "shared",
+          test: /[\\/]src[\\/]shared[\\/]/,
+          chunks: "all"
+        },
+        vueSharedComponents: {
+          name: "vue_shared_components",
+          test: /[\\/]src[\\/]renderer[\\/]components[\\/]/,
+          chunks: "all"
+        },
+        vendorVue: {
+          name: "vendor_vue",
+          test: /[\\/]node_modules[\\/]@?vue.*?[\\/]/,
+          chunks: "all"
+        }
+      }
+    }
+  },
   plugins: [
     new DefinePlugin({
       YTMD_GIT_COMMIT_HASH: JSON.stringify(gitCommitHash),
