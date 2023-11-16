@@ -3,7 +3,7 @@ import Fastify, { FastifyInstance } from "fastify";
 import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
-import ElectronStore from "electron-store";
+import Conf from "conf";
 import { BrowserView, safeStorage } from "electron";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { AuthToken } from "~shared/integrations/companion-server/types";
@@ -18,7 +18,7 @@ export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
   private listenPort = 9863;
   private fastifyServer: FastifyInstance;
-  private store: ElectronStore<StoreSchema>;
+  private store: Conf<StoreSchema>;
   private memoryStore: MemoryStore<MemoryStoreSchema>;
   private ytmView: BrowserView;
   private storeListener: () => void | null = null;
@@ -73,7 +73,7 @@ export default class CompanionServer implements IIntegration {
     });
   }
 
-  public provide(store: ElectronStore<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>, ytmView: BrowserView): void {
+  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>, ytmView: BrowserView): void {
     this.store = store;
     this.memoryStore = memoryStore;
     this.ytmView = ytmView;

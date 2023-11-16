@@ -16,7 +16,7 @@ import {
   shell,
   Tray
 } from "electron";
-import ElectronStore from "electron-store";
+import Conf from "conf";
 import log from "electron-log";
 import path from "path";
 
@@ -296,7 +296,10 @@ function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<
 }
 
 // Create the persistent config store
-const store = new ElectronStore<StoreSchema>({
+const store = new Conf<StoreSchema>({
+  configName: "config",
+  cwd: app.getPath("userData"),
+  projectVersion: app.getVersion(),
   watch: true,
   defaults: {
     metadata: {

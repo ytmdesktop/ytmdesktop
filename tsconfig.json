@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "allowJs": true,
-    "module": "node16",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,

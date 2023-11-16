@@ -1,5 +1,5 @@
 import { BrowserView, BrowserWindow, ipcMain } from "electron";
-import ElectronStore from "electron-store";
+import Conf from "conf";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "~shared/store/schema";
 import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-state-store";
@@ -76,7 +76,7 @@ const transformPlayerState = (state: PlayerState) => {
 };
 
 interface CompanionServerAPIv1Options extends FastifyPluginOptions {
-  getStore: () => ElectronStore<StoreSchema>;
+  getStore: () => Conf<StoreSchema>;
   getYtmView: () => BrowserView;
 }
 

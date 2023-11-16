@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { safeStorage } from "electron";
-import ElectronStore from "electron-store";
+import Conf from "conf";
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import { StoreSchema } from "../../../../shared/store/schema";
 import { AuthToken } from "../../../../shared/integrations/companion-server/types";
@@ -55,7 +55,7 @@ export function getIsTemporaryAuthCodeValidAndRemove(appId: string, code: string
   return false;
 }
 
-export function createAuthToken(store: ElectronStore<StoreSchema>, appId: string, appVersion: string, appName: string) {
+export function createAuthToken(store: Conf<StoreSchema>, appId: string, appVersion: string, appName: string) {
   let authTokens: AuthToken[] = [];
   try {
     authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex")));
@@ -86,7 +86,7 @@ export function createAuthToken(store: ElectronStore<StoreSchema>, appId: string
   return token;
 }
 
-export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string): [boolean, string] {
+export function isAuthValid(store: Conf<StoreSchema>, authToken: string): [boolean, string] {
   if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
@@ -116,7 +116,7 @@ export function isAuthValid(store: ElectronStore<StoreSchema>, authToken: string
   return [false, null];
 }
 
-export function isAuthValidMiddleware(store: ElectronStore<StoreSchema>, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
+export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
   const authToken = request.headers.authorization;
   if (!authToken) {
     response.code(401);

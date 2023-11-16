@@ -1,5 +1,5 @@
 import { shell, safeStorage } from "electron";
-import ElectronStore from "electron-store";
+import Conf from "conf";
 import cypto from "crypto";
 
 import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
@@ -11,7 +11,7 @@ import { LastfmErrorResponse, LastfmRequestBody, LastfmSessionResponse, LastfmTo
 import log from "electron-log";
 
 export default class LastFM implements IIntegration {
-  private store: ElectronStore<StoreSchema>;
+  private store: Conf<StoreSchema>;
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
   private isEnabled = false;
@@ -166,7 +166,7 @@ export default class LastFM implements IIntegration {
 
   // ----------------------------------------------------------
 
-  public provide(store: ElectronStore<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
+  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
     this.store = store;
     this.memoryStore = memoryStore;
   }
