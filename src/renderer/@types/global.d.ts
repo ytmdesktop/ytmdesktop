@@ -1,7 +1,7 @@
 import { WindowsEventArguments } from "~shared/types";
-import Store from "../store/renderer";
+import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
-import MemoryStore from "../memory-store/renderer";
+import MemoryStore from "../store-ipc/memory-store";
 
 declare global {
   interface Window {

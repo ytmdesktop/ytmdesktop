@@ -9,7 +9,7 @@
 // - Add functions to exposeInMainWorld when you need to call back to the main program. By nature you should not trust data coming from this.
 
 import { contextBridge, ipcRenderer, webFrame } from "electron";
-import Store from "../store/renderer";
+import Store from "../store-ipc/store";
 import { StoreSchema } from "~shared/store/schema";
 
 import playerBarControlsScript from "./scripts/playerbarcontrols.script";
