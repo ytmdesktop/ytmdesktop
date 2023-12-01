@@ -50,7 +50,8 @@ function isDisallowedKey(key: string) {
     key === "Tab" ||
     key === "AudioVolumeUp" ||
     key === "AudioVolumeDown" ||
-    key === "AudioVolumeMute"
+    key === "AudioVolumeMute" ||
+    key === "ContextMenu"
   );
 }
 
