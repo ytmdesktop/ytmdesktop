@@ -1196,8 +1196,8 @@ async function createWindow() {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
-                if (infoPlayerProvider.getTrackInfo().id === '')
-                    infoPlayerProvider.firstPlay(view.webContents)
+                // if (infoPlayerProvider.getTrackInfo().id === '') 
+                    // infoPlayerProvider.firstPlay(view.webContents)
 
                 doublePressPlayPause = true
                 setTimeout(() => {
