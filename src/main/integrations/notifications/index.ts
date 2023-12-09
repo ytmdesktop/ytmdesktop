@@ -37,6 +37,9 @@ function displayNotification(videoDetails: VideoDetails, imageData: string) {
 
   const notification = new Notification(notificationData);
   notification.show();
+  setTimeout(() => {
+    notification.close();
+  }, 5 * 1000);
 }
 
 /**
