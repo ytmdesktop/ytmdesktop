@@ -880,6 +880,18 @@ function urlIsGoogleAccountsDomain(url: URL): boolean {
   if (supportedDomains.includes(domain)) return true;
   return false;
 }
+function isPreventedNavOrRedirect(url: URL): boolean {
+  return (
+    url.hostname !== "consent.youtube.com" &&
+    url.hostname !== "accounts.youtube.com" &&
+    url.hostname !== "music.youtube.com" &&
+    !(
+      (url.hostname === "www.youtube.com" || url.hostname === "youtube.com") &&
+      (url.pathname === "/signin" || url.pathname === "/premium" || url.pathname === "/signin_prompt")
+    ) &&
+    !urlIsGoogleAccountsDomain(url)
+  );
+}
 
 const createYTMView = (): void => {
   memoryStore.set("ytmViewLoadTimedout", false);
@@ -902,16 +914,7 @@ const createYTMView = (): void => {
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
     const url = new URL(event.url);
-    if (
-      url.hostname !== "consent.youtube.com" &&
-      url.hostname !== "accounts.youtube.com" &&
-      url.hostname !== "music.youtube.com" &&
-      !(url.hostname === "www.youtube.com" && url.pathname === "/signin") &&
-      !(url.hostname === "youtube.com" && url.pathname === "/signin") &&
-      !(url.hostname === "www.youtube.com" && url.pathname === "/premium") &&
-      !(url.hostname === "youtube.com" && url.pathname === "/premium") &&
-      !urlIsGoogleAccountsDomain(url)
-    ) {
+    if (isPreventedNavOrRedirect(url)) {
       event.preventDefault();
       log.info(`Blocking YTM View navigation to ${event.url}`);
 
@@ -920,16 +923,7 @@ const createYTMView = (): void => {
   });
   ytmView.webContents.on("will-redirect", event => {
     const url = new URL(event.url);
-    if (
-      url.hostname !== "consent.youtube.com" &&
-      url.hostname !== "accounts.youtube.com" &&
-      url.hostname !== "music.youtube.com" &&
-      !(url.hostname === "www.youtube.com" && url.pathname === "/signin") &&
-      !(url.hostname === "youtube.com" && url.pathname === "/signin") &&
-      !(url.hostname === "www.youtube.com" && url.pathname === "/premium") &&
-      !(url.hostname === "youtube.com" && url.pathname === "/premium") &&
-      !urlIsGoogleAccountsDomain(url)
-    ) {
+    if (isPreventedNavOrRedirect(url)) {
       event.preventDefault();
       log.info(`Blocking YTM View redirect to ${event.url}`);
     }
