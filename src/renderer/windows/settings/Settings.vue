@@ -257,7 +257,7 @@ window.ytmd.handleUpdateDownloaded(() => {
   <div class="settings-container">
     <div class="content-container">
       <ul class="sidebar">
-        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
+        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">dashboard</span>General</li>
         <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
         <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
@@ -568,12 +568,15 @@ window.ytmd.handleUpdateDownloaded(() => {
 .sidebar li {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 10px 12px;
   cursor: pointer;
   color: #bbbbbb;
+  font-size: 0.9em;
+  border-left: 4px solid #212121;
 }
 
 .sidebar li .material-symbols-outlined {
+  padding-right: 8px;
   font-size: 28px;
   font-variation-settings:
     "FILL" 0,
@@ -583,12 +586,13 @@ window.ytmd.handleUpdateDownloaded(() => {
 }
 
 .sidebar li:hover {
-  background-color: #111111;
+  background-color: #212121;
 }
 
 .sidebar li.active {
-  background-color: #212121;
+  background-color: #333;
   color: #eeeeee;
+  border-left: 4px solid #d32f2f;
 }
 
 .sidebar li .material-symbols-outlined {

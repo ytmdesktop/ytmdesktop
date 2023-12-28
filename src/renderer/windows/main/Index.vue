@@ -27,6 +27,7 @@ onMounted(() => {
   <div ref="keyboardFocusZero" tabindex="0"></div>
   <Suspense>
     <TitleBar
+      class="text-title"
       is-main-window
       has-home-button
       has-settings-button

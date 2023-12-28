@@ -17,13 +17,13 @@ import Settings from "./Settings.vue";
 <style scoped>
 .settings {
   border-top: 1px solid #212121;
-  background-color: #000000;
+  background-color: #1d1d1d;
   height: calc(100% - 36px);
 }
 
 .container {
   width: 100%;
   height: 100%;
-  background-color: #000000;
+  background-color: #1d1d1d;
 }
 </style>

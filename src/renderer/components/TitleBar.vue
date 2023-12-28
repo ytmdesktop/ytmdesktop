@@ -158,18 +158,19 @@ if (props.isMainWindow) {
 .title .icon {
   margin-left: 4px;
   margin-right: 4px;
-  font-size: 24px;
+  font-size: 22px;
   font-variation-settings:
     "FILL" 0,
     "wght" 100,
     "GRAD" 0,
     "opsz" 24;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .title-text {
   font-family: "Open Sans", sans-serif;
+  font-size: 0.8em;
 }
 
 .app-button {
@@ -200,7 +201,7 @@ if (props.isMainWindow) {
 }
 
 .app-button > .material-symbols-outlined {
-  font-size: 28px;
+  font-size: 20px;
 }
 
 .app-buttons .divider {
@@ -209,14 +210,14 @@ if (props.isMainWindow) {
 }
 
 .app-buttons .divider:not(:last-child) {
-  margin: 2px 4px 2px 1px;
+  margin: 4px 4px 4px 1px;
   position: relative;
 }
 
 .app-buttons .divider:after {
   content: "";
   position: absolute;
-  border-left: 1px solid #666666;
+  border-left: 1px solid #333333;
   right: 0;
   height: 100%;
 }

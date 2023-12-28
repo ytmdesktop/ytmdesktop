@@ -115,10 +115,10 @@ input[type="checkbox"] {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  min-width: 62px;
-  min-height: 32px;
-  width: 62px;
-  height: 32px;
+  min-width: 55px;
+  min-height: 24px;
+  width: 55px;
+  height: 24px;
   display: inline-block;
   position: relative;
   border-radius: 50px;
@@ -135,8 +135,8 @@ input[type="checkbox"]:before {
   display: block;
   position: absolute;
   z-index: 2;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   background: #fff;
   left: 2px;
   top: 2px;
