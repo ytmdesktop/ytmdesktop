@@ -321,6 +321,7 @@ const store = new Conf<StoreSchema>({
     playback: {
       continueWhereYouLeftOff: true,
       continueWhereYouLeftOffPaused: true,
+      autoClickSkipAd: true,
       enableSpeakerFill: false,
       progressInTaskbar: false,
       ratioVolume: false
@@ -614,6 +615,20 @@ function setupTaskbarFeatures() {
       mainWindow.setProgressBar(hasVideo ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
         mode: isPlaying ? "normal" : "paused"
       });
+    }
+
+    if (store.get("playback.autoClickSkipAd") && state.adPlaying) {
+      ytmView.webContents
+        .executeJavaScript(`document.querySelector(".ytp-ad-preview-slot").style.display`)
+        .then((display: string) => {
+          if (display === "none") {
+            // The "skip btn" is visible, so click it
+            ytmView.webContents.executeJavaScript('document.querySelector(".ytp-ad-skip-button-modern").click()');
+          }
+        })
+        .catch(error => {
+          console.error("Error executing JavaScript:", error);
+        });
     }
   });
 
@@ -1361,7 +1376,6 @@ app.on("ready", async () => {
 
   ipcMain.on("ytmView:storeStateChanged", (event, queue, album, likeStatus, volume, adPlaying) => {
     if (event.sender !== ytmView.webContents) return;
-
     playerStateStore.updateFromStore(queue, album, likeStatus, volume, adPlaying);
   });
 

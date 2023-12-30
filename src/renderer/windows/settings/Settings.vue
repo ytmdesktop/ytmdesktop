@@ -47,6 +47,7 @@ const zoom = ref<number>(appearance.zoom);
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
+const autoClickSkipAd = ref<boolean>(playback.autoClickSkipAd);
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
@@ -83,6 +84,7 @@ store.onDidAnyChange(async newState => {
 
   continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
+  autoClickSkipAd.value = newState.playback.autoClickSkipAd;
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
@@ -153,6 +155,7 @@ async function settingsChanged() {
 
   store.set("playback.continueWhereYouLeftOff", continueWhereYouLeftOff.value);
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
+  store.set("playback.autoClickSkipAd", autoClickSkipAd.value);
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
@@ -313,6 +316,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             name="Pause on application launch"
             @change="settingsChanged"
           />
+          <YTMDSetting v-model="autoClickSkipAd" type="checkbox" name="Auto click skip ad" @change="settingsChanged" />
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />

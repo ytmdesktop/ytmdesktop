@@ -1,7 +1,7 @@
 export type StoreSchema = {
   metadata: {
-    version: 1
-  }
+    version: 1;
+  };
   general: {
     disableHardwareAcceleration: boolean;
     hideToTrayOnClose: boolean;
@@ -18,6 +18,7 @@ export type StoreSchema = {
   playback: {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
+    autoClickSkipAd: boolean;
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
@@ -52,12 +53,12 @@ export type StoreSchema = {
     sessionKey: string | null;
   };
   developer: {
-    enableDevTools: boolean
-  }
+    enableDevTools: boolean;
+  };
 };
 
 export type MemoryStoreSchema = {
-  discordPresenceConnectionFailed: boolean
+  discordPresenceConnectionFailed: boolean;
   shortcutsPlayPauseRegisterFailed: boolean;
   shortcutsNextRegisterFailed: boolean;
   shortcutsPreviousRegisterFailed: boolean;
