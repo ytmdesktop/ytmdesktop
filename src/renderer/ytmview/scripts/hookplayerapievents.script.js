@@ -4,6 +4,7 @@
     let state = document.querySelector("ytmusic-player-bar").store.getState();
 
     let album = null;
+    let thumbnails = null;
     if (state.playerPage.playerOverlay) {
       album = {
         id: null,
@@ -20,6 +21,10 @@
           }
         }
       }
+
+      if (state.playerPage.playerOverlay.playerOverlayRenderer.browserMediaSession.browserMediaSessionRenderer.thumbnailDetails) {
+        thumbnails = state.playerPage.playerOverlay.playerOverlayRenderer.browserMediaSession.browserMediaSessionRenderer.thumbnailDetails.thumbnails
+      }
     }
 
     const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
@@ -31,7 +36,7 @@
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
 
-    window.ytmd.sendStoreUpdate(state.queue, album, likeStatus, volume, adPlaying);
+    window.ytmd.sendStoreUpdate(state.queue, thumbnails, album, likeStatus, volume, adPlaying);
   }
 
   document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
