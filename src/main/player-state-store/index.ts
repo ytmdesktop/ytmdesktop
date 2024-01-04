@@ -357,8 +357,9 @@ class PlayerStateStore {
       this.videoDetails.albumId = album?.id;
       this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
     }
-    if (volume) this.volume = volume;
-    if (adPlaying) this.adPlaying = adPlaying;
+    this.adPlaying = adPlaying == true;
+
+    if (typeof volume === "number" && volume >= 0) this.volume = volume;
 
     this.eventEmitter.emit("stateChanged", this.getState());
   }
