@@ -10,7 +10,7 @@ updates:
       - "Dependencies"
     reviewers:
       - "novustheory"
-    target-branch: "v2"
+    target-branch: "development"
     open-pull-requests-limit: 10
     commit-message:
       prefix: "⬆️ "
