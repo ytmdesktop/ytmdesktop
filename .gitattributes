@@ -3,3 +3,4 @@
 /.yarn/releases/** binary
 /.yarn/plugins/** binary
 /src/assets/** binary
+/.github/images/** binary
