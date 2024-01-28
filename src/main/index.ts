@@ -1208,7 +1208,7 @@ app.on("ready", async () => {
     await fs.access(firstRunPath, fs.constants.F_OK);
   } catch (_) {
     // This is the first run of the program
-    const firstRunTouch = await open(firstRunPath, "a");
+    const firstRunTouch = await fs.open(firstRunPath, "a");
     await firstRunTouch.close();
 
     const v1ConfigPath = path.join(app.getPath("userData"), "..", "youtube-music-desktop-app", "config.json");
