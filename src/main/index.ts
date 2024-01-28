@@ -42,6 +42,8 @@ declare const SETTINGS_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const YTM_VIEW_PRELOAD_WEBPACK_ENTRY: string;
 
 declare const YTMD_DISABLE_UPDATES: boolean;
+declare const YTMD_UPDATE_FEED_OWNER: string;
+declare const YTMD_UPDATE_FEED_REPOSITORY: string;
 
 const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
 
@@ -238,7 +240,7 @@ function shouldDisableUpdates() {
 // macOS cannot use the autoUpdater without a code signature at this time
 if (app.isPackaged && !shouldDisableUpdates() && !YTMD_DISABLE_UPDATES) {
   const updateServer = "https://update.electronjs.org";
-  const updateFeed = `${updateServer}/ytmdesktop/ytmdesktop/${process.platform}-${process.arch}/${app.getVersion()}`;
+  const updateFeed = `${updateServer}/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/${process.platform}-${process.arch}/${app.getVersion()}`;
 
   autoUpdater.setFeedURL({
     url: updateFeed
