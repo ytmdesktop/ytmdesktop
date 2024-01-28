@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Open Sans';
+  src: url("./fonts/OpenSans-VariableFont_wdth,wght.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url("./fonts/WorkSans-VariableFont_wght.ttf") format('truetype');
+}
+
+html, body, #app {
+  margin: 0;
+  height: 100%;
+  color: #EEEEEE;
+  font-family: 'Work Sans', sans-serif;
+  overflow: hidden;
+}
