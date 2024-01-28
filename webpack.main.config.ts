@@ -28,7 +28,7 @@ export const mainConfig: Configuration = {
   },
   plugins: [
     new DefinePlugin({
-      YTMD_DISABLE_UPDATES: true
+      YTMD_DISABLE_UPDATES: false
     })
   ],
   resolve: {
