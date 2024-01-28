@@ -1740,13 +1740,13 @@ app.on("ready", async () => {
   memoryStore.set("ytmViewLoadingStatus", "Checking for updates...");
 
   // Check for application updates
-  if (app.isPackaged && !YTMD_DISABLE_UPDATES) {
+  if (app.isPackaged && !shouldDisableUpdates() && !YTMD_DISABLE_UPDATES) {
+    autoUpdater.checkForUpdates();
     await new Promise<void>(resolve => {
       setInterval(() => {
         if (!appLaunchUpdateCheck) resolve();
       }, 250);
     });
-    autoUpdater.checkForUpdates();
   } else {
     appLaunchUpdateCheck = false;
   }
