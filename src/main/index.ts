@@ -363,15 +363,13 @@ const store = new Conf<StoreSchema>({
     log.info(`Performing store migration from ${context.fromVersion} to ${context.toVersion}`);
   },
   migrations: {
-    ">=2.0.0-rc.2": store => {
+    ">=2.0.0": store => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       store.delete("integrations.companionServerAuthWindowEnabled");
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       store.delete("state.companionServerAuthWindowEnableTime");
-    },
-    ">=2.0.0-rc.4": store => {
       if (!store.has("appearance.zoom")) {
         store.set("appearance.zoom", 100);
       }
