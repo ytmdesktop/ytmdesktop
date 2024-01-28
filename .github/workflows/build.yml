@@ -1,5 +1,5 @@
 ---
-name: Build
+name: Application Build
 
 on:
   - push
@@ -7,38 +7,46 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [macos-11, ubuntu-latest, windows-2019]
+        os: [
+            { name: 'linux',   image: 'ubuntu-latest' },
+            { name: 'windows', image: 'windows-latest' },
+            { name: 'macos',   image: 'macos-latest' }
+          ]
+        arch: [ 'x64', 'arm64' ]
+      fail-fast: false
+          
+
+    runs-on: ${{ matrix.os.image }}
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v1
+      - name: Github checkout
+        uses: actions/checkout@v4
+
+      - name: Corepack Enable Yarn
+        run: corepack enable yarn
+
+      - name: Setup Node (v20)
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      - run: npm config set python python3.10
-      - run: yarn --frozen-lockfile
-      - run: node ./script/build-current-platform.js
-      - uses: actions/upload-artifact@v2
+          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
+          cache: 'yarn'
+          node-version: "20.9.0"
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Build (${{ matrix.arch }})
+        # if: matrix.os.image == 'macos-latest'
+        run: yarn make --arch ${{ matrix.arch }}
+
+      - name: Upload artifacts (${{ matrix.arch }})
+        uses: actions/upload-artifact@v4
         with:
-          name: dist-merged
+          name: dist-${{ matrix.os.name }}-${{ matrix.arch }}
           path: |
-            dist/*.dmg
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.blockmap
-            dist/*.yml
-      - uses: actions/upload-artifact@v2
-        with:
-          name: dist-${{ matrix.os }}
-          path: |
-            dist/*.dmg
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.blockmap
-            dist/*.yml
+            out/make/squirrel.windows/${{ matrix.arch }}/*.exe
+            out/make/deb/${{ matrix.arch }}/*.deb
+            out/make/rpm/${{ matrix.arch }}/*.rpm
+            out/make/zip/darwin/${{ matrix.arch }}/*.zip

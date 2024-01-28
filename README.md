@@ -1,37 +1,51 @@
 # YouTube Music Desktop App
-<img type="image/png" src="https://ytmdesktop.app/img/product/main_5.png" alt="window"/>
+### Now with a Fresh new Codebase 😉
 
-[![Discord][discord-img]](discord-url)
+![YouTube Music Desktop App](.github/images/readme_main_app.png)
+
+[![Discord][discord-img]][discord-url]
 [![Gitmoji][gitmoji-img]][gitmoji-url]
-[![GitHub license][license-img]](license-url)
+[![GitHub license][license-img]][license-url]
 [![GitHub release][release-img]][release-url]
 [![Download][download-img]][download-url]
 
-##### Guide:
+<!--
+TODO: Write guides for v2. While these may still be helpful they are geared towards v1
+#### 📖 Guide:
 1. [How to use](https://github.com/ytmdesktop/ytmdesktop/wiki/How-use)
 2. [FAQ](https://github.com/ytmdesktop/ytmdesktop/wiki/FAQ)
+-->
 
-# Available for
+# ⬇️ Download at
 <a href="https://repology.org/project/ytmdesktop/versions">
 	<img type="image/svg" align="right" src="https://repology.org/badge/vertical-allrepos/ytmdesktop.svg" alt="Packaging status"/>
 </a>
 
 #### Windows
+<!--
+### UPDATE THESE PLATFORMS ###
 - Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
 - Chocolatey: ```choco install ytmdesktop```
+-->
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Linux
+<!--
+### UPDATE THESE PLATFORMS ###
 - Arch Linux (AUR): <https://aur.archlinux.org/packages/ytmdesktop-git>
 - Snap: <https://snapcraft.io/youtube-music-desktop-app>
+-->
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Mac
+<!--
+### UPDATE THESE PLATFORMS ###
 - Brew: ```brew install --cask ytmdesktop-youtube-music```
+-->
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
-# Installing ytmdesktop
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+# Developing
+To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js (v20)](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
 ```sh
 # Clone this repository
@@ -41,35 +55,82 @@ cd ytmdesktop
 ```
 ##### And:
 ```sh
+# If you do not have Yarn Installed / New to Node as a whole you can enable Yarn with:
+corepack enable
+
 # Install dependencies
 yarn install
 # Run the app
 yarn start
 ```
 
-**Note:** If you're using Linux Bash for Windows, [see this guide][more] or use `node` from the command prompt.
+# Building the Project
+To build for your platform you need to run `yarn make`, however please see the information below regarding the required additionally Software, Tools and Packages which are needed to successfully package into a nice installer file.
 
+## Windows
+To download the full suite of Tools/Software needed to build the app it is recommended to install the suite of build tools that electron provide which includes Visual Studio, Python and other tools.
+
+`npm i -g @electron/build-tools`
+
+This will start downloading and installing, and may require a few prompts here and there to finalise everything.
+
+<!--
+TODO: Fill this information in
+## MacOS
+*to do*
+-->
+
+## Linux
+Building the project on Linux only requires you to install:
+- For building on Debian based Linux Distros like Ubuntu, you will need to install `fakeroot` and `dpkg`
+- For building on RedHat based Linux Distros like Fedora, you will need to install `rpm` or `rpm-build`
+
+*please note that by default both packages are built if you try building this application on a linux distro*
+
+<!--
+### Note to the note, I suspect this has been fixed now, testing myself I was able to run the software without anything extra, although did have to sepecify `--disable-gpu` to run.
+**Note:** If you're using Windows Subsystem for Linux (WSL2), [see this guide][more] or use `node` from the command prompt. -->
+
+<!--
+Project currently doesn't have Locales, so Ignore this for now.
 ## To contribute for your own language
 Navigate to [ytmdesktop-locales](https://github.com/ytmdesktop/ytmdesktop-locales) and follow the instructions there.
+-->
 
 ## Contributors
-[<img alt="adlerluiz" src="https://github.com/adlerluiz.png?size=120" width="120px"/>](https://github.com/adlerluiz)
-[<img alt="mingjun97" src="https://github.com/mingjun97.png?size=120" width="120px"/>](https://github.com/mingjun97)
-[<img alt="kyjus25" src="https://github.com/kyjus25.png?size=120" width="120px"/>](https://github.com/kyjus25)
-[<img alt="tbvjaos510" src="https://github.com/tbvjaos510.png?size=120" width="120px"/>](https://github.com/tbvjaos510)
-[<img alt="rickinbsb" src="https://github.com/rickinbsb.png?size=120" width="120px"/>](https://github.com/rickinbsb)
-[<img alt="KimVuu" src="https://github.com/KimVuu.png?size=120" width="120px"/>](https://github.com/KimVuu)
-[<img alt="Venipa" src="https://github.com/Venipa.png?size=120" width="120px"/>](https://github.com/Venipa)
-[<img alt="pinkiesky" src="https://github.com/pinkiesky.png?size=120" width="120px"/>](https://github.com/pinkiesky)
-[<img alt="austonpramodh" src="https://github.com/austonpramodh.png?size=120" width="120px"/>](https://github.com/austonpramodh)
-[<img alt="benjaminaudet" src="https://github.com/benjaminaudet.png?size=120" width="120px"/>](https://github.com/benjaminaudet)
-[<img alt="garfunkel" src="https://github.com/garfunkel.png?size=120" width="120px"/>](https://github.com/garfunkel)
-[<img alt="ZeusAFK" src="https://github.com/ZeusAFK.png?size=120" width="120px"/>](https://github.com/ZeusAFK)
-[<img alt="SN9NV" src="https://github.com/SN9NV.png?size=120" width="120px"/>](https://github.com/SN9NV)
-[<img alt="AdityaTD" src="https://github.com/AdityaTD.png?size=120" width="120px"/>](https://github.com/AdityaTD)
-[<img alt="vbackeberg" src="https://github.com/vbackeberg.png?size=120" width="120px"/>](https://github.com/vbackeberg)
-[<img alt="Vistaus" src="https://github.com/Vistaus.png?size=120" width="120px"/>](https://github.com/vistaus)
-[<img alt="ddarkr" src="https://github.com/ddarkr.png?size=120" width="120px"/>](https://github.com/ddarkr)
+
+A Thank you to all the contributors throughout the project, without their work this project would have just been a small project and never expanded to where it is now.
+
+[<img alt="adlerluiz" src="https://avatars.githubusercontent.com/u/2112638?v=4&s=240" width="120" height="120">](https://github.com/adlerluiz)
+[<img alt="rickpalmeira" src="https://avatars.githubusercontent.com/u/4140033?v=4&s=240" width="120" height="120">](https://github.com/rickpalmeira)
+[<img alt="mingjun97" src="https://avatars.githubusercontent.com/u/15214491?v=4&s=240" width="120" height="120">](https://github.com/mingjun97)
+[<img alt="Alipoodle" src="https://avatars.githubusercontent.com/u/17199186?v=4&s=240" width="120" height="120">](https://github.com/Alipoodle)
+[<img alt="NovusTheory" src="https://avatars.githubusercontent.com/u/3434404?v=4&s=240" width="120" height="120">](https://github.com/NovusTheory)
+[<img alt="flleeppyy" src="https://avatars.githubusercontent.com/u/18307183?v=4&s=240" width="120" height="120">](https://github.com/flleeppyy)
+[<img alt="zagoruev" src="https://avatars.githubusercontent.com/u/986243?v=4&s=240" width="120" height="120">](https://github.com/zagoruev)
+[<img alt="Venipa" src="https://avatars.githubusercontent.com/u/17952364?v=4&s=240" width="120" height="120">](https://github.com/Venipa)
+[<img alt="serzhan-nasredin" src="https://avatars.githubusercontent.com/u/67647968?v=4&s=240" width="120" height="120">](https://github.com/serzhan-nasredin)
+[<img alt="TotalChris" src="https://avatars.githubusercontent.com/u/41809916?v=4&s=240" width="120" height="120">](https://github.com/TotalChris)
+[<img alt="ArnyminerZ" src="https://avatars.githubusercontent.com/u/12086466?v=4&s=240" width="120" height="120">](https://github.com/ArnyminerZ)
+[<img alt="TotallyNotInUse" src="https://avatars.githubusercontent.com/u/56458705?v=4&s=240" width="120" height="120">](https://github.com/TotallyNotInUse)
+[<img alt="pinkiesky" src="https://avatars.githubusercontent.com/u/7098424?v=4&s=240" width="120" height="120">](https://github.com/pinkiesky)
+[<img alt="ddarkr" src="https://avatars.githubusercontent.com/u/6638675?v=4&s=240" width="120" height="120">](https://github.com/ddarkr)
+[<img alt="NNowakowski" src="https://avatars.githubusercontent.com/u/16933892?v=4&s=240" width="120" height="120">](https://github.com/NNowakowski)
+[<img alt="Vistaus" src="https://avatars.githubusercontent.com/u/1716229?v=4&s=240" width="120" height="120">](https://github.com/Vistaus)
+[<img alt="smarquespt" src="https://avatars.githubusercontent.com/u/1302668?v=4&s=240" width="120" height="120">](https://github.com/smarquespt)
+[<img alt="peter9811" src="https://avatars.githubusercontent.com/u/22783445?v=4&s=240" width="120" height="120">](https://github.com/peter9811)
+[<img alt="andrew000" src="https://avatars.githubusercontent.com/u/11490628?v=4&s=240" width="120" height="120">](https://github.com/andrew000)
+[<img alt="adiologydev" src="https://avatars.githubusercontent.com/u/9266227?v=4&s=240" width="120" height="120">](https://github.com/adiologydev)
+[<img alt="chaoky" src="https://avatars.githubusercontent.com/u/9826702?v=4&s=240" width="120" height="120">](https://github.com/chaoky)
+[<img alt="nattadasu" src="https://avatars.githubusercontent.com/u/49780229?v=4&s=240" width="120" height="120">](https://github.com/nattadasu)
+[<img alt="Nerogar" src="https://avatars.githubusercontent.com/u/3390934?v=4&s=240" width="120" height="120">](https://github.com/Nerogar)
+[<img alt="nils-kt" src="https://avatars.githubusercontent.com/u/34674720?v=4&s=240" width="120" height="120">](https://github.com/nils-kt)
+[<img alt="andia89" src="https://avatars.githubusercontent.com/u/6475757?v=4&s=240" width="120" height="120">](https://github.com/andia89)
+[<img alt="tbvjaos510" src="https://avatars.githubusercontent.com/u/32216112?v=4&s=240" width="120" height="120">](https://github.com/tbvjaos510)
+[<img alt="danparidae" src="https://avatars.githubusercontent.com/u/7272087?v=4&s=240" width="120" height="120">](https://github.com/danparidae)
+[<img alt="asuetin" src="https://avatars.githubusercontent.com/u/37500046?v=4&s=240" width="120" height="120">](https://github.com/asuetin)
+[<img alt="PHNX-Arcanus" src="https://avatars.githubusercontent.com/u/23439665?v=4&s=240" width="120" height="120">](https://github.com/PHNX-Arcanus)
+[<img alt="austonpramodh" src="https://avatars.githubusercontent.com/u/5049050?v=4&s=240" width="120" height="120">](https://github.com/austonpramodh)
 
 [discord-img]: https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord
 [discord-url]: https://discord.gg/88P2n2a
