@@ -1331,11 +1331,11 @@ app.on("ready", async () => {
     if (event.sender !== ytmView.webContents) return;
 
     // ytm state mapping definitions
-    // -1 -> Unknown (Seems tied to no buffer data, but cannot confirm)
+    // -1 -> Unstarted
     // 1 -> Playing
     // 2 -> Paused
     // 3 -> Buffering
-    // 5 -> Unknown (Only happens when loading new songs - unsure what this is for)
+    // 5 -> Video Cued
 
     // ytm state flow
     // Play Button Click
