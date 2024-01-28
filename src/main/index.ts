@@ -233,7 +233,8 @@ log.info("Created memory store");
 
 function shouldDisableUpdates() {
   // macOS can't have auto updates without a code signature
-  if (process.platform === "darwin") return true;
+  // linux is not supported on the update server and the application hangs as a result https://github.com/ytmdesktop/ytmdesktop/issues/1247
+  if (process.platform !== "win32") return true;
 }
 
 // Configure the autoupdater
