@@ -268,6 +268,10 @@ if (app.isPackaged && !shouldDisableUpdates() && !YTMD_DISABLE_UPDATES) {
     if (appLaunchUpdateCheck) autoUpdater.quitAndInstall();
     if (settingsWindow) settingsWindow.webContents.send("app:updateDownloaded");
   });
+  autoUpdater.on("error", () => {
+    if (appLaunchUpdateCheck) appLaunchUpdateCheck = false;
+    if (settingsWindow) settingsWindow.webContents.send("app:updateNotAvailable");
+  });
   log.info("Setup application updater");
 
   setInterval(
