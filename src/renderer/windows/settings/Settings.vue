@@ -759,8 +759,17 @@ window.ytmd.handleUpdateDownloaded(() => {
   table-layout: fixed;
 }
 
+.authorized-companions-table tbody tr .id {
+  word-wrap: break-word;
+}
+
 .authorized-companions-table tr .name {
   width: 50%;
+  word-wrap: break-word;
+}
+
+.authorized-companions-table tbody tr .version {
+  word-wrap: break-word;
 }
 
 .authorized-companions-table tr th,
