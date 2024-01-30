@@ -1281,31 +1281,45 @@ app.on("ready", async () => {
 
         if ("settings-accelerators" in v1Config) {
           if ("media-play-pause" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.playPause", v1Config["settings-accelerators"]["media-play-pause"]);
+            if (v1Config["settings-accelerators"]["media-play-pause"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.playPause", v1Config["settings-accelerators"]["media-play-pause"]);
+            }
           }
 
           if ("media-track-next" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.next", v1Config["settings-accelerators"]["media-track-next"]);
+            if (v1Config["settings-accelerators"]["media-track-next"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.next", v1Config["settings-accelerators"]["media-track-next"]);
+            }
           }
 
           if ("media-track-previous" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.previous", v1Config["settings-accelerators"]["media-track-previous"]);
+            if (v1Config["settings-accelerators"]["media-track-previous"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.previous", v1Config["settings-accelerators"]["media-track-previous"]);
+            }
           }
 
           if ("media-track-like" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.thumbsUp", v1Config["settings-accelerators"]["media-track-like"]);
+            if (v1Config["settings-accelerators"]["media-track-like"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.thumbsUp", v1Config["settings-accelerators"]["media-track-like"]);
+            }
           }
 
           if ("media-track-dislike" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.thumbsDown", v1Config["settings-accelerators"]["media-track-dislike"]);
+            if (v1Config["settings-accelerators"]["media-track-dislike"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.thumbsDown", v1Config["settings-accelerators"]["media-track-dislike"]);
+            }
           }
 
           if ("media-volume-up" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.volumeUp", v1Config["settings-accelerators"]["media-volume-up"]);
+            if (v1Config["settings-accelerators"]["media-volume-up"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.volumeUp", v1Config["settings-accelerators"]["media-volume-up"]);
+            }
           }
 
           if ("media-volume-down" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.volumeDown", v1Config["settings-accelerators"]["media-volume-down"]);
+            if (v1Config["settings-accelerators"]["media-volume-down"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.volumeDown", v1Config["settings-accelerators"]["media-volume-down"]);
+            }
           }
         }
 
