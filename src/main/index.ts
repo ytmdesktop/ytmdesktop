@@ -532,6 +532,32 @@ stateSaverInterval = setInterval(
   5 * 60 * 1000
 );
 
+async function directoryExists(path: string): Promise<boolean> {
+  try {
+    return (await fs.lstat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+async function loadChromeExtensions() {
+  const customExtensionsDirectory = path.join(app.getPath("userData"), "/extensions");
+  if (!(await directoryExists(customExtensionsDirectory))) {
+    await fs.mkdir(customExtensionsDirectory);
+  }
+
+  for (const extensionDirectory of await fs.readdir(customExtensionsDirectory)) {
+    session.defaultSession
+      .loadExtension(path.join(customExtensionsDirectory, extensionDirectory))
+      .then(({ id }) => {
+        console.log(`extension loaded: ${id} (/${extensionDirectory})`);
+      })
+      .catch(error => {
+        console.error(`failed to load extension ${extensionDirectory}: ${error}`);
+      });
+  }
+}
+
 function setupTaskbarFeatures() {
   // Setup Taskbar Icons
   if (mainWindow && mainWindow.isVisible() && process.platform === "win32") {
@@ -1788,6 +1814,10 @@ app.on("ready", async () => {
     log.info("Integration update: Zoom Factor");
     ytmView.webContents.setZoomFactor(store.get("appearance").zoom / 100);
   }
+
+  // Load Chrome Extensions
+  log.info("Load chrome extensions");
+  loadChromeExtensions();
 
   // Integrations setup
   log.info("Starting enabled integrations");
