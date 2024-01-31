@@ -1816,8 +1816,8 @@ app.on("ready", async () => {
   }
 
   // Load Chrome Extensions
-  log.info("Load chrome extensions");
-  loadChromeExtensions();
+  log.info("Loading chrome extensions");
+  await loadChromeExtensions();
 
   // Integrations setup
   log.info("Starting enabled integrations");
