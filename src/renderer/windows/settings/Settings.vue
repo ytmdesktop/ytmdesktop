@@ -4,6 +4,9 @@ import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n({ useScope: "global" });
 
 declare const YTMD_GIT_COMMIT_HASH: string;
 declare const YTMD_GIT_BRANCH: string;
@@ -268,23 +271,35 @@ window.ytmd.handleUpdateDownloaded(() => {
   <div class="settings-container">
     <div class="content-container">
       <ul class="sidebar">
-        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
-        <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
-        <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
-        <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
-        <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)">
+          <span class="material-symbols-outlined">settings_applications</span>{{ t("settings.general.title") }}
+        </li>
+        <li :class="{ active: currentTab === 2 }" @click="changeTab(2)">
+          <span class="material-symbols-outlined">brush</span>{{ t("settings.appearance.title") }}
+        </li>
+        <li :class="{ active: currentTab === 3 }" @click="changeTab(3)">
+          <span class="material-symbols-outlined">music_note</span>{{ t("settings.playback.title") }}
+        </li>
+        <li :class="{ active: currentTab === 4 }" @click="changeTab(4)">
+          <span class="material-symbols-outlined">wifi_tethering</span>{{ t("settings.integrations.title") }}
+        </li>
+        <li :class="{ active: currentTab === 5 }" @click="changeTab(5)">
+          <span class="material-symbols-outlined">keyboard</span>{{ t("settings.shortcuts.title") }}
+        </li>
         <span class="push"></span>
-        <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
+        <li :class="{ active: currentTab === 99 }" @click="changeTab(99)">
+          <span class="material-symbols-outlined">info</span>{{ t("settings.about.title") }}
+        </li>
       </ul>
       <div class="content">
         <div v-if="requiresRestart" class="restart-banner">
-          <p class="message"><span class="material-symbols-outlined">autorenew</span> Restart app to apply changes</p>
-          <button class="restart-button" @click="restartApplication">Restart</button>
+          <p class="message"><span class="material-symbols-outlined">autorenew</span> {{ t("settings.restartToApply") }}</p>
+          <button class="restart-button" @click="restartApplication">{{ t("settings.restartToApplyButton") }}</button>
         </div>
         <div v-if="currentTab === 1" class="general-tab">
-          <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" name="Hide to tray on close" @change="settingsChanged" />
-          <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" name="Show notification on song change" @change="settingsChanged" />
-          <YTMDSetting v-model="startOnBoot" type="checkbox" name="Start on boot" @change="settingsChanged" />
+          <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" :name="t('settings.general.hideToTray')" @change="settingsChanged" />
+          <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" :name="t('settings.general.showNotification')" @change="settingsChanged" />
+          <YTMDSetting v-model="startOnBoot" type="checkbox" :name="t('settings.general.startOnBoot')" @change="settingsChanged" />
           <!--<div class="setting">
             <p>Start minimized</p>
             <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
@@ -293,49 +308,55 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="disableHardwareAcceleration"
             type="checkbox"
             restart-required
-            name="Disable hardware acceleration"
+            :name="t('settings.general.disableHardwareAcceleration')"
             @change="settingChangedRequiresRestart"
           />
         </div>
 
         <div v-if="currentTab === 2" class="appearance-tab">
-          <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" name="Always show volume slider" @change="settingsChanged" />
-          <YTMDSetting v-model="customCSSEnabled" type="checkbox" name="Custom CSS" @change="settingsChanged" />
+          <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" :name="t('settings.apperance.alwaysShowVolumeSlider')" @change="settingsChanged" />
+          <YTMDSetting v-model="customCSSEnabled" type="checkbox" :name="t('settings.appearance.customCSS')" @change="settingsChanged" />
           <YTMDSetting
             v-if="customCSSEnabled"
             v-model="customCSSPath"
             type="file"
             indented
             bind-setting="appearance.customCSSPath"
-            name="Custom CSS file path"
+            :name="t('settings.appearance.customCSSFilePath')"
             @file-change="settingChangedFile"
             @clear="removeCustomCSSPath"
           />
-          <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
+          <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" :name="t('settings.appearance.zoom')" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 3" class="playback-tab">
-          <YTMDSetting v-model="continueWhereYouLeftOff" name="Continue where you left off" type="checkbox" @change="settingsChanged" />
+          <YTMDSetting v-model="continueWhereYouLeftOff" :name="t('settings.playback.continueLeftOff')" type="checkbox" @change="settingsChanged" />
           <YTMDSetting
             v-if="continueWhereYouLeftOff"
             v-model="continueWhereYouLeftOffPaused"
             type="checkbox"
             indented
-            name="Pause on application launch"
+            :name="t('settings.playback.continueLeftOffPause')"
             @change="settingsChanged"
           />
-          <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
-          <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
-          <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting v-model="progressInTaskbar" type="checkbox" :name="t('settings.playback.taskbarTrackProgress')" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="enableSpeakerFill"
+            type="checkbox"
+            restart-required
+            :name="t('settings.playback.speakerFill')"
+            @change="settingChangedRequiresRestart"
+          />
+          <YTMDSetting v-model="ratioVolume" type="checkbox" :name="t('settings.playback.ratioVolume')" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
           <YTMDSetting
             v-model="companionServerEnabled"
             type="checkbox"
-            name="Companion server"
+            :name="t('settings.integrations.companionServer')"
             :disabled="!safeStorageAvailable"
-            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            :disabled-message="t('settings.integrations.safeStorageUnavailable')"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -343,8 +364,8 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="companionServerCORSWildcardEnabled"
             type="checkbox"
             indented
-            name="Allow browser communication"
-            description="This setting could be dangerous as it allows any website you visit to communicate with the companion server"
+            :name="t('settings.integrations.companionServerBrowserComm')"
+            :description="t('settings.integrations.companionServerBrowserCommDesc')"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -352,8 +373,8 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="companionServerAuthWindowEnabled"
             type="checkbox"
             indented
-            name="Enable companion authorization"
-            description="Automatically disables after the first successful authorization or 5 minutes has passed"
+            :name="t('settings.integrations.companionServerEnableAuth')"
+            :description="t('settings.integrations.companionServerEnableAuthDesc')"
             @change="memorySettingsChanged"
           />
           <YTMDSetting
@@ -361,15 +382,15 @@ window.ytmd.handleUpdateDownloaded(() => {
             type="custom"
             flex-column
             indented
-            name="Authorized companions"
-            description="This is a list of companions that currently have access to the companion server"
+            :name="t('settings.integrations.companionServerAuthorizedCompanions')"
+            :description="t('settings.integrations.companionServerAuthorizedCompanionsDesc')"
             @change="settingsChanged"
           >
             <table class="authorized-companions-table">
               <thead>
                 <tr>
-                  <th class="companion">Companion</th>
-                  <th class="version">Version</th>
+                  <th class="companion">{{ t("settings.integrations.companionServerAuthorizedCompanionsTable.companion") }}</th>
+                  <th class="version">{{ t("settings.integrations.companionServerAuthorizedCompanionsTable.version") }}</th>
                   <th class="controls"></th>
                 </tr>
               </thead>
@@ -388,20 +409,20 @@ window.ytmd.handleUpdateDownloaded(() => {
               </tbody>
             </table>
             <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
-              <td>No authorized companions</td>
+              <td>{{ t("settings.integrations.companionServerAuthorizedCompanionsTable.noAuthorizedCompanions") }}</td>
             </div>
           </YTMDSetting>
-          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
+          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" :name="t('settings.integrations.discordRichPresence')" @change="settingsChanged" />
           <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
-            <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
-            <button @click="restartDiscordPresence">Retry</button>
+            <p class="discord-failure">{{ t("settings.integrations.discordRichPresenceConnectionAttemptsFailure") }}</p>
+            <button @click="restartDiscordPresence">{{ t("settings.integrations.discordRichPresenceRetryButton") }}</button>
           </div>
           <YTMDSetting
             v-model="lastFMEnabled"
             type="checkbox"
-            name="Last.fm scrobbling"
+            :name="t('settings.integrations.lastFmScrobbling')"
             :disabled="!safeStorageAvailable"
-            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            :disabled-message="t('settings.integrations.safeStorageUnavailable')"
             @change="settingsChanged"
           />
           <div v-if="lastFMEnabled" class="setting indented">
@@ -431,10 +452,11 @@ window.ytmd.handleUpdateDownloaded(() => {
         <div v-if="currentTab === 5" class="shortcuts-tab">
           <div class="setting">
             <p class="shortcut-title">
-              Play/Pause<span
+              {{ t("settings.shortcuts.playPause")
+              }}<span
                 v-if="shortcutsPlayPauseRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -442,10 +464,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Next<span
+              {{ t("settings.shortcuts.next")
+              }}<span
                 v-if="shortcutsNextRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -453,10 +476,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Previous<span
+              {{ t("settings.shortcuts.previous")
+              }}<span
                 v-if="shortcutsPreviousRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -464,10 +488,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Thumbs Up<span
+              {{ t("settings.shortcuts.thumbsUp")
+              }}<span
                 v-if="shortcutsThumbsUpRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -475,10 +500,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Thumbs Down<span
+              {{ t("settings.shortcuts.thumbsDown")
+              }}<span
                 v-if="shortcutsThumbsDownRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -486,10 +512,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Increase Volume<span
+              {{ t("settings.shortcuts.increaseVolume")
+              }}<span
                 v-if="shortcutsVolumeUpRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>
@@ -497,10 +524,11 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Decrease Volume<span
+              {{ t("settings.shortcuts.decreaseVolume")
+              }}<span
                 v-if="shortcutsVolumeDownRegisterFailed"
                 class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+                :title="t('settings.shortcuts.failedToRegisterKeybind')"
                 >error</span
               >
             </p>

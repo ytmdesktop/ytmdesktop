@@ -20,6 +20,9 @@
       ],
       "~assets/*": [
         "src/assets/*"
+      ],
+      "~locales/*": [
+        "src/shared/locales/json/*"
       ]
     }
   }

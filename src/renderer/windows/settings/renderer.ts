@@ -30,7 +30,20 @@ import "material-symbols/outlined.css";
 import "~assets/app.css";
 
 import { createApp } from "vue";
+import { createI18n } from "vue-i18n";
 import App from "./Index.vue";
 
+import enUS from "~locales/en-US.json";
+
+const i18n = createI18n({
+  legacy: false,
+  locale: navigator.language,
+  fallbackLocale: "en-US"
+});
+
+// Developer note: i18n is not explicitly constructed with en-US on the messages property due to type strictness issues from i18n when doing so
+i18n.global.setLocaleMessage("en-US", enUS);
+
 const app = createApp(App);
+app.use(i18n);
 app.mount("#app");

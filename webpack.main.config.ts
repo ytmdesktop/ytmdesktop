@@ -51,7 +51,8 @@ export const mainConfig: Configuration = {
   resolve: {
     alias: {
       "~shared": path.resolve(__dirname, "src/shared"),
-      "~assets": path.resolve(__dirname, "src/assets")
+      "~assets": path.resolve(__dirname, "src/assets"),
+      "~locales": path.resolve(__dirname, "src/shared/locales/json")
     },
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".json"]
   },

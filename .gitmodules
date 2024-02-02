@@ -1,0 +1,4 @@
+[submodule "src/shared/locales"]
+	path = src/shared/locales
+	url = https://github.com/ytmdesktop/ytmdesktop-locales.git
+  branch = v2
