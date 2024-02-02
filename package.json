@@ -48,7 +48,7 @@
     "eslint-plugin-vue": "^9.20.1",
     "fork-ts-checker-webpack-plugin": "^9.0.2",
     "git-revision-webpack-plugin": "5.0.0",
-    "husky": "^9.0.6",
+    "husky": "^9.0.10",
     "lint-staged": "^15.2.0",
     "node-loader": "^2.0.0",
     "prettier": "3.2.4",
