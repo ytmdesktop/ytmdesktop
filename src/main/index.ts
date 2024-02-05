@@ -9,6 +9,7 @@ import {
   globalShortcut,
   ipcMain,
   Menu,
+  MenuItemConstructorOptions,
   nativeImage,
   safeStorage,
   screen,
@@ -128,9 +129,67 @@ log.info("Application launched");
 // Enforce sandbox on all renderers
 app.enableSandbox();
 
-// Disabling the application menu improves performance, but we're disabling it to patch out default hotkeys for now
-// TODO: Come back to this at a future point in time to determine the necessary need for an application menu
-Menu.setApplicationMenu(null);
+const application: MenuItemConstructorOptions = {
+  label: "Application",
+  submenu: [
+    {
+      label: "About Application",
+      role: "about"
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Quit",
+      accelerator: "Command+Q",
+      click: () => {
+        app.quit();
+      }
+    }
+  ]
+};
+
+const edit: MenuItemConstructorOptions = {
+  label: "Edit",
+  submenu: [
+    {
+      label: "Undo",
+      accelerator: "CmdOrCtrl+Z",
+      role: "undo"
+    },
+    {
+      label: "Redo",
+      accelerator: "Shift+CmdOrCtrl+Z",
+      role: "redo"
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Cut",
+      accelerator: "CmdOrCtrl+X",
+      role: "cut"
+    },
+    {
+      label: "Copy",
+      accelerator: "CmdOrCtrl+C",
+      role: "copy"
+    },
+    {
+      label: "Paste",
+      accelerator: "CmdOrCtrl+V",
+      role: "paste"
+    },
+    {
+      label: "Select All",
+      accelerator: "CmdOrCtrl+A",
+      role: "selectAll"
+    }
+  ]
+};
+
+const template = [application, edit];
+Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
