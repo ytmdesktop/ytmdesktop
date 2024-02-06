@@ -112,14 +112,20 @@ export default class LastFM implements IIntegration {
 
       clearTimeout(this.scrobbleTimer);
 
+      // Track must be longer than 30 seconds
+      // https://www.last.fm/api/scrobbling "When is a scrobble a scrobble?"
+      if (state.videoDetails.durationSeconds < 30) {
+        return;
+      }
+
       this.updateNowPlaying(state.videoDetails);
 
       const scrobblePercentDecimal = this.lastfmDetails.scrobblePercent / 100;
       const scrobbleTimeRequired = Math.min(
         // Scrobble the track if it has been played to the percent picked by the user
         Math.round(state.videoDetails.durationSeconds * scrobblePercentDecimal),
-        // OR if it has been played for more than 5 minutes
-        300
+        // OR if it has been played for more than 4 minutes, scrobble maximum time: https://www.last.fm/api/scrobbling
+        240
       );
       const scrobbleTime = new Date().getTime();
       this.scrobbleTimer = setTimeout(() => {
