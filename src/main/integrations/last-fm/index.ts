@@ -1,4 +1,4 @@
-import { shell, safeStorage } from "electron";
+import { safeStorage, BrowserWindow } from "electron";
 import Conf from "conf";
 import cypto from "crypto";
 
@@ -40,12 +40,30 @@ export default class LastFM implements IIntegration {
     this.lastfmDetails.token = await this.createToken();
     this.saveSettings();
 
-    shell.openExternal(
-      `https://www.last.fm/api/auth/` + `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}` + `&token=${encodeURIComponent(this.lastfmDetails.token)}`
-    );
+    let authWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      show: false,
+      modal: process.platform !== "darwin",
+      titleBarStyle: "hidden"
+    });
+    return new Promise(resolve => {
+      authWindow.loadURL(
+        `https://www.last.fm/api/auth/` +
+          `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}` +
+          `&token=${encodeURIComponent(this.lastfmDetails.token)}`
+      );
+      authWindow.show();
+
+      authWindow.on("closed", function () {
+        authWindow = null;
+        resolve(true);
+      });
+    });
   }
 
   private async getSession() {
+    await this.authenticateUser();
     const params: LastfmRequestBody = {
       method: "auth.getSession",
       format: "json",
@@ -58,9 +76,8 @@ export default class LastFM implements IIntegration {
     const response = await fetch(`https://ws.audioscrobbler.com/2.0/` + `?${this.createQueryString(params, api_sig)}`);
 
     const json = (await response.json()) as LastfmSessionResponse;
-
     if (json.error) {
-      await this.authenticateUser();
+      log.error(json.error);
     } else if (json.session) {
       this.lastfmDetails.sessionKey = json.session.key;
       this.saveSettings();
@@ -105,7 +122,6 @@ export default class LastFM implements IIntegration {
         300
       );
       const scrobbleTime = new Date().getTime();
-
       this.scrobbleTimer = setTimeout(() => {
         this.scrobbleSong(state.videoDetails, scrobbleTime);
       }, scrobbleTimeRequired * 1000);
