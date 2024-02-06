@@ -62,6 +62,7 @@ body:
     options:
       - x64
       - x86
+      - ARM64
   validations:
     required: true
 - type: input
