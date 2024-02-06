@@ -68,6 +68,7 @@ const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
+const scrobblePercent = ref<number>(lastFM.scrobblePercent);
 
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
@@ -94,6 +95,7 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  scrobblePercent.value = newState.lastfm.scrobblePercent;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -161,6 +163,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -399,6 +402,20 @@ window.ytmd.handleUpdateDownloaded(() => {
                 <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
+          </div>
+          <div v-if="lastFMEnabled" class="setting indented">
+            <YTMDSetting
+              v-model="scrobblePercent"
+              type="range"
+              name="Scrobble percent: "
+              description="Determines when a song is scrobbled"
+              :disabled="!safeStorageAvailable"
+              disabled-message="This setting cannot be enabled due to safeStorage being unavailable"
+              min="0"
+              max="100"
+              step="5"
+              @change="settingsChanged"
+            />
           </div>
         </div>
 

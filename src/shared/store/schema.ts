@@ -1,7 +1,7 @@
 export type StoreSchema = {
   metadata: {
-    version: 1
-  }
+    version: 1;
+  };
   general: {
     disableHardwareAcceleration: boolean;
     hideToTrayOnClose: boolean;
@@ -50,14 +50,15 @@ export type StoreSchema = {
     secret: string;
     token: string | null;
     sessionKey: string | null;
+    scrobblePercent: number;
   };
   developer: {
-    enableDevTools: boolean
-  }
+    enableDevTools: boolean;
+  };
 };
 
 export type MemoryStoreSchema = {
-  discordPresenceConnectionFailed: boolean
+  discordPresenceConnectionFailed: boolean;
   shortcutsPlayPauseRegisterFailed: boolean;
   shortcutsNextRegisterFailed: boolean;
   shortcutsPreviousRegisterFailed: boolean;

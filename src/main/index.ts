@@ -361,7 +361,8 @@ const store = new Conf<StoreSchema>({
       api_key: "2a69bcf769a7a28a8bf2f6a5100accad",
       secret: "46eea23770a459a49eb4d26cbf46b41c",
       token: null,
-      sessionKey: null
+      sessionKey: null,
+      scrobblePercent: 50
     },
     developer: {
       enableDevTools: false
