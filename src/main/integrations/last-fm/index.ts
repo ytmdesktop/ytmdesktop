@@ -63,7 +63,6 @@ export default class LastFM implements IIntegration {
   }
 
   private async getSession() {
-    await this.authenticateUser();
     const params: LastfmRequestBody = {
       method: "auth.getSession",
       format: "json",
@@ -77,7 +76,7 @@ export default class LastFM implements IIntegration {
 
     const json = (await response.json()) as LastfmSessionResponse;
     if (json.error) {
-      log.error(json.error);
+      await this.authenticateUser();
     } else if (json.session) {
       this.lastfmDetails.sessionKey = json.session.key;
       this.saveSettings();
@@ -318,9 +317,13 @@ export default class LastFM implements IIntegration {
 
   private async saveSettings(): Promise<void> {
     try {
-      this.store.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
-      this.store.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
-    } catch {
+      if (this.lastfmDetails.sessionKey) {
+        this.store.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
+      }
+      if (this.lastfmDetails.token) {
+        this.store.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+      }
+    } catch (error) {
       // Do nothing, the values are not valid and can be ignored
     }
   }
