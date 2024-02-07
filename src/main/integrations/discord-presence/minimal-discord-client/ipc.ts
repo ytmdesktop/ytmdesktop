@@ -60,7 +60,7 @@ export default class IPCClient extends EventEmitter {
     buffer.writeInt32LE(length, 4);
     buffer.write(json, 8, length);
 
-    if (!this.socket.writable) {
+    if (this.socket.writable) {
       this.socket.write(buffer);
     } else {
       this.socket.end();
