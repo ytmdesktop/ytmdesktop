@@ -659,6 +659,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: playPause");
       memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
   }
 
   if (shortcuts.next) {
@@ -680,6 +682,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: next");
       memoryStore.set("shortcutsNextRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsNextRegisterFailed", false);
   }
 
   if (shortcuts.previous) {
@@ -701,6 +705,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: previous");
       memoryStore.set("shortcutsPreviousRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsPreviousRegisterFailed", false);
   }
 
   if (shortcuts.thumbsUp) {
@@ -722,6 +728,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: thumbsUp");
       memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
   }
 
   if (shortcuts.thumbsDown) {
@@ -743,6 +751,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: thumbsDown");
       memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
   }
 
   if (shortcuts.volumeUp) {
@@ -764,6 +774,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: volumeUp");
       memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
   }
 
   if (shortcuts.volumeDown) {
@@ -785,6 +797,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: volumeDown");
       memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");
