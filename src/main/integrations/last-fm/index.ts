@@ -1,4 +1,4 @@
-import { safeStorage, BrowserWindow } from "electron";
+import { shell, safeStorage } from "electron";
 import Conf from "conf";
 import cypto from "crypto";
 
@@ -40,26 +40,9 @@ export default class LastFM implements IIntegration {
     this.lastfmDetails.token = await this.createToken();
     this.saveSettings();
 
-    let authWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
-      show: false,
-      modal: process.platform !== "darwin",
-      titleBarStyle: "hidden"
-    });
-    return new Promise(resolve => {
-      authWindow.loadURL(
-        `https://www.last.fm/api/auth/` +
-          `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}` +
-          `&token=${encodeURIComponent(this.lastfmDetails.token)}`
-      );
-      authWindow.show();
-
-      authWindow.on("closed", function () {
-        authWindow = null;
-        resolve(true);
-      });
-    });
+    shell.openExternal(
+      `https://www.last.fm/api/auth/` + `?api_key=${encodeURIComponent(this.lastfmDetails.api_key)}` + `&token=${encodeURIComponent(this.lastfmDetails.token)}`
+    );
   }
 
   private async getSession() {

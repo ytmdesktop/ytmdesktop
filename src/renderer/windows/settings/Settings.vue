@@ -95,6 +95,7 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
@@ -230,6 +231,13 @@ function restartApplicationForUpdate() {
 function checkForUpdates() {
   window.ytmd.checkForUpdates();
   checkingForUpdate.value = true;
+}
+
+async function logoutLastFM() {
+  store.set("lastfm.sessionKey", null);
+  lastFMEnabled.value = false;
+  lastFMSessionKey.value = null;
+  await settingsChanged();
 }
 
 window.ytmd.handleCheckingForUpdate(() => {
@@ -399,6 +407,7 @@ window.ytmd.handleUpdateDownloaded(() => {
               <p class="description">
                 User is Authenticated:
                 <span v-if="lastFMSessionKey" style="color: #4caf50">Yes</span>
+                <button v-if="lastFMSessionKey" class="lastfm-logout-button" @click="logoutLastFM">Logout</button>
                 <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
