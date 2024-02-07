@@ -9,6 +9,7 @@ import {
   globalShortcut,
   ipcMain,
   Menu,
+  MenuItemConstructorOptions,
   nativeImage,
   safeStorage,
   screen,
@@ -46,6 +47,7 @@ declare const YTMD_UPDATE_FEED_OWNER: string;
 declare const YTMD_UPDATE_FEED_REPOSITORY: string;
 
 const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
+const isDarwin = process.platform === "darwin";
 
 let applicationExited = false;
 let applicationQuitting = false;
@@ -128,9 +130,10 @@ log.info("Application launched");
 // Enforce sandbox on all renderers
 app.enableSandbox();
 
-// Disabling the application menu improves performance, but we're disabling it to patch out default hotkeys for now
-// TODO: Come back to this at a future point in time to determine the necessary need for an application menu
-Menu.setApplicationMenu(null);
+// editMenu allow for copy and paste shortcuts on MacOS
+const template: MenuItemConstructorOptions[] = [{ role: "editMenu" }];
+const builtMenu = isDarwin ? Menu.buildFromTemplate(template) : null; // null for performance https://www.electronjs.org/docs/latest/tutorial/performance#8-call-menusetapplicationmenunull-when-you-do-not-need-a-default-menu
+Menu.setApplicationMenu(builtMenu);
 
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
@@ -823,7 +826,7 @@ const createOrShowSettingsWindow = (): void => {
     show: false,
     icon: getIconPath("ytmd.png"),
     parent: mainWindow,
-    modal: process.platform !== "darwin",
+    modal: !isDarwin,
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#000000",
@@ -1162,7 +1165,7 @@ const createMainWindow = (): void => {
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
   mainWindow.on("close", event => {
-    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || process.platform === "darwin")) {
+    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || isDarwin)) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -1383,7 +1386,7 @@ app.on("ready", async () => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
-      if (store.get("general").hideToTrayOnClose || process.platform === "darwin") {
+      if (store.get("general").hideToTrayOnClose || isDarwin) {
         mainWindow.hide();
       } else {
         app.quit();
@@ -1848,7 +1851,7 @@ app.on("open-url", (_, url) => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (!isDarwin) {
     app.quit();
   }
 });
