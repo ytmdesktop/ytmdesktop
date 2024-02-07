@@ -641,11 +641,16 @@ function registerShortcuts() {
   log.info("Unregistered shortcuts");
 
   if (shortcuts.playPause) {
-    const registered = globalShortcut.register(shortcuts.playPause, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "playPause");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.playPause, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "playPause");
+        }
+      });
+    } catch {
+      /* ignored */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: playPause");
@@ -657,11 +662,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.next) {
-    const registered = globalShortcut.register(shortcuts.next, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "next");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.next, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "next");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: next");
@@ -673,11 +683,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.previous) {
-    const registered = globalShortcut.register(shortcuts.previous, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "previous");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.previous, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "previous");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: previous");
@@ -689,11 +704,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.thumbsUp) {
-    const registered = globalShortcut.register(shortcuts.thumbsUp, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "toggleLike");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.thumbsUp, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "toggleLike");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: thumbsUp");
@@ -705,11 +725,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.thumbsDown) {
-    const registered = globalShortcut.register(shortcuts.thumbsDown, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "toggleDislike");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.thumbsDown, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "toggleDislike");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: thumbsDown");
@@ -721,11 +746,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.volumeUp) {
-    const registered = globalShortcut.register(shortcuts.volumeUp, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "volumeUp");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.volumeUp, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "volumeUp");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: volumeUp");
@@ -737,11 +767,16 @@ function registerShortcuts() {
   }
 
   if (shortcuts.volumeDown) {
-    const registered = globalShortcut.register(shortcuts.volumeDown, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "volumeDown");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.volumeDown, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "volumeDown");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: volumeDown");
