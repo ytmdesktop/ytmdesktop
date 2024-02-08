@@ -29,6 +29,7 @@ import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
 import DiscordPresence from "./integrations/discord-presence";
 import LastFM from "./integrations/last-fm";
+import ListenBrainz from "./integrations/listenbrainz";
 import NowPlayingNotifications from "./integrations/notifications";
 import VolumeRatio from "./integrations/volume-ratio";
 import fs from "fs/promises";
@@ -139,6 +140,7 @@ const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
 const discordPresence = new DiscordPresence();
 const lastFMScrobbler = new LastFM();
+const listenBrainzScrobbler = new ListenBrainz();
 const nowPlayingNotifications = new NowPlayingNotifications();
 const ratioVolume = new VolumeRatio();
 
@@ -341,7 +343,8 @@ const store = new Conf<StoreSchema>({
       companionServerAuthTokens: null,
       companionServerCORSWildcardEnabled: false,
       discordPresenceEnabled: false,
-      lastFMEnabled: false
+      lastFMEnabled: false,
+      listenbrainzEnabled: false
     },
     shortcuts: {
       playPause: "",
@@ -365,6 +368,9 @@ const store = new Conf<StoreSchema>({
       secret: "46eea23770a459a49eb4d26cbf46b41c",
       token: null,
       sessionKey: null
+    },
+    listenbrainz: {
+      token: null
     },
     developer: {
       enableDevTools: false
@@ -507,6 +513,17 @@ store.onDidAnyChange(async (newState, oldState) => {
   } else if (!newState.integrations.lastFMEnabled && oldState.integrations.lastFMEnabled) {
     lastFMScrobbler.disable();
     log.info("Integration disabled: Last.fm");
+  }
+
+  if (newState.integrations.listenbrainzEnabled) {
+    listenBrainzScrobbler.provide(store, memoryStore);
+  }
+  if (newState.integrations.listenbrainzEnabled && !oldState.integrations.listenbrainzEnabled) {
+    listenBrainzScrobbler.enable();
+    log.info("Integration enabled: ListenBrainz");
+  } else if (!newState.integrations.listenbrainzEnabled && oldState.integrations.listenbrainzEnabled) {
+    listenBrainzScrobbler.disable();
+    log.info("Integration disabled: ListenBrainz");
   }
 
   if (anyShortcutChanged(newState, oldState)) registerShortcuts();
@@ -1883,6 +1900,13 @@ app.on("ready", async () => {
     lastFMScrobbler.provide(store, memoryStore);
     lastFMScrobbler.enable();
     log.info("Integration enabled: Last.fm");
+  }
+
+  // ListenBrainz
+  if (store.get("integrations").listenbrainzEnabled) {
+    listenBrainzScrobbler.provide(store, memoryStore);
+    listenBrainzScrobbler.enable();
+    log.info("Integration enabled: ListenBrainz");
   }
 });
 

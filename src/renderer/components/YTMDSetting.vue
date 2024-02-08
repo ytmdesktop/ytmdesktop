@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom' | 'secret'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
@@ -6,6 +6,7 @@ type ModelValue = {
   file: string;
   range: number;
   custom: never;
+  secret: string;
 };
 
 const props = defineProps<{
@@ -54,7 +55,7 @@ const fileInput = ref(null);
     </div>
 
     <input
-      v-if="type !== 'file' && type !== 'range' && type !== 'custom'"
+      v-if="type !== 'file' && type !== 'range' && type !== 'custom' && type !== 'secret'"
       v-model="value"
       :disabled="disabled"
       :type="props.type"
@@ -71,6 +72,17 @@ const fileInput = ref(null);
         <input :disabled="disabled" type="text" readonly class="path" placeholder="No file chosen" :value="value" />
         <button v-if="value" class="remove" @click="$emit('clear')"><span class="material-symbols-outlined">delete</span></button>
       </div>
+    </div>
+    <div v-if="type === 'secret'" class="secret-input">
+      <input
+        v-if="type === 'secret'"
+        v-model="value"
+        :disabled="disabled"
+        type="text"
+        :placeholder="value && value.toString().length > 0 ? '********' : ''"
+        @change="$emit('change', $event)"
+      />
+      <button v-if="value" class="remove" @click="$emit('clear')"><span class="material-symbols-outlined">delete</span></button>
     </div>
 
     <slot></slot>
