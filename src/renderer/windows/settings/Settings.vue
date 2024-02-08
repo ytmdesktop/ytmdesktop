@@ -420,7 +420,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             name="Scrobble percent"
             description="Determines when a song is scrobbled"
             min="50"
-            max="100"
+            max="95"
             step="5"
             @change="settingsChanged"
           />
