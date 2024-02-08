@@ -382,6 +382,11 @@ const store = new Conf<StoreSchema>({
       if (!store.has("appearance.zoom")) {
         store.set("appearance.zoom", 100);
       }
+    },
+    ">=2.0.1": store => {
+      if (!store.has("lastfm.scrobblePercent")) {
+        store.set("lastfm.scrobblePercent", 50);
+      }
     }
   }
 });
