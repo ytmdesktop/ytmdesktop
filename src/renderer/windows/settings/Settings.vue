@@ -412,18 +412,18 @@ window.ytmd.handleUpdateDownloaded(() => {
             </div>
             <button v-if="lastFMSessionKey" @click="logoutLastFM">Logout</button>
           </div>
-          <div v-if="lastFMEnabled" class="setting indented">
-            <YTMDSetting
-              v-model="scrobblePercent"
-              type="range"
-              name="Scrobble percent: "
-              description="Determines when a song is scrobbled"
-              min="50"
-              max="100"
-              step="5"
-              @change="settingsChanged"
-            />
-          </div>
+          <YTMDSetting
+            v-if="lastFMEnabled"
+            v-model="scrobblePercent"
+            class="settings indented"
+            type="range"
+            name="Scrobble percent"
+            description="Determines when a song is scrobbled"
+            min="50"
+            max="100"
+            step="5"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
