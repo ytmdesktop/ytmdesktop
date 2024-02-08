@@ -407,10 +407,10 @@ window.ytmd.handleUpdateDownloaded(() => {
               <p class="description">
                 User is Authenticated:
                 <span v-if="lastFMSessionKey" style="color: #4caf50">Yes</span>
-                <button v-if="lastFMSessionKey" class="lastfm-logout-button" @click="logoutLastFM">Logout</button>
                 <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
+            <button v-if="lastFMSessionKey" @click="logoutLastFM">Logout</button>
           </div>
           <div v-if="lastFMEnabled" class="setting indented">
             <YTMDSetting
