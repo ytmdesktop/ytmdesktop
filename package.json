@@ -35,7 +35,7 @@
     "@electron-forge/plugin-webpack": "~7.2.0",
     "@electron-forge/publisher-github": "~7.2.0",
     "@electron/fuses": "^1.7.0",
-    "@types/node": "^20.11.8",
+    "@types/node": "^20.11.17",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
