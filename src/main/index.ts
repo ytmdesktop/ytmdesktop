@@ -1137,6 +1137,8 @@ const createMainWindow = (): void => {
     height: windowBounds?.height ?? 720 / scaleFactor,
     x: windowBounds?.x,
     y: windowBounds?.y,
+    minWidth: 156,
+    minHeight: 180,
     frame: false,
     show: false,
     icon: getIconPath("ytmd.png"),
