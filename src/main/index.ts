@@ -130,8 +130,8 @@ log.info("Application launched");
 // Enforce sandbox on all renderers
 app.enableSandbox();
 
-// editMenu allow for copy and paste shortcuts on MacOS
-const template: MenuItemConstructorOptions[] = [{ role: "editMenu" }];
+// appMenu allows for some basic windows management, editMenu allow for copy and paste shortcuts on MacOS
+const template: MenuItemConstructorOptions[] = [{ role: "appMenu", label: "YouTube Music Desktop App" }, { role: "editMenu" }];
 const builtMenu = isDarwin ? Menu.buildFromTemplate(template) : null; // null for performance https://www.electronjs.org/docs/latest/tutorial/performance#8-call-menusetapplicationmenunull-when-you-do-not-need-a-default-menu
 Menu.setApplicationMenu(builtMenu);
 
