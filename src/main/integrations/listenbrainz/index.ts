@@ -6,7 +6,7 @@ import MemoryStore from "../../memory-store";
 
 import IIntegration from "../integration";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
-import { ListenBrainzResponse, ListenBrainzSubmission, ListenBrainzSubmissionType } from "./schemas";
+import { ListenBrainzJSONResponse, ListenBrainzSubmission, ListenBrainzSubmissionType } from "./schemas";
 import log from "electron-log";
 
 export default class ListenBrainz implements IIntegration {
@@ -14,6 +14,7 @@ export default class ListenBrainz implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
   private isEnabled = false;
+  private isTokenValid: boolean | undefined = undefined;
 
   private possibleVideoIds: string[] | null;
   private listenbrainzDetails: StoreSchema["listenbrainz"] = null;
@@ -28,8 +29,6 @@ export default class ListenBrainz implements IIntegration {
     if (!this.isEnabled) {
       return;
     }
-
-    //console.log('updatePlayerState called with state:', state);
 
     if (state.videoDetails && state.trackState === VideoState.Playing) {
       // Check if the video has changed (TO DO: Fix song on repeat not scrobbling)
@@ -68,6 +67,34 @@ export default class ListenBrainz implements IIntegration {
     }
   }
 
+  private async validateToken(): Promise<boolean> {
+    try {
+      const response = await fetch("https://api.listenbrainz.org/1/validate-token", {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${this.listenbrainzDetails.token}`
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`Error in validateToken: ${response.status}`);
+        return false;
+      }
+
+      const responseBody: ListenBrainzJSONResponse = await response.json();
+
+      if (responseBody.valid) {
+        console.log(`Token is valid for user: ${responseBody.user_name}`);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(`Error in validateToken: ${error.message}`);
+      return false;
+    }
+  }
+
   private createListenBrainzSubmission(videoDetails: VideoDetails, listenType: ListenBrainzSubmissionType, scrobbleTime?: number): ListenBrainzSubmission {
     return {
       listen_type: listenType,
@@ -103,6 +130,15 @@ export default class ListenBrainz implements IIntegration {
   }
 
   private async sendToListenBrainz(listen: ListenBrainzSubmission): Promise<void> {
+    if (this.isTokenValid === undefined) {
+      this.isTokenValid = await this.validateToken();
+    }
+
+    if (!this.isTokenValid) {
+      console.error("Invalid ListenBrainz token - not sending scrobble");
+      return;
+    }
+
     try {
       const response = await fetch(`https://api.listenbrainz.org/1/submit-listens`, {
         method: "POST",
@@ -113,9 +149,11 @@ export default class ListenBrainz implements IIntegration {
         body: JSON.stringify(listen)
       });
 
+      const responseBody: ListenBrainzJSONResponse = await response.json();
+
       if (!response.ok) {
-        const responseBody: ListenBrainzResponse = await response.json();
-        throw new Error(`Error in sendToListenBrainz: ${response.status} - ${responseBody.message}`);
+        console.error(`Error in sendToListenBrainz: ${response.status} - ${responseBody.message}`);
+        return;
       }
     } catch (error) {
       console.error(`Error in sendToListenBrainz: ${error.message}`);
@@ -141,6 +179,7 @@ export default class ListenBrainz implements IIntegration {
     this.isEnabled = true;
 
     this.listenbrainzDetails = this.getSettings();
+    this.isTokenValid = undefined;
 
     this.playerStateFunction = (state: PlayerState) => this.updatePlayerState(state);
     playerStateStore.addEventListener(this.playerStateFunction);

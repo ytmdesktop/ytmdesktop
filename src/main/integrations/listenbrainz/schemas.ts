@@ -25,7 +25,14 @@ export type ListenBrainzSubmission = {
   payload: ListenBrainzListen[];
 };
 
-export type ListenBrainzResponse = {
-  status: number;
+export type ListenBrainzJSONResponse = {
   message?: string;
+  valid?: boolean;
+  user_name?: string;
+};
+
+export type ListenBrainzResponse = {
+  status?: string;
+  code?: number;
+  responseBody?: ListenBrainzJSONResponse;
 };
