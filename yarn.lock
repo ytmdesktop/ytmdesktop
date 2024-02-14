@@ -5222,12 +5222,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.6":
-  version: 9.0.6
-  resolution: "husky@npm:9.0.6"
+"husky@npm:^9.0.11":
+  version: 9.0.11
+  resolution: "husky@npm:9.0.11"
   bin:
-    husky: bin.js
-  checksum: 1ef034899dcdc35e5bf5436e1e02f8a7177dbb8a10dd91b77456d7fe110c204d8d4a7d53180e0651b87e35f39d7e0e95a53b4b7c334f68aefbc0d93bce4b54f8
+    husky: bin.mjs
+  checksum: 2c787dcf74a837fc9a4fea7da907509d4bd9a289f4ea10ecc9d86279e4d4542b0f5f6443a619bccae19e265f2677172cc2b86aae5c932a35a330cc227d914605
   languageName: node
   linkType: hard
 
@@ -9828,7 +9828,7 @@ __metadata:
     fastify-socket.io: "npm:^5.0.0"
     fork-ts-checker-webpack-plugin: "npm:^9.0.2"
     git-revision-webpack-plugin: "npm:5.0.0"
-    husky: "npm:^9.0.6"
+    husky: "npm:^9.0.11"
     lint-staged: "npm:^15.2.0"
     material-symbols: "npm:^0.12.0"
     node-loader: "npm:^2.0.0"
