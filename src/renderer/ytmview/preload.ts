@@ -177,6 +177,11 @@ async function hookPlayerApiEvents() {
   (await webFrame.executeJavaScript(hookPlayerApiEventsScript))();
 }
 
+function overrideHistoryButtonDisplay() {
+  // @ts-expect-error Style is reported as readonly but this still works
+  document.querySelector<HTMLElement>("#history-link tp-yt-paper-icon-button").style = "display: inline-block !important;";
+}
+
 function getYTMTextRun(runs: { text: string }[]) {
   let final = "";
   for (const run of runs) {
@@ -224,6 +229,7 @@ window.addEventListener("load", async () => {
   await createAdditionalPlayerBarControls();
   await hideChromecastButton();
   await hookPlayerApiEvents();
+  overrideHistoryButtonDisplay();
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
 
