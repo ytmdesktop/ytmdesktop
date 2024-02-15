@@ -35,8 +35,9 @@
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
+    const muted = state.player.muted;
 
-    window.ytmd.sendStoreUpdate(state.queue, thumbnails, album, likeStatus, volume, adPlaying);
+    window.ytmd.sendStoreUpdate(state.queue, thumbnails, album, likeStatus, volume, muted, adPlaying);
   }
 
   document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
