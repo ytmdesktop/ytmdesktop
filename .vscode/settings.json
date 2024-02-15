@@ -1,7 +1,4 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cSpell.words": [
-    "scrobble"
-  ]
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

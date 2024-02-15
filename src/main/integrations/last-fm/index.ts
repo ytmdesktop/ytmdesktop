@@ -58,6 +58,7 @@ export default class LastFM implements IIntegration {
     const response = await fetch(`https://ws.audioscrobbler.com/2.0/` + `?${this.createQueryString(params, api_sig)}`);
 
     const json = (await response.json()) as LastfmSessionResponse;
+
     if (json.error) {
       await this.authenticateUser();
     } else if (json.session) {
