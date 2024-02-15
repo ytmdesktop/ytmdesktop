@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Github checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Corepack Enable Yarn
         run: corepack enable yarn
@@ -42,7 +42,7 @@ jobs:
         run: yarn make --arch ${{ matrix.arch }}
 
       - name: Upload artifacts (${{ matrix.arch }})
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.os.name }}-${{ matrix.arch }}
           path: |

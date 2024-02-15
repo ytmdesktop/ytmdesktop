@@ -24,8 +24,8 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoProgress: (volume: number) => ipcRenderer.send("ytmView:videoProgressChanged", volume),
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: unknown, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
-  sendStoreUpdate: (queueState: unknown, thumbnails: unknown, album: unknown, likeStatus: string, volume: number, adPlaying: boolean) =>
-    ipcRenderer.send("ytmView:storeStateChanged", queueState, thumbnails, album, likeStatus, volume, adPlaying),
+  sendStoreUpdate: (queueState: unknown, thumbnails: unknown, album: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
+    ipcRenderer.send("ytmView:storeStateChanged", queueState, thumbnails, album, likeStatus, volume, muted, adPlaying),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
@@ -177,6 +177,11 @@ async function hookPlayerApiEvents() {
   (await webFrame.executeJavaScript(hookPlayerApiEventsScript))();
 }
 
+function overrideHistoryButtonDisplay() {
+  // @ts-expect-error Style is reported as readonly but this still works
+  document.querySelector<HTMLElement>("#history-link tp-yt-paper-icon-button").style = "display: inline-block !important;";
+}
+
 function getYTMTextRun(runs: { text: string }[]) {
   let final = "";
   for (const run of runs) {
@@ -224,6 +229,7 @@ window.addEventListener("load", async () => {
   await createAdditionalPlayerBarControls();
   await hideChromecastButton();
   await hookPlayerApiEvents();
+  overrideHistoryButtonDisplay();
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
 
