@@ -33,6 +33,7 @@ const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
+const listenbrainz: StoreSchema["listenbrainz"] = await store.get("listenbrainz");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
@@ -58,6 +59,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const listenbrainzEnabled = ref<boolean>(integrations.listenbrainzEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -68,6 +70,7 @@ const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
+const listenbrainzToken = ref<string>(listenbrainz.token);
 
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
@@ -94,6 +97,8 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  listenbrainzEnabled.value = newState.integrations.listenbrainzEnabled;
+  listenbrainzToken.value = newState.listenbrainz.token;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -161,6 +166,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("integrations.listenbrainzEnabled", listenbrainzEnabled.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -210,6 +216,21 @@ async function deleteCompanionAuthToken(appId: string) {
 
 function removeCustomCSSPath() {
   store.set("appearance.customCSSPath", null);
+}
+
+async function clearlistenbrainzToken() {
+  store.set("listenbrainz.token", null);
+}
+
+async function saveEncryptedToken(event: Event) {
+  const newToken = (event.target as HTMLInputElement).value;
+  if (typeof newToken === "string") {
+    const encryptedToken = (await safeStorage.encryptString(newToken)).toString("hex");
+    store.set("listenbrainz.token", encryptedToken);
+    await settingsChanged();
+  } else {
+    console.error("Invalid token: ", newToken);
+  }
 }
 
 function changeTab(newTab: number) {
@@ -399,6 +420,25 @@ window.ytmd.handleUpdateDownloaded(() => {
                 <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
+          </div>
+          <YTMDSetting
+            v-model="listenbrainzEnabled"
+            type="checkbox"
+            name="ListenBrainz scrobbling"
+            :disabled="!safeStorageAvailable"
+            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            @change="settingsChanged"
+          />
+          <div class="setting indented">
+            <YTMDSetting
+              v-if="listenbrainzEnabled"
+              v-model="listenbrainzToken"
+              type="secret"
+              name="Token:"
+              :disabled="!safeStorageAvailable"
+              @input="saveEncryptedToken"
+              @clear="clearlistenbrainzToken"
+            />
           </div>
         </div>
 
