@@ -49,7 +49,7 @@
     "fork-ts-checker-webpack-plugin": "^9.0.2",
     "git-revision-webpack-plugin": "5.0.0",
     "husky": "^9.0.11",
-    "lint-staged": "^15.2.0",
+    "lint-staged": "^15.2.2",
     "node-loader": "^2.0.0",
     "prettier": "3.2.4",
     "style-loader": "^3.3.4",
