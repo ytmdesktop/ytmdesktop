@@ -605,13 +605,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/cors@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@fastify/cors@npm:9.0.0"
+"@fastify/cors@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@fastify/cors@npm:9.0.1"
   dependencies:
     fastify-plugin: "npm:^4.0.0"
     mnemonist: "npm:0.39.6"
-  checksum: 28751f1a4432a894712847a4821bbc7c0d62a990a4c6012cd596e38ce524b4f3216e6eb3b1a209de707ef4834488c002d0a92724f5d84f5d3af111358b38361f
+  checksum: 4db9d3d02edbca741c8ed053819bf3b235ecd70e07c640ed91ba0fc1ee2dc8abedbbffeb79ae1a38ccbf59832e414cad90a554ee44227d0811d5a2d062940611
   languageName: node
   linkType: hard
 
@@ -9805,7 +9805,7 @@ __metadata:
     "@electron-forge/plugin-webpack": "npm:~7.2.0"
     "@electron-forge/publisher-github": "npm:~7.2.0"
     "@electron/fuses": "npm:^1.7.0"
-    "@fastify/cors": "npm:^9.0.0"
+    "@fastify/cors": "npm:^9.0.1"
     "@fastify/error": "npm:^3.4.1"
     "@fastify/rate-limit": "npm:^9.1.0"
     "@fastify/type-provider-typebox": "npm:^4.0.0"
