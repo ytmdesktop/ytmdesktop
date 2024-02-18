@@ -364,7 +364,8 @@ const store = new Conf<StoreSchema>({
       api_key: "2a69bcf769a7a28a8bf2f6a5100accad",
       secret: "46eea23770a459a49eb4d26cbf46b41c",
       token: null,
-      sessionKey: null
+      sessionKey: null,
+      scrobblePercent: 50
     },
     developer: {
       enableDevTools: false
@@ -383,6 +384,11 @@ const store = new Conf<StoreSchema>({
       store.delete("state.companionServerAuthWindowEnableTime");
       if (!store.has("appearance.zoom")) {
         store.set("appearance.zoom", 100);
+      }
+    },
+    ">=2.0.1": store => {
+      if (!store.has("lastfm.scrobblePercent")) {
+        store.set("lastfm.scrobblePercent", 50);
       }
     }
   }
