@@ -376,8 +376,8 @@ window.ytmd.handleUpdateDownloaded(() => {
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
                   <td class="companion">
-                    <strong>{{ authToken.appId }}</strong
-                    ><br />{{ authToken.appName }}
+                    <p class="name">{{ authToken.appName }}</p>
+                    <p class="id">{{ authToken.appId }}</p>
                   </td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
@@ -785,8 +785,14 @@ window.ytmd.handleUpdateDownloaded(() => {
 }
 
 .authorized-companions-table tr .companion {
-  width: 75%;
+  width: 70%;
   word-wrap: break-word;
+  line-height: 0.5;
+}
+
+.authorized-companions-table tr .companion .id {
+  color: #969696;
+  font-size: 14px;
 }
 
 .authorized-companions-table tbody tr .version {
