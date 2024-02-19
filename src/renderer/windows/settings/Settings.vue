@@ -376,8 +376,9 @@ window.ytmd.handleUpdateDownloaded(() => {
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
                   <td class="companion">
-                    <span class="name">{{ authToken.appName }}iuahs dhas uidhas uidhuais dhuiash duiasyhd iuashdui ahsdiuahsd asd uhi</span><br />
-                    <span class="id">{{ authToken.appId }}iuahs dhas uidhas uidhuais dhuiash duiasyhd iuashdui ahsdiuahsd asd uhi</span>
+                    <span class="name">{{ authToken.appName }}</span
+                    ><br />
+                    <span class="id">{{ authToken.appId }}</span>
                   </td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
