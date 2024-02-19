@@ -28,6 +28,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    enhancedMediaServiceEnabled: boolean;
   };
   shortcuts: {
     playPause: string;

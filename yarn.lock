@@ -2661,7 +2661,16 @@ __metadata:
 "caniuse-lite@npm:^1.0.30001580":
   version: 1.0.30001580
   resolution: "caniuse-lite@npm:1.0.30001580"
-  checksum: 10c0/f3a41bb5a820640a60071ed69d464f20d783d9a51cc2fd8916c7b0c187b25a8062e11986d04f531bdc1798d0bc37dfb0f90dcfa90fa3227bd49691efd4272c03
+  checksum: f3a41bb5a820640a60071ed69d464f20d783d9a51cc2fd8916c7b0c187b25a8062e11986d04f531bdc1798d0bc37dfb0f90dcfa90fa3227bd49691efd4272c03
+  languageName: node
+  linkType: hard
+
+"cargo-cp-artifact@npm:^0.1.5":
+  version: 0.1.8
+  resolution: "cargo-cp-artifact@npm:0.1.8"
+  bin:
+    cargo-cp-artifact: bin/cargo-cp-artifact.js
+  checksum: f28e0218a11926c0e12c781179a7ff26fd45bd979efad076a7db970e46e5e6e3d5c9ed4ab24f5e6fdfaaf98ac9f05273a8d3050f9194747ed2aab2facb4e22bb
   languageName: node
   linkType: hard
 
@@ -9863,7 +9872,16 @@ __metadata:
 "xmlbuilder@npm:^15.1.1":
   version: 15.1.1
   resolution: "xmlbuilder@npm:15.1.1"
-  checksum: 10c0/665266a8916498ff8d82b3d46d3993913477a254b98149ff7cff060d9b7cc0db7cf5a3dae99aed92355254a808c0e2e3ec74ad1b04aa1061bdb8dfbea26c18b8
+  checksum: 665266a8916498ff8d82b3d46d3993913477a254b98149ff7cff060d9b7cc0db7cf5a3dae99aed92355254a808c0e2e3ec74ad1b04aa1061bdb8dfbea26c18b8
+  languageName: node
+  linkType: hard
+
+"xosms@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "xosms@npm:0.3.0"
+  dependencies:
+    cargo-cp-artifact: "npm:^0.1.5"
+  checksum: 4f93a2bdc927e3c45d579822976c0adbd6cc0863f78dca14be6a6519147f0dab0d03ae0a7a337e9e14dc6ca1fcae67fd407bdacdf48c81b6dd9d3c1230112200
   languageName: node
   linkType: hard
 
@@ -10045,5 +10063,6 @@ __metadata:
     vue-loader: "npm:^17.4.2"
     vue-template-compiler: "npm:^2.7.16"
     webpack: "npm:^5.91.0"
+    xosms: "npm:^0.3.0"
   languageName: unknown
   linkType: soft

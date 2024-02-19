@@ -58,6 +58,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const enhancedMediaServiceEnabled = ref<boolean>(integrations.enhancedMediaServiceEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -97,6 +98,7 @@ store.onDidAnyChange(async newState => {
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
+  enhancedMediaServiceEnabled.value = newState.integrations.enhancedMediaServiceEnabled;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -165,6 +167,7 @@ async function settingsChanged() {
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
+  store.set("integrations.enhancedMediaServiceEnabled", enhancedMediaServiceEnabled.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -425,6 +428,14 @@ window.ytmd.handleUpdateDownloaded(() => {
             max="95"
             step="5"
             @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-model="enhancedMediaServiceEnabled"
+            type="checkbox"
+            indented
+            name="Enable enhanced media service"
+            description="An enhanced media service that can provide better media button controls"
+            @change="settingChangedRequiresRestart"
           />
         </div>
 
