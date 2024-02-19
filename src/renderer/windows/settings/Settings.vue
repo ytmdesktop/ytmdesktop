@@ -375,7 +375,10 @@ window.ytmd.handleUpdateDownloaded(() => {
               </thead>
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
-                  <td class="companion"><strong>{{ authToken.appId }}</strong><br>{{ authToken.appName }}</td>
+                  <td class="companion">
+                    <strong>{{ authToken.appId }}</strong
+                    ><br />{{ authToken.appName }}
+                  </td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
                     <button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button>
@@ -781,12 +784,8 @@ window.ytmd.handleUpdateDownloaded(() => {
   table-layout: fixed;
 }
 
-.authorized-companions-table tbody tr .id {
-  word-wrap: break-word;
-}
-
-.authorized-companions-table tr .name {
-  width: 50%;
+.authorized-companions-table tr .companion {
+  width: 75%;
   word-wrap: break-word;
 }
 
