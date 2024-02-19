@@ -368,16 +368,14 @@ window.ytmd.handleUpdateDownloaded(() => {
             <table class="authorized-companions-table">
               <thead>
                 <tr>
-                  <th class="id">ID</th>
-                  <th class="name">Name</th>
+                  <th class="companion">Companion</th>
                   <th class="version">Version</th>
                   <th class="controls"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
-                  <td class="id">{{ authToken.appId }}</td>
-                  <td class="name">{{ authToken.appName }}</td>
+                  <td class="companion"><strong>{{ authToken.appId }}</strong><br>{{ authToken.appName }}</td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
                     <button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button>
