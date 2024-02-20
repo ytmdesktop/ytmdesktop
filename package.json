@@ -58,7 +58,7 @@
     "typescript": "~5.3.3",
     "vue-loader": "^17.4.2",
     "vue-template-compiler": "^2.7.16",
-    "webpack": "^5.90.2"
+    "webpack": "^5.90.3"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
