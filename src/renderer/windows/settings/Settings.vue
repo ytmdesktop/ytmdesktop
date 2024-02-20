@@ -432,7 +432,6 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-model="enhancedMediaServiceEnabled"
             type="checkbox"
-            indented
             name="Enable enhanced media service"
             description="An enhanced media service that can provide better media button controls"
             @change="settingChangedRequiresRestart"
