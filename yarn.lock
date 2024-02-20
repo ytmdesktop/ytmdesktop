@@ -9876,12 +9876,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xosms@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "xosms@npm:0.3.0"
+"xosms@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "xosms@npm:0.4.0"
   dependencies:
     cargo-cp-artifact: "npm:^0.1.5"
-  checksum: 4f93a2bdc927e3c45d579822976c0adbd6cc0863f78dca14be6a6519147f0dab0d03ae0a7a337e9e14dc6ca1fcae67fd407bdacdf48c81b6dd9d3c1230112200
+  checksum: cefe47545445c6c4be8e53ba2c2261752ffc5260d6bca8898e539272d39ac645b49c298dedcd955d03893e2d4a992c6184a7f987682ae7744528f12ce867ac8d
   languageName: node
   linkType: hard
 
@@ -10063,6 +10063,6 @@ __metadata:
     vue-loader: "npm:^17.4.2"
     vue-template-compiler: "npm:^2.7.16"
     webpack: "npm:^5.91.0"
-    xosms: "npm:^0.3.0"
+    xosms: "npm:^0.4.0"
   languageName: unknown
   linkType: soft

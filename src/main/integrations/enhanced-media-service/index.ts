@@ -36,6 +36,9 @@ export default class EnhancedMediaService implements IIntegration {
           case "pause":
             this.ytmView.webContents.send("remoteControl:execute", "pause");
             break;
+          case "stop":
+            this.ytmView.webContents.send("remoteControl:execute", "pause");
+            break;
           case "next":
             this.ytmView.webContents.send("remoteControl:execute", "next");
             break;
