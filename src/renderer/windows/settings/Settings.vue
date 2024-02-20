@@ -368,16 +368,18 @@ window.ytmd.handleUpdateDownloaded(() => {
             <table class="authorized-companions-table">
               <thead>
                 <tr>
-                  <th class="id">ID</th>
-                  <th class="name">Name</th>
+                  <th class="companion">Companion</th>
                   <th class="version">Version</th>
                   <th class="controls"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
-                  <td class="id">{{ authToken.appId }}</td>
-                  <td class="name">{{ authToken.appName }}</td>
+                  <td class="companion">
+                    <span class="name">{{ authToken.appName }}</span
+                    ><br />
+                    <span class="id">{{ authToken.appId }}</span>
+                  </td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
                     <button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button>
@@ -783,13 +785,14 @@ window.ytmd.handleUpdateDownloaded(() => {
   table-layout: fixed;
 }
 
-.authorized-companions-table tbody tr .id {
+.authorized-companions-table tr .companion {
+  width: 70%;
   word-wrap: break-word;
 }
 
-.authorized-companions-table tr .name {
-  width: 50%;
-  word-wrap: break-word;
+.authorized-companions-table tr .companion .id {
+  color: #969696;
+  font-size: 14px;
 }
 
 .authorized-companions-table tbody tr .version {
