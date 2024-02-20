@@ -35,7 +35,7 @@ jobs:
           node-version: "20.9.0"
 
       - name: Install libdbus
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: matrix.os.name == 'linux'
         run: sudo apt-get install libdbus-1-dev pkg-config -y 
 
       - name: Install dependencies
