@@ -9,6 +9,7 @@ import {
   globalShortcut,
   ipcMain,
   Menu,
+  MenuItemConstructorOptions,
   nativeImage,
   safeStorage,
   screen,
@@ -46,6 +47,7 @@ declare const YTMD_UPDATE_FEED_OWNER: string;
 declare const YTMD_UPDATE_FEED_REPOSITORY: string;
 
 const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
+const isDarwin = process.platform === "darwin";
 
 let applicationExited = false;
 let applicationQuitting = false;
@@ -128,9 +130,10 @@ log.info("Application launched");
 // Enforce sandbox on all renderers
 app.enableSandbox();
 
-// Disabling the application menu improves performance, but we're disabling it to patch out default hotkeys for now
-// TODO: Come back to this at a future point in time to determine the necessary need for an application menu
-Menu.setApplicationMenu(null);
+// appMenu allows for some basic windows management, editMenu allow for copy and paste shortcuts on MacOS
+const template: MenuItemConstructorOptions[] = [{ role: "appMenu", label: "YouTube Music Desktop App" }, { role: "editMenu" }];
+const builtMenu = isDarwin ? Menu.buildFromTemplate(template) : null; // null for performance https://www.electronjs.org/docs/latest/tutorial/performance#8-call-menusetapplicationmenunull-when-you-do-not-need-a-default-menu
+Menu.setApplicationMenu(builtMenu);
 
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
@@ -233,7 +236,8 @@ log.info("Created memory store");
 
 function shouldDisableUpdates() {
   // macOS can't have auto updates without a code signature
-  if (process.platform === "darwin") return true;
+  // linux is not supported on the update server https://github.com/ytmdesktop/ytmdesktop/issues/1247 (hanging issue resolved)
+  if (process.platform !== "win32") return true;
 }
 
 // Configure the autoupdater
@@ -266,6 +270,10 @@ if (app.isPackaged && !shouldDisableUpdates() && !YTMD_DISABLE_UPDATES) {
     memoryStore.set("appUpdateDownloaded", true);
     if (appLaunchUpdateCheck) autoUpdater.quitAndInstall();
     if (settingsWindow) settingsWindow.webContents.send("app:updateDownloaded");
+  });
+  autoUpdater.on("error", () => {
+    if (appLaunchUpdateCheck) appLaunchUpdateCheck = false;
+    if (settingsWindow) settingsWindow.webContents.send("app:updateNotAvailable");
   });
   log.info("Setup application updater");
 
@@ -356,7 +364,8 @@ const store = new Conf<StoreSchema>({
       api_key: "2a69bcf769a7a28a8bf2f6a5100accad",
       secret: "46eea23770a459a49eb4d26cbf46b41c",
       token: null,
-      sessionKey: null
+      sessionKey: null,
+      scrobblePercent: 50
     },
     developer: {
       enableDevTools: false
@@ -375,6 +384,11 @@ const store = new Conf<StoreSchema>({
       store.delete("state.companionServerAuthWindowEnableTime");
       if (!store.has("appearance.zoom")) {
         store.set("appearance.zoom", 100);
+      }
+    },
+    ">=2.0.1": store => {
+      if (!store.has("lastfm.scrobblePercent")) {
+        store.set("lastfm.scrobblePercent", 50);
       }
     }
   }
@@ -633,11 +647,16 @@ function registerShortcuts() {
   log.info("Unregistered shortcuts");
 
   if (shortcuts.playPause) {
-    const registered = globalShortcut.register(shortcuts.playPause, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "playPause");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.playPause, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "playPause");
+        }
+      });
+    } catch {
+      /* ignored */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: playPause");
@@ -646,14 +665,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: playPause");
       memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
   }
 
   if (shortcuts.next) {
-    const registered = globalShortcut.register(shortcuts.next, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "next");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.next, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "next");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: next");
@@ -662,14 +688,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: next");
       memoryStore.set("shortcutsNextRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsNextRegisterFailed", false);
   }
 
   if (shortcuts.previous) {
-    const registered = globalShortcut.register(shortcuts.previous, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "previous");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.previous, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "previous");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: previous");
@@ -678,14 +711,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: previous");
       memoryStore.set("shortcutsPreviousRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsPreviousRegisterFailed", false);
   }
 
   if (shortcuts.thumbsUp) {
-    const registered = globalShortcut.register(shortcuts.thumbsUp, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "toggleLike");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.thumbsUp, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "toggleLike");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: thumbsUp");
@@ -694,14 +734,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: thumbsUp");
       memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
   }
 
   if (shortcuts.thumbsDown) {
-    const registered = globalShortcut.register(shortcuts.thumbsDown, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "toggleDislike");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.thumbsDown, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "toggleDislike");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: thumbsDown");
@@ -710,14 +757,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: thumbsDown");
       memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
   }
 
   if (shortcuts.volumeUp) {
-    const registered = globalShortcut.register(shortcuts.volumeUp, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "volumeUp");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.volumeUp, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "volumeUp");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: volumeUp");
@@ -726,14 +780,21 @@ function registerShortcuts() {
       log.info("Registered shortcut: volumeUp");
       memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
   }
 
   if (shortcuts.volumeDown) {
-    const registered = globalShortcut.register(shortcuts.volumeDown, () => {
-      if (ytmView) {
-        ytmView.webContents.send("remoteControl:execute", "volumeDown");
-      }
-    });
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.volumeDown, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "volumeDown");
+        }
+      });
+    } catch {
+      /* empty */
+    }
 
     if (!registered) {
       log.info("Failed to register shortcut: volumeDown");
@@ -742,6 +803,8 @@ function registerShortcuts() {
       log.info("Registered shortcut: volumeDown");
       memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
     }
+  } else {
+    memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");
@@ -818,7 +881,7 @@ const createOrShowSettingsWindow = (): void => {
     show: false,
     icon: getIconPath("ytmd.png"),
     parent: mainWindow,
-    modal: process.platform !== "darwin",
+    modal: !isDarwin,
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#000000",
@@ -1080,6 +1143,8 @@ const createMainWindow = (): void => {
     height: windowBounds?.height ?? 720 / scaleFactor,
     x: windowBounds?.x,
     y: windowBounds?.y,
+    minWidth: 156,
+    minHeight: 180,
     frame: false,
     show: false,
     icon: getIconPath("ytmd.png"),
@@ -1157,7 +1222,7 @@ const createMainWindow = (): void => {
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
   mainWindow.on("close", event => {
-    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || process.platform === "darwin")) {
+    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || isDarwin)) {
       event.preventDefault();
       mainWindow.hide();
     }
@@ -1276,31 +1341,45 @@ app.on("ready", async () => {
 
         if ("settings-accelerators" in v1Config) {
           if ("media-play-pause" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.playPause", v1Config["settings-accelerators"]["media-play-pause"]);
+            if (v1Config["settings-accelerators"]["media-play-pause"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.playPause", v1Config["settings-accelerators"]["media-play-pause"]);
+            }
           }
 
           if ("media-track-next" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.next", v1Config["settings-accelerators"]["media-track-next"]);
+            if (v1Config["settings-accelerators"]["media-track-next"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.next", v1Config["settings-accelerators"]["media-track-next"]);
+            }
           }
 
           if ("media-track-previous" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.previous", v1Config["settings-accelerators"]["media-track-previous"]);
+            if (v1Config["settings-accelerators"]["media-track-previous"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.previous", v1Config["settings-accelerators"]["media-track-previous"]);
+            }
           }
 
           if ("media-track-like" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.thumbsUp", v1Config["settings-accelerators"]["media-track-like"]);
+            if (v1Config["settings-accelerators"]["media-track-like"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.thumbsUp", v1Config["settings-accelerators"]["media-track-like"]);
+            }
           }
 
           if ("media-track-dislike" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.thumbsDown", v1Config["settings-accelerators"]["media-track-dislike"]);
+            if (v1Config["settings-accelerators"]["media-track-dislike"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.thumbsDown", v1Config["settings-accelerators"]["media-track-dislike"]);
+            }
           }
 
           if ("media-volume-up" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.volumeUp", v1Config["settings-accelerators"]["media-volume-up"]);
+            if (v1Config["settings-accelerators"]["media-volume-up"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.volumeUp", v1Config["settings-accelerators"]["media-volume-up"]);
+            }
           }
 
           if ("media-volume-down" in v1Config["settings-accelerators"]) {
-            store.set("shortcuts.volumeDown", v1Config["settings-accelerators"]["media-volume-down"]);
+            if (v1Config["settings-accelerators"]["media-volume-down"].toLowerCase() !== "disabled") {
+              store.set("shortcuts.volumeDown", v1Config["settings-accelerators"]["media-volume-down"]);
+            }
           }
         }
 
@@ -1364,7 +1443,7 @@ app.on("ready", async () => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
-      if (store.get("general").hideToTrayOnClose || process.platform === "darwin") {
+      if (store.get("general").hideToTrayOnClose || isDarwin) {
         mainWindow.hide();
       } else {
         app.quit();
@@ -1487,10 +1566,10 @@ app.on("ready", async () => {
     playerStateStore.updateVideoDetails(videoDetails, playlistId);
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue, thumbnails, album, likeStatus, volume, adPlaying) => {
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, thumbnails, album, likeStatus, volume, muted, adPlaying) => {
     if (event.sender !== ytmView.webContents) return;
 
-    playerStateStore.updateFromStore(queue, thumbnails, album, likeStatus, volume, adPlaying);
+    playerStateStore.updateFromStore(queue, thumbnails, album, likeStatus, volume, muted, adPlaying);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {
@@ -1829,7 +1908,7 @@ app.on("open-url", (_, url) => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (!isDarwin) {
     app.quit();
   }
 });
