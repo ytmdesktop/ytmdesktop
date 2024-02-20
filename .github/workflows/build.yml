@@ -34,6 +34,10 @@ jobs:
           cache: 'yarn'
           node-version: "20.9.0"
 
+      - name: Install libdbus
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get install libdbus-1-dev pkg-config -y 
+
       - name: Install dependencies
         run: yarn --immutable
 
