@@ -4,6 +4,7 @@ import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
+import logo from "~assets/icons/ytmd.png";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
 declare const YTMD_GIT_BRANCH: string;
@@ -509,7 +510,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         </div>
 
         <div v-if="currentTab === 99" class="about-tab">
-          <img class="icon" :src="require('~assets/icons/ytmd.png')" />
+          <img class="icon" :src="logo" />
           <h2 class="app-name">YouTube Music Desktop App</h2>
           <p class="made-by">Made by YTMDesktop Team</p>
           <template v-if="!autoUpdaterDisabled">

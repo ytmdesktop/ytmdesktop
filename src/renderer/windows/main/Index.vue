@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import TitleBar from "../../components/TitleBar.vue";
 import YTMViewLoading from "../../components/YTMViewLoading.vue";
+import icon from "~assets/icons/ytmd_white.png";
 
 const keyboardFocus = ref<HTMLElement>(null);
 const keyboardFocusZero = ref<HTMLElement>(null);
@@ -26,15 +27,7 @@ onMounted(() => {
 <template>
   <div ref="keyboardFocusZero" tabindex="0"></div>
   <Suspense>
-    <TitleBar
-      is-main-window
-      has-home-button
-      has-settings-button
-      has-minimize-button
-      has-maximize-button
-      title="YouTube Music Desktop App"
-      :icon-file="require('~assets/icons/ytmd_white.png')"
-    />
+    <TitleBar is-main-window has-home-button has-settings-button has-minimize-button has-maximize-button title="YouTube Music Desktop App" :icon-file="icon" />
   </Suspense>
   <Suspense>
     <YTMViewLoading />

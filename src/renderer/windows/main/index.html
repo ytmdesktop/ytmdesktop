@@ -4,7 +4,7 @@
     <% if (process.env.NODE_ENV === "production") { %>
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'">
     <% } else if (process.env.NODE_ENV === "development") { %>
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'">
     <% } %>
     <meta charset="UTF-8" />
     <title>YouTube Music Desktop App</title>
@@ -16,5 +16,6 @@
   </head>
   <body>
     <div id="app"></div>
+    <script type="module" src="./renderer.ts"></script>
   </body>
 </html>

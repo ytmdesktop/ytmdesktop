@@ -1,9 +1,9 @@
 import { BrowserView } from "electron";
 import IIntegration from "../integration";
 
-import enableScript from "./script/enable.script";
-import disableScript from "./script/disable.script";
-import forceUpdateVolume from "./script/forceupdatevolume.script";
+import enableScript from "./script/enable.script?raw";
+import disableScript from "./script/disable.script?raw";
+import forceUpdateVolume from "./script/forceupdatevolume.script?raw";
 
 export default class VolumeRatio implements IIntegration {
   // This integration is based upon the following GreasyFork script:

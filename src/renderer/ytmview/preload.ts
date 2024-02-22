@@ -12,11 +12,11 @@ import { contextBridge, ipcRenderer, webFrame } from "electron";
 import Store from "../store-ipc/store";
 import { StoreSchema } from "~shared/store/schema";
 
-import playerBarControlsScript from "./scripts/playerbarcontrols.script";
-import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script";
-import getPlaylistsScript from "./scripts/getplaylists.script";
-import toggleLikeScript from "./scripts/togglelike.script";
-import toggleDislikeScript from "./scripts/toggledislike.script";
+import playerBarControlsScript from "./scripts/playerbarcontrols.script?raw";
+import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw";
+import getPlaylistsScript from "./scripts/getplaylists.script?raw";
+import toggleLikeScript from "./scripts/togglelike.script?raw";
+import toggleDislikeScript from "./scripts/toggledislike.script?raw";
 
 const store = new Store<StoreSchema>();
 
