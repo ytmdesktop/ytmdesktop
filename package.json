@@ -73,7 +73,7 @@
     "fastify-socket.io": "^5.0.0",
     "material-symbols": "^0.12.0",
     "socket.io": "^4.7.4",
-    "vue": "^3.4.19"
+    "vue": "^3.4.20"
   },
   "lint-staged": {
     "*.{ts,tsx,vue}": [
