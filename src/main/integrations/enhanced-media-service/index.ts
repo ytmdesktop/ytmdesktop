@@ -23,6 +23,11 @@ export default class EnhancedMediaService implements IIntegration {
   private mediaServiceProvider: MediaServiceProvider = new MediaServiceProvider("ytmd", "YouTube Music Desktop App");
   private ytmView: BrowserView | null = null;
 
+  private lastVideoDetailsTitle: string | null = null;
+  private lastVideoDetailsAuthor: string | null = null;
+  private lastVideoDetailsId: string | null = null;
+  private lastTrackState: VideoState | null = null;
+
   constructor() {
     this.mediaServiceProvider.buttonPressed = (button: unknown) => {
       if (this.ytmView !== null) {
@@ -60,17 +65,29 @@ export default class EnhancedMediaService implements IIntegration {
 
   private playerStateChanged(state: PlayerState) {
     if (this.enabled && state.videoDetails) {
-      this.mediaServiceProvider.mediaType = MediaType.Music;
-      if (state.videoDetails.album !== null && state.videoDetails.album !== undefined) this.mediaServiceProvider.albumTitle = state.videoDetails.album;
-      this.mediaServiceProvider.artist = state.videoDetails.author;
-      this.mediaServiceProvider.title = state.videoDetails.title;
-      this.mediaServiceProvider.trackId = state.videoDetails.id;
-      this.mediaServiceProvider.setThumbnail(ThumbnailType.Uri, getHighestResThumbnail(state.videoDetails.thumbnails));
+      if (
+        state.videoDetails.title !== this.lastVideoDetailsTitle ||
+        state.videoDetails.author !== this.lastVideoDetailsAuthor ||
+        state.videoDetails.id !== this.lastVideoDetailsId ||
+        state.trackState !== this.lastTrackState
+      ) {
+        this.lastVideoDetailsTitle = state.videoDetails.title;
+        this.lastVideoDetailsAuthor = state.videoDetails.author;
+        this.lastVideoDetailsId = state.videoDetails.id;
+        this.lastTrackState = state.trackState;
 
-      if (state.trackState === VideoState.Playing) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Playing;
-      if (state.trackState === VideoState.Paused) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Paused;
-      if (state.trackState === VideoState.Buffering) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Changing;
-      if (state.trackState === VideoState.Unknown) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Closed;
+        this.mediaServiceProvider.mediaType = MediaType.Music;
+        if (state.videoDetails.album !== null && state.videoDetails.album !== undefined) this.mediaServiceProvider.albumTitle = state.videoDetails.album;
+        this.mediaServiceProvider.artist = state.videoDetails.author;
+        this.mediaServiceProvider.title = state.videoDetails.title;
+        this.mediaServiceProvider.trackId = state.videoDetails.id;
+        this.mediaServiceProvider.setThumbnail(ThumbnailType.Uri, getHighestResThumbnail(state.videoDetails.thumbnails));
+
+        if (state.trackState === VideoState.Playing) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Playing;
+        if (state.trackState === VideoState.Paused) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Paused;
+        if (state.trackState === VideoState.Buffering) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Changing;
+        if (state.trackState === VideoState.Unknown) this.mediaServiceProvider.playbackStatus = PlaybackStatus.Closed;
+      }
     } else if (this.enabled && !state.videoDetails) {
       this.mediaServiceProvider.playbackStatus = PlaybackStatus.Closed;
     }
