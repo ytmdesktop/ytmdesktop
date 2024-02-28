@@ -1283,12 +1283,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.11.19":
-  version: 20.11.19
-  resolution: "@types/node@npm:20.11.19"
+"@types/node@npm:^20.11.21":
+  version: 20.11.21
+  resolution: "@types/node@npm:20.11.21"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/f451ef0a1d78f29c57bad7b77e49ebec945f2a6d0d7a89851d7e185ee9fe7ad94d651c0dfbcb7858c9fa791310c8b40a881e2260f56bd3c1b7e7ae92723373ae
+  checksum: 10c0/52b1cdfe8b14a67ab98c01b2e9621994b34a2537368e108fb925121a9d5958eb7344a2fb81ff36964932d5e5a093de8897f021bded10cad3536fd31e932b3000
   languageName: node
   linkType: hard
 
@@ -9826,7 +9826,7 @@ __metadata:
     "@fastify/rate-limit": "npm:^9.1.0"
     "@fastify/type-provider-typebox": "npm:^4.0.0"
     "@sinclair/typebox": "npm:^0.32.14"
-    "@types/node": "npm:^20.11.19"
+    "@types/node": "npm:^20.11.21"
     "@typescript-eslint/eslint-plugin": "npm:^7.0.2"
     "@typescript-eslint/parser": "npm:^7.0.2"
     "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
