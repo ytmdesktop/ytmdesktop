@@ -1,5 +1,5 @@
 import { Notification, NotificationConstructorOptions, nativeImage } from "electron";
-import playerStateStore, { PlayerState, Thumbnail, VideoDetails } from "../../player-state-store";
+import playerStateStore, { PlayerState, Thumbnail, VideoDetails, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 import https from "https";
 
@@ -75,7 +75,7 @@ export default class NowPlayingNotifications implements IIntegration {
       return;
     }
 
-    if (state.videoDetails && state.trackState === 1) {
+    if (state.videoDetails && state.trackState === VideoState.Playing) {
       if (this.lastDetails && this.lastDetails.id === state.videoDetails.id) {
         return;
       }
