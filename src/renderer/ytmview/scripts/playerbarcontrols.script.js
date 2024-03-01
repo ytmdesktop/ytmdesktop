@@ -55,7 +55,7 @@
     toggled: false,
     type: "text"
   });
-  document.querySelector("ytmusic-popup-container").querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
+  document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
 
   let playlistButton = document.createElement("yt-button-shape");
   playlistButton.classList.add("ytmd-player-bar-control");
