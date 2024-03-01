@@ -1,7 +1,7 @@
 (function() {
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
-    let state = document.querySelector("ytmusic-player-bar").store.getState();
+    let state = document.querySelector("ytmusic-popup-container").store.getState();
 
     const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
     const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
@@ -51,7 +51,7 @@
       window.ytmd.sendVideoData(videoDetails, playlistId, album);
     }
   });
-  document.querySelector("ytmusic-player-bar").store.subscribe(() => {
+  document.querySelector("ytmusic-popup-container").store.subscribe(() => {
     sendStoreState();
   });
   window.addEventListener("yt-action", e => {

@@ -46,7 +46,7 @@
       };
       this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
       this.dispatchEvent(new CustomEvent("yt-action", feedbackEvent));
-      document.querySelector("ytmusic-player-bar").store.dispatch({
+      document.querySelector("ytmusic-popup-container").store.dispatch({
         type: "SET_FEEDBACK_TOGGLE_STATE",
         payload: { defaultEndpointFeedbackToken: libraryFeedbackDefaultToken, isToggled: !this.data.toggled }
       });
@@ -55,7 +55,7 @@
     toggled: false,
     type: "text"
   });
-  document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
+  document.querySelector("ytmusic-popup-container").querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
 
   let playlistButton = document.createElement("yt-button-shape");
   playlistButton.classList.add("ytmd-player-bar-control");
@@ -468,8 +468,8 @@
     }
   });
 
-  document.querySelector("ytmusic-player-bar").store.subscribe(() => {
-    let state = document.querySelector("ytmusic-player-bar").store.getState();
+  document.querySelector("ytmusic-popup-container").store.subscribe(() => {
+    let state = document.querySelector("ytmusic-popup-container").store.getState();
 
     // Update library button for current data
     const currentMenu = document.querySelector("ytmusic-player-bar").getMenuRenderer();
