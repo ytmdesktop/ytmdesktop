@@ -16,7 +16,7 @@
   let serviceEvent = null;
 
   const defaultLikeStatus = likeButtonData.likeStatus;
-  const state = document.querySelector("ytmusic-player-bar").store.getState();
+  const state = document.querySelector("ytmusic-popup-container").store.getState();
   const storeLikeStatus = state.likeStatus.videos[videoId];
 
   const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;

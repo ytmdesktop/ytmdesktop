@@ -23,9 +23,10 @@ const store = new Store<StoreSchema>();
 contextBridge.exposeInMainWorld("ytmd", {
   sendVideoProgress: (volume: number) => ipcRenderer.send("ytmView:videoProgressChanged", volume),
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
-  sendVideoData: (videoDetails: unknown, playlistId: string) => ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId),
-  sendStoreUpdate: (queueState: unknown, thumbnails: unknown, album: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
-    ipcRenderer.send("ytmView:storeStateChanged", queueState, thumbnails, album, likeStatus, volume, muted, adPlaying),
+  sendVideoData: (videoDetails: unknown, playlistId: string, album: { id: string; text: string }) =>
+    ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId, album),
+  sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
+    ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted, adPlaying),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
@@ -167,7 +168,7 @@ async function hideChromecastButton() {
   (
     await webFrame.executeJavaScript(`
       (function() {
-        document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_CAST_AVAILABLE', payload: false });
+        document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_CAST_AVAILABLE', payload: false });
       })
     `)
   )();
@@ -374,7 +375,7 @@ window.addEventListener("load", async () => {
           await webFrame.executeJavaScript(`
             (function(newVolumeUp) {
               document.querySelector("ytmusic-player-bar").playerApi.setVolume(newVolumeUp);
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_VOLUME', payload: newVolumeUp });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_VOLUME', payload: newVolumeUp });
             })
           `)
         )(newVolumeUp);
@@ -398,7 +399,7 @@ window.addEventListener("load", async () => {
           await webFrame.executeJavaScript(`
             (function(newVolumeDown) {
               document.querySelector("ytmusic-player-bar").playerApi.setVolume(newVolumeDown);
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_VOLUME', payload: newVolumeDown });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_VOLUME', payload: newVolumeDown });
             })
           `)
         )(newVolumeDown);
@@ -416,7 +417,7 @@ window.addEventListener("load", async () => {
           await webFrame.executeJavaScript(`
             (function(valueInt) {
               document.querySelector("ytmusic-player-bar").playerApi.setVolume(valueInt);
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_VOLUME', payload: valueInt });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_VOLUME', payload: valueInt });
             })
           `)
         )(valueInt);
@@ -428,7 +429,7 @@ window.addEventListener("load", async () => {
           await webFrame.executeJavaScript(`
             (function() {
               document.querySelector("ytmusic-player-bar").playerApi.mute();
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_MUTED', payload: true });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_MUTED', payload: true });
             })
           `)
         )();
@@ -439,7 +440,7 @@ window.addEventListener("load", async () => {
           await webFrame.executeJavaScript(`
             (function() {
               document.querySelector("ytmusic-player-bar").playerApi.unMute();
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_MUTED', payload: false });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_MUTED', payload: false });
             })
           `)
         )();
@@ -449,7 +450,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(value) {
-              document.querySelector("ytmusic-player-bar").store.dispatch({ type: 'SET_REPEAT', payload: value });
+              document.querySelector("ytmusic-popup-container").store.dispatch({ type: 'SET_REPEAT', payload: value });
             })
           `)
         )(value);
@@ -481,7 +482,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(index) {
-              const state = document.querySelector("ytmusic-player-bar").store.getState();
+              const state = document.querySelector("ytmusic-popup-container").store.getState();
               const queue = state.queue;
 
               const maxQueueIndex = state.queue.items.length - 1;
