@@ -2710,7 +2710,7 @@ __metadata:
 "caniuse-lite@npm:^1.0.30001580":
   version: 1.0.30001580
   resolution: "caniuse-lite@npm:1.0.30001580"
-  checksum: f3a41bb5a820640a60071ed69d464f20d783d9a51cc2fd8916c7b0c187b25a8062e11986d04f531bdc1798d0bc37dfb0f90dcfa90fa3227bd49691efd4272c03
+  checksum: 10c0/f3a41bb5a820640a60071ed69d464f20d783d9a51cc2fd8916c7b0c187b25a8062e11986d04f531bdc1798d0bc37dfb0f90dcfa90fa3227bd49691efd4272c03
   languageName: node
   linkType: hard
 
@@ -9912,7 +9912,7 @@ __metadata:
 "xmlbuilder@npm:^15.1.1":
   version: 15.1.1
   resolution: "xmlbuilder@npm:15.1.1"
-  checksum: 665266a8916498ff8d82b3d46d3993913477a254b98149ff7cff060d9b7cc0db7cf5a3dae99aed92355254a808c0e2e3ec74ad1b04aa1061bdb8dfbea26c18b8
+  checksum: 10c0/665266a8916498ff8d82b3d46d3993913477a254b98149ff7cff060d9b7cc0db7cf5a3dae99aed92355254a808c0e2e3ec74ad1b04aa1061bdb8dfbea26c18b8
   languageName: node
   linkType: hard
 
@@ -9942,7 +9942,7 @@ __metadata:
       optional: true
     "@xosms/xosms-win32-x64-msvc":
       optional: true
-  checksum: d859a258d6386d47deff4a13c748736e3a239b02e60ac54af94f6b87cd7513e9e003c57247421d1c6afb2d607d3aa0c08b30cd4b2b2be573db26d85fbdf7e2da
+  checksum: 10c0/d859a258d6386d47deff4a13c748736e3a239b02e60ac54af94f6b87cd7513e9e003c57247421d1c6afb2d607d3aa0c08b30cd4b2b2be573db26d85fbdf7e2da
   languageName: node
   linkType: hard
 
