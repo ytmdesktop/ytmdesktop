@@ -33,7 +33,7 @@ export default class EnhancedMediaService implements IIntegration {
   private lastVideoProgress: number | null = null;
 
   constructor() {
-    this.mediaPlayer.on("buttonpressed", (button: string) => {
+    this.mediaPlayer.on("buttonpressed", (_error: unknown, button: string) => {
       switch (button) {
         case "playpause":
           this.ytmView.webContents.send("remoteControl:execute", "playPause");
@@ -55,7 +55,7 @@ export default class EnhancedMediaService implements IIntegration {
           break;
       }
     });
-    this.mediaPlayer.on("positionchanged", (position: number) => {
+    this.mediaPlayer.on("positionchanged", (_error: unknown, position: number) => {
       if (this.ytmView !== null) {
         if (position >= 0 && position <= playerStateStore.getState().videoDetails.durationSeconds)
           this.ytmView.webContents.send("remoteControl:execute", "seekTo", position);
