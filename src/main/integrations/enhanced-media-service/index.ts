@@ -61,11 +61,25 @@ export default class EnhancedMediaService implements IIntegration {
           this.ytmView.webContents.send("remoteControl:execute", "seekTo", position);
       }
     });
+    this.mediaPlayer.on("positionseeked", (_error: unknown, seek: number) => {
+      if (this.ytmView !== null) {
+        let newProgress = this.lastVideoProgress + seek;
+        if (newProgress <= 0) newProgress = 0;
+
+        // Behavior aligns with MPRIS documentation
+        if (newProgress > this.lastDurationSeconds) {
+          this.ytmView.webContents.send("remoteControl:execute", "next");
+        } else {
+          this.ytmView.webContents.send("remoteControl:execute", "seekTo", newProgress);
+        }
+      }
+    });
 
     this.mediaPlayer.nextButtonEnabled = true;
     this.mediaPlayer.pauseButtonEnabled = true;
     this.mediaPlayer.playButtonEnabled = true;
     this.mediaPlayer.previousButtonEnabled = true;
+    this.mediaPlayer.seekEnabled = true;
   }
 
   private async playerStateChanged(state: PlayerState) {
@@ -85,10 +99,10 @@ export default class EnhancedMediaService implements IIntegration {
         needUpdate = true;
       }
 
-      /*if (state.videoDetails.id !== this.lastVideoDetailsId) {
+      if (state.videoDetails.id !== this.lastVideoDetailsId) {
         this.lastVideoDetailsId = state.videoDetails.id;
         this.mediaPlayer.trackId = state.videoDetails.id;
-      }*/
+      }
 
       if (state.trackState !== this.lastTrackState) {
         this.lastTrackState = state.trackState;
@@ -119,6 +133,7 @@ export default class EnhancedMediaService implements IIntegration {
       }
 
       if (state.videoDetails.durationSeconds !== this.lastDurationSeconds || state.videoProgress !== this.lastVideoProgress) {
+        this.lastVideoProgress == state.videoProgress;
         this.mediaPlayer.setTimeline(state.videoDetails.durationSeconds, Math.max(0, Math.min(state.videoProgress, state.videoDetails.durationSeconds)));
       }
 
