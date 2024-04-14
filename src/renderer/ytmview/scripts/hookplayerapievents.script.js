@@ -3,8 +3,8 @@
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = document.querySelector("ytmusic-popup-container").store.getState();
 
-    const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+    const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
+    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoId];
     
@@ -16,23 +16,23 @@
     window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying);
   }
 
-  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
+  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
     window.ytmd.sendVideoProgress(progress);
   });
-  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onStateChange", state => {
+  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onStateChange", state => {
     window.ytmd.sendVideoState(state);
   });
-  document.querySelector("ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
+  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      let videoDetails = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
-      let playlistId = document.querySelector("ytmusic-player-bar").playerApi.getPlaylistId();
+      let videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
+      let playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
       let album = null;
 
-      let currentItem = document.querySelector("ytmusic-player-bar").currentItem;
+      let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
       if (currentItem !== null && currentItem !== undefined) {
         if (videoDetails.musicVideoType === "MUSIC_VIDEO_TYPE_PODCAST_EPISODE") {
           // Thumbnails are not provided on the video details for a podcast
-          videoDetails.thumbnail = document.querySelector("ytmusic-player-bar").currentItem.thumbnail;
+          videoDetails.thumbnail = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem.thumbnail;
         }
 
         for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
