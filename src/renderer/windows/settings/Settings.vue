@@ -4,6 +4,7 @@ import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
+import { YTMExperimentOverride } from "~shared/types";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
 declare const YTMD_GIT_BRANCH: string;
@@ -20,6 +21,8 @@ const checkingForUpdate = ref(false);
 const updateAvailable = ref(await window.ytmd.isAppUpdateAvailable());
 const updateNotAvailable = ref(false);
 const updateDownloaded = ref(await window.ytmd.isAppUpdateDownloaded());
+const developerYTMAddExperimentFlagOverride = ref("");
+const developerYTMAddExperimentFlagOverrideValue = ref("");
 
 const store = window.ytmd.store;
 const memoryStore = window.ytmd.memoryStore;
@@ -32,6 +35,7 @@ const appearance: StoreSchema["appearance"] = await store.get("appearance");
 const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
+const developer: StoreSchema["developer"] = await store.get("developer");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
@@ -66,6 +70,9 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+
+const developerAcknowledgeWarning = ref<boolean>(developer.acknowledgeWarning);
+const developerYTMExperimentFlagOverrides = ref<YTMExperimentOverride>(developer.ytmExperimentFlagOverrides);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
@@ -105,6 +112,9 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+
+  developerAcknowledgeWarning.value = newState.developer.acknowledgeWarning;
+  developerYTMExperimentFlagOverrides.value = newState.developer.ytmExperimentFlagOverrides;
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -173,6 +183,9 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+
+  store.set("developer.acknowledgeWarning", developerAcknowledgeWarning.value);
+  store.set("developer.ytmExperimentFlagOverrides", JSON.parse(JSON.stringify(developerYTMExperimentFlagOverrides.value))); // Needs a json stringify/parse to structuredClone it properly for IPC
 }
 
 async function settingChangedRequiresRestart() {
@@ -240,6 +253,21 @@ async function logoutLastFM() {
   await settingsChanged();
 }
 
+async function acknowledgeDeveloperSettings() {
+  developerAcknowledgeWarning.value = true;
+  await settingsChanged();
+}
+
+async function deleteYTMExperimentOverride(experiment: string) {
+  delete developerYTMExperimentFlagOverrides.value[experiment];
+  await settingChangedRequiresRestart();
+}
+
+async function addYTMExperimentOverride() {
+  developerYTMExperimentFlagOverrides.value[developerYTMAddExperimentFlagOverride.value] = JSON.parse(developerYTMAddExperimentFlagOverrideValue.value);
+  await settingChangedRequiresRestart();
+}
+
 window.ytmd.handleCheckingForUpdate(() => {
   checkingForUpdate.value = true;
 });
@@ -274,6 +302,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
         <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
         <span class="push"></span>
+        <li :class="{ active: currentTab === 98 }" @click="changeTab(98)"><span class="material-symbols-outlined">code_blocks</span>Developer</li>
         <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
       </ul>
       <div class="content">
@@ -544,6 +573,56 @@ window.ytmd.handleUpdateDownloaded(() => {
           <div class="links">
             <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
             <a href="https://ytmdesktop.app" target="_blank">Website</a>
+          </div>
+        </div>
+
+        <div v-if="currentTab === 98" :class="{ 'developer-tab': true, 'has-warning': !developerAcknowledgeWarning }">
+          <div v-if="!developerAcknowledgeWarning" class="warning-message">
+            <h2 class="warning">Warning!</h2>
+            <span class="message">
+              <p>These are advanced settings and could potentially break the application.</p>
+              <p>No support is provided if these settings are changed.</p>
+            </span>
+            <button class="acknowledge-button" @click="acknowledgeDeveloperSettings">I understand</button>
+          </div>
+          <div v-else>
+            <YTMDSetting
+              v-if="companionServerEnabled && safeStorageAvailable"
+              type="custom"
+              flex-column
+              name="Experiment flag overrides"
+              description="Allows overriding experiment flags within YouTube Music"
+              @change="settingsChanged"
+            >
+              <table class="ytm-experiment-overrides-table">
+                <thead>
+                  <tr>
+                    <th class="experiment">Experiment</th>
+                    <th class="value">Value</th>
+                    <th class="controls"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="[experiment, value] of Object.entries(developerYTMExperimentFlagOverrides)" :key="experiment">
+                    <td class="experiment">{{ experiment }}</td>
+                    <td class="value">{{ value }}</td>
+                    <td class="controls">
+                      <button @click="deleteYTMExperimentOverride(experiment)"><span class="material-symbols-outlined">delete</span></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="experiment"><input v-model="developerYTMAddExperimentFlagOverride" type="text" /></td>
+                    <td class="value"><input v-model="developerYTMAddExperimentFlagOverrideValue" type="text" /></td>
+                    <td class="controls">
+                      <button @click="addYTMExperimentOverride"><span class="material-symbols-outlined">add</span></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
+                <td>No authorized companions</td>
+              </div>
+            </YTMDSetting>
           </div>
         </div>
       </div>
@@ -855,5 +934,97 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.developer-tab.has-warning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.developer-tab .warning-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.developer-tab .warning-message .warning {
+  margin-top: unset;
+  text-align: center;
+}
+
+.developer-tab .warning-message .message p {
+  margin-top: unset;
+  text-align: center;
+}
+
+.developer-tab .warning-message .acknowledge-button {
+  background-color: #f44336;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.ytm-experiment-overrides-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.ytm-experiment-overrides-table tr .experiment {
+  width: 50%;
+  word-wrap: break-word;
+}
+
+.ytm-experiment-overrides-table tbody tr .experiment {
+  user-select: text;
+}
+
+.ytm-experiment-overrides-table tbody tr .value {
+  word-wrap: break-word;
+  user-select: text;
+}
+
+.ytm-experiment-overrides-table tr th,
+.ytm-experiment-overrides-table tr td {
+  padding: 4px;
+}
+
+.ytm-experiment-overrides-table th {
+  text-align: left;
+}
+
+.ytm-experiment-overrides-table thead tr th {
+  border-bottom: 1px solid #212121;
+}
+.ytm-experiment-overrides-table thead tr .controls {
+  width: 48px;
+}
+
+.ytm-experiment-overrides-table tbody button {
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  background-color: #212121;
+  cursor: pointer;
+  border: none;
+}
+
+.ytm-experiment-overrides-table input[type="text"] {
+  margin: 0;
+  padding: 8px;
+  border-radius: 4px;
+  border: none;
+  background-color: #212121;
+}
+
+.ytm-experiment-overrides-table input[type="text"]:focus,
+.ytm-experiment-overrides-table input[type="text"]:active {
+  outline: none;
 }
 </style>

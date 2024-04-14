@@ -191,6 +191,37 @@ function getYTMTextRun(runs: { text: string }[]) {
   return final;
 }
 
+(async () => {
+  const developer = await store.get("developer");
+
+  // This overrides experiment flags inside YTM.
+  // Developer Note: Support is not provided for changing experiment flags inside YTM. Changing experiment flags can break YTM in several ways or worse.
+  (
+    await webFrame.executeJavaScript(`
+    (function(overrides) {
+      let ytcfg = null;
+      Object.defineProperty(window, "ytcfg", {
+        set: (value) => {
+          const origSet = value["set"];
+          value["set"] = (data) => {
+            if (data.EXPERIMENT_FLAGS !== null && data.EXPERIMENT_FLAGS !== undefined) {
+              for (const [experiment, value] of Object.entries(overrides)) {
+                data.EXPERIMENT_FLAGS[experiment] = value;
+              }
+            }
+            return Reflect.apply(origSet, value, [data]);
+          }
+          ytcfg = value;
+        },
+        get: () => {
+          return ytcfg;
+        }
+      });
+    })
+  `)
+  )(developer.ytmExperimentFlagOverrides);
+})();
+
 window.addEventListener("load", async () => {
   if (window.location.hostname !== "music.youtube.com") {
     if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {

@@ -1,3 +1,5 @@
+import { YTMExperimentOverride } from "~shared/types";
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -53,6 +55,8 @@ export type StoreSchema = {
     scrobblePercent: number;
   };
   developer: {
+    acknowledgeWarning: boolean;
+    ytmExperimentFlagOverrides: YTMExperimentOverride;
     enableDevTools: boolean;
   };
 };

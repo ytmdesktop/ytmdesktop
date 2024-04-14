@@ -368,6 +368,8 @@ const store = new Conf<StoreSchema>({
       scrobblePercent: 50
     },
     developer: {
+      acknowledgeWarning: false,
+      ytmExperimentFlagOverrides: {},
       enableDevTools: false
     }
   },
