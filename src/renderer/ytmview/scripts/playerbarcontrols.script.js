@@ -1,4 +1,6 @@
 (function() {
+  const ytmStore = window.__YTMD_HOOK__.ytmStore;
+
   let ytmdControlButtons = {};
 
   let currentVideoId = "";
@@ -468,8 +470,8 @@
     }
   });
 
-  document.querySelector("ytmusic-popup-container").store.subscribe(() => {
-    let state = document.querySelector("ytmusic-popup-container").store.getState();
+  ytmStore.subscribe(() => {
+    let state = ytmStore.getState();
 
     // Update library button for current data
     const currentMenu = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").getMenuRenderer();
