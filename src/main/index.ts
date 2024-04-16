@@ -951,7 +951,7 @@ function isPreventedNavOrRedirect(url: URL): boolean {
     url.hostname !== "music.youtube.com" &&
     !(
       (url.hostname === "www.youtube.com" || url.hostname === "youtube.com") &&
-      (url.pathname === "/signin" || url.pathname === "/premium" || url.pathname === "/signin_prompt")
+      (url.pathname === "/signin" || url.pathname === "/premium" || url.pathname === "/musicpremium" || url.pathname === "/signin_prompt")
     ) &&
     !urlIsGoogleAccountsDomain(url)
   );
@@ -992,7 +992,12 @@ const createYTMView = (): void => {
       log.info(`Blocking YTM View redirect to ${event.url}`);
     }
 
-    if ((url.hostname === "www.youtube.com" && url.pathname === "/premium") || (url.hostname === "youtube.com" && url.pathname === "/premium")) {
+    if (
+      (url.hostname === "www.youtube.com" && url.pathname === "/premium") ||
+      (url.hostname === "youtube.com" && url.pathname === "/premium") ||
+      (url.hostname === "www.youtube.com" && url.pathname === "/musicpremium") ||
+      (url.hostname === "youtube.com" && url.pathname === "/musicpremium")
+    ) {
       // This users region requires a premium subscription to use YTM
       ytmView.webContents.loadURL(
         "https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F"
