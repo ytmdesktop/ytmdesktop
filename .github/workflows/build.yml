@@ -39,6 +39,9 @@ jobs:
 
       - name: Build (${{ matrix.arch }})
         # if: matrix.os.image == 'macos-latest'
+        env:
+          YTMD_UPDATE_FEED_OWNER: ${{ secrets.YTMD_UPDATE_FEED_OWNER }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ secrets.YTMD_UPDATE_FEED_REPOSITORY }}
         run: yarn make --arch ${{ matrix.arch }}
 
       - name: Upload artifacts (${{ matrix.arch }})
