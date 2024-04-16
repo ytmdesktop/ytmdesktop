@@ -230,7 +230,6 @@ window.addEventListener("load", async () => {
     }
     return;
   }
-  ipcRenderer.send("ytmView:loaded");
 
   await new Promise<void>(resolve => {
     const interval = setInterval(async () => {
