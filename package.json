@@ -71,7 +71,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "fastify": "^4.26.2",
     "fastify-socket.io": "^5.0.0",
-    "material-symbols": "^0.17.2",
+    "material-symbols": "^0.12.0",
     "socket.io": "^4.7.5",
     "vue": "^3.4.21"
   },
