@@ -48,7 +48,7 @@
       };
       this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
       this.dispatchEvent(new CustomEvent("yt-action", feedbackEvent));
-      document.querySelector("ytmusic-popup-container").store.dispatch({
+      window.__YTMD_HOOK__.ytmStore.dispatch({
         type: "SET_FEEDBACK_TOGGLE_STATE",
         payload: { defaultEndpointFeedbackToken: libraryFeedbackDefaultToken, isToggled: !this.data.toggled }
       });
