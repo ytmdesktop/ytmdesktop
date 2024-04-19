@@ -1,4 +1,4 @@
-const clientId = '495666957501071390'
+const clientId = '1231024252195704844'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
