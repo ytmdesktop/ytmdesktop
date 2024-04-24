@@ -2,6 +2,7 @@ import IIntegration from "../integration";
 import Fastify, { FastifyInstance } from "fastify";
 import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
+import RemoteServer from "./remote";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import Conf from "conf";
 import { BrowserView, safeStorage } from "electron";
@@ -50,6 +51,11 @@ export default class CompanionServer implements IIntegration {
         return this.memoryStore;
       }
     });
+
+    this.fastifyServer.register(RemoteServer, {
+      prefix: "/remote"
+    });
+
     this.fastifyServer.setErrorHandler((error, request, reply) => {
       if (!isDefinedAPIError(error)) {
         if (!error.statusCode || error.statusCode >= 500) {
