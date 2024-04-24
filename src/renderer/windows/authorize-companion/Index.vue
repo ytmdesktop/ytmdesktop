@@ -5,12 +5,8 @@ import Auth from "./Auth.vue";
 
 <template>
   <div class="container">
-    <Suspense>
-      <TitleBar class="titlebar" />
-    </Suspense>
-    <Suspense>
-      <Auth class="auth"></Auth>
-    </Suspense>
+    <TitleBar class="titlebar" />
+    <Auth class="auth"></Auth>
   </div>
 </template>
 

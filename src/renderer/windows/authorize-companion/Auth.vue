@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
-const appName = ref(await window.ytmd.getAppName());
-const code = ref(await window.ytmd.getCode());
+const appName = ref("");
+const code = ref("");
 
 function denyCompanion() {
   window.ytmd.sendResult(false);
@@ -11,6 +11,11 @@ function denyCompanion() {
 function allowCompanion() {
   window.ytmd.sendResult(true);
 }
+
+onBeforeMount(async () => {
+  appName.value = await window.ytmd.getAppName();
+  code.value = await window.ytmd.getCode();
+});
 </script>
 
 <template>
