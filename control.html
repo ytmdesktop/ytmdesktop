@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YTMDesktop - Controller</title>
+
+  <link rel="stylesheet" href="css/control.css">
+</head>
+<body>
+    <div id="control">
+      <!-- Header -->
+      <div class="header">
+        <h1>YTMDesktop - Controller</h1>
+      </div>
+
+      <!-- Album Art -->
+      <div class="albumart-container">
+        <img src="https://via.placeholder.com/544/0d47a1?text=Album%20Art%20Here" alt="Album Art" class="albumart">
+      </div>
+
+
+      <div class="controldetails">
+        <div class="details">
+          <!-- Song Details -->
+          <div class="song-details">
+            <div class="title">Title</div>
+            <div class="artist">Artist</div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress">
+            <div class="progress-bar">
+              <div class="slider-container">
+                <div class="bar-container">
+                  <div id="sliderBar">
+                    <div id="progressContainer">
+                      <div id="progress" style="transform: scaleX(0.25);"></div>
+                    </div>
+                  </div>
+                </div>
+                <div id="sliderKnobContainer">
+                  <div id="sliderKnob" style="left: 25%;">
+                    <div class="slider-knob-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <span class="currenttime">0:00</span>
+            <span class="totaltime">1:00</span>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="control-button control-outer" fill="currentColor" id="control-shuffle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#shuffle"></use>
+            </svg>
+          </button>
+          <button class="control-button control-middle" fill="currentColor" id="control-previous">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#previous"></use>
+            </svg>
+          </button>
+          <button class="control-button control-center" fill="currentColor" id="control-playpause">
+            <div class="control-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <use href="#play"></use>
+              </svg>
+            </div>
+          </button>
+          <button class="control-button control-middle" fill="currentColor" id="control-next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#next"></use>
+            </svg>
+          </button>
+          <button class="control-button control-outer" fill="currentColor" id="control-repeat">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#repeat"></use>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="bottom">
+
+      </div>
+    </div>
+
+    <svg style="display:none">
+      <symbol id="shuffle">
+        <path d="M18.15,13.65l3.85,3.85l-3.85,3.85l-0.71-0.71L20.09,18H19c-2.84,0-5.53-1.23-7.39-3.38l0.76-0.65 C14.03,15.89,16.45,17,19,17h1.09l-2.65-2.65L18.15,13.65z M19,7h1.09l-2.65,2.65l0.71,0.71l3.85-3.85l-3.85-3.85l-0.71,0.71 L20.09,6H19c-3.58,0-6.86,1.95-8.57,5.09l-0.73,1.34C8.16,15.25,5.21,17,2,17v1c3.58,0,6.86-1.95,8.57-5.09l0.73-1.34 C12.84,8.75,15.79,7,19,7z M8.59,9.98l0.75-0.66C7.49,7.21,4.81,6,2,6v1C4.52,7,6.92,8.09,8.59,9.98z"></path>
+      </symbol>
+
+      <symbol id="repeat">
+        <path d="M21,13h1v5L3.93,18.03l2.62,2.62l-0.71,0.71L1.99,17.5l3.85-3.85l0.71,0.71l-2.67,2.67L21,17V13z M3,7l17.12-0.03 l-2.67,2.67l0.71,0.71l3.85-3.85l-3.85-3.85l-0.71,0.71l2.62,2.62L2,6v5h1V7z"></path>
+      </symbol>
+
+      <symbol id="previous">
+        <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z"></path>
+      </symbol>
+
+      <symbol id="next">
+        <path d="M5,18l10-6L5,6V18L5,18z M19,6h-2v12h2V6z"></path>
+      </symbol>
+
+      <symbol id="play">
+        <path d="M6,4l12,8L6,20V4z"></path>
+      </symbol>
+
+      <symbol id="pause">
+        <path d="M9,19H7V5H9ZM17,5H15V19h2Z"></path>
+      </symbol>
+    </svg>
+
+    <script>
+      // Add a Custom CSS property (--control-height) on #control with the height of the window
+      document.getElementById('control').style.setProperty('--control-height', window.outerHeight + 'px');
+      document.addEventListener('resize', () => {
+        document.getElementById('control').style.setProperty('--control-height', window.outerHeight + 'px');
+      });
+
+
+      document.getElementsByClassName('title')[0].innerText = 'Toothless Dancing Driftveil City (Phonk)';
+      document.getElementsByClassName('artist')[0].innerText = 'Mishashi Sensei';
+      // Album Art
+      document.getElementsByClassName('albumart')[0].src = 'https://lh3.googleusercontent.com/T9zNPGUT7u1mD0Q4fvBR3gFrX3Z94As96VAgnz9rI5TQpUX3iw_RPancH9bXPmKGFmWjdBjxkptbZCo=w544-h544-l90-rj';
+    </script>
+</body>
+</html>
