@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YTMDesktop - Controller</title>
+
+  <link rel="stylesheet" href="css/control.css">
+  <!-- <link rel="manifest" href="pwa/manifest.json"> -->
+</head>
+<body>
+    <div id="control">
+      <!-- Background -->
+      <div class="background">
+        <div class="background-image">
+          <img src="https://via.placeholder.com/1920x1080/0d47a1?text=Background%20Image%20Here" alt="Background Image" class="albumart">
+        </div>
+        <div class="background-overlay">
+        </div>
+
+      </div>
+
+      <!-- Header -->
+      <div class="header">
+        <h1>YTMDesktop - Controller</h1>
+      </div>
+
+      <!-- Album Art -->
+      <div class="albumart-container">
+        <img src="https://via.placeholder.com/544/000?text=Album%20Art%20Here" alt="Album Art" class="albumart">
+      </div>
+
+
+      <div class="controldetails">
+        <div class="details">
+          <!-- Song Details -->
+          <div class="song-details">
+            <div id="title">Title</div>
+            <div id="artist">Artist</div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="slider-container">
+                <div class="bar-container">
+                  <div class="sliderBar" id="progressSliderBar">
+                    <div class="progressContainer">
+                      <div class="progress" id="progressbar" style="transform: scaleX(0.25);"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sliderKnobContainer">
+                  <div class="sliderKnob" id="progressSliderKnob" style="left: 25%;">
+                    <div class="slider-knob-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <span class="currenttime">0:00</span>
+            <span class="totaltime">1:00</span>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="control-button control-outer" fill="currentColor" id="control-shuffle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#shuffle"></use>
+            </svg>
+          </button>
+          <button class="control-button control-middle" fill="currentColor" id="control-previous">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#previous"></use>
+            </svg>
+          </button>
+          <button class="control-button control-center" fill="currentColor" id="control-playpause">
+            <div class="control-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <use href="#play"></use>
+              </svg>
+            </div>
+          </button>
+          <button class="control-button control-middle" fill="currentColor" id="control-next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#next"></use>
+            </svg>
+          </button>
+          <button class="control-button control-outer" fill="currentColor" id="control-repeat">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#repeat-off"></use>
+            </svg>
+          </button>
+        </div>
+        <div class="extra-controls">
+          <button class="control-button control-outer" id="control-dislike">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#dislike-outline"></use>
+            </svg>
+          </button>
+
+          <button class="control-button control-outer" id="control-like">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#like-outline"></use>
+            </svg>
+          </button>
+
+          <button class="control-button control-outer" id="control-volume-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <use href="#volume"></use>
+            </svg>
+          </button>
+
+          <div class="progress-bar">
+            <div class="slider-container">
+              <div class="bar-container">
+                <div class="sliderBar" id="volumeSliderBar">
+                  <div class="progressContainer">
+                    <div class="progress" id="volumebar" style="transform: scaleX(0.25);"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="sliderKnobContainer">
+                <div class="sliderKnob" id="volumeSliderKnob" style="left: 25%;">
+                  <div class="slider-knob-inner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <svg style="display:none">
+      <symbol id="play">
+        <path d="M6,4l12,8L6,20V4z"></path>
+      </symbol>
+      <symbol id="pause">
+        <path d="M9,19H7V5H9ZM17,5H15V19h2Z"></path>
+      </symbol>
+      <symbol id="buffer" class="buffer-rotate">
+        <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+      </symbol>
+
+      <symbol id="previous">
+        <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z"></path>
+      </symbol>
+      <symbol id="next">
+        <path d="M5,18l10-6L5,6V18L5,18z M19,6h-2v12h2V6z"></path>
+      </symbol>
+
+      <symbol id="shuffle">
+        <path d="M18.15,13.65l3.85,3.85l-3.85,3.85l-0.71-0.71L20.09,18H19c-2.84,0-5.53-1.23-7.39-3.38l0.76-0.65 C14.03,15.89,16.45,17,19,17h1.09l-2.65-2.65L18.15,13.65z M19,7h1.09l-2.65,2.65l0.71,0.71l3.85-3.85l-3.85-3.85l-0.71,0.71 L20.09,6H19c-3.58,0-6.86,1.95-8.57,5.09l-0.73,1.34C8.16,15.25,5.21,17,2,17v1c3.58,0,6.86-1.95,8.57-5.09l0.73-1.34 C12.84,8.75,15.79,7,19,7z M8.59,9.98l0.75-0.66C7.49,7.21,4.81,6,2,6v1C4.52,7,6.92,8.09,8.59,9.98z"></path>
+      </symbol>
+
+      <symbol id="repeat-off">
+        <path d="M21,13h1v5L3.93,18.03l2.62,2.62l-0.71,0.71L1.99,17.5l3.85-3.85l0.71,0.71l-2.67,2.67L21,17V13z M3,7l17.12-0.03 l-2.67,2.67l0.71,0.71l3.85-3.85l-3.85-3.85l-0.71,0.71l2.62,2.62L2,6v5h1V7z"></path>
+      </symbol>
+      <symbol id="repeat-queue">
+        <path d="M20,14h2v5L5.84,19.02l1.77,1.77l-1.41,1.41L1.99,18l4.21-4.21l1.41,1.41l-1.82,1.82L20,17V14z M4,7l14.21-0.02l-1.82,1.82 l1.41,1.41L22.01,6l-4.21-4.21l-1.41,1.41l1.77,1.77L2,5v6h2V7z"></path>
+      </symbol>
+      <symbol id="repeat-song">
+        <path d="M13,15h-1.37v-4.52l-1.3,0.38v-1L12.83,9H13V15z M20,17L5.79,17.02l1.82-1.82l-1.41-1.41L1.99,18l4.21,4.21l1.41-1.41 l-1.77-1.77L22,19v-5h-2V17z M4,7l14.21-0.02l-1.82,1.82l1.41,1.41L22.01,6l-4.21-4.21l-1.41,1.41l1.77,1.77L2,5v6h2V7z"></path>
+      </symbol>
+
+      <symbol id="like-filled">
+        <path d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z" />
+      </symbol>
+      <symbol id="like-outline">
+        <path d="M5,9V21H1V9H5M9,21A2,2 0 0,1 7,19V9C7,8.45 7.22,7.95 7.59,7.59L14.17,1L15.23,2.06C15.5,2.33 15.67,2.7 15.67,3.11L15.64,3.43L14.69,8H21C22.11,8 23,8.9 23,10V12C23,12.26 22.95,12.5 22.86,12.73L19.84,19.78C19.54,20.5 18.83,21 18,21H9M9,19H18.03L21,12V10H12.21L13.34,4.68L9,9.03V19Z" />
+      </symbol>
+
+      <symbol id="dislike-filled">
+        <path d="M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z" />
+      </symbol>
+      <symbol id="dislike-outline">
+        <path d="M19,15V3H23V15H19M15,3A2,2 0 0,1 17,5V15C17,15.55 16.78,16.05 16.41,16.41L9.83,23L8.77,21.94C8.5,21.67 8.33,21.3 8.33,20.88L8.36,20.57L9.31,16H3C1.89,16 1,15.1 1,14V12C1,11.74 1.05,11.5 1.14,11.27L4.16,4.22C4.46,3.5 5.17,3 6,3H15M15,5H5.97L3,12V14H11.78L10.65,19.32L15,14.97V5Z" />
+      </symbol>
+
+      <symbol id="volume">
+        <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
+      </symbol>
+
+      <symbol id="volume-mute">
+        <path d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
+      </symbol>
+    </svg>
+
+    <dialog id="error-dialog">
+      <h2>TITLE</h2>
+      <p>CONTENTS</p>
+
+      <div class="button-container">
+        <button id="error-dialog-close">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="info-dialog">
+      <h2>TITLE</h2>
+      <p>CONTENTS</p>
+
+      <div class="button-container">
+        <button id="info-dialog-close">Close</button>
+      </div>
+    </dialog>
+
+    <script src="js/socket.io.min.js"></script>
+    <script src="js/control.js"></script>
+</body>
+</html>
