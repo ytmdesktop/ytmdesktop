@@ -14,6 +14,8 @@ body {
   text-align: center;
 }
 
+
+
 #control {
   --other-content-height: 400px;
 
@@ -21,6 +23,34 @@ body {
   flex-direction: column;
   height: 100%;
   width: 100%;
+}
+
+.background {
+  pointer-events: none;
+}
+
+.background-image, .background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+}
+
+.background-image img {
+  height: 49vh;
+  width: 100vw;
+  filter: blur(80px);
+}
+
+.background-overlay {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.5),
+    rgba(0,0,0,1)
+  );
 }
 
 .albumart-container {
@@ -45,7 +75,7 @@ body {
 
 .controldetails {
   --control-padding: 32px;
-  --controldetails-height: 250px;
+  --controldetails-height: 320px;
 
   display: inline-block;
   width: calc(100vw - var(--control-padding) * 2);
@@ -84,6 +114,10 @@ body {
   --container-color: rgba(255,255,255,0.2);
 }
 
+.extra-controls .progress-bar {
+  max-width: 50%;
+}
+
 .slider-container {
   position: relative;
   width: 100%;
@@ -102,7 +136,7 @@ body {
   overflow: hidden;
 }
 
-#sliderBar {
+.sliderBar {
   padding: 15px 0;
   width: 100%;
   background-color: var(--paper-slider-bar-color, transparent);
@@ -117,7 +151,7 @@ body {
   overflow: hidden;
 }
 
-#progressContainer {
+.progressContainer {
   background: var(--paper-progress-container-color, #e0e0e0);
 
   position: relative;
@@ -127,7 +161,7 @@ body {
   transform: var(--paper-progress-container-transform, none);
 }
 
-#progress {
+.progress {
   background: #fff;
 
   position: absolute;
@@ -142,13 +176,13 @@ body {
   will-change: transform;
 }
 
-#sliderKnobContainer {
+.sliderKnobContainer {
   position: relative;
   width: calc(100% - 2px * 2);
   margin: auto;
 }
 
-#sliderKnob {
+.sliderKnob {
   touch-action: none;
 
   position: absolute;
@@ -180,7 +214,7 @@ body {
   height: 52px;
 }
 
-.song-details .title {
+.song-details #title {
   font-size: 24px;
   font-weight: 700;
   line-height: 1.2;
@@ -190,7 +224,7 @@ body {
   overflow: hidden;
 }
 
-.song-details .artist {
+.song-details #artist {
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
@@ -201,14 +235,14 @@ body {
 }
 
 
-.controls {
+.controls, .extra-controls {
   align-items: center;
   color: #fff;
   display: flex;
   justify-content: space-between;
 }
 
-.controls > .control-button {
+.control-button {
   display: inline-block;
   position: relative;
   padding: 8px;
@@ -217,6 +251,12 @@ body {
   border: none;
   cursor: pointer;
   color: white;
+}
+
+.control-button-fake {
+  opacity: 0.8;
+  cursor: default;
+  pointer-events: none;
 }
 
 .control-button svg {
@@ -248,5 +288,17 @@ body {
   height: 40px;
   color: black;
   margin: auto;
+}
+
+.control-inner:has(use[href="#play"]) {
   margin-left: 9px;
+}
+
+.buffer-rotate {
+  animation: buffer-rotate 1s linear infinite;
+}
+
+@keyframes buffer-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
