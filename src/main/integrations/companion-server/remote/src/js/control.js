@@ -154,9 +154,16 @@ function getInitialStateAndStart() {
 const errorDialog = document.getElementById('error-dialog');
 function handleError(data) {
 
-  if (!data.code) {
+  if (!data.code && data.message) {
     errorDialog.querySelector('h2').innerText = data.error;
     errorDialog.querySelector('p').innerText = data.message;
+    errorDialog.showModal();
+    return;
+  }
+
+  if (!data.code && !data.message) {
+    errorDialog.querySelector('h2').innerText = "Unknown Error";
+    errorDialog.querySelector('p').innerText = data.error;
     errorDialog.showModal();
     return;
   }
@@ -173,6 +180,12 @@ function handleError(data) {
 
     case 'UNAUTHENTICATED':
       errorDialog.querySelector('p').innerText = "You are not authenticated. Please try again.";
+      localStorage.removeItem('code');
+      localStorage.removeItem('token');
+      break;
+
+    case 'UNAUTHORIZED':
+      errorDialog.querySelector('p').innerText = "You are not authorized to access this resource. Please try again.";
       localStorage.removeItem('code');
       localStorage.removeItem('token');
       break;
@@ -273,7 +286,7 @@ function displayState(stateData) {
   if (!lastState || lastState.video.id !== video.id) {
     // We can update a few things here
     const thumbnail = getLargeThumbnail(video.thumbnails);
-    let albumArts = document.getElementsByClassName('albumart')
+    let albumArts = document.getElementsByClassName('albumart');
     for (let i = 0; i < albumArts.length; i++) {
       albumArts[i].src = thumbnail;
     }
@@ -284,9 +297,6 @@ function displayState(stateData) {
 
 
   if (!lastState || lastState.player.trackState !== player.trackState) {
-    const playPauseButton = document.getElementById('control-playpause');
-
-    // #control-playpause div svg use
     const playPauseIcon = document.querySelector('#control-playpause div svg use');
     if (player.trackState === 0) {
       playPauseIcon.setAttribute('href', '#play');
@@ -423,14 +433,14 @@ document.getElementById('control-volume-toggle').addEventListener('click', funct
 });
 
 document.getElementById('progressSliderBar').addEventListener('click', function(e) {
-  const percentage = e.offsetX / e.target.clientWidth;
+  const percentage = e.offsetX / e.currentTarget.clientWidth;
   const duration = lastState.video.durationSeconds * percentage;
 
   sendCommand('seekTo', duration);
 });
 
 document.getElementById('volumeSliderBar').addEventListener('click', function(e) {
-  const percentage = e.offsetX / e.target.clientWidth;
+  const percentage = e.offsetX / e.currentTarget.clientWidth;
   sendCommand('setVolume', parseInt(percentage * 100));
 });
 
