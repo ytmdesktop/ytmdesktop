@@ -485,15 +485,15 @@ function getLargeThumbnail(thumbnails) {
 
 function getThumbnail(thumbnails, maxSize) {
   var maxHeight = 0;
-  var maxThumbnail = null;
+  var selectedThumbnail = null;
   thumbnails.forEach(thumbnail => {
     if (thumbnail.height > maxHeight && thumbnail.height <= maxSize) {
       maxHeight = thumbnail.height;
-      maxThumbnail = thumbnail;
+      selectedThumbnail = thumbnail;
     }
   });
 
-  return maxThumbnail.url;
+  return selectedThumbnail?.url || thumbnails[thumbnails.length - 1].url;
 }
 
 function humanReadableSeconds(seconds) {
