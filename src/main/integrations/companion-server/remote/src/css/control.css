@@ -4,6 +4,8 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: #030303;
   color: white;
+
+  overflow-y: hidden;
 }
 
 * {
@@ -12,6 +14,7 @@ body {
 
 .header {
   text-align: center;
+  cursor: pointer;
 }
 
 
@@ -309,6 +312,120 @@ body {
   100% { transform: rotate(360deg); }
 }
 
+/* #region Material Tabs */
+.bottom-draw {
+  --bottom-draw-height: 46px;
+
+  position: absolute;
+  transform: translateY(calc(100vh - var(--bottom-draw-height)));
+  width: 100%;
+
+  transition: transform 0.3s ease;
+}
+
+.bottom-draw[open] {
+  transform: translateY(calc(var(--bottom-draw-height)* 1.5)) !important;
+}
+
+.material-header {
+  position: relative;
+  background: rgba(20, 21, 22, 80%);
+  backdrop-filter: blur(20px);
+}
+
+.bottom-draw[open] .material-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* blurred background */
+.tab-contents {
+  position: relative;
+}
+
+.tab-contents::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(35, 36, 37, 0.8);
+  backdrop-filter: blur(20px);
+
+  z-index: -1;
+}
+
+.material-tabs {
+		position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+
+	  padding:0;
+		border-bottom: 1px solid #7c7c7c;
+}
+
+.material-tabs>a {
+		position: relative;
+	  display:inline-block;
+		text-decoration: none;
+		padding: 16px;
+		text-transform: uppercase;
+		font-size: 14px;
+		font-weight: 600;
+		color: #cccccc;
+		text-align: center;
+
+    width: 120px;
+}
+
+.material-tabs>a.active {
+		font-weight: 700;
+		outline:none;
+}
+
+.material-tabs>a:not(.active):hover {
+		background-color: inherit;
+		color: #7c848a;
+}
+
+@media only screen and (max-width: 520px) {
+		.nav-tabs.material-tabs>li>a {
+				font-size: 11px;
+		}
+}
+
+.active-line {
+		position: absolute;
+		z-index: 10;
+		bottom: 0;
+		height: 3px;
+		background: #f5f5f5;
+		display: block;
+		left: 0;
+		transition: left .2s ease;
+		-webkit-transition: left .2s ease;
+}
+
+.material-tabs .material-tab:nth-of-type(1).active~span.active-line {
+  left: 0;
+  width: 33.33%
+}
+.material-tabs .material-tab:nth-of-type(2).active~span.active-line {
+  left: 33.33%;
+  width: 33.33%
+}
+.material-tabs .material-tab:nth-of-type(3).active~span.active-line {
+  left: 66.66%;
+  width: 33.33%
+}
+
+.material-tab-content {
+  height: calc(100vh - var(--bottom-draw-height) * 2);
+}
+
 
 dialog {
   padding: 50px;
@@ -352,4 +469,115 @@ dialog .button-container {
   0% {
     opacity: 0;
   }
+}
+
+
+.material-tab-content {
+  padding: 16px;
+}
+
+#queue {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#queue .queue-separator {
+  padding: 20px 0;
+  border-bottom: 1px solid grey;
+}
+
+#queue .queue-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 16px;
+  padding-right: 4px;
+  cursor: pointer;
+
+  border-bottom: 1px solid #464646;
+}
+
+#queue .queue-item.selected {
+  background: rgba(255, 255, 255, 0.2);
+}
+#queue .queue-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#queue .queue-item .queue-item-album {
+  height: 64px;
+  position: relative;
+}
+
+/* #queue .queue-item.selected .queue-item-album::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#queue .queue-item.selected .queue-item-album::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(#volume) no-repeat center;
+  background-size: 50%;
+  z-index: 2;
+} */
+
+#queue .queue-item .queue-albumart {
+  aspect-ratio: 1 / 1 !important;
+  max-height: 100%;
+  max-width: 64px;
+  object-fit: cover;
+}
+
+#queue .queue-item .queue-item-details {
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100% - 64px - 32px - 40px);
+}
+
+#queue .queue-item .queue-item-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#queue .queue-item .queue-item-artist {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  color:rgba(255, 255, 255, 0.7);
+}
+
+#queue .queue-item .queue-item-end {
+  margin-left: auto;
+  max-width: 40px;
+}
+
+#queue .queue-item .queue-item-duration {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color:rgba(255, 255, 255, 0.7);
 }
