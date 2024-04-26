@@ -9,22 +9,22 @@ const assetFolder = path.join(
 const RemoteServer: FastifyPluginCallback<FastifyPluginOptions> = async (fastify, options, next) => {
   // Give the contents of `src` as the root of the server
   fastify.get("/", async (req, reply) => {
-    const stream = fs.createReadStream(path.join(assetFolder, "index.html"), "utf-8");
+    const stream = fs.createReadStream(getPath("index.html"), "utf-8");
     return reply.type("text/html").send(stream);
   });
 
   fastify.get("/css/control.css", async (req, reply) => {
-    const stream = fs.createReadStream(path.join(assetFolder, "css/control.css"), "utf-8");
+    const stream = fs.createReadStream(getPath("control.css", "css"), "utf-8");
     return reply.type("text/css").send(stream);
   });
 
   fastify.get("/js/control.js", async (req, reply) => {
-    const stream = fs.createReadStream(path.join(assetFolder, "js/control.js"), "utf-8");
+    const stream = fs.createReadStream(getPath("control.js", "js"), "utf-8");
     return reply.type("text/javascript").send(stream);
   });
 
   fastify.get("/js/socket.io.min.js", async (req, reply) => {
-    const stream = fs.createReadStream(path.join(assetFolder, "js/socket.io.min.js"), "utf-8");
+    const stream = fs.createReadStream(getPath("socket.io.min.js", "js"), "utf-8");
     return reply.type("text/javascript").send(stream);
   });
 
@@ -34,5 +34,17 @@ const RemoteServer: FastifyPluginCallback<FastifyPluginOptions> = async (fastify
 
   next();
 };
+
+function getPath(file: string, folder?: string): string {
+  const paths: string[] = [];
+
+  paths.push(assetFolder);
+  if (folder && process.env.NODE_ENV === "development") {
+    paths.push(folder);
+  }
+  paths.push(file);
+
+  return path.join(...paths);
+}
 
 export default RemoteServer;

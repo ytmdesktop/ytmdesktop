@@ -131,6 +131,51 @@
 
     </div>
 
+    <div class="bottom-draw">
+      <header class="material-header">
+        <div class="material-tabs">
+          <a id="tab-queue" href="#queue" class="material-tab active">Queue</a>
+          <a id="tab-playlist" href="#playlist" class="material-tab">Playlist</a>
+          <a id="tab-settings" href="#settings" class="material-tab">Settings</a>
+
+          <span class="active-line"></span>
+        </div>
+      </header>
+
+      <div class="tab-contents">
+        <div id="queue" class="material-tab-content">
+
+        </div>
+
+        <div id="playlist" class="material-tab-content">
+        </div>
+
+        <div id="settings" class="material-tab-content">
+        </div>
+      </div>
+    </div>
+
+    <dialog id="error-dialog">
+      <h2>TITLE</h2>
+      <p>CONTENTS</p>
+
+      <div class="button-container">
+        <button id="error-dialog-close">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="info-dialog">
+      <h2>TITLE</h2>
+      <p>CONTENTS</p>
+
+      <div class="button-container">
+        <button id="info-dialog-close">Close</button>
+      </div>
+    </dialog>
+
+    <script src="../remote/js/socket.io.min.js"></script>
+    <script src="../remote/js/control.js"></script>
+
     <svg style="display:none">
       <symbol id="play">
         <path d="M6,4l12,8L6,20V4z"></path>
@@ -186,25 +231,19 @@
       </symbol>
     </svg>
 
-    <dialog id="error-dialog">
-      <h2>TITLE</h2>
-      <p>CONTENTS</p>
-
-      <div class="button-container">
-        <button id="error-dialog-close">Close</button>
+    <template>
+      <div class="queue-item">
+        <div class="queue-item-album">
+          <img src="https://via.placeholder.com/64/000?text=Album" alt="Album Art" class="queue-albumart">
+        </div>
+        <div class="queue-item-details">
+          <div class="queue-item-title">Title</div>
+          <div class="queue-item-artist">Artist</div>
+        </div>
+        <div class="queue-item-end">
+          <span class="queue-item-duration">1:00</span>
+        </div>
       </div>
-    </dialog>
-
-    <dialog id="info-dialog">
-      <h2>TITLE</h2>
-      <p>CONTENTS</p>
-
-      <div class="button-container">
-        <button id="info-dialog-close">Close</button>
-      </div>
-    </dialog>
-
-    <script src="../remote/js/socket.io.min.js"></script>
-    <script src="../remote/js/control.js"></script>
+    </template>
 </body>
 </html>

@@ -1,6 +1,9 @@
 const api_version = 'v1';
 const getPrefix = (withVer = true) => {
-  return (`http://${localStorage.getItem('ip')}:9863` || 'http://localhost:9863') + (withVer ? `/api/${api_version}` : '');
+  return (
+    `http://${localStorage.getItem('ip') || 'localhost'}:9863` +
+    (withVer ? `/api/${api_version}` : '')
+  );
 }
 
 const appData = {
@@ -16,6 +19,51 @@ document.addEventListener('DOMContentLoaded', function() {
   control.style.setProperty('--control-height', control.clientHeight + 'px');
   window.addEventListener('resize', () => {
     control.style.setProperty('--control-height', control.clientHeight + 'px');
+  });
+
+  const materialtabs = document.getElementsByClassName('material-tabs');
+  for (let i = 0; i < materialtabs.length; i++) {
+    const currentMTab = materialtabs[i];
+    const links = currentMTab.querySelectorAll('a');
+
+    const active = links[0];
+    active.classList.add('active');
+
+    const content = document.getElementById(active.getAttribute('href').split('#')[1]);
+    content.style.display = null;
+
+    links.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const active = currentMTab.querySelector('.active');
+        active.classList.remove('active');
+  
+        const content = document.getElementById(active.getAttribute('href').split('#')[1]);
+        content.style.display = 'none';
+  
+        e.target.classList.add('active');
+        const target = document.getElementById(e.target.getAttribute('href').split('#')[1]);
+        target.style.display = null;
+
+        const bottomDraw = document.querySelector('.bottom-draw');
+        bottomDraw.setAttribute('open', '');
+      });
+
+      if (link === active) {return;}
+
+      const target = document.getElementById(link.getAttribute('href').split('#')[1]);
+      target.style.display = 'none';
+    });
+
+  }
+
+  const header = document.getElementsByClassName('header')[0];
+  const bottomDraw = document.querySelector('.bottom-draw');
+  header.addEventListener('click', function() {
+    if (bottomDraw.hasAttribute('open')) {
+      bottomDraw.removeAttribute('open');
+    }
   });
 
   if (!localStorage.getItem('ip')) {
@@ -243,8 +291,7 @@ var lastState = null;
 function displayState(stateData) {
   const {
     video,
-    player,
-    playlistId
+    player
   } = stateData;
 
   if (!lastState || lastState.video.author !== video.author) {
@@ -293,6 +340,80 @@ function displayState(stateData) {
 
     const totalDuration = humanReadableSeconds(video.durationSeconds);
     document.getElementsByClassName('totaltime')[0].innerText = totalDuration;
+  }
+
+  if (!lastState || lastState.video.id !== video.id ||
+    lastState.player.queue.items.length !== player.queue.items.length ||
+    lastState.player.queue.automixItems.length !== player.queue.automixItems.length ||
+    lastState.player.queue.selectedItemIndex !== player.queue.selectedItemIndex)
+  {
+    // Update the queue
+    const queue = document.getElementById('queue');
+    const queueTemplate = document.getElementsByTagName('TEMPLATE')[0]
+      .content.querySelector('.queue-item')
+    queue.innerHTML = '';
+
+    if (player.queue.items.length > 0) {
+      const separator = document.createElement('div');
+      separator.classList.add('queue-separator');
+      separator.innerText = 'Queue';
+      queue.appendChild(separator);
+
+      player.queue.items.forEach((item, index) => {
+        const queueItem = queueTemplate.cloneNode(true);
+        if (item.selected) {
+          queueItem.classList.add('selected');
+        }
+
+        const albumArt = queueItem.querySelector('.queue-albumart');
+        albumArt.src = getThumbnail(item.thumbnails, 128);
+
+        const title = queueItem.querySelector('.queue-item-title');
+        title.innerText = item.title;
+
+        const artist = queueItem.querySelector('.queue-item-artist');
+        artist.innerText = item.author;
+
+        const duration = queueItem.querySelector('.queue-item-duration');
+        duration.innerText = item.duration;
+
+        queueItem.setAttribute('queue-index', index);
+
+        queue.appendChild(queueItem);
+      });
+    }
+
+    // automix items
+    if (player.queue.automixItems.length > 0) {
+      // Append a separator
+      const separator = document.createElement('div');
+      separator.classList.add('queue-separator');
+      separator.innerText = 'Automix';
+      queue.appendChild(separator);
+
+      player.queue.automixItems.forEach((item, index) => {
+        const queueItem = queueTemplate.cloneNode(true);
+        if (item.selected) {
+          queueItem.classList.add('selected');
+        }
+
+        const albumArt = queueItem.querySelector('.queue-albumart');
+        albumArt.src = getThumbnail(item.thumbnails, 128);
+
+        const title = queueItem.querySelector('.queue-item-title');
+        title.innerText = item.title;
+
+        const artist = queueItem.querySelector('.queue-item-artist');
+        artist.innerText = item.author;
+
+        const duration = queueItem.querySelector('.queue-item-duration');
+        duration.innerText = item.duration;
+
+        queueItem.setAttribute('queue-index', (player.queue.items.length + index - 1));
+
+        queue.appendChild(queueItem);
+      });
+    }
   }
 
 
@@ -362,6 +483,19 @@ function getLargeThumbnail(thumbnails) {
   return maxThumbnail.url;
 }
 
+function getThumbnail(thumbnails, maxSize) {
+  var maxHeight = 0;
+  var maxThumbnail = null;
+  thumbnails.forEach(thumbnail => {
+    if (thumbnail.height > maxHeight && thumbnail.height <= maxSize) {
+      maxHeight = thumbnail.height;
+      maxThumbnail = thumbnail;
+    }
+  });
+
+  return maxThumbnail.url;
+}
+
 function humanReadableSeconds(seconds) {
   seconds = Math.floor(seconds);
   // Have to convert to MM:SS but also HH:MM:SS
@@ -381,6 +515,24 @@ function humanReadableSeconds(seconds) {
 }
 
 // ----------------------------------------------------------
+
+document.getElementById('tab-queue').addEventListener('click', function() {
+  setTimeout(() => {
+    // Scroll the #queue element so that the Selected item is in the top middle
+    const queue = document.getElementById('queue');
+    const selectedItem = queue.querySelector('.queue-item.selected');
+  
+    if (!selectedItem) { return; }
+  
+    const queueRect = queue.getBoundingClientRect();
+    const selectedItemRect = selectedItem.getBoundingClientRect();
+  
+
+    const scrollY = selectedItemRect.top - queueRect.top - (queueRect.height / 2) + (selectedItemRect.height);
+
+    queue.scrollTo({ top: scrollY, behavior: 'smooth' });
+  }, 100)
+});
 
 document.getElementById('control-playpause').addEventListener('click', function() {
   sendCommand('playPause');
@@ -444,6 +596,20 @@ document.getElementById('volumeSliderBar').addEventListener('click', function(e)
   sendCommand('setVolume', parseInt(percentage * 100));
 });
 
+// Any element clicked inside of queue which is class of queue-item
+document.getElementById('queue').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('queue-item')) {
+    return;
+  }
+
+  const index = parseInt(e.target.getAttribute('queue-index'));
+  if (index === lastState.player.queue.selectedItemIndex) {
+    return;
+  }
+
+  sendCommand('playQueueIndex', index);
+});
+
 function sendCommand(command, data = null) {
   const body = {
     command
@@ -460,6 +626,15 @@ function sendCommand(command, data = null) {
     },
     body: JSON.stringify(body)
   })
+    // Get resposne code and check if it's 4XX and display error
+    .then(response => {
+      if (response.status >= 400) {
+        response.json().then(data => {
+          handleError(data);
+          return;
+        });
+      }
+    })
     .catch(error => {
       console.error('Error:', error);
     });
