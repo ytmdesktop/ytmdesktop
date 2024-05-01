@@ -25,7 +25,7 @@
     
     if (preferredContentMode > 0) {
       let mappedPreferredContentMode = preferredContentMode == 1 ? "ATV_PREFERRED" : "OMV_PREFERRED"
-      if (state.queue.playbackContentMode != mappedPreferredContentMode) {
+      if (state.queue.playbackContentMode !== "NONE" && state.queue.playbackContentMode !== mappedPreferredContentMode) {
         let currentQueueItem = state.queue.items[state.queue.selectedItemIndex];
         if (!currentQueueItem)
           currentQueueItem = state.queue.items[0];
