@@ -27,6 +27,9 @@
       let mappedPreferredContentMode = preferredContentMode == 1 ? "ATV_PREFERRED" : "OMV_PREFERRED"
       if (state.queue.playbackContentMode != mappedPreferredContentMode) {
         let currentQueueItem = state.queue.items[state.queue.selectedItemIndex];
+        if (!currentQueueItem)
+          currentQueueItem = state.queue.items[0];
+        
         if (currentQueueItem.playlistPanelVideoWrapperRenderer) {
           // Check if a counterpart exists for the current item. We cannot set the content mode if there is no counterpart as YTM UI will bug out
           if (currentQueueItem.playlistPanelVideoWrapperRenderer.counterpart && currentQueueItem.playlistPanelVideoWrapperRenderer.counterpart.length > 0) {
