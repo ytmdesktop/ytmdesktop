@@ -546,7 +546,7 @@ document.getElementById('control-next').addEventListener('click', function() {
   sendCommand('next');
 });
 
-document.getElementById('control-repeat').addEventListener('click', function(e) {
+document.getElementById('control-repeat').addEventListener('click', function() {
   const repeatIcon = document.querySelector('#control-repeat svg use');
 
   const currentState = repeatIcon.getAttribute('data-state');
@@ -598,16 +598,20 @@ document.getElementById('volumeSliderBar').addEventListener('click', function(e)
 
 // Any element clicked inside of queue which is class of queue-item
 document.getElementById('queue').addEventListener('click', function(e) {
-  if (!e.target.classList.contains('queue-item')) {
-    return;
+  var targetElement = e.target;
+  while (targetElement && !targetElement.classList.contains('queue-item') && targetElement !== this) {
+    targetElement = targetElement.parentElement;
   }
 
-  const index = parseInt(e.target.getAttribute('queue-index'));
-  if (index === lastState.player.queue.selectedItemIndex) {
-    return;
+  if (targetElement && targetElement.classList.contains('queue-item')) {
+    const index = parseInt(targetElement.getAttribute('queue-index'));
+    if (index === lastState.player.queue.selectedItemIndex) {
+      return;
+    }
+  
+    sendCommand('playQueueIndex', index);
   }
 
-  sendCommand('playQueueIndex', index);
 });
 
 function sendCommand(command, data = null) {

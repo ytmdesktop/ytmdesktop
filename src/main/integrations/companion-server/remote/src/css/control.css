@@ -316,7 +316,7 @@ body {
 .bottom-draw {
   --bottom-draw-height: 46px;
 
-  position: absolute;
+  position: fixed;
   transform: translateY(calc(100vh - var(--bottom-draw-height)));
   width: 100%;
 
