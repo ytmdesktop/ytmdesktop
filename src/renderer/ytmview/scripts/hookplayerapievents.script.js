@@ -1,5 +1,7 @@
-(function() {
+(function(initialPreferredContentMode) {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
+  
+  let preferredContentMode = initialPreferredContentMode;
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
@@ -16,6 +18,26 @@
     const muted = state.player.muted;
 
     window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying);
+  }
+
+  function maintainPreferredContentMode() {
+    let state = ytmStore.getState();
+    
+    if (preferredContentMode > 0) {
+      let mappedPreferredContentMode = preferredContentMode == 1 ? "ATV_PREFERRED" : "OMV_PREFERRED"
+      if (state.queue.playbackContentMode != mappedPreferredContentMode) {
+        let currentQueueItem = state.queue.items[state.queue.selectedItemIndex];
+        if (currentQueueItem.playlistPanelVideoWrapperRenderer) {
+          // Check if a counterpart exists for the current item. We cannot set the content mode if there is no counterpart as YTM UI will bug out
+          if (currentQueueItem.playlistPanelVideoWrapperRenderer.counterpart && currentQueueItem.playlistPanelVideoWrapperRenderer.counterpart.length > 0) {
+            ytmStore.dispatch({
+              type: "SET_PLAYBACK_CONTENT_MODE",
+              payload: mappedPreferredContentMode
+            });
+          }
+        }
+      }
+    }
   }
 
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
@@ -55,6 +77,7 @@
   });
   ytmStore.subscribe(() => {
     sendStoreState();
+    maintainPreferredContentMode()
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
@@ -74,4 +97,16 @@
       window.ytmd.sendDeletePlaylistObservation(playlistId);
     }
   });
+  window.addEventListener("ytmd-settings-changed", e => {
+    preferredContentMode = e.detail.preferredContentMode;
+    
+    let state = ytmStore.getState();
+    let mappedPreferredContentMode = preferredContentMode == 1 ? "ATV_PREFERRED" : "OMV_PREFERRED"
+    if (state.queue.playbackContentMode != mappedPreferredContentMode) {
+      ytmStore.dispatch({
+        type: "SET_PLAYBACK_CONTENT_MODE",
+        payload: mappedPreferredContentMode
+      });
+    }
+  })
 })

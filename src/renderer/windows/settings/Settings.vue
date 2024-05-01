@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema } from "~shared/store/schema";
+import { PreferredContentMode, StoreSchema } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
@@ -50,6 +50,7 @@ const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeft
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
+const preferredContentMode = ref<PreferredContentMode>(playback.preferredContentMode);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthTokens = ref<AuthToken[]>(
@@ -87,6 +88,7 @@ store.onDidAnyChange(async newState => {
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
+  preferredContentMode.value = newState.playback.preferredContentMode;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -159,6 +161,7 @@ async function settingsChanged() {
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
+  store.set("playback.preferredContentMode", preferredContentMode.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -327,6 +330,14 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="preferredContentMode"
+            :options-map="{ [PreferredContentMode.None]: 'Default', [PreferredContentMode.Song]: 'Song', [PreferredContentMode.Video]: 'Video' }"
+            type="select"
+            name="Preferred content mode"
+            description="This setting requires YouTube Music Premium"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">

@@ -175,7 +175,8 @@ async function hideChromecastButton() {
 }
 
 async function hookPlayerApiEvents() {
-  (await webFrame.executeJavaScript(hookPlayerApiEventsScript))();
+  const preferredContentMode = (await store.get("playback")).preferredContentMode;
+  (await webFrame.executeJavaScript(hookPlayerApiEventsScript))(preferredContentMode);
 }
 
 function overrideHistoryButtonDisplay() {
@@ -627,7 +628,8 @@ window.addEventListener("load", async () => {
     ipcRenderer.send(`ytmView:getPlaylists:response:${requestId}`, playlists);
   });
 
-  store.onDidAnyChange(newState => {
+  let preferredContentMode = (await store.get("playback")).preferredContentMode;
+  store.onDidAnyChange(async newState => {
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
       if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
@@ -638,6 +640,23 @@ window.addEventListener("load", async () => {
       if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
+    }
+
+    if (newState.playback.preferredContentMode != preferredContentMode) {
+      preferredContentMode = newState.playback.preferredContentMode;
+      (
+        await webFrame.executeJavaScript(`
+          (function(preferredContentMode) {
+            window.dispatchEvent(
+              new CustomEvent("ytmd-settings-changed", {
+                detail: {
+                  preferredContentMode
+                }
+              })
+            );
+          })
+        `)
+      )(preferredContentMode);
     }
   });
 

@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom' | 'select'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
@@ -6,6 +6,7 @@ type ModelValue = {
   file: string;
   range: number;
   custom: never;
+  select: number;
 };
 
 const props = defineProps<{
@@ -22,6 +23,7 @@ const props = defineProps<{
   disabled?: boolean;
   disabledMessage?: string;
   flexColumn?: boolean;
+  optionsMap?: { [key: number]: string };
 }>();
 const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
@@ -39,6 +41,18 @@ const hasDescription = computed(() => {
 });
 
 const fileInput = ref(null);
+
+const selectOpen = ref(false);
+const selectedOption = computed(() => {
+  return props.optionsMap[props.modelValue as number];
+});
+
+function select(optionKey: number) {
+  // @ts-expect-error Type issues that need to be resolved
+  value.value = optionKey;
+  selectOpen.value = false;
+  emit("change");
+}
 </script>
 
 <template>
@@ -54,7 +68,7 @@ const fileInput = ref(null);
     </div>
 
     <input
-      v-if="type !== 'file' && type !== 'range' && type !== 'custom'"
+      v-if="type !== 'file' && type !== 'range' && type !== 'custom' && type !== 'select'"
       v-model="value"
       :disabled="disabled"
       :type="props.type"
@@ -70,6 +84,14 @@ const fileInput = ref(null);
         <button class="choose" @click="fileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
         <input :disabled="disabled" type="text" readonly class="path" placeholder="No file chosen" :value="value" />
         <button v-if="value" class="remove" @click="$emit('clear')"><span class="material-symbols-outlined">delete</span></button>
+      </div>
+    </div>
+    <div v-if="type == 'select'" :class="{ select: true, open: selectOpen }">
+      <div class="selected" @click="selectOpen = !selectOpen">
+        {{ selectedOption }}
+      </div>
+      <div class="options">
+        <div v-for="(optionValue, optionKey) of props.optionsMap" :key="optionKey" class="option" @click="select(optionKey)">{{ optionValue }}</div>
       </div>
     </div>
 
@@ -242,5 +264,42 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #f44336;
   cursor: pointer;
+}
+
+.select {
+  position: relative;
+  width: 216px;
+  background-color: #212121;
+  border-radius: 4px;
+}
+
+.select .selected {
+  cursor: pointer;
+  padding: 8px;
+}
+
+.select .options {
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.select .options .option {
+  user-select: none;
+  cursor: pointer;
+  background-color: #212121;
+  padding: 8px;
+}
+
+.select .options .option:hover {
+  background-color: #323232;
+}
+
+.select:not(.open) .options {
+  display: none;
 }
 </style>

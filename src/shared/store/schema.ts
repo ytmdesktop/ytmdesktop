@@ -1,3 +1,9 @@
+export enum PreferredContentMode {
+  None = 0,
+  Song = 1,
+  Video = 2
+}
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -21,6 +27,7 @@ export type StoreSchema = {
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
+    preferredContentMode: PreferredContentMode;
   };
   integrations: {
     companionServerEnabled: boolean;

@@ -334,7 +334,8 @@ const store = new Conf<StoreSchema>({
       continueWhereYouLeftOffPaused: true,
       enableSpeakerFill: false,
       progressInTaskbar: false,
-      ratioVolume: false
+      ratioVolume: false,
+      preferredContentMode: 0
     },
     integrations: {
       companionServerEnabled: false,
