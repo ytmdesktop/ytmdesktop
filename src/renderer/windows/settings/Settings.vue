@@ -69,6 +69,7 @@ const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
+const scrobblePercent = ref<number>(lastFM.scrobblePercent);
 
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
@@ -96,6 +97,8 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  lastFMSessionKey.value = newState.lastfm.sessionKey;
+  scrobblePercent.value = newState.lastfm.scrobblePercent;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -164,6 +167,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -230,6 +234,13 @@ function restartApplicationForUpdate() {
 function checkForUpdates() {
   window.ytmd.checkForUpdates();
   checkingForUpdate.value = true;
+}
+
+async function logoutLastFM() {
+  store.set("lastfm.sessionKey", null);
+  lastFMEnabled.value = false;
+  lastFMSessionKey.value = null;
+  await settingsChanged();
 }
 
 window.ytmd.handleCheckingForUpdate(() => {
@@ -361,16 +372,18 @@ window.ytmd.handleUpdateDownloaded(() => {
             <table class="authorized-companions-table">
               <thead>
                 <tr>
-                  <th class="id">ID</th>
-                  <th class="name">Name</th>
+                  <th class="companion">Companion</th>
                   <th class="version">Version</th>
                   <th class="controls"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="authToken in companionServerAuthTokens" :key="authToken.appId">
-                  <td class="id">{{ authToken.appId }}</td>
-                  <td class="name">{{ authToken.appName }}</td>
+                  <td class="companion">
+                    <span class="name">{{ authToken.appName }}</span
+                    ><br />
+                    <span class="id">{{ authToken.appId }}</span>
+                  </td>
                   <td class="version">{{ authToken.appVersion }}</td>
                   <td class="controls">
                     <button @click="deleteCompanionAuthToken(authToken.appId)"><span class="material-symbols-outlined">delete</span></button>
@@ -403,7 +416,20 @@ window.ytmd.handleUpdateDownloaded(() => {
                 <span v-else style="color: #ff1100">No</span>
               </p>
             </div>
+            <button v-if="lastFMSessionKey" @click="logoutLastFM">Logout</button>
           </div>
+          <YTMDSetting
+            v-if="lastFMEnabled"
+            v-model="scrobblePercent"
+            class="settings indented"
+            type="range"
+            name="Scrobble percent"
+            description="Determines when a song is scrobbled"
+            min="50"
+            max="95"
+            step="5"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
@@ -763,13 +789,14 @@ window.ytmd.handleUpdateDownloaded(() => {
   table-layout: fixed;
 }
 
-.authorized-companions-table tbody tr .id {
+.authorized-companions-table tr .companion {
+  width: 70%;
   word-wrap: break-word;
 }
 
-.authorized-companions-table tr .name {
-  width: 50%;
-  word-wrap: break-word;
+.authorized-companions-table tr .companion .id {
+  color: #969696;
+  font-size: 14px;
 }
 
 .authorized-companions-table tbody tr .version {

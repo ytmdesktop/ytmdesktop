@@ -1,6 +1,8 @@
 (function() {
-  const videoId = document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
-  const likeButtonData = document.querySelector("ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+  const ytmStore = window.__YTMD_HOOK__.ytmStore;
+
+  const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
   
   let dislikeServiceEndpoint = null;
   let indifferentServiceEndpoint = null;
@@ -16,7 +18,7 @@
   let serviceEvent = null;
 
   const defaultLikeStatus = likeButtonData.likeStatus;
-  const state = document.querySelector("ytmusic-player-bar").store.getState();
+  const state = ytmStore.getState();
   const storeLikeStatus = state.likeStatus.videos[videoId];
 
   const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;

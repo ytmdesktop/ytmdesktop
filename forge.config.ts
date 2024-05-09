@@ -47,7 +47,7 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      iconUrl: "https://raw.githubusercontent.com/ytmdesktop/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico"
+      iconUrl: `https://raw.githubusercontent.com/${process.env.YTMD_UPDATE_FEED_OWNER ?? "ytmdesktop"}/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico`
     }),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({
@@ -71,8 +71,8 @@ const config: ForgeConfig = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: "ytmdesktop",
-          name: "ytmdesktop"
+          owner: process.env.YTMD_UPDATE_FEED_OWNER ?? "ytmdesktop",
+          name: process.env.YTMD_UPDATE_FEED_REPOSITORY ?? "ytmdesktop"
         }
       }
     }

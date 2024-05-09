@@ -39,9 +39,14 @@ jobs:
         run: yarn --immutable
 
       - name: Publish Dry (${{ matrix.arch }})
+        env:
+          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
         run: yarn publish:dry --arch ${{ matrix.arch }}
 
       - name: Publish From Dry (${{ matrix.arch }})
         run: yarn publish:fromdry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}

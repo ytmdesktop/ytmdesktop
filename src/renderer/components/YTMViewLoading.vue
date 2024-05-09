@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
 const memoryStore = window.ytmd.memoryStore;
 
@@ -7,6 +7,13 @@ const ytmViewLoading = ref<boolean>(await memoryStore.get("ytmViewLoading"));
 const ytmViewLoadingError = ref<boolean>(await memoryStore.get("ytmViewLoadingError"));
 const ytmViewLoadTimedout = ref<boolean>(await memoryStore.get("ytmViewLoadTimedout"));
 const ytmViewLoadingStatus = ref<string>((await memoryStore.get("ytmViewLoadingStatus")) ?? "");
+
+onBeforeMount(async () => {
+  ytmViewLoading.value = await memoryStore.get("ytmViewLoading");
+  ytmViewLoadTimedout.value = await memoryStore.get("ytmViewLoadTimedout");
+  ytmViewLoadingError.value = await memoryStore.get("ytmViewLoadingError");
+  ytmViewLoadingStatus.value = (await memoryStore.get("ytmViewLoadingStatus")) ?? "";
+});
 
 memoryStore.onStateChanged(newState => {
   ytmViewLoading.value = newState.ytmViewLoading;

@@ -8,10 +8,10 @@
       detail: {
         actionName: "yt-service-request",
         args: [
-          document.querySelector("ytmusic-player-bar"),
+          document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
           {
             addToPlaylistEndpoint: {
-              videoId: document.querySelector("ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId
+              videoId: document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId
             }
           }
         ],
@@ -19,7 +19,7 @@
         returnValue
       }
     };
-    document.querySelector("ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
     returnValue[0].ajaxPromise.then(
       response => {
         resolve(response.data.contents[0].addToPlaylistRenderer.playlists);

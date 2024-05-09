@@ -51,6 +51,7 @@ export type StoreSchema = {
     secret: string;
     token: string | null;
     sessionKey: string | null;
+    scrobblePercent: number;
   };
   developer: {
     enableDevTools: boolean;

@@ -308,13 +308,13 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string) {
+  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: { id: string; text: string } | null) {
     this.videoDetails = {
       author: videoDetails.author,
       channelId: videoDetails.channelId,
       title: videoDetails.title,
-      album: null,
-      albumId: null,
+      album: album?.text ?? null,
+      albumId: album?.id ?? null,
       likeStatus: LikeStatus.Unknown,
       thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
       durationSeconds: parseInt(videoDetails.lengthSeconds),
@@ -326,8 +326,6 @@ class PlayerStateStore {
 
   public updateFromStore(
     queueState: YTMPlayerQueue | null,
-    thumbnails: YTMThumbnail[] | null,
-    album: { id: string; text: YTMText } | null,
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
     muted: boolean | null,
@@ -351,14 +349,6 @@ class PlayerStateStore {
         }
       : null;
     if (this.videoDetails) {
-      // This is specifically for if thumbnails have to be provided in a different way because of how YTM works
-      // Example being a podcast not including a thumbnail
-      if (thumbnails) {
-        this.videoDetails.thumbnails = thumbnails.map(mapYTMThumbnails);
-      }
-
-      this.videoDetails.album = album?.text ? getYTMTextRun(album.text.runs) : null;
-      this.videoDetails.albumId = album?.id;
       this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
     }
     this.adPlaying = adPlaying === true;
