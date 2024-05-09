@@ -183,6 +183,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron-forge/maker-flatpak@npm:^7.4.0":
+  version: 7.4.0
+  resolution: "@electron-forge/maker-flatpak@npm:7.4.0"
+  dependencies:
+    "@electron-forge/maker-base": "npm:7.4.0"
+    "@electron-forge/shared-types": "npm:7.4.0"
+    "@malept/electron-installer-flatpak": "npm:^0.11.4"
+    fs-extra: "npm:^10.0.0"
+  dependenciesMeta:
+    "@malept/electron-installer-flatpak":
+      optional: true
+  checksum: 10c0/095b9dc5fb8dad637739dbb864f9e9ea677889ea29cf7824d14b52f1e6cdd2d06f337ca3c96e0baa6173d4a3bc5888aa2a3d425e9128d217e0ee6e5c58b7c108
+  languageName: node
+  linkType: hard
+
 "@electron-forge/maker-rpm@npm:~7.4.0":
   version: 7.4.0
   resolution: "@electron-forge/maker-rpm@npm:7.4.0"
@@ -838,6 +853,34 @@ __metadata:
   dependencies:
     cross-spawn: "npm:^7.0.1"
   checksum: 10c0/84d60b8d467f4252114849f0a33c3763f07898335269eec5c94978ccac9d5680e1e268d993dd1a6d25a91476f9e0992759d7e1f385f9f3a090d862f9bb949603
+  languageName: node
+  linkType: hard
+
+"@malept/electron-installer-flatpak@npm:^0.11.4":
+  version: 0.11.4
+  resolution: "@malept/electron-installer-flatpak@npm:0.11.4"
+  dependencies:
+    "@malept/flatpak-bundler": "npm:^0.4.0"
+    debug: "npm:^4.1.1"
+    electron-installer-common: "npm:^0.10.0"
+    lodash: "npm:^4.17.15"
+    semver: "npm:^7.1.1"
+    yargs: "npm:^16.0.0"
+  bin:
+    electron-installer-flatpak: bin/electron-installer-flatpak.js
+  conditions: (os=darwin | os=linux)
+  languageName: node
+  linkType: hard
+
+"@malept/flatpak-bundler@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@malept/flatpak-bundler@npm:0.4.0"
+  dependencies:
+    debug: "npm:^4.1.1"
+    fs-extra: "npm:^9.0.0"
+    lodash: "npm:^4.17.15"
+    tmp-promise: "npm:^3.0.2"
+  checksum: 10c0/b3c87f6482b1956411af1118c771afb39cd9a0568fbb5e86015547ff6d68d2e73a7f0d74b75a57f0a156391c347c8d0adc1037e75172b92da72b96e0a05a2f4f
   languageName: node
   linkType: hard
 
@@ -3491,7 +3534,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-installer-common@npm:^0.10.2":
+"electron-installer-common@npm:^0.10.0, electron-installer-common@npm:^0.10.2":
   version: 0.10.3
   resolution: "electron-installer-common@npm:0.10.3"
   dependencies:
@@ -9927,7 +9970,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^16.0.2":
+"yargs@npm:^16.0.0, yargs@npm:^16.0.2":
   version: 16.2.0
   resolution: "yargs@npm:16.2.0"
   dependencies:
@@ -10000,6 +10043,7 @@ __metadata:
   dependencies:
     "@electron-forge/cli": "npm:~7.4.0"
     "@electron-forge/maker-deb": "npm:~7.4.0"
+    "@electron-forge/maker-flatpak": "npm:^7.4.0"
     "@electron-forge/maker-rpm": "npm:~7.4.0"
     "@electron-forge/maker-squirrel": "npm:~7.4.0"
     "@electron-forge/maker-zip": "npm:~7.4.0"

@@ -3,6 +3,7 @@ import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
+import { MakerFlatpak } from "@electron-forge/maker-flatpak";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 
@@ -63,6 +64,39 @@ const config: ForgeConfig = {
         mimeType: ["x-scheme-handler/ytmd"],
         section: "sound",
         icon: "./src/assets/icons/ytmd.png"
+      }
+    }),
+    new MakerFlatpak({
+      options: {
+        id: "app.ytmdesktop.ytmdesktop2",
+        files: [],
+        categories: ["AudioVideo", "Audio"],
+        mimeType: ["x-scheme-handler/ytmd"],
+        icon: "./src/assets/icons/ytmd.png",
+        baseVersion: "23.08",
+        runtimeVersion: "23.08",
+        modules: [
+          {
+            name: "zypak",
+            sources: [
+              {
+                type: "git",
+                url: "https://github.com/refi64/zypak",
+                tag: "v2024.01.17"
+              }
+            ]
+          }
+        ],
+        finishArgs: [
+          "--socket=pulseaudio",
+          "--socket=wayland",
+          "--socket=x11",
+          "--share=ipc",
+          "--share=network",
+          "--device=dri",
+          "--own-name=org.mpris.MediaPlayer2.youtubemusic",
+          "--filesystem=xdg-run/app/com.discordapp.Discord:create"
+        ]
       }
     })
   ],
