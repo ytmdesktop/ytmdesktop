@@ -88,14 +88,27 @@ const config: ForgeConfig = {
           }
         ],
         finishArgs: [
-          "--socket=pulseaudio",
-          "--socket=wayland",
+          // Rendering
           "--socket=x11",
+          "--socket=wayland",
           "--share=ipc",
-          "--share=network",
+          // OpenGL
           "--device=dri",
-          "--own-name=org.mpris.MediaPlayer2.youtubemusic",
-          "--filesystem=xdg-run/app/com.discordapp.Discord:create"
+          // Audio output
+          "--socket=pulseaudio",
+          // Read/write home directory access
+          "--filesystem=home",
+          // Chromium uses a socket in tmp for its singleton check
+          "--env=TMPDIR=/var/tmp",
+          // Allow communication with network
+          "--share=network",
+          // System notifications with libnotify
+          "--talk-name=org.freedesktop.Notifications",
+          // MPRIS (Chromium uses chromium.instance{PID})
+          "--own-name=org.mpris.MediaPlayer2.chromium.*",
+          // Discord Rich Presence
+          "--filesystem=xdg-run/app/com.discordapp.Discord:create",
+          "--filesystem=xdg-run/discord-ipc-*"
         ]
       }
     })
