@@ -1,10 +1,8 @@
-const api_version = 'v1';
-const getPrefix = (withVer = true) => {
-  return (
-    `http://${localStorage.getItem('ip') || 'localhost'}:9863` +
-    (withVer ? `/api/${api_version}` : '')
-  );
-}
+import { api_version, $, getPrefix, getThumbnail, humanReadableSeconds } from "./util";
+import './events';
+import io from 'socket.io-client';
+
+import '../css/control.scss';
 
 const appData = {
   appId: 'ytmd-remote-control',
@@ -13,84 +11,21 @@ const appData = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Add a Custom CSS property (--control-height) on #control with the height of the window
-  const control = document.getElementById('control');
-
-  control.style.setProperty('--control-height', control.clientHeight + 'px');
-  window.addEventListener('resize', () => {
-    control.style.setProperty('--control-height', control.clientHeight + 'px');
-  });
-
-  const materialtabs = document.getElementsByClassName('material-tabs');
-  for (let i = 0; i < materialtabs.length; i++) {
-    const currentMTab = materialtabs[i];
-    const links = currentMTab.querySelectorAll('a');
-
-    const active = links[0];
-    active.classList.add('active');
-
-    const content = document.getElementById(active.getAttribute('href').split('#')[1]);
-    content.style.display = null;
-
-    links.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const active = currentMTab.querySelector('.active');
-        active.classList.remove('active');
-  
-        const content = document.getElementById(active.getAttribute('href').split('#')[1]);
-        content.style.display = 'none';
-  
-        e.target.classList.add('active');
-        const target = document.getElementById(e.target.getAttribute('href').split('#')[1]);
-        target.style.display = null;
-
-        const bottomDraw = document.querySelector('.bottom-draw');
-        bottomDraw.setAttribute('open', '');
-      });
-
-      if (link === active) {return;}
-
-      const target = document.getElementById(link.getAttribute('href').split('#')[1]);
-      target.style.display = 'none';
-    });
-
-  }
-
-  const header = document.getElementsByClassName('header')[0];
-  const bottomDraw = document.querySelector('.bottom-draw');
-  header.addEventListener('click', function() {
-    if (bottomDraw.hasAttribute('open')) {
-      bottomDraw.removeAttribute('open');
+  fetch(`${getPrefix(false)}/metadata`)
+  .then(response => response.json())
+  .then(data => {
+    if (data.apiVersions.indexOf(api_version) === -1) {
+      handleError({ 'code': 'UNSUPPORTED_API' });
     }
+  })
+  .catch(error => {
+    console.error('Error:', error);
   });
 
   if (!localStorage.getItem('ip')) {
-    let ip = window.prompt(
-      "Please enter the IP Address of the YouTube Music Desktop Player instance",
-      "localhost"
-    );
-
-    if (ip === null) { 
-      handleError({ 'code': 'NO_IP' });
-      return;
-    }
-
-    localStorage.setItem('ip', ip);
+    // Open the settings bottom draw
+    $('#settings').dispatchEvent(new CustomEvent('click'));
   }
-
-  fetch(`${getPrefix(false)}/metadata`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.apiVersions.indexOf(api_version) === -1) {
-        handleError({ 'code': 'UNSUPPORTED_API' });
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-
 
   if (!localStorage.getItem('code') || !localStorage.getItem('token')) {
     getCode();
@@ -199,7 +134,7 @@ function getInitialStateAndStart() {
   })
 }
 
-const errorDialog = document.getElementById('error-dialog');
+const errorDialog = $('#error-dialog');
 function handleError(data) {
 
   if (!data.code && data.message) {
@@ -273,7 +208,7 @@ errorDialog.querySelector('button').addEventListener('click', function() {
   errorDialog.close();
 });
 
-const infoDialog = document.getElementById('info-dialog');
+const infoDialog = $('#info-dialog');
 function showInfo(title, message) {
   infoDialog.querySelector('h2').innerText = title;
   infoDialog.querySelector('p').innerText = (
@@ -295,22 +230,22 @@ function displayState(stateData) {
   } = stateData;
 
   if (!lastState || lastState.video.author !== video.author) {
-    document.getElementById('artist').innerText = video.author;
+    $('#artist').innerText = video.author;
   }
 
   if (!lastState || lastState.video.title !== video.title) {
-    document.getElementById('title').innerText = video.title;
+    $('#title').innerText = video.title;
   }
 
   if (lastState && !lastState.player.adPlaying && player.adPlaying) {
-    document.getElementById('title').innerText = 'Advertisement';
-    document.getElementById('artist').innerText = 'YouTube Music';
+    $('#title').innerText = 'Advertisement';
+    $('#artist').innerText = 'YouTube Music';
   }
 
   if (!lastState || lastState.video.likeStatus !== video.likeStatus) {
     // -1 = Unknown, 0 Disliked, 1 = Indifferent, 2 = Liked
-    const likeIcon = document.querySelector('#control-like svg use');
-    const dislikeIcon = document.querySelector('#control-dislike svg use');
+    const likeIcon = $('#control-like svg use');
+    const dislikeIcon = $('#control-dislike svg use');
 
     switch(video.likeStatus) {
       case 0:
@@ -332,14 +267,14 @@ function displayState(stateData) {
 
   if (!lastState || lastState.video.id !== video.id) {
     // We can update a few things here
-    const thumbnail = getLargeThumbnail(video.thumbnails);
+    const thumbnail = getThumbnail(video.thumbnails);
     let albumArts = document.getElementsByClassName('albumart');
     for (let i = 0; i < albumArts.length; i++) {
       albumArts[i].src = thumbnail;
     }
 
     const totalDuration = humanReadableSeconds(video.durationSeconds);
-    document.getElementsByClassName('totaltime')[0].innerText = totalDuration;
+    $('.totaltime').innerText = totalDuration;
   }
 
   if (!lastState || lastState.video.id !== video.id ||
@@ -348,7 +283,7 @@ function displayState(stateData) {
     lastState.player.queue.selectedItemIndex !== player.queue.selectedItemIndex)
   {
     // Update the queue
-    const queue = document.getElementById('queue');
+    const queue = $('#queue');
     const queueTemplate = document.getElementsByTagName('TEMPLATE')[0]
       .content.querySelector('.queue-item')
     queue.innerHTML = '';
@@ -418,7 +353,7 @@ function displayState(stateData) {
 
 
   if (!lastState || lastState.player.trackState !== player.trackState) {
-    const playPauseIcon = document.querySelector('#control-playpause div svg use');
+    const playPauseIcon = $('#control-playpause div svg use');
     if (player.trackState === 0) {
       playPauseIcon.setAttribute('href', '#play');
     }
@@ -437,7 +372,7 @@ function displayState(stateData) {
   }
 
   if (!lastState || lastState.player.queue.repeatMode !== player.queue.repeatMode) {
-    const repeatIcon = document.querySelector('#control-repeat svg use');
+    const repeatIcon = $('#control-repeat svg use');
     repeatIcon.setAttribute('data-state', player.queue.repeatMode);
     if (player.queue.repeatMode === 0) {
       repeatIcon.setAttribute('href', '#repeat-off');
@@ -450,196 +385,29 @@ function displayState(stateData) {
     }
   }
 
-  if (!lastState || lastState.player.videoProgress !== player.videoProgress) {
+  if (!lastState || lastState.player.videoProgress !== player.videoProgress && video.isLive === false) {
     // Update the progress bar
     const durationPercent = player.videoProgress / video.durationSeconds;
 
-    document.getElementById('progressbar').style.transform = `scaleX(${durationPercent})`;
-    document.getElementById('progressSliderKnob').style.left = `${durationPercent * 100}%`;
+    $('#progressbar').style.transform = `scaleX(${durationPercent})`;
+    $('#progressSliderKnob').style.left = `${durationPercent * 100}%`;
 
     const currentTime = humanReadableSeconds(player.videoProgress);
-    document.getElementsByClassName('currenttime')[0].innerText = currentTime;
+    $('.currenttime').innerText = currentTime;
+  }
+  
+  if (!lastState || lastState.video.isLive !== video.isLive) {
+    $('#progressSliderBar').style.display = (video.isLive ? 'none' : 'block');
+    $('#progressSliderKnob').style.display = (video.isLive ? 'none' : 'block');
+    $('.currenttime').style.display = (video.isLive ? 'none' : 'block');
+    $('.totaltime').style.display = (video.isLive ? 'none' : 'block');
   }
 
   if (!lastState || lastState.player.volume !== player.volume) {
     const volumePercent = player.volume;
-    document.getElementById('volumebar').style.transform = `scaleX(${volumePercent / 100})`;
-    document.getElementById('volumeSliderKnob').style.left = `${volumePercent}%`;
+    $('#volumebar').style.transform = `scaleX(${volumePercent / 100})`;
+    $('#volumeSliderKnob').style.left = `${volumePercent}%`;
   }
 
   lastState = stateData;
-}
-
-function getLargeThumbnail(thumbnails) {
-  var maxHeight = 0;
-  var maxThumbnail = null;
-  thumbnails.forEach(thumbnail => {
-    if (thumbnail.height > maxHeight) {
-      maxHeight = thumbnail.height;
-      maxThumbnail = thumbnail;
-    }
-  });
-
-  return maxThumbnail.url;
-}
-
-function getThumbnail(thumbnails, maxSize) {
-  var maxHeight = 0;
-  var selectedThumbnail = null;
-  thumbnails.forEach(thumbnail => {
-    if (thumbnail.height > maxHeight && thumbnail.height <= maxSize) {
-      maxHeight = thumbnail.height;
-      selectedThumbnail = thumbnail;
-    }
-  });
-
-  return selectedThumbnail?.url || thumbnails[thumbnails.length - 1].url;
-}
-
-function humanReadableSeconds(seconds) {
-  seconds = Math.floor(seconds);
-  // Have to convert to MM:SS but also HH:MM:SS
-  if (seconds < 60) {
-    return `00:${seconds < 10 ? '0' : ''}${seconds}`;
-  }
-  if (seconds < 3600) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  }
-
-  const hours = Math.floor(seconds / 3600);
-  const remainingMinutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  return `${hours < 10 ? '0' : ''}${hours}:${remainingMinutes < 10 ? '0' : ''}${remainingMinutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-}
-
-// ----------------------------------------------------------
-
-document.getElementById('tab-queue').addEventListener('click', function() {
-  setTimeout(() => {
-    // Scroll the #queue element so that the Selected item is in the top middle
-    const queue = document.getElementById('queue');
-    const selectedItem = queue.querySelector('.queue-item.selected');
-  
-    if (!selectedItem) { return; }
-  
-    const queueRect = queue.getBoundingClientRect();
-    const selectedItemRect = selectedItem.getBoundingClientRect();
-  
-
-    const scrollY = selectedItemRect.top - queueRect.top - (queueRect.height / 2) + (selectedItemRect.height);
-
-    queue.scrollTo({ top: scrollY, behavior: 'smooth' });
-  }, 100)
-});
-
-document.getElementById('control-playpause').addEventListener('click', function() {
-  sendCommand('playPause');
-});
-
-document.getElementById('control-previous').addEventListener('click', function() {
-  sendCommand('previous');
-});
-
-document.getElementById('control-next').addEventListener('click', function() {
-  sendCommand('next');
-});
-
-document.getElementById('control-repeat').addEventListener('click', function() {
-  const repeatIcon = document.querySelector('#control-repeat svg use');
-
-  const currentState = repeatIcon.getAttribute('data-state');
-  let nextState = (currentState + 1) % 3;
-
-  sendCommand('repeatMode', nextState)
-});
-
-document.getElementById('control-shuffle').addEventListener('click', function() {
-  sendCommand('shuffle');
-});
-
-document.getElementById('control-like').addEventListener('click', function() {
-  sendCommand('toggleLike');
-});
-
-document.getElementById('control-dislike').addEventListener('click', function() {
-  sendCommand('toggleDislike');
-});
-
-document.getElementById('control-volume-toggle').addEventListener('click', function() {
-  const currentState = document.getElementById('control-volume-toggle').getAttribute('data-state');
-  let nextState = currentState === 'mute' ? 'unmute' : 'mute';
-
-  sendCommand(nextState)
-    .then(() => {
-      document.getElementById('control-volume-toggle').setAttribute('data-state', nextState);
-
-      if (nextState === 'mute') {
-        document.querySelector('#control-volume-toggle svg use').setAttribute('href', `#volume-mute`);
-      }
-      else {
-        document.querySelector('#control-volume-toggle svg use').setAttribute('href', `#volume`);
-      }
-    });
-});
-
-document.getElementById('progressSliderBar').addEventListener('click', function(e) {
-  const percentage = e.offsetX / e.currentTarget.clientWidth;
-  const duration = lastState.video.durationSeconds * percentage;
-
-  sendCommand('seekTo', duration);
-});
-
-document.getElementById('volumeSliderBar').addEventListener('click', function(e) {
-  const percentage = e.offsetX / e.currentTarget.clientWidth;
-  sendCommand('setVolume', parseInt(percentage * 100));
-});
-
-// Any element clicked inside of queue which is class of queue-item
-document.getElementById('queue').addEventListener('click', function(e) {
-  var targetElement = e.target;
-  while (targetElement && !targetElement.classList.contains('queue-item') && targetElement !== this) {
-    targetElement = targetElement.parentElement;
-  }
-
-  if (targetElement && targetElement.classList.contains('queue-item')) {
-    const index = parseInt(targetElement.getAttribute('queue-index'));
-    if (index === lastState.player.queue.selectedItemIndex) {
-      return;
-    }
-  
-    sendCommand('playQueueIndex', index);
-  }
-
-});
-
-function sendCommand(command, data = null) {
-  const body = {
-    command
-  };
-  if (data !== null) {
-    body.data = data;
-  }
-
-  return fetch(`${getPrefix()}/command`, {
-    method: 'POST',
-    headers: {
-      'Authorization': localStorage.getItem('token'),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
-    // Get resposne code and check if it's 4XX and display error
-    .then(response => {
-      if (response.status >= 400) {
-        response.json().then(data => {
-          handleError(data);
-          return;
-        });
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
 }

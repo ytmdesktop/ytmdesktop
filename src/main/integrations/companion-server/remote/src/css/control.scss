@@ -1,0 +1,232 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #030303;
+  color: white;
+
+  overflow-y: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  cursor: pointer;
+}
+
+.background {
+  pointer-events: none;
+
+  .background-image,
+  .background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .background-image img {
+    height: 49vh;
+    width: 100vw;
+    filter: blur(80px);
+  }
+
+  .background-overlay {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.5),
+      rgba(0,0,0,1)
+    );
+  }
+}
+
+#control {
+  --other-content-height: 450px;
+
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  .albumart-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(var(--control-height) - var(--other-content-height));
+
+    position: absolute;
+    top: 72px;
+  }
+
+  .albumart {
+    aspect-ratio: 1 / 1 !important;
+    margin: auto auto;
+    max-height: min(100vw - 64px, var(--control-height) - var(--other-content-height));
+    /* max-width: min(100vw - 64px, var(--control-height) - var(--other-content-height)); */
+    /* width: 100%; */
+    height: 100%;
+    object-fit: cover;
+
+    pointer-events: none;
+  }
+
+  .controldetails {
+    --control-padding: 32px;
+    --controldetails-height: 320px;
+
+    display: inline-block;
+    width: calc(100vw - var(--control-padding) * 2);
+    margin: 0 var(--control-padding);
+
+    position: absolute;
+    top: calc(var(--control-height) - var(--controldetails-height));
+  }
+
+  /* .progress {} */
+  .currenttime, .totaltime {
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.7);
+
+    position: relative;
+    top: -24px;
+  }
+  .totaltime {
+    float: right;
+  }
+
+  .extra-controls .progress-bar {
+    max-width: 50%;
+  }
+
+
+  /* .details {} */
+  .song-details {
+    display: block;
+    height: 52px;
+  }
+
+  .song-details #title {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .song-details #artist {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+
+  .controls, .extra-controls {
+    align-items: center;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .control-button {
+    display: inline-block;
+    position: relative;
+    padding: 8px;
+
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+  }
+
+  .control-button-fake {
+    opacity: 0.8;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .control-button svg {
+    fill: currentColor;
+    width: 100%;
+    height: 100%;
+  }
+
+  .control-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .control-middle {
+    width: 52px;
+    height: 52px;
+  }
+
+  .control-center {
+    background: white !important;
+    border-radius: 50%;
+
+    width: 70px;
+    height: 70px;
+  }
+
+  .control-inner {
+    width: 40px;
+    height: 40px;
+    color: black;
+    margin: auto;
+  }
+
+  .control-inner:has(use[href="#play"]) {
+    margin-left: 9px;
+  }
+}
+
+.buffer-rotate {
+  animation: buffer-rotate 1s linear infinite;
+}
+
+@keyframes buffer-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* #region Material Tabs */
+.bottom-draw {
+  --bottom-draw-height: 46px;
+
+  position: fixed;
+  transform: translateY(calc(100vh - var(--bottom-draw-height)));
+  width: 100%;
+
+  transition: transform 0.3s ease;
+
+  [open] {
+    transform: translateY(calc(var(--bottom-draw-height)* 1.5)) !important;
+
+    .material-header {
+      border-radius: 8px 8px 0 0;
+
+    }
+  }
+}
+
+@import './_inputs';
+@import './_slider';
+@import './_material-tabs';
+@import './_queue';
+@import './_dialog';

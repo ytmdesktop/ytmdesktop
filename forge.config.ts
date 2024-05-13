@@ -33,12 +33,7 @@ const config: ForgeConfig = {
       "./src/assets/icons/controls/pause-button.png",
       "./src/assets/icons/controls/play-button.png",
       "./src/assets/icons/controls/play-next-button.png",
-      "./src/assets/icons/controls/play-previous-button.png",
-
-      "./src/main/integrations/companion-server/remote/src/index.html",
-      "./src/main/integrations/companion-server/remote/src/js/control.js",
-      "./src/main/integrations/companion-server/remote/src/js/socket.io.min.js",
-      "./src/main/integrations/companion-server/remote/src/css/control.css"
+      "./src/assets/icons/controls/play-previous-button.png"
     ],
     protocols: [
       {
@@ -120,6 +115,11 @@ const config: ForgeConfig = {
             preload: {
               js: "./src/renderer/ytmview/preload.ts"
             }
+          },
+          {
+            name: "remote",
+            html: "./src/main/integrations/companion-server/remote/src/index.html",
+            js: "./src/main/integrations/companion-server/remote/src/js/control.js"
           }
         ]
       }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YTMDesktop - Controller</title>
 
-  <link rel="stylesheet" href="../remote/css/control.css">
+  <!-- <link rel="stylesheet" href="./css/control.scss"> -->
   <!-- <link rel="manifest" href="pwa/manifest.json"> -->
 </head>
 <body>
@@ -143,16 +143,31 @@
       </header>
 
       <div class="tab-contents">
-        <div id="queue" class="material-tab-content">
 
+        <!-- Queue Tab -->
+        <div id="queue" class="material-tab-content">
         </div>
 
+        <!-- Playlist Tab? -->
         <div id="playlist" class="material-tab-content">
         </div>
 
+        <!-- Settings Tab -->
         <div id="settings" class="material-tab-content">
+
+          <div class="setting">
+            <label for="settings-server">Server</label>
+            <input type="text" id="settings-server" placeholder="http://localhost:9863">
+          </div>
+
+          <div class="setting">
+            <label for="settings-reset">Reset Connection</label>
+            <button id="settings-reset" class="button">Button</button>
+          </div>
+
         </div>
-      </div>
+
+      </div> <!-- End of Tab Contents -->
     </div>
 
     <dialog id="error-dialog">
@@ -172,9 +187,6 @@
         <button id="info-dialog-close">Close</button>
       </div>
     </dialog>
-
-    <script src="../remote/js/socket.io.min.js"></script>
-    <script src="../remote/js/control.js"></script>
 
     <svg style="display:none">
       <symbol id="play">
