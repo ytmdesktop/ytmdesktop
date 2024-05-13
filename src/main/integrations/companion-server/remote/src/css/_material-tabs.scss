@@ -60,12 +60,13 @@ $number-of-tabs: 3;
     -webkit-transition: left 0.2s ease;
   }
 
-  /* blurred background */
-  .tab-contents {
-    position: relative;
-  }
+}
 
-  .tab-contents::before {
+/* blurred background */
+.tab-contents {
+  position: relative;
+
+  &:before {
     content: "";
     position: absolute;
     top: 0;
@@ -77,9 +78,9 @@ $number-of-tabs: 3;
 
     z-index: -1;
   }
+}
 
-  .material-tab-content {
-    height: calc(100vh - var(--bottom-draw-height) * 2);
-    padding: 16px;
-  }
+.material-tab-content {
+  height: calc(100vh - var(--bottom-draw-height) * 2);
+  padding: 16px;
 }

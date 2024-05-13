@@ -215,7 +215,7 @@ body {
 
   transition: transform 0.3s ease;
 
-  [open] {
+  &[open] {
     transform: translateY(calc(var(--bottom-draw-height)* 1.5)) !important;
 
     .material-header {

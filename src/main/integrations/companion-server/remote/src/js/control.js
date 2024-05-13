@@ -1,7 +1,8 @@
 import { api_version, $, getPrefix, getThumbnail, humanReadableSeconds } from "./util";
-import './events';
 import io from 'socket.io-client';
 
+import './bottom-draw';
+import './events';
 import '../css/control.scss';
 
 const appData = {
@@ -410,4 +411,8 @@ function displayState(stateData) {
   }
 
   lastState = stateData;
+}
+
+export {
+  lastState
 }

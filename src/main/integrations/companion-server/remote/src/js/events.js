@@ -1,3 +1,4 @@
+import { lastState } from "./control";
 import { $, getPrefix } from "./util";
 
 document.addEventListener('DOMContentLoaded', function() {
