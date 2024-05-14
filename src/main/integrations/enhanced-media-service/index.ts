@@ -63,11 +63,11 @@ export default class EnhancedMediaService implements IIntegration {
     });
     this.mediaPlayer.on("positionseeked", (_error: unknown, seek: number) => {
       if (this.ytmView !== null) {
-        let newProgress = this.lastVideoProgress + seek;
+        let newProgress = playerStateStore.getState().videoProgress + seek;
         if (newProgress <= 0) newProgress = 0;
 
         // Behavior aligns with MPRIS documentation
-        if (newProgress > this.lastDurationSeconds) {
+        if (newProgress > playerStateStore.getState().videoDetails.durationSeconds) {
           this.ytmView.webContents.send("remoteControl:execute", "next");
         } else {
           this.ytmView.webContents.send("remoteControl:execute", "seekTo", newProgress);
@@ -109,7 +109,8 @@ export default class EnhancedMediaService implements IIntegration {
 
         if (state.trackState === VideoState.Playing) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Playing;
         if (state.trackState === VideoState.Paused) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Paused;
-        if (state.trackState === VideoState.Buffering) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Stopped;
+        // No buffering indicator for the media service so we'll indicate it's paused which will keep some controllers happy as well and allow certain functionality to work
+        if (state.trackState === VideoState.Buffering) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Paused;
         if (state.trackState === VideoState.Unknown) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Stopped;
 
         needUpdate = true;
@@ -133,7 +134,8 @@ export default class EnhancedMediaService implements IIntegration {
       }
 
       if (state.videoDetails.durationSeconds !== this.lastDurationSeconds || state.videoProgress !== this.lastVideoProgress) {
-        this.lastVideoProgress == state.videoProgress;
+        this.lastVideoProgress = state.videoProgress;
+        this.lastDurationSeconds = state.videoDetails.durationSeconds;
         this.mediaPlayer.setTimeline(state.videoDetails.durationSeconds, Math.max(0, Math.min(state.videoProgress, state.videoDetails.durationSeconds)));
       }
 
