@@ -432,10 +432,12 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-model="enhancedMediaServiceEnabled"
             type="checkbox"
-            restart-required
-            name="Enable enhanced media service"
+            name="Enhanced media service"
             description="An enhanced media service that can provide better media button controls"
-            @change="settingChangedRequiresRestart"
+            :disabled="!isDarwin"
+            disabled-message="This integration is unavailable on your platform"
+            beta
+            @change="settingsChanged"
           />
         </div>
 
