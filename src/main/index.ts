@@ -22,7 +22,7 @@ import log from "electron-log";
 import path from "path";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { LikeStatus, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 
 import CompanionServer from "./integrations/companion-server";
@@ -546,6 +546,21 @@ function setupTaskbarFeatures() {
   if (mainWindow && mainWindow.isVisible() && process.platform === "win32") {
     mainWindow.setThumbarButtons([
       {
+        tooltip: "Dislike",
+        icon: nativeImage.createFromPath(getControlsIconPath("thumbs-down-button-outline.png")),
+        flags: ["disabled"],
+        click() {
+          if (ytmView) {
+            ytmView.webContents.send("remoteControl:execute", "toggleDislike");
+          }
+        }
+      },
+      {
+        icon: nativeImage.createEmpty(),
+        flags: ["nobackground", "noninteractive"],
+        click() {}
+      },
+      {
         tooltip: "Previous",
         icon: nativeImage.createFromPath(getControlsIconPath("play-previous-button.png")),
         flags: ["disabled"],
@@ -574,12 +589,29 @@ function setupTaskbarFeatures() {
             ytmView.webContents.send("remoteControl:execute", "next");
           }
         }
+      },
+      {
+        icon: nativeImage.createEmpty(),
+        flags: ["nobackground", "noninteractive"],
+        click() {}
+      },
+      {
+        tooltip: "Like",
+        icon: nativeImage.createFromPath(getControlsIconPath("thumbs-up-button-outline.png")),
+        flags: ["disabled"],
+        click() {
+          if (ytmView) {
+            ytmView.webContents.send("remoteControl:execute", "toggleLike");
+          }
+        }
       }
     ]);
   }
   playerStateStore.addEventListener((state: PlayerState) => {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
+    const isDisliked = state.videoDetails.likeStatus === LikeStatus.Dislike;
+    const isLiked = state.videoDetails.likeStatus === LikeStatus.Like;
 
     if (process.platform == "win32") {
       const taskbarFlags = [];
@@ -589,6 +621,23 @@ function setupTaskbarFeatures() {
 
       if (mainWindow && mainWindow.isVisible()) {
         mainWindow.setThumbarButtons([
+          {
+            tooltip: "Dislike",
+            icon: isDisliked
+              ? nativeImage.createFromPath(getControlsIconPath("thumbs-down-button.png"))
+              : nativeImage.createFromPath(getControlsIconPath("thumbs-down-button-outline.png")),
+            flags: taskbarFlags,
+            click() {
+              if (ytmView) {
+                ytmView.webContents.send("remoteControl:execute", "toggleDislike");
+              }
+            }
+          },
+          {
+            icon: nativeImage.createEmpty(),
+            flags: ["nobackground", "noninteractive"],
+            click() {}
+          },
           {
             tooltip: "Previous",
             icon: nativeImage.createFromPath(getControlsIconPath("play-previous-button.png")),
@@ -618,6 +667,23 @@ function setupTaskbarFeatures() {
             click() {
               if (ytmView) {
                 ytmView.webContents.send("remoteControl:execute", "next");
+              }
+            }
+          },
+          {
+            icon: nativeImage.createEmpty(),
+            flags: ["nobackground", "noninteractive"],
+            click() {}
+          },
+          {
+            tooltip: "Like",
+            icon: isLiked
+              ? nativeImage.createFromPath(getControlsIconPath("thumbs-up-button.png"))
+              : nativeImage.createFromPath(getControlsIconPath("thumbs-up-button-outline.png")),
+            flags: taskbarFlags,
+            click() {
+              if (ytmView) {
+                ytmView.webContents.send("remoteControl:execute", "toggleLike");
               }
             }
           }
