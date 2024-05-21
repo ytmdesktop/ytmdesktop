@@ -1139,7 +1139,7 @@ const createYTMView = (): void => {
   }, 30 * 1000);
 };
 
-const createMainWindow = (): void => {
+const createMainWindow = (firstStart = false): void => {
   // Create the browser window.
   const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
   const windowBounds = store.get("state").windowBounds;
@@ -1253,7 +1253,11 @@ const createMainWindow = (): void => {
   });
 
   mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
+    if (firstStart) {
+      if (!store.get("general.startMinimized") && !store.get("general.startMinimized")) {
+        mainWindow.show();
+      }
+    }
     // Open the DevTools.
     if (process.env.NODE_ENV === "development") {
       mainWindow.webContents.openDevTools({
@@ -1817,7 +1821,7 @@ app.on("ready", async () => {
 
   log.info("Created tray icon");
 
-  createMainWindow();
+  createMainWindow(true);
   log.info("Created main window");
 
   memoryStore.set("ytmViewLoading", true);

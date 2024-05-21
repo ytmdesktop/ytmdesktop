@@ -285,10 +285,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" name="Hide to tray on close" @change="settingsChanged" />
           <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" name="Show notification on song change" @change="settingsChanged" />
           <YTMDSetting v-model="startOnBoot" type="checkbox" name="Start on boot" @change="settingsChanged" />
-          <!--<div class="setting">
-            <p>Start minimized</p>
-            <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
-          </div>-->
+          <YTMDSetting v-model="startMinimized" type="checkbox" name="Start minimized to tray" @change="settingsChanged" />
           <YTMDSetting
             v-model="disableHardwareAcceleration"
             type="checkbox"
