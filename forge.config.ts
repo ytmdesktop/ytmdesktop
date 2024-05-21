@@ -119,7 +119,7 @@ const config: ForgeConfig = {
           {
             name: "remote",
             html: "./src/main/integrations/companion-server/remote/src/index.html",
-            js: "./src/main/integrations/companion-server/remote/src/js/control.js"
+            js: "./src/main/integrations/companion-server/remote/src/js/control.ts"
           }
         ]
       }
