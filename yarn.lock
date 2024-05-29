@@ -1916,51 +1916,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xosms/xosms-darwin-arm64@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-darwin-arm64@npm:0.6.1"
+"@xosms/xosms-darwin-arm64@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-darwin-arm64@npm:0.6.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@xosms/xosms-darwin-universal@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-darwin-universal@npm:0.6.1"
+"@xosms/xosms-darwin-universal@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-darwin-universal@npm:0.6.2"
   conditions: os=darwin
   languageName: node
   linkType: hard
 
-"@xosms/xosms-darwin-x64@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-darwin-x64@npm:0.6.1"
+"@xosms/xosms-darwin-x64@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-darwin-x64@npm:0.6.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@xosms/xosms-linux-arm64-gnu@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-linux-arm64-gnu@npm:0.6.1"
+"@xosms/xosms-linux-arm64-gnu@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-linux-arm64-gnu@npm:0.6.2"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@xosms/xosms-linux-x64-gnu@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-linux-x64-gnu@npm:0.6.1"
+"@xosms/xosms-linux-x64-gnu@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-linux-x64-gnu@npm:0.6.2"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@xosms/xosms-win32-arm64-msvc@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-win32-arm64-msvc@npm:0.6.1"
+"@xosms/xosms-win32-arm64-msvc@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-win32-arm64-msvc@npm:0.6.2"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@xosms/xosms-win32-x64-msvc@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@xosms/xosms-win32-x64-msvc@npm:0.6.1"
+"@xosms/xosms-win32-x64-msvc@npm:0.6.2":
+  version: 0.6.2
+  resolution: "@xosms/xosms-win32-x64-msvc@npm:0.6.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -9916,17 +9916,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xosms@npm:^0.6.1":
-  version: 0.6.1
-  resolution: "xosms@npm:0.6.1"
+"xosms@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "xosms@npm:0.6.2"
   dependencies:
-    "@xosms/xosms-darwin-arm64": "npm:0.6.1"
-    "@xosms/xosms-darwin-universal": "npm:0.6.1"
-    "@xosms/xosms-darwin-x64": "npm:0.6.1"
-    "@xosms/xosms-linux-arm64-gnu": "npm:0.6.1"
-    "@xosms/xosms-linux-x64-gnu": "npm:0.6.1"
-    "@xosms/xosms-win32-arm64-msvc": "npm:0.6.1"
-    "@xosms/xosms-win32-x64-msvc": "npm:0.6.1"
+    "@xosms/xosms-darwin-arm64": "npm:0.6.2"
+    "@xosms/xosms-darwin-universal": "npm:0.6.2"
+    "@xosms/xosms-darwin-x64": "npm:0.6.2"
+    "@xosms/xosms-linux-arm64-gnu": "npm:0.6.2"
+    "@xosms/xosms-linux-x64-gnu": "npm:0.6.2"
+    "@xosms/xosms-win32-arm64-msvc": "npm:0.6.2"
+    "@xosms/xosms-win32-x64-msvc": "npm:0.6.2"
   dependenciesMeta:
     "@xosms/xosms-darwin-arm64":
       optional: true
@@ -9942,7 +9942,7 @@ __metadata:
       optional: true
     "@xosms/xosms-win32-x64-msvc":
       optional: true
-  checksum: 10c0/fa5d9e5bfabb082f0d155d7c87d68da1cfc08a3bef9514743125e060306f2bced2d466190dc408e7beac7d1c8dab5fd7504d8499c9b15e6e8210af5ae95ae993
+  checksum: 10c0/08af44a35a4fb545d5c7f4dec77bab7cd5766a98d98da5e1870d73bc52a12a3b8d1953ce2135eec267a9f8b46aa2e40e04243e8e70795eaa82ba36c74df1c22e
   languageName: node
   linkType: hard
 
@@ -10124,6 +10124,6 @@ __metadata:
     vue-loader: "npm:^17.4.2"
     vue-template-compiler: "npm:^2.7.16"
     webpack: "npm:^5.91.0"
-    xosms: "npm:^0.6.1"
+    xosms: "npm:^0.6.2"
   languageName: unknown
   linkType: soft
