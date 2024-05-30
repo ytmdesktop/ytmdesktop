@@ -1,5 +1,6 @@
-import { handleError, lastState } from "./control";
-import { CommandData } from "./type";
+import { lastState } from "./control";
+import { error_show } from "./dialogs";
+import { CommandData, RepeatMode } from "./type";
 import { $, getPrefix } from "./util";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -46,7 +47,7 @@ document.getElementById("control-repeat").addEventListener("click", function () 
   const repeatIcon = document.querySelector("#control-repeat svg use");
 
   const currentState: number = parseInt(repeatIcon.getAttribute("data-state"));
-  const nextState = (currentState + 1) % 3;
+  const nextState = ((currentState + 1) % 3) as RepeatMode;
 
   sendCommand("repeatMode", nextState);
 });
@@ -89,6 +90,7 @@ document.getElementById("progressSliderBar").addEventListener("click", function 
 document.getElementById("volumeSliderBar").addEventListener("click", function (e) {
   const currentTarget = e.target as HTMLElement;
   const percentage = e.offsetX / currentTarget.clientWidth;
+
   sendCommand("setVolume", percentage * 100);
 });
 
@@ -128,7 +130,7 @@ function sendCommand(command: string, data: string | number = null) {
       .then(response => {
         if (response.status >= 400) {
           response.json().then(data => {
-            handleError(data);
+            error_show(data);
             return;
           });
         }

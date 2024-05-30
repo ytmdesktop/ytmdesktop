@@ -1,8 +1,9 @@
-import { ApplicationState, ErrorData, PlayerQueueItem } from "./type";
+import { ApplicationState, PlayerQueueItem } from "./type";
 import { api_version, $, getPrefix, getThumbnail, humanReadableSeconds } from "./util";
 import "./bottom-draw";
 import "./events";
 import "../css/control.scss";
+import { error_show, info_close, info_show } from "./dialogs";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const io = require("socket.io-client");
@@ -18,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(response => response.json())
     .then(data => {
       if (data.apiVersions.indexOf(api_version) === -1) {
-        handleError({ code: "UNSUPPORTED_API" });
+        error_show({ code: "UNSUPPORTED_API" });
       }
     })
     .catch(error => {
@@ -48,7 +49,7 @@ function getCode() {
     .then(response => response.json())
     .then(data => {
       if (data.error) {
-        handleError(data);
+        error_show(data);
         return;
       }
 
@@ -63,7 +64,7 @@ function getCode() {
 }
 
 function getToken() {
-  showInfo("Authorization Required", [
+  info_show("Authorization Required", [
     "Please authorize the application to continue. YouTube Music Desktop Player will open a new Window to authorize the application.",
     "Please check it uses the code below:",
     `Code: ${localStorage.getItem("code")}`
@@ -82,7 +83,7 @@ function getToken() {
     .then(response => response.json())
     .then(data => {
       if (data.error) {
-        handleError(data);
+        error_show(data);
         return;
       }
 
@@ -94,7 +95,7 @@ function getToken() {
       console.error("Error:", error);
     })
     .finally(() => {
-      infoDialog.close();
+      info_close();
     });
 }
 
@@ -107,10 +108,9 @@ function getInitialStateAndStart() {
     .then(response => response.json())
     .then(data => {
       if (data.error) {
-        handleError(data);
+        error_show(data);
         return;
       }
-      console.log("Success:", data);
 
       displayState(data);
     })
@@ -128,90 +128,6 @@ function getInitialStateAndStart() {
     displayState(stateData);
   });
 }
-
-const errorDialog = $("#error-dialog") as HTMLDialogElement;
-function handleError(data: ErrorData) {
-  if (!data.code && data.message) {
-    errorDialog.querySelector("h2").innerText = data.error;
-    errorDialog.querySelector("p").innerText = data.message;
-    errorDialog.showModal();
-    return;
-  }
-
-  if (!data.code && !data.message) {
-    errorDialog.querySelector("h2").innerText = "Unknown Error";
-    errorDialog.querySelector("p").innerText = data.error;
-    errorDialog.showModal();
-    return;
-  }
-
-  errorDialog.querySelector("h2").innerText = "Error - " + data.code;
-  switch (data.code) {
-    case "NO_IP":
-      errorDialog.querySelector("p").innerText = "No IP Address was provided. Please refresh and try again.";
-      break;
-
-    case "UNSUPPORTED_API":
-      errorDialog.querySelector("p").innerText =
-        `No supported API Version in current Application. Required Version ${api_version}. Please update YouTube Music Desktop Player.`;
-      break;
-
-    case "UNAUTHENTICATED":
-      errorDialog.querySelector("p").innerText = "You are not authenticated. Please try again.";
-      localStorage.removeItem("code");
-      localStorage.removeItem("token");
-      break;
-
-    case "UNAUTHORIZED":
-      errorDialog.querySelector("p").innerText = "You are not authorized to access this resource. Please try again.";
-      localStorage.removeItem("code");
-      localStorage.removeItem("token");
-      break;
-
-    case "AUTHORIZATION_TIME_OUT":
-      errorDialog.querySelector("p").innerText = "Authorization request timed out. Please try again.";
-      break;
-
-    case "AUTHORIZATION_DENIED":
-      errorDialog.querySelector("p").innerText = "Authorization request was denied. Please try again.";
-      break;
-
-    case "AUTHORIZATION_TOO_MANY":
-      errorDialog.querySelector("p").innerText = "Too many authorization requests. Please try removing some other connections and try again.";
-      break;
-
-    case "AUTHORIZATION_DISABLED":
-      errorDialog.querySelector("p").innerText = "New Authorizations are currently disabled. Please enable it and try again.";
-      break;
-
-    case "AUTHORIZATION_INVALID":
-      errorDialog.querySelector("p").innerText = "Authorization code is invalid. Please try again.";
-      break;
-
-    case "YOUTUBE_MUSIC_UNVAILABLE":
-      errorDialog.querySelector("p").innerText = "YouTube Music is currently unavailable. Please try again later.";
-      break;
-
-    case "YOUTUBE_MUSIC_TIME_OUT":
-      errorDialog.querySelector("p").innerText = "Request to YouTube Music timed out. Please try again.";
-      break;
-  }
-
-  errorDialog.showModal();
-}
-errorDialog.querySelector("button").addEventListener("click", function () {
-  errorDialog.close();
-});
-
-const infoDialog = $("#info-dialog") as HTMLDialogElement;
-function showInfo(title: string, message: string | string[]) {
-  infoDialog.querySelector("h2").innerText = title;
-  infoDialog.querySelector("p").innerText = typeof message === "object" ? message.join("\n") : message;
-  infoDialog.showModal();
-}
-infoDialog.querySelector("button").addEventListener("click", function () {
-  infoDialog.close();
-});
 
 let lastState: ApplicationState = null;
 function displayState(stateData: ApplicationState) {
@@ -397,4 +313,4 @@ function displayState(stateData: ApplicationState) {
   lastState = stateData;
 }
 
-export { lastState, handleError };
+export { lastState };
