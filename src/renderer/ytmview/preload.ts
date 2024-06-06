@@ -23,8 +23,8 @@ const store = new Store<StoreSchema>();
 contextBridge.exposeInMainWorld("ytmd", {
   sendVideoProgress: (volume: number) => ipcRenderer.send("ytmView:videoProgressChanged", volume),
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
-  sendVideoData: (videoDetails: unknown, playlistId: string, album: { id: string; text: string }) =>
-    ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId, album),
+  sendVideoData: (videoDetails: unknown, playlistId: string, album: { id: string; text: string }, likeStatus: unknown) =>
+    ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId, album, likeStatus),
   sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
     ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted, adPlaying),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),

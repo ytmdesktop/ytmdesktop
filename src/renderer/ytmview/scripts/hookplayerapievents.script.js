@@ -50,7 +50,14 @@
         }
       }
 
-      window.ytmd.sendVideoData(videoDetails, playlistId, album);
+      let state = ytmStore.getState();
+      const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+      const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+      const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
+      
+      const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+
+      window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus);
     }
   });
   ytmStore.subscribe(() => {
