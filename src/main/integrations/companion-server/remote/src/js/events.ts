@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+document.getElementById("share-button").addEventListener("click", function () {
+  if (window.navigator.canShare) {
+    window.navigator.share({
+      title: "Check out this song!",
+      text: lastState.video.title + " - " + lastState.video.author,
+      url: "https://music.youtube.com/watch?v=" + lastState.video.id
+    });
+  }
+});
+
 document.getElementById("tab-queue").addEventListener("click", function () {
   setTimeout(() => {
     // Scroll the #queue element so that the Selected item is in the top middle

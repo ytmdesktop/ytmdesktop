@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YTMDesktop - Controller</title>
+  <meta name="description" content="Control your YTMDesktop from anywhere!">
+
+  <!-- Preconnect to Album Art location early to speed up initial DNS calls. -->
+  <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
   <!-- <link rel="stylesheet" href="./css/control.scss"> -->
   <!-- <link rel="manifest" href="pwa/manifest.json"> -->
@@ -29,6 +33,13 @@
       <div class="albumart-container">
         <img src="https://via.placeholder.com/544/000?text=Album%20Art%20Here" referrerpolicy="no-referrer" loading="lazy" alt="Album Art" class="albumart">
       </div>
+
+      <!-- Share -->
+      <button id="share-button" title="Share this song!">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <use href="#share"></use>
+        </svg>
+      </button>
 
 
       <div class="controldetails">
@@ -63,48 +74,48 @@
           </div>
         </div>
         <div class="controls">
-          <button class="control-button control-outer" fill="currentColor" id="control-shuffle">
+          <button class="control-button control-outer" fill="currentColor" id="control-shuffle" title="Shuffle" aria-label="Shuffle">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#shuffle"></use>
             </svg>
           </button>
-          <button class="control-button control-middle" fill="currentColor" id="control-previous">
+          <button class="control-button control-middle" fill="currentColor" id="control-previous" title="Previous" aria-label="Previous">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#previous"></use>
             </svg>
           </button>
-          <button class="control-button control-center" fill="currentColor" id="control-playpause">
+          <button class="control-button control-center" fill="currentColor" id="control-playpause" title="Play/Pause" aria-label="Play/Pause">
             <div class="control-inner">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <use href="#play"></use>
               </svg>
             </div>
           </button>
-          <button class="control-button control-middle" fill="currentColor" id="control-next">
+          <button class="control-button control-middle" fill="currentColor" id="control-next" title="Next" aria-label="Next">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#next"></use>
             </svg>
           </button>
-          <button class="control-button control-outer" fill="currentColor" id="control-repeat">
+          <button class="control-button control-outer" fill="currentColor" id="control-repeat" title="Repeat" aria-label="Repeat">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#repeat-off"></use>
             </svg>
           </button>
         </div>
         <div class="extra-controls">
-          <button class="control-button control-outer" id="control-dislike">
+          <button class="control-button control-outer" id="control-dislike" title="Dislike" aria-label="Dislike">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#dislike-outline"></use>
             </svg>
           </button>
 
-          <button class="control-button control-outer" id="control-like">
+          <button class="control-button control-outer" id="control-like" title="Like" aria-label="Like">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#like-outline"></use>
             </svg>
           </button>
 
-          <button class="control-button control-outer" id="control-volume-toggle">
+          <button class="control-button control-outer" id="control-volume-toggle" title="Mute/Unmute" aria-label="Mute/Unmute">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <use href="#volume"></use>
             </svg>
@@ -238,6 +249,10 @@
 
       <symbol id="volume-mute">
         <path d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
+      </symbol>
+
+      <symbol id="share">
+        <path d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z" />
       </symbol>
     </svg>
 

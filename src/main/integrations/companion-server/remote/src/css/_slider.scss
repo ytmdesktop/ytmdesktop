@@ -19,7 +19,7 @@
   height: calc(30px + 2px);
   margin-left: calc(15px + 2px / 2);
   margin-right: calc(15px + 2px / 2);
-  padding: 0 var(--paper-slider-container-padding, 0);
+  padding: 0 var(--slider-container-padding, 0);
 }
 .bar-container {
   position: absolute;
@@ -33,12 +33,12 @@
 .sliderBar {
   padding: 15px 0;
   width: 100%;
-  background-color: var(--paper-slider-bar-color, transparent);
-  --paper-progress-container-color: var(--container-color, #bdbdbd);
-  --paper-progress-height: 2px;
-  --paper-progress-container-border-radius: 0;
-  --paper-progress-container-overflow: visible;
-  --paper-progress-container-transform: none;
+  background-color: var(--slider-bar-color, transparent);
+  --progress-container-color: var(--container-color, #bdbdbd);
+  --progress-height: 2px;
+  --progress-container-border-radius: 0;
+  --progress-container-overflow: visible;
+  --progress-container-transform: none;
 
   display: block;
   position: relative;
@@ -46,13 +46,13 @@
 }
 
 .progressContainer {
-  background: var(--paper-progress-container-color, #e0e0e0);
+  background: var(--progress-container-color, #e0e0e0);
 
   position: relative;
-  height: var(--paper-progress-height, 4px);
-  border-radius: var(--paper-progress-container-border-radius, 0px);
-  overflow: var(--paper-progress-container-overflow, visible);
-  transform: var(--paper-progress-container-transform, none);
+  height: var(--progress-height, 4px);
+  border-radius: var(--progress-container-border-radius, 0px);
+  overflow: var(--progress-container-overflow, visible);
+  transform: var(--progress-container-transform, none);
 }
 
 .progress {
@@ -82,18 +82,18 @@
   position: absolute;
   top: var(--paper-slider-knob-top, 0);
   margin-left: calc(-15px - 2px / 2);
-  width: var(--paper-slider-knob-size, calc(30px + 2px));
-  height: var(--paper-slider-knob-size, calc(30px + 2px));
+  width: var(--knob-size, calc(30px + 2px));
+  height: var(--knob-size, calc(30px + 2px));
 }
 
 .slider-knob-inner {
   margin: 10px;
-  width: var(--paper-slider-knob-inner-size, calc(100% - 20px));
-  height: var(--paper-slider-knob-inner-size, calc(100% - 20px));
-  background-color: var(--paper-slider-knob-color, #3367d6);
-  border: var(--paper-slider-knob-border-style, 2px solid var(--paper-slider-knob-color, #3367d6));
+  width: var(--knob-inner-size, calc(100% - 20px));
+  height: var(--knob-inner-size, calc(100% - 20px));
+  background-color: var(--knob-color, #3367d6);
+  border: var(--knob-border-style, 2px solid var(--knob-color, #3367d6));
   border-radius: 50%;
-  box-shadow: var(--paper-slider-knob-box-shadow-style, none);
+  box-shadow: var(--knob-box-shadow-style, none);
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   transition-property: -webkit-transform, background-color, border;
