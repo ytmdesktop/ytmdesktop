@@ -1,4 +1,4 @@
-$number-of-tabs: 3;
+$number-of-tabs: 1;
 
 .material-header {
   position: relative;
@@ -26,8 +26,9 @@ $number-of-tabs: 3;
       font-weight: 600;
       color: #cccccc;
       text-align: center;
-
-      width: 120px;
+      
+      // width: 100%;  //May need to adjust this to fit the number of tabs
+      width: calc(100% / $number-of-tabs);
 
       .active {
         font-weight: 700;

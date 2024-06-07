@@ -6,7 +6,7 @@ const $ = (selector: string) => {
 
 const api_version = "v1";
 const getPrefix = (withVer: boolean = true) => {
-  return `http://${localStorage.getItem("ip") || "localhost"}:9863` + (withVer ? `/api/${api_version}` : "");
+  return `http://${localStorage.getItem("ip") || window.location.hostname}:9863` + (withVer ? `/api/${api_version}` : "");
 };
 
 function getThumbnail(thumbnails: Thumbnail[], maxSize: number = 1024) {

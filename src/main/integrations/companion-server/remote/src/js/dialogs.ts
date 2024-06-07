@@ -11,10 +11,14 @@ function error_show(data: ErrorData) {
   }
 
   if (!data.code && !data.message) {
-    errorDialog.querySelector("h2").innerText = "Unknown Error";
-    errorDialog.querySelector("p").innerText = data.error;
-    errorDialog.showModal();
-    return;
+    if (data.error === "UNAUTHORIZED") {
+      data.code = data.error;
+    } else {
+      errorDialog.querySelector("h2").innerText = "Unknown Error";
+      errorDialog.querySelector("p").innerText = data.error;
+      errorDialog.showModal();
+      return;
+    }
   }
 
   errorDialog.querySelector("h2").innerText = "Error - " + data.code;

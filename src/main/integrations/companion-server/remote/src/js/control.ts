@@ -26,11 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error:", error);
     });
 
-  if (!localStorage.getItem("ip")) {
-    // Open the settings bottom draw
-    $("#settings").dispatchEvent(new CustomEvent("click"));
-  }
-
   if (!localStorage.getItem("code") || !localStorage.getItem("token")) {
     getCode();
   } else {
