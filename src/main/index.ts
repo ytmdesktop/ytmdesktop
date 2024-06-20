@@ -91,7 +91,15 @@ log.errorHandler.startCatching({
 
     if (stateSaverInterval) clearInterval(stateSaverInterval);
 
-    log.error(error);
+    // This just ensures AggregateError sub errors is being unwrapped properly and logged
+    if (error instanceof AggregateError) {
+      log.error(error);
+      for (const subError of error.errors) {
+        log.error(subError);
+      }
+    } else {
+      log.error(error);
+    }
 
     let result = 1; // Default to Exit
 
