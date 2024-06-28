@@ -79,14 +79,27 @@ errorDialog.querySelector("button").addEventListener("click", function () {
   errorDialog.close();
 });
 
+errorDialog.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" || e.key === "Esc") {
+    errorDialog.close();
+  }
+});
+
 const infoDialog = $("#info-dialog") as HTMLDialogElement;
 function info_show(title: string, message: string | string[]) {
   infoDialog.querySelector("h2").innerText = title;
   infoDialog.querySelector("p").innerText = typeof message === "object" ? message.join("\n") : message;
   infoDialog.showModal();
 }
+
 infoDialog.querySelector("button").addEventListener("click", function () {
   infoDialog.close();
+});
+
+infoDialog.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" || e.key === "Esc") {
+    infoDialog.close();
+  }
 });
 
 function info_close() {

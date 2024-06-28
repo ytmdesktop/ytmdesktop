@@ -12,15 +12,17 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document.getElementById("share-button").addEventListener("click", function () {
-  if (window.navigator.canShare) {
+if (window.navigator.canShare) {
+  document.getElementById("share-button").addEventListener("click", function () {
     window.navigator.share({
       title: "Check out this song!",
       text: lastState.video.title + " - " + lastState.video.author,
       url: "https://music.youtube.com/watch?v=" + lastState.video.id
     });
-  }
-});
+  });
+} else {
+  document.getElementById("share-button").style.display = "none";
+}
 
 document.getElementById("tab-queue").addEventListener("click", function () {
   setTimeout(() => {
