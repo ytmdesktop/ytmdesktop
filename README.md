@@ -24,24 +24,22 @@ TODO: Write guides for v2. While these may still be helpful they are geared towa
 #### Windows
 <!--
 ### UPDATE THESE PLATFORMS ###
-- Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
 - Chocolatey: ```choco install ytmdesktop```
 -->
+- Winget: ```winget install "YouTube Music Desktop App"``` or ```winget install Ytmdesktop.Ytmdesktop```
+- Scoop: ```scoop bucket add extras``` then ```scoop install ytmdesktop``` (Community Maintained)
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Linux
 <!--
 ### UPDATE THESE PLATFORMS ###
-- Arch Linux (AUR): <https://aur.archlinux.org/packages/ytmdesktop-git>
 - Snap: <https://snapcraft.io/youtube-music-desktop-app>
 -->
+- Arch Linux (AUR): <https://aur.archlinux.org/packages/ytmdesktop> (Community Maintained)
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 #### Mac
-<!--
-### UPDATE THESE PLATFORMS ###
-- Brew: ```brew install --cask ytmdesktop-youtube-music```
--->
+- Brew: ```brew install --cask ytmdesktop-youtube-music``` (Community Maintained)
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
 # Developing
