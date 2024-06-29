@@ -3,14 +3,18 @@ import fs from 'fs';
 
 const repoOwner = 'ytmdesktop';
 const repoName = 'ytmdesktop';
-const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contributors?per_page=30`;
+
+// We are fetching the first 35 contributors
+// But we only display the first 30 contributors in the README
+// As we are filtering out the bots
+const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contributors?per_page=35`;
 
 function fetchContributors() {
   return new Promise((resolve, reject) => {
     const options = {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'User-Agent': 'GitHub-Contributors-App' // Add your user agent here
+        "User-Agent": "GitHub-Contributors-App" // Add your user agent here
       }
     };
 
@@ -40,11 +44,18 @@ function fetchContributors() {
 
 function generateMarkdown(contributors) {
   const markdownContent = contributors.map(contributor => {
+    if (contributor.type === 'Bot') {
+      return null;
+    }
+
     return (
       `[<img alt="${contributor.login}" src="${contributor.avatar_url}&s=240" width="120" height="120">]`+
       `(${contributor.html_url})`
     );
-  }).join('\n');
+  })
+  .filter(contributor => contributor !== null)
+  .slice(0, 30)
+  .join('\n');
 
   const readmeContent = (
     `## Contributors`+
