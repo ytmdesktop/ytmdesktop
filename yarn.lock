@@ -3594,16 +3594,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:~29.0.1":
-  version: 29.0.1
-  resolution: "electron@npm:29.0.1"
+"electron@npm:~31.2.1":
+  version: 31.2.1
+  resolution: "electron@npm:31.2.1"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^20.9.0"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/828845b89ce8f759a38c85b7183b76ee9ef250ca6b87714dc44ede82fe6bb9f48ceb1418ed9a9ef640ec9aaa7431669a956915681808ee50a5731b8e84dcd6cd
+  checksum: 10c0/f1b4ed8ebd5213a29cb84af884c3437055626f730c419aca58168f46fd0bb57bcf113790b90a201a6e2b13939cb297e925cfcc84abf04716b1077a7f0ae06291
   languageName: node
   linkType: hard
 
@@ -9234,11 +9234,11 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A~5.4.5#optional!builtin<compat/typescript>":
   version: 5.4.5
-  resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"
+  resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/9cf4c053893bcf327d101b6c024a55baf05430dc30263f9adb1bf354aeffc11306fe1f23ba2f9a0209674359f16219b5b7d229e923477b94831d07d5a33a4217
+  checksum: 10c0/db2ad2a16ca829f50427eeb1da155e7a45e598eec7b086d8b4e8ba44e5a235f758e606d681c66992230d3fc3b8995865e5fd0b22a2c95486d0b3200f83072ec9
   languageName: node
   linkType: hard
 
@@ -10019,7 +10019,7 @@ __metadata:
     "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
     conf: "npm:^10.2.0"
     css-loader: "npm:^7.1.1"
-    electron: "npm:~29.0.1"
+    electron: "npm:~31.2.1"
     electron-log: "npm:5.1.1"
     electron-squirrel-startup: "npm:^1.0.0"
     eslint: "npm:^8.56.0"
