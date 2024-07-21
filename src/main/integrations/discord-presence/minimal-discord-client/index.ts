@@ -3,14 +3,30 @@ import IPCClient, { OPCode } from "./ipc";
 import { DiscordActivity } from "./types";
 import { randomUUID } from "crypto";
 import log from "electron-log";
+import { existsSync, statSync } from "node:fs";
+
+function directoryExists(dirPath: string): boolean {
+  try {
+    return existsSync(dirPath) && statSync(dirPath).isDirectory();
+  } catch (error) {
+    return false;
+  }
+}
 
 function getIPCPath(id: number): string {
   if (process.platform === "win32") {
     return `\\\\?\\pipe\\discord-ipc-${id}`;
   }
 
-  const prefix = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
-  return `${prefix.replace(/\/$/, "")}/discord-ipc-${id}`;
+  const dirtyPrefix = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
+  const prefix = dirtyPrefix.replace(/\/$/, "");
+  const discordSnapDir = "snap.discord";
+
+  if (directoryExists(`${prefix}/${discordSnapDir}`)) {
+    return `${prefix}/${discordSnapDir}/discord-ipc-${id}`;
+  } else {
+    return `${prefix}/discord-ipc-${id}`;
+  }
 }
 
 export default class DiscordClient extends EventEmitter {
