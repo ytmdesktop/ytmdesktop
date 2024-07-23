@@ -64,15 +64,25 @@ log.transports.console.format = "[{processType}][{level}]{text}";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{level}]{text}";
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
+// Fix to https://github.com/ytmdesktop/ytmdesktop/issues/1394#issuecomment-2244147375 -aki6
 log.hooks.push((message, transport) => {
   if (transport !== log.transports.file) return message;
 
-  // Annoyingly spammed log from YTM that doesn't need to get added to the log file
-  if (message.data[0].includes("Third-party cookie will be blocked.")) return false;
-  for (let i = 0; i < message.data.length; i++) {
-    let dataString: string = message.data[i] as string;
-    dataString = dataString.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
-    message.data[i] = dataString;
+  const isSpamMessage = (data: any) => {
+    return typeof data === 'string' && data.includes("Third-party cookie will be blocked.");
+  };
+
+  if (message?.data?.[0] && isSpamMessage(message.data[0])) {
+    return false;
+  }
+
+  if (Array.isArray(message.data)) {
+    message.data = message.data.map(data => {
+      if (typeof data === 'string') {
+        return data.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
+      }
+      return data;
+    });
   }
 
   return message;
