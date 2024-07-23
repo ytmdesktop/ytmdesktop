@@ -315,7 +315,7 @@ class PlayerStateStore {
   }
 
   public async updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: Partial<VideoDetails> | null, likeStatus: YTMLikeStatus) {
-    const musicBrainzDetails = this?.previousTitle != videoDetails.title ? await this.requestFromMusicBrainz(videoDetails, album) : {};
+    const musicBrainzDetails = this?.previousTitle != videoDetails.title ? await this.requestFromMusicBrainz(videoDetails, album) : null;
     this.videoDetails = {
       author: musicBrainzDetails?.author ?? videoDetails.author,
       channelId: videoDetails.channelId,
@@ -353,7 +353,7 @@ class PlayerStateStore {
 
       const bestMatch = releases[0]; // Replace with a better method that checks for the similarity between the title and the album author or something
       const coverArtThumbnail: YTMThumbnail = await this.requestFromCoverArtArchive(bestMatch['release-group'].id); // !!returns the OG cover art usually so there will be a difference from the ones provided by youtube
-      const thumbnails: YTMThumbnail[] = [coverArtThumbnail] ?? null;
+      const thumbnails: YTMThumbnail[] = coverArtThumbnail ? [coverArtThumbnail] : null;
 
       return {
         author: bestMatch['artist-credit'][0].name,
