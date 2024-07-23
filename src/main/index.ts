@@ -64,7 +64,6 @@ log.transports.console.format = "[{processType}][{level}]{text}";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{level}]{text}";
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
-// Fix to https://github.com/ytmdesktop/ytmdesktop/issues/1394#issuecomment-2244147375 -aki6
 log.hooks.push((message, transport) => {
   if (transport !== log.transports.file) { return message; }
 
