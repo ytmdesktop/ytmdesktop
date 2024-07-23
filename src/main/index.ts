@@ -66,11 +66,11 @@ log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
 // Fix to https://github.com/ytmdesktop/ytmdesktop/issues/1394#issuecomment-2244147375 -aki6
 log.hooks.push((message, transport) => {
-  if (transport !== log.transports.file) return message;
+  if (transport !== log.transports.file) { return message; }
 
   const isSpamMessage = (data: any) => {
     return typeof data === 'string' && data.includes("Third-party cookie will be blocked.");
-  };
+  }
 
   if (message?.data?.[0] && isSpamMessage(message.data[0])) {
     return false;
