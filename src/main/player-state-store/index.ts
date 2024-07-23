@@ -307,21 +307,103 @@ class PlayerStateStore {
     }
     this.eventEmitter.emit("stateChanged", this.getState());
   }
+  private previousTitle: string | null = null;
+  private headers: {} = {
+    headers: {
+      "User-Agent": " YouTube Music Desktop ( user@ytmdesktop.app)" // replace with actual user-agent
+    }
+  }
 
-  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: { id: string; text: string } | null, likeStatus: YTMLikeStatus) {
+  public async updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: Partial<VideoDetails> | null, likeStatus: YTMLikeStatus) {
+    const musicBrainzDetails = this?.previousTitle != videoDetails.title ? await this.requestFromMusicBrainz(videoDetails, album) : null;
     this.videoDetails = {
-      author: videoDetails.author,
+      author: musicBrainzDetails?.author ?? videoDetails.author,
       channelId: videoDetails.channelId,
-      title: videoDetails.title,
-      album: album?.text ?? null,
+      title: musicBrainzDetails?.title ?? videoDetails.title,
+      album: musicBrainzDetails?.album ?? album?.album ?? null,
       albumId: album?.id ?? null,
       likeStatus: transformLikeStatus(likeStatus),
-      thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
+      thumbnails: musicBrainzDetails?.thumbnails ? musicBrainzDetails.thumbnails : videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // Use thumbnails from MusicBrainz if available
       durationSeconds: parseInt(videoDetails.lengthSeconds),
-      id: videoDetails.videoId
+      id: videoDetails.videoId,
     };
+
+    this.previousTitle = videoDetails.title;
+
     this.playlistId = playlistId;
     this.eventEmitter.emit("stateChanged", this.getState());
+  }
+
+  private async requestFromMusicBrainz(videoDetails: YTMVideoDetails, album: Partial<VideoDetails> | null): Promise<Partial<VideoDetails>> {
+    const query = [
+      videoDetails.title ?? "",
+      videoDetails.author ?? ""
+    ].filter(part => part !== "").join(" ");
+
+    return fetch(`https://musicbrainz.org/ws/2/release?query=${encodeURIComponent(query)}&fmt=json`, this.headers).then((response) => {
+      if (!response.ok) {
+        return Promise.reject(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    }).then((async (data) => {
+      const releases = data.releases || [];
+      if (!releases && releases.length <= 0) {
+        return null;
+      }
+
+      const bestMatch = releases[0]; // Replace with a better method that checks for the similarity between the title and the album author or something
+      const coverArtThumbnail: YTMThumbnail = await this.requestFromCoverArtArchive(bestMatch['release-group'].id); // !!returns the OG cover art usually so there will be a difference from the ones provided by youtube
+      const thumbnails: YTMThumbnail[] = coverArtThumbnail ? [coverArtThumbnail] : null;
+
+      return {
+        author: bestMatch['artist-credit'][0].name,
+        title: bestMatch.title,
+        album: bestMatch['release-group']?.title ?? null,
+        thumbnails: thumbnails
+      } as Partial<VideoDetails>;
+    })).catch((error) => {
+      console.error(error);
+      return null;
+    });
+  }
+
+  private async requestFromCoverArtArchive(releaseId: string): Promise<YTMThumbnail | null> {
+    if (!releaseId) return null;
+
+    return fetch(`https://coverartarchive.org/release-group/${releaseId}`, this.headers).then((response) => {
+      if (!response.ok) {
+        return Promise.reject(`HTTP error! Status: ${response.status}`);
+      }
+
+      if (response.redirected) {
+        const finalUrl = response.url;
+        return fetch(finalUrl, this.headers);
+      } else {
+        return Promise.reject(`Unexpected response status: ${response.status}`);
+      }
+    })
+    .then((response) => {
+      if (!response.ok) {
+        return Promise.reject(`Failed to fetch cover art from redirected URL! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const images = data.images || [];
+      if (images.length === 0) return null;
+      
+      const frontCoverImage = images.find((image: any) => image.front);
+
+      return frontCoverImage ? {
+        url: frontCoverImage.thumbnails?.large || frontCoverImage.image, // .image might be 1200x1200
+        height: 500,
+        width: 500
+      } as YTMThumbnail : null;
+    })
+    .catch((error) => {
+      console.error('Error fetching:', error);
+      return null;
+    });
   }
 
   public updateFromStore(
