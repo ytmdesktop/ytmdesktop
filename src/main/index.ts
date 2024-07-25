@@ -65,16 +65,12 @@ log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{lev
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
 log.hooks.push((message, transport) => {
+  // If the transport is not a file transport then return as is
   if (transport !== log.transports.file) { return message; }
+  // If there isnt message data, or the data isnt a string, or the data is spam from Youtube Music, return false
+  if (message?.data?.[0] && typeof message.data[0] === 'string' && message.data[0].includes("Third-party cookie will be blocked.")) return false;
 
-  const isSpamMessage = (data: any) => {
-    return typeof data === 'string' && data.includes("Third-party cookie will be blocked.");
-  };
-
-  if (message?.data?.[0] && isSpamMessage(message.data[0])) {
-    return false;
-  }
-
+  // Check it is an array, then redact sensitive info
   if (Array.isArray(message.data)) {
     message.data = message.data.map(data => {
       if (typeof data === 'string') {
@@ -86,6 +82,7 @@ log.hooks.push((message, transport) => {
 
   return message;
 });
+
 
 log.initialize({
   preload: true,
