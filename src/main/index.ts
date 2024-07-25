@@ -71,14 +71,12 @@ log.hooks.push((message, transport) => {
   if (message?.data?.[0] && (typeof message.data[0] === 'string' && message.data[0].includes("Third-party cookie will be blocked."))) return false;
 
   // Check it is an array, then redact sensitive info
-  if (Array.isArray(message.data)) {
-    message.data = message.data.map(data => {
-      if (typeof data === 'string') {
-        return data.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
-      }
-      return data;
-    });
-  }
+  message.data = message.data.map(data => {
+    if (typeof data === 'string') {
+      return data.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
+    }
+    return data;
+  });
 
   return message;
 });
