@@ -8,7 +8,18 @@ import { DiscordActivityType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
-function getHighestResThumbnail(thumbnails: Thumbnail[]) {
+interface VideoDetails {
+  title: string;
+  author: string;
+  album?: string; // Optional
+  id: string;
+  trackState: VideoState;
+  thumbnail?: string; // Optional
+  progress: number;
+  duration: number;
+}
+// More appropriate name
+function getBestThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 0;
   let currentHeight = 0;
   let url = null;
@@ -21,21 +32,13 @@ function getHighestResThumbnail(thumbnails: Thumbnail[]) {
   }
   return url;
 }
-
+// Simplify these, when buffering it will just show as being paused
 function getSmallImageKey(state: number) {
   // Developer Note:
   // You can add "-invert" to the end of the image key to invert (Black with White Border)
   switch (state) {
     case VideoState.Playing: {
       return "play-border";
-    }
-
-    case VideoState.Paused: {
-      return "pause-border";
-    }
-
-    case VideoState.Buffering: {
-      return "play-outline-border";
     }
 
     default: {
@@ -50,23 +53,19 @@ function getSmallImageText(state: number) {
       return "Playing";
     }
 
-    case VideoState.Paused: {
-      return "Paused";
-    }
-
-    case VideoState.Buffering: {
-      return "Buffering";
-    }
-
     default: {
-      return "Unknown";
+      return "Paused";
     }
   }
 }
 
+function removeTrailingSpace(str: string) {
+  return str.endsWith(' ') ? str.slice(0, -1) : str;
+}
+
 function stringLimit(str: string, limit: number, minimum: number) {
   if (str.length > limit) {
-    return str.substring(0, limit - 3) + "...";
+    return removeTrailingSpace(str.substring(0, limit - 3)) + "...";
   }
 
   if (str.length < minimum) {
@@ -84,86 +83,60 @@ export default class DiscordPresence implements IIntegration {
   private ready = false;
   private connectionRetryTimeout: string | number | NodeJS.Timeout = null;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
-  private endTimestamp: number | null = null;
   private stateCallback: (event: PlayerState) => void = null;
 
-  private lastTimeSeconds: number | null = null;
-  private lastDuration: number | null = null;
-
-  private lastEndTimestamp: number | null = null;
-  private lastVideoDetailsTitle: string | null = null;
-  private lastVideoDetailsAuthor: string | null = null;
-  private lastVideoDetailsId: string | null = null;
-  private lastTrackState: VideoState | null = null;
+  private videoDetails: VideoDetails | null = null;
 
   private connectionRetries: number = 0;
 
+  private setActivity() {
+    const { title, author, album, id, thumbnail, progress, duration, trackState } = this.videoDetails;
+
+    this.discordClient.setActivity({
+      type: DiscordActivityType.Listening,
+      details: stringLimit(title, 128, 2),
+      state: stringLimit(author, 128, 2),
+      timestamps: {
+        end: trackState === VideoState.Playing ? Date.now() + ((duration - progress) * 1000) : undefined
+      },
+      assets: {
+        large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
+        large_text: stringLimit(album ?? "", 128, 2),
+        small_image: getSmallImageKey(trackState),
+        small_text: getSmallImageText(trackState)
+      },
+      instance: false,
+      buttons: [
+        {
+          label: "Play on YouTube Music",
+          url: `https://music.youtube.com/watch?v=${id}`
+        },
+        {
+          label: "Play on YouTube Music Desktop",
+          url: `ytmd://play/${id}`
+        }
+      ]
+    });
+  }
+
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
-      const date = Date.now();
-      const timeSeconds = Math.floor(date / 1000);
-      const videoProgress = Math.floor(state.videoProgress);
-      const duration = state.videoDetails.durationSeconds - videoProgress;
+      const oldTitle = this.videoDetails ? this.videoDetails.title : null
+      const oldProgress = this.videoDetails ? this.videoDetails.progress : 0;
 
-      let adjustedTimeSeconds = timeSeconds;
-
-      if (!this.lastTimeSeconds) this.lastTimeSeconds = timeSeconds;
-      if (!this.lastDuration) this.lastDuration = duration;
-      if (timeSeconds - this.lastTimeSeconds > 0) {
-        if (this.lastDuration === duration) {
-          // The time changed seconds but the duration hasn't. We use the old timestamp to prevent weird deviations
-          adjustedTimeSeconds = this.lastTimeSeconds;
-        } else {
-          this.lastDuration = duration;
-          this.lastTimeSeconds = timeSeconds;
-        }
-      } else {
-        this.lastDuration = duration;
-        this.lastTimeSeconds = timeSeconds;
-      }
-
-      this.endTimestamp = state.trackState === VideoState.Playing ? adjustedTimeSeconds + (state.videoDetails.durationSeconds - videoProgress) : undefined;
-      if (
-        this.lastEndTimestamp !== this.endTimestamp ||
-        state.videoDetails.title !== this.lastVideoDetailsTitle ||
-        state.videoDetails.author !== this.lastVideoDetailsAuthor ||
-        state.videoDetails.id !== this.lastVideoDetailsId ||
-        state.trackState !== this.lastTrackState
-      ) {
-        this.lastEndTimestamp = this.endTimestamp;
-        this.lastVideoDetailsTitle = state.videoDetails.title;
-        this.lastVideoDetailsAuthor = state.videoDetails.author;
-        this.lastVideoDetailsId = state.videoDetails.id;
-        this.lastTrackState = state.trackState;
-
-        const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
-        this.discordClient.setActivity({
-          // Discord accepts Playing, Listening, and Watching. But ignores it and sets it to 0 (Playing)
-          // We'll still send a type in case Discord at some point updates to allow this
-          type: DiscordActivityType.Listening,
-          details: stringLimit(state.videoDetails.title, 128, 2),
-          state: stringLimit(state.videoDetails.author, 128, 2),
-          timestamps: {
-            end: state.trackState === VideoState.Playing ? this.endTimestamp : undefined
-          },
-          assets: {
-            large_image: thumbnail && thumbnail.length <= 256 ? thumbnail : "ytmd-logo",
-            large_text: stringLimit(state.videoDetails.title, 128, 2),
-            small_image: getSmallImageKey(state.trackState),
-            small_text: getSmallImageText(state.trackState)
-          },
-          instance: false,
-          buttons: [
-            {
-              label: "Play on YouTube Music",
-              url: `https://music.youtube.com/watch?v=${state.videoDetails.id}`
-            },
-            {
-              label: "Play on YouTube Music Desktop",
-              url: `ytmd://play/${state.videoDetails.id}`
-            }
-          ]
-        });
+      this.videoDetails = {
+        title: state.videoDetails.title,
+        author: state.videoDetails.author,
+        album: state.videoDetails.album,
+        id: state.videoDetails.id,
+        thumbnail: getBestThumbnail(state.videoDetails.thumbnails),
+        progress: Math.floor(state.videoProgress),
+        duration: state.videoDetails.durationSeconds,
+        trackState: state.trackState
+      };
+      
+      if (oldTitle !== this.videoDetails.title || Math.abs(oldProgress - this.videoDetails.progress) > 5 ) {
+        this.setActivity();
       }
 
       if (state.trackState === VideoState.Buffering || state.trackState === VideoState.Paused || state.trackState === VideoState.Unknown) {
