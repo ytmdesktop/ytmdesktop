@@ -59,13 +59,9 @@ function getSmallImageText(state: number) {
   }
 }
 
-function removeTrailingSpace(str: string) {
-  return str.endsWith(' ') ? str.slice(0, -1) : str;
-}
-
 function stringLimit(str: string, limit: number, minimum: number) {
   if (str.length > limit) {
-    return removeTrailingSpace(str.substring(0, limit - 3)) + "...";
+    return str.substring(0, limit - 3).trim() + "...";
   }
 
   if (str.length < minimum) {
@@ -74,6 +70,7 @@ function stringLimit(str: string, limit: number, minimum: number) {
 
   return str;
 }
+
 
 export default class DiscordPresence implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
