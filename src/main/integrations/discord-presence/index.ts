@@ -123,6 +123,7 @@ export default class DiscordPresence implements IIntegration {
     if (this.ready && state.videoDetails) {
       const oldTitle = this.videoDetails ? this.videoDetails.title : null
       const oldProgress = this.videoDetails ? this.videoDetails.progress : 0;
+      const oldState = this.videoDetails ? this.videoDetails.trackState : null;
 
       this.videoDetails = {
         title: state.videoDetails.title,
@@ -135,7 +136,7 @@ export default class DiscordPresence implements IIntegration {
         trackState: state.trackState
       };
       
-      if (oldTitle !== this.videoDetails.title || Math.abs(oldProgress - this.videoDetails.progress) > 5 ) {
+      if (oldTitle !== this.videoDetails.title || Math.abs(oldProgress - this.videoDetails.progress) > 5 || oldState !== this.videoDetails.trackState ) {
         this.setActivity();
       }
 
