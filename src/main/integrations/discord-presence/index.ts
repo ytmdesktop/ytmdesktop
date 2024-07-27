@@ -71,7 +71,6 @@ function stringLimit(str: string, limit: number, minimum: number) {
   return str;
 }
 
-
 export default class DiscordPresence implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
@@ -86,11 +85,13 @@ export default class DiscordPresence implements IIntegration {
 
   private connectionRetries: number = 0;
 
+  public ListeningActivityType : boolean = true; // change outside
+
   private setActivity() {
     const { title, author, album, id, thumbnail, progress, duration, trackState } = this.videoDetails;
 
     this.discordClient.setActivity({
-      type: DiscordActivityType.Listening,
+      type: this.ListeningActivityType ? DiscordActivityType.Listening : DiscordActivityType.Game,
       details: stringLimit(title, 128, 2),
       state: stringLimit(author, 128, 2),
       timestamps: {
@@ -118,8 +119,6 @@ export default class DiscordPresence implements IIntegration {
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
-      const oldTitle = this.videoDetails ? this.videoDetails.title : null
-      const oldProgress = this.videoDetails ? this.videoDetails.progress : 0;
       const oldState = this.videoDetails ? this.videoDetails.trackState : null;
 
       this.videoDetails = {
@@ -133,7 +132,7 @@ export default class DiscordPresence implements IIntegration {
         trackState: state.trackState
       };
       
-      if (oldTitle !== this.videoDetails.title || Math.abs(oldProgress - this.videoDetails.progress) > 5 || oldState !== this.videoDetails.trackState ) {
+      if (oldState !== this.videoDetails.trackState) {
         this.setActivity();
       }
 
