@@ -65,15 +65,18 @@ log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{lev
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
 log.hooks.push((message, transport) => {
-  if (transport !== log.transports.file) return message;
+  // If the transport is not a file transport then return as is
+  if (transport !== log.transports.file) { return message; }
+  // If there isnt message data, or the data isnt a string, or the data is spam from Youtube Music, return false
+  if (message?.data?.[0] && (typeof message.data[0] === 'string' && message.data[0].includes("Third-party cookie will be blocked."))) return false;
 
-  // Annoyingly spammed log from YTM that doesn't need to get added to the log file
-  if (message.data[0].includes("Third-party cookie will be blocked.")) return false;
-  for (let i = 0; i < message.data.length; i++) {
-    let dataString: string = message.data[i] as string;
-    dataString = dataString.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
-    message.data[i] = dataString;
-  }
+  // Check it is an array, then redact sensitive info
+  message.data = message.data.map(data => {
+    if (typeof data === 'string') {
+      return data.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
+    }
+    return data;
+  });
 
   return message;
 });
@@ -363,6 +366,7 @@ const store = new Conf<StoreSchema>({
       companionServerAuthTokens: null,
       companionServerCORSWildcardEnabled: false,
       discordPresenceEnabled: false,
+      discordPresenceListening: true,
       lastFMEnabled: false
     },
     shortcuts: {
@@ -525,6 +529,7 @@ store.onDidAnyChange(async (newState, oldState) => {
     discordPresence.disable();
     log.info("Integration disabled: Discord presence");
   }
+  discordPresence.listeningActivityType = newState.integrations.discordPresenceListening;
 
   if (newState.integrations.lastFMEnabled) {
     lastFMScrobbler.provide(store, memoryStore);
