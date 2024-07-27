@@ -85,13 +85,13 @@ export default class DiscordPresence implements IIntegration {
 
   private connectionRetries: number = 0;
 
-  public ListeningActivityType : boolean = true; // change outside
+  public listeningActivityType : boolean = true; // change outside
 
   private setActivity() {
     const { title, author, album, id, thumbnail, progress, duration, trackState } = this.videoDetails;
 
     this.discordClient.setActivity({
-      type: this.ListeningActivityType ? DiscordActivityType.Listening : DiscordActivityType.Game,
+      type: this.listeningActivityType ? DiscordActivityType.Listening : DiscordActivityType.Game,
       details: stringLimit(title, 128, 2),
       state: stringLimit(author, 128, 2),
       timestamps: {
