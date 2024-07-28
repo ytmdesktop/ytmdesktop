@@ -517,7 +517,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
 
   if (newState.integrations.discordPresenceEnabled) {
-    discordPresence.provide(memoryStore);
+    discordPresence.provide(store, memoryStore);
   }
   if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) {
     discordPresence.enable();
@@ -526,7 +526,6 @@ store.onDidAnyChange(async (newState, oldState) => {
     discordPresence.disable();
     log.info("Integration disabled: Discord presence");
   }
-  discordPresence.listeningActivityType = newState.integrations.discordPresenceListening;
 
   if (newState.integrations.lastFMEnabled) {
     lastFMScrobbler.provide(store, memoryStore);
@@ -1910,7 +1909,7 @@ app.on("ready", async () => {
 
   // DiscordPresence
   if (store.get("integrations").discordPresenceEnabled) {
-    discordPresence.provide(memoryStore);
+    discordPresence.provide(store, memoryStore);
     discordPresence.enable();
     log.info("Integration enabled: Discord presence");
   }
