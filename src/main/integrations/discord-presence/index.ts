@@ -1,25 +1,16 @@
-import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
+import playerStateStore, { PlayerState, Thumbnail, VideoState, VideoDetails } from "../../player-state-store";
 import IIntegration from "../integration";
+import Conf from "conf";
 import MemoryStore from "../../memory-store";
-import { MemoryStoreSchema } from "~shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
+import { Unsubscribe } from "conf/dist/source/types";
 import DiscordClient from "./minimal-discord-client";
 import log from "electron-log";
 import { DiscordActivityType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
-interface VideoDetails {
-  title: string;
-  author: string;
-  album?: string; // Optional
-  id: string;
-  trackState: VideoState;
-  thumbnail?: string; // Optional
-  progress: number;
-  duration: number;
-}
-// More appropriate name
-function getBestThumbnail(thumbnails: Thumbnail[]) {
+function getBestThumbnail(thumbnails: Thumbnail[]): string {
   let currentWidth = 0;
   let currentHeight = 0;
   let url = null;
@@ -32,7 +23,7 @@ function getBestThumbnail(thumbnails: Thumbnail[]) {
   }
   return url;
 }
-// Simplify these, when buffering it will just show as being paused
+
 function getSmallImageKey(state: number) {
   // Developer Note:
   // You can add "-invert" to the end of the image key to invert (Black with White Border)
@@ -73,6 +64,9 @@ function stringLimit(str: string, limit: number, minimum: number) {
 
 export default class DiscordPresence implements IIntegration {
   private memoryStore: MemoryStore<MemoryStoreSchema>;
+  private store: Conf<StoreSchema>;
+
+  private storeListener: Unsubscribe | null = null;
 
   private discordClient: DiscordClient = null;
   private enabled = false;
@@ -81,27 +75,29 @@ export default class DiscordPresence implements IIntegration {
   private pauseTimeout: string | number | NodeJS.Timeout = null;
   private stateCallback: (event: PlayerState) => void = null;
 
-  private videoDetails: VideoDetails | null = null;
+  private videoDetails: Partial<VideoDetails> | null = null;
+  private videoState: VideoState | null = null;
+  private progress: number | null = null;
 
   private connectionRetries: number = 0;
 
-  public listeningActivityType : boolean = true; // change outside
-
   private setActivity() {
-    const { title, author, album, id, thumbnail, progress, duration, trackState } = this.videoDetails;
+    if (!this.videoDetails) return;
+    const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
+    const thumbnail: string | null = getBestThumbnail(thumbnails);
 
     this.discordClient.setActivity({
-      type: this.listeningActivityType ? DiscordActivityType.Listening : DiscordActivityType.Game,
+      type: this.store.get("integrations").discordPresenceListening ? DiscordActivityType.Listening : DiscordActivityType.Game,
       details: stringLimit(title, 128, 2),
       state: stringLimit(author, 128, 2),
       timestamps: {
-        end: trackState === VideoState.Playing ? Date.now() + ((duration - progress) * 1000) : undefined
+        end: this.videoState === VideoState.Playing ? Date.now() + (durationSeconds - this.progress) * 1000 : undefined
       },
       assets: {
         large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
-        large_text: stringLimit(album ?? "", 128, 2),
-        small_image: getSmallImageKey(trackState),
-        small_text: getSmallImageText(trackState)
+        large_text: album ? stringLimit(album, 128, 2) : undefined,
+        small_image: getSmallImageKey(this.videoState),
+        small_text: getSmallImageText(this.videoState)
       },
       instance: false,
       buttons: [
@@ -119,20 +115,20 @@ export default class DiscordPresence implements IIntegration {
 
   private playerStateChanged(state: PlayerState) {
     if (this.ready && state.videoDetails) {
-      const oldState = this.videoDetails ? this.videoDetails.trackState : null;
+      const oldState = this.videoState ?? null;
 
       this.videoDetails = {
         title: state.videoDetails.title,
         author: state.videoDetails.author,
         album: state.videoDetails.album,
         id: state.videoDetails.id,
-        thumbnail: getBestThumbnail(state.videoDetails.thumbnails),
-        progress: Math.floor(state.videoProgress),
-        duration: state.videoDetails.durationSeconds,
-        trackState: state.trackState
+        thumbnails: state.videoDetails.thumbnails,
+        durationSeconds: state.videoDetails.durationSeconds
       };
-      
-      if (oldState !== this.videoDetails.trackState) {
+      this.progress = Math.floor(state.videoProgress);
+      this.videoState = state.trackState;
+
+      if (oldState !== this.videoState) {
         this.setActivity();
       }
 
@@ -159,7 +155,8 @@ export default class DiscordPresence implements IIntegration {
     }
   }
 
-  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
+  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
+    this.store = store;
     this.memoryStore = memoryStore;
   }
 
@@ -198,6 +195,15 @@ export default class DiscordPresence implements IIntegration {
       this.stateCallback = event => {
         this.playerStateChanged(event);
       };
+      if (this.storeListener) {
+        this.storeListener();
+        this.storeListener = null;
+      }
+      this.storeListener = this.store.onDidChange("integrations", (oldState, newState) => {
+        if (oldState.discordPresenceListening !== newState.discordPresenceListening) {
+          this.setActivity();
+        }
+      });
       playerStateStore.addEventListener(this.stateCallback);
     }
   }
@@ -217,6 +223,10 @@ export default class DiscordPresence implements IIntegration {
     }
     if (this.stateCallback) {
       playerStateStore.removeEventListener(this.stateCallback);
+    }
+    if (this.storeListener) {
+      this.storeListener();
+      this.storeListener = null;
     }
   }
 
