@@ -22,6 +22,7 @@ const props = defineProps<{
   disabled?: boolean;
   disabledMessage?: string;
   flexColumn?: boolean;
+  beta?: boolean;
 }>();
 const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
@@ -43,13 +44,22 @@ const fileInput = ref(null);
 
 <template>
   <div :class="{ 'ytmd-setting': true, 'indented': props.indented, 'flex-column': props.flexColumn }">
-    <p v-if="!disabled && !hasDescription">{{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span></p>
-    <div v-else class="name-description">
-      <p class="name">{{ name }}</p>
+    <p v-if="!disabled && !hasDescription">
+      {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
+      <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+    </p>
+    <div v-else-if="!disabled && hasDescription" class="name-description">
+      <p class="name">
+        {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
+        <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+      </p>
       <p class="description">{{ description }}</p>
     </div>
     <div v-if="disabled" class="disabled-name-message">
-      <p class="name">{{ name }}</p>
+      <p class="name">
+        <span class="disabled-tag">DISABLED</span> {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
+        <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+      </p>
       <p class="message">{{ disabledMessage }}</p>
     </div>
 
@@ -94,6 +104,18 @@ const fileInput = ref(null);
   flex-direction: column;
   align-items: initial;
   justify-content: initial;
+}
+
+.ytmd-setting .beta-tag {
+  background-color: #f44336;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.ytmd-setting .disabled-tag {
+  background-color: #212121;
+  border-radius: 4px;
+  padding: 2px 4px;
 }
 
 .name-description .name,

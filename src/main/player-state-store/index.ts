@@ -346,14 +346,14 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: { id: string; text: string } | null) {
+  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: { id: string; text: string } | null, likeStatus: YTMLikeStatus) {
     this.videoDetails = {
       author: videoDetails.author,
       channelId: videoDetails.channelId,
       title: videoDetails.title,
       album: album?.text ?? null,
       albumId: album?.id ?? null,
-      likeStatus: LikeStatus.Unknown,
+      likeStatus: transformLikeStatus(likeStatus),
       thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
       durationSeconds: parseInt(videoDetails.lengthSeconds),
       id: videoDetails.videoId,

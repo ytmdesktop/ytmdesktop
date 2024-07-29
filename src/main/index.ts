@@ -64,6 +64,20 @@ log.transports.console.format = "[{processType}][{level}]{text}";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{level}]{text}";
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
+log.hooks.push((message, transport) => {
+  if (transport !== log.transports.file) return message;
+
+  // Annoyingly spammed log from YTM that doesn't need to get added to the log file
+  if (message.data[0].includes("Third-party cookie will be blocked.")) return false;
+  for (let i = 0; i < message.data.length; i++) {
+    let dataString: string = message.data[i] as string;
+    dataString = dataString.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
+    message.data[i] = dataString;
+  }
+
+  return message;
+});
+
 log.initialize({
   preload: true,
   spyRendererConsole: true
@@ -77,7 +91,15 @@ log.errorHandler.startCatching({
 
     if (stateSaverInterval) clearInterval(stateSaverInterval);
 
-    log.error(error);
+    // This just ensures AggregateError sub errors is being unwrapped properly and logged
+    if (error instanceof AggregateError) {
+      log.error(error);
+      for (const subError of error.errors) {
+        log.error(subError);
+      }
+    } else {
+      log.error(error);
+    }
 
     let result = 1; // Default to Exit
 
@@ -1562,13 +1584,13 @@ app.on("ready", async () => {
     playerStateStore.updateVideoState(state);
   });
 
-  ipcMain.on("ytmView:videoDataChanged", (event, videoDetails, playlistId, album) => {
+  ipcMain.on("ytmView:videoDataChanged", (event, videoDetails, playlistId, album, likeStatus) => {
     if (event.sender !== ytmView.webContents) return;
 
     lastVideoId = videoDetails.videoId;
     lastPlaylistId = playlistId;
 
-    playerStateStore.updateVideoDetails(videoDetails, playlistId, album);
+    playerStateStore.updateVideoDetails(videoDetails, playlistId, album, likeStatus);
   });
 
   ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying) => {
