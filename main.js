@@ -1088,8 +1088,8 @@ async function createWindow() {
 
         switch (command) {
             case 'media-play-pause':
-                if (infoPlayerProvider.getTrackInfo().id === '')
-                    infoPlayerProvider.firstPlay(view.webContents)
+                //if (infoPlayerProvider.getTrackInfo().id === '')
+                //    infoPlayerProvider.firstPlay(view.webContents)
                 mediaControl.playPauseTrack(view)
                 break
 
@@ -1260,8 +1260,8 @@ async function createWindow() {
         if (settingsProvider.get('settings-enable-double-tapping-show-hide')) {
             if (!doublePressPlayPause) {
                 // The first press
-                if (infoPlayerProvider.getTrackInfo().id === '')
-                    infoPlayerProvider.firstPlay(view.webContents)
+                // if (infoPlayerProvider.getTrackInfo().id === '') 
+                    // infoPlayerProvider.firstPlay(view.webContents)
 
                 doublePressPlayPause = true
                 setTimeout(() => {
