@@ -18,27 +18,69 @@
     </head>
 
     <body>
-        <div class="center">
-            <div class="row">
-                <div class="input-field col s12">
-                    <input id="username" type="text" class="white-text" />
-                    <label for="username">Username</label>
-                </div>
-                <div class="input-field col s12">
-                    <input id="password" type="password" class="white-text" />
-                    <label for="password">Password</label>
+        <div id="nice-titlebar" class="bar drag">
+            <div id="mac" class="hide no-drag">
+                <span id="window-title" class="hide"></span>
+                <!-- <div class="col s6 center">
+                            <div class="title">
+                                <i class="material-icons tiny" id="icon"></i>
+                            </div>
+                        </div> -->
+            </div>
+
+            <div id="win" class="hide">
+                <div class="row">
+                    <div class="col s9 left-align">
+                        <div class="title">
+                            <i
+                                class="material-icons tiny tiny-margin left"
+                                id="icon"
+                                >music_note</i
+                            >
+                            <span id="window-title">Last.FM Login</span>
+                        </div>
+                    </div>
+
+                    <div class="col s3 right-align">
+                        <div
+                            class="no-drag pointer cmd-btn hover-red"
+                            id="btn-close"
+                        >
+                            <i class="material-icons tiny" title="Close"
+                                >close</i
+                            >
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <button
-                    class="btn red"
-                    id="btn-save"
-                    style="text-transform: none;"
-                >
-                    <span
-                        i18n="i18n_LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE"
-                    ></span>
-                </button>
+        </div>
+        <div id="content">
+            <div class="center">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="username" type="text" class="white-text" />
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input
+                            id="password"
+                            type="password"
+                            class="white-text"
+                        />
+                        <label for="password">Password</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <button
+                        class="btn red"
+                        id="btn-save"
+                        style="text-transform: none"
+                    >
+                        <span
+                            i18n="i18n_LABEL_SETTINGS_TAB_LAST_FM_SCROBBLER_AUTHORIZE"
+                        ></span>
+                    </button>
+                </div>
             </div>
         </div>
     </body>
@@ -50,4 +92,7 @@
     M.updateTextFields()
 </script>
 
-<script src="./last-fm-login.js"></script>
+<script>
+    require('../../../shared/window-buttons/window-buttons.js')
+    require('./last-fm-login.js')
+</script>

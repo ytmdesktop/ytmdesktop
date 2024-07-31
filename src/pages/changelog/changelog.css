@@ -2,13 +2,6 @@ html,
 body {
     background-color: #1D1D1D;
     color: #fff;
-
-    padding: 5px;
-
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: .95em;
-
-    line-height: 1.3em;
 }
 
 #version {
@@ -23,8 +16,16 @@ body {
     width: 100%;
     padding: 2px;
     height: 90%;
-    
+    margin-left: 8px;
+    margin-right: 8px;
     scroll-behavior: smooth;
+
+    padding: 5px;
+
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: .95em;
+
+    line-height: 1.3em;
 }
 
 ::-webkit-scrollbar {

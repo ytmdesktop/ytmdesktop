@@ -18,10 +18,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 18
       # - name: Setup tmate session
       #   uses: mxschmitt/action-tmate@v3
-      - run: npm config set python python3.10
+      # - run: npm config set python python3.10
       - run: yarn --frozen-lockfile
       - run: node ./script/build-current-platform.js
       - uses: actions/upload-artifact@v2

@@ -31,10 +31,12 @@ class windowsMediaProvider {
         this._controls.isPauseEnabled = true
         this._controls.isPlayEnabled = true
         this._controls.isPreviousEnabled = true
+        this._controls.isStopEnabled = true
 
         this._controls.playbackStatus = MediaPlaybackStatus.closed
         this._controls.displayUpdater.type = MediaPlaybackType.music
 
+        this._controls.displayUpdater.appMediaId = 'Youtube Music Desktop'
         this._controls.displayUpdater.musicProperties.title = 'YouTube Music'
         this._controls.displayUpdater.musicProperties.artist = ''
         this._controls.displayUpdater.thumbnail = RandomAccessStreamReference.createFromUri(
@@ -68,9 +70,9 @@ class windowsMediaProvider {
         this._isInitialized = true
     }
 
-    setPlaybackStatus(status) {
+    setPlaybackStatus(paused) {
         if (this._isInitialized) {
-            if (status)
+            if (paused)
                 this._controls.playbackStatus = MediaPlaybackStatus.paused
             else this._controls.playbackStatus = MediaPlaybackStatus.playing
 
@@ -80,12 +82,21 @@ class windowsMediaProvider {
 
     setPlaybackData(title, author, cover, album) {
         if (this._isInitialized) {
+            if (
+                settingsProvider.get(
+                    'settings-windows10-media-service-show-info'
+                ) &&
+                !this._controls.isEnabled
+            )
+                this._controls.isEnabled = true
+
             this._controls.displayUpdater.musicProperties.title = title
             this._controls.displayUpdater.musicProperties.artist = author
+            this._controls.displayUpdater.musicProperties.albumTitle = album
             this._controls.displayUpdater.thumbnail = RandomAccessStreamReference.createFromUri(
                 new Uri(cover)
             )
-            this._controls.displayUpdater.musicProperties.albumTitle = album
+
             this._controls.displayUpdater.update()
         }
     }

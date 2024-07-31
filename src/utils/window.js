@@ -1,7 +1,58 @@
 const { screen, ipcMain } = require('electron')
+const { isWindows, isMac, isLinux } = require('./systemInfo')
+const electronStore = require('electron-store')
+const store = new electronStore()
+const __ = require('../providers/translateProvider')
 
 function create() {
     // for create window
+}
+
+// lifted code from: https://dev.to/craftzdog/how-to-check-if-a-browser-window-is-inside-of-screens-on-electron-1eme
+function getMiniplayerWindowBounds(windowPosition, windowSize) {
+    return new Promise((resolve, reject) => {
+        try {
+            const displays = screen.getAllDisplays()
+            const isWithinDisplayBounds = displays.reduce((result, display) => {
+                const area = display.workArea
+                if (
+                    windowPosition === undefined ||
+                    windowPosition[0] == null ||
+                    windowPosition[1] == null
+                ) {
+                    return false
+                } else {
+                    return (
+                        result ||
+                        (windowPosition[0] >= area.x &&
+                            windowPosition[1] >= area.y &&
+                            windowPosition[0] < area.x + area.width &&
+                            windowPosition[1] < area.y + area.height)
+                    )
+                }
+            }, false)
+
+            if (!isWithinDisplayBounds) {
+                const primaryScreenBounds = screen.getPrimaryDisplay().bounds
+                const x = Math.floor(
+                    (primaryScreenBounds.width - windowSize) / 2
+                )
+                const y = Math.floor(
+                    (primaryScreenBounds.height - windowSize) / 2
+                )
+
+                resolve({
+                    x: x,
+                    y: y,
+                })
+            } else {
+                reject('display is within bounds')
+            }
+        } catch (err) {
+            console.log('error -> getMiniplayerWindowBounds', err)
+            reject(null)
+        }
+    })
 }
 
 function checkWindowPosition(windowPosition, windowSize) {
@@ -12,57 +63,42 @@ function checkWindowPosition(windowPosition, windowSize) {
                 return
             }
 
-            let nearestDisplay = screen.getDisplayMatching({
-                x: windowPosition.x,
-                y: windowPosition.y,
-                width: windowSize.width,
-                height: windowSize.height,
-            })
-            let nearestDisplayBounds = nearestDisplay.bounds
+            const displays = screen.getAllDisplays()
+            const isWithinDisplayBounds = displays.reduce((result, display) => {
+                const area = display.workArea
+                if (
+                    windowPosition === undefined ||
+                    windowPosition.x == null ||
+                    windowPosition.y == null
+                ) {
+                    return false
+                } else {
+                    return (
+                        result ||
+                        (windowPosition.x >= area.x &&
+                            windowPosition.y >= area.y &&
+                            windowPosition.x < area.x + area.width &&
+                            windowPosition.y < area.y + area.height)
+                    )
+                }
+            }, false)
 
-            var position = {
-                x: windowPosition.x,
-                y: windowPosition.y,
+            if (!isWithinDisplayBounds) {
+                const primaryScreenBounds = screen.getPrimaryDisplay().bounds
+                const x = Math.floor(
+                    (primaryScreenBounds.width - windowSize.width) / 2
+                )
+                const y = Math.floor(
+                    (primaryScreenBounds.height - windowSize.height) / 2
+                )
+
+                resolve({
+                    x: x,
+                    y: y,
+                })
+            } else {
+                resolve(windowPosition)
             }
-
-            // The reason for + 64 in window sizes is because 1px inside nearest display is considered visible but not user friendly as it's quite well hidden and could prevent dragging
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.x - (windowSize.width + 64) >
-                    nearestDisplayBounds.x
-            ) {
-                position.x = windowPosition.x - nearestDisplayBounds.width
-            }
-
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.x + (windowSize.width + 64) <
-                    nearestDisplayBounds.x
-            ) {
-                position.x = windowPosition.x + nearestDisplayBounds.width
-            }
-
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.y - (windowSize.height + 64) >
-                    nearestDisplayBounds.y
-            ) {
-                position.y = windowPosition.y - nearestDisplayBounds.height
-            }
-
-            if (
-                windowPosition &&
-                windowSize &&
-                windowPosition.y + (windowSize.height + 64) <
-                    nearestDisplayBounds.y
-            ) {
-                position.y = windowPosition.y + nearestDisplayBounds.height
-            }
-
-            resolve(position)
         } catch (err) {
             console.log('error -> checkWindowPosition', err)
             reject(false)
@@ -79,8 +115,48 @@ function doBehavior(mainWindow) {
     else ipcMain.emit('window', { command: 'restore-main-window' })
 }
 
+function handleWindowButtonsInit() {
+    const winElement = document.getElementById('win')
+    const macElement = document.getElementById('mac')
+
+    let webviewElem = document.getElementById('webview')
+    let iframeElem = document.getElementById('iframe')
+    let contentElem = document.getElementById('content')
+
+    if (store.get('titlebar-type', 'nice') !== 'nice') {
+        document.getElementById('nice-titlebar').style.display = 'none'
+
+        if (webviewElem) webviewElem.style.height = '100vh'
+        if (iframeElem) iframeElem.style.height = '100vh'
+    } else {
+        if (isMac()) {
+            if (winElement) winElement.remove()
+            if (macElement) macElement.classList.remove('hide')
+        } else if (isWindows()) {
+            if (macElement) macElement.remove()
+            if (winElement) winElement.classList.remove('hide')
+        } else if (isLinux()) {
+            if (winElement) winElement.remove()
+            if (macElement) macElement.remove()
+        }
+        if (webviewElem) webviewElem.style.height = '95vh'
+        if (iframeElem) iframeElem.style.height = '95vh'
+        if (contentElem) contentElem.style.marginTop = '10vh'
+    }
+}
+
+function updateWindowTitle() {
+    let windowTitleElem = document.getElementById('window-title')
+    let windowTitleLabel = windowTitleElem.innerText
+    let translatedTitle = __.trans(windowTitleLabel)
+    windowTitleElem.innerText = translatedTitle
+}
+
 module.exports = {
     create: create,
     checkWindowPosition: checkWindowPosition,
     doBehavior: doBehavior,
+    getMiniplayerWindowBounds: getMiniplayerWindowBounds,
+    handleWindowButtonsInit: handleWindowButtonsInit,
+    updateWindowTitle: updateWindowTitle,
 }

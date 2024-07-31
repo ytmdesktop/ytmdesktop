@@ -24,12 +24,11 @@ window.addEventListener('load', () => {
 
     const { hostname } = window.location
     if (hostname === 'music.youtube.com') {
-        createTopMiddleContent()
+        createHistoryButtons()
         createTopRightContent()
         createBottomPlayerBarContent()
         playerBarScrollToChangeVolume()
         enableAVSwitcher()
-
     } else createOffTheRoadContent()
 
     // injectCast()
@@ -115,6 +114,11 @@ function createContextMenu() {
 
                 .ytmd-icons {
                     margin: 0 18px 0 2px !important;
+                    color: rgba(255, 255, 255, 0.5) !important;
+                }
+
+                .history-icons {
+                    margin: 0 10px 0 0 !important;
                     color: rgba(255, 255, 255, 0.5) !important;
                 }
 
@@ -222,7 +226,7 @@ function createContextMenu() {
     try {
         const menuDiv = document.createElement('div')
         menuDiv.setAttribute('id', 'ytmd-menu')
-        menuDiv.innerHTML = quickShortcuts
+        menuDiv.innerHTML = getTrustedHTML(quickShortcuts)
         document.body.prepend(menuDiv)
     } catch (err) {
         console.error(err)
@@ -318,11 +322,16 @@ function createContextMenu() {
     }
 }
 
-function createTopMiddleContent() {
+function getTrustedHTML(htmlText) {
+    const escapeHTMLPolicy = trustedTypes.createPolicy('forceInner', {
+        createHTML: (to_escape) => to_escape,
+    })
+    return escapeHTMLPolicy.createHTML(htmlText)
+}
+
+function createHistoryButtons() {
     try {
-        const center_content = document.getElementsByTagName(
-            'ytmusic-pivot-bar-renderer'
-        )[0]
+        const search_box = document.getElementsByClassName('center-content')[0]
 
         // HISTORY BACK
         const back_element = document.createElement('i')
@@ -331,8 +340,7 @@ function createTopMiddleContent() {
             'material-icons',
             'pointer',
             'shine',
-            'ytmd-icons',
-            'center-content'
+            'history-icons'
         )
         back_element.innerText = 'keyboard_backspace'
 
@@ -347,8 +355,7 @@ function createTopMiddleContent() {
             'material-icons',
             'pointer',
             'shine',
-            'ytmd-icons',
-            'center-content'
+            'history-icons'
         )
         forward_element.style.cssText = 'transform: rotate(180deg);'
         forward_element.innerText = 'keyboard_backspace'
@@ -357,13 +364,13 @@ function createTopMiddleContent() {
             history.forward()
         })
 
-        center_content.prepend(forward_element)
-        center_content.prepend(back_element)
+        search_box.prepend(forward_element)
+        search_box.prepend(back_element)
     } catch (err) {
         console.error(err)
         ipcRenderer.send('log', {
             type: 'warn',
-            data: 'error on createTopMiddleContent',
+            data: 'error on createBackButton',
         })
     }
 }
@@ -574,7 +581,7 @@ function createBottomPlayerBarContent() {
                         value
                             .querySelector('g path:not([fill])')
                             .getAttribute('d') ===
-                        'M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z'
+                        'M22,13h-4v4h-2v-4h-4v-2h4V7h2v4h4V13z M14,7H2v1h12V7z M2,12h8v-1H2V12z M2,16h8v-1H2V16z'
                 )[0]
                 .querySelector('a')
             addPlaylist.click()
@@ -678,15 +685,13 @@ function createBottomPlayerBarContent() {
                 ) {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'check'
-                    document.querySelector(
-                        '#ytmd_add_to_library'
-                    ).title = translate('REMOVE_FROM_LIBRARY')
+                    document.querySelector('#ytmd_add_to_library').title =
+                        translate('REMOVE_FROM_LIBRARY')
                 } else {
                     document.querySelector('#ytmd_add_to_library').innerText =
                         'library_add'
-                    document.querySelector(
-                        '#ytmd_add_to_library'
-                    ).title = translate('ADD_TO_LIBRARY')
+                    document.querySelector('#ytmd_add_to_library').title =
+                        translate('ADD_TO_LIBRARY')
                 }
                 document
                     .querySelector('#btn_ytmd_add_to_library')
@@ -770,7 +775,7 @@ function createBottomPlayerBarContent() {
         elementSleepTimerModal.id = 'ytmd_sleeptimer_modal'
         elementSleepTimerModal.append(elementSleepTimerModalContent)
 
-        elementSleepTimerModalContent.innerHTML = `
+        elementSleepTimerModalContent.innerHTML = getTrustedHTML(`
                 <p class="ytmd-modal-content-title">${translate(
                     'SLEEPTIMER'
                 )}</p>
@@ -808,7 +813,7 @@ function createBottomPlayerBarContent() {
                         'SLEEPTIMER_SONGS'
                     )}</>
                 </div>
-        `
+        `)
         elementSleepTimerModalContent.append(elementSleepTimerSet)
         elementSleepTimerModalContent.append(elementSleepTimerClear)
 
@@ -827,7 +832,7 @@ function createBottomPlayerBarContent() {
             }, 10) // animation
         })
 
-        elementSleepTimerCloseModal.innerHTML = '&times;'
+        elementSleepTimerCloseModal.innerHTML = getTrustedHTML('&times;')
         elementSleepTimerCloseModal.classList.add('ytmd-modal-close')
         elementSleepTimerCloseModal.addEventListener('click', () => {
             elementSleepTimerModal.style.display = 'none'
@@ -860,27 +865,25 @@ function createBottomPlayerBarContent() {
         playerBarRightControls.append(elementSleepTimer)
         document.body.append(elementSleepTimerModal)
 
-        document.getElementById(
-            'sleep-timer-minutes'
-        ).onkeydown = document.getElementById(
-            // use the same function when change/keydown
-            'sleep-timer-minutes'
-        ).onchange = (e) => {
-            var radio = document.getElementById('sleep-timer-customized')
-            radio.checked = true
-            radio.value = parseInt(e.target.value)
-        }
+        document.getElementById('sleep-timer-minutes').onkeydown =
+            document.getElementById(
+                // use the same function when change/keydown
+                'sleep-timer-minutes'
+            ).onchange = (e) => {
+                var radio = document.getElementById('sleep-timer-customized')
+                radio.checked = true
+                radio.value = parseInt(e.target.value)
+            }
 
-        document.getElementById(
-            'sleep-timer-songs'
-        ).onkeydown = document.getElementById('sleep-timer-songs').onchange = (
-            // use the same function when change/keydown
-            e
-        ) => {
-            var radio = document.getElementById('sleep-timer-customized-c')
-            radio.checked = true
-            radio.value = parseInt(e.target.value) + 'c'
-        }
+        document.getElementById('sleep-timer-songs').onkeydown =
+            document.getElementById('sleep-timer-songs').onchange = (
+                // use the same function when change/keydown
+                e
+            ) => {
+                var radio = document.getElementById('sleep-timer-customized-c')
+                radio.checked = true
+                radio.value = parseInt(e.target.value) + 'c'
+            }
 
         ipcRenderer.on('sleep-timer-info', (_, mode, counter) => {
             if (mode == 'time') {

@@ -78,7 +78,10 @@ async function retrieveAllInfo() {
         ipcRenderer
             .invoke('invoke-all-info')
             .then((result) => resolve(result))
-            .catch((_) => reject(false))
+            .catch((_) => {
+                console.error(_)
+                reject(false)
+            })
     })
 }
 

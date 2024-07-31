@@ -1,4 +1,4 @@
-const clientId = '495666957501071390'
+const clientId = '1231024252195704844'
 const RPC = require('discord-rpc')
 const settingsProvider = require('./settingsProvider')
 
@@ -41,7 +41,9 @@ async function setActivity(info) {
     if (isStarted() && info.track.title) {
         const now = Date.now()
         const activity = {}
-        const discordSettings = settingsProvider.get('discord-presence-settings')
+        const discordSettings = settingsProvider.get(
+            'discord-presence-settings'
+        )
 
         if (discordSettings.details) activity.details = info.track.title
 
@@ -69,6 +71,7 @@ async function setActivity(info) {
         activity.largeImageText = 'YouTube Music'
         activity.smallImageText = info.player.isPaused ? 'Paused' : 'Playing'
         activity.instance = false
+        activity.type = 2 // 'Listening To' - but doesn't seem to work
         if (discordSettings.details) {
             activity.buttons = [
                 {
@@ -78,7 +81,10 @@ async function setActivity(info) {
             ]
         }
 
-        if ((!discordSettings.hideIdle && info.player.isPaused) || info.track.isAdvertisement) {
+        if (
+            (!discordSettings.hideIdle && info.player.isPaused) ||
+            info.track.isAdvertisement
+        ) {
             await client.clearActivity()
         } else {
             // As of writing this discord-rpc was not updated to support buttons with setActivity
@@ -99,6 +105,7 @@ async function setActivity(info) {
                     },
                     instance: activity.instance,
                     buttons: activity.buttons,
+                    type: activity.type,
                 },
             })
         }

@@ -194,9 +194,8 @@ function createThumbar(mainWindow, mediaInfo) {
                 flags: !hasId ? ['disabled'] : [],
             },
         ])
-        mainWindow.setSkipTaskbar(false)
     } catch (e) {
-        //console.log(e);
+        console.error(e)
     }
 }
 

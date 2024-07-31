@@ -22,6 +22,44 @@
     </head>
 
     <body>
+        <div id="nice-titlebar" class="bar drag">
+            <div id="mac" class="hide no-drag">
+                <span id="window-title" class="hide"></span>
+                <!-- <div class="col s6 center">
+                    <div class="title">
+                        <i class="material-icons tiny" id="icon"></i>
+                    </div>
+                </div> -->
+            </div>
+
+            <div id="win" class="hide">
+                <div class="row">
+                    <div class="col s9 left-align">
+                        <div class="title">
+                            <i
+                                class="material-icons tiny tiny-margin left"
+                                id="icon"
+                                >settings</i
+                            >
+                            <span id="window-title"
+                                >LABEL_SETTINGS_DISCORD</span
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col s3 right-align">
+                        <div
+                            class="no-drag pointer cmd-btn hover-red"
+                            id="btn-close"
+                        >
+                            <i class="material-icons tiny" title="Close"
+                                >close</i
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="content" class="ml-1">
             <div class="row">
                 <div class="col s12 mt-1">
@@ -111,6 +149,7 @@
 
         <script src="../../../../../src/assets/js/materialize.min.js"></script>
         <script>
+            require('../../../shared/window-buttons/window-buttons.js')
             require('./discord_settings.js')
         </script>
     </body>

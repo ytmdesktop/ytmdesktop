@@ -70,6 +70,7 @@ Navigate to [ytmdesktop-locales](https://github.com/ytmdesktop/ytmdesktop-locale
 [<img alt="vbackeberg" src="https://github.com/vbackeberg.png?size=120" width="120px"/>](https://github.com/vbackeberg)
 [<img alt="Vistaus" src="https://github.com/Vistaus.png?size=120" width="120px"/>](https://github.com/vistaus)
 [<img alt="ddarkr" src="https://github.com/ddarkr.png?size=120" width="120px"/>](https://github.com/ddarkr)
+[<img alt="guywmustang" src="https://github.com/guywmustang.png?size=120" width="120px"/>](https://github.com/guywmustang)
 
 [discord-img]: https://img.shields.io/badge/Discord-JOIN-GREEN.svg?style=for-the-badge&logo=discord
 [discord-url]: https://discord.gg/88P2n2a

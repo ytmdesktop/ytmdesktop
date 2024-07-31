@@ -1,9 +1,9 @@
 const { ipcMain } = require('electron')
-const isDev = require('electron-is-dev')
 const i18n = require('i18n')
 var http = require('https')
 var fs = require('fs')
 const settingsProvider = require('./settingsProvider')
+const isRenderer = require('is-electron-renderer')
 
 const defaultLocale = settingsProvider.get('settings-app-language') || 'en'
 
@@ -18,35 +18,55 @@ console.log(
 console.log('[!] ' + localesPath + ' to modify the your locale file.')
 console.log('[!] Then kindly open a PR to ytmdesktop-locales repo. :)')
 
+function isDev() {
+    return require('electron-is-dev')
+}
+
 var updateLocaleFile = function (locale, cb, force = false) {
     // for developer, skip auto update to prevent data loss
-    if (isDev && !force) {
+    if (!isRenderer && isDev() && !force) {
         console.log('[!]Skip i18n auto-update in development mode')
-        // updateLocaleFile(locale, cb, true)
+        updateLocaleFile(locale, cb, true)
         console.log(
             '[!]You may force update i18n by uncomment previous line in `src/providers/translateProvider`'
         )
         return
     }
-    // console.log('downloading locale file for:' + locale);
+    console.log('downloading locale file for locale:' + locale)
     dest = `${localesPath}/${locale}.json`
-    var file = fs.createWriteStream(dest)
+    console.log('desintation path: ' + dest)
     var request = http
         .get(
-            `https://raw.githubusercontent.com/ytmdesktop/ytmdesktop-locales/master/locales/${locale}.json`,
+            `https://raw.githubusercontent.com/guywmustang/ytmdesktop-locales/master/locales/${locale}.json`,
             function (response) {
+                console.log('statusCode:', response.statusCode)
+
                 let body = ''
-                response.on('data', function (chunk) {
-                    body += chunk
-                })
-                response.on('end', function () {
-                    file.write(body)
-                    file.close()
-                })
+                if (response.statusCode && response.statusCode == 200) {
+                    response.on('data', function (chunk) {
+                        body += chunk
+                    })
+                    response.on('end', function () {
+                        var file = fs.createWriteStream(dest)
+                        file.write(body)
+                        file.close()
+                        console.log('Locale file written:', dest)
+                    })
+                } else if (response.statusCode) {
+                    console.log(
+                        'Invalid status code to update locales:',
+                        response.statusCode
+                    )
+                } else {
+                    console.log(
+                        'Unable to update locales, no status code available'
+                    )
+                }
             }
         )
         .on('error', function (err) {
             // Handle errors
+            console.log('error making http request for locales:', err)
             fs.unlink(dest) // Delete the file async. (But we don't check the result)
             if (cb) cb(err.message)
         })
