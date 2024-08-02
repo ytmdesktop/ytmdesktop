@@ -10,7 +10,7 @@ import { DiscordActivityType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
-function getBestThumbnail(thumbnails: Thumbnail[]): string {
+function getHighestResThumbnail(thumbnails: Thumbnail[]) {(thumbnails: Thumbnail[]): string {
   let currentWidth = 0;
   let currentHeight = 0;
   let url = null;
@@ -84,7 +84,7 @@ export default class DiscordPresence implements IIntegration {
   private setActivity() {
     if (!this.videoDetails) return;
     const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
-    const thumbnail: string | null = getBestThumbnail(thumbnails);
+    const thumbnail: string | null = getHighestResThumbnail(thumbnails);
 
     this.discordClient.setActivity({
       type: this.store.get("integrations").discordPresenceListening ? DiscordActivityType.Listening : DiscordActivityType.Game,
