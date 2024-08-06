@@ -71,11 +71,12 @@ export type PlayerState = {
 };
 
 enum YTMVideoState {
-  UnknownNegativeOne = -1,
+  Unstarted = -1,
+  Ended = 0,
   Playing = 1,
   Paused = 2,
   Buffering = 3,
-  UnknownFive = 5
+  VideoCued = 5
 }
 
 type YTMThumbnail = {
