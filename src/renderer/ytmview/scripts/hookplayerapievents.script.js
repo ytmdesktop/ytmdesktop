@@ -37,7 +37,7 @@
         hasFullMetadata = true;
 
         // Fill out video details with better information
-        videoDetails.title = currentItem.title.runs.join(""); // Can contain featuring text which isn't in player response
+        videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
         videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
 
         for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
