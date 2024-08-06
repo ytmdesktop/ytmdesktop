@@ -29,13 +29,16 @@
       let videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
       let playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
       let album = null;
+      let hasFullMetadata = false;
 
+      // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
       let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
       if (currentItem !== null && currentItem !== undefined) {
-        if (videoDetails.musicVideoType === "MUSIC_VIDEO_TYPE_PODCAST_EPISODE") {
-          // Thumbnails are not provided on the video details for a podcast
-          videoDetails.thumbnail = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem.thumbnail;
-        }
+        hasFullMetadata = true;
+
+        // Fill out video details with better information
+        videoDetails.title = currentItem.title.runs.join(""); // Can contain featuring text which isn't in player response
+        videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
 
         for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
           const item = currentItem.longBylineText.runs[i];
@@ -57,7 +60,7 @@
       
       const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
 
-      window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus);
+      window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
     }
   });
   ytmStore.subscribe(() => {

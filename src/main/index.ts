@@ -1584,13 +1584,13 @@ app.on("ready", async () => {
     playerStateStore.updateVideoState(state);
   });
 
-  ipcMain.on("ytmView:videoDataChanged", (event, videoDetails, playlistId, album, likeStatus) => {
+  ipcMain.on("ytmView:videoDataChanged", (event, videoDetails, playlistId, album, likeStatus, hasFullMetadata) => {
     if (event.sender !== ytmView.webContents) return;
 
     lastVideoId = videoDetails.videoId;
     lastPlaylistId = playlistId;
 
-    playerStateStore.updateVideoDetails(videoDetails, playlistId, album, likeStatus);
+    playerStateStore.updateVideoDetails(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
   });
 
   ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying) => {

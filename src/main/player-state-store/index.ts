@@ -68,6 +68,7 @@ export type PlayerState = {
   volume: number;
   muted: boolean;
   adPlaying: boolean;
+  hasFullMetadata: boolean;
 };
 
 enum YTMVideoState {
@@ -250,6 +251,7 @@ class PlayerStateStore {
   private volume: number = 0;
   private muted: boolean = false;
   private adPlaying: boolean = false;
+  private hasFullMetadata: boolean = false;
   private eventEmitter = new EventEmitter();
 
   constructor() {
@@ -267,7 +269,8 @@ class PlayerStateStore {
       videoProgress: this.videoProgress,
       volume: this.volume,
       muted: this.muted,
-      adPlaying: this.adPlaying
+      adPlaying: this.adPlaying,
+      hasFullMetadata: this.hasFullMetadata
     };
   }
 
@@ -309,7 +312,13 @@ class PlayerStateStore {
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
-  public updateVideoDetails(videoDetails: YTMVideoDetails, playlistId: string, album: { id: string; text: string } | null, likeStatus: YTMLikeStatus) {
+  public updateVideoDetails(
+    videoDetails: YTMVideoDetails,
+    playlistId: string,
+    album: { id: string; text: string } | null,
+    likeStatus: YTMLikeStatus,
+    hasFullMetadata: boolean
+  ) {
     this.videoDetails = {
       author: videoDetails.author,
       channelId: videoDetails.channelId,
@@ -322,6 +331,7 @@ class PlayerStateStore {
       id: videoDetails.videoId
     };
     this.playlistId = playlistId;
+    this.hasFullMetadata = hasFullMetadata;
     this.eventEmitter.emit("stateChanged", this.getState());
   }
 
