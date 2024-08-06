@@ -1,10 +1,11 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'text' | 'custom'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
   checkbox: boolean;
   file: string;
   range: number;
+  text: string;
   custom: never;
 };
 
@@ -24,7 +25,7 @@ const props = defineProps<{
   flexColumn?: boolean;
   beta?: boolean;
 }>();
-const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
+const emit = defineEmits(["update:modelValue", "file-change", "change", "input", "clear"]);
 
 const value = computed({
   get() {
