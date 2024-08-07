@@ -45,6 +45,7 @@ export default class SlackStatus implements IIntegration {
         status_expiration: newUnixTimestamp
       };
     }
+    if (!this.slackUserToken) return;
     fetch("https://slack.com/api/users.profile.set", {
       headers: {
         "Authorization": `Bearer ${this.slackUserToken}`,
