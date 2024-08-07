@@ -25,7 +25,7 @@ const props = defineProps<{
   flexColumn?: boolean;
   beta?: boolean;
 }>();
-const emit = defineEmits(["update:modelValue", "file-change", "change", "input", "clear"]);
+const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
 const value = computed({
   get() {
