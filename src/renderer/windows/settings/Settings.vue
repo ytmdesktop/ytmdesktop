@@ -437,7 +437,6 @@ window.ytmd.handleUpdateDownloaded(() => {
             @change="settingsChanged"
           />
           <YTMDSetting v-model="slackEnabled" type="checkbox" name="Slack" @change="settingsChanged" />
-          <i v-if="slackEnabled">You must create a Slack app and generate a user token to use slack integration</i>
           <YTMDSetting
             v-if="slackEnabled"
             v-model="slackUserToken"

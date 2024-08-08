@@ -1,7 +1,8 @@
-import playerStateStore, { PlayerState, VideoDetails } from "../../player-state-store";
+import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 import { StoreSchema } from "~shared/store/schema";
 import Conf from "conf";
+import { PostType } from "../../@types/slack";
 
 export default class SlackStatus implements IIntegration {
   private store: Conf<StoreSchema>;
@@ -12,8 +13,9 @@ export default class SlackStatus implements IIntegration {
   private slackUserToken: string = "";
 
   private async playerStateChanged(state: PlayerState) {
+    if (!this.enabled) return;
     const { secondsTillClearStatus } = await this.store.get("slack");
-    if (state.trackState === 1 && state.videoDetails) {
+    if (state.trackState === VideoState.Playing && state.videoDetails) {
       if (!state.adPlaying) {
         if (this.statusTimeoutId) clearTimeout(this.statusTimeoutId);
         if (this.currentVideoId === state.videoDetails.id) {
@@ -29,23 +31,17 @@ export default class SlackStatus implements IIntegration {
     }
   }
   private updateSlackStatus(clear: boolean, data: VideoDetails) {
-    const message = `Listening To: ${data.title} | ${data.author}`;
-    let postData: { status_text: string; status_emoji: string; status_expiration: number } = {
+    const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+    const clearPostData: PostType = {
       status_text: "",
       status_emoji: "",
       status_expiration: 0
     };
-    if (!clear) {
-      const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-      // Add 15 minutes (15 * 60 seconds)
-      const newUnixTimestamp = currentUnixTimestamp + 15 * 60;
-      postData = {
-        status_text: message,
-        status_emoji: ":notes:",
-        status_expiration: newUnixTimestamp
-      };
-    }
-    if (!this.slackUserToken) return;
+    const listeningToPostData: PostType = {
+      status_text: `Listening To: ${data.title} | ${data.author}`,
+      status_emoji: ":notes:",
+      status_expiration: currentUnixTimestamp + 15 * 60
+    };
     fetch("https://slack.com/api/users.profile.set", {
       headers: {
         "Authorization": `Bearer ${this.slackUserToken}`,
@@ -53,7 +49,7 @@ export default class SlackStatus implements IIntegration {
       },
       method: "POST",
       body: JSON.stringify({
-        profile: postData
+        profile: clear ? clearPostData : listeningToPostData
       })
     });
   }
@@ -61,8 +57,9 @@ export default class SlackStatus implements IIntegration {
     this.store = store;
   }
   public async enable(): Promise<void> {
-    this.enabled = true;
     const { slackUserToken } = await this.store.get("slack");
+    if (!slackUserToken) return;
+    this.enabled = true;
     this.slackUserToken = slackUserToken;
     this.stateCallback = event => {
       this.playerStateChanged(event);
