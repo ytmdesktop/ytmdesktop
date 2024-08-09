@@ -1358,9 +1358,6 @@ app.on("ready", async () => {
         if ("settings-discord-rich-presence" in v1Config) {
           store.set("integrations.discordPresenceEnabled", v1Config["settings-discord-rich-presence"]);
         }
-        if ("settings-slack-status" in v1Config) {
-          store.set("integrations.slackEnabled", v1Config["slack-status"]);
-        }
 
         if ("settings-page-zoom" in v1Config) {
           store.set("appearance.zoom", v1Config["settings-page-zoom"]);
