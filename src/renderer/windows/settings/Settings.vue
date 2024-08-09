@@ -60,7 +60,7 @@ const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionSe
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 const slackEnabled = ref<boolean>(integrations.slackEnabled);
-const slackUserToken = ref<string>(slack.slackUserToken);
+const slackUserToken = ref<string>(await safeStorage.decryptString(slack.slackUserToken));
 const secondsTillClearStatus = ref<number>(slack.secondsTillClearStatus);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
@@ -110,7 +110,7 @@ store.onDidAnyChange(async newState => {
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
 
-  slackUserToken.value = newState.slack.slackUserToken;
+  slackUserToken.value = await safeStorage.decryptString(newState.slack.slackUserToken);
   secondsTillClearStatus.value = newState.slack.secondsTillClearStatus;
 });
 
@@ -173,7 +173,6 @@ async function settingsChanged() {
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
   store.set("integrations.slackEnabled", slackEnabled.value);
-  store.set("slack.slackUserToken", slackUserToken.value);
   store.set("slack.secondsTillClearStatus", secondsTillClearStatus.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
@@ -183,6 +182,15 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+}
+async function storeSlackUserToken() {
+  const encrypted = (await safeStorage.encryptString(slackUserToken.value)).toString("hex");
+  if (slackUserToken.value !== "") store.set("slack.slackUserToken", encrypted);
+  // save and restart slack integration
+  slackEnabled.value = false;
+  await settingsChanged();
+  slackEnabled.value = true;
+  await settingsChanged();
 }
 
 async function settingChangedRequiresRestart() {
@@ -444,7 +452,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             class="settings indented"
             type="text"
             name="Slack User Token:"
-            @change="settingsChanged"
+            @change="storeSlackUserToken"
           />
           <YTMDSetting
             v-if="slackEnabled"
