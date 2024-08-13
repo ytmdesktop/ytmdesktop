@@ -394,16 +394,14 @@ window.ytmd.handleUpdateDownloaded(() => {
               <td>No authorized companions</td>
             </div>
           </YTMDSetting>
-          <div>
-            <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
-            <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
-              <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
-              <button @click="restartDiscordPresence">Retry</button>
-            </div>
-            <div v-if="discordPresenceEnabled">
-              <YTMDSetting v-model="discordPresenceListening" type="checkbox" name="Discord presence listening" @change="settingsChanged" />
-              <div v-if="discordPresenceListening" class="setting indented"></div>
-            </div>
+          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
+          <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
+            <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
+            <button @click="restartDiscordPresence">Retry</button>
+          </div>
+          <div v-if="discordPresenceEnabled">
+            <YTMDSetting v-model="discordPresenceListening" type="checkbox" name="Discord presence listening" @change="settingsChanged" />
+            <div v-if="discordPresenceListening" class="setting indented"></div>
           </div>
           <YTMDSetting
             v-model="lastFMEnabled"
