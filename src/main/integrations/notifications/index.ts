@@ -49,7 +49,7 @@ function displayNotification(videoDetails: VideoDetails, imageData: string) {
  */
 function getUrlContents(url: string) {
   return new Promise((resolve, reject) => {
-    https.get(url, res => {
+    const request = https.get(url, res => {
       const data: Array<Buffer> = [];
       res.on("data", chunk => {
         data.push(chunk);
@@ -61,6 +61,10 @@ function getUrlContents(url: string) {
       res.on("error", err => {
         reject(err);
       });
+    });
+
+    request.on("error", function (e) {
+      reject(e);
     });
   });
 }
