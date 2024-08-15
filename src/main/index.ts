@@ -432,7 +432,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
 
   // General
-  if (newState.general.showNotificationOnSongChange) {
+  if (newState.general.showNotificationOnSongChange && !oldState.general.showNotificationOnSongChange) {
     nowPlayingNotifications.enable();
     log.info("Integration enabled: Now playing notifications");
   } else if (!newState.general.showNotificationOnSongChange && oldState.general.showNotificationOnSongChange) {
