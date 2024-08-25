@@ -97,7 +97,6 @@ if (props.isMainWindow) {
         <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
           <span class="material-symbols-outlined">home</span>
         </button>
-        <span class="divider"></span>
         <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
@@ -146,7 +145,6 @@ if (props.isMainWindow) {
 }
 
 .titlebar .right .app-buttons {
-  margin-right: 4px;
   display: flex;
   flex-direction: row;
 }
@@ -158,16 +156,16 @@ if (props.isMainWindow) {
 }
 
 .title .icon {
-  margin-left: 4px;
-  margin-right: 4px;
-  font-size: 24px;
+  margin-left: 8px;
+  margin-right: 8px;
+  font-size: 13px;
   font-variation-settings:
     "FILL" 0,
     "wght" 100,
     "GRAD" 0,
     "opsz" 24;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
 }
 
 .title-text {
@@ -175,11 +173,12 @@ if (props.isMainWindow) {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
+  font-size: 13px;
 }
 
 .app-button {
-  width: 28px;
-  height: 28px;
+  height: 35px;
+  width: 44px;
   background: none;
   color: #bbbbbb;
   display: flex;
@@ -187,17 +186,13 @@ if (props.isMainWindow) {
   justify-content: center;
   -webkit-app-region: no-drag;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   font-variation-settings:
     "FILL" 0,
-    "wght" 100,
+    "wght" 200,
     "GRAD" 0,
     "opsz" 28;
   cursor: pointer;
-}
-
-.app-button:not(:last-child) {
-  margin-right: 4px;
 }
 
 .app-button:hover {
@@ -205,7 +200,8 @@ if (props.isMainWindow) {
 }
 
 .app-button > .material-symbols-outlined {
-  font-size: 28px;
+  font-size: 20px;
+  color: #b4b4b4;
 }
 
 .app-buttons .divider {
