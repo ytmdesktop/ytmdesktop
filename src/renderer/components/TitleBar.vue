@@ -166,6 +166,13 @@ if (props.isMainWindow) {
     "opsz" 24;
   width: 16px;
   height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title .icon.material-symbols-outlined {
+  font-size: 18px;
 }
 
 .title-text {
