@@ -180,7 +180,7 @@ if (props.isMainWindow) {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .app-button {
