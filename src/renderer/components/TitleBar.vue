@@ -147,6 +147,7 @@ if (props.isMainWindow) {
 .titlebar .right .app-buttons {
   display: flex;
   flex-direction: row;
+  margin-right: 16px;
 }
 
 .title {
@@ -184,8 +185,9 @@ if (props.isMainWindow) {
 }
 
 .app-button {
-  height: 35px;
-  width: 44px;
+  margin-right: 4px;
+  height: 28px;
+  width: 28px;
   background: none;
   color: #bbbbbb;
   display: flex;
@@ -193,7 +195,7 @@ if (props.isMainWindow) {
   justify-content: center;
   -webkit-app-region: no-drag;
   border: none;
-  border-radius: 0;
+  border-radius: 4px;
   font-variation-settings:
     "FILL" 0,
     "wght" 200,
