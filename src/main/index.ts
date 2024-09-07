@@ -988,7 +988,7 @@ const createYTMView = (): void => {
     webPreferences: {
       sandbox: true,
       contextIsolation: true,
-      partition: "persist:ytmview",
+      partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
       preload: YTM_VIEW_PRELOAD_WEBPACK_ENTRY,
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
@@ -1740,7 +1740,7 @@ app.on("ready", async () => {
   log.info("Setup IPC handlers");
 
   // Create the permission handlers
-  session.fromPartition("persist:ytmview").setPermissionCheckHandler((webContents, permission) => {
+  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionCheckHandler((webContents, permission) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return true;
@@ -1749,7 +1749,7 @@ app.on("ready", async () => {
 
     return false;
   });
-  session.fromPartition("persist:ytmview").setPermissionRequestHandler((webContents, permission, callback) => {
+  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionRequestHandler((webContents, permission, callback) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return callback(true);
