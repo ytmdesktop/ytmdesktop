@@ -57,6 +57,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 );
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
+const discordPresenceListening = ref<boolean>(integrations.discordPresenceListening);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
@@ -94,6 +95,7 @@ store.onDidAnyChange(async newState => {
     : [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
+  discordPresenceListening.value = newState.integrations.discordPresenceListening;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
@@ -163,6 +165,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
+  store.set("integrations.discordPresenceListening", discordPresenceListening.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
@@ -395,6 +398,10 @@ window.ytmd.handleUpdateDownloaded(() => {
           <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
             <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
             <button @click="restartDiscordPresence">Retry</button>
+          </div>
+          <div v-if="discordPresenceEnabled">
+            <YTMDSetting v-model="discordPresenceListening" type="checkbox" name="Discord presence listening" @change="settingsChanged" />
+            <div v-if="discordPresenceListening" class="setting indented"></div>
           </div>
           <YTMDSetting
             v-model="lastFMEnabled"
