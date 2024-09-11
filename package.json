@@ -73,6 +73,7 @@
     "fastify-socket.io": "^5.0.0",
     "material-symbols": "^0.12.0",
     "socket.io": "^4.7.5",
+    "unleash-client": "^6.1.1",
     "vue": "^3.4.21"
   },
   "lint-staged": {

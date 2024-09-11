@@ -34,7 +34,9 @@ export const mainConfig: Configuration = {
     new DefinePlugin({
       YTMD_DISABLE_UPDATES: false,
       YTMD_UPDATE_FEED_OWNER: `'${process.env.YTMD_UPDATE_FEED_OWNER}'` ?? "'ytmdesktop'",
-      YTMD_UPDATE_FEED_REPOSITORY: `'${process.env.YTMD_UPDATE_FEED_REPOSITORY}'` ?? "'ytmdesktop'"
+      YTMD_UPDATE_FEED_REPOSITORY: `'${process.env.YTMD_UPDATE_FEED_REPOSITORY}'` ?? "'ytmdesktop'",
+      YTMD_UNLEASH_SERVER: `'${process.env.YTMD_UNLEASH_SERVER}'` ?? "'https://gitlab.com/api/v4/feature_flags/unleash/59142964'",
+      YTMD_UNLEASH_INSTANCE_ID: `'${process.env.YTMD_UNLEASH_INSTANCE_ID}'` ?? "'glffct-YSac7uDgSYGNUXak2uzL'"
     }),
     {
       // This fixes issues with webpack where natives or other were not being properly configured and relocated because of an undefined variable in webpack
