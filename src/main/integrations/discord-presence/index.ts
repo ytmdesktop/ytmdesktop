@@ -138,12 +138,12 @@ export default class DiscordPresence implements IIntegration {
 
         const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
         this.discordClient.setActivity({
-          // Discord accepts Playing, Listening, and Watching. But ignores it and sets it to 0 (Playing)
-          // We'll still send a type in case Discord at some point updates to allow this
+          // Discord not accepts Listening + Progress, but you MUST include Start + End (to know the progress)
           type: DiscordActivityType.Listening,
           details: stringLimit(state.videoDetails.title, 128, 2),
           state: stringLimit(state.videoDetails.author, 128, 2),
           timestamps: {
+            start: state.trackState === VideoState.Playing ? adjustedTimeSeconds - videoProgress : undefined,
             end: state.trackState === VideoState.Playing ? this.endTimestamp : undefined
           },
           assets: {
