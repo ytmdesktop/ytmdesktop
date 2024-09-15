@@ -1,0 +1,33 @@
+dialog {
+  padding: 50px;
+  border-radius: 5px;
+  border: 0;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  &[open], &::backdrop {
+    animation: dialog_show 500ms ease;
+  }
+
+  #error-dialog {
+    background: rgb(255, 120, 120);
+  }
+
+  p {
+    white-space: pre-wrap;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+}
+
+@keyframes dialog_show {
+  0% {
+    opacity: 0;
+  }
+}

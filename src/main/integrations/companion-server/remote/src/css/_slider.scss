@@ -1,0 +1,103 @@
+.progress-bar {
+  position: relative;
+  left: -16px;
+  width: 100%;
+  transform: translateY(-50%);
+  margin-top: 32px;
+  cursor: pointer;
+  display: block;
+  --knob-color: #fff;
+  --knob-start-color: #fff;
+  --knob-start-border-color: #fff;
+  --active-color: #fff;
+  --secondary-color: rgba(255,255,255,0.5);
+  --container-color: rgba(255,255,255,0.2);
+}
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: calc(30px + 2px);
+  margin-left: calc(15px + 2px / 2);
+  margin-right: calc(15px + 2px / 2);
+  padding: 0 var(--slider-container-padding, 0);
+}
+.bar-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.sliderBar {
+  padding: 15px 0;
+  width: 100%;
+  background-color: var(--slider-bar-color, transparent);
+  --progress-container-color: var(--container-color, #bdbdbd);
+  --progress-height: 2px;
+  --progress-container-border-radius: 0;
+  --progress-container-overflow: visible;
+  --progress-container-transform: none;
+
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.progressContainer {
+  background: var(--progress-container-color, #e0e0e0);
+
+  position: relative;
+  height: var(--progress-height, 4px);
+  border-radius: var(--progress-container-border-radius, 0px);
+  overflow: var(--progress-container-overflow, visible);
+  transform: var(--progress-container-transform, none);
+}
+
+.progress {
+  background: #fff;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-transform-origin: left center;
+  transform-origin: left center;
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+.sliderKnobContainer {
+  position: relative;
+  width: calc(100% - 2px * 2);
+  margin: auto;
+}
+
+.sliderKnob {
+  touch-action: none;
+
+  position: absolute;
+  top: var(--paper-slider-knob-top, 0);
+  margin-left: calc(-15px - 2px / 2);
+  width: var(--knob-size, calc(30px + 2px));
+  height: var(--knob-size, calc(30px + 2px));
+}
+
+.slider-knob-inner {
+  margin: 10px;
+  width: var(--knob-inner-size, calc(100% - 20px));
+  height: var(--knob-inner-size, calc(100% - 20px));
+  background-color: var(--knob-color, #3367d6);
+  border: var(--knob-border-style, 2px solid var(--knob-color, #3367d6));
+  border-radius: 50%;
+  box-shadow: var(--knob-box-shadow-style, none);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  transition-property: -webkit-transform, background-color, border;
+  transition-property: transform, background-color, border;
+  transition-duration: 0.18s;
+  transition-timing-function: ease;
+}

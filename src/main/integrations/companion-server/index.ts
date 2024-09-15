@@ -1,7 +1,8 @@
 import IIntegration from "../integration";
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify, { FastifyInstance, FastifyRequest } from "fastify";
 import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
+import RemoteServer from "./remote";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import Conf from "conf";
 import { BrowserView, safeStorage } from "electron";
@@ -9,7 +10,7 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import { RemoteSocket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import cors from "@fastify/cors";
+import cors, { FastifyCorsOptions } from "@fastify/cors";
 import MemoryStore from "../../memory-store";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
@@ -25,8 +26,20 @@ export default class CompanionServer implements IIntegration {
 
   private createServer() {
     this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
-    this.fastifyServer.register(cors, {
-      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
+    this.fastifyServer.register(cors, () => {
+      return (req: FastifyRequest, callback: (error: Error | null, corsOptions?: FastifyCorsOptions) => void) => {
+        if (req.url.startsWith("/api")) {
+          callback(null, {
+            origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false)
+              ? "*"
+              : false
+          });
+        } else {
+          callback(null, {
+            origin: false
+          });
+        }
+      };
     });
     this.fastifyServer.register(FastifyIO, {
       transports: ["websocket"],
@@ -50,6 +63,11 @@ export default class CompanionServer implements IIntegration {
         return this.memoryStore;
       }
     });
+
+    this.fastifyServer.register(RemoteServer, {
+      prefix: "/remote"
+    });
+
     this.fastifyServer.setErrorHandler((error, request, reply) => {
       if (!isDefinedAPIError(error)) {
         if (!error.statusCode || error.statusCode >= 500) {

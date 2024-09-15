@@ -21,6 +21,14 @@ export enum LikeStatus {
   Like = 2
 }
 
+export enum VideoType {
+  Unknown = -1,
+  MusicAudio = 0,
+  MusicVideo = 1,
+  MusicUploaded = 2,
+  PodcastEpisode = 3
+}
+
 export type Thumbnail = {
   height: number;
   url: string;
@@ -37,6 +45,9 @@ export type VideoDetails = {
   title: string;
   id: string;
   likeStatus: LikeStatus;
+
+  videoType: VideoType;
+  isLive: boolean;
 };
 
 export type PlayerQueueItem = {
@@ -144,6 +155,9 @@ type YTMVideoDetails = {
   };
   title: string;
   videoId: string;
+
+  isLive: boolean;
+  musicVideoType: string;
 };
 
 function getYTMTextRun(runs: YTMTextRun[]) {
@@ -242,6 +256,30 @@ function transformLikeStatus(likeStatus: YTMLikeStatus) {
   }
 }
 
+function transformVideoType(videoType: string) {
+  switch (videoType) {
+    case "MUSIC_VIDEO_TYPE_ATV": {
+      return VideoType.MusicAudio;
+    }
+
+    case "MUSIC_VIDEO_TYPE_UGC": {
+      return VideoType.MusicVideo;
+    }
+
+    case "MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK": {
+      return VideoType.MusicUploaded;
+    }
+
+    case "MUSIC_VIDEO_TYPE_PODCAST_EPISODE": {
+      return VideoType.PodcastEpisode;
+    }
+
+    default: {
+      return VideoType.Unknown;
+    }
+  }
+}
+
 class PlayerStateStore {
   private videoProgress = 0;
   private state: VideoState = -1;
@@ -328,7 +366,9 @@ class PlayerStateStore {
       likeStatus: transformLikeStatus(likeStatus),
       thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
       durationSeconds: parseInt(videoDetails.lengthSeconds),
-      id: videoDetails.videoId
+      id: videoDetails.videoId,
+      videoType: transformVideoType(videoDetails.musicVideoType),
+      isLive: !!videoDetails.isLive
     };
     this.playlistId = playlistId;
     this.hasFullMetadata = hasFullMetadata;

@@ -72,7 +72,10 @@
     "fastify": "^4.26.2",
     "fastify-socket.io": "^5.0.0",
     "material-symbols": "^0.12.0",
+    "sass": "^1.76.0",
+    "sass-loader": "^14.2.1",
     "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.4.21"
   },
   "lint-staged": {
