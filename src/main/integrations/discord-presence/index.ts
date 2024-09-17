@@ -10,7 +10,7 @@ import { DiscordActivityType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
-function getHighestResThumbnail(thumbnails: Thumbnail[]): string {
+function getBestThumbnail(thumbnails: Thumbnail[]): string {
   let currentWidth = 0;
   let currentHeight = 0;
   let url = null;
@@ -82,15 +82,19 @@ export default class DiscordPresence implements IIntegration {
   private connectionRetries: number = 0;
 
   private setActivity() {
-    if (!this.videoDetails) return;
+    if (!this.videoDetails) {
+      this.discordClient.clearActivity();
+      return;
+    }
     const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
-    const thumbnail: string | null = getHighestResThumbnail(thumbnails);
+    const thumbnail: string | null = getBestThumbnail(thumbnails);
 
     this.discordClient.setActivity({
       type: this.store.get("integrations").discordPresenceListening ? DiscordActivityType.Listening : DiscordActivityType.Game,
       details: stringLimit(title, 128, 2),
       state: stringLimit(author, 128, 2),
       timestamps: {
+        start: this.videoState === VideoState.Playing ? Date.now() - this.progress * 1000 : undefined,
         end: this.videoState === VideoState.Playing ? Date.now() + (durationSeconds - this.progress) * 1000 : undefined
       },
       assets: {
@@ -133,7 +137,7 @@ export default class DiscordPresence implements IIntegration {
       if (
         this.videoDetails &&
         this.videoDetails.id &&
-        (oldState !== this.videoState || Math.abs(oldProgress - this.progress) > 5 || oldId !== this.videoDetails.id)
+        (oldState !== this.videoState || this.progress - oldProgress > 1 || oldProgress > this.progress || oldId !== this.videoDetails.id)
       )
         this.setActivity();
 
