@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: null
@@ -37,7 +37,7 @@ const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
 const windowFullscreen = ref(false);
 
-window.ytmd.handleWindowEvents((event, state) => {
+window.ytmd.handleWindowEvents(state => {
   windowMaximized.value = state.maximized;
   windowFullscreen.value = state.fullscreen;
 });
@@ -53,7 +53,7 @@ function restartApplicationForUpdate() {
 const ytmViewUnresponsive = ref<boolean>(false);
 const appUpdateDownloaded = ref<boolean>(false);
 
-if (props.isMainWindow) {
+/*if (props.isMainWindow) {
   const memoryStore = window.ytmd.memoryStore;
 
   onBeforeMount(async () => {
@@ -65,7 +65,7 @@ if (props.isMainWindow) {
     ytmViewUnresponsive.value = newState.ytmViewUnresponsive;
     appUpdateDownloaded.value = newState.appUpdateDownloaded;
   });
-}
+}*/
 </script>
 
 <template>

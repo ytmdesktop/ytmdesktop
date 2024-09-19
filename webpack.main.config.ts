@@ -33,8 +33,8 @@ export const mainConfig: Configuration = {
   plugins: [
     new DefinePlugin({
       YTMD_DISABLE_UPDATES: false,
-      YTMD_UPDATE_FEED_OWNER: `'${process.env.YTMD_UPDATE_FEED_OWNER}'` ?? "'ytmdesktop'",
-      YTMD_UPDATE_FEED_REPOSITORY: `'${process.env.YTMD_UPDATE_FEED_REPOSITORY}'` ?? "'ytmdesktop'"
+      YTMD_UPDATE_FEED_OWNER: process.env.YTMD_UPDATE_FEED_OWNER ? `'${process.env.YTMD_UPDATE_FEED_OWNER}'` : "'ytmdesktop'",
+      YTMD_UPDATE_FEED_REPOSITORY: process.env.YTMD_UPDATE_FEED_REPOSITORY ? `'${process.env.YTMD_UPDATE_FEED_REPOSITORY}'` : "'ytmdesktop'"
     }),
     {
       // This fixes issues with webpack where natives or other were not being properly configured and relocated because of an undefined variable in webpack

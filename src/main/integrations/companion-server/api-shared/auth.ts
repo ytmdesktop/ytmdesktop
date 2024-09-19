@@ -1,9 +1,8 @@
 import crypto from "crypto";
 import { safeStorage } from "electron";
-import Conf from "conf";
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
-import { StoreSchema } from "../../../../shared/store/schema";
 import { AuthToken } from "../../../../shared/integrations/companion-server/types";
+import configStore from "../../../config-store";
 
 const temporaryCodeMap: { [code: string]: { appId: string; appVersion: string; appName: string } } = {};
 
@@ -55,10 +54,10 @@ export function getIsTemporaryAuthCodeValidAndRemove(appId: string, code: string
   return false;
 }
 
-export function createAuthToken(store: Conf<StoreSchema>, appId: string, appVersion: string, appName: string) {
+export function createAuthToken(appId: string, appVersion: string, appName: string) {
   let authTokens: AuthToken[] = [];
   try {
-    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex")));
+    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens"), "hex")));
   } catch {
     /* authTokens will just be an empty array */
   }
@@ -81,19 +80,19 @@ export function createAuthToken(store: Conf<StoreSchema>, appId: string, appVers
     }
   });
 
-  store.set("integrations.companionServerAuthTokens", safeStorage.encryptString(JSON.stringify(authTokens)).toString("hex"));
+  configStore.set("integrations.companionServerAuthTokens", safeStorage.encryptString(JSON.stringify(authTokens)).toString("hex"));
 
   return token;
 }
 
-export function isAuthValid(store: Conf<StoreSchema>, authToken: string): [boolean, string] {
+export function isAuthValid(authToken: string): [boolean, string] {
   if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
   let authTokens: AuthToken[] = [];
   try {
-    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex"));
+    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens"), "hex"));
     authTokens = JSON.parse(decryptedAuthTokens);
   } catch {
     /* authTokens will just be an empty array */
@@ -116,7 +115,7 @@ export function isAuthValid(store: Conf<StoreSchema>, authToken: string): [boole
   return [false, null];
 }
 
-export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
+export function isAuthValidMiddleware(request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
   const authToken = request.headers.authorization;
   if (!authToken) {
     response.code(401);
@@ -126,7 +125,7 @@ export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: Fastify
     return;
   }
 
-  const [validSession, tokenId] = isAuthValid(store, authToken);
+  const [validSession, tokenId] = isAuthValid(authToken);
 
   if (validSession) {
     request.authId = tokenId;

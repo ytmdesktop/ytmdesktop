@@ -1,10 +1,9 @@
 import playerStateStore, { PlayerState, Thumbnail, VideoState } from "../../player-state-store";
-import IIntegration from "../integration";
-import MemoryStore from "../../memory-store";
-import { MemoryStoreSchema } from "~shared/store/schema";
 import DiscordClient from "./minimal-discord-client";
 import log from "electron-log";
 import { DiscordActivityType } from "./minimal-discord-client/types";
+import Integration from "../integration";
+import memoryStore from "../../memory-store";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
@@ -76,11 +75,11 @@ function stringLimit(str: string, limit: number, minimum: number) {
   return str;
 }
 
-export default class DiscordPresence implements IIntegration {
-  private memoryStore: MemoryStore<MemoryStoreSchema>;
+export default class DiscordPresence extends Integration {
+  public name = "DiscordPresence";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.discordPresenceEnabled";
 
   private discordClient: DiscordClient = null;
-  private enabled = false;
   private ready = false;
   private connectionRetryTimeout: string | number | NodeJS.Timeout = null;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
@@ -189,13 +188,9 @@ export default class DiscordPresence implements IIntegration {
     }
   }
 
-  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
-    this.memoryStore = memoryStore;
-  }
-
   private retryDiscordConnection() {
     log.info(`Connecting to Discord attempt ${this.connectionRetries}/30`);
-    if (this.enabled) {
+    if (this.isEnabled) {
       if (this.connectionRetries < 30) {
         this.connectionRetries++;
         this.connectionRetryTimeout = setTimeout(() => {
@@ -204,20 +199,19 @@ export default class DiscordPresence implements IIntegration {
           }
         }, 5 * 1000);
       } else {
-        this.memoryStore.set("discordPresenceConnectionFailed", true);
+        memoryStore.set("discordPresenceConnectionFailed", true);
       }
     }
   }
 
-  public enable(): void {
-    this.enabled = true;
+  public onEnabled(): void {
     if (!this.discordClient) {
       this.discordClient = new DiscordClient(DISCORD_CLIENT_ID);
 
       this.discordClient.on("connect", () => {
         this.ready = true;
         this.connectionRetries = 0;
-        this.memoryStore.set("discordPresenceConnectionFailed", false);
+        memoryStore.set("discordPresenceConnectionFailed", false);
       });
       this.discordClient.on("close", () => {
         log.info("Discord connection closed");
@@ -232,10 +226,9 @@ export default class DiscordPresence implements IIntegration {
     }
   }
 
-  public disable(): void {
-    this.enabled = false;
+  public onDisabled(): void {
     this.connectionRetries = 0;
-    this.memoryStore.set("discordPresenceConnectionFailed", false);
+    memoryStore.set("discordPresenceConnectionFailed", false);
     if (this.connectionRetryTimeout) {
       clearTimeout(this.connectionRetryTimeout);
       this.connectionRetryTimeout = null;
@@ -248,9 +241,5 @@ export default class DiscordPresence implements IIntegration {
     if (this.stateCallback) {
       playerStateStore.removeEventListener(this.stateCallback);
     }
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
   }
 }

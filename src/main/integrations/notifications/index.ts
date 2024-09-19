@@ -1,7 +1,7 @@
 import { Notification, NotificationConstructorOptions, nativeImage } from "electron";
 import playerStateStore, { PlayerState, Thumbnail, VideoDetails, VideoState } from "../../player-state-store";
-import IIntegration from "../integration";
 import https from "https";
+import Integration from "../integration";
 
 // Visualiser - https://apps.microsoft.com/store/detail/notifications-visualizer/9NBLGGH5XSL1?hl=en-gb&gl=gb&rtc=1
 // Documentation / Examples - https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/adaptive-interactive-toasts?tabs=xml
@@ -69,8 +69,10 @@ function getUrlContents(url: string) {
   });
 }
 
-export default class NowPlayingNotifications implements IIntegration {
-  private isEnabled = false;
+export default class NowPlayingNotifications extends Integration {
+  public name = "NowPlayingNotifications";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "general.showNotificationOnSongChange";
+
   private lastDetails: VideoDetails = null;
   private playerStateFunction: (state: PlayerState) => void;
 
@@ -104,21 +106,12 @@ export default class NowPlayingNotifications implements IIntegration {
     throw new Error("Method not implemented.");
   }
 
-  public enable(): void {
-    if (!this.isEnabled) {
-      this.playerStateFunction = (state: PlayerState) => this.updateVideoDetails(state);
-      playerStateStore.addEventListener(this.playerStateFunction);
-      this.isEnabled = true;
-    }
-  }
-  public disable(): void {
-    if (this.isEnabled) {
-      playerStateStore.removeEventListener(this.playerStateFunction);
-      this.isEnabled = false;
-    }
+  public onEnabled() {
+    this.playerStateFunction = (state: PlayerState) => this.updateVideoDetails(state);
+    playerStateStore.addEventListener(this.playerStateFunction);
   }
 
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
+  public onDisabled(): void {
+    playerStateStore.removeEventListener(this.playerStateFunction);
   }
 }

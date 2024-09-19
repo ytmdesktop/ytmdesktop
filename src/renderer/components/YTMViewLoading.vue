@@ -1,32 +1,46 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { computed, ref } from "vue";
+import { YTMViewStatus } from "~shared/types";
 
-const memoryStore = window.ytmd.memoryStore;
-
-const ytmViewLoading = ref<boolean>(await memoryStore.get("ytmViewLoading"));
-const ytmViewLoadingError = ref<boolean>(await memoryStore.get("ytmViewLoadingError"));
-const ytmViewLoadTimedout = ref<boolean>(await memoryStore.get("ytmViewLoadTimedout"));
-const ytmViewLoadingStatus = ref<string>((await memoryStore.get("ytmViewLoadingStatus")) ?? "");
-
-onBeforeMount(async () => {
-  ytmViewLoading.value = await memoryStore.get("ytmViewLoading");
-  ytmViewLoadTimedout.value = await memoryStore.get("ytmViewLoadTimedout");
-  ytmViewLoadingError.value = await memoryStore.get("ytmViewLoadingError");
-  ytmViewLoadingStatus.value = (await memoryStore.get("ytmViewLoadingStatus")) ?? "";
+const unresponsive = ref(false);
+const hide = ref(false);
+const ytmViewLoadingStatus = ref<YTMViewStatus>(YTMViewStatus.Loading);
+const ytmViewLoadingStatusMessage = computed(() => {
+  switch (ytmViewLoadingStatus.value) {
+    case YTMViewStatus.Loading:
+      return "Loading YouTube Music...";
+    case YTMViewStatus.Hooking:
+      return "Waiting for YouTube Music hooks...";
+    case YTMViewStatus.Ready:
+      return "Ready";
+    default:
+      return "";
+  }
 });
 
-memoryStore.onStateChanged(newState => {
-  ytmViewLoading.value = newState.ytmViewLoading;
-  ytmViewLoadingError.value = newState.ytmViewLoadingError;
-  ytmViewLoadTimedout.value = newState.ytmViewLoadTimedout;
-  ytmViewLoadingStatus.value = newState.ytmViewLoadingStatus;
+window.ytmd.ytmViewStatusChanged((status: YTMViewStatus) => {
+  ytmViewLoadingStatus.value = status;
 });
+window.ytmd.memoryStore.onStateChanged(newState => {
+  unresponsive.value = newState.ytmViewUnresponsive ?? false;
+});
+
+window.ytmd.appViewHiding(() => {
+  hide.value = true;
+});
+window.ytmd.appViewShowing(() => {
+  hide.value = false;
+});
+
+function onHide() {
+  window.ytmd.appViewHide();
+}
 </script>
 
 <template>
-  <div class="ytmview-loading-container">
-    <Transition name="fade">
-      <div v-if="ytmViewLoading" class="ytmview-loading">
+  <Transition name="fade" @after-leave="onHide">
+    <div v-if="!hide" class="ytmview-loading-container">
+      <div v-if="ytmViewLoadingStatus != YTMViewStatus.Ready" class="ytmview-loading">
         <img class="logo" :src="require('~assets/icons/ytmd.png')" />
         <div class="music-loader">
           <div class="loader-line"></div>
@@ -38,18 +52,19 @@ memoryStore.onStateChanged(newState => {
           <div class="loader-line"></div>
           <div class="loader-line"></div>
         </div>
-        <p :class="{ 'ytmview-loading-status': true, 'error': ytmViewLoadingError }">{{ ytmViewLoadingStatus }}</p>
-        <p v-if="ytmViewLoadTimedout" class="ytmview-loading-timeout">YouTube Music is taking longer than usual to load</p>
+        <p class="ytmview-loading-status">{{ ytmViewLoadingStatusMessage }}</p>
+        <!--<p :class="{ 'ytmview-loading-status': true, 'error': ytmViewLoadingError }">{{ ytmViewLoadingStatus }}</p>
+        <p v-if="ytmViewLoadTimedout" class="ytmview-loading-timeout">YouTube Music is taking longer than usual to load</p>-->
       </div>
-      <div v-else class="ytmview-loading"></div>
-    </Transition>
-  </div>
+      <div v-if="unresponsive" class="ytmview-unresponsive"></div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
 .ytmview-loading-container {
-  height: calc(100% - 36px);
-  background-color: #000000;
+  width: 100%;
+  height: 100%;
 }
 
 .ytmview-loading {
@@ -57,8 +72,17 @@ memoryStore.onStateChanged(newState => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100% - 36px);
+  height: 100%;
   user-select: none;
+  background-color: #000000;
+}
+
+.ytmview-unresponsive {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: wait;
 }
 
 .ytmview-loading-status {

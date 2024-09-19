@@ -111,6 +111,24 @@ const config: ForgeConfig = {
             additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
           },
           {
+            html: "./src/renderer/windows/updater/index.html",
+            js: "./src/renderer/windows/updater/renderer.ts",
+            name: "updater_window",
+            preload: {
+              js: "./src/renderer/windows/updater/preload.ts"
+            },
+            additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
+          },
+          {
+            html: "./src/renderer/windows/titlebar/index.html",
+            js: "./src/renderer/windows/titlebar/renderer.ts",
+            name: "titlebar_window",
+            preload: {
+              js: "./src/renderer/windows/titlebar/preload.ts"
+            },
+            additionalChunks: ["shared", "vueSharedComponents", "vendorVue"]
+          },
+          {
             name: "ytm_view",
             preload: {
               js: "./src/renderer/ytmview/preload.ts"

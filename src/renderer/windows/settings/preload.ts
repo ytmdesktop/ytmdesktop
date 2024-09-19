@@ -4,13 +4,23 @@
 import { contextBridge, ipcRenderer } from "electron";
 import Store from "../../store-ipc/store";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
-import { WindowsEventArguments } from "~shared/types";
 import MemoryStore from "../../store-ipc/memory-store";
+import { WindowsEventArguments } from "~shared/types";
 
 const store = new Store<StoreSchema>();
 const memoryStore = new MemoryStore<MemoryStoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
+  minimizeWindow: () => ipcRenderer.send("windowControls:minimize"),
+  maximizeWindow: () => ipcRenderer.send("windowControls:maximize"),
+  restoreWindow: () => ipcRenderer.send("windowControls:restore"),
+  closeWindow: () => ipcRenderer.send("windowControls:close"),
+  handleWindowEvents: (callback: (args: WindowsEventArguments) => void) =>
+    ipcRenderer.on("windowControls:stateChanged", (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => {
+      callback(args);
+    }),
+  requestWindowState: () => ipcRenderer.send("windowControls:requestState"),
+
   isDarwin: process.platform === "darwin",
   isLinux: process.platform === "linux",
   isWindows: process.platform === "win32",
@@ -29,20 +39,14 @@ contextBridge.exposeInMainWorld("ytmd", {
     decryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:decryptString", value),
     encryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:encryptString", value)
   },
-  restartApplication: () => ipcRenderer.send("settingsWindow:restartapplication"),
+  restartApplication: () => ipcRenderer.send("app:relaunch"),
   restartApplicationForUpdate: () => ipcRenderer.send("app:restartApplicationForUpdate"),
-  minimizeWindow: () => ipcRenderer.send("settingsWindow:minimize"),
-  maximizeWindow: () => ipcRenderer.send("settingsWindow:maximize"),
-  restoreWindow: () => ipcRenderer.send("settingsWindow:restore"),
-  closeWindow: () => ipcRenderer.send("settingsWindow:close"),
-  handleWindowEvents: (callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void) =>
-    ipcRenderer.on("settingsWindow:stateChanged", callback),
   getAppVersion: async (): Promise<string> => await ipcRenderer.invoke("app:getVersion"),
   checkForUpdates: () => ipcRenderer.send("app:checkForUpdates"),
-  handleCheckingForUpdate: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:checkingForUpdate", callback),
-  handleUpdateAvailable: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:updateAvailable", callback),
-  handleUpdateNotAvailable: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:updateNotAvailable", callback),
-  handleUpdateDownloaded: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:updateDownloaded", callback),
-  isAppUpdateAvailable: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateAvailable"),
-  isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateDownloaded")
+  handleCheckingForUpdate: (callback: () => void) => ipcRenderer.on("autoUpdater:checkingForUpdate", () => callback()),
+  handleUpdateAvailable: (callback: () => void) => ipcRenderer.on("autoUpdater:updateAvailable", () => callback()),
+  handleUpdateNotAvailable: (callback: () => void) => ipcRenderer.on("autoUpdater:updateNotAvailable", () => callback()),
+  handleUpdateDownloaded: (callback: () => void) => ipcRenderer.on("autoUpdater:updateDownloaded", () => callback()),
+  isAppUpdateAvailable: async (): Promise<boolean> => await ipcRenderer.invoke("autoUpdater:isUpdateAvailable"),
+  isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("autoUpdater:isUpdateDownloaded")
 });

@@ -1,54 +1,45 @@
-import IIntegration from "../integration";
 import Fastify, { FastifyInstance } from "fastify";
 import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1 from "./api/v1";
-import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
-import Conf from "conf";
-import { BrowserView, safeStorage } from "electron";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import { RemoteSocket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import cors from "@fastify/cors";
-import MemoryStore from "../../memory-store";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
+import Integration from "../integration";
+import configStore from "../../config-store";
+import memoryStore from "../../memory-store";
+import { safeStorage } from "electron";
+import { MemoryStoreSchema } from "~shared/store/schema";
 
-export default class CompanionServer implements IIntegration {
+export default class CompanionServer extends Integration {
+  public name = "CompanionServer";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.companionServerEnabled";
+  public override dependentStoreProperties: Integration["dependentStoreProperties"] = ["integrations.companionServerCORSWildcardEnabled"];
+
   private listenIp = "0.0.0.0";
   private listenPort = 9863;
   private fastifyServer: FastifyInstance;
-  private store: Conf<StoreSchema>;
-  private memoryStore: MemoryStore<MemoryStoreSchema>;
-  private ytmView: BrowserView;
   private storeListener: () => void | null = null;
+  private authWindowTimeout: NodeJS.Timeout | null = null;
 
   private createServer() {
     this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
     this.fastifyServer.register(cors, {
-      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
+      origin: configStore.get("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
     });
     this.fastifyServer.register(FastifyIO, {
       transports: ["websocket"],
       allowUpgrades: false,
       // While this is websocket only we still apply cors just in case
       cors: {
-        origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false)
-          ? "*"
-          : false
+        origin: configStore.get("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
       }
     });
     this.fastifyServer.register(CompanionServerAPIv1, {
-      prefix: "/api/v1",
-      getYtmView: () => {
-        return this.ytmView;
-      },
-      getStore: () => {
-        return this.store;
-      },
-      getMemoryStore: () => {
-        return this.memoryStore;
-      }
+      prefix: "/api/v1"
     });
     this.fastifyServer.setErrorHandler((error, request, reply) => {
       if (!isDefinedAPIError(error)) {
@@ -73,17 +64,13 @@ export default class CompanionServer implements IIntegration {
     });
   }
 
-  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>, ytmView: BrowserView): void {
-    this.store = store;
-    this.memoryStore = memoryStore;
-    this.ytmView = ytmView;
-  }
-
-  public async enable() {
-    if (!this.memoryStore.get("safeStorageAvailable")) {
+  public async onEnabled() {
+    if (!memoryStore.get("safeStorageAvailable")) {
       log.info("Refusing to enable Companion Server Integration with reason: safeStorage unavailable");
       return;
     }
+
+    memoryStore.onStateChanged(this.memoryStoryListenerCallback);
 
     if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
       this.createServer();
@@ -91,7 +78,7 @@ export default class CompanionServer implements IIntegration {
         host: this.listenIp,
         port: this.listenPort
       });
-      this.storeListener = this.store.onDidChange("integrations", async newState => {
+      this.storeListener = configStore.onDidChange("integrations", async newState => {
         const validTokenIds: string[] = newState.companionServerAuthTokens
           ? JSON.parse(safeStorage.decryptString(Buffer.from(newState.companionServerAuthTokens, "hex"))).map((authToken: AuthToken) => authToken.id)
           : [];
@@ -114,7 +101,9 @@ export default class CompanionServer implements IIntegration {
     }
   }
 
-  public async disable() {
+  public async onDisabled() {
+    memoryStore.set("companionServerAuthWindowEnabled", false);
+    memoryStore.removeOnStateChanged(this.memoryStoryListenerCallback);
     if (this.fastifyServer) {
       await this.fastifyServer.close();
       if (this.storeListener) {
@@ -123,7 +112,20 @@ export default class CompanionServer implements IIntegration {
     }
   }
 
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
+  private memoryStoryListenerCallback(newState: MemoryStoreSchema, oldState: MemoryStoreSchema) {
+    if (newState.companionServerAuthWindowEnabled && !oldState.companionServerAuthWindowEnabled) {
+      this.authWindowTimeout = setTimeout(
+        () => {
+          memoryStore.set("companionServerAuthWindowEnabled", false);
+          this.authWindowTimeout = null;
+        },
+        5 * 60 * 1000
+      );
+    } else if (!newState.companionServerAuthWindowEnabled) {
+      if (this.authWindowTimeout) {
+        clearTimeout(this.authWindowTimeout);
+        this.authWindowTimeout = null;
+      }
+    }
   }
 }

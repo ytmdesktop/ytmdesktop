@@ -1,77 +1,45 @@
-import { BrowserView } from "electron";
-import IIntegration from "../integration";
-
 import enableScript from "./script/enable.script";
 import disableScript from "./script/disable.script";
 import forceUpdateVolume from "./script/forceupdatevolume.script";
+import Integration from "../integration";
+import ytmviewmanager from "../../ytmviewmanager";
 
-export default class VolumeRatio implements IIntegration {
+export default class VolumeRatio extends Integration {
+  public override name = "VolumeRatio";
+  public override storeEnableProperty: Integration["storeEnableProperty"] = "playback.ratioVolume";
+
   // This integration is based upon the following GreasyFork script:
   // https://greasyfork.org/en/scripts/397686-youtube-music-fix-volume-ratio
   // Made by: Marco Pfeiffer <git@marco.zone>
 
-  private ytmView: BrowserView;
-  private hasInjected = false;
-  private isEnabled = false;
-  private waitForYTMView = true;
+  private injected = false;
+  private ytmViewRecreatedListener = () => {
+    this.onEnabled();
+  };
 
-  public provide(ytmView: BrowserView): void {
-    if (ytmView !== this.ytmView) {
-      // The YTM view object has changed from what we knew it was. Invalidate the state as the YTM view was recreated
-      this.hasInjected = false;
-      this.waitForYTMView = true;
-    }
-    this.ytmView = ytmView;
+  public async onEnabled() {
+    ytmviewmanager.on("view-recreated", this.ytmViewRecreatedListener);
 
-    if (this.isEnabled && !this.hasInjected) {
-      this.enable();
+    if (!this.injected) {
+      await ytmviewmanager.ready();
+      this.executeYTMScript(enableScript);
+      this.forceUpdateVolume();
+      this.injected = true;
     }
   }
 
-  public enable(): void {
-    this.isEnabled = true;
-    if ((this.isEnabled && this.hasInjected) || this.waitForYTMView || this.ytmView === null) return;
+  public async onDisabled() {
+    ytmviewmanager.off("view-recreated", this.ytmViewRecreatedListener);
 
-    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "enable");
-
-    this.forceUpdateVolume();
-
-    this.hasInjected = true;
-  }
-
-  public disable(): void {
-    this.isEnabled = false;
-    if (!this.hasInjected) return;
-
-    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "disable");
-
-    this.forceUpdateVolume();
-    this.hasInjected = false;
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [
-      {
-        name: "enable",
-        script: enableScript
-      },
-      {
-        name: "disable",
-        script: disableScript
-      },
-      {
-        name: "forceUpdateVolume",
-        script: forceUpdateVolume
-      }
-    ];
+    if (this.injected) {
+      await ytmviewmanager.ready();
+      this.executeYTMScript(disableScript);
+      this.forceUpdateVolume();
+      this.injected = false;
+    }
   }
 
   private forceUpdateVolume(): void {
-    this.ytmView.webContents.send("ytmView:executeScript", "ratioVolume", "forceUpdateVolume");
-  }
-
-  public ytmViewLoaded(): void {
-    this.waitForYTMView = false;
-    if (this.isEnabled) this.enable();
+    this.executeYTMScript(forceUpdateVolume);
   }
 }

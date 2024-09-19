@@ -69,11 +69,15 @@ export type MemoryStoreSchema = {
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;
+  autoUpdaterChecking: boolean;
+  autoUpdaterNotAvailable: boolean;
+  autoUpdaterAvailable: boolean;
+  autoUpdaterDownloaded: boolean;
+  autoUpdaterErrored: boolean;
   ytmViewLoadTimedout: boolean;
   ytmViewLoading: boolean;
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
   ytmViewUnresponsive: boolean;
-  appUpdateAvailable: boolean;
-  appUpdateDownloaded: boolean;
+  appLoadingStatus: string;
 };
