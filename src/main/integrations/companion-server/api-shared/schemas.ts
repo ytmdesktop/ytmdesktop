@@ -56,6 +56,13 @@ export const APIV1CommandRequestBody = Type.Union([
     })
   }),
   Type.Object({
+    command: Type.Literal("changeVideo"),
+    data: Type.Object({
+      videoId: Type.Optional(Type.String()),
+      playlistId: Type.Optional(Type.String())
+    })
+  }),
+  Type.Object({
     command: Type.Literal("toggleLike")
   }),
   Type.Object({

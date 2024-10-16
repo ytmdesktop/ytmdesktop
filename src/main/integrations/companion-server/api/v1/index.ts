@@ -23,6 +23,7 @@ import {
   InvalidPositionError,
   InvalidQueueIndexError,
   InvalidRepeatModeError,
+  InvalidChangeVideoRequestError,
   InvalidVolumeError,
   UnauthenticatedError,
   YouTubeMusicTimeOutError,
@@ -145,6 +146,21 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
             throw new InvalidPositionError(position);
           }
           ytmView.webContents.send("remoteControl:execute", "seekTo", position);
+          break;
+        }
+
+        case "changeVideo": {
+          const videoId = commandRequest.data.videoId;
+          const playlistId = commandRequest.data.playlistId;
+          if (videoId == null && playlistId == null) {
+            throw new InvalidChangeVideoRequestError();
+          }
+          ytmView.webContents.send("remoteControl:execute", "navigate", {
+            watchEndpoint: {
+              videoId: videoId,
+              playlistId: playlistId
+            }
+          });
           break;
         }
 
