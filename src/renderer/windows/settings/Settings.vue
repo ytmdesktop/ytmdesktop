@@ -190,7 +190,7 @@ async function settingChangedFile(event: Event) {
     throw new Error("No setting specified in File Input");
   }
 
-  store.set(setting, target.files.length > 0 ? target.files[0].path : null);
+  store.set(setting, target.files.length > 0 ? window.ytmd.getTrueFilePath(target.files[0]) : null);
 
   target.value = null;
 }

@@ -19,6 +19,7 @@ declare global {
       openSettingsWindow(): void;
       restartApplication(): void;
       restartApplicationForUpdate(): void;
+      getTrueFilePath(file: File): string;
 
       // Companion Authorization specific
       sendResult(authorized: boolean);
