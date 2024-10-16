@@ -369,23 +369,31 @@ window.addEventListener("load", async () => {
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
     switch (command) {
       case "playPause": {
+        // User gesture argument required to allow playback if the application just started up in case pause on start is enabled
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.pauseVideo() : document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.playVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "play": {
+        // User gesture argument required to allow playback if the application just started up in case pause on start is enabled
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.playVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
