@@ -3,6 +3,7 @@ import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
+import { MakerFlatpak } from "@electron-forge/maker-flatpak";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 
@@ -63,6 +64,52 @@ const config: ForgeConfig = {
         mimeType: ["x-scheme-handler/ytmd"],
         section: "sound",
         icon: "./src/assets/icons/ytmd.png"
+      }
+    }),
+    new MakerFlatpak({
+      options: {
+        id: "app.ytmdesktop.ytmdesktop2",
+        files: [],
+        categories: ["AudioVideo", "Audio"],
+        mimeType: ["x-scheme-handler/ytmd"],
+        icon: "./src/assets/icons/ytmd.png",
+        baseVersion: "23.08",
+        runtimeVersion: "23.08",
+        modules: [
+          {
+            name: "zypak",
+            sources: [
+              {
+                type: "git",
+                url: "https://github.com/refi64/zypak",
+                tag: "v2024.01.17"
+              }
+            ]
+          }
+        ],
+        finishArgs: [
+          // Rendering
+          "--socket=x11",
+          "--socket=wayland",
+          "--share=ipc",
+          // OpenGL
+          "--device=dri",
+          // Audio output
+          "--socket=pulseaudio",
+          // Read/write home directory access
+          "--filesystem=home",
+          // Chromium uses a socket in tmp for its singleton check
+          "--env=TMPDIR=/var/tmp",
+          // Allow communication with network
+          "--share=network",
+          // System notifications with libnotify
+          "--talk-name=org.freedesktop.Notifications",
+          // MPRIS (Chromium uses chromium.instance{PID})
+          "--own-name=org.mpris.MediaPlayer2.chromium.*",
+          // Discord Rich Presence
+          "--filesystem=xdg-run/app/com.discordapp.Discord:create",
+          "--filesystem=xdg-run/discord-ipc-*"
+        ]
       }
     })
   ],
