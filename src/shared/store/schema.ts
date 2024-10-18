@@ -18,6 +18,7 @@ export type StoreSchema = {
   playback: {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
+    autoClickSkipAd: boolean;
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
