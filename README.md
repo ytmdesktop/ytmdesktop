@@ -82,6 +82,7 @@ TODO: Fill this information in
 Building the project on Linux only requires you to install:
 - For building on Debian based Linux Distros like Ubuntu, you will need to install `fakeroot` and `dpkg`
 - For building on RedHat based Linux Distros like Fedora, you will need to install `rpm` or `rpm-build`
+- For building flatpak bundles, you need to install `flatpak`, `flatpak-builder`, and `eu-strip` (usually part of the `elfutils` package).
 
 *please note that by default both packages are built if you try building this application on a linux distro*
 

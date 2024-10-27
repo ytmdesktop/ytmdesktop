@@ -53,3 +53,4 @@ jobs:
             out/make/deb/${{ matrix.arch }}/*.deb
             out/make/rpm/${{ matrix.arch }}/*.rpm
             out/make/zip/darwin/${{ matrix.arch }}/*.zip
+            out/make/flatpak/${{ matrix.arch }}/*.flatpak
