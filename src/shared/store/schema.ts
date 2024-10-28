@@ -28,6 +28,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    slackEnabled: boolean;
   };
   shortcuts: {
     playPause: string;
@@ -51,6 +52,10 @@ export type StoreSchema = {
     token: string | null;
     sessionKey: string | null;
     scrobblePercent: number;
+  };
+  slack: {
+    slackUserToken: string;
+    secondsTillClearStatus: number;
   };
   developer: {
     enableDevTools: boolean;

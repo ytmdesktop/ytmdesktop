@@ -1,10 +1,11 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'text' | 'custom'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
   checkbox: boolean;
   file: string;
   range: number;
+  text: string;
   custom: never;
 };
 

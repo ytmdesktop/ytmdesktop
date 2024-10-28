@@ -33,6 +33,7 @@ const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
+const slack: StoreSchema["slack"] = await store.get("slack");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
@@ -58,6 +59,9 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const slackEnabled = ref<boolean>(integrations.slackEnabled);
+const slackUserToken = ref<string>(await safeStorage.decryptString(slack.slackUserToken));
+const secondsTillClearStatus = ref<number>(slack.secondsTillClearStatus);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -105,6 +109,9 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+
+  slackUserToken.value = await safeStorage.decryptString(newState.slack.slackUserToken);
+  secondsTillClearStatus.value = newState.slack.secondsTillClearStatus;
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -165,6 +172,8 @@ async function settingsChanged() {
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
+  store.set("integrations.slackEnabled", slackEnabled.value);
+  store.set("slack.secondsTillClearStatus", secondsTillClearStatus.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -173,6 +182,15 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+}
+async function storeSlackUserToken() {
+  const encrypted = (await safeStorage.encryptString(slackUserToken.value)).toString("hex");
+  if (slackUserToken.value !== "") store.set("slack.slackUserToken", encrypted);
+  // save and restart slack integration
+  slackEnabled.value = false;
+  await settingsChanged();
+  slackEnabled.value = true;
+  await settingsChanged();
 }
 
 async function settingChangedRequiresRestart() {
@@ -423,6 +441,28 @@ window.ytmd.handleUpdateDownloaded(() => {
             description="Determines when a song is scrobbled"
             min="50"
             max="95"
+            step="5"
+            @change="settingsChanged"
+          />
+          <YTMDSetting v-model="slackEnabled" type="checkbox" name="Slack" @change="settingsChanged" />
+          <YTMDSetting
+            v-if="slackEnabled"
+            v-model="slackUserToken"
+            description="Enter your Slack User Token"
+            class="settings indented"
+            type="text"
+            name="Slack User Token:"
+            @change="storeSlackUserToken"
+          />
+          <YTMDSetting
+            v-if="slackEnabled"
+            v-model="secondsTillClearStatus"
+            class="settings indented"
+            type="range"
+            name="Clear Status Seconds"
+            description="Time until the status is automatically cleared"
+            min="5"
+            max="120"
             step="5"
             @change="settingsChanged"
           />
