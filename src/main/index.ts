@@ -1981,6 +1981,8 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createMainWindow();
     createYTMView();
+  } else if (mainWindow && !mainWindow.isVisible()) {
+    mainWindow.show();
   }
 });
 
