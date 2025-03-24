@@ -365,7 +365,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             indented
             name="Enable companion authorization"
             description="Automatically disables after the first successful authorization or 5 minutes has passed"
-            @change="memorySettingsChanged"
+            @change="settingsChanged"
           />
           <YTMDSetting
             v-if="companionServerEnabled && safeStorageAvailable"
