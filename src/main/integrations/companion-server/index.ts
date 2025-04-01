@@ -14,7 +14,7 @@ import MemoryStore from "../../memory-store";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
 import fs from "fs";
-import path from "path";
+import axios from "axios";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -25,17 +25,22 @@ export default class CompanionServer implements IIntegration {
   private ytmView: BrowserView;
   private storeListener: () => void | null = null;
 
-  private certPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/server.cert.pem");
-  private keyPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/server.key.pem");
-  private CAPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/ca.cert.pem");
+  private async loadCertFromURL(url: string): Promise<Buffer> {
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    return Buffer.from(response.data);
+  }
 
-  private createServer() {
+  private async createServer() {
+    const key = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/server.key.pem");
+    const cert = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/server.cert.pem");
+    const ca = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/ca.cert.pem");
+
     this.fastifyServer = Fastify({
       //logger: true,
       https: {
-        key: fs.readFileSync(this.keyPath),
-        cert: fs.readFileSync(this.certPath),
-        ca: fs.readFileSync(this.CAPath)
+        key: fs.readFileSync(key),
+        cert: fs.readFileSync(cert),
+        ca: fs.readFileSync(ca)
       }
     }).withTypeProvider<TypeBoxTypeProvider>();
     this.fastifyServer.register(cors, {
