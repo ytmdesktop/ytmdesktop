@@ -13,7 +13,6 @@ import cors from "@fastify/cors";
 import MemoryStore from "../../memory-store";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
-import fs from "fs";
 import axios from "axios";
 
 export default class CompanionServer implements IIntegration {
@@ -25,24 +24,41 @@ export default class CompanionServer implements IIntegration {
   private ytmView: BrowserView;
   private storeListener: () => void | null = null;
 
-  private async loadCertFromURL(url: string): Promise<Buffer> {
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    return Buffer.from(response.data);
+  private async loadCertFromURL(url: string, label: string): Promise<Buffer | null> {
+    try {
+      const res = await axios.get(url, {
+        responseType: "arraybuffer",
+        auth: {
+          username: "youtubeconnect",
+          password: "ae@MzdJ6D"
+        }
+      });
+      console.log(`[OK] ${label} carregado com sucesso`);
+      return Buffer.from(res.data);
+    } catch (err) {
+      console.warn(`[WARN] Não foi possível carregar ${label}: ${err.message}`);
+      return null;
+    }
   }
 
   private async createServer() {
-    const key = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/server.key.pem");
-    const cert = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/server.cert.pem");
-    const ca = await this.loadCertFromURL("http://youtubeconnect.app.br/cert/ssl/ca.cert.pem");
+    const key = await this.loadCertFromURL("http://youtubeconnect.app.br/uploads/certs/ssl/server.key.pem", "Chave Privada");
+    const cert = await this.loadCertFromURL("http://youtubeconnect.app.br/uploads/certs/ssl/server.cert.pem", "Certificado");
+    const ca = await this.loadCertFromURL("http://youtubeconnect.app.br/uploads/certs/ssl/ca.cert.pem", "CA");
 
-    this.fastifyServer = Fastify({
-      //logger: true,
-      https: {
-        key: fs.readFileSync(key),
-        cert: fs.readFileSync(cert),
-        ca: fs.readFileSync(ca)
-      }
-    }).withTypeProvider<TypeBoxTypeProvider>();
+    if (key && cert && ca) {
+      this.fastifyServer = Fastify({
+        logger: true,
+        https: {
+          key: key,
+          cert: cert,
+          ca: ca
+        }
+      }).withTypeProvider<TypeBoxTypeProvider>();
+    } else {
+      this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
+    }
+
     this.fastifyServer.register(cors, {
       origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
     });
@@ -104,7 +120,7 @@ export default class CompanionServer implements IIntegration {
     }
 
     if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
-      this.createServer();
+      await this.createServer();
       await this.fastifyServer.listen({
         host: this.listenIp,
         port: this.listenPort
