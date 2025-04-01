@@ -13,6 +13,8 @@ import cors from "@fastify/cors";
 import MemoryStore from "../../memory-store";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
+import fs from "fs";
+import path from "path";
 
 export default class CompanionServer implements IIntegration {
   private listenIp = "0.0.0.0";
@@ -23,8 +25,19 @@ export default class CompanionServer implements IIntegration {
   private ytmView: BrowserView;
   private storeListener: () => void | null = null;
 
+  private certPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/server.cert.pem");
+  private keyPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/server.key.pem");
+  private CAPath = path.resolve(__dirname, "../../src/main/integrations/companion-server/ssl/ca.cert.pem");
+
   private createServer() {
-    this.fastifyServer = Fastify().withTypeProvider<TypeBoxTypeProvider>();
+    this.fastifyServer = Fastify({
+      //logger: true,
+      https: {
+        key: fs.readFileSync(this.keyPath),
+        cert: fs.readFileSync(this.certPath),
+        ca: fs.readFileSync(this.CAPath)
+      }
+    }).withTypeProvider<TypeBoxTypeProvider>();
     this.fastifyServer.register(cors, {
       origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
     });
