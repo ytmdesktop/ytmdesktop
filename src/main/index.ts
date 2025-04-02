@@ -196,6 +196,11 @@ if (!gotTheLock) {
         mainWindow.restore();
       }
       mainWindow.focus();
+      ipcMain.on("ssl-cert-generated", () => {
+        if (mainWindow?.webContents) {
+          mainWindow.webContents.send("ssl-generated");
+        }
+      });
     }
 
     handleProtocol(commandLine[commandLine.length - 1]);

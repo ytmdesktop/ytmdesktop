@@ -37,6 +37,7 @@
     "@electron/fuses": "^1.8.0",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/node": "^22.13.1",
+    "@types/pem": "^1",
     "@typescript-eslint/eslint-plugin": "^8.23.0",
     "@typescript-eslint/parser": "^8.23.0",
     "@vitejs/plugin-vue": "^5.2.1",
@@ -66,6 +67,7 @@
     "fastify": "^5.2.1",
     "fastify-socket.io": "^5.1.0",
     "material-symbols": "^0.12.0",
+    "pem": "^1.14.8",
     "socket.io": "^4.8.1",
     "vue": "^3.5.13"
   },

@@ -1466,6 +1466,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pem@npm:^1":
+  version: 1.14.4
+  resolution: "@types/pem@npm:1.14.4"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/1757eb5ac81e63baaf799800c6cf1d7a9a70afe3430d9dc2715ea1390450a1650317167a481a8c015e37299c784272d5b73e249ea47552e2ba8f9f4bd3086130
+  languageName: node
+  linkType: hard
+
 "@types/responselike@npm:^1.0.0":
   version: 1.0.0
   resolution: "@types/responselike@npm:1.0.0"
@@ -2359,6 +2368,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"charenc@npm:0.0.2":
+  version: 0.0.2
+  resolution: "charenc@npm:0.0.2"
+  checksum: 10c0/a45ec39363a16799d0f9365c8dd0c78e711415113c6f14787a22462ef451f5013efae8a28f1c058f81fc01f2a6a16955f7a5fd0cd56247ce94a45349c89877d8
+  languageName: node
+  linkType: hard
+
 "chownr@npm:^2.0.0":
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
@@ -2683,6 +2699,13 @@ __metadata:
   version: 4.0.0
   resolution: "cross-zip@npm:4.0.0"
   checksum: 10c0/a4de23d6adda172aac4f26502aed9abb45cc12307e107c5d3da32dc2d0a872f1adb9bcafcc72583c705ae65279b1d257364c1ad015ecacd33d6336600b5ecaa3
+  languageName: node
+  linkType: hard
+
+"crypt@npm:0.0.2":
+  version: 0.0.2
+  resolution: "crypt@npm:0.0.2"
+  checksum: 10c0/adbf263441dd801665d5425f044647533f39f4612544071b1471962209d235042fb703c27eea2795c7c53e1dfc242405173003f83cf4f4761a633d11f9653f18
   languageName: node
   linkType: hard
 
@@ -3329,6 +3352,13 @@ __metadata:
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
   checksum: 10c0/357663fb1e845c047d548c3d30f86e005db71e122678f4184ced0693f634688c3f3ef2d7de7d4af732f734de01f528b05954e270f06aa7d133679fb9fe6600ef
+  languageName: node
+  linkType: hard
+
+"es6-promisify@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "es6-promisify@npm:7.0.0"
+  checksum: 10c0/2d71b098a9bff9802cdb5cd9f4079d13d31236a2ed4753230c3099edff2c0f34b280fcf7ce814e0ff30713dfb25dd888d1eb2ac50a8f1e26ceae04d66d51c4f4
   languageName: node
   linkType: hard
 
@@ -4936,6 +4966,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-buffer@npm:~1.1.6":
+  version: 1.1.6
+  resolution: "is-buffer@npm:1.1.6"
+  checksum: 10c0/ae18aa0b6e113d6c490ad1db5e8df9bdb57758382b313f5a22c9c61084875c6396d50bbf49315f5b1926d142d74dfb8d31b40d993a383e0a158b15fea7a82234
+  languageName: node
+  linkType: hard
+
 "is-bun-module@npm:^1.0.2":
   version: 1.2.1
   resolution: "is-bun-module@npm:1.2.1"
@@ -5630,6 +5667,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"md5@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "md5@npm:2.3.0"
+  dependencies:
+    charenc: "npm:0.0.2"
+    crypt: "npm:0.0.2"
+    is-buffer: "npm:~1.1.6"
+  checksum: 10c0/14a21d597d92e5b738255fbe7fe379905b8cb97e0a49d44a20b58526a646ec5518c337b817ce0094ca94d3e81a3313879c4c7b510d250c282d53afbbdede9110
+  languageName: node
+  linkType: hard
+
 "media-typer@npm:0.3.0":
   version: 0.3.0
   resolution: "media-typer@npm:0.3.0"
@@ -6247,6 +6295,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"os-tmpdir@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "os-tmpdir@npm:1.0.2"
+  checksum: 10c0/f438450224f8e2687605a8dd318f0db694b6293c5d835ae509a69e97c8de38b6994645337e5577f5001115470414638978cc49da1cdcc25106dad8738dc69990
+  languageName: node
+  linkType: hard
+
 "p-cancelable@npm:^2.0.0":
   version: 2.1.1
   resolution: "p-cancelable@npm:2.1.1"
@@ -6472,6 +6527,18 @@ __metadata:
   version: 1.0.0
   resolution: "pe-library@npm:1.0.0"
   checksum: 10c0/697a39d3dd97cb0b859f6088689b72a58969f39145faaf478d7ac4be88602cd556f08c0ab8332d018f091c05de5848accb699fc20d358127127f5bded85074f1
+  languageName: node
+  linkType: hard
+
+"pem@npm:^1.14.8":
+  version: 1.14.8
+  resolution: "pem@npm:1.14.8"
+  dependencies:
+    es6-promisify: "npm:^7.0.0"
+    md5: "npm:^2.3.0"
+    os-tmpdir: "npm:^1.0.2"
+    which: "npm:^2.0.2"
+  checksum: 10c0/c57cb469ba607ac8a71b63be3ae37749909581a8fe1453424e084f3421feefeba78b0e6615feffe77fe9680a04f27ad92342352fc11a4c619086498633506eb3
   languageName: node
   linkType: hard
 
@@ -8538,6 +8605,7 @@ __metadata:
     "@sinclair/typebox": "npm:^0.34.15"
     "@types/electron-squirrel-startup": "npm:^1.0.2"
     "@types/node": "npm:^22.13.1"
+    "@types/pem": "npm:^1"
     "@typescript-eslint/eslint-plugin": "npm:^8.23.0"
     "@typescript-eslint/parser": "npm:^8.23.0"
     "@vitejs/plugin-vue": "npm:^5.2.1"
@@ -8556,6 +8624,7 @@ __metadata:
     husky: "npm:^9.1.7"
     lint-staged: "npm:^15.4.3"
     material-symbols: "npm:^0.12.0"
+    pem: "npm:^1.14.8"
     prettier: "npm:3.4.2"
     socket.io: "npm:^4.8.1"
     ts-node: "npm:^10.9.2"

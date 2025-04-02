@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
@@ -26,6 +26,31 @@ const updateDownloaded = ref(await window.ytmd.isAppUpdateDownloaded());
 const store = window.ytmd.store;
 const memoryStore = window.ytmd.memoryStore;
 const safeStorage = window.ytmd.safeStorage;
+
+const sslGenerated = ref<boolean>(!!memoryStore.get("ssl_cert_generated"));
+
+function generateSSL() {
+  fetch("http://localhost:9863/api/v1/setup") // Vai forçar a geração (o backend detecta e gera se não existir)
+    .then(() => {
+      memoryStore.set("ssl_cert_generated", true);
+      sslGenerated.value = true;
+      alert("Certificado SSL gerado! Agora você pode instalar o certificado da autoridade (CA).");
+    })
+    .catch(err => {
+      alert("Erro ao tentar gerar o certificado.", err);
+      console.error(err);
+    });
+}
+
+onMounted(async () => {
+  /*if (window.electronAPI?.onSSLGenerated) {
+    window.electronAPI.onSSLGenerated(() => {
+      memoryStore.set("ssl_cert_generated", true);
+      sslGenerated.value = true;
+    });
+  }*/
+  sslGenerated.value = <boolean>!!memoryStore.get("ssl_cert_generated");
+});
 
 const safeStorageAvailable = ref<boolean>(await memoryStore.get("safeStorageAvailable"));
 
@@ -265,6 +290,8 @@ window.ytmd.handleUpdateDownloaded(() => {
   updateAvailable.value = false;
   updateDownloaded.value = true;
 });
+
+console.log("Status SSl", sslGenerated.value);
 </script>
 
 <template>
@@ -341,6 +368,57 @@ window.ytmd.handleUpdateDownloaded(() => {
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
+          <section class="ssl-section">
+            <h2>Configuração SSL do Companion Server</h2>
+
+            <div v-if="!sslGenerated">
+              <p>Você ainda não gerou o certificado local para conexão segura (SSL).</p>
+              <button @click="generateSSL">Gerar Certificado SSL</button>
+            </div>
+
+            <div v-else>
+              <p>Certificado SSL gerado!</p>
+              <p><a href="http://localhost:9862/ca.pem" download>⬇️ Baixar certificado da autoridade (CA)</a></p>
+              <div class="card">
+                <h2>🛠️ Instruções de Instalação</h2>
+
+                <h3>🔹 Chrome / Edge (Windows, Linux)</h3>
+                <ol>
+                  <li>Acesse <code>chrome://settings/certificates</code></li>
+                  <li>Vá até a aba <strong>"Autoridades"</strong></li>
+                  <li>Importe o arquivo <code>ca.pem</code></li>
+                  <li>Marque as opções para confiar na CA</li>
+                </ol>
+
+                <h3>🦊 Firefox</h3>
+                <ol>
+                  <li>Abra o menu → Configurações → Privacidade e Segurança</li>
+                  <li>Role até a seção <strong>Certificados</strong> e clique em <strong>"Ver Certificados"</strong></li>
+                  <li>Importe o <code>ca.pem</code></li>
+                </ol>
+
+                <h3>🪟 Windows</h3>
+                <ol>
+                  <li>Execute o arquivo <code>ca.pem</code> (ou clique com o botão direito → "Instalar")</li>
+                  <li>Escolha "Autoridades de certificação raiz confiáveis"</li>
+                  <li>Confirme todos os passos</li>
+                </ol>
+
+                <h3>🐧 Linux (Chrome/Chromium)</h3>
+                <pre>
+sudo cp ca.pem /usr/local/share/ca-certificates/myca.crt
+  sudo update-ca-certificates</pre
+                >
+
+                <h3>🍎 macOS</h3>
+                <ol>
+                  <li>Abra o <strong>Acesso às Chaves</strong></li>
+                  <li>Importe o <code>ca.pem</code> na categoria "Sistema"</li>
+                  <li>Clique com o botão direito → "Obter informações" → "Confiar sempre"</li>
+                </ol>
+              </div>
+            </div>
+          </section>
           <YTMDSetting
             v-model="companionServerEnabled"
             type="checkbox"
@@ -399,7 +477,7 @@ window.ytmd.handleUpdateDownloaded(() => {
               </tbody>
             </table>
             <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
-              <td>No authorized companions</td>
+              <p>No authorized companions</p>
             </div>
           </YTMDSetting>
           <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
@@ -866,5 +944,17 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.ssl-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
+.ssl-section button {
+  margin-top: 0.5rem;
 }
 </style>
