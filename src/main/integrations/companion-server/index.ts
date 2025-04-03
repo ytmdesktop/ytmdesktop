@@ -259,10 +259,51 @@ export default class CompanionServer implements IIntegration {
       `);
     });
 
-    this.httpSetupServer.all("*", async (req, reply) => {
-      const host = req.headers.host?.replace(/:\d+$/, "") ?? "localhost";
-      const redirectTo = `https://${host}:9863${req.raw.url}`;
-      reply.redirect(redirectTo, 308);
+    this.httpSetupServer.register(cors, {
+      origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false) ? "*" : false
+    });
+    this.httpSetupServer.register(FastifyIO, {
+      transports: ["websocket"],
+      allowUpgrades: false,
+      // While this is websocket only we still apply cors just in case
+      cors: {
+        origin: this.store.get<"integrations.companionServerCORSWildcardEnabled", boolean>("integrations.companionServerCORSWildcardEnabled", false)
+          ? "*"
+          : false
+      }
+    });
+    this.httpSetupServer.register(CompanionServerAPIv1, {
+      prefix: "/api/v1",
+      getYtmView: () => {
+        return this.ytmView;
+      },
+      getStore: () => {
+        return this.store;
+      },
+      getMemoryStore: () => {
+        return this.memoryStore;
+      }
+    });
+    this.httpSetupServer.setErrorHandler((error, request, reply) => {
+      if (!isDefinedAPIError(error)) {
+        if (!error.statusCode || error.statusCode >= 500) {
+          log.error(error);
+          reply.send(new Error("An internal server error occurred"));
+          return;
+        }
+      }
+
+      reply.send(error);
+    });
+    this.httpSetupServer.get("/metadata", (request, reply) => {
+      reply.send({
+        apiVersions: ["v1"]
+      });
+    });
+
+    // Disconnect connections to the default namespace
+    this.httpSetupServer.ready().then(() => {
+      this.httpSetupServer.io.on("connection", socket => socket.disconnect());
     });
   }
 
