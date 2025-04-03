@@ -258,6 +258,12 @@ export default class CompanionServer implements IIntegration {
         </html>
       `);
     });
+
+    this.httpSetupServer.all("*", async (req, reply) => {
+      const host = req.headers.host?.replace(/:\d+$/, "") ?? "localhost";
+      const redirectTo = `https://${host}:9863${req.raw.url}`;
+      reply.redirect(redirectTo, 308);
+    });
   }
 
   public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>, ytmView: BrowserView): void {
