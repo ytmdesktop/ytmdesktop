@@ -6,6 +6,8 @@ import logo from "~assets/icons/ytmd_white.png";
 
 const keyboardFocus = ref<HTMLElement>(null);
 const keyboardFocusZero = ref<HTMLElement>(null);
+const memoryStore = window.ytmd.memoryStore;
+const sslGenerated = ref<boolean>(!!memoryStore.get("ssl_cert_generated"));
 
 onMounted(() => {
   window.onfocus = () => {
@@ -21,6 +23,15 @@ onMounted(() => {
   };
 
   window.ytmd.requestWindowState();
+
+  /*if (window.electronAPI?.onSSLGenerated) {
+    window.electronAPI.onSSLGenerated(() => {
+      memoryStore.set("ssl_cert_generated", true);
+      sslGenerated.value = true;
+    });
+  }*/
+
+  sslGenerated.value = <boolean>!!memoryStore.get("ssl_cert_generated");
 });
 </script>
 

@@ -106,7 +106,6 @@ function select(optionKey: string) {
         <div v-for="(optionValue, optionKey) of props.optionsMap" :key="optionKey" class="option" @click="select(optionKey)">{{ optionValue }}</div>
       </div>
     </div>
-
     <slot></slot>
   </div>
 </template>
