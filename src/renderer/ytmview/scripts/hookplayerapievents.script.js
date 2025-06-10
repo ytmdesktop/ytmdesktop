@@ -14,8 +14,9 @@
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
     const muted = state.player.muted;
+    const shuffled = !!document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-player-bar[shuffle-on] .shuffle.ytmusic-player-bar");
 
-    window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying);
+    window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying, shuffled);
   }
 
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
