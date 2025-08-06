@@ -40,6 +40,7 @@ const transformPlayerState = (state: PlayerState) => {
       videoProgress: state.videoProgress,
       volume: state.volume,
       muted: state.muted,
+      shuffled: state.shuffled,
       adPlaying: state.adPlaying,
       queue: state.queue
         ? {
