@@ -67,6 +67,7 @@ export type PlayerQueue = {
   items: PlayerQueueItem[];
   repeatMode: RepeatMode;
   selectedItemIndex: number;
+  shuffleEnabled: boolean;
 };
 
 export type PlayerState = {
@@ -379,7 +380,8 @@ class PlayerStateStore {
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
     muted: boolean | null,
-    adPlaying: boolean | null
+    adPlaying: boolean | null,
+    shuffleEnabled: boolean | null
   ) {
     const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
     const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
@@ -396,7 +398,8 @@ class PlayerStateStore {
           // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
           selectedItemIndex: queueItems.findIndex(item => {
             return item.selected;
-          })
+          }),
+          shuffleEnabled
         }
       : null;
     if (this.videoDetails) {
