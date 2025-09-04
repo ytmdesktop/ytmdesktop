@@ -3232,16 +3232,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^36.4.0":
-  version: 36.4.0
-  resolution: "electron@npm:36.4.0"
+"electron@npm:^36.8.1":
+  version: 36.8.1
+  resolution: "electron@npm:36.8.1"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^22.7.7"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/c82fab3fbda01e5be561509f362bbbce1179f50e6f2fe3b5262cbb622887ae7c0f8d0ac728190207d3fb9480f3144ce5ddfbd1a6145627c3d267cd24811e9fdf
+  checksum: 10c0/a683f2276b460c404b8ea5d819c2282cdb5a963c5569eabac8accffca01432111d847860726f04e87277b7dcbe3099201afbe2f752c99918683c37734cef86da
   languageName: node
   linkType: hard
 
@@ -8605,7 +8605,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^8.33.1"
     "@vitejs/plugin-vue": "npm:^5.2.4"
     conf: "npm:^10.2.0"
-    electron: "npm:^36.4.0"
+    electron: "npm:^36.8.1"
     electron-log: "npm:5.4.0"
     electron-squirrel-startup: "npm:^1.0.1"
     eslint: "npm:^8.57.1"
