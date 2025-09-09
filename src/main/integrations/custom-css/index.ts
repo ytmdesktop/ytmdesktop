@@ -1,132 +1,90 @@
-import { BrowserView, ipcMain } from "electron";
 import fs from "fs";
-import Conf from "conf";
 
-import IIntegration from "../integration";
-import { StoreSchema } from "~shared/store/schema";
+import Integration from "../integration";
 import { Unsubscribe } from "conf/dist/source/types";
+import YTMViewManager from "../../services/ytmviewmanager";
+import ConfigStore from "../../services/configstore";
 
-export default class CustomCSS implements IIntegration {
-  private ytmView: BrowserView;
-  private store: Conf<StoreSchema>;
-  private isEnabled = false;
-  private hasInjectedOnce = false;
+export default class CustomCSS extends Integration {
+  public override name = "CustomCSS";
+  public override storeEnableProperty: Integration["storeEnableProperty"] = "appearance.customCSSEnabled";
+  private injected = false;
 
   private customCSSKey: string | null = null;
   private storeListener: Unsubscribe | null = null;
-  private ipcListener: () => void | null = null;
 
   private currentWatcher: fs.FSWatcher | null = null;
 
-  public provide(store: Conf<StoreSchema>, ytmView: BrowserView): void {
-    let ytmViewChanged = false;
-    if (ytmView !== this.ytmView) {
-      ytmViewChanged = true;
-    }
+  private ytmViewRecreatedListener = () => {
+    this.injected = false;
+    this.updateCSS();
+  };
 
-    this.ytmView = ytmView;
-    this.store = store;
+  public onSetup() {}
 
-    if (ytmViewChanged) {
-      this.customCSSKey = null;
-    }
+  public onEnabled(): void {
+    const ytmViewManager = this.getService(YTMViewManager);
+    const configStore = this.getService(ConfigStore);
 
-    if ((this.isEnabled && !this.hasInjectedOnce) || (this.isEnabled && ytmViewChanged)) {
-      this.enable();
-    }
-  }
-
-  public enable(): void {
-    this.isEnabled = true;
-    if (this.ytmView === null || this.customCSSKey) return;
-
-    this.injectCSS();
-
-    // Listen to updates to the custom CSS file
-    if (this.storeListener) {
-      this.storeListener();
-      this.storeListener = null;
-    }
-    this.storeListener = this.store.onDidChange("appearance", (oldState, newState) => {
-      if (newState.customCSSEnabled && oldState.customCSSPath != newState.customCSSPath) {
+    ytmViewManager.on("view-recreated", this.ytmViewRecreatedListener);
+    this.storeListener = configStore.onDidChange("appearance", (newState, oldState) => {
+      if (newState.customCSSEnabled && newState.customCSSPath != oldState.customCSSPath) {
         this.updateCSS();
       }
     });
+
+    this.injectCSS();
   }
 
-  public disable(): void {
-    this.removeCSS();
-    this.isEnabled = false;
-    this.hasInjectedOnce = false;
+  public onDisabled(): void {
+    const ytmViewManager = this.getService(YTMViewManager);
 
+    ytmViewManager.off("view-recreated", this.ytmViewRecreatedListener);
     if (this.currentWatcher) {
       this.currentWatcher.close();
       this.currentWatcher = null;
     }
-
     if (this.storeListener) {
       this.storeListener();
       this.storeListener = null;
     }
 
-    if (this.ipcListener) {
-      ipcMain.removeListener("ytmView:loaded", this.ipcListener);
-      this.ipcListener = null;
-    }
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
+    this.removeCSS();
   }
 
   public updateCSS(): void {
-    if (this.isEnabled) {
-      this.removeCSS();
-      this.injectCSS();
-    }
+    this.removeCSS();
+    this.injectCSS();
   }
 
-  // --------------------------------------------------
+  private async injectCSS() {
+    if (this.injected) return;
 
-  private injectCSS() {
-    if (!this.ytmView) {
-      return;
-    }
-    this.hasInjectedOnce = true;
+    const ytmViewManager = this.getService(YTMViewManager);
+    const configStore = this.getService(ConfigStore);
 
-    const cssPath: string | null = this.store.get("appearance.customCSSPath");
+    const cssPath = configStore.get("appearance.customCSSPath");
     if (cssPath && fs.existsSync(cssPath)) {
       const content: string = fs.readFileSync(cssPath, "utf8");
 
-      /* To do in the future...
-        Have an alternative means of checking if YTM has loaded
-        as I'd rather keep away from constantly having an event for if `ytmView:loaded` is emitted
-        and only needed for the initial load of the app */
-      if (this.ipcListener) {
-        ipcMain.removeListener("ytmView:loaded", this.ipcListener);
-      }
-      this.ipcListener = () => {
-        this.ytmView.webContents.insertCSS(content).then(customCssRef => {
-          this.customCSSKey = customCssRef;
-        });
-      };
-      ipcMain.once("ytmView:loaded", this.ipcListener);
-
-      this.ytmView.webContents.insertCSS(content).then(customCssRef => {
-        this.refitYTMPopups();
-        this.customCSSKey = customCssRef;
-      });
+      await ytmViewManager.ready();
+      this.customCSSKey = await ytmViewManager.getView().webContents.insertCSS(content);
+      this.injected = true;
 
       this.watchCSSFile(cssPath);
     }
   }
 
   private async removeCSS() {
-    if (this.customCSSKey === null || !this.ytmView) return;
+    if (this.customCSSKey === null && !this.injected) return;
 
-    await this.ytmView.webContents.removeInsertedCSS(this.customCSSKey);
+    const ytmViewManager = this.getService(YTMViewManager);
+
+    await ytmViewManager.ready();
+    await ytmViewManager.getView().webContents.removeInsertedCSS(this.customCSSKey);
+
     this.customCSSKey = null;
-    this.refitYTMPopups();
+    this.injected = false;
   }
 
   private async watchCSSFile(newFile?: string) {
@@ -145,17 +103,13 @@ export default class CustomCSS implements IIntegration {
         this.updateCSS();
       } else if (type === "rename") {
         if (filename) {
-          this.store.set("appearance.customCSSPath", null);
+          const configStore = this.getService(ConfigStore);
+
+          configStore.set("appearance.customCSSPath", null);
           this.removeCSS();
           this.currentWatcher.close();
         }
       }
     });
-  }
-
-  private async refitYTMPopups() {
-    if (this.ytmView) {
-      this.ytmView.webContents.send("ytmView:refitPopups");
-    }
   }
 }

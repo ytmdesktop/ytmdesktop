@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: null
@@ -37,7 +37,7 @@ const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
 const windowFullscreen = ref(false);
 
-window.ytmd.handleWindowEvents((event, state) => {
+window.ytmd.handleWindowEvents(state => {
   windowMaximized.value = state.maximized;
   windowFullscreen.value = state.fullscreen;
 });
@@ -53,7 +53,11 @@ function restartApplicationForUpdate() {
 const ytmViewUnresponsive = ref<boolean>(false);
 const appUpdateDownloaded = ref<boolean>(false);
 
-if (props.isMainWindow) {
+window.ytmd.memoryStore.onStateChanged(newState => {
+  ytmViewUnresponsive.value = newState.ytmViewUnresponsive ?? false;
+});
+
+/*if (props.isMainWindow) {
   const memoryStore = window.ytmd.memoryStore;
 
   onBeforeMount(async () => {
@@ -65,23 +69,46 @@ if (props.isMainWindow) {
     ytmViewUnresponsive.value = newState.ytmViewUnresponsive;
     appUpdateDownloaded.value = newState.appUpdateDownloaded;
   });
-}
+}*/
 </script>
 
 <template>
-  <div v-if="!windowFullscreen" class="titlebar">
+  <div
+    v-if="!windowFullscreen"
+    class="titlebar"
+  >
     <div class="left">
       <div class="title">
-        <span v-if="icon" class="icon material-symbols-outlined">{{ icon }}</span>
-        <img v-if="iconFile" class="icon" :src="iconFile" />
-        <p v-if="title && !centerTitleText" class="title-text">{{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}</p>
+        <span
+          v-if="icon"
+          class="icon material-symbols-outlined"
+        >{{ icon }}</span>
+        <img
+          v-if="iconFile"
+          class="icon"
+          :src="iconFile"
+        >
+        <p
+          v-if="title && !centerTitleText"
+          class="title-text"
+        >
+          {{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}
+        </p>
       </div>
     </div>
-    <div v-if="title && centerTitleText" class="center">
-      <p class="title-text">{{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}</p>
+    <div
+      v-if="title && centerTitleText"
+      class="center"
+    >
+      <p class="title-text">
+        {{ title }}{{ ytmViewUnresponsive ? " (Unresponsive)" : "" }}
+      </p>
     </div>
     <div class="right">
-      <div v-if="isMainWindow" class="update-buttons">
+      <div
+        v-if="isMainWindow"
+        class="update-buttons"
+      >
         <button
           v-if="appUpdateDownloaded"
           class="app-button update-button"
@@ -93,25 +120,57 @@ if (props.isMainWindow) {
         </button>
       </div>
       <div class="app-buttons">
-        <slot name="app-buttons"></slot>
-        <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
+        <slot name="app-buttons" />
+        <button
+          v-if="hasHomeButton"
+          class="app-button"
+          tabindex="2"
+          @click="navigateToDefault"
+        >
           <span class="material-symbols-outlined">home</span>
         </button>
-        <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
+        <button
+          v-if="hasSettingsButton"
+          class="app-button"
+          tabindex="3"
+          @click="openSettingsWindow"
+        >
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
-      <div v-if="!wcoVisible" class="windows-action-buttons">
-        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="4" @click="minimizeWindow">
+      <div
+        v-if="!wcoVisible"
+        class="windows-action-buttons"
+      >
+        <button
+          v-if="hasMinimizeButton"
+          class="action-button window-minimize"
+          tabindex="4"
+          @click="minimizeWindow"
+        >
           <span class="material-symbols-outlined">remove</span>
         </button>
-        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="5" @click="maximizeWindow">
+        <button
+          v-if="hasMaximizeButton && !windowMaximized"
+          class="action-button window-maximize"
+          tabindex="5"
+          @click="maximizeWindow"
+        >
           <span class="material-symbols-outlined">square</span>
         </button>
-        <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="6" @click="restoreWindow">
+        <button
+          v-if="hasMinimizeButton && windowMaximized"
+          class="action-button window-restore"
+          tabindex="6"
+          @click="restoreWindow"
+        >
           <span class="material-symbols-outlined">filter_none</span>
         </button>
-        <button class="action-button window-close" tabindex="7" @click="closeWindow">
+        <button
+          class="action-button window-close"
+          tabindex="7"
+          @click="closeWindow"
+        >
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -184,7 +243,7 @@ if (props.isMainWindow) {
   font-size: 14px;
 }
 
-.app-button {
+:deep(.app-button) {
   margin-right: 4px;
   height: 28px;
   width: 28px;
@@ -204,11 +263,11 @@ if (props.isMainWindow) {
   cursor: pointer;
 }
 
-.app-button:hover {
+:deep(.app-button:hover) {
   background-color: #222222;
 }
 
-.app-button > .material-symbols-outlined {
+:deep(.app-button) > .material-symbols-outlined {
   font-size: 20px;
   color: #b4b4b4;
 }

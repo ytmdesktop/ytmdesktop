@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 (function() {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
@@ -18,6 +19,56 @@
     window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying);
   }
 
+  function sendVideoData() {
+    let videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
+    let playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
+    let album = null;
+    let hasFullMetadata = false;
+
+    // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
+    let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
+    if (currentItem !== null && currentItem !== undefined) {
+      hasFullMetadata = true;
+
+      // Fill out video details with better information
+      videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
+      videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
+
+      for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
+        const item = currentItem.longBylineText.runs[i];
+        if (item.navigationEndpoint) {
+          if (item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType === "MUSIC_PAGE_TYPE_ALBUM") {
+            album = {
+              id: item.navigationEndpoint.browseEndpoint.browseId,
+              text: item.text
+            }
+          }
+        }
+      }
+    }
+
+    let state = ytmStore.getState();
+    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+    const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
+    
+    const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+
+    window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+  }
+
+  function hydrateApplicationState() {
+    sendStoreState();
+
+    const progressState = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getProgressState();
+    window.ytmd.sendVideoProgress(progressState.current);
+
+    const videoState = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerState();
+    window.ytmd.sendVideoState(videoState);
+
+    sendVideoData();
+  }
+
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
     window.ytmd.sendVideoProgress(progress);
   });
@@ -26,41 +77,7 @@
   });
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      let videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
-      let playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
-      let album = null;
-      let hasFullMetadata = false;
-
-      // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
-      let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
-      if (currentItem !== null && currentItem !== undefined) {
-        hasFullMetadata = true;
-
-        // Fill out video details with better information
-        videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
-        videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
-
-        for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
-          const item = currentItem.longBylineText.runs[i];
-          if (item.navigationEndpoint) {
-            if (item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType === "MUSIC_PAGE_TYPE_ALBUM") {
-              album = {
-                id: item.navigationEndpoint.browseEndpoint.browseId,
-                text: item.text
-              }
-            }
-          }
-        }
-      }
-
-      let state = ytmStore.getState();
-      const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-      const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-      const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
-      
-      const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
-
-      window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+      sendVideoData();
     }
   });
   ytmStore.subscribe(() => {
@@ -84,4 +101,10 @@
       window.ytmd.sendDeletePlaylistObservation(playlistId);
     }
   });
+
+  try {
+    // Attempt to do an initial state hydration for the app
+    // TODO: This should be made more reliable as this can sometimes fail even if a video is loaded on startup
+    hydrateApplicationState();
+  } catch { /* empty */ }
 })

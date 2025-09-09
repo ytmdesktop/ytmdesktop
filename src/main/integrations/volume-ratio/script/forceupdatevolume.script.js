@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 (function() {
   let volume = document.querySelector("ytmusic-player-bar").playerApi.getVolume();
   document.querySelector("ytmusic-player-bar").playerApi.setVolume(volume);

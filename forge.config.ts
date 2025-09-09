@@ -5,6 +5,7 @@ import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
+import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
 // There is probably a better way to do this, such as fetching it directly from forge
@@ -100,6 +101,21 @@ const config: ForgeConfig = {
           target: "preload"
         },
         {
+          entry: "src/renderer/windows/titlebar/preload.ts",
+          config: "viteconfig/preload/titlebar_window.ts",
+          target: "preload"
+        },
+        {
+          entry: "src/renderer/windows/updater/preload.ts",
+          config: "viteconfig/preload/updater_window.ts",
+          target: "preload"
+        },
+        {
+          entry: "src/renderer/windows/miniplayer/preload.ts",
+          config: "viteconfig/preload/miniplayer_window.ts",
+          target: "preload"
+        },
+        {
           entry: "src/renderer/ytmview/preload.ts",
           config: "viteconfig/preload/ytmview.ts",
           target: "preload"
@@ -113,6 +129,7 @@ const config: ForgeConfig = {
         }
       ]
     }),
+    new AutoUnpackNativesPlugin({}),
     new FusesPlugin({
       version: FuseVersion.V1,
       resetAdHocDarwinSignature: process.platform === "darwin" && makerArch == "arm64",
@@ -121,7 +138,8 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
       [FuseV1Options.EnableNodeCliInspectArguments]: false,
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-      [FuseV1Options.OnlyLoadAppFromAsar]: true
+      [FuseV1Options.OnlyLoadAppFromAsar]: true,
+      [FuseV1Options.GrantFileProtocolExtraPrivileges]: false
     })
   ]
 };

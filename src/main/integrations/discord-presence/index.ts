@@ -1,10 +1,11 @@
-import playerStateStore, { PlayerState, Thumbnail, VideoDetails, VideoState } from "../../player-state-store";
-import IIntegration from "../integration";
-import MemoryStore from "../../memory-store";
-import { MemoryStoreSchema } from "~shared/store/schema";
+import playerStateStore from "../../player-state-store";
 import DiscordClient from "./minimal-discord-client";
 import log from "electron-log";
 import { DiscordActivityType } from "./minimal-discord-client/types";
+import Integration from "../integration";
+import MemoryStore from "../../services/memorystore";
+import { MemoryStoreSchema } from "~shared/store/schema";
+import { PlayerState, Thumbnail, VideoDetails, VideoState } from "~shared/playerstatestore/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
@@ -49,11 +50,11 @@ function stringLimit(str: string, limit: number, minimum: number) {
   return str;
 }
 
-export default class DiscordPresence implements IIntegration {
-  private memoryStore: MemoryStore<MemoryStoreSchema>;
+export default class DiscordPresence extends Integration {
+  public name = "DiscordPresence";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.discordPresenceEnabled";
 
   private discordClient: DiscordClient = null;
-  private enabled = false;
   private ready = false;
   private activityDebounceTimeout: NodeJS.Timeout | null = null;
   private pauseTimeout: string | number | NodeJS.Timeout = null;
@@ -66,19 +67,22 @@ export default class DiscordPresence implements IIntegration {
 
   private connectionRetries: number = 0;
 
-  private UpdateActivity() {
+  private updateActivity() {
     if (this.activityDebounceTimeout) return;
     this.activityDebounceTimeout = setTimeout(() => {
       if (!this.videoDetails) {
         this.discordClient.clearActivity();
         return;
       }
-      const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
+      const { title, author, album, id, thumbnails, durationSeconds, channelId, albumId } = this.videoDetails;
       const thumbnail = getHighestResThumbnail(thumbnails);
       this.discordClient.setActivity({
         type: DiscordActivityType.Listening,
+        status_display_type: 1,
         details: stringLimit(title, 128, 2),
+        details_url: `https://music.youtube.com/watch?v=${id}`,
         state: stringLimit(author, 128, 2),
+        state_url: `https://music.youtube.com/channel/${channelId}`,
         timestamps: {
           start: this.videoState === VideoState.Playing ? Date.now() - this.progress * 1000 : undefined,
           end: this.videoState === VideoState.Playing ? Date.now() + (durationSeconds - this.progress) * 1000 : undefined
@@ -86,17 +90,14 @@ export default class DiscordPresence implements IIntegration {
         assets: {
           large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
           large_text: album ? stringLimit(album, 128, 2) : undefined,
+          large_url: `https://music.youtube.com/browse/${albumId}`,
           small_image: getSmallImageKey(this.videoState),
           small_text: getSmallImageText(this.videoState)
         },
         instance: false,
         buttons: [
           {
-            label: "Play on YouTube Music",
-            url: `https://music.youtube.com/watch?v=${id}`
-          },
-          {
-            label: "Play on YouTube Music Desktop",
+            label: "Play on YTMDesktop",
             url: `ytmd://play/${id}`
           }
         ]
@@ -123,7 +124,7 @@ export default class DiscordPresence implements IIntegration {
       hasFullMetadata &&
       (oldState !== this.videoState || oldId !== this.videoDetails.id || Math.abs(this.progress - oldProgress) > 1 || oldProgress > this.progress)
     ) {
-      this.UpdateActivity();
+      this.updateActivity();
     }
 
     clearTimeout(this.pauseTimeout);
@@ -136,14 +137,11 @@ export default class DiscordPresence implements IIntegration {
     }, 30 * 1000);
   }
 
-  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
-    this.memoryStore = memoryStore;
-  }
-
   private retryDiscordConnection() {
-    if (!this.enabled) return;
+    if (!this.isEnabled) return;
     if (this.connectionRetries >= 30) {
-      this.memoryStore.set("discordPresenceConnectionFailed", true);
+      const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+      memoryStore.set("discordPresenceConnectionFailed", true);
       return;
     }
 
@@ -157,15 +155,17 @@ export default class DiscordPresence implements IIntegration {
     }, 5 * 1000);
   }
 
-  public enable(): void {
-    this.enabled = true;
+  public onSetup() {}
+
+  public onEnabled(): void {
     if (this.discordClient) return;
     this.discordClient = new DiscordClient(DISCORD_CLIENT_ID);
 
     this.discordClient.on("connect", () => {
       this.ready = true;
       this.connectionRetries = 0;
-      this.memoryStore.set("discordPresenceConnectionFailed", false);
+      const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+      memoryStore.set("discordPresenceConnectionFailed", false);
     });
     this.discordClient.on("close", () => {
       log.info("Discord connection closed");
@@ -180,10 +180,10 @@ export default class DiscordPresence implements IIntegration {
     playerStateStore.addEventListener(this.stateCallback);
   }
 
-  public disable(): void {
-    this.enabled = false;
+  public onDisabled(): void {
     this.connectionRetries = 0;
-    this.memoryStore.set("discordPresenceConnectionFailed", false);
+    const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+    memoryStore.set("discordPresenceConnectionFailed", false);
 
     clearTimeout(this.activityDebounceTimeout);
     clearTimeout(this.pauseTimeout);
@@ -198,9 +198,5 @@ export default class DiscordPresence implements IIntegration {
     this.ready = false;
     this.discordClient.destroy();
     this.discordClient = null;
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
   }
 }

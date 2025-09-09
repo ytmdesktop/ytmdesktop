@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 (function () {
   if (
     typeof window.HTMLMediaElement_volume !== "undefined" &&

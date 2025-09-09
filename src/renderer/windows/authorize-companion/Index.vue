@@ -6,7 +6,7 @@ import Auth from "./Auth.vue";
 <template>
   <div class="container">
     <TitleBar class="titlebar" />
-    <Auth class="auth"></Auth>
+    <Auth class="auth" />
   </div>
 </template>
 

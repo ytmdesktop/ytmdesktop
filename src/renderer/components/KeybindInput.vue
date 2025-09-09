@@ -114,10 +114,35 @@ function keybindInputKeyDown(event: KeyboardEvent) {
 
 <template>
   <div :class="{ 'keybind': true, 'is-editing': isEditing }">
-    <p v-if="!currentKeybind" class="keybind-text" @click="startEditing">None</p>
-    <p v-else class="keybind-text" @click="startEditing">{{ currentKeybind }}</p>
-    <input ref="keybindInput" class="keybind-input" type="text" @focus="keybindInputFocused" @blur="keybindInputBlurred" @keydown="keybindInputKeyDown" />
-    <button class="remove" :disabled="!currentKeybind" @click="currentKeybind = ''"><span class="material-symbols-outlined">delete</span></button>
+    <p
+      v-if="!currentKeybind"
+      class="keybind-text"
+      @click="startEditing"
+    >
+      None
+    </p>
+    <p
+      v-else
+      class="keybind-text"
+      @click="startEditing"
+    >
+      {{ currentKeybind }}
+    </p>
+    <input
+      ref="keybindInput"
+      class="keybind-input"
+      type="text"
+      @focus="keybindInputFocused"
+      @blur="keybindInputBlurred"
+      @keydown="keybindInputKeyDown"
+    >
+    <button
+      class="remove"
+      :disabled="!currentKeybind"
+      @click="currentKeybind = ''"
+    >
+      <span class="material-symbols-outlined">delete</span>
+    </button>
   </div>
 </template>
 

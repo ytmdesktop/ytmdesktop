@@ -1,20 +1,19 @@
 import { shell, safeStorage } from "electron";
-import Conf from "conf";
 import cypto from "crypto";
 
-import playerStateStore, { PlayerState, VideoDetails, VideoState } from "../../player-state-store";
-import MemoryStore from "../../memory-store";
+import playerStateStore from "../../player-state-store";
 
-import IIntegration from "../integration";
-import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import { LastfmErrorResponse, LastfmRequestBody, LastfmSessionResponse, LastfmTokenResponse } from "./schemas";
 import log from "electron-log";
+import Integration from "../integration";
+import memoryStore from "../../services/memorystore";
+import configStore from "../../services/configstore";
+import { StoreSchema } from "~shared/store/schema";
+import { PlayerState, VideoDetails, VideoState } from "~shared/playerstatestore/types";
 
-export default class LastFM implements IIntegration {
-  private store: Conf<StoreSchema>;
-  private memoryStore: MemoryStore<MemoryStoreSchema>;
-
-  private isEnabled = false;
+export default class LastFM extends Integration {
+  public name = "LastFM";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.lastFMEnabled";
 
   private possibleVideoIds: string[] | null;
   private lastfmDetails: StoreSchema["lastfm"] = null;
@@ -103,7 +102,7 @@ export default class LastFM implements IIntegration {
 
       this.updateNowPlaying(state.videoDetails);
 
-      this.lastfmDetails.scrobblePercent = this.store.get("lastfm.scrobblePercent");
+      this.lastfmDetails.scrobblePercent = configStore.get("lastfm.scrobblePercent");
       const scrobblePercentDecimal = this.lastfmDetails.scrobblePercent / 100;
       const scrobbleTimeRequired = Math.min(
         // Scrobble the track if it has been played to the percent picked by the user
@@ -173,21 +172,13 @@ export default class LastFM implements IIntegration {
 
   // ----------------------------------------------------------
 
-  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
-    this.store = store;
-    this.memoryStore = memoryStore;
-  }
+  public onSetup() {}
 
-  public enable(): void {
-    if (!this.memoryStore.get("safeStorageAvailable")) {
+  public onEnabled(): void {
+    if (!memoryStore.get("safeStorageAvailable")) {
       log.info("Refusing to enable LastFM Integration with reason: safeStorage unavailable");
       return;
     }
-
-    if (this.isEnabled) {
-      return;
-    }
-    this.isEnabled = true;
 
     this.lastfmDetails = this.getSettings();
 
@@ -199,17 +190,8 @@ export default class LastFM implements IIntegration {
     playerStateStore.addEventListener(this.playerStateFunction);
   }
 
-  public disable(): void {
-    if (!this.isEnabled) {
-      return;
-    }
-
+  public onDisabled(): void {
     playerStateStore.removeEventListener(this.playerStateFunction);
-    this.isEnabled = false;
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
   }
 
   /**
@@ -276,7 +258,7 @@ export default class LastFM implements IIntegration {
   }
 
   private getSettings(): StoreSchema["lastfm"] {
-    const decryptedValues = this.store.get("lastfm");
+    const decryptedValues = configStore.get("lastfm");
 
     // Grab the session key and token from the store and decrypt them
     if (decryptedValues.sessionKey) {
@@ -303,10 +285,10 @@ export default class LastFM implements IIntegration {
   private async saveSettings(): Promise<void> {
     try {
       if (this.lastfmDetails.sessionKey) {
-        this.store.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
+        configStore.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
       }
       if (this.lastfmDetails.token) {
-        this.store.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+        configStore.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
       }
     } catch {
       // Do nothing, the values are not valid and can be ignored

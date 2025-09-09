@@ -21,9 +21,12 @@ function getIPCPath(id: number): string {
   const dirtyPrefix = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
   const prefix = dirtyPrefix.replace(/\/$/, "");
   const discordSnapDir = "snap.discord";
+  const discordFlatpakDir = "com.discordapp.Discord";
 
   if (directoryExists(`${prefix}/${discordSnapDir}`)) {
     return `${prefix}/${discordSnapDir}/discord-ipc-${id}`;
+  } else if (directoryExists(`${prefix}/${discordFlatpakDir}`)) {
+    return `${prefix}/app/${discordFlatpakDir}/discord-ipc-${id}`;
   } else {
     return `${prefix}/discord-ipc-${id}`;
   }

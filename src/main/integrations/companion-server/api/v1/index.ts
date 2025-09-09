@@ -1,8 +1,6 @@
-import { BrowserView, BrowserWindow, ipcMain } from "electron";
-import Conf from "conf";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
-import { StoreSchema } from "~shared/store/schema";
-import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-state-store";
+import playerStateStore from "../../../../player-state-store";
 import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../api-shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
@@ -27,13 +25,21 @@ import {
   InvalidVolumeError,
   UnauthenticatedError,
   YouTubeMusicTimeOutError,
-  YouTubeMusicUnavailableError
+  YouTubeMusicUnavailableError,
+  InvalidQueueAddRequestError
 } from "../../api-shared/errors";
 import path from "node:path";
+import Service from "../../../../services/service";
+import { Constructor } from "~shared/types";
+import YTMViewManager from "../../../../services/ytmviewmanager";
+import MemoryStore from "../../../../services/memorystore";
+import { MemoryStoreSchema } from "~shared/store/schema";
+import ConfigStore from "../../../../services/configstore";
+import { PlayerState, RepeatMode } from "~shared/playerstatestore/types";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
-const transformPlayerState = (state: PlayerState) => {
+export const transformPlayerState = (state: PlayerState) => {
   return {
     player: {
       trackState: state.trackState,
@@ -49,7 +55,8 @@ const transformPlayerState = (state: PlayerState) => {
             isGenerating: state.queue.isGenerating,
             isInfinite: state.queue.isInfinite,
             repeatMode: state.queue.repeatMode,
-            selectedItemIndex: state.queue.selectedItemIndex
+            selectedItemIndex: state.queue.selectedItemIndex,
+            shuffleEnabled: state.queue.shuffleEnabled
           }
         : null
     },
@@ -83,8 +90,7 @@ const transformPlayerState = (state: PlayerState) => {
 };
 
 interface CompanionServerAPIv1Options extends FastifyPluginOptions {
-  getStore: () => Conf<StoreSchema>;
-  getYtmView: () => BrowserView;
+  getService: <T extends Service>(service: Constructor<T>) => T;
 }
 
 type Playlist = {
@@ -96,7 +102,8 @@ const authorizationWindows: BrowserWindow[] = [];
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options) => {
   const sendCommand = (commandRequest: APIV1CommandRequestBodyType) => {
-    const ytmView = options.getYtmView();
+    const ytmViewManager = options.getService(YTMViewManager);
+    const ytmView = ytmViewManager.getView();
     if (ytmView) {
       switch (commandRequest.command) {
         case "playPause": {
@@ -227,6 +234,61 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           ytmView.webContents.send("remoteControl:execute", "toggleDislike");
           break;
         }
+
+        case "queueAdd": {
+          const videoId = commandRequest.data.videoId;
+          const playlistId = commandRequest.data.playlistId;
+          if (videoId == null && playlistId == null) {
+            throw new InvalidQueueAddRequestError();
+          } else if (videoId != null && playlistId != null) {
+            throw new InvalidQueueAddRequestError();
+          }
+
+          const index = commandRequest.data.index;
+          const state = playerStateStore.getState();
+          if (isNaN(index) || index > state.queue.items.length) {
+            throw new InvalidQueueIndexError(index);
+          }
+
+          ytmView.webContents.send("remoteControl:execute", "queueAdd", {
+            videoId: videoId,
+            playlistId: playlistId,
+            index
+          });
+          break;
+        }
+
+        case "queueRemove": {
+          const index = commandRequest.data;
+          const state = playerStateStore.getState();
+
+          if (isNaN(index) || index > state.queue.items.length - 1) {
+            throw new InvalidQueueIndexError(index);
+          }
+
+          ytmView.webContents.send("remoteControl:execute", "queueRemove", index);
+          break;
+        }
+
+        case "queueMove": {
+          const fromIndex = commandRequest.data.fromIndex;
+          const toIndex = commandRequest.data.toIndex;
+          const state = playerStateStore.getState();
+
+          if (isNaN(fromIndex) || fromIndex > state.queue.items.length - 1) {
+            throw new InvalidQueueIndexError(fromIndex);
+          }
+
+          if (isNaN(toIndex) || toIndex > state.queue.items.length - 1) {
+            throw new InvalidQueueIndexError(toIndex);
+          }
+
+          ytmView.webContents.send("remoteControl:execute", "queueMove", {
+            fromIndex,
+            toIndex
+          });
+          break;
+        }
       }
     }
   };
@@ -251,7 +313,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
+      const memoryStore = options.getService(MemoryStore<MemoryStoreSchema>);
+      const companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
@@ -283,7 +346,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
+      const memoryStore = options.getService(MemoryStore<MemoryStoreSchema>);
+      const companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
 
       // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
       // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
@@ -323,12 +387,11 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(__dirname, `../renderer/windows/authorize-companion/preload.js`),
+          preload: path.join(import.meta.dirname, `../renderer/windows/authorize-companion/preload.js`),
           additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });
-      if (ALL_WINDOWS_VITE_DEV_SERVER_URL) authorizationWindow.loadURL(ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html");
-      else authorizationWindow.loadFile(path.join(__dirname, `../renderer/windows/authorize-companion/index.html`));
+      authorizationWindow.loadURL(app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/settings/index.html");
       authorizationWindow.show();
       authorizationWindow.flashFrame(true);
 
@@ -339,7 +402,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       });
 
       authorizationWindow.webContents.on("will-navigate", event => {
-        if (process.env.NODE_ENV === "development") if (event.url.startsWith("http://localhost")) return;
+        if (!app.isPackaged) if (event.url.startsWith("http://localhost")) return;
 
         event.preventDefault();
       });
@@ -348,7 +411,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       try {
         // Open the DevTools.
-        if (process.env.NODE_ENV === "development") {
+        if (!app.isPackaged) {
           authorizationWindow.webContents.openDevTools({
             mode: "detach"
           });
@@ -402,12 +465,12 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
 
         if (authorized) {
-          const token = createAuthToken(options.getStore(), authData.appId, authData.appVersion, authData.appName);
+          const token = createAuthToken(options.getService(ConfigStore), authData.appId, authData.appVersion, authData.appName);
 
           response.send({
             token
           });
-          options.getMemoryStore().set("companionServerAuthWindowEnabled", false);
+          memoryStore.set("companionServerAuthWindowEnabled", false);
         } else {
           throw new AuthorizationDeniedError();
         }
@@ -436,11 +499,12 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
       },
       preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
       }
     },
     async (request, response) => {
-      const ytmView = options.getYtmView();
+      const ytmViewManager = options.getService(YTMViewManager);
+      const ytmView = ytmViewManager.getView();
       if (ytmView) {
         const requestId = crypto.randomUUID();
 
@@ -479,7 +543,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         }
       },
       preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
       }
     },
     (request, response) => {
@@ -504,7 +568,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         body: APIV1CommandRequestBody
       },
       preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
       }
     },
     (request, response) => {
@@ -516,7 +580,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
   fastify.ready().then(() => {
     fastify.io.of("/api/v1/realtime").use((socket, next) => {
       const token = socket.handshake.auth.token;
-      const [validSession, tokenId] = isAuthValid(options.getStore(), token);
+      const [validSession, tokenId] = isAuthValid(options.getService(ConfigStore), token);
       if (validSession) {
         socket.data.tokenId = tokenId;
         next();
@@ -537,7 +601,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     playerStateStore.addEventListener(stateStoreListener);
 
     const createPlaylistObservedListener = (event: Electron.IpcMainEvent, playlist: Playlist) => {
-      const ytmView = options.getYtmView();
+      const ytmViewManager = options.getService(YTMViewManager);
+      const ytmView = ytmViewManager.getView();
       if (event.sender !== ytmView.webContents) return;
 
       fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
@@ -545,7 +610,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     ipcMain.on("ytmView:createPlaylistObserved", createPlaylistObservedListener);
 
     const deletePlaylistObservedListener = (event: Electron.IpcMainEvent, playlistId: string) => {
-      const ytmView = options.getYtmView();
+      const ytmViewManager = options.getService(YTMViewManager);
+      const ytmView = ytmViewManager.getView();
       if (event.sender !== ytmView.webContents) return;
 
       fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
@@ -561,5 +627,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     });
   });
 };
+
+// @ts-expect-error This is for ESM purposes so that Fastify isn't trying to use CJS require.cache to get the name
+CompanionServerAPIv1[Symbol.for("fastify.display-name")] = "CompanionServerAPIv1";
 
 export default CompanionServerAPIv1;

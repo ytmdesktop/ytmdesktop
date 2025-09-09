@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 (function() {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 

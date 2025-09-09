@@ -35,6 +35,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    enhancedMediaServiceEnabled: boolean;
   };
   shortcuts: {
     playPause: string;
@@ -44,6 +45,9 @@ export type StoreSchema = {
     thumbsDown: string;
     volumeUp: string;
     volumeDown: string;
+    volumeMute: string;
+    toggleShuffle: string;
+    toggleRepeat: string;
   };
   state: {
     lastUrl: string;
@@ -51,6 +55,7 @@ export type StoreSchema = {
     lastVideoId: string;
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
+    miniplayerWindowBounds: Electron.Rectangle | null;
   };
   lastfm: {
     api_key: string;
@@ -73,14 +78,21 @@ export type MemoryStoreSchema = {
   shortcutsThumbsDownRegisterFailed: boolean;
   shortcutsVolumeUpRegisterFailed: boolean;
   shortcutsVolumeDownRegisterFailed: boolean;
+  shortcutsVolumeMuteRegisterFailed: boolean;
+  shortcutsToggleShuffleRegisterFailed: boolean;
+  shortcutsToggleRepeatRegisterFailed: boolean;
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;
+  autoUpdaterChecking: boolean;
+  autoUpdaterNotAvailable: boolean;
+  autoUpdaterAvailable: boolean;
+  autoUpdaterDownloaded: boolean;
+  autoUpdaterErrored: boolean;
   ytmViewLoadTimedout: boolean;
   ytmViewLoading: boolean;
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
   ytmViewUnresponsive: boolean;
-  appUpdateAvailable: boolean;
-  appUpdateDownloaded: boolean;
+  appLoadingStatus: string;
 };

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 (function () {
   function isExperimentEnabled(experimentFlag) {
     const flag = window.ytcfg.data_.EXPERIMENT_FLAGS[experimentFlag];

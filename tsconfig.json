@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -11,6 +11,7 @@
     "baseUrl": ".",
     "outDir": "dist",
     "resolveJsonModule": true,
+    "noImplicitOverride": true,
     "paths": {
       "*": [
         "node_modules/*"

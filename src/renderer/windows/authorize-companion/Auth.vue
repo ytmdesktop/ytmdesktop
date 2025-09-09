@@ -21,17 +21,31 @@ onBeforeMount(async () => {
 <template>
   <div class="container-wrapper">
     <div class="container">
-      <h1 class="title">Companion Authorization Request</h1>
+      <h1 class="title">
+        Companion Authorization Request
+      </h1>
       <p class="subtitle">
         <b>{{ appName }}</b> would like to control YouTube Music Desktop App
       </p>
       <p class="code-confirm">
         Please ensure the code below matches what <b>{{ appName }}</b> is showing
       </p>
-      <p class="code">{{ code }}</p>
+      <p class="code">
+        {{ code }}
+      </p>
       <div class="buttons">
-        <button class="deny" @click="denyCompanion">Deny</button>
-        <button class="allow" @click="allowCompanion">Allow</button>
+        <button
+          class="deny"
+          @click="denyCompanion"
+        >
+          Deny
+        </button>
+        <button
+          class="allow"
+          @click="allowCompanion"
+        >
+          Allow
+        </button>
       </div>
     </div>
   </div>

@@ -1,5 +1,7 @@
 import { execSync } from "node:child_process";
+import path from "node:path";
 import { defineConfig } from "vite";
+import nodeNativesPlugin from "./plugins/node-natives";
 
 let gitBranch: string = "";
 try {
@@ -27,6 +29,13 @@ export default defineConfig({
     outDir: ".vite/main",
     rollupOptions: {
       external: ["bufferutil", "utf-8-validate"]
+    }
+  },
+  plugins: [nodeNativesPlugin()],
+  resolve: {
+    alias: {
+      "~shared": path.resolve(__dirname, "../src/shared"),
+      "~assets": path.resolve(__dirname, "../src/assets")
     }
   },
   define: {

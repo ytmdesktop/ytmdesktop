@@ -1,0 +1,13 @@
+diff --git a/dist/config/vite.main.config.js b/dist/config/vite.main.config.js
+index 8c50ed747d0c399edd966916660cc12a5784cb72..9093090ad4ce0eb5540ea56490f8e071159a9114 100644
+--- a/dist/config/vite.main.config.js
++++ b/dist/config/vite.main.config.js
+@@ -25,7 +25,7 @@ function getConfig(forgeEnv, userConfig = {}) {
+         config.build.lib = {
+             entry: forgeConfigSelf.entry,
+             fileName: () => '[name].js',
+-            formats: ['cjs'],
++            formats: ['es'],
+         };
+     }
+     return (0, vite_1.mergeConfig)((0, vite_1.mergeConfig)(buildConfig, config), userConfig);
