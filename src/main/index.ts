@@ -1010,6 +1010,14 @@ const createOrShowSettingsWindow = (): void => {
     event.preventDefault();
   });
 
+  // Handle Escape key to close settings window
+  settingsWindow.webContents.on("before-input-event", (event, input) => {
+    if (input.type === "keyDown" && input.key === "Escape") {
+      event.preventDefault();
+      settingsWindow.close();
+    }
+  });
+
   settingsWindow.on("ready-to-show", () => {
     settingsWindow.show();
     // Open the DevTools.
@@ -1065,6 +1073,14 @@ const createYTMView = (): void => {
   ratioVolume.provide(ytmView);
 
   // Attach events to ytm view
+  // Handle Ctrl+, (Cmd+, on macOS) to open settings from ytmView
+  ytmView.webContents.on("before-input-event", (event, input) => {
+    if (input.type === "keyDown" && input.key === "," && (input.control || input.meta)) {
+      event.preventDefault();
+      createOrShowSettingsWindow();
+    }
+  });
+
   ytmView.webContents.on("will-navigate", event => {
     const url = new URL(event.url);
     if (isPreventedNavOrRedirect(url)) {
@@ -1305,6 +1321,14 @@ const createMainWindow = (): void => {
     if (process.env.NODE_ENV === "development") if (event.url.startsWith("http://localhost")) return;
 
     event.preventDefault();
+  });
+
+  // Handle Ctrl+, (Cmd+, on macOS) to open settings
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (input.type === "keyDown" && input.key === "," && (input.control || input.meta)) {
+      event.preventDefault();
+      createOrShowSettingsWindow();
+    }
   });
 
   mainWindow.on("ready-to-show", () => {
