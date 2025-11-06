@@ -42,6 +42,12 @@ TODO: Write guides for v2. While these may still be helpful they are geared towa
 - Brew: ```brew install --cask ytmdesktop-youtube-music``` (Community Maintained)
 - Binaries: <https://github.com/ytmdesktop/ytmdesktop/releases>
 
+# Usage
+
+## Command Line Arguments
+
+- `--frameless` - Launch the application without a title bar
+
 # Developing
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js (v20)](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
