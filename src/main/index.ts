@@ -9,7 +9,6 @@ import {
   globalShortcut,
   ipcMain,
   Menu,
-  MenuItemConstructorOptions,
   nativeImage,
   nativeTheme,
   safeStorage,
@@ -156,9 +155,18 @@ log.info("Application launched");
 // Enforce sandbox on all renderers
 app.enableSandbox();
 
+// Parse --frameless flag early to avoid building menu unnecessarily
+const isFrameless = process.argv.includes("--frameless");
+
 // appMenu allows for some basic windows management, editMenu allow for copy and paste shortcuts on MacOS
-const template: MenuItemConstructorOptions[] = [{ role: "appMenu", label: "YouTube Music Desktop App" }, { role: "editMenu" }];
-const builtMenu = isDarwin ? Menu.buildFromTemplate(template) : null; // null for performance https://www.electronjs.org/docs/latest/tutorial/performance#8-call-menusetapplicationmenunull-when-you-do-not-need-a-default-menu
+// Only build menu if not running in frameless mode
+const builtMenu = !isFrameless && isDarwin ? Menu.buildFromTemplate([{ role: "appMenu", label: "YouTube Music Desktop App" }, { role: "editMenu" }]) : null;
+
+function updateApplicationMenu(visible: boolean) {
+  Menu.setApplicationMenu(visible ? builtMenu : null);
+}
+
+// Set initial menu
 Menu.setApplicationMenu(builtMenu);
 
 const companionServer = new CompanionServer();
@@ -257,8 +265,17 @@ memoryStore.onStateChanged((newState, oldState) => {
   if (ytmView !== null) {
     ytmView.webContents.send("memoryStore:stateChanged", newState, oldState);
   }
+
+  if (oldState && newState.titleBarVisible !== oldState.titleBarVisible) {
+    updateApplicationMenu(newState.titleBarVisible);
+    repositionYtmView();
+  }
 });
 log.info("Created memory store");
+
+memoryStore.set("titleBarVisible", !isFrameless);
+updateApplicationMenu(!isFrameless);
+log.info(`Title bar visibility initialized: ${!isFrameless} (frameless flag: ${isFrameless})`);
 
 function shouldDisableUpdates() {
   // macOS can't have auto updates without a code signature
@@ -868,6 +885,25 @@ function registerShortcuts() {
   log.info("Registered shortcuts");
 }
 
+// Constants
+const TITLE_BAR_HEIGHT = 36;
+
+// Helper function to reposition ytmView based on title bar visibility
+function repositionYtmView() {
+  if (!ytmView || !mainWindow) return;
+
+  const titleBarVisible = memoryStore.get("titleBarVisible");
+  const titleBarHeight = titleBarVisible ? TITLE_BAR_HEIGHT : 0;
+  const isFullScreen = mainWindow.fullScreen;
+
+  ytmView.setBounds({
+    x: 0,
+    y: isFullScreen ? 0 : titleBarHeight,
+    width: mainWindow.getContentBounds().width,
+    height: mainWindow.getContentBounds().height - (isFullScreen ? 0 : titleBarHeight)
+  });
+}
+
 // Functions which call to mainWindow renderer
 function sendMainWindowStateIpc() {
   if (mainWindow !== null) {
@@ -940,12 +976,6 @@ const createOrShowSettingsWindow = (): void => {
     icon: getIconPath("ytmd.png"),
     parent: mainWindow,
     modal: !isDarwin,
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#000000",
-      symbolColor: "#BBBBBB",
-      height: 36
-    },
     webPreferences: {
       sandbox: true,
       contextIsolation: true,
@@ -1212,12 +1242,6 @@ const createMainWindow = (): void => {
     frame: false,
     show: false,
     icon: getIconPath("ytmd.png"),
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#000000",
-      symbolColor: "#BBBBBB",
-      height: 36
-    },
     webPreferences: {
       sandbox: true,
       contextIsolation: true,
@@ -1237,47 +1261,19 @@ const createMainWindow = (): void => {
   // Attach events to main window
   mainWindow.on("resize", () => {
     setTimeout(() => {
-      if (ytmView) {
-        if (mainWindow.fullScreen) {
-          ytmView.setBounds({
-            x: 0,
-            y: 0,
-            width: mainWindow.getContentBounds().width,
-            height: mainWindow.getContentBounds().height
-          });
-        } else {
-          ytmView.setBounds({
-            x: 0,
-            y: 36,
-            width: mainWindow.getContentBounds().width,
-            height: mainWindow.getContentBounds().height - 36
-          });
-        }
-      }
+      repositionYtmView();
     });
   });
 
   mainWindow.on("enter-full-screen", () => {
     setTimeout(() => {
-      if (ytmView) {
-        ytmView.setBounds({
-          x: 0,
-          y: 0,
-          width: mainWindow.getContentBounds().width,
-          height: mainWindow.getContentBounds().height
-        });
-      }
+      repositionYtmView();
     });
     sendMainWindowStateIpc();
   });
   mainWindow.on("leave-full-screen", () => {
     setTimeout(() => {
-      ytmView.setBounds({
-        x: 0,
-        y: 36,
-        width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height - 36
-      });
+      repositionYtmView();
     });
     sendMainWindowStateIpc();
   });
@@ -1576,12 +1572,7 @@ app.on("ready", async () => {
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
-      ytmView.setBounds({
-        x: 0,
-        y: 36,
-        width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height - 36
-      });
+      repositionYtmView();
       if (process.env.NODE_ENV === "development") {
         ytmView.webContents.openDevTools({
           mode: "detach"

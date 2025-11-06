@@ -33,9 +33,20 @@ const closeWindow = window.ytmd.closeWindow;
 const openSettingsWindow = window.ytmd.openSettingsWindow;
 const navigateToDefault = window.ytmd.ytmViewNavigateDefault;
 
+const memoryStore = window.ytmd.memoryStore;
+
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
 const windowFullscreen = ref(false);
+const titleBarVisible = ref<boolean>(true);
+
+onBeforeMount(async () => {
+  titleBarVisible.value = (await memoryStore.get("titleBarVisible")) ?? true;
+});
+
+memoryStore.onStateChanged(newState => {
+  titleBarVisible.value = newState.titleBarVisible;
+});
 
 window.ytmd.handleWindowEvents((event, state) => {
   windowMaximized.value = state.maximized;
@@ -69,7 +80,7 @@ if (props.isMainWindow) {
 </script>
 
 <template>
-  <div v-if="!windowFullscreen" class="titlebar">
+  <div v-if="!windowFullscreen && titleBarVisible" class="titlebar">
     <div class="left">
       <div class="title">
         <span v-if="icon" class="icon material-symbols-outlined">{{ icon }}</span>
