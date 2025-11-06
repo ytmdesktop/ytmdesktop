@@ -1,0 +1,428 @@
+openapi: 3.0.0
+info:
+  title: YTM-Desktop API
+  description: >-
+    This is a [ytm-desktop](https://github.com/ytmdesktop/ytmdesktop) server
+    using OpenAPI 3.0 specification.
+  contact:
+    email: mail@haraldheckmann.de
+  license:
+    name: WTFPL Version 2
+    url: http://www.wtfpl.net/about/
+  version: 2.0.6-oas3.0
+externalDocs:
+  description: Find out more about ytmdesktop
+  url: https://github.com/ytmdesktop/ytmdesktop/wiki
+servers:
+  - url: http://localhost:9863
+tags:
+  - name: youtube music desktop
+    description: This API is used to interact with youtube music via ytm-desktop
+paths:
+  /metadata:
+    get:
+      description: >-
+        Returns metadata about the application and its available API versions.
+        You can use this to quickly determine what API versions are available in
+        the application.
+      responses:
+        '200':
+          description: Metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+  /api/v1/auth/requestcode:
+    post:
+      description: Requests a code to exchange for a valid token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestCode'
+      responses:
+        '200':
+          description: Requested Code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestCodeResponse'
+  /api/v1/auth/request:
+    post:
+      description: Exchanges a code for a valid token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAuth'
+      responses:
+        '200':
+          description: Valid auth token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestAuthResponse'
+  /api/v1/command:
+    post:
+      description: Controls the player.
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/GenericCommand'
+                - $ref: '#/components/schemas/NumberCommand'
+                - $ref: '#/components/schemas/RepeatModeCommand'
+                - $ref: '#/components/schemas/ChangeVideoCommand'
+            examples:
+              playPause:
+                value:
+                  command: playPause
+              play:
+                value:
+                  command: play
+              pause:
+                value:
+                  command: pause
+              volumeUp:
+                value:
+                  command: volumeUp
+              volumeDown:
+                value:
+                  command: volumeDown
+              mute:
+                value:
+                  command: mute
+              unmute:
+                value:
+                  command: unmute
+              next:
+                value:
+                  command: next
+              previous:
+                value:
+                  command: previous
+              shuffle:
+                value:
+                  command: shuffle
+              toggleLike:
+                value:
+                  command: toggleLike
+              toggleDislike:
+                value:
+                  command: toggleDislike
+              setVolume:
+                description: Set volume to 25%
+                value:
+                  command: setVolume
+                  data: 25
+              seekTo:
+                description: Jump to second 10
+                value:
+                  command: seekTo
+                  data: 10
+              playQueueIndex:
+                description: Play the second item from the current queue
+                value:
+                  command: playQueueIndex
+                  data: 1
+              repeatMode:
+                description: Do not repeat items from the queue
+                value:
+                  command: repeatMode
+                  data: 0
+              changeVideo:
+                description: Change video to first video in first playlist
+                value:
+                  command: changeVideo
+                  data:
+                    videoId: dQw4w9WgXcQ
+                    playlistId: null
+      responses:
+        '204':
+          description: Command executed
+  /api/v1/playlists:
+    get:
+      description: Returns the users playlists from YouTube Music.
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Request Code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playlist'
+  /api/v1/state:
+    get:
+      description: Exchanges a code for a valid token.
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Current YTM state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/State'
+components:
+  schemas:
+    Metadata:
+      type: object
+      properties:
+        apiVersions:
+          type: array
+          items:
+            type: string
+          description: Supportet API versions
+          example: [v1]
+    RequestCode:
+      type: object
+      properties:
+        appId:
+          type: string
+          example: testapp
+        appName:
+          type: string
+          example: TestApp
+        appVersion:
+          type: string
+          example: 0.0.1
+    RequestCodeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+    RequestAuth:
+      type: object
+      properties:
+        appId:
+          type: string
+        code:
+          type: string
+    RequestAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    Playlist:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    GenericCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - playPause
+            - play
+            - pause
+            - volumeUp
+            - volumeDown
+            - mute
+            - unmute
+            - next
+            - previous
+            - shuffle
+            - toggleLike
+            - toggleDislike
+            - changeVideo
+    NumberCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - setVolume
+            - seekTo
+            - playQueueIndex
+        data:
+          type: integer
+    RepeatModeCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          enum: [repeatMode]
+        data:
+          $ref: '#/components/schemas/RepeatMode'
+    ChangeVideoCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          enum: [changeVideo]
+        data:
+          type: object
+          properties:
+            videoId:
+              type: string
+              nullable: true
+            playlistId:
+              type: string
+              nullable: true
+    Thumbnail:
+      type: object
+      properties:
+        url:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+    QueueItem:
+      type: object
+      properties:
+        thumbnails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thumbnail'
+        title:
+          type: string
+        author:
+          type: string
+        duration:
+          type: string
+        selected:
+          type: boolean
+        videoId:
+          type: string
+        counterparts:
+          nullable: true
+          type: array
+          items:
+            $ref: '#/components/schemas/QueueItem'
+    Queue:
+      type: object
+      properties:
+        autoplay:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueueItem'
+        automixItems:
+          $ref: '#/components/schemas/QueueItem'
+        isGenerating:
+          type: boolean
+        isInfinite:
+          type: boolean
+        repeatMode:
+          type: integer
+          enum: [-1, 0, 1, 2]
+          x-enum-varnames: [Unknown, None, All, One]
+        selectedItemIndex:
+          type: integer
+    Player:
+      type: object
+      properties:
+        trackState:
+          $ref: '#/components/schemas/TrackState'
+        videoProgress:
+          type: integer
+        volume:
+          type: integer
+        adPlaying:
+          type: boolean
+        queue:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Queue'
+    Video:
+      type: object
+      required:
+        - author
+        - channelId
+        - title
+        - album
+        - albumId
+        - likeStatus
+        - thumbnails
+        - durationSeconds
+        - id
+      properties:
+        author:
+          type: string
+        channelId:
+          type: string
+        title:
+          type: string
+        album:
+          type: string
+          nullable: true
+        albumId:
+          type: string
+          nullable: true
+        likeStatus:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/LikeStatus'
+        thumbnails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thumbnail'
+        durationSeconds:
+          type: integer
+        id:
+          type: string
+        isLive:
+          type: boolean
+        videoType:
+          $ref: '#/components/schemas/VideoType'
+        metadataFilled:
+          type: boolean
+    State:
+      type: object
+      properties:
+        player:
+          $ref: '#/components/schemas/Player'
+        video:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Video'
+        playlistId:
+          type: string
+    TrackState:
+      type: integer
+      enum: [-1, 0, 1, 2]
+      x-enum-varnames:
+        - Unknown
+        - Paused
+        - Playing
+        - Buffering
+    RepeatMode:
+      type: integer
+      enum: [0, 1, 2]
+      x-enum-varnames: [None, All, One]
+    LikeStatus:
+      type: integer
+      enum: [-1, 0, 1, 2]
+      x-enum-varnames:
+        - Unknown
+        - Dislike
+        - Indifferent
+        - Like
+    VideoType:
+      type: integer
+      enum: [-1, 0, 1, 2, 3]
+      x-enum-varnames:
+        - Unknown
+        - Audio
+        - Video
+        - Uploaded
+        - Podcast
+  securitySchemes:
+    api_key:
+      description: Use key retrieved via /auth/request
+      type: apiKey
+      name: Authorization
+      in: header
