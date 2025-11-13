@@ -1,4 +1,4 @@
-import { BrowserView, BrowserWindow, ipcMain } from "electron";
+import { WebContentsView, BrowserWindow, ipcMain } from "electron";
 import Conf from "conf";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "~shared/store/schema";
@@ -84,7 +84,7 @@ const transformPlayerState = (state: PlayerState) => {
 
 interface CompanionServerAPIv1Options extends FastifyPluginOptions {
   getStore: () => Conf<StoreSchema>;
-  getYtmView: () => BrowserView;
+  getYtmView: () => WebContentsView;
 }
 
 type Playlist = {

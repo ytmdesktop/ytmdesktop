@@ -1,4 +1,4 @@
-import { BrowserView } from "electron";
+import { WebContentsView } from "electron";
 import IIntegration from "../integration";
 
 import enableScript from "./script/enable.script?raw";
@@ -10,12 +10,12 @@ export default class VolumeRatio implements IIntegration {
   // https://greasyfork.org/en/scripts/397686-youtube-music-fix-volume-ratio
   // Made by: Marco Pfeiffer <git@marco.zone>
 
-  private ytmView: BrowserView;
+  private ytmView: WebContentsView;
   private hasInjected = false;
   private isEnabled = false;
   private waitForYTMView = true;
 
-  public provide(ytmView: BrowserView): void {
+  public provide(ytmView: WebContentsView): void {
     if (ytmView !== this.ytmView) {
       // The YTM view object has changed from what we knew it was. Invalidate the state as the YTM view was recreated
       this.hasInjected = false;

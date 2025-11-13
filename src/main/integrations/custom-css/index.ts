@@ -1,4 +1,4 @@
-import { BrowserView, ipcMain } from "electron";
+import { WebContentsView, ipcMain } from "electron";
 import fs from "fs";
 import Conf from "conf";
 
@@ -7,7 +7,7 @@ import { StoreSchema } from "~shared/store/schema";
 import { Unsubscribe } from "conf/dist/source/types";
 
 export default class CustomCSS implements IIntegration {
-  private ytmView: BrowserView;
+  private ytmView: WebContentsView;
   private store: Conf<StoreSchema>;
   private isEnabled = false;
   private hasInjectedOnce = false;
@@ -18,7 +18,7 @@ export default class CustomCSS implements IIntegration {
 
   private currentWatcher: fs.FSWatcher | null = null;
 
-  public provide(store: Conf<StoreSchema>, ytmView: BrowserView): void {
+  public provide(store: Conf<StoreSchema>, ytmView: WebContentsView): void {
     let ytmViewChanged = false;
     if (ytmView !== this.ytmView) {
       ytmViewChanged = true;

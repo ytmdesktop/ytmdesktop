@@ -1,7 +1,7 @@
 import {
   app,
   autoUpdater,
-  BrowserView,
+  WebContentsView,
   BrowserWindow,
   clipboard,
   crashReporter,
@@ -172,7 +172,7 @@ const ytmViewIntegrationScripts: { [name: string]: { [name: string]: string } } 
 
 let mainWindow: BrowserWindow = null;
 let settingsWindow: BrowserWindow = null;
-let ytmView: BrowserView = null;
+let ytmView: WebContentsView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
 
@@ -1021,7 +1021,7 @@ const createYTMView = (): void => {
   memoryStore.set("ytmViewLoading", true);
   memoryStore.set("ytmViewLoadingStatus", "Initializing...");
 
-  ytmView = new BrowserView({
+  ytmView = new WebContentsView({
     webPreferences: {
       sandbox: true,
       contextIsolation: true,
@@ -1030,6 +1030,7 @@ const createYTMView = (): void => {
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
+  ytmView.setBackgroundColor("#00000000");
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
@@ -1575,7 +1576,7 @@ app.on("ready", async () => {
 
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
-      mainWindow.addBrowserView(ytmView);
+      mainWindow.contentView.addChildView(ytmView);
       ytmView.setBounds({
         x: 0,
         y: 36,
@@ -1664,7 +1665,7 @@ app.on("ready", async () => {
 
     if (ytmView) {
       if (mainWindow) {
-        mainWindow.removeBrowserView(ytmView);
+        mainWindow.contentView.removeChildView(ytmView);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
