@@ -77,6 +77,7 @@ export default class DiscordPresence implements IIntegration {
       const thumbnail = getHighestResThumbnail(thumbnails);
       this.discordClient.setActivity({
         type: DiscordActivityType.Listening,
+        name: stringLimit(author, 128, 2),
         details: stringLimit(title, 128, 2),
         state: stringLimit(author, 128, 2),
         timestamps: {

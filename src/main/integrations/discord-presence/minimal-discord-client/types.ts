@@ -9,6 +9,7 @@ export enum DiscordActivityType {
 
 export type DiscordActivity = {
   type?: DiscordActivityType;
+  name?: string;
   state?: string;
   details?: string;
   timestamps?: {
