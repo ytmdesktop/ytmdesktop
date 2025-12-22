@@ -438,8 +438,9 @@ window.addEventListener("load", async () => {
           `)
         )();
 
-        let newVolumeUp = currentVolumeUp + 10;
-        if (currentVolumeUp > 100) {
+        const volumeDelta = Number(await store.get("shortcuts.volumeDelta"));
+        let newVolumeUp = currentVolumeUp + volumeDelta;
+        if (newVolumeUp > 100) {
           newVolumeUp = 100;
         }
         (
@@ -462,8 +463,9 @@ window.addEventListener("load", async () => {
           `)
         )();
 
-        let newVolumeDown = currentVolumeDown - 10;
-        if (currentVolumeDown < 0) {
+        const volumeDelta = Number(await store.get("shortcuts.volumeDelta"));
+        let newVolumeDown = currentVolumeDown - volumeDelta;
+        if (newVolumeDown < 0) {
           newVolumeDown = 0;
         }
         (

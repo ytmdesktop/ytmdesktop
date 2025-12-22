@@ -69,6 +69,7 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+const shortcutsVolumeDelta = ref<number>(shortcuts.volumeDelta);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
@@ -178,6 +179,7 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+  store.set("shortcuts.volumeDelta", shortcutsVolumeDelta.value);
 }
 
 async function settingChangedRequiresRestart() {
@@ -517,6 +519,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
           </div>
+          <YTMDSetting v-model="shortcutsVolumeDelta" type="range" max="20" min="1" step="1" name="Volume Delta %" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 99" class="about-tab">
