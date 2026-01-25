@@ -587,9 +587,33 @@ window.addEventListener("load", async () => {
             true
           );
 
-          if (process.env.NODE_ENV === "development") {
-            __ytmdDbgPlay("VP3", "ytmview/preload.ts:remoteControl:playPause", "actionResult", { actionResult });
-          }
+          // #region agent log (debug instrumentation)
+          __ytmdDbgPlay("VP3", "ytmview/preload.ts:remoteControl:playPause", "actionResult", { actionResult });
+          // #endregion agent log (debug instrumentation)
+
+          // Wait a brief moment for player state to update (YTM player API is asynchronous)
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+          // Snapshot after attempting the action
+          const after = (await webFrame.executeJavaScript(`
+            (function() {
+              try {
+                const bar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+                return {
+                  hasBar: Boolean(bar),
+                  hasApi: Boolean(bar && bar.playerApi),
+                  playing: Boolean(bar && bar.playing),
+                  userActivation: (navigator.userActivation ? { isActive: navigator.userActivation.isActive, hasBeenActive: navigator.userActivation.hasBeenActive } : null)
+                };
+              } catch (e) {
+                return { error: String(e) };
+              }
+            })()
+          `)) as unknown;
+
+          // #region agent log (debug instrumentation)
+          __ytmdDbgPlay("VP3", "ytmview/preload.ts:remoteControl:playPause", "after", { after });
+          // #endregion agent log (debug instrumentation)
 
           break;
         }
