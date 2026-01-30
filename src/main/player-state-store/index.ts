@@ -177,9 +177,9 @@ function mapYTMThumbnails(thumbnail: YTMThumbnail) {
 }
 
 function mapCounterpart(counterpart: YTMPlayerQueueItemCounterpart) {
-  // Explicit mapping to keep a consistent API
-  // If YouTube Music changes how this is presented internally then it's easier to update without breaking the API
-  return transformPlaylistPanelVideoRenderer(counterpart.counterpartRenderer.playlistPanelVideoRenderer);
+  const renderer = counterpart?.counterpartRenderer?.playlistPanelVideoRenderer;
+  if (!renderer) return null;
+  return transformPlaylistPanelVideoRenderer(renderer);
 }
 
 function transformPlaylistPanelVideoRenderer(
@@ -187,13 +187,13 @@ function transformPlaylistPanelVideoRenderer(
   counterpart?: YTMPlayerQueueItemCounterpart[]
 ): PlayerQueueItem {
   return {
-    thumbnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails),
+    thumbnails: playlistPanelVideoRenderer.thumbnail?.thumbnails?.map(mapYTMThumbnails) ?? [],
     title: getYTMTextRun(playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }]),
     author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }]),
     duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }]),
     selected: playlistPanelVideoRenderer.selected,
     videoId: playlistPanelVideoRenderer.videoId,
-    counterparts: counterpart ? counterpart.map(mapCounterpart) : null
+    counterparts: counterpart?.map(mapCounterpart)?.filter(Boolean) ?? null
   };
 }
 
