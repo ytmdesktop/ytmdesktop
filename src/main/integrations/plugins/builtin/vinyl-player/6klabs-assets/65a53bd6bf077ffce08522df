@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width,height=device-height initial-scale=1" />
+		<title>6K Labs</title>
+		<link rel="icon" type="image/svg+xml" href="/6k_logo_white_ico.svg" />
+		<script type="module" crossorigin src="/assets/index-4783303a.js"></script>
+		<link rel="stylesheet" href="/assets/index-ef1a3273.css">
+	</head>
+	<body>
+		<div id="root"></div>
+		
+	</body>
+</html>

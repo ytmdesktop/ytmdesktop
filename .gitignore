@@ -60,6 +60,8 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
+.env.local
+.env.*.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -88,11 +90,18 @@ typings/
 # Vite
 .vite/
 
+# TypeScript build output
+dist/
+
 # Electron-Forge
 out/
+.forge/
 
 # Contributors Export
 scripts/CONTRIBUTORS.md
+
+# Builder config resolver output
+builder.config.resolved.json
 
 # Yarn (https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored)
 .pnp.*
@@ -105,3 +114,39 @@ scripts/CONTRIBUTORS.md
 
 # JetBrains IDE (could be more specific, but it's no issues at all, to just ignore the entire folder)
 .idea
+
+# Cursor files (skills and agents are committed for team use)
+.cursor/*
+!.cursor/skills/
+!.cursor/agents/
+
+# Browser Tools MCP (local)
+.browser-tools-mcp/
+
+# Screenshots (local)
+.screenshots/
+
+# 6K Labs Reference Files (local)
+.6klabs_REF_Files/
+6klabs_REF_Files/
+
+# Local scratch / OS files
+__noop__.ipynb
+package-lock.json
+*.lnk
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+*.swp
+*.swo
+*~
+.vs/
+
+# Local helper scripts (not part of the app)
+.scripts/analyze-branches.js
+.scripts/cleanup-branches.js
+.scripts/test-sentry-update-monitoring.js
+.scripts/generateContributors.mjs

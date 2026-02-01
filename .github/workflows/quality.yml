@@ -1,0 +1,36 @@
+---
+name: Quality Checks
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Github checkout
+        uses: actions/checkout@v4
+
+      - name: Corepack Enable Yarn
+        run: corepack enable yarn
+
+      - name: Setup Node (v20)
+        uses: actions/setup-node@v4
+        with:
+          cache: yarn
+          node-version: "20.9.0"
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Prettier (check)
+        run: yarn prettier
+
+      - name: Tests
+        run: yarn test
+

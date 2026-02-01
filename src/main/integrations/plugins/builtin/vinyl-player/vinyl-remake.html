@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remake Widget</title>
+    <style>
+      :root {
+        /* Theme tokens (customizable) */
+        --bg: rgba(12, 13, 16, 0.72);
+        --bg2: rgba(20, 22, 27, 0.55);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: rgba(255, 255, 255, 0.95);
+        --muted: rgba(255, 255, 255, 0.7);
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        --accent: #f22e76;
+        --accent2: #7c3aed;
+        --bar: rgba(255, 255, 255, 0.18);
+        --barFill: linear-gradient(90deg, var(--accent), var(--accent2));
+        --btnBg: rgba(0, 0, 0, 0.55);
+        --btnBorder: rgba(255, 255, 255, 0.14);
+        --btnIcon: rgba(255, 255, 255, 0.92);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        user-select: none;
+        background: transparent;
+        font-family:
+          Poppins,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          "Noto Sans",
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Stable drag region; interactive elements opt-out. */
+        -webkit-app-region: drag;
+      }
+
+      /* Full-bleed blurred backdrop (uses cover image when available) */
+      .backdrop {
+        position: absolute;
+        inset: -20px;
+        background:
+          radial-gradient(circle at 25% 10%, rgba(242, 46, 118, 0.3), transparent 55%),
+          radial-gradient(circle at 70% 60%, rgba(124, 58, 237, 0.26), transparent 55%), linear-gradient(135deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65));
+        filter: blur(18px) saturate(1.2);
+        transform: scale(1.1);
+        opacity: 0;
+        visibility: hidden;
+        color: rgba(255, 255, 255, 0);
+        background-color: rgba(255, 255, 255, 1);
+        pointer-events: none;
+      }
+
+      .backdrop.has-cover {
+        background-size: cover;
+        background-position: center;
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 14px 16px;
+      }
+
+      .card {
+        width: 100%;
+        height: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, var(--bg), var(--bg2));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px;
+        position: relative;
+      }
+
+      /* Left: disc/cover */
+      .disc-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        aspect-ratio: 1;
+        flex-shrink: 0;
+        -webkit-app-region: no-drag;
+      }
+
+      .disc {
+        width: 100%;
+        height: 100%;
+        border-radius: 999px;
+        position: relative;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06), transparent 48%), conic-gradient(from 0deg, #0a0a0a, #161616, #0e0e0e, #262626, #0a0a0a);
+        box-shadow:
+          0 18px 60px rgba(0, 0, 0, 0.55),
+          inset 0 0 28px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        transition:
+          transform 180ms ease,
+          filter 180ms ease;
+        animation: spin 2.6s linear infinite;
+      }
+
+      .disc.paused {
+        animation-play-state: paused;
+        filter: grayscale(0.5) brightness(0.86);
+      }
+
+      .disc:hover {
+        transform: scale(1.01);
+        filter: brightness(1.06);
+      }
+
+      .grooves {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background:
+          repeating-radial-gradient(circle, transparent 14%, rgba(255, 255, 255, 0.035) 14.7%, transparent 15.4%),
+          repeating-radial-gradient(circle, transparent 22%, rgba(255, 255, 255, 0.025) 22.5%, transparent 23%);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: clamp(28px, 18%, 72px);
+        height: clamp(28px, 18%, 72px);
+        border-radius: 999px;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent 60%),
+          linear-gradient(135deg, #2c1810 0%, #8b4513 20%, #a0522d 40%, #8b4513 60%, #654321 100%);
+        background-repeat: repeat;
+        background-size: auto;
+        background-position: 0% 0%;
+        border: 2px solid rgba(139, 69, 19, 0.75);
+        box-shadow:
+          inset 0 0 12px rgba(0, 0, 0, 0.55),
+          0 10px 26px rgba(0, 0, 0, 0.35);
+        overflow: visible;
+        opacity: 0.8;
+        z-index: 1;
+      }
+
+      .cover {
+        position: absolute;
+        inset: 7%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+        background-size: cover;
+        background-position: center;
+        box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.45);
+        opacity: 0.31;
+        z-index: 0;
+      }
+
+      .hole {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: clamp(10px, 7%, 28px);
+        height: clamp(10px, 7%, 28px);
+        border-radius: 50%;
+        background: radial-gradient(circle, #000 0%, #1a1a1a 70%, #333 100%);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.85);
+        z-index: 2;
+      }
+
+      .disc-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0);
+        transition: background 120ms ease;
+        cursor: pointer;
+      }
+
+      .disc-overlay.disabled {
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .disc-overlay:hover {
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .disc-overlay .icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 999px;
+        background: var(--btnBg);
+        border: 1px solid var(--btnBorder);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.98);
+        transition:
+          opacity 120ms ease,
+          transform 120ms ease;
+        pointer-events: none;
+      }
+
+      .disc-overlay:hover .icon,
+      .disc-overlay.active .icon {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .disc-overlay svg {
+        width: 22px;
+        height: 22px;
+        fill: var(--btnIcon);
+      }
+
+      /* Right: text + progress */
+      .info {
+        flex: 1;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 8px;
+        min-width: 0;
+        height: 100%;
+        padding-top: 4px;
+      }
+
+      .badge {
+        justify-self: end;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.22);
+        backdrop-filter: blur(10px);
+      }
+
+      .title {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.05;
+        color: var(--text);
+        min-width: 0;
+      }
+
+      .artist {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--muted);
+        min-width: 0;
+      }
+
+      .marquee {
+        overflow: hidden;
+        white-space: nowrap;
+        min-width: 0;
+      }
+      .marquee > span {
+        display: inline-block;
+        position: relative;
+      }
+      .marquee.animate > span {
+        animation: move 10s linear infinite;
+      }
+
+      @keyframes move {
+        0%,
+        25% {
+          transform: translateX(0%);
+          left: 0%;
+        }
+        75%,
+        100% {
+          transform: translateX(-100%);
+          left: 100%;
+        }
+      }
+
+      .progress {
+        align-self: end;
+        display: grid;
+        gap: 8px;
+      }
+
+      .bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--bar);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .bar > .fill {
+        height: 100%;
+        width: 0%;
+        background: var(--barFill);
+        border-radius: 999px;
+        box-shadow: 0 0 18px rgba(242, 46, 118, 0.28);
+        transition: width 220ms ease;
+      }
+
+      .times {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .controls {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        display: flex;
+        gap: 10px;
+        z-index: 20;
+        -webkit-app-region: no-drag;
+      }
+
+      .btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: 1px solid var(--btnBorder);
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--btnIcon);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background 120ms ease,
+          border-color 120ms ease;
+      }
+
+      .btn:hover {
+        transform: scale(1.08);
+        background: rgba(0, 0, 0, 0.58);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .btn:active {
+        transform: scale(0.96);
+      }
+
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        fill: var(--btnIcon);
+      }
+
+      .btn.close:hover {
+        background: rgba(232, 17, 35, 0.72);
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive fallback */
+      @media (max-width: 520px) {
+        .title {
+          font-size: 20px;
+        }
+        .badge {
+          font-size: 10px;
+          padding: 4px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="disc-wrap">
+        <div class="disc" id="disc">
+          <div class="grooves">
+            <div class="label"></div>
+            <div class="cover" id="cover"></div>
+          </div>
+          <div class="hole"></div>
+          <div class="disc-overlay" id="discOverlay">
+            <div class="icon" id="overlayIcon" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="title marquee" id="titleWrap"><span id="title">Loading…</span></div>
+        <div class="artist marquee" id="artistWrap"><span id="artist">—</span></div>
+        <div class="progress">
+          <div class="bar"><div class="fill" id="barFill"></div></div>
+          <div class="times">
+            <span id="tCur">0:00</span>
+            <span id="tDur">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="btn" id="btnPlayPause" title="Play/Pause" aria-label="Play/Pause"></button>
+        <button class="btn close" id="btnClose" title="Close" aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="frame"></div>
+
+    <script>
+      const isElectron = Boolean(window.electron && window.electron.ipcRenderer);
+      const ipc = isElectron ? window.electron.ipcRenderer : null;
+
+      const els = {
+        disc: document.getElementById("disc"),
+        cover: document.getElementById("cover"),
+        titleWrap: document.getElementById("titleWrap"),
+        title: document.getElementById("title"),
+        artistWrap: document.getElementById("artistWrap"),
+        artist: document.getElementById("artist"),
+        barFill: document.getElementById("barFill"),
+        tCur: document.getElementById("tCur"),
+        tDur: document.getElementById("tDur"),
+        controls: document.getElementById("controls"),
+        btnPlayPause: document.getElementById("btnPlayPause"),
+        btnClose: document.getElementById("btnClose"),
+        discOverlay: document.getElementById("discOverlay"),
+        overlayIcon: document.getElementById("overlayIcon")
+      };
+
+      const icons = {
+        play: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>`,
+        pause: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
+        close: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L12 13.41l-6.89 6.3-1.42-1.41L10.59 12 3.69 5.71 5.1 4.29 12 10.59l6.89-6.3z"/></svg>`
+      };
+
+      if (els.btnClose) els.btnClose.innerHTML = icons.close;
+
+      const formatTime = seconds => {
+        const s = Math.max(0, Math.floor(Number(seconds || 0)));
+        const mins = Math.floor(s / 60);
+        const secs = String(s % 60).padStart(2, "0");
+        return `${mins}:${secs}`;
+      };
+
+      const setMarquee = wrapEl => {
+        if (!wrapEl) return;
+        const child = wrapEl.querySelector("span");
+        if (!child) return;
+        // Enable marquee if content is wider than container
+        requestAnimationFrame(() => {
+          try {
+            wrapEl.classList.toggle("animate", child.scrollWidth > wrapEl.clientWidth + 6);
+          } catch {}
+        });
+      };
+
+      let settings = {
+        showControls: true,
+        enableButtonFeature: true
+      };
+
+      let state = {
+        title: "Loading…",
+        artist: "—",
+        thumbnail: "",
+        isPlaying: false,
+        spinSpeed: 2,
+        durationSeconds: 0,
+        progressSeconds: 0
+      };
+
+      const applySettings = s => {
+        if (!s || typeof s !== "object") return;
+        if (typeof s.showControls === "boolean") settings.showControls = s.showControls;
+        if (typeof s.enableButtonFeature === "boolean") settings.enableButtonFeature = s.enableButtonFeature;
+
+        if (els.controls) els.controls.style.display = settings.showControls && isElectron ? "flex" : "none";
+        if (els.discOverlay) {
+          els.discOverlay.classList.toggle("disabled", !settings.enableButtonFeature || !isElectron);
+        }
+      };
+
+      const update = patch => {
+        if (!patch || typeof patch !== "object") return;
+        state = { ...state, ...patch };
+
+        const title = String(state.title || "No track playing");
+        const artist = String(state.artist || "");
+        const cover = String(state.thumbnail || "");
+        const isPlaying = Boolean(state.isPlaying);
+        const spinSpeed = Number(state.spinSpeed || 2);
+        const dur = Number(state.durationSeconds || 0);
+        const prog = Number(state.progressSeconds || 0);
+        const pct = dur > 0 ? Math.max(0, Math.min(1, prog / dur)) : 0;
+
+        if (els.title) els.title.textContent = title;
+        if (els.artist) els.artist.textContent = artist || "—";
+        if (els.tCur) els.tCur.textContent = formatTime(prog);
+        if (els.tDur) els.tDur.textContent = formatTime(dur);
+        if (els.barFill) els.barFill.style.width = `${pct * 100}%`;
+
+        // Cover
+        if (els.cover) {
+          if (cover) {
+            els.cover.style.backgroundImage = `url(${cover})`;
+          }
+        }
+
+        // Playing state affects spin + icon
+        if (els.disc) els.disc.classList.toggle("paused", !isPlaying);
+        if (els.disc) {
+          // Match the built-in vinyl player behavior: higher spinSpeed => faster spin.
+          const spinDuration = Math.max(2, 8 - spinSpeed);
+          els.disc.style.animationDuration = `${spinDuration}s`;
+        }
+        const iconSvg = isPlaying ? icons.pause : icons.play;
+        if (els.btnPlayPause) els.btnPlayPause.innerHTML = iconSvg;
+        if (els.overlayIcon) els.overlayIcon.innerHTML = iconSvg;
+
+        setMarquee(els.titleWrap);
+        setMarquee(els.artistWrap);
+      };
+
+      // Electron controls
+      if (isElectron) {
+        els.btnPlayPause?.addEventListener("click", () => ipc.send("vinyl-player:play-pause"));
+        els.btnClose?.addEventListener("click", () => ipc.send("vinyl-player:close"));
+
+        // Multi-click actions on the disc overlay:
+        // - 1 click: play/pause
+        // - 2 clicks: next
+        // - 3 clicks: previous
+        const MULTI_CLICK_WINDOW_MS = 350;
+        let clickCount = 0;
+        let clickTimer = null;
+
+        const flushClicks = () => {
+          const n = clickCount;
+          clickCount = 0;
+          if (clickTimer) {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+          }
+          if (!settings.enableButtonFeature) return;
+          if (n === 1) ipc.send("vinyl-player:play-pause");
+          else if (n === 2) ipc.send("vinyl-player:next");
+          else if (n >= 3) ipc.send("vinyl-player:previous");
+        };
+
+        els.discOverlay?.addEventListener(
+          "pointerdown",
+          e => {
+            if (!settings.enableButtonFeature) return;
+            if (!e || e.button !== 0) return;
+            e.preventDefault();
+            e.stopPropagation();
+            els.discOverlay.classList.add("active");
+          },
+          true
+        );
+        const clearActive = () => els.discOverlay?.classList.remove("active");
+        els.discOverlay?.addEventListener("pointerup", clearActive, true);
+        els.discOverlay?.addEventListener("pointercancel", clearActive, true);
+        els.discOverlay?.addEventListener("pointerleave", clearActive, true);
+
+        els.discOverlay?.addEventListener(
+          "click",
+          e => {
+            if (!settings.enableButtonFeature) return;
+            e.preventDefault();
+            e.stopPropagation();
+            clickCount += 1;
+            if (clickTimer) clearTimeout(clickTimer);
+            clickTimer = setTimeout(flushClicks, MULTI_CLICK_WINDOW_MS);
+          },
+          true
+        );
+
+        ipc.on("vinyl-player:update-track", track => update(track));
+        ipc.on("vinyl-player:update-settings", s => applySettings(s));
+      } else {
+        // Standalone overlay: poll the local companion server /query endpoint
+        applySettings({ showControls: false, enableButtonFeature: false });
+        const poll = async () => {
+          try {
+            const res = await fetch("/query", { cache: "no-store" });
+            if (!res.ok) {
+              throw new Error(`Query failed: ${res.status} ${res.statusText}`);
+            }
+            const json = await res.json();
+            const mapped = {
+              title: json?.track?.title || "No track playing",
+              artist: json?.track?.author || "",
+              thumbnail: json?.track?.cover || "",
+              isPlaying: !json?.player?.isPaused,
+              durationSeconds: Number(json?.track?.duration || 0),
+              progressSeconds: Number(json?.player?.seekbarCurrentPosition || 0)
+            };
+            update(mapped);
+          } catch {
+            // ignore
+          }
+        };
+        poll();
+        setInterval(poll, 900);
+      }
+
+      // Init
+      update(state);
+      applySettings(settings);
+    </script>
+  </body>
+</html>

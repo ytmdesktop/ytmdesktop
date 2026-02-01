@@ -15,6 +15,13 @@ export type StoreSchema = {
     startOnBoot: boolean;
     startMinimized: boolean;
   };
+  updates: {
+    checkIntervalMinutes: number;
+    checkOnStartup: boolean;
+    autoInstall: boolean;
+    betaChannel: boolean;
+    lastChecked: number;
+  };
   appearance: {
     alwaysShowVolumeSlider: boolean;
     customCSSEnabled: boolean;
@@ -35,6 +42,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    vinylPlayerEnabled: boolean;
   };
   shortcuts: {
     playPause: string;
@@ -44,6 +52,7 @@ export type StoreSchema = {
     thumbsDown: string;
     volumeUp: string;
     volumeDown: string;
+    openDevTools: string;
   };
   state: {
     lastUrl: string;
@@ -61,6 +70,8 @@ export type StoreSchema = {
   };
   developer: {
     enableDevTools: boolean;
+    debugLoggingEnabled: boolean;
+    debugLoggingLevel: string;
   };
 };
 
@@ -73,8 +84,11 @@ export type MemoryStoreSchema = {
   shortcutsThumbsDownRegisterFailed: boolean;
   shortcutsVolumeUpRegisterFailed: boolean;
   shortcutsVolumeDownRegisterFailed: boolean;
+  shortcutsOpenDevToolsRegisterFailed: boolean;
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
+  lastfmUsingInsecureStorage: boolean;
+  companionServerUsingInsecureStorage: boolean;
   autoUpdaterDisabled: boolean;
   ytmViewLoadTimedout: boolean;
   ytmViewLoading: boolean;
@@ -83,4 +97,12 @@ export type MemoryStoreSchema = {
   ytmViewUnresponsive: boolean;
   appUpdateAvailable: boolean;
   appUpdateDownloaded: boolean;
+  updateStatus: "idle" | "checking" | "downloading" | "ready" | "error";
+  updateProgress: number;
+  updateInfo: {
+    version: string;
+    releaseDate: string;
+    releaseNotes?: string;
+  } | null;
+  updateError: string | null;
 };

@@ -1,0 +1,6 @@
+{
+  "command": "npm run start",
+  "serverUrl": "${BUILDER_SERVER_URL:-http://localhost:9863/}",
+  "authenticateProxy": false,
+  "commitMode": "commits"
+}
