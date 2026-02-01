@@ -23,13 +23,13 @@
           const storedDeviation = Math.abs(storedOriginalVolume - calculatedOriginalVolume);
 
           const originalVolume = storedDeviation < 0.01 ? storedOriginalVolume : calculatedOriginalVolume;
-          console.log('manipulated volume from', lowVolume.toFixed(2), 'to  ', originalVolume.toFixed(2), storedDeviation);
+          // console.debug('manipulated volume from', lowVolume.toFixed(2), 'to', originalVolume.toFixed(2), storedDeviation);
           return originalVolume;
       },
       set (originalVolume) {
           const lowVolume = originalVolume ** EXPONENT;
           storedOriginalVolumes.set(this, originalVolume);
-          // console.log('manipulated volume to  ', lowVolume.toFixed(2), 'from', originalVolume.toFixed(2));
+          // console.debug('manipulated volume to', lowVolume.toFixed(2), 'from', originalVolume.toFixed(2));
           HTMLMediaElement_volume.set.call(this, lowVolume);
       }
   });

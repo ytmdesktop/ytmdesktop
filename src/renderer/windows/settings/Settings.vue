@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
+import PluginSettings from "./components/PluginSettings.vue";
+import CrashReports from "./components/CrashReports.vue";
+import UpdateSettings from "./components/UpdateSettings.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
@@ -35,6 +38,7 @@ const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
+const developer: StoreSchema["developer"] = await store.get("developer");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
@@ -61,6 +65,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const vinylPlayerEnabled = ref<boolean>(integrations.vinylPlayerEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -69,9 +74,23 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+const shortcutOpenDevTools = ref<string>(shortcuts.openDevTools);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
+
+const enableDevTools = ref<boolean>(developer.enableDevTools);
+const debugLoggingEnabled = ref<boolean>(developer.debugLoggingEnabled);
+
+// Map debug logging levels to indices for the select component
+const debugLoggingLevels = ["error", "warn", "info", "verbose", "debug", "silly"];
+const debugLoggingLevel = computed({
+  get: () => debugLoggingLevels.indexOf(developer.debugLoggingLevel),
+  set: (value: number) => {
+    const level = debugLoggingLevels[value] || "info";
+    store.set("developer.debugLoggingLevel", level);
+  }
+});
 
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
@@ -99,6 +118,7 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  vinylPlayerEnabled.value = newState.integrations.vinylPlayerEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
@@ -109,6 +129,10 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+  shortcutOpenDevTools.value = newState.shortcuts.openDevTools;
+
+  enableDevTools.value = newState.developer.enableDevTools;
+  debugLoggingEnabled.value = newState.developer.debugLoggingEnabled;
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -120,6 +144,7 @@ const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shor
 const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsDownRegisterFailed"));
 const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
 const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
+const shortcutsOpenDevToolsRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsOpenDevToolsRegisterFailed"));
 
 const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
 
@@ -169,6 +194,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("integrations.vinylPlayerEnabled", vinylPlayerEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
@@ -178,6 +204,10 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+  store.set("shortcuts.openDevTools", shortcutOpenDevTools.value);
+
+  store.set("developer.enableDevTools", enableDevTools.value);
+  store.set("developer.debugLoggingEnabled", debugLoggingEnabled.value);
 }
 
 async function settingChangedRequiresRestart() {
@@ -243,6 +273,10 @@ async function logoutLastFM() {
   await settingsChanged();
 }
 
+function openConsoleWindow() {
+  window.ytmd.openDevTools();
+}
+
 window.ytmd.handleCheckingForUpdate(() => {
   checkingForUpdate.value = true;
 });
@@ -276,6 +310,9 @@ window.ytmd.handleUpdateDownloaded(() => {
         <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
         <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <li :class="{ active: currentTab === 6 }" @click="changeTab(6)"><span class="material-symbols-outlined">extension</span>Plugins</li>
+        <li :class="{ active: currentTab === 7 }" @click="changeTab(7)"><span class="material-symbols-outlined">developer_mode</span>Developer</li>
+        <li :class="{ active: currentTab === 8 }" @click="changeTab(8)"><span class="material-symbols-outlined">system_update</span>Updates</li>
         <span class="push"></span>
         <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
       </ul>
@@ -437,6 +474,13 @@ window.ytmd.handleUpdateDownloaded(() => {
             step="5"
             @change="settingsChanged"
           />
+          <YTMDSetting
+            v-model="vinylPlayerEnabled"
+            type="checkbox"
+            name="Vinyl Player"
+            description="Mini pop-out player with spinning vinyl record"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
@@ -517,6 +561,55 @@ window.ytmd.handleUpdateDownloaded(() => {
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
           </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Open Developer Tools<span
+                v-if="shortcutsOpenDevToolsRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutOpenDevTools" @change="settingsChanged" />
+          </div>
+        </div>
+
+        <div v-if="currentTab === 6" class="plugins-tab">
+          <PluginSettings />
+        </div>
+
+        <div v-if="currentTab === 7" class="developer-tab">
+          <YTMDSetting v-model="enableDevTools" type="checkbox" name="Enable Developer Tools" @change="settingsChanged" />
+          <YTMDSetting v-model="debugLoggingEnabled" type="checkbox" name="Enable Debug Logging" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="debugLoggingLevel"
+            type="select"
+            name="Debug Logging Level"
+            :options-map="{
+              0: 'Error',
+              1: 'Warning',
+              2: 'Info',
+              3: 'Verbose',
+              4: 'Debug',
+              5: 'Silly'
+            }"
+            @change="settingsChanged"
+          />
+          <div class="developer-actions">
+            <div class="action-group">
+              <h4>Console Window</h4>
+              <p class="description">Open the developer console to view logs and debug the application.</p>
+              <button class="btn-primary" :disabled="!enableDevTools" @click="openConsoleWindow">
+                <span class="material-symbols-outlined">terminal</span>
+                Show Console Window
+              </button>
+            </div>
+          </div>
+          <CrashReports />
+        </div>
+
+        <div v-if="currentTab === 8" class="updates-tab">
+          <UpdateSettings />
         </div>
 
         <div v-if="currentTab === 99" class="about-tab">
@@ -866,5 +959,55 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.developer-actions {
+  margin: 24px 0;
+  padding: 16px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.action-group h4 {
+  margin: 0 0 8px 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.action-group .description {
+  margin: 0 0 16px 0;
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #d32f2f;
+}
+
+.btn-primary:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary .material-symbols-outlined {
+  font-size: 18px;
 }
 </style>

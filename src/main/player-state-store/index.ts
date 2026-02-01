@@ -293,7 +293,7 @@ class PlayerStateStore {
 
   constructor() {
     this.eventEmitter.on("error", error => {
-      console.log("PlayerStateStore EventEmitter threw an error", error);
+      console.error("PlayerStateStore EventEmitter threw an error", error);
     });
   }
 
@@ -320,33 +320,43 @@ class PlayerStateStore {
   }
 
   public updateVideoProgress(progress: number) {
-    this.videoProgress = progress;
-    this.eventEmitter.emit("stateChanged", this.getState());
+    try {
+      if (typeof progress === "number" && !isNaN(progress)) {
+        this.videoProgress = progress;
+        this.eventEmitter.emit("stateChanged", this.getState());
+      }
+    } catch (error) {
+      console.error("Error in updateVideoProgress:", error);
+    }
   }
 
   public updateVideoState(state: YTMVideoState) {
-    switch (state) {
-      case YTMVideoState.Paused: {
-        this.state = VideoState.Paused;
-        break;
-      }
+    try {
+      switch (state) {
+        case YTMVideoState.Paused: {
+          this.state = VideoState.Paused;
+          break;
+        }
 
-      case YTMVideoState.Playing: {
-        this.state = VideoState.Playing;
-        break;
-      }
+        case YTMVideoState.Playing: {
+          this.state = VideoState.Playing;
+          break;
+        }
 
-      case YTMVideoState.Buffering: {
-        this.state = VideoState.Buffering;
-        break;
-      }
+        case YTMVideoState.Buffering: {
+          this.state = VideoState.Buffering;
+          break;
+        }
 
-      default: {
-        this.state = VideoState.Unknown;
-        break;
+        default: {
+          this.state = VideoState.Unknown;
+          break;
+        }
       }
+      this.eventEmitter.emit("stateChanged", this.getState());
+    } catch (error) {
+      console.error("Error in updateVideoState:", error);
     }
-    this.eventEmitter.emit("stateChanged", this.getState());
   }
 
   public updateVideoDetails(
@@ -356,22 +366,31 @@ class PlayerStateStore {
     likeStatus: YTMLikeStatus,
     hasFullMetadata: boolean
   ) {
-    this.videoDetails = {
-      author: videoDetails.author,
-      channelId: videoDetails.channelId,
-      title: videoDetails.title,
-      album: album?.text ?? null,
-      albumId: album?.id ?? null,
-      likeStatus: transformLikeStatus(likeStatus),
-      thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
-      durationSeconds: parseInt(videoDetails.lengthSeconds),
-      id: videoDetails.videoId,
-      videoType: transformVideoType(videoDetails.musicVideoType),
-      isLive: !!videoDetails.isLive
-    };
-    this.playlistId = playlistId;
-    this.hasFullMetadata = hasFullMetadata;
-    this.eventEmitter.emit("stateChanged", this.getState());
+    try {
+      if (!videoDetails) {
+        console.warn("updateVideoDetails received null videoDetails");
+        return;
+      }
+
+      this.videoDetails = {
+        author: videoDetails.author || "",
+        channelId: videoDetails.channelId || "",
+        title: videoDetails.title || "",
+        album: album?.text ?? null,
+        albumId: album?.id ?? null,
+        likeStatus: transformLikeStatus(likeStatus),
+        thumbnails: videoDetails.thumbnail?.thumbnails?.map(mapYTMThumbnails) || [],
+        durationSeconds: parseInt(videoDetails.lengthSeconds || "0") || 0,
+        id: videoDetails.videoId || "",
+        videoType: transformVideoType(videoDetails.musicVideoType || ""),
+        isLive: !!videoDetails.isLive
+      };
+      this.playlistId = playlistId || null;
+      this.hasFullMetadata = !!hasFullMetadata;
+      this.eventEmitter.emit("stateChanged", this.getState());
+    } catch (error) {
+      console.error("Error in updateVideoDetails:", error);
+    }
   }
 
   public updateFromStore(
@@ -381,40 +400,91 @@ class PlayerStateStore {
     muted: boolean | null,
     adPlaying: boolean | null
   ) {
-    const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
-    const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
-    this.queue = queueState
-      ? {
-          // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
-          automixItems: automixItems,
-          autoplay: queueState.autoplay,
-          isGenerating: queueState.isGenerating,
-          // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
-          isInfinite: queueState.isInfinite,
-          items: queueItems,
-          repeatMode: transformRepeatMode(queueState.repeatMode),
-          // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
-          selectedItemIndex: queueItems.findIndex(item => {
-            return item.selected;
-          })
-        }
-      : null;
-    if (this.videoDetails) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
-    }
-    this.adPlaying = adPlaying === true;
-    this.muted = muted === true;
-    if (typeof volume === "number" && volume >= 0) this.volume = volume;
+    try {
+      // Safely handle queue mapping with error handling
+      let queueItems: PlayerQueueItem[] = [];
+      let automixItems: PlayerQueueItem[] = [];
 
-    this.eventEmitter.emit("stateChanged", this.getState());
+      if (queueState?.items) {
+        queueItems = queueState.items
+          .map(item => {
+            try {
+              return mapYTMQueueItems(item);
+            } catch (err) {
+              console.error("Error mapping queue item:", err);
+              return null;
+            }
+          })
+          .filter(Boolean);
+      }
+
+      if (queueState?.automixItems) {
+        automixItems = queueState.automixItems
+          .map(item => {
+            try {
+              return mapYTMQueueItems(item);
+            } catch (err) {
+              console.error("Error mapping automix item:", err);
+              return null;
+            }
+          })
+          .filter(Boolean);
+      }
+
+      this.queue = queueState
+        ? {
+            automixItems: automixItems,
+            autoplay: !!queueState.autoplay,
+            isGenerating: !!queueState.isGenerating,
+            isInfinite: !!queueState.isInfinite,
+            items: queueItems,
+            repeatMode: transformRepeatMode(queueState.repeatMode),
+            selectedItemIndex: queueItems.findIndex(item => item?.selected) || 0
+          }
+        : null;
+
+      if (this.videoDetails && likeStatus) {
+        this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
+      }
+
+      this.adPlaying = adPlaying === true;
+      this.muted = muted === true;
+      if (typeof volume === "number" && volume >= 0 && !isNaN(volume)) {
+        this.volume = volume;
+      }
+
+      this.eventEmitter.emit("stateChanged", this.getState());
+    } catch (error) {
+      console.error("Error in updateFromStore:", error);
+    }
   }
 
   public addEventListener(listener: (state: PlayerState) => void) {
-    this.eventEmitter.addListener("stateChanged", listener);
+    if (typeof listener === "function") {
+      try {
+        // Wrap the listener in a try-catch to prevent errors from propagating
+        const safeListener = (state: PlayerState) => {
+          try {
+            listener(state);
+          } catch (error) {
+            console.error("Error in player state listener:", error);
+          }
+        };
+        this.eventEmitter.addListener("stateChanged", safeListener);
+      } catch (error) {
+        console.error("Error adding event listener:", error);
+      }
+    } else {
+      console.error("Invalid listener provided to addEventListener");
+    }
   }
 
   public removeEventListener(listener: (state: PlayerState) => void) {
-    this.eventEmitter.removeListener("stateChanged", listener);
+    try {
+      this.eventEmitter.removeListener("stateChanged", listener);
+    } catch (error) {
+      console.error("Error removing event listener:", error);
+    }
   }
 }
 

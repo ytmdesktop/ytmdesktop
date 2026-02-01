@@ -1,0 +1,213 @@
+import * as Sentry from "@sentry/electron/main";
+import { app } from "electron";
+import BaseIntegration from "../../integrations/base-integration";
+import { SENTRY_CONFIG } from "../../../shared/sentry.config";
+import log from "electron-log";
+
+/**
+ * Sentry Integration for the main process
+ * Tracks errors and exceptions in the main Electron process
+ */
+export default class SentryIntegration extends BaseIntegration {
+  constructor() {
+    super();
+    this.initialize();
+  }
+
+  // Implement the abstract provide method from BaseIntegration
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  provide(..._args: unknown[]): void {
+    // No dependencies needed for Sentry integration
+  }
+
+  private initialize(): void {
+    // Don't initialize Sentry in development unless configured to do so
+    if (process.env.NODE_ENV === "development" && !SENTRY_CONFIG.captureInDevelopment) {
+      return;
+    }
+
+    if (!SENTRY_CONFIG.dsn) {
+      log.info("Sentry DSN not set; skipping main-process Sentry initialization");
+      return;
+    }
+
+    try {
+      Sentry.init({
+        dsn: SENTRY_CONFIG.dsn,
+        environment: SENTRY_CONFIG.environment,
+        release: SENTRY_CONFIG.release,
+
+        // Performance monitoring
+        tracesSampleRate: SENTRY_CONFIG.tracesSampleRate,
+
+        // Set maximum breadcrumbs
+        maxBreadcrumbs: SENTRY_CONFIG.maxBreadcrumbs,
+
+        // Debug mode to help with troubleshooting
+        debug: process.env.NODE_ENV === "development",
+
+        // Include app info
+        initialScope: {
+          tags: {
+            ...SENTRY_CONFIG.initialTags,
+            process: "main"
+          }
+        },
+
+        // Specify which errors to ignore
+        ignoreErrors: SENTRY_CONFIG.ignoreErrors,
+
+        // Before sending an event to Sentry
+        beforeSend(event) {
+          // Don't send events in development unless configured to do so
+          if (process.env.NODE_ENV === "development" && !SENTRY_CONFIG.captureInDevelopment) {
+            return null;
+          }
+          return event;
+        }
+      });
+
+      // Set user information once available
+      app.on("ready", () => {
+        Sentry.setTag("app_version", app.getVersion());
+        Sentry.setTag("executable_path", app.getPath("exe"));
+        Sentry.setTag("user_data_path", app.getPath("userData"));
+      });
+
+      log.info("Sentry integration initialized in main process");
+    } catch (error) {
+      log.error("Failed to initialize Sentry in main process:", error);
+    }
+  }
+
+  enable(): void {
+    if (this.isEnabled) {
+      return;
+    }
+
+    if (process.env.NODE_ENV === "development" && !SENTRY_CONFIG.captureInDevelopment) {
+      log.info("Sentry integration not enabled in development mode");
+      return;
+    }
+
+    try {
+      // Use direct option setting instead of through hub
+      const client = Sentry.getClient();
+      if (client) {
+        client.getOptions().enabled = true;
+      }
+      this.isEnabled = true;
+      log.info("Sentry integration enabled in main process");
+    } catch (error) {
+      log.error("Failed to enable Sentry in main process:", error);
+    }
+  }
+
+  disable(): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    try {
+      const client = Sentry.getClient();
+      if (client) {
+        client.getOptions().enabled = false;
+      }
+      super.disable();
+      log.info("Sentry integration disabled in main process");
+    } catch (error) {
+      log.error("Failed to disable Sentry in main process:", error);
+    }
+  }
+
+  /**
+   * Manually capture an exception
+   * @param error The error to capture
+   * @param context Additional context information
+   */
+  captureException(error: Error, context?: Record<string, unknown>): string | null {
+    if (!this.isEnabled) {
+      return null;
+    }
+
+    try {
+      return Sentry.captureException(error, {
+        contexts: { additional: context || {} }
+      });
+    } catch (captureError) {
+      log.error("Failed to capture exception with Sentry:", captureError);
+      return null;
+    }
+  }
+
+  /**
+   * Manually capture a message
+   * @param message The message to capture
+   * @param level The severity level
+   * @param context Additional context information
+   */
+  captureMessage(message: string, level: Sentry.SeverityLevel = "info", context?: Record<string, unknown>): string | null {
+    if (!this.isEnabled) {
+      return null;
+    }
+
+    try {
+      return Sentry.captureMessage(message, {
+        level,
+        contexts: { additional: context || {} }
+      });
+    } catch (captureError) {
+      log.error("Failed to capture message with Sentry:", captureError);
+      return null;
+    }
+  }
+
+  /**
+   * Add breadcrumb to the current scope
+   * @param breadcrumb The breadcrumb to add
+   */
+  addBreadcrumb(breadcrumb: Sentry.Breadcrumb): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    try {
+      Sentry.addBreadcrumb(breadcrumb);
+    } catch (error) {
+      log.error("Failed to add breadcrumb to Sentry:", error);
+    }
+  }
+
+  /**
+   * Set tag for the current scope
+   * @param key Tag key
+   * @param value Tag value
+   */
+  setTag(key: string, value: string): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    try {
+      Sentry.setTag(key, value);
+    } catch (error) {
+      log.error("Failed to set Sentry tag:", error);
+    }
+  }
+
+  /**
+   * Set user information
+   * @param user User information object
+   */
+  setUser(user: Sentry.User | null): void {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    try {
+      Sentry.setUser(user);
+    } catch (error) {
+      log.error("Failed to set Sentry user:", error);
+    }
+  }
+}

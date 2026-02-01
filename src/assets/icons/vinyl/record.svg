@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="60%" stop-color="#111"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <radialGradient id="sheen" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <mask id="center-hole-mask">
+      <rect x="0" y="0" width="1024" height="1024" fill="white"/>
+      <!-- Center hole (transparent) -->
+      <circle cx="512" cy="512" r="24" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- Disc base -->
+  <circle cx="512" cy="512" r="480" fill="url(#shadow)" mask="url(#center-hole-mask)"/>
+
+  <!-- Grooves: concentric rings with low-opacity strokes -->
+  <g opacity="0.2" stroke="#fff" stroke-opacity="0.08" fill="none">
+    <!-- Use a dense but lightweight set of rings -->
+    <!-- Outer to inner rings every 6px from r=470 down to r=80 -->
+    <!-- This yields ~65 rings, visually smooth without being too heavy -->
+    
+    <!-- Generated pattern (representative sample); repeated manually for clarity/readability -->
+    
+    <circle cx="512" cy="512" r="470"/>
+    <circle cx="512" cy="512" r="464"/>
+    <circle cx="512" cy="512" r="458"/>
+    <circle cx="512" cy="512" r="452"/>
+    <circle cx="512" cy="512" r="446"/>
+    <circle cx="512" cy="512" r="440"/>
+    <circle cx="512" cy="512" r="434"/>
+    <circle cx="512" cy="512" r="428"/>
+    <circle cx="512" cy="512" r="422"/>
+    <circle cx="512" cy="512" r="416"/>
+    <circle cx="512" cy="512" r="410"/>
+    <circle cx="512" cy="512" r="404"/>
+    <circle cx="512" cy="512" r="398"/>
+    <circle cx="512" cy="512" r="392"/>
+    <circle cx="512" cy="512" r="386"/>
+    <circle cx="512" cy="512" r="380"/>
+    <circle cx="512" cy="512" r="374"/>
+    <circle cx="512" cy="512" r="368"/>
+    <circle cx="512" cy="512" r="362"/>
+    <circle cx="512" cy="512" r="356"/>
+    <circle cx="512" cy="512" r="350"/>
+    <circle cx="512" cy="512" r="344"/>
+    <circle cx="512" cy="512" r="338"/>
+    <circle cx="512" cy="512" r="332"/>
+    <circle cx="512" cy="512" r="326"/>
+    <circle cx="512" cy="512" r="320"/>
+    <circle cx="512" cy="512" r="314"/>
+    <circle cx="512" cy="512" r="308"/>
+    <circle cx="512" cy="512" r="302"/>
+    <circle cx="512" cy="512" r="296"/>
+    <circle cx="512" cy="512" r="290"/>
+    <circle cx="512" cy="512" r="284"/>
+    <circle cx="512" cy="512" r="278"/>
+    <circle cx="512" cy="512" r="272"/>
+    <circle cx="512" cy="512" r="266"/>
+    <circle cx="512" cy="512" r="260"/>
+    <circle cx="512" cy="512" r="254"/>
+    <circle cx="512" cy="512" r="248"/>
+    <circle cx="512" cy="512" r="242"/>
+    <circle cx="512" cy="512" r="236"/>
+    <circle cx="512" cy="512" r="230"/>
+    <circle cx="512" cy="512" r="224"/>
+    <circle cx="512" cy="512" r="218"/>
+    <circle cx="512" cy="512" r="212"/>
+    <circle cx="512" cy="512" r="206"/>
+    <circle cx="512" cy="512" r="200"/>
+    <circle cx="512" cy="512" r="194"/>
+    <circle cx="512" cy="512" r="188"/>
+    <circle cx="512" cy="512" r="182"/>
+    <circle cx="512" cy="512" r="176"/>
+    <circle cx="512" cy="512" r="170"/>
+    <circle cx="512" cy="512" r="164"/>
+    <circle cx="512" cy="512" r="158"/>
+    <circle cx="512" cy="512" r="152"/>
+    <circle cx="512" cy="512" r="146"/>
+    <circle cx="512" cy="512" r="140"/>
+    <circle cx="512" cy="512" r="134"/>
+    <circle cx="512" cy="512" r="128"/>
+    <circle cx="512" cy="512" r="122"/>
+    <circle cx="512" cy="512" r="116"/>
+    <circle cx="512" cy="512" r="110"/>
+    <circle cx="512" cy="512" r="104"/>
+    <circle cx="512" cy="512" r="98"/>
+    <circle cx="512" cy="512" r="92"/>
+    <circle cx="512" cy="512" r="86"/>
+    <circle cx="512" cy="512" r="80"/>
+  </g>
+
+  <!-- Specular sheen overlay -->
+  <ellipse cx="512" cy="512" rx="420" ry="420" fill="url(#sheen)" opacity="0.35"/>
+
+  <!-- Outer rim highlight -->
+  <circle cx="512" cy="512" r="480" fill="none" stroke="#fff" stroke-opacity="0.08" stroke-width="2"/>
+
+  <!-- Inner label guide (faint) -->
+  <circle cx="512" cy="512" r="180" fill="none" stroke="#fff" stroke-opacity="0.06" stroke-width="1"/>
+</svg>
+
+

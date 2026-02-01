@@ -69,38 +69,56 @@ export default class DiscordPresence implements IIntegration {
   private UpdateActivity() {
     if (this.activityDebounceTimeout) return;
     this.activityDebounceTimeout = setTimeout(() => {
-      if (!this.videoDetails) {
-        this.discordClient.clearActivity();
-        return;
-      }
-      const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
-      const thumbnail = getHighestResThumbnail(thumbnails);
-      this.discordClient.setActivity({
-        type: DiscordActivityType.Listening,
-        details: stringLimit(title, 128, 2),
-        state: stringLimit(author, 128, 2),
-        timestamps: {
-          start: this.videoState === VideoState.Playing ? Date.now() - this.progress * 1000 : undefined,
-          end: this.videoState === VideoState.Playing ? Date.now() + (durationSeconds - this.progress) * 1000 : undefined
-        },
-        assets: {
-          large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
-          large_text: album ? stringLimit(album, 128, 2) : undefined,
-          small_image: getSmallImageKey(this.videoState),
-          small_text: getSmallImageText(this.videoState)
-        },
-        instance: false,
-        buttons: [
-          {
-            label: "Play on YouTube Music",
-            url: `https://music.youtube.com/watch?v=${id}`
-          },
-          {
-            label: "Play on YouTube Music Desktop",
-            url: `ytmd://play/${id}`
+      try {
+        if (!this.videoDetails || !this.discordClient) {
+          if (this.discordClient) {
+            this.discordClient.clearActivity();
           }
-        ]
-      });
+          this.activityDebounceTimeout = null;
+          return;
+        }
+
+        const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
+        if (!thumbnails || !title || !author || !id) {
+          this.discordClient.clearActivity();
+          this.activityDebounceTimeout = null;
+          return;
+        }
+
+        const thumbnail = thumbnails && thumbnails.length > 0 ? getHighestResThumbnail(thumbnails) : null;
+        this.discordClient.setActivity({
+          type: DiscordActivityType.Listening,
+          details: stringLimit(title, 128, 2),
+          state: stringLimit(author, 128, 2),
+          timestamps: {
+            start: this.videoState === VideoState.Playing ? Date.now() - (this.progress || 0) * 1000 : undefined,
+            end: this.videoState === VideoState.Playing && durationSeconds ? Date.now() + (durationSeconds - (this.progress || 0)) * 1000 : undefined
+          },
+          assets: {
+            large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
+            large_text: album ? stringLimit(album, 128, 2) : undefined,
+            small_image: getSmallImageKey(this.videoState),
+            small_text: getSmallImageText(this.videoState)
+          },
+          instance: false,
+          buttons: [
+            {
+              label: "Play on YouTube Music",
+              url: `https://music.youtube.com/watch?v=${id}`
+            },
+            {
+              label: "Play on YouTube Music Desktop",
+              url: `ytmd://play/${id}`
+            }
+          ]
+        });
+      } catch (error) {
+        log.error(`Error in Discord Presence UpdateActivity: ${error.message || "Unknown error"}`);
+        if (this.discordClient) {
+          this.discordClient.clearActivity();
+        }
+      }
+
       this.activityDebounceTimeout = null;
     }, 1000);
   }
@@ -108,32 +126,42 @@ export default class DiscordPresence implements IIntegration {
   private playerStateChanged(state: PlayerState) {
     if (!this.ready) return;
 
-    const { videoDetails, videoProgress, trackState, hasFullMetadata } = state;
-    if (!videoDetails) {
-      this.discordClient.clearActivity();
-      return;
-    }
-    const oldState = this.videoState ?? null;
-    const oldId = this.videoDetails?.id ?? null;
-    const oldProgress = this.progress ?? null;
-    this.videoState = trackState;
-    this.videoDetails = videoDetails;
-    this.progress = Math.floor(videoProgress);
-    if (
-      hasFullMetadata &&
-      (oldState !== this.videoState || oldId !== this.videoDetails.id || Math.abs(this.progress - oldProgress) > 1 || oldProgress > this.progress)
-    ) {
-      this.UpdateActivity();
-    }
+    try {
+      const { videoDetails, videoProgress, trackState, hasFullMetadata } = state || {};
+      if (!videoDetails) {
+        this.discordClient.clearActivity();
+        return;
+      }
 
-    clearTimeout(this.pauseTimeout);
-    this.pauseTimeout = null;
-    if (state.trackState == VideoState.Playing) return;
-    this.pauseTimeout = setTimeout(() => {
-      if (!this.discordClient && !this.ready) return;
-      this.discordClient.clearActivity();
+      const oldState = this.videoState ?? null;
+      const oldId = this.videoDetails?.id ?? null;
+      const oldProgress = this.progress ?? null;
+
+      this.videoState = trackState;
+      this.videoDetails = videoDetails;
+      this.progress = Math.floor(videoProgress || 0);
+
+      if (
+        hasFullMetadata &&
+        (oldState !== this.videoState ||
+          oldId !== this.videoDetails?.id ||
+          Math.abs((this.progress || 0) - (oldProgress || 0)) > 1 ||
+          (oldProgress || 0) > (this.progress || 0))
+      ) {
+        this.UpdateActivity();
+      }
+
+      clearTimeout(this.pauseTimeout);
       this.pauseTimeout = null;
-    }, 30 * 1000);
+      if (state.trackState == VideoState.Playing) return;
+      this.pauseTimeout = setTimeout(() => {
+        if (!this.discordClient && !this.ready) return;
+        this.discordClient.clearActivity();
+        this.pauseTimeout = null;
+      }, 30 * 1000);
+    } catch (error) {
+      log.error(`Error in Discord Presence playerStateChanged: ${error.message || "Unknown error"}`);
+    }
   }
 
   public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {

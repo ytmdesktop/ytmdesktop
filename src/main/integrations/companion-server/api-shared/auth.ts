@@ -138,3 +138,33 @@ export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: Fastify
     });
   }
 }
+
+/**
+ * Extract the authorization token from a request
+ * @param request The Fastify request object
+ * @returns The authorization token or null if not found
+ */
+export function parseToken(request: FastifyRequest): string | null {
+  return request.headers.authorization || null;
+}
+
+/**
+ * Validate a token and throw an error if invalid
+ * @param token The token to validate
+ * @param store The application store
+ * @throws Error if the token is invalid
+ */
+export async function validateToken(token: string | null, store: Conf<StoreSchema>): Promise<void> {
+  if (!token) {
+    const error = new Error("Unauthorized: Missing token");
+    error.name = "UnauthorizedError";
+    throw error;
+  }
+
+  const [validSession] = isAuthValid(store, token);
+  if (!validSession) {
+    const error = new Error("Unauthorized: Invalid token");
+    error.name = "UnauthorizedError";
+    throw error;
+  }
+}

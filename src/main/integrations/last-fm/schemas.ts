@@ -15,12 +15,14 @@ export type LastfmRequestBody = {
 };
 
 export type LastfmErrorResponse = {
-  code: number;
+  error: number;
+  message?: string;
 };
 
 export type LastfmSessionResponse = {
-  error: number;
-  session: {
+  error?: number;
+  message?: string;
+  session?: {
     name: string;
     key: string;
     subscriber: number;
@@ -28,6 +30,7 @@ export type LastfmSessionResponse = {
 };
 
 export type LastfmTokenResponse = {
-  error: number;
+  error?: number;
+  message?: string;
   token: string;
 };

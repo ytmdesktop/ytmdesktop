@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vinyl Player</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: transparent;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        user-select: none;
+        /* Use Electron drag region for stable window movement.
+               Interactive elements must explicitly opt-out using `no-drag`. */
+        -webkit-app-region: drag;
+      }
+
+      :root {
+        --ytmd-btn-bg: rgba(0, 0, 0, 0.55);
+        --ytmd-btn-bg-hover: rgba(0, 0, 0, 0.62);
+        --ytmd-btn-bg-active: rgba(0, 0, 0, 0.7);
+        --ytmd-btn-border: rgba(255, 255, 255, 0.14);
+        --ytmd-btn-border-hover: rgba(255, 255, 255, 0.2);
+        --ytmd-btn-icon: rgba(255, 255, 255, 0.92);
+        --ytmd-btn-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        --ytmd-btn-shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.55);
+      }
+
+      .vinyl-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
+        backdrop-filter: blur(10px);
+      }
+
+      .track-info {
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 10;
+        max-width: 90%;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 8px 12px;
+        border-radius: 20px;
+        backdrop-filter: blur(5px);
+      }
+
+      .track-title {
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .track-artist {
+        color: #ccc;
+        font-size: 12px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .vinyl-record {
+        /* Scale the player content with the window so the window isn't larger than the UI */
+        width: min(92vmin, 100%);
+        height: min(92vmin, 100%);
+        max-width: 100%;
+        max-height: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.7));
+      }
+
+      .vinyl-disc {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        position: relative;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(40, 40, 40, 0.8) 0%, transparent 50%),
+          conic-gradient(from 0deg, #0a0a0a, #1a1a1a, #0f0f0f, #2a2a2a, #0a0a0a, #1a1a1a, #0f0f0f, #2a2a2a), radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+        animation: spin 3s linear infinite;
+        box-shadow:
+          0 0 50px rgba(0, 0, 0, 0.9),
+          inset 0 0 20px rgba(0, 0, 0, 0.8),
+          inset 0 0 40px rgba(255, 255, 255, 0.03),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+        overflow: hidden;
+      }
+
+      .vinyl-disc:hover {
+        transform: scale(1.02);
+        filter: brightness(1.1);
+        box-shadow:
+          0 0 60px rgba(0, 0, 0, 0.95),
+          inset 0 0 25px rgba(0, 0, 0, 0.8),
+          inset 0 0 50px rgba(255, 255, 255, 0.05),
+          0 0 0 2px rgba(255, 255, 255, 0.15);
+      }
+
+      /* Button overlay for click effect */
+      .button-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0);
+        pointer-events: none;
+        transition: background 0.1s ease;
+        z-index: 100;
+        -webkit-app-region: no-drag;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button-overlay.button-enabled {
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      .button-overlay.button-enabled:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .vinyl-disc.active .button-overlay {
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      .overlay-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 999px;
+        background: var(--ytmd-btn-bg);
+        border: 1px solid var(--ytmd-btn-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--ytmd-btn-shadow);
+        opacity: 0;
+        transform: scale(0.98);
+        transition:
+          opacity 120ms ease,
+          transform 120ms ease,
+          background 120ms ease,
+          border-color 120ms ease,
+          box-shadow 120ms ease;
+        pointer-events: none;
+      }
+
+      .overlay-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: var(--ytmd-btn-icon);
+      }
+
+      .button-overlay.button-enabled:hover .overlay-icon {
+        opacity: 1;
+        transform: scale(1);
+        background: var(--ytmd-btn-bg-hover);
+        border-color: var(--ytmd-btn-border-hover);
+        box-shadow: var(--ytmd-btn-shadow-hover);
+      }
+
+      .vinyl-disc.active .overlay-icon {
+        opacity: 1;
+        transform: scale(0.98);
+        background: var(--ytmd-btn-bg-active);
+      }
+
+      .vinyl-disc.paused {
+        animation-play-state: paused;
+        filter: grayscale(0.4) brightness(0.8);
+      }
+
+      .vinyl-grooves {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(circle, transparent 15%, transparent 16%, rgba(255, 255, 255, 0.02) 16%, rgba(255, 255, 255, 0.02) 17%),
+          repeating-radial-gradient(circle, transparent 20%, transparent 20.5%, rgba(255, 255, 255, 0.03) 20.5%, rgba(255, 255, 255, 0.03) 21%),
+          repeating-radial-gradient(circle, transparent 25%, transparent 25.3%, rgba(255, 255, 255, 0.02) 25.3%, rgba(255, 255, 255, 0.02) 25.6%);
+        pointer-events: none;
+        animation: grooveSpin 25s linear infinite reverse;
+      }
+
+      .vinyl-grooves.paused {
+        animation-play-state: paused;
+      }
+
+      .record-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 38%;
+        height: 38%;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+          linear-gradient(135deg, #2c1810 0%, #8b4513 20%, #a0522d 40%, #8b4513 60%, #654321 100%);
+        border: 2px solid rgba(139, 69, 19, 0.8);
+        box-shadow:
+          inset 0 0 15px rgba(0, 0, 0, 0.6),
+          inset 0 0 30px rgba(139, 69, 19, 0.3),
+          0 0 20px rgba(139, 69, 19, 0.2),
+          0 2px 8px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+        animation: inherit;
+      }
+
+      .album-art {
+        position: absolute;
+        top: 4%;
+        left: 4%;
+        width: 92%;
+        height: 92%;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        box-shadow:
+          inset 0 0 10px rgba(0, 0, 0, 0.5),
+          inset 0 0 20px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        animation: inherit;
+      }
+
+      .vinyl-center-hole {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 8%;
+        height: 8%;
+        background: radial-gradient(circle, #000000 0%, #1a1a1a 70%, #333333 100%);
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        box-shadow:
+          inset 0 0 8px rgba(0, 0, 0, 0.9),
+          0 0 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .vinyl-reflections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background:
+          radial-gradient(ellipse at 25% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 75% 75%, rgba(255, 255, 255, 0.04) 0%, transparent 30%);
+        pointer-events: none;
+        animation: inherit;
+      }
+
+      .record-texture {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: repeating-conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          transparent 0.8deg,
+          rgba(255, 255, 255, 0.015) 0.8deg,
+          rgba(255, 255, 255, 0.015) 1.2deg
+        );
+        pointer-events: none;
+        animation: inherit;
+        mix-blend-mode: overlay;
+      }
+
+      /* Enhanced paused states for all elements */
+      .record-label.paused {
+        animation-play-state: paused;
+        filter: grayscale(0.4) brightness(0.8);
+      }
+
+      .vinyl-reflections.paused {
+        animation-play-state: paused;
+        opacity: 0.5;
+      }
+
+      .record-texture.paused {
+        animation-play-state: paused;
+        opacity: 0.3;
+      }
+
+      .album-art.paused {
+        animation-play-state: paused;
+        filter: grayscale(0.3) brightness(0.9);
+      }
+
+      /* Dynamic lighting effects */
+      .vinyl-disc::before {
+        content: "";
+        position: absolute;
+        top: -5%;
+        left: -5%;
+        width: 110%;
+        height: 110%;
+        border-radius: 50%;
+        background:
+          radial-gradient(ellipse at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 40%),
+          radial-gradient(ellipse at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 25%);
+        pointer-events: none;
+        animation: lightShift 8s ease-in-out infinite alternate;
+      }
+
+      @keyframes lightShift {
+        0% {
+          transform: rotate(0deg);
+          opacity: 0.6;
+        }
+        100% {
+          transform: rotate(360deg);
+          opacity: 1;
+        }
+      }
+
+      /* Improved glow effect */
+      .vinyl-record::before {
+        content: "";
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: recordGlow 4s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes recordGlow {
+        0% {
+          opacity: 0.3;
+          transform: scale(0.98);
+        }
+        100% {
+          opacity: 0.7;
+          transform: scale(1.02);
+        }
+      }
+
+      /* Stylus/needle effect */
+      .vinyl-record::after {
+        content: "";
+        position: absolute;
+        top: 15%;
+        right: -10px;
+        width: 4px;
+        height: 40px;
+        background: linear-gradient(180deg, #c0c0c0 0%, #808080 50%, #404040 100%);
+        border-radius: 2px;
+        transform: rotate(25deg);
+        box-shadow:
+          2px 2px 8px rgba(0, 0, 0, 0.4),
+          inset 0 0 2px rgba(255, 255, 255, 0.3);
+        z-index: 10;
+      }
+
+      .controls {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 8px 12px;
+        border-radius: 25px;
+        backdrop-filter: blur(5px);
+        z-index: 120;
+        -webkit-app-region: no-drag;
+      }
+
+      .control-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.45);
+        border: 1px solid var(--ytmd-btn-border);
+        color: var(--ytmd-btn-icon);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 140ms ease,
+          transform 140ms ease,
+          border-color 140ms ease,
+          box-shadow 140ms ease;
+        -webkit-app-region: no-drag;
+        backdrop-filter: blur(5px);
+      }
+
+      .control-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: var(--ytmd-btn-icon);
+      }
+
+      .control-btn:hover {
+        background: rgba(0, 0, 0, 0.6);
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        border-color: var(--ytmd-btn-border-hover);
+      }
+
+      .control-btn:active {
+        transform: scale(0.95);
+        background: rgba(0, 0, 0, 0.72);
+      }
+
+      .control-btn#play-pause-btn {
+        background: rgba(0, 0, 0, 0.45);
+      }
+
+      .control-btn#play-pause-btn:hover {
+        background: rgba(0, 0, 0, 0.6);
+      }
+
+      .control-btn#close-btn {
+        background: rgba(0, 0, 0, 0.45);
+      }
+
+      .control-btn#close-btn:hover {
+        background: rgba(232, 17, 35, 0.72);
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes grooveSpin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Vinyl record texture and effects */
+      .vinyl-disc::before {
+        content: "";
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        right: 5%;
+        bottom: 5%;
+        border-radius: 50%;
+        background: repeating-radial-gradient(circle at center, transparent 0px, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px);
+        pointer-events: none;
+      }
+
+      .vinyl-disc::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+      }
+
+      /* Responsive design */
+      @media (max-width: 200px) {
+        .track-title {
+          font-size: 12px;
+        }
+        .track-artist {
+          font-size: 10px;
+        }
+        .control-btn {
+          width: 30px;
+          height: 30px;
+          font-size: 14px;
+        }
+      }
+
+      /* Loading animation */
+      .loading {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* Vinyl player glow effect */
+      .vinyl-record::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+        animation: glow 3s ease-in-out infinite alternate;
+        pointer-events: none;
+      }
+
+      @keyframes glow {
+        from {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        to {
+          opacity: 0.6;
+          transform: scale(1.1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vinyl-container">
+      <div class="track-info">
+        <div class="track-title" id="track-title">Loading...</div>
+        <div class="track-artist" id="track-artist">Unknown Artist</div>
+      </div>
+
+      <div class="vinyl-record">
+        <div class="vinyl-disc" id="vinyl-disc">
+          <div class="button-overlay">
+            <div class="overlay-icon" id="overlay-playpause-icon" aria-hidden="true"></div>
+          </div>
+          <div class="vinyl-grooves" id="vinyl-grooves"></div>
+          <div class="record-label">
+            <div class="album-art" id="album-art"></div>
+          </div>
+          <div class="vinyl-center-hole"></div>
+          <div class="vinyl-reflections"></div>
+          <div class="record-texture"></div>
+        </div>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="control-btn" id="play-pause-btn" title="Play/Pause" aria-label="Play/Pause"></button>
+        <button class="control-btn" id="close-btn" title="Close" aria-label="Close"></button>
+      </div>
+    </div>
+
+    <script>
+      // Use the exposed API from the preload script
+      const { ipcRenderer } = window.electron;
+
+      // Debug ingest logging (disabled by default to avoid console noise)
+      // To re-enable temporarily, set: localStorage.setItem('ytmd_ingest','1') and reload.
+      const __ytmdIngestEnabled = (() => {
+        try {
+          return localStorage.getItem("ytmd_ingest") === "1";
+        } catch {
+          return false;
+        }
+      })();
+      const __ytmdDbg = (_location, _message, _data) => {};
+      const __ytmdDbgPlay = (_location, _message, _data) => {};
+
+      // DOM elements
+      const trackTitle = document.getElementById("track-title");
+      const trackArtist = document.getElementById("track-artist");
+      const albumArt = document.getElementById("album-art");
+      const vinylDisc = document.getElementById("vinyl-disc");
+      const vinylGrooves = document.getElementById("vinyl-grooves");
+      const playPauseBtn = document.getElementById("play-pause-btn");
+      const closeBtn = document.getElementById("close-btn");
+      const controls = document.getElementById("controls");
+      const buttonOverlay = document.querySelector(".button-overlay");
+      const overlayIcon = buttonOverlay?.querySelector(".overlay-icon");
+
+      // Inline SVG icons (crisp + consistent across platforms)
+      const icons = {
+        play: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>`,
+        pause: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
+        close: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L12 13.41l-6.89 6.3-1.42-1.41L10.59 12 3.69 5.71 5.1 4.29 12 10.59l6.89-6.3z"/></svg>`
+      };
+
+      const setPlayPauseIcons = isPlaying => {
+        const svg = isPlaying ? icons.pause : icons.play;
+        if (playPauseBtn) playPauseBtn.innerHTML = svg;
+        if (overlayIcon) overlayIcon.innerHTML = svg;
+      };
+
+      // Initialize static icons
+      if (closeBtn) closeBtn.innerHTML = icons.close;
+
+      let currentTrack = {
+        title: "Loading...",
+        artist: "Unknown Artist",
+        thumbnail: "",
+        isPlaying: false,
+        spinSpeed: 2
+      };
+
+      // Update track info
+      function updateTrackInfo(track) {
+        if (!track) return; // Guard against undefined track
+
+        // Make a copy of currentTrack before updating
+        const prevTrack = { ...currentTrack };
+        currentTrack = { ...currentTrack, ...track };
+
+        // Add loading animation for new tracks
+        if (track.title && prevTrack.title && track.title !== prevTrack.title) {
+          trackTitle.classList.add("loading");
+          setTimeout(() => trackTitle.classList.remove("loading"), 1000);
+        }
+
+        trackTitle.textContent = track.title || "Unknown Title";
+        trackArtist.textContent = track.artist || "Unknown Artist";
+
+        // Enhanced album art handling
+        if (track.thumbnail) {
+          albumArt.style.backgroundImage = `url(${track.thumbnail})`;
+          albumArt.style.opacity = "1";
+        } else {
+          // Create a beautiful gradient fallback for unknown albums
+          const colors = [
+            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+            "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+            "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+            "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+            "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+            "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+            "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)"
+          ];
+          const randomGradient = colors[Math.floor(Math.random() * colors.length)];
+          albumArt.style.backgroundImage = randomGradient;
+          albumArt.style.opacity = "0.8";
+        }
+
+        // Update spin animation with more realistic speed
+        const spinDuration = Math.max(2, 8 - track.spinSpeed); // More realistic speed range
+        vinylDisc.style.animationDuration = `${spinDuration}s`;
+        vinylGrooves.style.animationDuration = `${spinDuration * 1.5}s`;
+
+        // Enhanced pause/play visual feedback
+        if (track.isPlaying) {
+          vinylDisc.classList.remove("paused");
+          vinylGrooves.classList.remove("paused");
+          document.querySelector(".record-label").classList.remove("paused");
+          document.querySelector(".vinyl-reflections").classList.remove("paused");
+          document.querySelector(".record-texture").classList.remove("paused");
+        } else {
+          vinylDisc.classList.add("paused");
+          vinylGrooves.classList.add("paused");
+          document.querySelector(".record-label").classList.add("paused");
+          document.querySelector(".vinyl-reflections").classList.add("paused");
+          document.querySelector(".record-texture").classList.add("paused");
+        }
+
+        // Update play/pause button with better icons
+        playPauseBtn.title = track.isPlaying ? "Pause" : "Play";
+
+        // Update hover overlay + control icon
+        setPlayPauseIcons(Boolean(track.isPlaying));
+      }
+
+      // Event listeners
+      playPauseBtn.addEventListener("click", () => {
+        // #region agent log (debug instrumentation)
+        if (__ytmdIngestEnabled) __ytmdDbgPlay("vinyl-player.html:playPauseBtn", "click", { via: "control-btn" });
+        // #endregion agent log (debug instrumentation)
+        ipcRenderer.send("vinyl-player:play-pause");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        ipcRenderer.send("vinyl-player:close");
+      });
+
+      // Listen for track updates from main process
+      // Note: preload strips the event, so the first arg is the actual data
+      ipcRenderer.on("vinyl-player:update-track", track => {
+        // #region agent log (debug instrumentation)
+        try {
+          if (__ytmdIngestEnabled)
+            __ytmdDbgPlay("vinyl-player.html:update-track", "received", {
+              title: String(track?.title || ""),
+              artist: String(track?.artist || ""),
+              isPlaying: Boolean(track?.isPlaying)
+            });
+        } catch {}
+        // #endregion agent log (debug instrumentation)
+        updateTrackInfo(track);
+      });
+
+      // Handle settings changes
+      ipcRenderer.on("vinyl-player:update-settings", settings => {
+        if (settings && settings.showControls !== undefined) {
+          controls.style.display = settings.showControls ? "flex" : "none";
+        }
+        if (settings && settings.enableButtonFeature !== undefined) {
+          const buttonOverlay = document.querySelector(".button-overlay");
+          if (settings.enableButtonFeature) {
+            buttonOverlay?.classList.add("button-enabled");
+          } else {
+            buttonOverlay?.classList.remove("button-enabled");
+          }
+        }
+      });
+
+      // Initialize with default values
+      updateTrackInfo(currentTrack);
+
+      // Set initial button state (enabled by default)
+      buttonOverlay?.classList.add("button-enabled");
+
+      const isOverlayEnabled = () => Boolean(buttonOverlay?.classList.contains("button-enabled"));
+
+      // Pressed feedback + reliable click toggle (dragging the window is handled by Electron drag regions)
+      buttonOverlay?.addEventListener(
+        "pointerdown",
+        e => {
+          if (!isOverlayEnabled()) return;
+          if (!e || e.button !== 0) return;
+          e.preventDefault();
+          e.stopPropagation();
+          vinylDisc.classList.add("active");
+        },
+        true
+      );
+
+      const clearActive = () => vinylDisc.classList.remove("active");
+      buttonOverlay?.addEventListener("pointerup", clearActive, true);
+      buttonOverlay?.addEventListener("pointercancel", clearActive, true);
+      buttonOverlay?.addEventListener("pointerleave", clearActive, true);
+
+      // Multi-click actions on the vinyl overlay:
+      // - 1 click: play/pause
+      // - 2 clicks: next track
+      // - 3 clicks: previous track
+      // Note: single click is delayed slightly to disambiguate.
+      const MULTI_CLICK_WINDOW_MS = 350;
+      let clickCount = 0;
+      let clickTimer = null;
+      let lastClickTs = 0;
+
+      const flushClicks = () => {
+        const n = clickCount;
+        clickCount = 0;
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+        }
+
+        if (!isOverlayEnabled()) return;
+
+        // #region agent log (debug instrumentation)
+        if (__ytmdIngestEnabled) __ytmdDbg("vinyl-player.html:flushClicks", "flush", { n, enabled: isOverlayEnabled() });
+        // #endregion agent log (debug instrumentation)
+
+        if (n === 1) ipcRenderer.send("vinyl-player:play-pause");
+        else if (n === 2) ipcRenderer.send("vinyl-player:next");
+        else if (n >= 3) ipcRenderer.send("vinyl-player:previous");
+
+        // #region agent log (debug instrumentation)
+        if (n === 1) {
+          if (__ytmdIngestEnabled) __ytmdDbgPlay("vinyl-player.html:flushClicks", "sent play-pause", { via: "overlay" });
+        }
+        // #endregion agent log (debug instrumentation)
+      };
+
+      buttonOverlay?.addEventListener(
+        "click",
+        e => {
+          if (!isOverlayEnabled()) return;
+          e.preventDefault();
+          e.stopPropagation();
+
+          clickCount += 1;
+          const now = Date.now();
+          const dt = lastClickTs ? now - lastClickTs : null;
+          lastClickTs = now;
+          // #region agent log (debug instrumentation)
+          if (__ytmdIngestEnabled) __ytmdDbg("vinyl-player.html:overlayClick", "click", { clickCount, dt, windowMs: MULTI_CLICK_WINDOW_MS });
+          // #endregion agent log (debug instrumentation)
+          if (clickTimer) clearTimeout(clickTimer);
+          clickTimer = setTimeout(flushClicks, MULTI_CLICK_WINDOW_MS);
+        },
+        true
+      );
+
+      // Prevent context menu on vinyl disc
+      vinylDisc.addEventListener("contextmenu", e => {
+        e.preventDefault();
+      });
+    </script>
+  </body>
+</html>

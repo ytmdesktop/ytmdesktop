@@ -3,8 +3,16 @@ import Conf from "conf";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { StoreSchema } from "~shared/store/schema";
 import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-state-store";
-import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../api-shared/auth";
-import fastifyRateLimit from "@fastify/rate-limit";
+import {
+  createAuthToken,
+  getIsTemporaryAuthCodeValidAndRemove,
+  getTemporaryAuthCode,
+  isAuthValid,
+  isAuthValidMiddleware,
+  parseToken,
+  validateToken
+} from "../../api-shared/auth";
+import { fastifyRateLimit } from "@fastify/rate-limit";
 import crypto from "crypto";
 import {
   APIV1CommandRequestBody,
@@ -147,9 +155,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
         case "seekTo": {
           const position = commandRequest.data;
-          if (isNaN(position) || position < 0 || position > playerStateStore.getState().videoDetails.durationSeconds) {
+          const state = playerStateStore.getState();
+
+          // Validate position within bounds and make sure videoDetails exists
+          if (!state || !state.videoDetails || isNaN(position) || position < 0 || position > state.videoDetails.durationSeconds) {
             throw new InvalidPositionError(position);
           }
+
           ytmView.webContents.send("remoteControl:execute", "seekTo", position);
           break;
         }
@@ -210,7 +222,14 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           const index = commandRequest.data;
           const state = playerStateStore.getState();
 
-          if (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1) {
+          if (
+            !state ||
+            !state.queue ||
+            !state.queue.items ||
+            isNaN(index) ||
+            index < 0 ||
+            index > state.queue.items.length + (state.queue.automixItems?.length || 0) - 1
+          ) {
             throw new InvalidQueueIndexError(index);
           }
 
@@ -560,6 +579,89 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       ipcMain.off("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
     });
   });
+
+  // Get the player state
+  fastify.get("/player/state", async request => {
+    type PlayerStatePayload = {
+      video: PlayerState["videoDetails"];
+      full: {
+        author: string;
+        channelId: string;
+        title: string;
+        album: string | null;
+        albumId: string | null;
+        likeStatus: PlayerState["videoDetails"]["likeStatus"];
+        thumbnails: PlayerState["videoDetails"]["thumbnails"];
+        durationSeconds: number;
+        id: string;
+        isLive: boolean;
+        videoType: PlayerState["videoDetails"]["videoType"];
+      };
+    };
+
+    type PlayerStateResponse = {
+      status: PlayerState["trackState"] | "UNKNOWN";
+      state: PlayerStatePayload | null;
+      queue: PlayerState["queue"] | null;
+      progress: number;
+      volume: number;
+      muted: boolean;
+      adPlaying: boolean;
+    };
+
+    const token = parseToken(request);
+    await validateToken(token, getStore());
+
+    const state = playerStateStore.getState();
+
+    // Add null checks to ensure the response doesn't cause errors
+    if (!state) {
+      const fallback: PlayerStateResponse = {
+        status: "UNKNOWN",
+        state: null,
+        queue: null,
+        progress: 0,
+        volume: 0,
+        muted: false,
+        adPlaying: false
+      };
+      return fallback;
+    }
+
+    const data: PlayerStateResponse = {
+      status: state.trackState,
+      state: state.videoDetails
+        ? {
+            video: state.videoDetails,
+            full: {
+              author: state.videoDetails.author,
+              channelId: state.videoDetails.channelId,
+              title: state.videoDetails.title,
+              album: state.videoDetails.album ?? null,
+              albumId: state.videoDetails.albumId ?? null,
+              likeStatus: state.videoDetails.likeStatus,
+              thumbnails: state.videoDetails.thumbnails,
+              durationSeconds: state.videoDetails.durationSeconds,
+              id: state.videoDetails.id,
+              isLive: state.videoDetails.isLive,
+              videoType: state.videoDetails.videoType
+            }
+          }
+        : null,
+      queue: state.queue || null,
+      progress: state.videoProgress,
+      volume: state.volume,
+      muted: state.muted,
+      adPlaying: state.adPlaying
+    };
+
+    return data;
+  });
+
+  // Helper function to get the store
+  function getStore(): Conf<StoreSchema> {
+    return options.getStore();
+  }
 };
 
 export default CompanionServerAPIv1;
