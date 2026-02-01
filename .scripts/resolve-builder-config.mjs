@@ -93,6 +93,10 @@ function main() {
   const write = getArgFlag("--write");
 
   const sourceConfigPath = resolveConfigFilePath({ repoRoot, nodeEnv });
+  if (!fs.existsSync(sourceConfigPath)) {
+    console.error(`[builder-config] Error: config file not found: ${sourceConfigPath}`);
+    process.exit(1);
+  }
   const config = readJsonFile(sourceConfigPath);
 
   const resolved = {

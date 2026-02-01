@@ -92,7 +92,7 @@
                         :value="toNumber(getPluginSetting(plugin.id, 'opacity'), 0.9)"
                         @input="onRangeInput(plugin.id, 'opacity', $event)"
                       />
-                      <span class="vinyl-value">{{ Number(getPluginSetting(plugin.id, "opacity")).toFixed(2) }}</span>
+                      <span class="vinyl-value">{{ toNumber(getPluginSetting(plugin.id, "opacity"), 0.9).toFixed(2) }}</span>
                     </div>
                   </div>
 
@@ -238,7 +238,9 @@
                       :value="String(getPluginSetting(plugin.id, 'widgetToken') ?? '')"
                       @input="onTextInput(plugin.id, 'widgetToken', $event)"
                     />
-                    <p class="widget-help-text">Get your token from <a href="https://6klabs.com/dashboard" target="_blank">6klabs.com/dashboard</a></p>
+                    <p class="widget-help-text">
+                      Get your token from <a href="https://6klabs.com/dashboard" target="_blank" rel="noopener noreferrer">6klabs.com/dashboard</a>
+                    </p>
                   </div>
 
                   <!-- Widget URL Display -->
@@ -530,6 +532,9 @@ interface YTMDBridge {
 }
 
 const ytmd = (window as unknown as { ytmd: YTMDBridge }).ytmd;
+if (typeof ytmd === "undefined") {
+  throw new Error("Preload bridge window.ytmd is not defined; ensure the settings window was opened with the correct preload script.");
+}
 
 onMounted(async () => {
   await loadPlugins();

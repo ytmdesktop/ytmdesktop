@@ -129,7 +129,6 @@
               .replace(/ΓÇÜ/g, '—')
               .replace(/ΓÇô/g, '"')
               .replace(/ΓÇ£/g, '"')
-              .replace(/ΓÇ¥/g, "'")
               .replace(/ΓÇ¥/g, "'");
           }
         }

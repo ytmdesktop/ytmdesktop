@@ -189,7 +189,7 @@ export default class FigmaIntegration extends BaseIntegration {
       const tokens: DesignToken[] = [];
 
       // For demonstration, we'll just extract some colors from the first page
-      const firstPage = file.document.children[0];
+      const firstPage = file.document.children?.[0];
 
       if (firstPage && firstPage.type === "CANVAS") {
         // Look for a "Colors" or "Tokens" frame

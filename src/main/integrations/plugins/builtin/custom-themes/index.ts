@@ -33,7 +33,7 @@ export class CustomThemesPlugin extends BasePlugin {
   }
 
   onSettingsChanged(newSettings: Record<string, unknown>): void {
-    log.debug("Custom Themes settings changed:", newSettings);
+    log.debug("Custom Themes settings changed:", Object.keys(newSettings));
 
     if (newSettings.selectedTheme !== undefined) {
       const themeName = typeof newSettings.selectedTheme === "string" ? newSettings.selectedTheme : String(newSettings.selectedTheme);

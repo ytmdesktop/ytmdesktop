@@ -797,6 +797,8 @@ log.info("Created electron store");
 
 // #region agent log (debug instrumentation)
 const __ytmdDbg = (hypothesisId: string, location: string, message: string, data: Record<string, unknown>): void => {
+  if (process.env.NODE_ENV !== "development") return;
+
   try {
     fetch("http://127.0.0.1:7244/ingest/0a7fc512-60ca-4a36-8768-23f664c122af", {
       method: "POST",
@@ -1051,7 +1053,7 @@ function setTrayIcon() {
     log.error("Failed to set tray icon:", error);
     // Try fallback icon
     try {
-      const fallbackPath = path.join(__dirname, "../../src/assets/icons/tray.ico");
+      const fallbackPath = path.join(assetFolder, process.platform === "win32" ? "tray.ico" : "ytmd_white.png");
       tray.setImage(fallbackPath);
     } catch (fallbackError) {
       log.error("Failed to set fallback tray icon:", fallbackError);
@@ -1929,6 +1931,8 @@ const createMainWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
   log.info("Application ready");
+
+  pluginManager.init();
 
   // First run checks
   const firstRunPath = path.join(app.getPath("userData"), ".first-run");

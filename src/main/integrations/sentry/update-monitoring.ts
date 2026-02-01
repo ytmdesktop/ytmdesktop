@@ -24,7 +24,7 @@ export class SentryUpdateMonitor {
    * @param currentVersion Current app version
    */
   trackUpdateCheck(isManualCheck: boolean, currentVersion = app.getVersion()): void {
-    if (!this.enabled || !SENTRY_CONFIG.updateMonitoring?.trackEvents.updateCheck) {
+    if (!this.enabled || !SENTRY_CONFIG.updateMonitoring?.trackEvents?.updateCheck) {
       return;
     }
 
@@ -114,10 +114,10 @@ export class SentryUpdateMonitor {
 
   /**
    * Tracks when an update is installed
-   * @param newVersion New version that was installed
    * @param previousVersion Previous app version
+   * @param newVersion New version that was installed (defaults to current app version)
    */
-  trackUpdateInstalled(newVersion = app.getVersion(), previousVersion: string): void {
+  trackUpdateInstalled(previousVersion: string, newVersion = app.getVersion()): void {
     if (!this.enabled || !SENTRY_CONFIG.updateMonitoring?.trackEvents.updateInstalled) {
       return;
     }

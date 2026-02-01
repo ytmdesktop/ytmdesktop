@@ -6,6 +6,7 @@ import { SENTRY_CONFIG } from "../../../shared/sentry.config";
  * Tracks errors and exceptions in the renderer Electron process
  */
 export default class RendererSentryIntegration {
+  private isInitialized = false;
   private isEnabled = false;
 
   constructor() {
@@ -59,6 +60,7 @@ export default class RendererSentryIntegration {
         }
       });
 
+      this.isInitialized = true;
       this.isEnabled = true;
       console.debug("Sentry integration initialized in renderer process");
     } catch (error) {
@@ -77,10 +79,22 @@ export default class RendererSentryIntegration {
     }
 
     try {
-      // Use direct option setting instead of through hub
-      const client = Sentry.getClient();
-      if (client) {
-        client.getOptions().enabled = true;
+      if (!this.isInitialized) {
+        Sentry.init({
+          dsn: SENTRY_CONFIG.dsn,
+          environment: SENTRY_CONFIG.environment,
+          release: SENTRY_CONFIG.release,
+          tracesSampleRate: SENTRY_CONFIG.tracesSampleRate,
+          maxBreadcrumbs: SENTRY_CONFIG.maxBreadcrumbs,
+          debug: process.env.NODE_ENV === "development",
+          initialScope: { tags: { ...SENTRY_CONFIG.initialTags, process: "renderer" } },
+          ignoreErrors: SENTRY_CONFIG.ignoreErrors,
+          beforeSend(event) {
+            if (process.env.NODE_ENV === "development" && !SENTRY_CONFIG.captureInDevelopment) return null;
+            return event;
+          }
+        });
+        this.isInitialized = true;
       }
       this.isEnabled = true;
       console.debug("Sentry integration enabled in renderer process");
@@ -95,10 +109,8 @@ export default class RendererSentryIntegration {
     }
 
     try {
-      const client = Sentry.getClient();
-      if (client) {
-        client.getOptions().enabled = false;
-      }
+      // Note: `@sentry/electron/renderer` does not reliably expose `close()`/`flush()` APIs.
+      // We simply stop emitting new events by toggling `isEnabled`.
       this.isEnabled = false;
       console.debug("Sentry integration disabled in renderer process");
     } catch (error) {

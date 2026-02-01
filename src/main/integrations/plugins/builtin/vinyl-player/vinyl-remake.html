@@ -411,6 +411,7 @@
     </style>
   </head>
   <body>
+    <div class="frame">
     <div class="card">
       <div class="disc-wrap">
         <div class="disc" id="disc">
@@ -442,7 +443,7 @@
         <button class="btn close" id="btnClose" title="Close" aria-label="Close"></button>
       </div>
     </div>
-    <div class="frame"></div>
+    </div>
 
     <script>
       const isElectron = Boolean(window.electron && window.electron.ipcRenderer);
@@ -537,10 +538,20 @@
         if (els.tDur) els.tDur.textContent = formatTime(dur);
         if (els.barFill) els.barFill.style.width = `${pct * 100}%`;
 
-        // Cover
+        // Cover: validate URL/data URL to avoid CSS injection
         if (els.cover) {
           if (cover) {
-            els.cover.style.backgroundImage = `url(${cover})`;
+            let safeCover = "";
+            try {
+              const u = new URL(cover, document.baseURI || undefined);
+              const ok = u.protocol === "http:" || u.protocol === "https:" || u.protocol === "data:";
+              const ext = (u.pathname || "").toLowerCase();
+              const allowedExt = ok && (ext.endsWith(".png") || ext.endsWith(".jpg") || ext.endsWith(".jpeg") || ext.endsWith(".webp") || ext.endsWith(".svg") || u.protocol === "data:");
+              safeCover = ok && (u.protocol === "data:" || allowedExt) ? cover : "";
+            } catch {
+              safeCover = "";
+            }
+            if (safeCover) els.cover.style.backgroundImage = `url(${safeCover})`;
           }
         }
 
@@ -622,6 +633,9 @@
         const poll = async () => {
           try {
             const res = await fetch("/query", { cache: "no-store" });
+            if (!res.ok) {
+              throw new Error(`Query failed: ${res.status} ${res.statusText}`);
+            }
             const json = await res.json();
             const mapped = {
               title: json?.track?.title || "No track playing",

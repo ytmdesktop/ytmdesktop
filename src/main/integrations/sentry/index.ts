@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/electron/main";
 import { app } from "electron";
+import path from "path";
 import BaseIntegration from "../../integrations/base-integration";
 import { SENTRY_CONFIG } from "../../../shared/sentry.config";
 import log from "electron-log";
@@ -67,13 +68,16 @@ export default class SentryIntegration extends BaseIntegration {
         }
       });
 
-      // Set user information once available
+      // Set user information once available (anonymize paths to avoid PII)
       app.on("ready", () => {
         Sentry.setTag("app_version", app.getVersion());
-        Sentry.setTag("executable_path", app.getPath("exe"));
-        Sentry.setTag("user_data_path", app.getPath("userData"));
+        const exePath = app.getPath("exe");
+        const userDataPath = app.getPath("userData");
+        Sentry.setTag("executable_path", exePath ? `${path.basename(path.dirname(exePath))}/${path.basename(exePath)}` : "unknown");
+        Sentry.setTag("user_data_path", userDataPath ? path.basename(userDataPath) : "unknown");
       });
 
+      this.isEnabled = true;
       log.info("Sentry integration initialized in main process");
     } catch (error) {
       log.error("Failed to initialize Sentry in main process:", error);

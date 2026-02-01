@@ -35,9 +35,12 @@ export class NotificationEnhancerPlugin extends BasePlugin {
     log.debug("Notification Enhancer settings changed:", newSettings);
     // Reapply notification styling if needed
     if (newSettings.notificationStyle !== undefined) {
+      const validStyles = ["default", "minimal", "detailed"];
       const styleValue =
         typeof newSettings.notificationStyle === "string"
-          ? newSettings.notificationStyle
+          ? validStyles.includes(newSettings.notificationStyle)
+            ? newSettings.notificationStyle
+            : "default"
           : String(newSettings.notificationStyle ?? this.settings.notificationStyle ?? "default");
       this.updateNotificationStyle(styleValue);
     }

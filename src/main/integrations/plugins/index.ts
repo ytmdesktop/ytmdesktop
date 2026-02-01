@@ -14,17 +14,31 @@ type PluginStoreSchema = Record<string, { enabled?: boolean; settings: Record<st
 export class PluginManager {
   private plugins: Map<string, BasePlugin> = new Map();
   private enabledPlugins: Set<string> = new Set();
-  private pluginStore: Conf<PluginStoreSchema>;
+  private _pluginStore: Conf<PluginStoreSchema> | null = null;
 
   constructor() {
-    // Create a dedicated store for plugin settings
-    this.pluginStore = new Conf<PluginStoreSchema>({
+    this.registerBuiltinPlugins();
+  }
+
+  /**
+   * Initialize the plugin store and load persisted settings. Call this after app.whenReady()
+   * so app.getPath("userData") is safe.
+   */
+  init(): void {
+    if (this._pluginStore !== null) return;
+    this._pluginStore = new Conf<PluginStoreSchema>({
       configName: "plugins",
       cwd: app.getPath("userData")
     });
-    this.registerBuiltinPlugins();
     this.loadPluginSettings();
     this.autoEnablePlugins();
+  }
+
+  private get pluginStore(): Conf<PluginStoreSchema> {
+    if (this._pluginStore === null) {
+      throw new Error("PluginManager not initialized; call init() after app.whenReady()");
+    }
+    return this._pluginStore;
   }
 
   private registerBuiltinPlugins(): void {

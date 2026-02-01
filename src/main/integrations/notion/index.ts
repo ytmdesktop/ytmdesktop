@@ -298,13 +298,13 @@ export default class NotionIntegration extends BaseIntegration {
               }
             ]
           },
-          Category: {
-            select: doc.category
-              ? {
-                  name: doc.category
+          ...(doc.category
+            ? {
+                Category: {
+                  select: { name: doc.category }
                 }
-              : null
-          },
+              }
+            : {}),
           Tags: {
             multi_select: doc.tags
               ? doc.tags.map(tag => ({

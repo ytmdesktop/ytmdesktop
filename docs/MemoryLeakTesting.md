@@ -27,22 +27,26 @@ The memory monitor will log memory usage every 60 seconds to the console and wil
 ### Steps:
 
 1. **Open Chrome DevTools**
+
    - In development mode, DevTools opens automatically
    - Or use the shortcut: `F12` (if enabled in settings)
 
 2. **Take Baseline Snapshot**
+
    - Go to the "Memory" tab
    - Select "Heap snapshot"
    - Click "Take snapshot"
    - Label it "Baseline"
 
 3. **Perform Actions**
+
    - Open and close the settings window 10 times
    - Play/pause music multiple times
    - Navigate between different pages in YouTube Music
    - Let it run for 5 minutes
 
 4. **Take Second Snapshot**
+
    - Take another heap snapshot
    - Label it "After Actions"
 
@@ -56,6 +60,7 @@ The memory monitor will log memory usage every 60 seconds to the console and wil
      - ❌ **BAD**: Event listeners multiplying rapidly
 
 ### Success Criteria:
+
 - Detached DOM nodes < 20
 - No excessive event listeners
 - Memory growth < 50MB for typical usage
@@ -67,21 +72,25 @@ The memory monitor will log memory usage every 60 seconds to the console and wil
 ### Steps:
 
 1. **Start the Application**
+
    ```bash
    npm start
    ```
 
 2. **Note Initial Memory**
+
    - Open Task Manager
    - Find "YouTube Music Desktop App" processes
    - Note the memory usage (should be around 100-200MB initially)
 
 3. **Use Normally for 1 Hour**
+
    - Play music continuously
    - Interact with the app (change songs, playlists, settings)
    - Don't just let it sit idle
 
 4. **Monitor Memory Growth**
+
    - Check memory every 15 minutes
    - Log the values
    - Memory monitor will automatically warn if issues detected
@@ -91,12 +100,14 @@ The memory monitor will log memory usage every 60 seconds to the console and wil
    - Calculate growth percentage
 
 ### Success Criteria:
-- **✅ PASS**: Memory growth < 100MB (< 50% growth from baseline)
+
+- **✅ PASS**: Memory growth < 75MB (< 50% growth from baseline)
 - **✅ PASS**: Memory stabilizes (not continuously growing)
-- **❌ FAIL**: Memory grows > 200MB (> 100% growth)
+- **❌ FAIL**: Memory grows > 150MB (> 100% growth)
 - **❌ FAIL**: Memory continuously increases without leveling off
 
 ### Expected Behavior:
+
 ```
 Initial: ~150MB
 After 15min: ~180MB
@@ -112,6 +123,7 @@ After 60min: ~215MB (stable)
 ### Steps:
 
 1. **Start App in Development Mode**
+
    ```bash
    npm start
    ```
@@ -121,15 +133,17 @@ After 60min: ~215MB (stable)
 3. **Take Baseline Snapshot**
 
 4. **Stress Test Settings Window**
+
    - Open settings: Click settings button
    - Close settings: Click close button
    - Repeat 50 times rapidly
 
 5. **Force Garbage Collection**
+
    - In DevTools console: Click the trash can icon (collect garbage)
    - Or if app started with `--expose-gc`:
      ```javascript
-     window.gc()
+     window.gc();
      ```
 
 6. **Take Final Snapshot**
@@ -140,6 +154,7 @@ After 60min: ~215MB (stable)
    - Look for Vue component instances
 
 ### Success Criteria:
+
 - No BrowserWindow objects retained (should be 1 - the main window)
 - Event listeners properly cleaned up
 - Vue components properly destroyed
@@ -151,6 +166,7 @@ The app includes an automated memory monitor that runs in development mode.
 ### View Memory Stats:
 
 In DevTools console:
+
 ```javascript
 // The memory monitor logs automatically every 60 seconds
 // Look for logs like:
@@ -163,11 +179,13 @@ In DevTools console:
 ### Warnings to Watch For:
 
 1. **High Heap Growth**
+
    ```
    [Memory Monitor] ⚠️  Heap has grown by 75.3%
    ```
 
 2. **Potential Memory Leak**
+
    ```
    [Memory Monitor] 🔴 Potential memory leak detected!
    ```
@@ -180,22 +198,27 @@ In DevTools console:
 ## Common Memory Leak Patterns (Now Fixed)
 
 ### ✅ Fixed: Vue Component Listeners
+
 **Before**: IPC listeners added in `onMounted` but never removed
 **After**: All listeners stored and removed in `onBeforeUnmount`
 
 ### ✅ Fixed: BrowserView Cleanup
+
 **Before**: BrowserView recreated without cleaning up old one
 **After**: Proper `cleanupYTMView()` function that removes listeners and destroys webContents
 
 ### ✅ Fixed: Intervals and Timeouts
+
 **Before**: Multiple intervals/timeouts never cleared
 **After**: CleanupRegistry tracks and clears all on app quit
 
 ### ✅ Fixed: PlayerStateStore Listener
+
 **Before**: Listener added but never removed
 **After**: Listener reference stored and removed on quit
 
 ### ✅ Fixed: Tray and Menu
+
 **Before**: Tray/Menu not destroyed on quit
 **After**: Proper `destroy()` calls in quit handler
 
@@ -211,6 +234,7 @@ In DevTools console:
 ### High Initial Memory?
 
 This is normal for Electron apps. They typically use:
+
 - Main Process: 50-100MB
 - Renderer Process: 100-200MB
 - GPU Process: 30-50MB
@@ -219,17 +243,20 @@ This is normal for Electron apps. They typically use:
 ### Memory Spikes During Music Playback?
 
 Normal behavior - audio buffering can temporarily increase memory. Watch for:
+
 - ✅ **OK**: Spikes that return to baseline
 - ❌ **PROBLEM**: Spikes that never release
 
 ## Performance Benchmarks
 
 ### Expected Memory Usage:
+
 - **Startup**: 150-250 MB
 - **After 1 hour**: 200-350 MB
 - **Peak**: < 500 MB
 
 ### Unacceptable Memory Usage:
+
 - **> 500 MB** during normal use
 - **> 1 GB** at any time
 - **Continuous growth** without stabilization
@@ -239,6 +266,7 @@ Normal behavior - audio buffering can temporarily increase memory. Watch for:
 If you discover a memory leak:
 
 1. **Collect Data**:
+
    - Heap snapshots (before and after)
    - Memory monitor logs
    - Steps to reproduce
@@ -266,6 +294,7 @@ Before marking testing complete, verify:
 ## Conclusion
 
 The comprehensive memory leak fixes include:
+
 1. ✅ CleanupRegistry for centralized cleanup
 2. ✅ Vue component lifecycle management
 3. ✅ BrowserView proper disposal
@@ -276,11 +305,3 @@ The comprehensive memory leak fixes include:
 8. ✅ Automated memory monitoring
 
 All critical memory leaks have been addressed. Run these tests to validate!
-
-
-
-
-
-
-
-
