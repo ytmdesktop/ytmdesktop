@@ -115,8 +115,10 @@ builder.config.resolved.json
 # JetBrains IDE (could be more specific, but it's no issues at all, to just ignore the entire folder)
 .idea
 
-# Cursor files
+# Cursor files (skills and agents are committed for team use)
 .cursor/*
+!.cursor/skills/
+!.cursor/agents/
 
 # Browser Tools MCP (local)
 .browser-tools-mcp/
