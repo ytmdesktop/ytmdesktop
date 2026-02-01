@@ -513,6 +513,340 @@
         .track-artist {
           font-size: 10px;
         }
+ 
+        .vinyl-record {
+            /* Scale the player content with the window so the window isn't larger than the UI */
+            width: min(92vmin, 100%);
+            height: min(92vmin, 100%);
+            max-width: 100%;
+            max-height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 15px 35px rgba(0,0,0,0.7));
+        }
+
+        .vinyl-disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(40,40,40,0.8) 0%, transparent 50%),
+                conic-gradient(from 0deg, #0a0a0a, #1a1a1a, #0f0f0f, #2a2a2a, #0a0a0a, #1a1a1a, #0f0f0f, #2a2a2a),
+                radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+            animation: spin 3s linear infinite;
+            box-shadow: 
+                0 0 50px rgba(0,0,0,0.9),
+                inset 0 0 20px rgba(0,0,0,0.8),
+                inset 0 0 40px rgba(255,255,255,0.03),
+                0 0 0 1px rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+
+        .vinyl-disc:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+            box-shadow: 
+                0 0 60px rgba(0,0,0,0.95),
+                inset 0 0 25px rgba(0,0,0,0.8),
+                inset 0 0 50px rgba(255,255,255,0.05),
+                0 0 0 2px rgba(255,255,255,0.15);
+        }
+
+        /* Button overlay for click effect */
+        .button-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0);
+            pointer-events: none;
+            transition: background 0.1s ease;
+            z-index: 100;
+            -webkit-app-region: no-drag;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-overlay.button-enabled {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .button-overlay.button-enabled:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .vinyl-disc.active .button-overlay {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .overlay-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.55);
+            color: white;
+            font-size: 24px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 120ms ease, transform 120ms ease;
+            pointer-events: none;
+        }
+
+        .button-overlay.button-enabled:hover .overlay-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .vinyl-disc.active .overlay-icon {
+            opacity: 1;
+            transform: scale(0.98);
+        }
+
+        .vinyl-disc.paused {
+            animation-play-state: paused;
+            filter: grayscale(0.4) brightness(0.8);
+        }
+
+        .vinyl-grooves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: 
+                repeating-radial-gradient(circle, 
+                    transparent 15%, 
+                    transparent 16%, 
+                    rgba(255,255,255,0.02) 16%, 
+                    rgba(255,255,255,0.02) 17%
+                ),
+                repeating-radial-gradient(circle, 
+                    transparent 20%, 
+                    transparent 20.5%, 
+                    rgba(255,255,255,0.03) 20.5%, 
+                    rgba(255,255,255,0.03) 21%
+                ),
+                repeating-radial-gradient(circle, 
+                    transparent 25%, 
+                    transparent 25.3%, 
+                    rgba(255,255,255,0.02) 25.3%, 
+                    rgba(255,255,255,0.02) 25.6%
+                );
+            pointer-events: none;
+            animation: grooveSpin 25s linear infinite reverse;
+        }
+
+        .vinyl-grooves.paused {
+            animation-play-state: paused;
+        }
+
+        .record-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 38%;
+            height: 38%;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 60%),
+                linear-gradient(135deg, #2c1810 0%, #8b4513 20%, #a0522d 40%, #8b4513 60%, #654321 100%);
+            border: 2px solid rgba(139, 69, 19, 0.8);
+            box-shadow: 
+                inset 0 0 15px rgba(0,0,0,0.6),
+                inset 0 0 30px rgba(139, 69, 19, 0.3),
+                0 0 20px rgba(139, 69, 19, 0.2),
+                0 2px 8px rgba(0,0,0,0.4);
+            overflow: hidden;
+            animation: inherit;
+        }
+
+        .album-art {
+            position: absolute;
+            top: 4%;
+            left: 4%;
+            width: 92%;
+            height: 92%;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 
+                inset 0 0 10px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: inherit;
+        }
+
+        .vinyl-center-hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8%;
+            height: 8%;
+            background: 
+                radial-gradient(circle, #000000 0%, #1a1a1a 70%, #333333 100%);
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.8);
+            box-shadow: 
+                inset 0 0 8px rgba(0,0,0,0.9),
+                0 0 4px rgba(0,0,0,0.5);
+        }
+
+        .vinyl-reflections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: 
+                radial-gradient(ellipse at 25% 25%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 75%, rgba(255,255,255,0.04) 0%, transparent 30%);
+            pointer-events: none;
+            animation: inherit;
+        }
+
+        .record-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: 
+                repeating-conic-gradient(from 0deg,
+                    transparent 0deg,
+                    transparent 0.8deg,
+                    rgba(255,255,255,0.015) 0.8deg,
+                    rgba(255,255,255,0.015) 1.2deg
+                );
+            pointer-events: none;
+            animation: inherit;
+            mix-blend-mode: overlay;
+        }
+
+        /* Enhanced paused states for all elements */
+        .record-label.paused {
+            animation-play-state: paused;
+            filter: grayscale(0.4) brightness(0.8);
+        }
+
+        .vinyl-reflections.paused {
+            animation-play-state: paused;
+            opacity: 0.5;
+        }
+
+        .record-texture.paused {
+            animation-play-state: paused;
+            opacity: 0.3;
+        }
+
+        .album-art.paused {
+            animation-play-state: paused;
+            filter: grayscale(0.3) brightness(0.9);
+        }
+
+        /* Dynamic lighting effects */
+        .vinyl-disc::before {
+            content: '';
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            border-radius: 50%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 25%);
+            pointer-events: none;
+            animation: lightShift 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes lightShift {
+            0% {
+                transform: rotate(0deg);
+                opacity: 0.6;
+            }
+            100% {
+                transform: rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        /* Improved glow effect */
+        .vinyl-record::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: recordGlow 4s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes recordGlow {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(1.02);
+            }
+        }
+
+        /* Stylus/needle effect */
+        .vinyl-record::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            right: -10px;
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(180deg, #c0c0c0 0%, #808080 50%, #404040 100%);
+            border-radius: 2px;
+            transform: rotate(25deg);
+            box-shadow: 
+                2px 2px 8px rgba(0,0,0,0.4),
+                inset 0 0 2px rgba(255,255,255,0.3);
+            z-index: 10;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 25px;
+            backdrop-filter: blur(5px);
+        }
+
         .control-btn {
           width: 30px;
           height: 30px;
@@ -834,6 +1168,7 @@
       vinylDisc.addEventListener("contextmenu", e => {
         e.preventDefault();
       });
+ 
     </script>
   </body>
 </html>
