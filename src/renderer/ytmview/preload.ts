@@ -257,7 +257,7 @@ window.addEventListener("load", async () => {
               }
             }
           }
-          
+
           return false;
         })
       `)
@@ -268,6 +268,13 @@ window.addEventListener("load", async () => {
         resolve();
       }
     }, 250);
+
+    // Add timeout to prevent infinite waiting
+    setTimeout(() => {
+      clearInterval(interval);
+      console.error("Timeout waiting for YouTube Music app hook");
+      resolve();
+    }, 15000);
   });
 
   let materialSymbolsLoaded = false;
@@ -276,90 +283,156 @@ window.addEventListener("load", async () => {
   materialSymbols.onload = () => {
     materialSymbolsLoaded = true;
   };
+  materialSymbols.onerror = () => {
+    console.error("Failed to load Material Symbols font");
+    materialSymbolsLoaded = true; // Continue anyway
+  };
   document.head.appendChild(materialSymbols);
 
   await new Promise<void>(resolve => {
     const interval = setInterval(async () => {
-      const playerApiReady: boolean = (
-        await webFrame.executeJavaScript(`
-          (function() {
-            return document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.isReady();
-          })
-        `)
-      )();
+      try {
+        const playerApiReady: boolean = (
+          await webFrame.executeJavaScript(`
+            (function() {
+              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+              return playerBar && playerBar.playerApi && playerBar.playerApi.isReady();
+            })
+          `)
+        )();
 
-      if (materialSymbolsLoaded && playerApiReady) {
-        clearInterval(interval);
-        resolve();
+        if (materialSymbolsLoaded && playerApiReady) {
+          clearInterval(interval);
+          resolve();
+        }
+      } catch (error) {
+        // Player bar might not be available yet, continue waiting
       }
     }, 250);
+
+    // Add timeout to prevent infinite waiting (15 seconds)
+    setTimeout(() => {
+      clearInterval(interval);
+      console.error("Timeout waiting for player API to be ready");
+      resolve();
+    }, 15000);
   });
 
-  createStyleSheet();
-  createNavigationMenuArrows();
-  createKeyboardNavigation();
-  await createAdditionalPlayerBarControls();
-  await hideChromecastButton();
-  await hookPlayerApiEvents();
-  overrideHistoryButtonDisplay();
+  try {
+    createStyleSheet();
+  } catch (error) {
+    console.error("Failed to create stylesheet:", error);
+  }
 
-  const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
+  try {
+    createNavigationMenuArrows();
+  } catch (error) {
+    console.error("Failed to create navigation arrows:", error);
+  }
 
-  const state = await store.get("state");
-  const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
+  try {
+    createKeyboardNavigation();
+  } catch (error) {
+    console.error("Failed to create keyboard navigation:", error);
+  }
 
-  if (continueWhereYouLeftOff) {
-    // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
-    if (!state.lastUrl.startsWith("https://music.youtube.com/watch")) {
-      if (state.lastVideoId) {
-        // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
-        let heightTransitionCount = 0;
-        const transitionEnd = async (e: TransitionEvent) => {
-          if (e.target === document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
-            if (e.propertyName === "height") {
-              (
-                await webFrame.executeJavaScript(`
-                  (function() {
-                    document.querySelector("ytmusic-popup-container").refitPopups_();
-                  })
-                `)
-              )();
-              heightTransitionCount++;
-              if (heightTransitionCount >= 2) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
-              }
-            }
-          }
-        };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+  try {
+    await createAdditionalPlayerBarControls();
+  } catch (error) {
+    console.error("Failed to create additional player bar controls:", error);
+  }
 
-        document.dispatchEvent(
-          new CustomEvent("yt-navigate", {
-            detail: {
-              endpoint: {
-                watchEndpoint: {
-                  videoId: state.lastVideoId,
-                  playlistId: state.lastPlaylistId
+  try {
+    await hideChromecastButton();
+  } catch (error) {
+    console.error("Failed to hide chromecast button:", error);
+  }
+
+  try {
+    await hookPlayerApiEvents();
+  } catch (error) {
+    console.error("Failed to hook player API events:", error);
+  }
+
+  try {
+    overrideHistoryButtonDisplay();
+  } catch (error) {
+    console.error("Failed to override history button display:", error);
+  }
+
+  let integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = {};
+  try {
+    integrationScripts = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
+  } catch (error) {
+    console.error("Failed to get integration scripts:", error);
+  }
+
+  try {
+    const state = await store.get("state");
+    const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
+
+    if (continueWhereYouLeftOff) {
+      // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
+      if (!state.lastUrl.startsWith("https://music.youtube.com/watch")) {
+        if (state.lastVideoId) {
+          // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
+          let heightTransitionCount = 0;
+          const transitionEnd = async (e: TransitionEvent) => {
+            if (e.target === document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
+              if (e.propertyName === "height") {
+                (
+                  await webFrame.executeJavaScript(`
+                    (function() {
+                      document.querySelector("ytmusic-popup-container").refitPopups_();
+                    })
+                  `)
+                )();
+                heightTransitionCount++;
+                if (heightTransitionCount >= 2) {
+                  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
                 }
               }
             }
-          })
-        );
+          };
+          document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+
+          document.dispatchEvent(
+            new CustomEvent("yt-navigate", {
+              detail: {
+                endpoint: {
+                  watchEndpoint: {
+                    videoId: state.lastVideoId,
+                    playlistId: state.lastPlaylistId
+                  }
+                }
+              }
+            })
+          );
+        }
+      } else {
+        (
+          await webFrame.executeJavaScript(`
+            (function() {
+              window.ytmd.sendVideoData(document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails, document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId());
+            })
+          `)
+        )();
       }
-    } else {
-      (
-        await webFrame.executeJavaScript(`
-          (function() {
-            window.ytmd.sendVideoData(document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails, document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId());
-          })
-        `)
-      )();
     }
+  } catch (error) {
+    console.error("Failed to restore playback state:", error);
   }
 
-  const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
-  if (alwaysShowVolumeSlider) {
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+  try {
+    const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
+    if (alwaysShowVolumeSlider) {
+      const volumeSlider = document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider");
+      if (volumeSlider) {
+        volumeSlider.classList.add("ytmd-persist-volume-slider");
+      }
+    }
+  } catch (error) {
+    console.error("Failed to set volume slider visibility:", error);
   }
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {

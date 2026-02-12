@@ -147,7 +147,9 @@ Object.assign(console, log.functions);
 //#endregion  Crash + Error reporting
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
+log.info("Checking electron squirrel startup...");
 if (electronSquirrelStartup) {
+  log.info("Squirrel startup detected, quitting...");
   app.quit();
 }
 
@@ -1175,6 +1177,18 @@ const createYTMView = (): void => {
 
   memoryStore.set("ytmViewLoadingStatus", "Initialized");
 
+  // Attach the BrowserView to the window BEFORE loading any URL
+  // This is critical to ensure proper rendering
+  if (mainWindow) {
+    mainWindow.addBrowserView(ytmView);
+    ytmView.setBounds({
+      x: 0,
+      y: 36,
+      width: mainWindow.getContentBounds().width,
+      height: mainWindow.getContentBounds().height - 36
+    });
+  }
+
   let navigateDefault = true;
 
   const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
@@ -1313,6 +1327,9 @@ const createMainWindow = (): void => {
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
+    mainWindow.focus();
+    mainWindow.setAlwaysOnTop(true);
+    setTimeout(() => mainWindow.setAlwaysOnTop(false), 1000);
     // Open the DevTools.
     if (process.env.NODE_ENV === "development") {
       mainWindow.webContents.openDevTools({
@@ -1575,18 +1592,6 @@ app.on("ready", async () => {
 
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
-      mainWindow.addBrowserView(ytmView);
-      ytmView.setBounds({
-        x: 0,
-        y: 36,
-        width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height - 36
-      });
-      if (process.env.NODE_ENV === "development") {
-        ytmView.webContents.openDevTools({
-          mode: "detach"
-        });
-      }
 
       // TODO: this is just a hack fix for ratio volume to run the enable script
       ratioVolume.ytmViewLoaded();
