@@ -7,7 +7,6 @@
   }
 
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
-  const wizButtonShapeEnabled = true; // TODO: Remove this - 9/3/2025 YTM did a UI update and the experiment flag associated with this is gone as its now default enabled
 
   let ytmdControlButtons = {};
 
@@ -66,15 +65,10 @@
     toggleable: true,
     type: "text"
   };
-  if (wizButtonShapeEnabled) {
-    libraryButton.rawProps = {
-      iconName: "yt-sys-icons:library_add",
-      data: libraryButtonData
-    };
-  } else {
-    libraryButton.set("iconName", "yt-sys-icons:library_add");
-    libraryButton.set("data", libraryButtonData);
-  }
+  libraryButton.rawProps = {
+    iconName: "yt-sys-icons:library_add",
+    data: libraryButtonData
+  };
   document
     .querySelector("ytmusic-app-layout>ytmusic-player-bar")
     .querySelector("ytmusic-like-button-renderer")
@@ -155,15 +149,10 @@
     toggled: false,
     type: "text"
   };
-  if (wizButtonShapeEnabled) {
-    playlistButton.rawProps = {
-      iconName: "yt-sys-icons:playlist_add",
-      data: playlistButtonData
-    };
-  } else {
-    playlistButton.set("iconName", "yt-sys-icons:playlist_add");
-    playlistButton.set("data", playlistButtonData);
-  }
+  playlistButton.rawProps = {
+    iconName: "yt-sys-icons:playlist_add",
+    data: playlistButtonData
+  };
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
@@ -518,8 +507,8 @@
         const item = currentMenu.items[i];
         if (item.toggleMenuServiceItemRenderer) {
           if (
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_SAVED" ||
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_ADD"
+            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER" ||
+            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK"
           ) {
             foundLibraryButton = true;
             libraryFeedbackDefaultToken = item.toggleMenuServiceItemRenderer.defaultServiceEndpoint.feedbackEndpoint.feedbackToken;
@@ -530,49 +519,26 @@
               state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken] !== null
             ) {
               libraryButtonData.toggled = state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken];
-              if (wizButtonShapeEnabled) {
-                libraryButton.setters.data(libraryButtonData); 
-              } else {
-                libraryButton.set("data.toggled", libraryButtonData.toggled);
-              }
+              libraryButton.setters.data(libraryButtonData); 
             } else {
               libraryButtonData.toggled = false;
-              if (wizButtonShapeEnabled) {
-                libraryButton.setters.data(libraryButtonData); 
-              } else {
-                libraryButton.set("data.toggled", libraryButtonData.toggled);
-              }
+              libraryButton.setters.data(libraryButtonData); 
             }
 
-            if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_SAVED") {
+            // Dev note 2/12/26: I think this if check got reversed the comments are probably outdated. Didn't bother investigating further to update comments
+            if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER") {
               // Default value is saved to library (false == remove from library, true == add to library)
               if (libraryButtonData.toggled) {
-                if (wizButtonShapeEnabled) {
-                  libraryButton.setters.iconName("yt-sys-icons:library_add");
-                } else {
-                  libraryButton.set("iconName", "yt-sys-icons:library_add");
-                }
+                libraryButton.setters.iconName("yt-sys-icons:library_saved");
               } else {
-                if (wizButtonShapeEnabled) {
-                  libraryButton.setters.iconName("yt-sys-icons:library_saved");
-                } else {
-                  libraryButton.set("iconName", "yt-sys-icons:library_saved");
-                } 
+                libraryButton.setters.iconName("yt-sys-icons:library_add");
               }
-            } else if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_ADD") {
+            } else if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK") {
               // Default value is add to library (false == add to library, true == remove from library)
               if (libraryButtonData.toggled) {
-                if (wizButtonShapeEnabled) {
-                  libraryButton.setters.iconName("yt-sys-icons:library_saved");
-                } else {
-                  libraryButton.set("iconName", "yt-sys-icons:library_saved");
-                }
+                libraryButton.setters.iconName("yt-sys-icons:library_add");
               } else {
-                if (wizButtonShapeEnabled) {
-                  libraryButton.setters.iconName("yt-sys-icons:library_add");
-                } else {
-                  libraryButton.set("iconName", "yt-sys-icons:library_add");
-                }
+                libraryButton.setters.iconName("yt-sys-icons:library_saved");
               }
             }
             break;

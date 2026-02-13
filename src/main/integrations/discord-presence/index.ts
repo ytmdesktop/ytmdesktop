@@ -73,12 +73,15 @@ export default class DiscordPresence implements IIntegration {
         this.discordClient.clearActivity();
         return;
       }
-      const { title, author, album, id, thumbnails, durationSeconds } = this.videoDetails;
+      const { title, author, album, id, thumbnails, durationSeconds, channelId, albumId } = this.videoDetails;
       const thumbnail = getHighestResThumbnail(thumbnails);
       this.discordClient.setActivity({
         type: DiscordActivityType.Listening,
+        status_display_type: 1,
         details: stringLimit(title, 128, 2),
+        details_url: `https://music.youtube.com/watch?v=${id}`,
         state: stringLimit(author, 128, 2),
+        state_url: `https://music.youtube.com/channel/${channelId}`,
         timestamps: {
           start: this.videoState === VideoState.Playing ? Date.now() - this.progress * 1000 : undefined,
           end: this.videoState === VideoState.Playing ? Date.now() + (durationSeconds - this.progress) * 1000 : undefined
@@ -86,17 +89,14 @@ export default class DiscordPresence implements IIntegration {
         assets: {
           large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
           large_text: album ? stringLimit(album, 128, 2) : undefined,
+          large_url: albumId ? `https://music.youtube.com/browse/${albumId}` : undefined,
           small_image: getSmallImageKey(this.videoState),
           small_text: getSmallImageText(this.videoState)
         },
         instance: false,
         buttons: [
           {
-            label: "Play on YouTube Music",
-            url: `https://music.youtube.com/watch?v=${id}`
-          },
-          {
-            label: "Play on YouTube Music Desktop",
+            label: "Play on YTMDesktop",
             url: `ytmd://play/${id}`
           }
         ]

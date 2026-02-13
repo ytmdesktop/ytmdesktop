@@ -192,28 +192,25 @@ function getYTMTextRun(runs: { text: string }[]) {
   (
     await webFrame.executeJavaScript(`
     (function() {
-      let ytmdHookedObjects = [];
-      
-      let decorate = null;
-      Object.defineProperty(Reflect, "decorate", {
-        set: (value) => {
-          decorate = value;
-        },
-        get: () => {
-          return (...args) => {
-            if (!window.__YTMD_HOOK__) {
-              let obj = args[1];
-              if (typeof obj === "object") {
-                ytmdHookedObjects.push(obj);
-              }
+      let fakeBaseClass = function() {
+        try {
+          if (!window.__YTMD_HOOK__) {
+            if (this.store && !!this.store.getState && !!this.store.dispatch && !!this.store.subscribe) {
+              let ytmdHook = {
+                ytmStore: this.store
+              };
+              Object.freeze(ytmdHook);
+              window.__YTMD_HOOK__ = ytmdHook;
             }
-
-            return decorate(...args);
           }
+        } catch {}
+      }
+      Object.defineProperty(window, "PolymerFakeBaseClassWithoutHtml", {
+        set: (value) => {},
+        get: () => {
+          return fakeBaseClass
         }
-      });
-
-      window.__YTMD_HOOK_OBJS__ = ytmdHookedObjects;
+      })
     })
   `)
   )();
@@ -232,30 +229,8 @@ window.addEventListener("load", async () => {
       const hooked = (
         await webFrame.executeJavaScript(`
         (function() {
-          for (const hookedObj of window.__YTMD_HOOK_OBJS__) {
-            if (hookedObj.is) {
-              if (hookedObj.is === "ytmusic-app") {
-                if (hookedObj.provide) {
-                  for (const provider of hookedObj.provide) {
-                    if (provider.useValue) {
-                      if (provider.useValue.store) {
-                        let ytmdHook = {
-                          ytmStore: provider.useValue.store
-                        };
-                        Object.freeze(ytmdHook);
-                        window.__YTMD_HOOK__ = ytmdHook;
-                        break;
-                      }
-                    }
-                  }
-                }
-
-                if (window.__YTMD_HOOK__) {
-                  delete window.__YTMD_HOOK_OBJS__;
-                  return true;
-                }
-              }
-            }
+          if (window.__YTMD_HOOK__) {
+            return true;
           }
           
           return false;
