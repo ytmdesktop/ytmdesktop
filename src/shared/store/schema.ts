@@ -4,6 +4,18 @@ export enum TrayIconStyle {
   Black = 2
 }
 
+export enum LyricsProvider {
+  LRCLib = 0,
+  Musixmatch = 1,
+  Auto = 2
+}
+
+export enum LyricsFontSize {
+  Small = 0,
+  Medium = 1,
+  Large = 2
+}
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -28,6 +40,13 @@ export type StoreSchema = {
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
+    lyricsEnabled: boolean;
+    lyricsPreferSynced: boolean;
+    lyricsProvider: LyricsProvider;
+    lyricsFontSize: LyricsFontSize;
+    lyricsFontSizePx: number;
+    lyricsDebug: boolean;
+    lyricsMusixmatchApiKey: string | null;
   };
   integrations: {
     companionServerEnabled: boolean;

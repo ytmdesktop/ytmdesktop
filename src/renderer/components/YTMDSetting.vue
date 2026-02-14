@@ -25,6 +25,7 @@ const props = defineProps<{
   flexColumn?: boolean;
   beta?: boolean;
   optionsMap?: { [key: number]: string }; // This is for the select menu
+  realtime?: boolean;
 }>();
 const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
@@ -33,6 +34,10 @@ const value = computed({
     return props.modelValue;
   },
   set(value) {
+    if (props.type === "range" && typeof value === "string") {
+      emit("update:modelValue", Number.parseFloat(value));
+      return;
+    }
     emit("update:modelValue", value);
   }
 });
@@ -86,7 +91,16 @@ function select(optionKey: string) {
     />
     <div v-if="type == 'range'" class="range-selector">
       <span class="range-value">{{ value }}</span>
-      <input v-model="value" :disabled="disabled" :type="props.type" :max="props.max" :min="props.min" :step="props.step" @change="$emit('change', $event)" />
+      <input
+        v-model="value"
+        :disabled="disabled"
+        :type="props.type"
+        :max="props.max"
+        :min="props.min"
+        :step="props.step"
+        @input="props.realtime && $emit('change', $event)"
+        @change="$emit('change', $event)"
+      />
     </div>
     <div v-if="type == 'file'" class="file-picker">
       <input ref="fileInput" :disabled="disabled" type="file" accept=".css" :data-setting="bindSetting" @change="$emit('file-change', $event)" />
