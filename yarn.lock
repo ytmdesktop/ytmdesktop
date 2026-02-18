@@ -902,6 +902,81 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ghostery/adblocker-content@npm:^2.13.4, @ghostery/adblocker-content@npm:^2.14.1":
+  version: 2.14.1
+  resolution: "@ghostery/adblocker-content@npm:2.14.1"
+  dependencies:
+    "@ghostery/adblocker-extended-selectors": "npm:^2.14.1"
+  checksum: 10c0/bff43ff2ccb1654d6404762e09dbb72be3f7181256de91fda403a986702e4adc011ce333f714b306b95da041844eb95e175ade57fcf4340067cd7e217857aece
+  languageName: node
+  linkType: hard
+
+"@ghostery/adblocker-electron-preload@npm:2.13.4":
+  version: 2.13.4
+  resolution: "@ghostery/adblocker-electron-preload@npm:2.13.4"
+  dependencies:
+    "@ghostery/adblocker-content": "npm:^2.13.4"
+  peerDependencies:
+    electron: ">11"
+  checksum: 10c0/fdbf470d84e15fd131a8a0b95346b22d90f15f498c01cfd8869f2793961de25ef910727bdc4b19a6e18b2e22ba03db020f66ad74363a022a3dfc15a8b92656e6
+  languageName: node
+  linkType: hard
+
+"@ghostery/adblocker-electron-preload@npm:^2.13.4":
+  version: 2.14.1
+  resolution: "@ghostery/adblocker-electron-preload@npm:2.14.1"
+  dependencies:
+    "@ghostery/adblocker-content": "npm:^2.14.1"
+  peerDependencies:
+    electron: ">11"
+  checksum: 10c0/5e16510153101b6f6c3d541017883cf98cdd06bacff4fad16d25e6a525418ba21d3ae695e8c8cc90cc175a2edfcc3a0e160ed56206db8205792cf158e2b04e93
+  languageName: node
+  linkType: hard
+
+"@ghostery/adblocker-electron@npm:2.13.4":
+  version: 2.13.4
+  resolution: "@ghostery/adblocker-electron@npm:2.13.4"
+  dependencies:
+    "@ghostery/adblocker": "npm:^2.13.4"
+    "@ghostery/adblocker-electron-preload": "npm:^2.13.4"
+    tldts-experimental: "npm:^7.0.18"
+  peerDependencies:
+    electron: ">11"
+  checksum: 10c0/94153ac431e108b84fced5eb52b58d30d4d8f6082e13c4a921223b198abddb119dd59890412f685267659be332b51b0a9d7f195e689cbb68c4490b646d85bfe4
+  languageName: node
+  linkType: hard
+
+"@ghostery/adblocker-extended-selectors@npm:^2.14.1":
+  version: 2.14.1
+  resolution: "@ghostery/adblocker-extended-selectors@npm:2.14.1"
+  checksum: 10c0/32b566412e9de397f85a98c0b4914b1a406718f7cefbf607a856e19fa4a7b0010c22e7e3a77518045fc6f1ff305f1c1e6c0fc61d857d0bb69c01ada5d7d49e1b
+  languageName: node
+  linkType: hard
+
+"@ghostery/adblocker@npm:^2.13.4":
+  version: 2.14.1
+  resolution: "@ghostery/adblocker@npm:2.14.1"
+  dependencies:
+    "@ghostery/adblocker-content": "npm:^2.14.1"
+    "@ghostery/adblocker-extended-selectors": "npm:^2.14.1"
+    "@ghostery/url-parser": "npm:^1.3.1"
+    "@remusao/guess-url-type": "npm:^2.1.0"
+    "@remusao/small": "npm:^2.1.0"
+    "@remusao/smaz": "npm:^2.2.0"
+    tldts-experimental: "npm:^7.0.23"
+  checksum: 10c0/9a2b9a4a7b6dbc86659dbe724795b878e72ac40d1f7dc396c72d2177f2316d544f4ca0e067d0c23ef4488757afafbea00ab03821a407ca5001e2aac56a4b66c7
+  languageName: node
+  linkType: hard
+
+"@ghostery/url-parser@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "@ghostery/url-parser@npm:1.3.1"
+  dependencies:
+    tldts-experimental: "npm:^7.0.8"
+  checksum: 10c0/d619560085a95f43f7d72c01ce785b4ac991f27b7b0c4a5dc118a42313d9fdbe06ddb8be408f1087a4ab9c855dac3de116ddc2dbd34c78aacc439dd233a590e2
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.13.0":
   version: 0.13.0
   resolution: "@humanwhocodes/config-array@npm:0.13.0"
@@ -1452,6 +1527,53 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 10c0/5bd7576bb1b38a47a7fc7b51ac9f38748e772beebc56200450c4a817d712232b8f1d3ef70532c80840243c657d491cf6a6be1e3a214cff907645819fdc34aadd
+  languageName: node
+  linkType: hard
+
+"@remusao/guess-url-type@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@remusao/guess-url-type@npm:2.1.0"
+  checksum: 10c0/b33d27cb14a1354a3af5d6ac59ada8069a0e093d9617a3d3aa905619783073325245d50f2f0678803779b7501c499fe3a1118cbb23a77f7e9fe1e139c3ab6218
+  languageName: node
+  linkType: hard
+
+"@remusao/small@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@remusao/small@npm:2.1.0"
+  checksum: 10c0/79e915c59f052dce7735e38d0fcd49657f40947813b0eb1984a9ca632c88fce84c2fd62e61632354a61d1898f895f5a476b7d41d39e8f773a5c11e96ec7e6098
+  languageName: node
+  linkType: hard
+
+"@remusao/smaz-compress@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@remusao/smaz-compress@npm:2.2.0"
+  dependencies:
+    "@remusao/trie": "npm:^2.1.0"
+  checksum: 10c0/116dbc7d345cc5c3be3a238301d4352c5103050e6b49dab33cfe1125af1f095cfe16f2d4363fe37c94f7cec3e36be1ce3c64e303074dc5439ab98cf585faaa11
+  languageName: node
+  linkType: hard
+
+"@remusao/smaz-decompress@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@remusao/smaz-decompress@npm:2.2.0"
+  checksum: 10c0/b835f1f8f272fdb9ec6229adf98d50725df35fe9d7d4b155146b0139c93cf35d772cf01f4a5b27dad291971fae93831cb10fd72e2f95f0a1d6e78eae677d1569
+  languageName: node
+  linkType: hard
+
+"@remusao/smaz@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@remusao/smaz@npm:2.2.0"
+  dependencies:
+    "@remusao/smaz-compress": "npm:^2.2.0"
+    "@remusao/smaz-decompress": "npm:^2.2.0"
+  checksum: 10c0/d2e6424662de6128786020055789e1ee0c2eb352f2967f9bb0902f168b60c1eef40f5c76443c14ded1eff0987f14c849a6188d6d2a8e858a7e3b2004bb39fd87
+  languageName: node
+  linkType: hard
+
+"@remusao/trie@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@remusao/trie@npm:2.1.0"
+  checksum: 10c0/d5dbbe5eba140713c960037e20f7f76a0409aad76537513129c8a23ae34f20382f259f261f30419ce2993eb78207518cb4f136e80f20c1d62861c318c06f8296
   languageName: node
   linkType: hard
 
@@ -8929,6 +9051,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tldts-core@npm:^7.0.23":
+  version: 7.0.23
+  resolution: "tldts-core@npm:7.0.23"
+  checksum: 10c0/b3d936a75b5f65614c356a58ef37563681c6224187dcce9f57aac76d92aae83b1a6fe6ab910f77472b35456bc145a8441cb3e572b4850be43cb4f3465e0610ec
+  languageName: node
+  linkType: hard
+
+"tldts-experimental@npm:^7.0.18, tldts-experimental@npm:^7.0.23, tldts-experimental@npm:^7.0.8":
+  version: 7.0.23
+  resolution: "tldts-experimental@npm:7.0.23"
+  dependencies:
+    tldts-core: "npm:^7.0.23"
+  checksum: 10c0/57ebe153ff3cbea273987fe439feff4485ff5006ca7e483099fd86068a7c98b5d3d0577b0fb899cb96aeedff48fed8be058471c2737e52a73f4085278ebd9722
+  languageName: node
+  linkType: hard
+
 "tmp-promise@npm:^3.0.2":
   version: 3.0.3
   resolution: "tmp-promise@npm:3.0.3"
@@ -9963,6 +10101,8 @@ __metadata:
     "@fastify/error": "npm:^4.2.0"
     "@fastify/rate-limit": "npm:^10.3.0"
     "@fastify/type-provider-typebox": "npm:^5.2.0"
+    "@ghostery/adblocker-electron": "npm:2.13.4"
+    "@ghostery/adblocker-electron-preload": "npm:2.13.4"
     "@sinclair/typebox": "npm:^0.34.48"
     "@types/electron-squirrel-startup": "npm:^1.0.2"
     "@types/node": "npm:^22.19.11"

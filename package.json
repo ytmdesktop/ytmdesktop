@@ -58,6 +58,8 @@
     "@fastify/error": "^4.2.0",
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/type-provider-typebox": "^5.2.0",
+    "@ghostery/adblocker-electron": "2.13.4",
+    "@ghostery/adblocker-electron-preload": "2.13.4",
     "@sinclair/typebox": "^0.34.48",
     "conf": "^10.2.0",
     "electron-log": "5.4.3",
