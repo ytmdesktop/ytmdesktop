@@ -2,12 +2,11 @@ import { BrowserView } from "electron";
 import Conf from "conf";
 import log from "electron-log";
 
-import { LyricsProvider as LyricsProviderSetting, StoreSchema } from "../../../shared/store/schema";
+import { StoreSchema } from "../../../shared/store/schema";
 import playerStateStore, { PlayerState, VideoState } from "../../player-state-store";
 import LyricsCache from "./cache";
-import LRCLibProvider, { createTrackFingerprint } from "./providers/lrclib";
-import MusixmatchProvider from "./providers/musixmatch";
-import { LyricsSyncState, LyricsViewState, TrackInfo } from "./types";
+import YouTubeProvider from "./providers/youtube";
+import { LyricsSyncState, LyricsViewState, TrackInfo, createTrackFingerprint } from "./types";
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -43,8 +42,7 @@ export default class LyricsFeature {
   private store: Conf<StoreSchema> | null = null;
   private ytmView: BrowserView | null = null;
   private cache: LyricsCache | null = null;
-  private lrclibProvider = new LRCLibProvider();
-  private musixmatchProvider = new MusixmatchProvider();
+  private youtubeProvider = new YouTubeProvider();
   private enabled = false;
 
   private lastState: PlayerState | null = null;
@@ -114,12 +112,12 @@ export default class LyricsFeature {
     this.fetchRequestId++;
     this.currentTrackFingerprint = "";
     this.lastViewState = { status: "idle" };
-    this.sendLyricsState(this.lastViewState);
+    this.sendToUI(this.lastViewState);
     log.info("Lyrics feature listener detached");
   }
 
   public ytmViewLoaded() {
-    this.sendLyricsState(this.lastViewState);
+    this.sendToUI(this.lastViewState);
     this.sendLyricsSync(this.syncState, true);
   }
 
@@ -140,16 +138,6 @@ export default class LyricsFeature {
     return this.cache.getStats();
   }
 
-  public handleSettingsChanged(oldState: StoreSchema["playback"], newState: StoreSchema["playback"]) {
-    if (!this.enabled) {
-      return;
-    }
-
-    if (oldState.lyricsProvider !== newState.lyricsProvider) {
-      this.scheduleFetch(100);
-    }
-  }
-
   private onPlayerStateChanged(state: PlayerState) {
     if (!this.enabled) {
       return;
@@ -163,7 +151,7 @@ export default class LyricsFeature {
 
     if (state.adPlaying) {
       this.currentTrackFingerprint = trackFingerprint;
-      this.sendLyricsState({
+      this.sendToUI({
         status: "ad",
         message: "Ad playing",
         trackFingerprint
@@ -181,7 +169,7 @@ export default class LyricsFeature {
     }
 
     if (!state.adPlaying && this.lastViewState.status === "ad") {
-      this.sendLyricsState({
+      this.sendToUI({
         status: "loading",
         trackFingerprint
       });
@@ -192,7 +180,7 @@ export default class LyricsFeature {
       this.currentTrackFingerprint = trackFingerprint;
       this.fetchedWithMissingMetadata = false;
       if (trackFingerprint) {
-        this.sendLyricsState({
+        this.sendToUI({
           status: "loading",
           trackFingerprint
         });
@@ -237,14 +225,14 @@ export default class LyricsFeature {
     const track = this.toTrackInfo(state);
 
     if (!track) {
-      this.sendLyricsState({ status: "none", message: "No lyrics found" });
+      this.sendToUI({ status: "none", message: "No lyrics found" });
       return;
     }
 
     const trackFingerprint = createTrackFingerprint(track);
     log.info(`Lyrics fetch requested: ${track.artist} - ${track.title}`);
     if (state.adPlaying) {
-      this.sendLyricsState({
+      this.sendToUI({
         status: "ad",
         message: "Ad playing",
         trackFingerprint
@@ -253,7 +241,6 @@ export default class LyricsFeature {
     }
 
     const preferSynced = true;
-    this.musixmatchProvider.setApiKey(store.get("playback.lyricsMusixmatchApiKey"));
     const cacheKey = this.getCacheKey(trackFingerprint, preferSynced);
     const lastFetchAt = this.recentFetchByKey.get(cacheKey) ?? 0;
     if (Date.now() - lastFetchAt < 1200) {
@@ -293,7 +280,7 @@ export default class LyricsFeature {
         this.fetchedWithMissingMetadata = true;
       }
 
-      this.sendLyricsState({
+      this.sendToUI({
         status: "loading",
         trackFingerprint
       });
@@ -319,7 +306,7 @@ export default class LyricsFeature {
       }
 
       log.warn("Lyrics fetch failed", error);
-      this.sendLyricsState({
+      this.sendToUI({
         status: "error",
         message: "Lyrics unavailable right now",
         trackFingerprint
@@ -336,92 +323,39 @@ export default class LyricsFeature {
   }
 
   private async searchFromSelectedProvider(track: TrackInfo, preferSynced: boolean, signal: AbortSignal) {
-    const selectedProvider = this.store?.get("playback.lyricsProvider") ?? LyricsProviderSetting.Auto;
+    const fingerprint = createTrackFingerprint(track);
 
-    const tryLrclib = async () => {
+    const tryYoutube = async () => {
       try {
-        return await withTimeout(this.lrclibProvider.search(track, preferSynced, signal), 20_000, "LRCLib timeout");
+        return await withTimeout(this.youtubeProvider.search(track, preferSynced, signal), 8000, "YouTube timeout");
       } catch (error) {
         if (signal.aborted) {
           throw error;
         }
-        log.warn("LRCLib provider failed", error);
+        log.warn("YouTube provider failed", error);
         return null;
       }
     };
 
-    const tryMusixmatch = async () => {
-      try {
-        return await withTimeout(this.musixmatchProvider.search(track, preferSynced, signal), 8000, "Musixmatch timeout");
-      } catch (error) {
-        if (signal.aborted) {
-          throw error;
-        }
-        log.warn("Musixmatch provider failed", error);
-        return null;
-      }
-    };
-
-    switch (selectedProvider) {
-      case LyricsProviderSetting.Musixmatch: {
-        const fromMusixmatch = await tryMusixmatch();
-        if (fromMusixmatch && fromMusixmatch.type !== "none") {
-          return fromMusixmatch;
-        }
-        const fromLrclib = await tryLrclib();
-        if (fromLrclib) {
-          return fromLrclib;
-        }
-        return {
-          type: "none",
-          source: "musixmatch",
-          trackFingerprint: createTrackFingerprint(track)
-        };
-      }
-
-      case LyricsProviderSetting.Auto: {
-        const fromLrclib = await tryLrclib();
-        if (fromLrclib && fromLrclib.type !== "none") {
-          return fromLrclib;
-        }
-
-        const fromMusixmatch = await tryMusixmatch();
-        if (fromMusixmatch) {
-          return fromMusixmatch;
-        }
-
-        return {
-          type: "none",
-          source: "lrclib",
-          trackFingerprint: createTrackFingerprint(track)
-        };
-      }
-
-      case LyricsProviderSetting.LRCLib:
-      default: {
-        const fromLrclib = await tryLrclib();
-        if (fromLrclib) {
-          return fromLrclib;
-        }
-        return {
-          type: "none",
-          source: "lrclib",
-          trackFingerprint: createTrackFingerprint(track)
-        };
-      }
+    const fromYoutube = await tryYoutube();
+    if (fromYoutube) {
+      return fromYoutube;
     }
+    return {
+      type: "none" as const,
+      source: "youtube" as const,
+      trackFingerprint: fingerprint
+    };
   }
 
   private getCacheKey(trackFingerprint: string, preferSynced: boolean) {
-    const provider = this.store?.get("playback.lyricsProvider") ?? LyricsProviderSetting.Auto;
-    const musixmatchKeyConfigured = this.store?.get("playback.lyricsMusixmatchApiKey") ? 1 : 0;
-    const strategyVersion = 5;
-    return `v${strategyVersion}|p:${provider}|mxk:${musixmatchKeyConfigured}|ps:${preferSynced ? 1 : 0}|${trackFingerprint}`;
+    const strategyVersion = 1;
+    return `v${strategyVersion}|ps:${preferSynced ? 1 : 0}|${trackFingerprint}`;
   }
 
-  private sendResultState(result: Awaited<ReturnType<LRCLibProvider["search"]>>, trackFingerprint: string, origin: "cache" | "network") {
+  private sendResultState(result: Awaited<ReturnType<YouTubeProvider["search"]>>, trackFingerprint: string, origin: "cache" | "network") {
     if (result.type === "synced" && hasRenderableSyncedLines(result.lines)) {
-      this.sendLyricsState({
+      this.sendToUI({
         status: "synced",
         result,
         trackFingerprint,
@@ -434,7 +368,7 @@ export default class LyricsFeature {
     }
 
     if (result.type === "synced" && !hasRenderableSyncedLines(result.lines)) {
-      this.sendLyricsState({
+      this.sendToUI({
         status: "none",
         message: "No lyrics found",
         trackFingerprint,
@@ -447,7 +381,7 @@ export default class LyricsFeature {
     }
 
     if (result.type === "plain") {
-      this.sendLyricsState({
+      this.sendToUI({
         status: "plain",
         result,
         trackFingerprint,
@@ -459,7 +393,7 @@ export default class LyricsFeature {
       return;
     }
 
-    this.sendLyricsState({
+    this.sendToUI({
       status: "none",
       message: "No lyrics found",
       trackFingerprint,
@@ -487,7 +421,7 @@ export default class LyricsFeature {
     };
   }
 
-  private sendLyricsState(state: LyricsViewState) {
+  private sendToUI(state: LyricsViewState) {
     this.lastViewState = state;
     if (!this.ytmView) {
       return;

@@ -82,7 +82,6 @@ export default class LyricsOverlay {
   private mutationObserver: MutationObserver | null = null;
   private lastPlacementSignature = "";
   private lastHostSelector = "none";
-  private syncingPlacement = false;
 
   public setSeekCallback(callback: (positionSeconds: number) => void) {
     this.seekCallback = callback;
@@ -185,6 +184,10 @@ export default class LyricsOverlay {
       this.mutationObserver.disconnect();
       this.mutationObserver = null;
     }
+    const globalStyle = document.getElementById("ytmd-lyrics-global-style");
+    if (globalStyle) {
+      globalStyle.remove();
+    }
 
     this.root?.remove();
     this.collapsedButtonEl?.remove();
@@ -263,13 +266,18 @@ export default class LyricsOverlay {
       }
       .content {
         flex: 1;
-        overflow: auto;
+        overflow-y: scroll;
+        overflow-x: hidden;
         padding: 14px;
         line-height: 2.05;
         font-size: 26px;
         scrollbar-width: none;
+        -ms-overflow-style: none;
+        position: relative;
       }
-      .content::-webkit-scrollbar { display: none; }
+      .content::-webkit-scrollbar { 
+        display: none; 
+      }
       .empty { color: rgba(255,255,255,0.74); }
       .loader {
         display: inline-flex;
@@ -430,7 +438,7 @@ export default class LyricsOverlay {
       "ytmusic-player-page ytmusic-tab-renderer[selected] #contents",
       "ytmusic-player-page ytmusic-tab-renderer[selected] #content",
       "ytmusic-player-page ytmusic-tab-renderer[selected]",
-      "ytmusic-player-page #right-content ytmusic-description-shelf-renderer"
+      "ytmusic-player-page ytmusic-description-shelf-renderer"
     ];
 
     for (const selector of selectors) {
@@ -448,11 +456,8 @@ export default class LyricsOverlay {
   }
 
   private hideNativeLyrics() {
-    const rightContent = document.querySelector("ytmusic-player-page #right-content") as HTMLElement | null;
-    const scope = rightContent ?? document.body;
-
     const candidates = Array.from(
-      scope.querySelectorAll(
+      document.querySelectorAll(
         "ytmusic-description-shelf-renderer yt-formatted-string.description, ytmusic-description-shelf-renderer yt-attributed-string, ytmusic-description-shelf-renderer yt-formatted-string.footer"
       )
     ) as HTMLElement[];
@@ -481,158 +486,149 @@ export default class LyricsOverlay {
       return;
     }
 
-    if (this.syncingPlacement) {
-      return;
-    }
-    this.syncingPlacement = true;
+    const tabSelected = this.isLyricsTabSelected();
+    const hostInfo = this.findLyricsHost();
+    const host = hostInfo.host;
+    this.lastHostSelector = hostInfo.selector;
+    const playerPageVisible = this.isPlayerPageVisible();
+    const showInTab = this.enabled && tabSelected && !!host && host.isConnected;
+    this.debugPlacement(
+      `placement status=${this.currentState.status} pageVisible=${playerPageVisible} tabSelected=${tabSelected} host=${host ? "yes" : "no"} selector=${this.lastHostSelector} showInTab=${showInTab} collapsed=${this.collapsed}`
+    );
 
-    try {
-      const tabSelected = this.isLyricsTabSelected();
-      const hostInfo = this.findLyricsHost();
-      const host = hostInfo.host;
-      this.lastHostSelector = hostInfo.selector;
-      const playerPageVisible = this.isPlayerPageVisible();
-      const showInTab = this.enabled && playerPageVisible && tabSelected && !!host && host.isConnected;
-      this.debugPlacement(
-        `placement status=${this.currentState.status} pageVisible=${playerPageVisible} tabSelected=${tabSelected} host=${host ? "yes" : "no"} selector=${this.lastHostSelector} showInTab=${showInTab} collapsed=${this.collapsed}`
-      );
+    if (!showInTab) {
+      const canUseFloatingFallback = this.enabled && tabSelected;
+      if (canUseFloatingFallback) {
+        if (this.root.parentElement !== document.body) {
+          document.body.appendChild(this.root);
+        }
+        if (this.collapsedButtonEl.parentElement !== document.body) {
+          document.body.appendChild(this.collapsedButtonEl);
+        }
+        if (this.loadingBadgeEl.parentElement !== document.body) {
+          document.body.appendChild(this.loadingBadgeEl);
+        }
 
-      if (!showInTab) {
-        const canUseFloatingFallback = this.enabled && tabSelected && playerPageVisible;
-        if (canUseFloatingFallback) {
-          if (this.root.parentElement !== document.body) {
-            document.body.appendChild(this.root);
-          }
-          if (this.collapsedButtonEl.parentElement !== document.body) {
-            document.body.appendChild(this.collapsedButtonEl);
-          }
-          if (this.loadingBadgeEl.parentElement !== document.body) {
-            document.body.appendChild(this.loadingBadgeEl);
-          }
+        this.root.style.position = "fixed";
+        this.root.style.top = "84px";
+        this.root.style.right = "16px";
+        this.root.style.width = "min(36vw, 500px)";
+        this.root.style.height = "calc(100vh - 160px)";
+        this.root.style.zIndex = "2147483000";
 
-          this.root.style.position = "fixed";
-          this.root.style.top = "84px";
-          this.root.style.right = "16px";
-          this.root.style.width = "min(36vw, 500px)";
-          this.root.style.height = "calc(100vh - 160px)";
-          this.root.style.zIndex = "2147483000";
+        this.collapsedButtonEl.style.position = "fixed";
+        this.collapsedButtonEl.style.top = "84px";
+        this.collapsedButtonEl.style.right = "16px";
+        this.collapsedButtonEl.style.zIndex = "2147483001";
 
-          this.collapsedButtonEl.style.position = "fixed";
-          this.collapsedButtonEl.style.top = "84px";
-          this.collapsedButtonEl.style.right = "16px";
-          this.collapsedButtonEl.style.zIndex = "2147483001";
+        this.loadingBadgeEl.style.position = "fixed";
+        this.loadingBadgeEl.style.top = "84px";
+        this.loadingBadgeEl.style.right = "16px";
+        this.loadingBadgeEl.style.zIndex = "2147483001";
 
-          this.loadingBadgeEl.style.position = "fixed";
-          this.loadingBadgeEl.style.top = "84px";
-          this.loadingBadgeEl.style.right = "16px";
-          this.loadingBadgeEl.style.zIndex = "2147483001";
-
-          if (this.collapsed) {
-            this.showNativeLyrics();
-            this.root.style.display = "none";
-            this.collapsedButtonEl.style.display = "inline-block";
-            this.loadingBadgeEl.style.display = "none";
-            return;
-          }
-
-          const shouldShowCustomLyrics = this.hasRenderableCustomLyrics();
-          if (shouldShowCustomLyrics) {
-            this.hideNativeLyrics();
-            this.root.style.display = "block";
-            this.collapsedButtonEl.style.display = "none";
-            this.loadingBadgeEl.style.display = "none";
-            return;
-          }
-
+        if (this.collapsed) {
           this.showNativeLyrics();
           this.root.style.display = "none";
+          this.collapsedButtonEl.style.display = "inline-block";
+          this.loadingBadgeEl.style.display = "none";
+          return;
+        }
+
+        const shouldShowCustomLyrics = this.hasRenderableCustomLyrics();
+        if (shouldShowCustomLyrics) {
+          this.hideNativeLyrics();
+          this.root.style.display = "block";
           this.collapsedButtonEl.style.display = "none";
-          this.loadingBadgeEl.style.display = this.currentState.status === "loading" ? "inline-flex" : "none";
+          this.loadingBadgeEl.style.display = "none";
           return;
         }
 
         this.showNativeLyrics();
         this.root.style.display = "none";
         this.collapsedButtonEl.style.display = "none";
-        this.loadingBadgeEl.style.display = "none";
-        return;
-      }
-
-      const nativeContainer = host;
-      if (!nativeContainer || !nativeContainer.isConnected) {
-        this.showNativeLyrics();
-        this.root.style.display = "none";
-        this.collapsedButtonEl.style.display = "none";
-        this.loadingBadgeEl.style.display = "none";
-        this.debugLog("native container unavailable; restoring native lyrics");
-        return;
-      }
-
-      if (nativeContainer && this.root.parentElement !== nativeContainer) {
-        nativeContainer.prepend(this.root);
-      }
-
-      if (nativeContainer && this.collapsedButtonEl.parentElement !== nativeContainer) {
-        nativeContainer.prepend(this.collapsedButtonEl);
-      }
-
-      if (nativeContainer && this.loadingBadgeEl.parentElement !== nativeContainer) {
-        nativeContainer.prepend(this.loadingBadgeEl);
-      }
-
-      this.root.style.position = "sticky";
-      this.root.style.top = "0";
-      this.root.style.right = "";
-      this.root.style.width = "100%";
-      this.root.style.zIndex = "0";
-
-      this.collapsedButtonEl.style.position = "sticky";
-      this.collapsedButtonEl.style.top = "0";
-      this.collapsedButtonEl.style.right = "";
-      this.collapsedButtonEl.style.zIndex = "0";
-
-      this.loadingBadgeEl.style.position = "sticky";
-      this.loadingBadgeEl.style.top = "0";
-      this.loadingBadgeEl.style.zIndex = "2";
-
-      if (this.collapsed) {
-        this.showNativeLyrics();
-        this.root.style.display = "none";
-        this.collapsedButtonEl.style.display = "inline-block";
-        this.loadingBadgeEl.style.display = "none";
-        return;
-      }
-
-      const shouldShowCustomLyrics = this.hasRenderableCustomLyrics();
-
-      if (!shouldShowCustomLyrics) {
-        this.showNativeLyrics();
-        this.collapsedButtonEl.style.display = "none";
-        this.root.style.display = "none";
         this.loadingBadgeEl.style.display = this.currentState.status === "loading" ? "inline-flex" : "none";
         return;
       }
 
-      this.hideNativeLyrics();
+      this.showNativeLyrics();
+      this.root.style.display = "none";
       this.collapsedButtonEl.style.display = "none";
       this.loadingBadgeEl.style.display = "none";
-      this.root.style.display = "block";
-
-      queueMicrotask(() => {
-        if (!this.root) {
-          return;
-        }
-        const visible = this.root.isConnected && this.root.getClientRects().length > 0 && this.root.offsetHeight > 0;
-        const renderedLineCount = this.lineElements.length;
-        const shouldHaveLines = this.currentState.status === "synced";
-        if (!visible || (shouldHaveLines && renderedLineCount === 0)) {
-          this.showNativeLyrics();
-          this.root.style.display = "none";
-        }
-      });
-    } finally {
-      this.syncingPlacement = false;
+      return;
     }
+
+    const nativeContainer = host;
+    if (!nativeContainer || !nativeContainer.isConnected) {
+      this.showNativeLyrics();
+      this.root.style.display = "none";
+      this.collapsedButtonEl.style.display = "none";
+      this.loadingBadgeEl.style.display = "none";
+      this.debugLog("native container unavailable; restoring native lyrics");
+      return;
+    }
+
+    if (nativeContainer && this.root.parentElement !== nativeContainer) {
+      nativeContainer.prepend(this.root);
+    }
+
+    if (nativeContainer && this.collapsedButtonEl.parentElement !== nativeContainer) {
+      nativeContainer.prepend(this.collapsedButtonEl);
+    }
+
+    if (nativeContainer && this.loadingBadgeEl.parentElement !== nativeContainer) {
+      nativeContainer.prepend(this.loadingBadgeEl);
+    }
+
+    this.root.style.position = "sticky";
+    this.root.style.top = "0";
+    this.root.style.right = "";
+    this.root.style.width = "100%";
+    this.root.style.zIndex = "0";
+
+    this.collapsedButtonEl.style.position = "sticky";
+    this.collapsedButtonEl.style.top = "0";
+    this.collapsedButtonEl.style.right = "";
+    this.collapsedButtonEl.style.zIndex = "0";
+
+    this.loadingBadgeEl.style.position = "sticky";
+    this.loadingBadgeEl.style.top = "0";
+    this.loadingBadgeEl.style.zIndex = "2";
+
+    if (this.collapsed) {
+      this.showNativeLyrics();
+      this.root.style.display = "none";
+      this.collapsedButtonEl.style.display = "inline-block";
+      this.loadingBadgeEl.style.display = "none";
+      return;
+    }
+
+    const shouldShowCustomLyrics = this.hasRenderableCustomLyrics();
+
+    if (!shouldShowCustomLyrics) {
+      this.showNativeLyrics();
+      this.collapsedButtonEl.style.display = "none";
+      this.root.style.display = "none";
+      this.loadingBadgeEl.style.display = this.currentState.status === "loading" ? "inline-flex" : "none";
+      return;
+    }
+
+    this.hideNativeLyrics();
+    this.collapsedButtonEl.style.display = "none";
+    this.loadingBadgeEl.style.display = "none";
+    this.root.style.display = "block";
+
+    queueMicrotask(() => {
+      if (!this.root) {
+        return;
+      }
+      const visible = this.root.isConnected && this.root.getClientRects().length > 0 && this.root.offsetHeight > 0;
+      const renderedLineCount = this.lineElements.length;
+      const shouldHaveLines = this.currentState.status === "synced";
+      if (!visible || (shouldHaveLines && renderedLineCount === 0)) {
+        this.showNativeLyrics();
+        this.root.style.display = "none";
+      }
+    });
   }
 
   private hasRenderableCustomLyrics() {
@@ -665,34 +661,37 @@ export default class LyricsOverlay {
 
     this.updateHeaderMeta();
 
-    if (this.currentState.status === "idle") {
+    const state = this.currentState;
+    if (state.status === "idle") {
       this.renderMessage("Waiting for track info...");
       return;
     }
-    if (this.currentState.status === "loading") {
+    if (state.status === "loading") {
       this.renderMessage("Loading lyrics...");
       return;
     }
-    if (this.currentState.status === "ad") {
-      this.renderMessage(this.currentState.message ?? "Ad playing");
+    if (state.status === "ad") {
+      this.renderMessage(state.message ?? "Ad playing");
       return;
     }
-    if (this.currentState.status === "error") {
-      this.renderMessage(this.currentState.message ?? "Lyrics unavailable right now");
+    if (state.status === "error") {
+      this.renderMessage(state.message ?? "Lyrics unavailable right now");
       return;
     }
-    if (this.currentState.status === "none") {
-      this.renderMessage(this.currentState.message ?? "No lyrics found");
-      return;
-    }
-
-    this.renderedTrackFingerprint = this.currentState.trackFingerprint;
-    if (this.currentState.status === "plain") {
-      this.renderPlain(this.currentState.result.plainText ?? "No lyrics found");
+    if (state.status === "none") {
+      this.renderMessage(state.message ?? "No lyrics found");
       return;
     }
 
-    this.renderSynced(this.currentState.result.lines ?? []);
+    this.renderedTrackFingerprint = state.trackFingerprint;
+    if (state.status === "plain") {
+      this.renderPlain(state.result.plainText ?? "No lyrics found");
+      return;
+    }
+
+    if (state.status === "synced") {
+      this.renderSynced(state.result.lines ?? []);
+    }
     this.updateActiveSyncedLine(this.currentSyncState.progressMs);
   }
 
@@ -707,12 +706,11 @@ export default class LyricsOverlay {
       return;
     }
 
-    const source =
-      this.currentState.debug?.source ??
-      (this.currentState.status === "synced" || this.currentState.status === "plain" ? this.currentState.result.source : undefined);
-    const origin = this.currentState.debug?.origin;
+    const state = this.currentState;
+    const source = state.debug?.source ?? (state.status === "synced" || state.status === "plain" ? state.result.source : undefined);
+    const origin = state.debug?.origin;
 
-    const sourceLabel = source === "musixmatch" ? "Musixmatch" : source === "lrclib" ? "LRCLib" : "unknown";
+    const sourceLabel = source === "musixmatch" ? "Musixmatch" : source === "lrclib" ? "LRCLib" : source === "youtube" ? "YouTube" : "unknown";
     const originLabel = origin === "cache" ? "cached" : origin === "network" ? "fetched" : "";
     this.headerMetaEl.textContent = originLabel ? `${sourceLabel} ${originLabel}` : sourceLabel;
   }
@@ -846,8 +844,13 @@ export default class LyricsOverlay {
       if (lineIndex >= 0) {
         const activeLine = this.lineElements[lineIndex];
         activeLine?.classList.add("active");
-        if (Date.now() > this.manualScrollUntil) {
-          activeLine?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (Date.now() > this.manualScrollUntil && this.contentEl && activeLine) {
+          const containerCenter = this.contentEl.clientHeight / 2;
+          const lineCenter = activeLine.offsetTop + activeLine.clientHeight / 2;
+          this.contentEl.scrollTo({
+            top: lineCenter - containerCenter,
+            behavior: "smooth"
+          });
         }
       }
     }

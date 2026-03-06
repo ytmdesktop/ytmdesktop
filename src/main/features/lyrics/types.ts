@@ -18,7 +18,7 @@ export type LyricsResult = {
   type: "synced" | "plain" | "none";
   lines?: LyricsLine[];
   plainText?: string;
-  source: "lrclib" | "musixmatch";
+  source: "lrclib" | "musixmatch" | "youtube";
   trackFingerprint: string;
 };
 
@@ -56,4 +56,29 @@ export type LyricsSyncState = {
 
 export interface LyricsProvider {
   search(track: TrackInfo, preferSynced: boolean, signal?: AbortSignal): Promise<LyricsResult>;
+}
+
+export function normalizeText(value: string | null | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  let normalized = value.toLowerCase().trim();
+  normalized = normalized.replace(/\((feat\.|ft\.|featuring)[^)]+\)/gi, "");
+  normalized = normalized.replace(/\[(feat\.|ft\.|featuring)[^\]]+\]/gi, "");
+  normalized = normalized.replace(/[–—-]\s*(feat\.|ft\.|featuring)\s+.+$/gi, "");
+  normalized = normalized.replace(/\s+/g, " ");
+  normalized = normalized.replace(/[^a-z0-9\s]/g, "");
+  return normalized.trim();
+}
+
+export function createTrackFingerprint(track: TrackInfo) {
+  if (track.videoId) {
+    return `ytid:${track.videoId}`;
+  }
+
+  const title = normalizeText(track.title);
+  const artist = normalizeText(track.artist);
+  const duration = typeof track.durationSeconds === "number" ? String(Math.round(track.durationSeconds)) : "";
+  return `${artist}|${title}|${duration}`;
 }

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { LyricsFontSize, LyricsProvider, StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { LyricsFontSize, StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -55,11 +55,9 @@ const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
 const lyricsEnabled = ref<boolean>(playback.lyricsEnabled ?? false);
 const lyricsPreferSynced = ref<boolean>(playback.lyricsPreferSynced ?? true);
-const lyricsProvider = ref<number>(playback.lyricsProvider ?? LyricsProvider.Auto);
 const lyricsFontSize = ref<number>(playback.lyricsFontSize ?? LyricsFontSize.Medium);
 const lyricsFontSizePx = ref<number>(playback.lyricsFontSizePx ?? 26);
 const lyricsDebug = ref<boolean>(playback.lyricsDebug ?? false);
-const lyricsMusixmatchApiKey = ref<string>(playback.lyricsMusixmatchApiKey ?? "");
 const lyricsCacheEntries = ref<number>(0);
 const lyricsCacheBytes = ref<number>(0);
 
@@ -106,11 +104,9 @@ store.onDidAnyChange(async newState => {
   ratioVolume.value = newState.playback.ratioVolume;
   lyricsEnabled.value = newState.playback.lyricsEnabled;
   lyricsPreferSynced.value = newState.playback.lyricsPreferSynced;
-  lyricsProvider.value = newState.playback.lyricsProvider;
   lyricsFontSize.value = newState.playback.lyricsFontSize;
   lyricsFontSizePx.value = newState.playback.lyricsFontSizePx;
   lyricsDebug.value = newState.playback.lyricsDebug;
-  lyricsMusixmatchApiKey.value = newState.playback.lyricsMusixmatchApiKey ?? "";
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -186,11 +182,9 @@ async function settingsChanged() {
   store.set("playback.ratioVolume", ratioVolume.value);
   store.set("playback.lyricsEnabled", lyricsEnabled.value ?? false);
   store.set("playback.lyricsPreferSynced", lyricsPreferSynced.value ?? true);
-  store.set("playback.lyricsProvider", lyricsProvider.value ?? LyricsProvider.Auto);
   store.set("playback.lyricsFontSize", lyricsFontSize.value ?? LyricsFontSize.Medium);
   store.set("playback.lyricsFontSizePx", Number(lyricsFontSizePx.value ?? 26));
   store.set("playback.lyricsDebug", lyricsDebug.value ?? false);
-  store.set("playback.lyricsMusixmatchApiKey", lyricsMusixmatchApiKey.value.trim() || null);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -400,29 +394,6 @@ window.ytmd.handleUpdateDownloaded(() => {
             name="Prefer synced word highlight"
             @change="settingsChanged"
           />
-          <YTMDSetting
-            v-if="lyricsEnabled"
-            v-model="lyricsProvider"
-            indented
-            type="select"
-            name="Lyrics provider"
-            :options-map="{
-              [LyricsProvider.Auto]: 'Auto (LRCLib -> Musixmatch)',
-              [LyricsProvider.LRCLib]: 'LRCLib',
-              [LyricsProvider.Musixmatch]: 'Musixmatch (experimental)'
-            }"
-            @change="settingsChanged"
-          />
-          <div v-if="lyricsEnabled" class="setting indented">
-            <p>Musixmatch API key (optional)</p>
-            <input
-              v-model="lyricsMusixmatchApiKey"
-              class="musixmatch-key-input"
-              type="password"
-              placeholder="Enter Musixmatch API key"
-              @change="settingsChanged"
-            />
-          </div>
           <YTMDSetting
             v-if="lyricsEnabled"
             v-model="lyricsFontSizePx"

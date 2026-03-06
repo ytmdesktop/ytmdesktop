@@ -22,11 +22,12 @@ import Conf from "conf";
 import log from "electron-log";
 import path from "path";
 import fs from "fs/promises";
+// @ts-expect-error No type definitions available for electron-squirrel-startup
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
-import { LyricsFontSize, LyricsProvider, MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import { LyricsFontSize, MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LyricsFeature from "./features/lyrics";
 
 import CompanionServer from "./integrations/companion-server";
@@ -366,11 +367,9 @@ const store = new Conf<StoreSchema>({
       ratioVolume: false,
       lyricsEnabled: false,
       lyricsPreferSynced: true,
-      lyricsProvider: LyricsProvider.Auto,
       lyricsFontSize: LyricsFontSize.Medium,
       lyricsFontSizePx: 26,
-      lyricsDebug: false,
-      lyricsMusixmatchApiKey: null
+      lyricsDebug: false
     },
     integrations: {
       companionServerEnabled: false,
@@ -439,9 +438,6 @@ const store = new Conf<StoreSchema>({
       if (!store.has("playback.lyricsPreferSynced")) {
         store.set("playback.lyricsPreferSynced", true);
       }
-      if (!store.has("playback.lyricsProvider")) {
-        store.set("playback.lyricsProvider", LyricsProvider.Auto);
-      }
       if (!store.has("playback.lyricsFontSize")) {
         store.set("playback.lyricsFontSize", LyricsFontSize.Medium);
       }
@@ -450,9 +446,6 @@ const store = new Conf<StoreSchema>({
       }
       if (!store.has("playback.lyricsDebug")) {
         store.set("playback.lyricsDebug", false);
-      }
-      if (!store.has("playback.lyricsMusixmatchApiKey")) {
-        store.set("playback.lyricsMusixmatchApiKey", null);
       }
     }
   }
@@ -464,12 +457,6 @@ if (!store.has("playback.lyricsEnabled")) {
 if (!store.has("playback.lyricsPreferSynced")) {
   store.set("playback.lyricsPreferSynced", true);
 }
-if (!store.has("playback.lyricsProvider")) {
-  store.set("playback.lyricsProvider", LyricsProvider.Auto);
-}
-if (![LyricsProvider.LRCLib, LyricsProvider.Musixmatch, LyricsProvider.Auto].includes(store.get("playback.lyricsProvider"))) {
-  store.set("playback.lyricsProvider", LyricsProvider.Auto);
-}
 if (!store.has("playback.lyricsFontSize")) {
   store.set("playback.lyricsFontSize", LyricsFontSize.Medium);
 }
@@ -478,9 +465,6 @@ if (!store.has("playback.lyricsFontSizePx")) {
 }
 if (!store.has("playback.lyricsDebug")) {
   store.set("playback.lyricsDebug", false);
-}
-if (!store.has("playback.lyricsMusixmatchApiKey")) {
-  store.set("playback.lyricsMusixmatchApiKey", null);
 }
 
 store.onDidAnyChange(async (newState, oldState) => {
@@ -547,8 +531,6 @@ store.onDidAnyChange(async (newState, oldState) => {
     lyricsFeature.disable();
     log.info("Feature disabled: Synced lyrics");
   }
-
-  lyricsFeature.handleSettingsChanged(oldState.playback, newState.playback);
 
   // Integrations
   let companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
