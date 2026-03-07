@@ -1,3 +1,4 @@
+import fetch from 'cross-fetch';
 import {
   app,
   autoUpdater,
@@ -1033,6 +1034,34 @@ const createYTMView = (): void => {
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
+// --- FRONTEND AD-BLOCKER ---
+  ytmView.webContents.on("dom-ready", () => {
+    // 1. Force-hide all visual banner ads and popups
+    ytmView.webContents.insertCSS(`
+      ytmusic-mealbar-promo-renderer,
+      .ytp-ad-module,
+      .ytp-ad-image-overlay,
+      .ytp-ad-overlay-container {
+        display: none !important;
+      }
+    `);
+
+    // 2. Brutalize audio/video ads by auto-skipping and fast-forwarding
+    ytmView.webContents.executeJavaScript(`
+      setInterval(() => {
+        // Click the 'Skip Ad' button if it exists
+        const skipBtn = document.querySelector('.ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button');
+        if (skipBtn) skipBtn.click();
+
+        // If an unskippable ad is playing, instantly fast-forward to the end of it
+        const adVideo = document.querySelector('.ad-showing video, .ad-interrupting video');
+        if (adVideo && !isNaN(adVideo.duration)) {
+          adVideo.currentTime = adVideo.duration;
+        }
+      }, 250);
+    `).catch(console.error);
+  });
+  // --------------------------------------------------
 
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
