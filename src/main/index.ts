@@ -328,6 +328,7 @@ function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<
   if (newState.shortcuts.thumbsUp !== oldState.shortcuts.thumbsUp) return true;
   if (newState.shortcuts.volumeDown !== oldState.shortcuts.volumeDown) return true;
   if (newState.shortcuts.volumeUp !== oldState.shortcuts.volumeUp) return true;
+  if (newState.shortcuts.playSupermix !== oldState.shortcuts.playSupermix) return true;
 
   return false;
 }
@@ -377,14 +378,16 @@ const store = new Conf<StoreSchema>({
       thumbsUp: "",
       thumbsDown: "",
       volumeUp: "",
-      volumeDown: ""
+      volumeDown: "",
+      playSupermix: ""
     },
     state: {
       lastUrl: "https://music.youtube.com/",
       lastPlaylistId: "",
       lastVideoId: "",
       windowBounds: null,
-      windowMaximized: false
+      windowMaximized: false,
+      supermixPlaylistId: ""
     },
     lastfm: {
       // Last FM Keys belong to @Alipoodle
@@ -863,6 +866,29 @@ function registerShortcuts() {
     }
   } else {
     memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
+  }
+
+  if (shortcuts.playSupermix) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.playSupermix, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "playSupermix");
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: playSupermix");
+      memoryStore.set("shortcutsPlaySupermixRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: playSupermix");
+      memoryStore.set("shortcutsPlaySupermixRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsPlaySupermixRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");
@@ -1845,6 +1871,17 @@ app.on("ready", async () => {
       type: "normal",
       click: () => {
         ytmView.webContents.send("remoteControl:execute", "next");
+      }
+    },
+    {
+      label: store.get("shortcuts").playSupermix
+        ? `Play Supermix (${store.get("shortcuts").playSupermix.replace("Meta", isDarwin ? "Cmd" : "Win")})`
+        : "Play Supermix",
+      type: "normal",
+      click: () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "playSupermix");
+        }
       }
     },
     {

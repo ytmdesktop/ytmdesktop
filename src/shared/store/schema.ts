@@ -44,6 +44,7 @@ export type StoreSchema = {
     thumbsDown: string;
     volumeUp: string;
     volumeDown: string;
+    playSupermix: string;
   };
   state: {
     lastUrl: string;
@@ -51,6 +52,7 @@ export type StoreSchema = {
     lastVideoId: string;
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
+    supermixPlaylistId: string;
   };
   lastfm: {
     api_key: string;
@@ -73,6 +75,7 @@ export type MemoryStoreSchema = {
   shortcutsThumbsDownRegisterFailed: boolean;
   shortcutsVolumeUpRegisterFailed: boolean;
   shortcutsVolumeDownRegisterFailed: boolean;
+  shortcutsPlaySupermixRegisterFailed: boolean;
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;

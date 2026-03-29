@@ -581,6 +581,22 @@ window.addEventListener("load", async () => {
         );
         break;
       }
+
+      case "playSupermix": {
+        const supermixState = await store.get("state");
+        const playlistId = supermixState.supermixPlaylistId;
+        if (playlistId) {
+          window.location.href = `https://music.youtube.com/playlist?list=${playlistId}`;
+        }
+        break;
+      }
+
+      case "playMix": {
+        if (value) {
+          window.location.href = `https://music.youtube.com/playlist?list=${value}`;
+        }
+        break;
+      }
     }
   });
 
@@ -610,6 +626,57 @@ window.addEventListener("load", async () => {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
     }
+  });
+
+  // Scan for Supermix playlist ID and save to store
+  async function scanForSupermix(): Promise<boolean> {
+    const playlistId: string | null = (
+      await webFrame.executeJavaScript(`
+        (function() {
+          const items = document.querySelectorAll("ytmusic-two-row-item-renderer");
+          for (const item of items) {
+            const titleEl = item.querySelector("yt-formatted-string.title");
+            if (!titleEl) continue;
+            if (titleEl.textContent.trim() === "My Supermix") {
+              const link = item.querySelector("a.yt-simple-endpoint");
+              if (link) {
+                const href = link.getAttribute("href");
+                const match = href && href.match(/[?&]list=([^&]+)/);
+                if (match) return match[1];
+              }
+            }
+          }
+          return null;
+        })
+      `)
+    )();
+
+    if (playlistId) {
+      store.set("state.supermixPlaylistId", playlistId);
+      return true;
+    }
+    return false;
+  }
+
+  // Scan periodically after page loads to catch the home page carousel
+  let supermixScanInterval: NodeJS.Timeout | null = null;
+  function startSupermixScan() {
+    if (supermixScanInterval) clearInterval(supermixScanInterval);
+    let attempts = 0;
+    supermixScanInterval = setInterval(async () => {
+      attempts++;
+      const found = await scanForSupermix();
+      if (found || attempts >= 10) {
+        clearInterval(supermixScanInterval);
+        supermixScanInterval = null;
+      }
+    }, 1000);
+  }
+
+  // Run scan on initial load and on navigation
+  startSupermixScan();
+  window.addEventListener("yt-navigate-finish", () => {
+    startSupermixScan();
   });
 
   ipcRenderer.on("ytmView:refitPopups", async () => {
