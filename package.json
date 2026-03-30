@@ -16,7 +16,7 @@
     "lint:fix": "eslint --ext .ts,.tsx,.vue .",
     "prettier": "prettier --check *.{ts,tsx,vue}",
     "prettier:fix": "prettier --write *.{ts,tsx,vue}",
-    "postinstall": "husky install"
+    "postinstall": "patch-package && husky install"
   },
   "keywords": [],
   "author": {
@@ -48,6 +48,8 @@
     "eslint-plugin-vue": "^9.33.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3",

@@ -1,0 +1,13 @@
+diff --git a/node_modules/electron-installer-debian/resources/desktop.ejs b/node_modules/electron-installer-debian/resources/desktop.ejs
+index dd2cb0b..c578760 100644
+--- a/node_modules/electron-installer-debian/resources/desktop.ejs
++++ b/node_modules/electron-installer-debian/resources/desktop.ejs
+@@ -6,6 +6,8 @@
+ Icon=<%= name %>
+ <% } %>Type=Application
+ StartupNotify=true
++<% if (name) { %>StartupWMClass=<%= name %>
++<% } %>
+ <% if (categories && categories.length) { %>Categories=<%= categories.join(';') %>;
+ <% } %><% if (mimeType && mimeType.length) { %>MimeType=<%= mimeType.join(';') %>;
+ <% } %>

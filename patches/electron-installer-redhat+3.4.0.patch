@@ -1,0 +1,11 @@
+diff --git a/node_modules/electron-installer-redhat/resources/desktop.ejs b/node_modules/electron-installer-redhat/resources/desktop.ejs
+index 05f3b90..da1620e 100644
+--- a/node_modules/electron-installer-redhat/resources/desktop.ejs
++++ b/node_modules/electron-installer-redhat/resources/desktop.ejs
+@@ -6,5 +6,6 @@ Exec=<%= name %> %U<% if (execArguments && execArguments.length) { %> <%= execAr
+ Icon=<%= name %>
+ Type=Application
+ StartupNotify=true
++StartupWMClass=<%= name %>
+ Categories=<%= categories.join(';') %>;
+ <% if (mimeType.length) { %>MimeType=<%= mimeType.join(';') %>;<% } %>
