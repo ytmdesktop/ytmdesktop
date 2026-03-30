@@ -1778,23 +1778,32 @@ app.on("ready", async () => {
   log.info("Setup IPC handlers");
 
   // Create the permission handlers
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionCheckHandler((webContents, permission) => {
-    if (webContents == ytmView.webContents) {
-      if (permission === "fullscreen") {
-        return true;
-      }
+  const ytmViewAllowedPermissions: Array<string> = ["fullscreen", "hid", "usb", "clipboard-sanitized-write"];
+  const ytmViewSession = session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev");
+
+  ytmViewSession.setPermissionCheckHandler((webContents, permission) => {
+    if (webContents == ytmView.webContents && ytmViewAllowedPermissions.includes(permission)) {
+      return true;
     }
 
     return false;
   });
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionRequestHandler((webContents, permission, callback) => {
-    if (webContents == ytmView.webContents) {
-      if (permission === "fullscreen") {
-        return callback(true);
-      }
+  ytmViewSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (webContents == ytmView.webContents && ytmViewAllowedPermissions.includes(permission)) {
+      return callback(true);
     }
 
     return callback(false);
+  });
+
+  // Allow HID device selection for security key (WebAuthn/FIDO2) 2FA flows
+  ytmViewSession.on("select-hid-device", (event, details, callback) => {
+    event.preventDefault();
+    if (details.deviceList.length > 0) {
+      callback(details.deviceList[0].deviceId);
+    } else {
+      callback("");
+    }
   });
 
   log.info("Setup permission handlers");
