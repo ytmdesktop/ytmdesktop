@@ -82,6 +82,105 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      .ytmd-sleep-timer-popup {
+        width: 220px;
+        background: #282828;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        z-index: 9999;
+        overflow: hidden;
+        animation: ytmd-sleep-fade-in 0.15s ease-out;
+        font-family: 'Roboto', 'YouTube Noto', sans-serif;
+      }
+
+      @keyframes ytmd-sleep-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .ytmd-sleep-timer-tabs {
+        display: flex;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .ytmd-sleep-timer-tab {
+        flex: 1;
+        padding: 12px 0;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s;
+        user-select: none;
+        letter-spacing: 0.3px;
+      }
+
+      .ytmd-sleep-timer-tab:hover {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .ytmd-sleep-timer-tab.active {
+        color: #FFFFFF;
+      }
+
+      .ytmd-sleep-timer-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        background: #FFFFFF;
+        border-radius: 1px;
+      }
+
+      .ytmd-sleep-timer-options {
+        padding: 8px;
+        display: none;
+      }
+
+      .ytmd-sleep-timer-options.active {
+        display: block;
+      }
+
+      .ytmd-sleep-timer-option {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        background: none;
+        border: none;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-family: inherit;
+      }
+
+      .ytmd-sleep-timer-option:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .ytmd-sleep-timer-option.clear {
+        color: #FF4E45;
+        margin-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0 0 8px 8px;
+        padding-top: 12px;
+      }
+
+      .ytmd-sleep-timer-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9998;
+      }
     `)
   );
   document.head.appendChild(css);
