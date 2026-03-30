@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
@@ -141,6 +141,12 @@ memoryStore.onStateChanged(newState => {
   safeStorageAvailable.value = newState.safeStorageAvailable;
 
   autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
+
+  listeningPartyState.value = (newState.listeningPartyState as string) || "inactive";
+  listeningPartyCode.value = newState.listeningPartyCode as string | null;
+  listeningPartyMembers.value = (newState.listeningPartyMembers as Array<{ socketId: string; displayName: string; joinedAt: number }>) || [];
+  listeningPartyHostIp.value = newState.listeningPartyHostIp as string | null;
+  listeningPartyError.value = newState.listeningPartyError as string | null;
 });
 
 async function memorySettingsChanged() {
@@ -241,6 +247,66 @@ async function logoutLastFM() {
   lastFMEnabled.value = false;
   lastFMSessionKey.value = null;
   await settingsChanged();
+}
+
+// Listening Party
+const listeningPartyState = ref<string>(((await memoryStore.get("listeningPartyState")) as string) || "inactive");
+const listeningPartyCode = ref<string | null>((await memoryStore.get("listeningPartyCode")) as string | null);
+const listeningPartyMembers = ref<Array<{ socketId: string; displayName: string; joinedAt: number }>>(
+  ((await memoryStore.get("listeningPartyMembers")) as Array<{ socketId: string; displayName: string; joinedAt: number }>) || []
+);
+const listeningPartyHostIp = ref<string | null>((await memoryStore.get("listeningPartyHostIp")) as string | null);
+const listeningPartyError = ref<string | null>((await memoryStore.get("listeningPartyError")) as string | null);
+const partyJoinHostIp = ref("");
+const partyJoinCode = ref("");
+const partyDisplayName = ref<string>(integrations.listeningPartyDisplayName || "");
+const partyShowJoinForm = ref(false);
+const partyJoinFormRef = ref<HTMLElement | null>(null);
+const partyLocalIp = ref<string | null>(null);
+
+async function createParty() {
+  store.set("integrations.listeningPartyDisplayName", partyDisplayName.value);
+  const result = await window.ytmd.listeningParty.create(partyDisplayName.value || "Host");
+  if (result.error) {
+    listeningPartyError.value = result.error;
+  } else {
+    partyLocalIp.value = result.localIp;
+  }
+}
+
+async function joinParty() {
+  if (!partyJoinHostIp.value || !partyJoinCode.value) return;
+  store.set("integrations.listeningPartyDisplayName", partyDisplayName.value);
+  const result = await window.ytmd.listeningParty.join(partyJoinHostIp.value, partyJoinCode.value, partyDisplayName.value || "Guest");
+  if (result.error) {
+    listeningPartyError.value = result.error;
+  }
+}
+
+const partyCopiedText = ref<string | null>(null);
+let partyCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text);
+  partyCopiedText.value = text;
+  if (partyCopiedTimeout) clearTimeout(partyCopiedTimeout);
+  partyCopiedTimeout = setTimeout(() => {
+    partyCopiedText.value = null;
+  }, 1500);
+}
+
+function toggleJoinForm() {
+  partyShowJoinForm.value = !partyShowJoinForm.value;
+  if (partyShowJoinForm.value) {
+    nextTick(() => {
+      partyJoinFormRef.value?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+  }
+}
+
+function leaveParty() {
+  window.ytmd.listeningParty.leave();
+  partyShowJoinForm.value = false;
 }
 
 window.ytmd.handleCheckingForUpdate(() => {
@@ -437,6 +503,109 @@ window.ytmd.handleUpdateDownloaded(() => {
             step="5"
             @change="settingsChanged"
           />
+
+          <div class="listening-party-divider"></div>
+          <YTMDSetting
+            type="custom"
+            flex-column
+            name="Listening Party"
+            :description="
+              listeningPartyState === 'inactive'
+                ? 'Listen to music together with friends on your local network'
+                : listeningPartyState === 'hosting'
+                  ? 'You are hosting a listening party'
+                  : listeningPartyState === 'connecting'
+                    ? 'Connecting to party...'
+                    : 'You are synced to the host\u2019s playback'
+            "
+          >
+            <div v-if="listeningPartyError" class="party-error">{{ listeningPartyError }}</div>
+
+            <div v-if="listeningPartyState === 'inactive'" class="party-controls">
+              <div class="party-name-input">
+                <label>Your display name</label>
+                <input v-model="partyDisplayName" type="text" maxlength="32" placeholder="Your name" />
+              </div>
+              <div class="party-actions">
+                <button class="party-btn party-btn-create" :disabled="!companionServerEnabled" @click="createParty">
+                  <span class="material-symbols-outlined">group_add</span> Create Party
+                </button>
+                <button class="party-btn" @click="toggleJoinForm"><span class="material-symbols-outlined">group</span> Join Party</button>
+              </div>
+              <p v-if="!companionServerEnabled" class="party-hint">Enable the companion server above to host a party</p>
+              <div v-if="partyShowJoinForm" ref="partyJoinFormRef" class="party-join-form" @keydown.enter="partyJoinHostIp && partyJoinCode && joinParty()">
+                <div class="party-join-field">
+                  <label>Host IP address</label>
+                  <input v-model="partyJoinHostIp" type="text" placeholder="192.168.1.50" />
+                </div>
+                <div class="party-join-field">
+                  <label>Party code</label>
+                  <input v-model="partyJoinCode" type="text" maxlength="8" placeholder="ABCD1234" class="party-code-input" />
+                </div>
+                <button class="party-btn party-btn-create" :disabled="!partyJoinHostIp || !partyJoinCode" @click="joinParty">Connect</button>
+              </div>
+            </div>
+
+            <div v-if="listeningPartyState === 'hosting'" class="party-active">
+              <div class="party-info-banner">
+                <span class="material-symbols-outlined">info</span>
+                <span>You control playback. Play, pause, skip, or seek and everyone in the party will stay in sync with you.</span>
+              </div>
+              <div class="party-info-row">
+                <div class="party-info-item">
+                  <label>Party Code</label>
+                  <span class="party-copyable">
+                    <span class="party-code-display">{{ listeningPartyCode }}</span>
+                    <button class="party-copy-btn" title="Copy code" @click="copyToClipboard(listeningPartyCode)">
+                      <span v-if="partyCopiedText === listeningPartyCode" class="party-copied">Copied!</span>
+                      <span v-else class="material-symbols-outlined">content_copy</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="party-info-item">
+                  <label>Your IP</label>
+                  <span class="party-copyable">
+                    <span>{{ partyLocalIp || "Unknown" }}</span>
+                    <button v-if="partyLocalIp" class="party-copy-btn" title="Copy IP" @click="copyToClipboard(partyLocalIp)">
+                      <span v-if="partyCopiedText === partyLocalIp" class="party-copied">Copied!</span>
+                      <span v-else class="material-symbols-outlined">content_copy</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <p class="party-hint">Share the code and IP with friends on your network so they can join</p>
+              <div v-if="listeningPartyMembers.length > 0" class="party-members">
+                <label>Members ({{ listeningPartyMembers.length }})</label>
+                <ul>
+                  <li v-for="member in listeningPartyMembers" :key="member.socketId">
+                    {{ member.displayName }}<span v-if="member.socketId === 'host'" class="party-host-badge">host</span>
+                  </li>
+                </ul>
+              </div>
+              <button class="party-btn party-btn-leave" @click="leaveParty">End Party</button>
+            </div>
+
+            <div v-if="listeningPartyState === 'connecting'" class="party-active">
+              <p>Connecting to {{ listeningPartyHostIp }}...</p>
+            </div>
+
+            <div v-if="listeningPartyState === 'joined'" class="party-active">
+              <div class="party-info-banner">
+                <span class="material-symbols-outlined">info</span>
+                <span>The host controls playback. Your player will automatically sync to whatever they play, pause, skip, or seek to.</span>
+              </div>
+              <p class="party-hint">Connected to {{ listeningPartyHostIp }}</p>
+              <div v-if="listeningPartyMembers.length > 0" class="party-members">
+                <label>Members ({{ listeningPartyMembers.length }})</label>
+                <ul>
+                  <li v-for="member in listeningPartyMembers" :key="member.socketId">
+                    {{ member.displayName }}<span v-if="member.socketId === 'host'" class="party-host-badge">host</span>
+                  </li>
+                </ul>
+              </div>
+              <button class="party-btn party-btn-leave" @click="leaveParty">Leave Party</button>
+            </div>
+          </YTMDSetting>
         </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
@@ -861,6 +1030,232 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Listening Party */
+.listening-party-divider {
+  border-top: 1px solid #323232;
+  margin: 16px 0;
+}
+
+.party-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.party-name-input,
+.party-join-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.party-name-input label,
+.party-join-field label,
+.party-members label {
+  color: #969696;
+  font-size: 12px;
+}
+
+.party-name-input input,
+.party-join-field input {
+  background-color: #212121;
+  border: 1px solid #323232;
+  border-radius: 4px;
+  padding: 8px;
+  color: #eeeeee;
+  font-size: 14px;
+  max-width: 280px;
+}
+
+.party-name-input input:focus,
+.party-join-field input:focus {
+  outline: none;
+  border-color: #f44336;
+}
+
+.party-code-input {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+.party-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.party-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #323232;
+  color: #eeeeee;
+}
+
+.party-btn:hover {
+  background-color: #414141;
+}
+
+.party-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.party-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.party-btn-create {
+  background-color: #f44336;
+}
+
+.party-btn-create:hover {
+  background-color: #d32f2f;
+}
+
+.party-btn-leave {
+  background-color: #616161;
+}
+
+.party-btn-leave:hover {
+  background-color: #757575;
+}
+
+.party-join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  border: 1px solid #323232;
+}
+
+.party-active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.party-info-row {
+  display: flex;
+  gap: 24px;
+}
+
+.party-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.party-info-item label {
+  color: #969696;
+  font-size: 12px;
+}
+
+.party-code-display {
+  font-family: monospace;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: #f44336;
+  font-weight: bold;
+}
+
+.party-hint {
+  color: #969696;
+  margin: 0;
+  font-size: 13px;
+}
+
+.party-members ul {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.party-members li {
+  padding: 4px 0;
+  color: #bbbbbb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.party-host-badge {
+  font-size: 10px;
+  background-color: #f44336;
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.party-copyable {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.party-copy-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.5;
+  display: inline-flex;
+  align-items: center;
+}
+
+.party-copy-btn:hover {
+  opacity: 1;
+}
+
+.party-copy-btn .material-symbols-outlined {
+  font-size: 16px;
+  color: #bbbbbb;
+}
+
+.party-copied {
+  font-size: 11px;
+  color: #4caf50;
+}
+
+.party-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  border-radius: 4px;
+  color: #bbbbbb;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.party-info-banner .material-symbols-outlined {
+  font-size: 18px;
+  color: #f44336;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.party-error {
+  color: #ff5252;
+  font-size: 13px;
+  padding: 8px;
+  background-color: rgba(255, 82, 82, 0.1);
+  border-radius: 4px;
 }
 
 .shortcuts-tab .shortcut-title .register-error {

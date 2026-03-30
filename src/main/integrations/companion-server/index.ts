@@ -105,7 +105,8 @@ export default class CompanionServer implements IIntegration {
           }
 
           for (const socket of sockets) {
-            if (!validTokenIds.includes(socket.data.tokenId)) {
+            // Skip sockets without token-based auth (e.g. party guests authenticated via party code)
+            if (socket.data.tokenId && !validTokenIds.includes(socket.data.tokenId)) {
               socket.disconnect(true);
             }
           }
