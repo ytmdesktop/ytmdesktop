@@ -82,6 +82,11 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      .ytmd-player-bar-control.share-button {
+        margin-left: 0px;
+        width: 32px;
+      }
     `)
   );
   document.head.appendChild(css);
