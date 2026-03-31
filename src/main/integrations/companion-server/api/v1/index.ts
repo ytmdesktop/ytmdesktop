@@ -227,6 +227,16 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           ytmView.webContents.send("remoteControl:execute", "toggleDislike");
           break;
         }
+
+        case "restartTrack": {
+          ytmView.webContents.send("remoteControl:execute", "restartTrack");
+          break;
+        }
+
+        case "nextAndPause": {
+          ytmView.webContents.send("remoteControl:execute", "nextAndPause");
+          break;
+        }
       }
     }
   };

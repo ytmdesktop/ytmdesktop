@@ -67,6 +67,12 @@ export const APIV1CommandRequestBody = Type.Union([
   }),
   Type.Object({
     command: Type.Literal("toggleDislike")
+  }),
+  Type.Object({
+    command: Type.Literal("restartTrack")
+  }),
+  Type.Object({
+    command: Type.Literal("nextAndPause")
   })
 ]);
 export type APIV1CommandRequestBodyType = Static<typeof APIV1CommandRequestBody>;
