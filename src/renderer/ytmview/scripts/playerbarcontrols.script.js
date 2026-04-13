@@ -340,86 +340,6 @@
   };
   rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
 
-  let shareButton = document.createElement("yt-icon-button");
-  let shareMenuOpen = false;
-  let shareIcon = document.createElement("yt-icon");
-  shareIcon.set("icon", "SHARE");
-  shareButton.appendChild(shareIcon);
-
-  shareButton.setAttribute("title", "Share");
-  shareButton.classList.add("ytmusic-player-bar");
-  shareButton.classList.add("ytmd-player-bar-control");
-  shareButton.classList.add("share-button");
-  shareButton.onclick = () => {
-    if (shareMenuOpen) {
-      shareButton.dispatchEvent(
-        new CustomEvent("yt-action", {
-          bubbles: true,
-          cancelable: false,
-          composed: true,
-          detail: {
-            actionName: "yt-close-popups-action",
-            args: [["ytmusic-menu-popup-renderer"]],
-            optionalAction: false,
-            returnValue: []
-          }
-        })
-      );
-      return;
-    }
-
-    shareButton.dispatchEvent(
-      new CustomEvent("yt-action", {
-        bubbles: true,
-        cancelable: false,
-        composed: true,
-        detail: {
-          actionName: "yt-open-popup-action",
-          args: [
-            {
-              openPopupAction: {
-                popup: {
-                  menuPopupRenderer: {
-                    accessibilityData: {
-                      label: "Share menu"
-                    },
-                    items: [
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "SEND"
-                          },
-                          serviceEndpoint: {
-                            ytmdShareServiceEndpoint: {
-                              platform: "telegram"
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "Telegram"
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                popupType: "DROPDOWN"
-              }
-            },
-            shareButton
-          ],
-          optionalAction: false,
-          returnValue: []
-        }
-      })
-    );
-    shareMenuOpen = true;
-  };
-  sleepTimerButton.insertAdjacentElement("afterend", shareButton);
-
   const humanizeTime = time => {
     // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
     if (time === 1) return `${time} minute`;
@@ -429,28 +349,7 @@
   };
 
   window.addEventListener("yt-action", e => {
-    if (e.detail.actionName === "yt-close-popups-action") {
-      shareMenuOpen = false;
-    }
-
     if (e.detail.actionName === "yt-service-request") {
-      if (e.detail.args[1].ytmdShareServiceEndpoint) {
-        try {
-          const platform = e.detail.args[1].ytmdShareServiceEndpoint.platform;
-          const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
-          const videoDetails = playerBar.playerApi.getPlayerResponse()?.videoDetails;
-          if (videoDetails) {
-            const songUrl = `https://music.youtube.com/watch?v=${videoDetails.videoId}`;
-            const text = `${videoDetails.title} - ${videoDetails.author}`;
-            if (platform === "telegram") {
-              window.open(`https://t.me/share/url?url=${encodeURIComponent(songUrl)}&text=${encodeURIComponent(text)}`);
-            }
-          }
-        } catch (e) {
-          // no video playing
-        }
-      }
-
       if (e.detail.args[1].ytmdSleepTimerServiceEndpoint) {
         if (sleepTimerTimeout !== null) {
           clearTimeout(sleepTimerTimeout);

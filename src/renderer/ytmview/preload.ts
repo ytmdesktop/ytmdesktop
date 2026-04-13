@@ -14,6 +14,7 @@ import { StoreSchema } from "~shared/store/schema";
 
 import playerBarControlsScript from "./scripts/playerbarcontrols.script?raw";
 import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw";
+import injectSharePanelScript from "./scripts/injectsharepanel.script?raw";
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
@@ -81,11 +82,6 @@ function createStyleSheet() {
 
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
-      }
-
-      .ytmd-player-bar-control.share-button {
-        margin-left: 0px;
-        width: 32px;
       }
     `)
   );
@@ -163,6 +159,10 @@ function createKeyboardNavigation() {
 
 async function createAdditionalPlayerBarControls() {
   (await webFrame.executeJavaScript(playerBarControlsScript))();
+}
+
+async function injectSharePanelTargets() {
+  (await webFrame.executeJavaScript(injectSharePanelScript))();
 }
 
 async function hideChromecastButton() {
@@ -279,6 +279,7 @@ window.addEventListener("load", async () => {
   createNavigationMenuArrows();
   createKeyboardNavigation();
   await createAdditionalPlayerBarControls();
+  await injectSharePanelTargets();
   await hideChromecastButton();
   await hookPlayerApiEvents();
   overrideHistoryButtonDisplay();
