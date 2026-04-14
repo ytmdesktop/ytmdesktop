@@ -83,6 +83,37 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      .ytmd-share-target-button {
+        background: transparent;
+        border: none;
+        margin: 0;
+        padding: 5px 1px 2px 1px;
+        cursor: pointer;
+        display: inline-block;
+        color: inherit;
+        font: inherit;
+        text-align: center;
+      }
+
+      .ytmd-share-target-icon {
+        display: block;
+        margin: 0 4px 8px 4px;
+      }
+
+      .ytmd-share-target-icon svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .ytmd-share-target-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: #fff;
+        text-align: center;
+      }
     `)
   );
   document.head.appendChild(css);
