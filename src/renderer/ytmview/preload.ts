@@ -62,6 +62,44 @@ function createStyleSheet() {
         opacity: 1 !important;
         pointer-events: initial !important;
       }
+
+      ytmusic-player-bar.ytmd-centered-player-controls {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        column-gap: 16px;
+        align-items: center;
+      }
+
+      ytmusic-player-bar.ytmd-centered-player-controls .middle-controls {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+        width: 100%;
+        max-width: 420px;
+        min-width: 0;
+        padding-left: 8px;
+      }
+
+      ytmusic-player-bar.ytmd-centered-player-controls .left-controls {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: center;
+        position: static !important;
+        transform: none !important;
+        width: auto;
+        min-width: max-content;
+      }
+
+      ytmusic-player-bar.ytmd-centered-player-controls .right-controls {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+        min-width: 0;
+      }
+
+      ytmusic-player-bar.ytmd-centered-player-controls .middle-controls .content-info-wrapper {
+        min-width: 0;
+      }
       
       .ytmd-player-bar-control.library-button {
         margin-left: 8px;
@@ -172,6 +210,10 @@ async function hideChromecastButton() {
 
 async function hookPlayerApiEvents() {
   (await webFrame.executeJavaScript(hookPlayerApiEventsScript))();
+}
+
+function setCenteredPlayerControls(enabled: boolean) {
+  document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.classList.toggle("ytmd-centered-player-controls", enabled);
 }
 
 function overrideHistoryButtonDisplay() {
@@ -336,6 +378,8 @@ window.addEventListener("load", async () => {
   if (alwaysShowVolumeSlider) {
     document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
   }
+
+  setCenteredPlayerControls((await store.get("appearance")).centeredPlayerControls);
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
     switch (command) {
@@ -610,6 +654,8 @@ window.addEventListener("load", async () => {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
     }
+
+    setCenteredPlayerControls(newState.appearance.centeredPlayerControls);
   });
 
   ipcRenderer.on("ytmView:refitPopups", async () => {
