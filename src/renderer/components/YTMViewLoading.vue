@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
+import { getTranslations } from "~shared/i18n";
+import { Language, StoreSchema } from "~shared/store/schema";
 import logo from "~assets/icons/ytmd.png";
 
 const memoryStore = window.ytmd.memoryStore;
+const store = window.ytmd.store;
 
 const ytmViewLoading = ref<boolean>(await memoryStore.get("ytmViewLoading"));
 const ytmViewLoadingError = ref<boolean>(await memoryStore.get("ytmViewLoadingError"));
 const ytmViewLoadTimedout = ref<boolean>(await memoryStore.get("ytmViewLoadTimedout"));
 const ytmViewLoadingStatus = ref<string>((await memoryStore.get("ytmViewLoadingStatus")) ?? "");
+const language = ref<Language>(((await store.get("general")) as StoreSchema["general"]).language);
+const text = computed(() => getTranslations(language.value).app.loading);
 
 onBeforeMount(async () => {
   ytmViewLoading.value = await memoryStore.get("ytmViewLoading");
@@ -21,6 +26,10 @@ memoryStore.onStateChanged(newState => {
   ytmViewLoadingError.value = newState.ytmViewLoadingError;
   ytmViewLoadTimedout.value = newState.ytmViewLoadTimedout;
   ytmViewLoadingStatus.value = newState.ytmViewLoadingStatus;
+});
+
+store.onDidAnyChange(newState => {
+  language.value = newState.general.language;
 });
 </script>
 
@@ -40,7 +49,7 @@ memoryStore.onStateChanged(newState => {
           <div class="loader-line"></div>
         </div>
         <p :class="{ 'ytmview-loading-status': true, 'error': ytmViewLoadingError }">{{ ytmViewLoadingStatus }}</p>
-        <p v-if="ytmViewLoadTimedout" class="ytmview-loading-timeout">YouTube Music is taking longer than usual to load</p>
+        <p v-if="ytmViewLoadTimedout" class="ytmview-loading-timeout">{{ text.youTubeMusicLoadTimedOut }}</p>
       </div>
       <div v-else class="ytmview-loading"></div>
     </Transition>

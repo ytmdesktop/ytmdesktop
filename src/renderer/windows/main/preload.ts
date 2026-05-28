@@ -3,10 +3,12 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { WindowsEventArguments } from "~shared/types";
-import { MemoryStoreSchema } from "~shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import MemoryStore from "../../store-ipc/memory-store";
+import Store from "../../store-ipc/store";
 
 const memoryStore = new MemoryStore<MemoryStoreSchema>();
+const store = new Store<StoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
   minimizeWindow: () => ipcRenderer.send("mainWindow:minimize"),
@@ -24,6 +26,12 @@ contextBridge.exposeInMainWorld("ytmd", {
     set: (key: string, value: unknown) => memoryStore.set(key, value),
     get: async (key: keyof MemoryStoreSchema) => await memoryStore.get(key),
     onStateChanged: (callback: (newState: MemoryStoreSchema, oldState: MemoryStoreSchema) => void) => memoryStore.onStateChanged(callback)
+  },
+  store: {
+    set: (key: string, value: unknown) => store.set(key, value),
+    get: async (key: keyof StoreSchema) => await store.get(key),
+    reset: (key: keyof StoreSchema) => store.reset(key),
+    onDidAnyChange: (callback: (newState: StoreSchema, oldState: StoreSchema) => void) => store.onDidAnyChange(callback)
   },
   restartApplicationForUpdate: () => ipcRenderer.send("app:restartApplicationForUpdate")
 });
