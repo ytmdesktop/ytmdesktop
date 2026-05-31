@@ -1,8 +1,5 @@
 import { EventEmitter } from "events";
 
-// Public player-state types live in ~shared so renderer windows (the tray mini-player)
-// can consume them without importing main-process code. They are re-exported here so
-// existing `import { PlayerState, VideoState } from "./player-state-store"` call sites keep working.
 export * from "../../shared/player-state";
 import { VideoState, RepeatMode, LikeStatus, VideoType, VideoDetails, PlayerQueueItem, PlayerQueue, PlayerState } from "../../shared/player-state";
 

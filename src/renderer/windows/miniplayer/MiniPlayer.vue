@@ -18,9 +18,7 @@ let seekDeadline = 0;
 function applyState(next: PlayerState | null) {
   state.value = next;
   const incoming = next?.videoProgress ?? 0;
-  // Don't let an authoritative update fight the thumb the user is dragging
   if (draggingSeek.value) return;
-  // Keep showing the seek target until main confirms a value near it (or the failsafe expires)
   if (seekTarget !== null && Math.abs(incoming - seekTarget) > 1.5 && Date.now() < seekDeadline) return;
   seekTarget = null;
   localProgress.value = incoming;
@@ -134,7 +132,6 @@ function onSeekChange(e: Event) {
   const secs = Number((e.target as HTMLInputElement).value);
   localProgress.value = secs;
   draggingSeek.value = false;
-  // Hold the bar at this target until main reports a matching position (failsafe: 2s)
   seekTarget = secs;
   seekDeadline = Date.now() + 2000;
   window.ytmd.sendCommand("seekTo", secs);
@@ -308,7 +305,7 @@ function openApp() {
 }
 .artist {
   margin-top: 3px;
-  min-height: 17px; /* reserve the line so layout doesn't shift when there's no artist */
+  min-height: 17px;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.62);
   white-space: nowrap;
