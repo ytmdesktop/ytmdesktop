@@ -4,13 +4,9 @@ import { PlayerState, RepeatMode, VideoState } from "~shared/player-state";
 
 const state = ref<PlayerState | null>(null);
 
-// Local progress so the bar animates smoothly between the ~1s updates from main
 const localProgress = ref(0);
 let ticker: ReturnType<typeof setInterval> | null = null;
 
-// After a user seek, main keeps reporting the pre-seek progress for ~1s until YTM actually
-// jumps. Trusting those stale values snaps the bar backward then forward — the flicker.
-// We hold the bar at the seek target and ignore reports until one lands near it (or we time out).
 const draggingSeek = ref(false);
 let seekTarget: number | null = null;
 let seekDeadline = 0;
