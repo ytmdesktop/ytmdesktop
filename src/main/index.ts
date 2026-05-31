@@ -1775,35 +1775,39 @@ app.on("ready", async () => {
     createOrShowSettingsWindow();
   });
 
-  // Handle tray mini-player popover ipc
-  ipcMain.handle("playerState:request", () => playerStateStore.getState());
+  // Handle tray mini-player popover ipc. The popover is macOS-only, so its handlers are
+  // never registered on other platforms (the popover renderer that sends these only loads
+  // on macOS anyway).
+  if (isDarwin) {
+    ipcMain.handle("playerState:request", () => playerStateStore.getState());
 
-  ipcMain.on("miniplayer:command", (event, command: string, value?: unknown) => {
-    if (playerWindow === null || event.sender !== playerWindow.webContents) return;
-    if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
-  });
+    ipcMain.on("miniplayer:command", (event, command: string, value?: unknown) => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
+    });
 
-  ipcMain.on("miniplayer:openSettings", event => {
-    if (playerWindow === null || event.sender !== playerWindow.webContents) return;
-    createOrShowSettingsWindow();
-  });
+    ipcMain.on("miniplayer:openSettings", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      createOrShowSettingsWindow();
+    });
 
-  ipcMain.on("miniplayer:showMainWindow", event => {
-    if (playerWindow === null || event.sender !== playerWindow.webContents) return;
-    playerWindow.hide(); // dismiss the popover before bringing the window up
-    if (mainWindow) {
-      mainWindow.show();
-      mainWindow.focus();
-      // Pull the app (and the Space hosting the main window) to the foreground; without
-      // stealing focus macOS leaves us on the current Space and the window never surfaces.
-      if (isDarwin) app.focus({ steal: true });
-    }
-  });
+    ipcMain.on("miniplayer:showMainWindow", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      playerWindow.hide(); // dismiss the popover before bringing the window up
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+        // Pull the app (and the Space hosting the main window) to the foreground; without
+        // stealing focus macOS leaves us on the current Space and the window never surfaces.
+        app.focus({ steal: true });
+      }
+    });
 
-  ipcMain.on("miniplayer:hide", event => {
-    if (playerWindow === null || event.sender !== playerWindow.webContents) return;
-    playerWindow.hide();
-  });
+    ipcMain.on("miniplayer:hide", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      playerWindow.hide();
+    });
+  }
 
   ipcMain.on("settingsWindow:minimize", event => {
     if (settingsWindow !== null) {
