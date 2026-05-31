@@ -615,7 +615,8 @@ function setupTaskbarFeatures() {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
 
-    // macOS pushes state to the popover; other platforms refresh the native menu.
+    // macOS: album art tray icon + push state to the popover. Other platforms: native menu.
+    updateTrayImage(state);
     updateTrayContextMenu();
 
     // Push live state to the popover only while it's visible (avoids needless IPC on every tick)
@@ -725,6 +726,44 @@ function toggleMainWindowVisibility() {
     mainWindow.hide();
   } else {
     mainWindow.show();
+  }
+}
+
+function pickTrayThumbnailUrl(video: PlayerState["videoDetails"] | undefined) {
+  if (!video?.thumbnails?.length) return null;
+  // Prefer a small thumbnail so the download is cheap
+  const sorted = [...video.thumbnails].sort((a, b) => a.width - b.width);
+  const chosen = sorted.find(thumbnail => thumbnail.width >= 48) ?? sorted[sorted.length - 1];
+  return chosen?.url ?? null;
+}
+
+// On macOS the tray icon becomes the current song's album art (falling back to the
+// YTMD logo when nothing is playing). Tracked by URL so we only refetch on song change.
+let currentTrayImageUrl: string | null = null;
+
+async function updateTrayImage(state: PlayerState) {
+  if (!tray || !isDarwin) return;
+
+  const url = pickTrayThumbnailUrl(state?.videoDetails);
+  if (url === currentTrayImageUrl) return;
+  currentTrayImageUrl = url;
+
+  if (!url) {
+    tray.setImage(getTrayIconPath());
+    return;
+  }
+
+  try {
+    const response = await fetch(url);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    // The song may have changed while we were fetching; bail if so
+    if (url !== currentTrayImageUrl) return;
+    const image = nativeImage.createFromBuffer(buffer).resize({ width: 18, height: 18 });
+    image.setTemplateImage(false); // show the album art in full color, not a monochrome template
+    tray.setImage(image);
+  } catch (error) {
+    log.error("Failed to load tray album art", error);
+    tray.setImage(getTrayIconPath());
   }
 }
 
@@ -878,10 +917,7 @@ function createPlayerPopover() {
       sandbox: true,
       contextIsolation: true,
       preload: path.join(__dirname, `../renderer/windows/miniplayer/preload.js`),
-      devTools: store.get("developer.enableDevTools"),
-      // The popover spends most of its life unfocused; without this Chromium throttles its
-      // timers/paint, which stalls the progress ticker and makes the controls feel laggy.
-      backgroundThrottling: false
+      devTools: store.get("developer.enableDevTools")
     }
   });
 

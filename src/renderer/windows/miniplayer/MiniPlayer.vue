@@ -8,10 +8,22 @@ const state = ref<PlayerState | null>(null);
 const localProgress = ref(0);
 let ticker: ReturnType<typeof setInterval> | null = null;
 
+// After a user seek, main keeps reporting the pre-seek progress for ~1s until YTM actually
+// jumps. Trusting those stale values snaps the bar backward then forward — the flicker.
+// We hold the bar at the seek target and ignore reports until one lands near it (or we time out).
+const draggingSeek = ref(false);
+let seekTarget: number | null = null;
+let seekDeadline = 0;
+
 function applyState(next: PlayerState | null) {
   state.value = next;
-  // Resync the smoothly-ticking bar to the authoritative progress from main
-  localProgress.value = next?.videoProgress ?? 0;
+  const incoming = next?.videoProgress ?? 0;
+  // Don't let an authoritative update fight the thumb the user is dragging
+  if (draggingSeek.value) return;
+  // Keep showing the seek target until main confirms a value near it (or the failsafe expires)
+  if (seekTarget !== null && Math.abs(incoming - seekTarget) > 1.5 && Date.now() < seekDeadline) return;
+  seekTarget = null;
+  localProgress.value = incoming;
 }
 
 onMounted(async () => {
@@ -19,7 +31,7 @@ onMounted(async () => {
   window.ytmd.onPlayerState(applyState);
 
   ticker = setInterval(() => {
-    if (isPlaying.value && hasVideo.value) {
+    if (isPlaying.value && hasVideo.value && !draggingSeek.value) {
       const max = duration.value || Number.POSITIVE_INFINITY;
       localProgress.value = Math.min(localProgress.value + 0.25, max);
     }
@@ -115,11 +127,16 @@ function cycleRepeat() {
 }
 
 function onSeekInput(e: Event) {
+  draggingSeek.value = true;
   localProgress.value = Number((e.target as HTMLInputElement).value);
 }
 function onSeekChange(e: Event) {
   const secs = Number((e.target as HTMLInputElement).value);
   localProgress.value = secs;
+  draggingSeek.value = false;
+  // Hold the bar at this target until main reports a matching position (failsafe: 2s)
+  seekTarget = secs;
+  seekDeadline = Date.now() + 2000;
   window.ytmd.sendCommand("seekTo", secs);
 }
 
