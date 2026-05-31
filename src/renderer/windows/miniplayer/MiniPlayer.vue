@@ -83,8 +83,21 @@ function playPause() {
 function next() {
   if (hasVideo.value) window.ytmd.sendCommand("next");
 }
+// Threshold (seconds) after which Previous restarts the song instead of skipping back
+const RESTART_THRESHOLD_SECONDS = 3;
+
 function previous() {
-  if (hasVideo.value) window.ytmd.sendCommand("previous");
+  if (!hasVideo.value) return;
+  // Match Spotify / YouTube Music: once you're a few seconds in, Previous restarts the
+  // current track; near the start it skips to the previous one. This also gives the
+  // "single click = restart, quick double click = previous" feel without a click timer —
+  // the first press restarts (now at 0s), so a fast second press skips back.
+  if (progress.value > RESTART_THRESHOLD_SECONDS) {
+    localProgress.value = 0; // optimistic, so a fast second press sees us at the start
+    window.ytmd.sendCommand("seekTo", 0);
+  } else {
+    window.ytmd.sendCommand("previous");
+  }
 }
 function shuffle() {
   if (hasVideo.value) window.ytmd.sendCommand("shuffle");
@@ -125,7 +138,7 @@ function toggleMute() {
 }
 
 function openApp() {
-  window.ytmd.toggleMainWindow();
+  window.ytmd.showMainWindow();
 }
 </script>
 
@@ -135,7 +148,7 @@ function openApp() {
     <div class="scrim"></div>
 
     <div class="content">
-      <div class="art" title="Double-click to open YouTube Music" @dblclick="openApp">
+      <div class="art" title="Open YouTube Music" @click="openApp">
         <img v-if="art" :src="art" alt="" />
         <span v-else class="material-symbols-outlined ph">music_note</span>
       </div>

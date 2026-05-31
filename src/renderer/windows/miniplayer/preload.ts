@@ -11,6 +11,6 @@ contextBridge.exposeInMainWorld("ytmd", {
   // Playback commands forwarded to remoteControl:execute on the YTM view
   sendCommand: (command: string, value?: unknown) => ipcRenderer.send("miniplayer:command", command, value),
   openSettings: () => ipcRenderer.send("miniplayer:openSettings"),
-  toggleMainWindow: () => ipcRenderer.send("miniplayer:toggleMainWindow"),
+  showMainWindow: () => ipcRenderer.send("miniplayer:showMainWindow"),
   hide: () => ipcRenderer.send("miniplayer:hide")
 });

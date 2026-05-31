@@ -47,7 +47,7 @@ declare global {
       onPlayerState(callback: (state: PlayerState) => void): void;
       sendCommand(command: string, value?: unknown): void;
       openSettings(): void;
-      toggleMainWindow(): void;
+      showMainWindow(): void;
       hide(): void;
 
       // App specific
