@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>YouTube Music Desktop App - Mini Player</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      /* Transparent so the frameless popover can show rounded corners / vibrancy */
+      html,
+      body,
+      #app {
+        background: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./renderer.ts"></script>
+  </body>
+</html>
