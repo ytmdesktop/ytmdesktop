@@ -82,6 +82,37 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      .ytmd-library-local-search-container {
+        margin: 0 10px 30px 10px;
+      }
+
+      .ytmd-library-local-search-input {
+        width: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 18px;
+        background-color: rgba(255, 255, 255, 0.06);
+        color: #FFFFFF;
+        font-size: 14px;
+        line-height: 10px;
+        padding: 8px 14px;
+        outline: none;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .ytmd-library-local-search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .ytmd-library-local-search-input:focus {
+        border-color: rgba(255, 255, 255, 0.34);
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .ytmd-library-filter-hidden {
+        display: none !important;
+      }
     `)
   );
   document.head.appendChild(css);
@@ -135,9 +166,11 @@ function createNavigationMenuArrows() {
   if (!pivotBar) {
     // New YTM UI
     const searchBar = document.querySelector("ytmusic-search-box");
-    const navBar = searchBar.parentNode;
-    navBar.insertBefore(historyForwardElement, searchBar);
-    navBar.insertBefore(historyBackElement, historyForwardElement);
+    if (searchBar && searchBar.parentNode) {
+      const navBar = searchBar.parentNode;
+      navBar.insertBefore(historyForwardElement, searchBar);
+      navBar.insertBefore(historyBackElement, historyForwardElement);
+    }
   } else {
     historyForwardElement.classList.add("pivotbar");
     historyBackElement.classList.add("pivotbar");
@@ -185,6 +218,98 @@ function getYTMTextRun(runs: { text: string }[]) {
     final += run.text;
   }
   return final;
+}
+
+let libraryFilterQuery = "";
+
+function isLibraryRoute() {
+  return window.location.pathname.startsWith("/library") || window.location.href.includes("FEmusic_library");
+}
+
+function getLibraryFilterHost() {
+  const candidates = [
+    "ytmusic-browse-response #contents",
+    "ytmusic-tabbed-search-results-renderer #contents",
+    "ytmusic-browse-response"
+  ];
+
+  for (const selector of candidates) {
+    const host = document.querySelector<HTMLElement>(selector);
+    if (host) {
+      return host;
+    }
+  }
+
+  return null;
+}
+
+function getLibraryFilterItems() {
+  const selectors = [
+    "ytmusic-responsive-list-item-renderer",
+    "ytmusic-two-row-item-renderer",
+    "ytmusic-item-section-renderer ytmusic-navigation-button-renderer"
+  ];
+  return Array.from(document.querySelectorAll<HTMLElement>(selectors.join(",")));
+}
+
+function applyLibraryFilter(query: string) {
+  const normalized = query.trim().toLowerCase();
+  const items = getLibraryFilterItems();
+
+  for (const item of items) {
+    if (normalized.length === 0) {
+      item.classList.remove("ytmd-library-filter-hidden");
+      continue;
+    }
+
+    const text = (item.innerText || "").toLowerCase();
+    const shouldShow = text.includes(normalized);
+    item.classList.toggle("ytmd-library-filter-hidden", !shouldShow);
+  }
+}
+
+function ensureLibraryLocalSearchBar() {
+  const existing = document.querySelector<HTMLElement>("#ytmd-library-local-search");
+  const shouldShow = isLibraryRoute();
+
+  if (!shouldShow) {
+    if (existing?.parentElement) {
+      existing.parentElement.remove();
+    }
+    libraryFilterQuery = "";
+    applyLibraryFilter("");
+    return;
+  }
+
+  if (existing) {
+    applyLibraryFilter(libraryFilterQuery);
+    return;
+  }
+
+  const host = getLibraryFilterHost();
+  if (!host) {
+    return;
+  }
+
+  const container = document.createElement("div");
+  container.classList.add("ytmd-library-local-search-container");
+
+  const input = document.createElement("input");
+  input.type = "search";
+  input.id = "ytmd-library-local-search";
+  input.classList.add("ytmd-library-local-search-input");
+  input.placeholder = "Search your library";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.value = libraryFilterQuery;
+  input.addEventListener("input", () => {
+    libraryFilterQuery = input.value;
+    applyLibraryFilter(libraryFilterQuery);
+  });
+
+  container.appendChild(input);
+  host.prepend(container);
+  applyLibraryFilter(libraryFilterQuery);
 }
 
 // This function helps hook YTM
@@ -277,6 +402,28 @@ window.addEventListener("load", async () => {
   await hideChromecastButton();
   await hookPlayerApiEvents();
   overrideHistoryButtonDisplay();
+  ensureLibraryLocalSearchBar();
+
+  let lastRoute = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  setInterval(() => {
+    const currentRoute = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (currentRoute !== lastRoute) {
+      lastRoute = currentRoute;
+      ensureLibraryLocalSearchBar();
+    } else if (isLibraryRoute() && libraryFilterQuery.length > 0) {
+      applyLibraryFilter(libraryFilterQuery);
+    }
+  }, 500);
+
+  const observer = new MutationObserver(() => {
+    if (isLibraryRoute()) {
+      ensureLibraryLocalSearchBar();
+      if (libraryFilterQuery.length > 0) {
+        applyLibraryFilter(libraryFilterQuery);
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
 
