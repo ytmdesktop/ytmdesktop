@@ -187,7 +187,7 @@ function transformPlaylistPanelVideoRenderer(
   counterpart?: YTMPlayerQueueItemCounterpart[]
 ): PlayerQueueItem {
   return {
-    thumbnails: playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails),
+    thumbnails: playlistPanelVideoRenderer.thumbnail ? playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails) : [],
     title: getYTMTextRun(playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }]),
     author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }]),
     duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }]),

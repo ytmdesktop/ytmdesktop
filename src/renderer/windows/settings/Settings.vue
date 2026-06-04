@@ -554,7 +554,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           </span>
           <div class="links">
             <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
-            <a href="https://ytmdesktop.app" target="_blank">Website</a>
+            <a href="https://ytmdesktop.github.io/" target="_blank">Website</a>
           </div>
         </div>
       </div>

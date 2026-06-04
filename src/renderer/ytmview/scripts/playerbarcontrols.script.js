@@ -1,4 +1,11 @@
-(function() {
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+(function () {
+  function isExperimentEnabled(experimentFlag) {
+    const flag = window.ytcfg.data_.EXPERIMENT_FLAGS[experimentFlag];
+    if (flag && typeof flag === "string") return flag === "false" ? false : true;
+    return !!flag;
+  }
+
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
   let ytmdControlButtons = {};
@@ -13,8 +20,7 @@
   let libraryButton = document.createElement("yt-button-shape");
   libraryButton.classList.add("ytmd-player-bar-control");
   libraryButton.classList.add("library-button");
-  libraryButton.set("iconName", "yt-sys-icons:library_add");
-  libraryButton.set("data", {
+  let libraryButtonData = {
     focused: false,
     iconPosition: "icon-only",
     onTap: function () {
@@ -39,7 +45,7 @@
             this,
             {
               feedbackEndpoint: {
-                feedbackToken: this.data.toggled ? libraryFeedbackToggledToken : libraryFeedbackDefaultToken
+                feedbackToken: libraryButtonData.toggled ? libraryFeedbackToggledToken : libraryFeedbackDefaultToken
               }
             }
           ],
@@ -51,20 +57,27 @@
       this.dispatchEvent(new CustomEvent("yt-action", feedbackEvent));
       window.__YTMD_HOOK__.ytmStore.dispatch({
         type: "SET_FEEDBACK_TOGGLE_STATE",
-        payload: { defaultEndpointFeedbackToken: libraryFeedbackDefaultToken, isToggled: !this.data.toggled }
+        payload: { defaultEndpointFeedbackToken: libraryFeedbackDefaultToken, isToggled: !libraryButtonData.toggled }
       });
     }.bind(libraryButton),
     style: "mono",
     toggled: false,
+    toggleable: true,
     type: "text"
-  });
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
+  };
+  libraryButton.rawProps = {
+    iconName: "yt-sys-icons:library_add",
+    data: libraryButtonData
+  };
+  document
+    .querySelector("ytmusic-app-layout>ytmusic-player-bar")
+    .querySelector("ytmusic-like-button-renderer")
+    .insertAdjacentElement("afterend", libraryButton);
 
   let playlistButton = document.createElement("yt-button-shape");
   playlistButton.classList.add("ytmd-player-bar-control");
   playlistButton.classList.add("playlist-button");
-  playlistButton.set("iconName", "yt-sys-icons:playlist_add");
-  playlistButton.set("data", {
+  let playlistButtonData = {
     focused: false,
     iconPosition: "icon-only",
     onTap: function () {
@@ -135,7 +148,11 @@
     style: "mono",
     toggled: false,
     type: "text"
-  });
+  };
+  playlistButton.rawProps = {
+    iconName: "yt-sys-icons:playlist_add",
+    data: playlistButtonData
+  };
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
@@ -145,12 +162,16 @@
   });
 
   let rightControls = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector(".right-controls-buttons");
-  let sleepTimerButton = document.createElement("tp-yt-paper-icon-button");
+  let sleepTimerButton = document.createElement("yt-icon-button");
+
+  let sleepTimerIcon = document.createElement("yt-icon");
+  sleepTimerIcon.set("icon", "TIMER");
+  sleepTimerButton.appendChild(sleepTimerIcon);
+
   sleepTimerButton.setAttribute("title", "Sleep timer off");
   sleepTimerButton.classList.add("ytmusic-player-bar");
   sleepTimerButton.classList.add("ytmd-player-bar-control");
   sleepTimerButton.classList.add("sleep-timer-button");
-  sleepTimerButton.set("icon", "yt-sys-icons:stopwatch");
   sleepTimerButton.onclick = () => {
     sleepTimerButton.dispatchEvent(
       new CustomEvent("yt-action", {
@@ -284,24 +305,24 @@
                       },
                       sleepTimerTimeout !== null
                         ? {
-                            menuServiceItemRenderer: {
-                              icon: {
-                                iconType: "DELETE"
-                              },
-                              serviceEndpoint: {
-                                ytmdSleepTimerServiceEndpoint: {
-                                  time: 0
-                                }
-                              },
-                              text: {
-                                runs: [
-                                  {
-                                    text: "Clear sleep timer"
-                                  }
-                                ]
+                          menuServiceItemRenderer: {
+                            icon: {
+                              iconType: "DELETE"
+                            },
+                            serviceEndpoint: {
+                              ytmdSleepTimerServiceEndpoint: {
+                                time: 0
                               }
+                            },
+                            text: {
+                              runs: [
+                                {
+                                  text: "Clear sleep timer"
+                                }
+                              ]
                             }
                           }
+                        }
                         : {}
                     ]
                   }
@@ -319,13 +340,13 @@
   };
   rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
 
-  const humanizeTime = (time) => {
+  const humanizeTime = time => {
     // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
     if (time === 1) return `${time} minute`;
     if (time > 1 && time < 60) return `${time} minutes`;
-    if (time >= 60 && time < 120) return `${time/60} hour`;
-    if (time >= 120) return `${time/60} hours`;
-  }
+    if (time >= 60 && time < 120) return `${time / 60} hour`;
+    if (time >= 120) return `${time / 60} hours`;
+  };
 
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
@@ -486,8 +507,8 @@
         const item = currentMenu.items[i];
         if (item.toggleMenuServiceItemRenderer) {
           if (
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_SAVED" ||
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_ADD"
+            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER" ||
+            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK"
           ) {
             foundLibraryButton = true;
             libraryFeedbackDefaultToken = item.toggleMenuServiceItemRenderer.defaultServiceEndpoint.feedbackEndpoint.feedbackToken;
@@ -497,31 +518,34 @@
               state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken] !== undefined &&
               state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken] !== null
             ) {
-              libraryButton.set("data.toggled", state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken]);
+              libraryButtonData.toggled = state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken];
+              libraryButton.setters.data(libraryButtonData); 
             } else {
-              libraryButton.set("data.toggled", false);
+              libraryButtonData.toggled = false;
+              libraryButton.setters.data(libraryButtonData); 
             }
 
-            if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_SAVED") {
+            // Dev note 2/12/26: I think this if check got reversed the comments are probably outdated. Didn't bother investigating further to update comments
+            if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER") {
               // Default value is saved to library (false == remove from library, true == add to library)
-              if (libraryButton.data.toggled) {
-                libraryButton.set("iconName", "yt-sys-icons:library_add");
+              if (libraryButtonData.toggled) {
+                libraryButton.setters.iconName("yt-sys-icons:library_saved");
               } else {
-                libraryButton.set("iconName", "yt-sys-icons:library_saved");
+                libraryButton.setters.iconName("yt-sys-icons:library_add");
               }
-            } else if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "LIBRARY_ADD") {
+            } else if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK") {
               // Default value is add to library (false == add to library, true == remove from library)
-              if (libraryButton.data.toggled) {
-                libraryButton.set("iconName", "yt-sys-icons:library_saved");
+              if (libraryButtonData.toggled) {
+                libraryButton.setters.iconName("yt-sys-icons:library_add");
               } else {
-                libraryButton.set("iconName", "yt-sys-icons:library_add");
+                libraryButton.setters.iconName("yt-sys-icons:library_saved");
               }
             }
             break;
           }
         }
       }
-      
+
       if (!foundLibraryButton) {
         if (!libraryButton.classList.contains("hidden")) {
           libraryButton.classList.add("hidden");
@@ -542,4 +566,4 @@
   });
 
   ytmdControlButtons.libraryButton = libraryButton;
-})
+});
