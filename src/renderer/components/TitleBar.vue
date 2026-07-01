@@ -15,6 +15,7 @@ const props = defineProps({
     default: null
   },
   hasHomeButton: Boolean,
+  hasOpenInBrowserButton: Boolean,
   hasSettingsButton: Boolean,
   hasMinimizeButton: Boolean,
   hasMaximizeButton: Boolean,
@@ -32,6 +33,7 @@ const closeWindow = window.ytmd.closeWindow;
 
 const openSettingsWindow = window.ytmd.openSettingsWindow;
 const navigateToDefault = window.ytmd.ytmViewNavigateDefault;
+const openCurrentSongInBrowser = window.ytmd.openCurrentSongInBrowser;
 
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
@@ -97,15 +99,18 @@ if (props.isMainWindow) {
         <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
           <span class="material-symbols-outlined">home</span>
         </button>
-        <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
+        <button v-if="hasOpenInBrowserButton" class="app-button" tabindex="3" title="Open current song on YouTube Music" @click="openCurrentSongInBrowser">
+          <span class="material-symbols-outlined">open_in_new</span>
+        </button>
+        <button v-if="hasSettingsButton" class="app-button" tabindex="4" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
       <div v-if="!wcoVisible" class="windows-action-buttons">
-        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="4" @click="minimizeWindow">
+        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="5" @click="minimizeWindow">
           <span class="material-symbols-outlined">remove</span>
         </button>
-        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="5" @click="maximizeWindow">
+        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="6" @click="maximizeWindow">
           <span class="material-symbols-outlined">square</span>
         </button>
         <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="6" @click="restoreWindow">
