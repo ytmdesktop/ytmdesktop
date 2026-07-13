@@ -368,6 +368,7 @@ const store = new Conf<StoreSchema>({
       companionServerAuthTokens: null,
       companionServerCORSWildcardEnabled: false,
       discordPresenceEnabled: false,
+      discordPresenceStatusDisplayType: 1,
       lastFMEnabled: false
     },
     shortcuts: {
@@ -527,7 +528,7 @@ store.onDidAnyChange(async (newState, oldState) => {
   }
 
   if (newState.integrations.discordPresenceEnabled) {
-    discordPresence.provide(memoryStore);
+    discordPresence.provide(store, memoryStore);
   }
   if (newState.integrations.discordPresenceEnabled && !oldState.integrations.discordPresenceEnabled) {
     discordPresence.enable();
@@ -1941,7 +1942,7 @@ app.on("ready", async () => {
 
   // DiscordPresence
   if (store.get("integrations").discordPresenceEnabled) {
-    discordPresence.provide(memoryStore);
+    discordPresence.provide(store, memoryStore);
     discordPresence.enable();
     log.info("Integration enabled: Discord presence");
   }

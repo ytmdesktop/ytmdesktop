@@ -1,10 +1,11 @@
+import Conf from "conf";
 import playerStateStore, { PlayerState, Thumbnail, VideoDetails, VideoState } from "../../player-state-store";
 import IIntegration from "../integration";
 import MemoryStore from "../../memory-store";
-import { MemoryStoreSchema } from "~shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import DiscordClient from "./minimal-discord-client";
 import log from "electron-log";
-import { DiscordActivityType } from "./minimal-discord-client/types";
+import { DiscordActivityType, DiscordActivityStatusDisplayType } from "./minimal-discord-client/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 
@@ -50,6 +51,7 @@ function stringLimit(str: string, limit: number, minimum: number) {
 }
 
 export default class DiscordPresence implements IIntegration {
+  private store: Conf<StoreSchema>;
   private memoryStore: MemoryStore<MemoryStoreSchema>;
 
   private discordClient: DiscordClient = null;
@@ -77,7 +79,7 @@ export default class DiscordPresence implements IIntegration {
       const thumbnail = getHighestResThumbnail(thumbnails);
       this.discordClient.setActivity({
         type: DiscordActivityType.Listening,
-        status_display_type: 1,
+        status_display_type: this.store.get("integrations").discordPresenceStatusDisplayType ?? DiscordActivityStatusDisplayType.State,
         details: stringLimit(title, 128, 2),
         details_url: `https://music.youtube.com/watch?v=${id}`,
         state: stringLimit(author, 128, 2),
@@ -136,7 +138,8 @@ export default class DiscordPresence implements IIntegration {
     }, 30 * 1000);
   }
 
-  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
+  public provide(store: Conf<StoreSchema>, memoryStore: MemoryStore<MemoryStoreSchema>): void {
+    this.store = store;
     this.memoryStore = memoryStore;
   }
 
