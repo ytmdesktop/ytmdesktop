@@ -676,11 +676,13 @@ function trayIconFileName(style: TrayIconStyle) {
   if (process.platform === "win32") return "tray.ico";
   if (process.platform === "darwin") return "trayTemplate.png";
 
-  let color: "white" | "black";
+  let color: "white" | "black" | "red";
   if (style === TrayIconStyle.White) {
     color = "white";
   } else if (style === TrayIconStyle.Black) {
     color = "black";
+  } else if (style === TrayIconStyle.Red) {
+    color = "red";
   } else {
     color = nativeTheme.shouldUseDarkColors ? "white" : "black";
   }
