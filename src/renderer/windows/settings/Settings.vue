@@ -53,6 +53,12 @@ const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeft
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
+const liveLyricsEnabled = ref<boolean>(playback.liveLyricsEnabled ?? true);
+const liveLyricsDefaultMode = ref<"line" | "karaoke">(playback.liveLyricsDefaultMode ?? "line");
+const liveLyricsLanguage = ref<string>(playback.liveLyricsLanguage ?? "default");
+const liveLyricsFontSize = ref<number>(playback.liveLyricsFontSize ?? 32);
+const liveLyricsGradientBg = ref<boolean>(playback.liveLyricsGradientBg ?? true);
+const liveLyricsInstrumentalBreaks = ref<boolean>(playback.liveLyricsInstrumentalBreaks ?? true);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthTokens = ref<AuthToken[]>(
@@ -69,6 +75,7 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+const shortcutToggleLyrics = ref<string>(shortcuts.toggleLyrics ?? "");
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
@@ -91,6 +98,12 @@ store.onDidAnyChange(async newState => {
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
+  liveLyricsEnabled.value = newState.playback.liveLyricsEnabled ?? true;
+  liveLyricsDefaultMode.value = newState.playback.liveLyricsDefaultMode ?? "line";
+  liveLyricsLanguage.value = newState.playback.liveLyricsLanguage ?? "default";
+  liveLyricsFontSize.value = newState.playback.liveLyricsFontSize ?? 32;
+  liveLyricsGradientBg.value = newState.playback.liveLyricsGradientBg ?? true;
+  liveLyricsInstrumentalBreaks.value = newState.playback.liveLyricsInstrumentalBreaks ?? true;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -109,6 +122,7 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+  shortcutToggleLyrics.value = newState.shortcuts.toggleLyrics ?? "";
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -120,6 +134,7 @@ const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shor
 const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsDownRegisterFailed"));
 const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
 const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
+const shortcutsToggleLyricsRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsToggleLyricsRegisterFailed"));
 
 const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
 
@@ -135,6 +150,7 @@ memoryStore.onStateChanged(newState => {
   shortcutsThumbsDownRegisterFailed.value = newState.shortcutsThumbsDownRegisterFailed;
   shortcutsVolumeUpRegisterFailed.value = newState.shortcutsVolumeUpRegisterFailed;
   shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
+  shortcutsToggleLyricsRegisterFailed.value = newState.shortcutsToggleLyricsRegisterFailed;
 
   companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
 
@@ -164,6 +180,12 @@ async function settingsChanged() {
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
+  store.set("playback.liveLyricsEnabled", liveLyricsEnabled.value);
+  store.set("playback.liveLyricsDefaultMode", liveLyricsDefaultMode.value);
+  store.set("playback.liveLyricsLanguage", liveLyricsLanguage.value);
+  store.set("playback.liveLyricsFontSize", liveLyricsFontSize.value);
+  store.set("playback.liveLyricsGradientBg", liveLyricsGradientBg.value);
+  store.set("playback.liveLyricsInstrumentalBreaks", liveLyricsInstrumentalBreaks.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -178,45 +200,32 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+  store.set("shortcuts.toggleLyrics", shortcutToggleLyrics.value);
 }
 
 async function settingChangedRequiresRestart() {
   requiresRestart.value = true;
-  settingsChanged();
 }
 
-async function settingChangedFile(event: Event) {
-  const target = event.target as HTMLInputElement;
+async function settingChangedFile(e: Event) {
+  const target = e.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) return;
 
-  const setting = target.dataset.setting;
-  if (!setting) {
-    throw new Error("No setting specified in File Input");
-  }
+  const file = target.files[0];
+  const filePath = file.path;
 
-  store.set(setting, target.files.length > 0 ? window.ytmd.getTrueFilePath(target.files[0]) : null);
-
-  target.value = null;
+  store.set("appearance.customCSSPath", filePath);
+  customCSSPath.value = filePath;
 }
 
-async function restartDiscordPresence() {
-  discordPresenceEnabled.value = false;
-  await settingsChanged();
-  discordPresenceEnabled.value = true;
-  await settingsChanged();
-}
-
-async function deleteCompanionAuthToken(appId: string) {
-  const index = companionServerAuthTokens.value.findIndex(token => token.appId === appId);
-  if (index > -1) {
-    companionServerAuthTokens.value.splice(index, 1);
-  }
-
-  if (safeStorageAvailable.value)
-    store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
-}
-
-function removeCustomCSSPath() {
+async function removeCustomCSSPath() {
   store.set("appearance.customCSSPath", null);
+  customCSSPath.value = null;
+}
+
+async function logoutLastFM() {
+  store.set("lastfm.sessionKey", null);
+  lastFMSessionKey.value = null;
 }
 
 function changeTab(newTab: number) {
@@ -236,11 +245,13 @@ function checkForUpdates() {
   checkingForUpdate.value = true;
 }
 
-async function logoutLastFM() {
-  store.set("lastfm.sessionKey", null);
-  lastFMEnabled.value = false;
-  lastFMSessionKey.value = null;
-  await settingsChanged();
+function deleteCompanionAuthToken(appId: string) {
+  companionServerAuthTokens.value = companionServerAuthTokens.value.filter(token => token.appId !== appId);
+  store.set("integrations.companionServerAuthTokens", companionServerAuthTokens.value as unknown as string);
+}
+
+function restartDiscordPresence() {
+  window.ytmd.restartDiscordPresence();
 }
 
 window.ytmd.handleCheckingForUpdate(() => {
@@ -255,14 +266,14 @@ window.ytmd.handleUpdateAvailable(() => {
 
 window.ytmd.handleUpdateNotAvailable(() => {
   checkingForUpdate.value = false;
-  updateNotAvailable.value = true;
   updateAvailable.value = false;
+  updateNotAvailable.value = true;
 });
 
 window.ytmd.handleUpdateDownloaded(() => {
   checkingForUpdate.value = false;
-  updateNotAvailable.value = false;
   updateAvailable.value = false;
+  updateNotAvailable.value = false;
   updateDownloaded.value = true;
 });
 </script>
@@ -338,6 +349,81 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+
+          <YTMDSetting
+            v-model="liveLyricsEnabled"
+            type="checkbox"
+            name="Live Lyrics"
+            description="Display synchronized lyrics with real-time word highlighting and dynamic backgrounds"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="liveLyricsEnabled"
+            v-model="liveLyricsDefaultMode"
+            :options-map="{ line: 'Time-Synced (Standard)', karaoke: 'Live Karaoke (Beta)' }"
+            type="select"
+            indented
+            name="Default sync mode"
+            description="Choose between line-by-line sync or word-by-word karaoke"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="liveLyricsEnabled"
+            v-model="liveLyricsLanguage"
+            :options-map="{
+              default: 'System Default',
+              en: 'English',
+              ja: 'Japanese (日本語)',
+              ko: 'Korean (한국어)',
+              es: 'Spanish (Español)',
+              zh: 'Chinese (中文)',
+              fr: 'French (Français)',
+              de: 'German (Deutsch)',
+              ru: 'Russian (Русский)',
+              pt: 'Portuguese (Português)',
+              it: 'Italian (Italiano)',
+              ar: 'Arabic (العربية)',
+              hi: 'Hindi (हिन्दी)'
+            }"
+            type="select"
+            indented
+            name="Default lyrics language"
+            description="Preferred language when matching songs with multiple titles"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="liveLyricsEnabled"
+            v-model="liveLyricsFontSize"
+            type="range"
+            min="20"
+            max="48"
+            step="2"
+            indented
+            name="Lyric font size"
+            :description="`Custom lyric text size (${liveLyricsFontSize}px)`"
+            @change="settingsChanged"
+          />
+          <div v-if="liveLyricsEnabled" class="setting indented lyrics-preview-box">
+            <p class="lyrics-preview-text" :style="{ fontSize: `${liveLyricsFontSize}px` }">♪ Live Lyrics Preview</p>
+          </div>
+          <YTMDSetting
+            v-if="liveLyricsEnabled"
+            v-model="liveLyricsGradientBg"
+            type="checkbox"
+            indented
+            name="Album art gradient background"
+            description="Animate subtle ambient colors based on the current album artwork"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="liveLyricsEnabled"
+            v-model="liveLyricsInstrumentalBreaks"
+            type="checkbox"
+            indented
+            name="Show instrumental breaks"
+            description="Display musical notes during guitar solos, intros, and interludes"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
@@ -399,7 +485,7 @@ window.ytmd.handleUpdateDownloaded(() => {
               </tbody>
             </table>
             <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
-              <td>No authorized companions</td>
+              <p>No authorized companions</p>
             </div>
           </YTMDSetting>
           <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
@@ -516,6 +602,17 @@ window.ytmd.handleUpdateDownloaded(() => {
               >
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Toggle Lyrics<span
+                v-if="shortcutsToggleLyricsRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutToggleLyrics" @change="settingsChanged" />
           </div>
         </div>
 
@@ -866,5 +963,25 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.lyrics-preview-box {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-top: -6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  justify-content: flex-start !important;
+}
+
+.lyrics-preview-text {
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 1.3;
 }
 </style>
