@@ -1,5 +1,11 @@
 (function () {
   const MAX_RESULTS = 20;
+  const MUSIC_VIDEO_TYPES = new Set([
+    "MUSIC_VIDEO_TYPE_ATV",
+    "MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK",
+    "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+  ]);
+  const VIDEO_VIDEO_TYPES = new Set(["MUSIC_VIDEO_TYPE_OMV", "MUSIC_VIDEO_TYPE_UGC"]);
 
   function runsText(runs) {
     return (runs ?? []).map(run => run.text ?? "").join("");
@@ -11,13 +17,40 @@
     return (sorted.find(thumbnail => (thumbnail.width ?? 0) >= 60) ?? sorted[sorted.length - 1]).url ?? null;
   }
 
+  function resultKind(watchEndpoint, renderer, metadataRuns) {
+    const musicVideoType =
+      watchEndpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig?.musicVideoType ??
+      renderer?.playlistItemData?.musicVideoType ??
+      renderer?.musicVideoType ??
+      null;
+    if (MUSIC_VIDEO_TYPES.has(musicVideoType)) return "music";
+    if (VIDEO_VIDEO_TYPES.has(musicVideoType)) return "video";
+
+    const labels = (metadataRuns ?? []).map(run => (run.text ?? "").trim().toLowerCase());
+    if (labels.some(label => /^(video|videos|동영상)$/.test(label))) return "video";
+    if (labels.some(label => /^(song|songs|노래|audio|podcast|팟캐스트)$/.test(label))) return "music";
+    return "unknown";
+  }
+
+  function watchEndpointFromRenderer(renderer) {
+    if (!renderer) return null;
+    const titleRuns =
+      renderer.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs ??
+      renderer.title?.runs ??
+      [];
+    return (
+      renderer.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint ??
+      renderer.navigationEndpoint?.watchEndpoint ??
+      renderer.onTap?.watchEndpoint ??
+      renderer.buttons?.map(button => button.buttonRenderer?.command?.watchEndpoint).find(Boolean) ??
+      titleRuns.map(run => run.navigationEndpoint?.watchEndpoint).find(Boolean) ??
+      null
+    );
+  }
+
   function parseSong(renderer) {
     if (!renderer) return null;
-    const watchEndpoint =
-      renderer.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint ??
-      renderer.playlistItemData ??
-      renderer.navigationEndpoint?.watchEndpoint ??
-      null;
+    const watchEndpoint = watchEndpointFromRenderer(renderer);
     const videoId = renderer.playlistItemData?.videoId ?? watchEndpoint?.videoId;
     if (!videoId) return null;
 
@@ -49,19 +82,21 @@
       artist,
       duration,
       artworkUrl: pickArtworkUrl(renderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails),
-      playlistId: watchEndpoint?.playlistId ?? null
+      playlistId: watchEndpoint?.playlistId ?? renderer.playlistItemData?.playlistId ?? null,
+      kind: resultKind(watchEndpoint, renderer, subtitleRuns)
     };
   }
 
   function parseCard(renderer) {
     if (!renderer) return null;
+    const nestedRenderer = renderer.contents?.[0]?.musicResponsiveListItemRenderer ?? null;
     const watchEndpoint =
-      renderer.onTap?.watchEndpoint ??
-      renderer.buttons?.map(button => button.buttonRenderer?.command?.watchEndpoint).find(Boolean) ??
-      renderer.contents?.[0]?.musicResponsiveListItemRenderer?.playlistItemData ??
+      watchEndpointFromRenderer(renderer) ??
+      watchEndpointFromRenderer(nestedRenderer) ??
+      nestedRenderer?.playlistItemData ??
       null;
-    const videoId = watchEndpoint?.videoId ?? renderer.contents?.[0]?.musicResponsiveListItemRenderer?.playlistItemData?.videoId;
-    if (!videoId) return parseSong(renderer.contents?.[0]?.musicResponsiveListItemRenderer);
+    const videoId = watchEndpoint?.videoId ?? nestedRenderer?.playlistItemData?.videoId;
+    if (!videoId) return parseSong(nestedRenderer);
 
     const title = runsText(renderer.title?.runs).trim();
     if (!title) return parseSong(renderer.contents?.[0]?.musicResponsiveListItemRenderer);
@@ -88,7 +123,8 @@
           .trim(),
       duration,
       artworkUrl: pickArtworkUrl(renderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails),
-      playlistId: watchEndpoint?.playlistId ?? null
+      playlistId: watchEndpoint?.playlistId ?? null,
+      kind: resultKind(watchEndpoint, nestedRenderer ?? renderer, subtitleRuns)
     };
   }
 

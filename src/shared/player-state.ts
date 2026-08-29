@@ -129,6 +129,7 @@ export type MiniPlayerSearchResult = {
   duration: string | null;
   artworkUrl: string | null;
   playlistId: string | null;
+  kind: "music" | "video" | "unknown";
 };
 
 export type MiniPlayerSearchStatus = "idle" | "loading" | "ready" | "error";

@@ -81,6 +81,47 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.ytmd-results-header {
+  spacing: 8px;
+  padding: 0 2px;
+}
+
+.ytmd-results-label {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  font-weight: 600;
+  padding-top: 4px;
+}
+
+.ytmd-order-toggle {
+  spacing: 2px;
+  padding: 2px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+}
+
+.ytmd-order-button {
+  padding: 2px 6px;
+  color: rgba(255, 255, 255, 0.62);
+  background-color: transparent;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ytmd-order-button:hover,
+.ytmd-order-button:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-order-button-selected,
+.ytmd-order-button-selected:hover,
+.ytmd-order-button-selected:focus {
+  color: #151515;
+  background-color: #ffffff;
+}
+
 .ytmd-results-scroll {
   max-height: 240px;
 }

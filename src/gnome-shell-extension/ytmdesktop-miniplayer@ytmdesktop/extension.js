@@ -17,6 +17,7 @@ const OBJECT_PATH = '/io/github/ytmdesktop/MiniPlayer';
 const SEARCH_DEBOUNCE_MS = 900;
 const LAYOUTS = ['small', 'medium', 'large'];
 const LAYOUT_SIZES = {small: 48, medium: 96, large: 128};
+const SEARCH_ORDERS = ['music', 'video'];
 
 const DBUS_XML = `
 <node>
@@ -86,6 +87,33 @@ function writeLayout(size) {
     dir.get_child('layout').replace_contents(new TextEncoder().encode(size), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 }
 
+function searchOrderPath() {
+    return GLib.build_filenamev([GLib.get_user_config_dir(), 'ytmdesktop-miniplayer', 'search-order']);
+}
+
+function readSearchOrder() {
+    try {
+        const file = Gio.File.new_for_path(searchOrderPath());
+        const [, contents] = file.load_contents(null);
+        const text = new TextDecoder().decode(contents).trim();
+        if (SEARCH_ORDERS.includes(text))
+            return text;
+    } catch (error) {}
+    return 'music';
+}
+
+function writeSearchOrder(order) {
+    const dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), 'ytmdesktop-miniplayer']));
+    try {
+        dir.make_directory_with_parents(null);
+    } catch (error) {}
+    try {
+        dir.get_child('search-order').replace_contents(new TextEncoder().encode(order), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+    } catch (error) {
+        console.error(`YTMDesktop search order save failed: ${error.message}`);
+    }
+}
+
 const MiniPlayerIndicator = GObject.registerClass(
 class MiniPlayerIndicator extends PanelMenu.Button {
     _init(extension) {
@@ -103,6 +131,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._artLoadId = 0;
         this._searchTimer = 0;
         this._lastSearchQuery = '';
+        this._searchOrder = readSearchOrder();
+        writeSearchOrder(this._searchOrder);
         this._layout = readLayout();
         this._volumeDragging = false;
         this._likeOverride = null;
@@ -192,6 +222,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         searchWrap.add_child(this._searchEntry);
 
         this._resultsBox = new St.BoxLayout({vertical: true, style_class: 'ytmd-results-box', x_expand: true});
+        this._resultsHeader = new St.BoxLayout({style_class: 'ytmd-results-header', x_expand: true});
+        this._resultsHeader.add_child(new St.Label({text: 'Results', style_class: 'ytmd-results-label', x_expand: true}));
+        const orderToggle = new St.BoxLayout({style_class: 'ytmd-order-toggle'});
+        this._musicFirstButton = this._orderButton('Music ↑', 'Music results first', 'music');
+        this._videoFirstButton = this._orderButton('Video ↑', 'Video results first', 'video');
+        orderToggle.add_child(this._musicFirstButton);
+        orderToggle.add_child(this._videoFirstButton);
+        this._resultsHeader.add_child(orderToggle);
         this._resultsStatus = new St.Label({text: '', style_class: 'ytmd-results-status'});
         this._resultsStatus.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._resultsList = new St.BoxLayout({vertical: true, style_class: 'ytmd-results', x_expand: true});
@@ -203,6 +241,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             vscrollbar_policy: St.PolicyType.AUTOMATIC,
         });
         addScrollChild(this._resultsScroll, this._resultsList);
+        this._resultsBox.add_child(this._resultsHeader);
         this._resultsBox.add_child(this._resultsStatus);
         this._resultsBox.add_child(this._resultsScroll);
         this._resultsBox.visible = false;
@@ -446,6 +485,41 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         return button;
     }
 
+    _orderButton(label, accessibleName, order) {
+        const button = new St.Button({
+            label,
+            style_class: 'ytmd-order-button',
+            accessible_name: accessibleName,
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+        });
+        button.connect('clicked', () => this._setSearchOrder(order));
+        return button;
+    }
+
+    _setSearchOrder(order) {
+        if (!SEARCH_ORDERS.includes(order) || order === this._searchOrder)
+            return;
+        this._searchOrder = order;
+        writeSearchOrder(order);
+        this._renderSearch();
+    }
+
+    _orderedSearchResults(results) {
+        const ranks = this._searchOrder === 'video'
+            ? {video: 0, music: 1, unknown: 2}
+            : {music: 0, video: 1, unknown: 2};
+        return results
+            .map((result, index) => ({result, index}))
+            .sort((left, right) => {
+                const leftRank = ranks[left.result.kind] ?? ranks.unknown;
+                const rightRank = ranks[right.result.kind] ?? ranks.unknown;
+                return leftRank - rightRank || left.index - right.index;
+            })
+            .map(({result}) => result);
+    }
+
     _isComposing() {
         const text = this._searchEntry.get_clutter_text();
         try {
@@ -538,6 +612,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
 
         this._resultsBox.visible = true;
+        this._resultsHeader.visible = false;
         if (search.status === 'loading') {
             this._resultsStatus.text = 'Searching…';
             this._resultsStatus.visible = true;
@@ -553,8 +628,11 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
 
         this._resultsStatus.visible = false;
+        this._resultsHeader.visible = true;
         this._resultsScroll.visible = true;
-        for (const result of search.results)
+        this._musicFirstButton[this._searchOrder === 'music' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
+        this._videoFirstButton[this._searchOrder === 'video' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
+        for (const result of this._orderedSearchResults(search.results))
             this._resultsList.add_child(this._createResultRow(result));
     }
 
