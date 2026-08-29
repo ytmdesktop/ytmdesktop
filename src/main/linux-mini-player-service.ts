@@ -1,0 +1,214 @@
+import log from "electron-log";
+import { defineInterface, DefinedInterface, ExportRegistration, MessageBus, NameRegistration, sessionBus } from "dbus-native";
+
+import { MiniPlayerCommand, MiniPlayerSnapshot, MiniPlayerStatus, PlayerState, VideoState } from "./player-state-store";
+
+export const MINI_PLAYER_SERVICE = "io.github.ytmdesktop.MiniPlayer";
+export const MINI_PLAYER_PATH = "/io/github/ytmdesktop/MiniPlayer";
+
+type MiniPlayerActions = {
+  command(command: MiniPlayerCommand, value?: number): void;
+  toggleMainWindow(): void;
+  openSettings(): void;
+  quit(): void;
+};
+
+type SessionState = {
+  authenticated: boolean;
+  hasSavedTrack: boolean;
+};
+
+const PROGRESS_SIGNAL_INTERVAL_MS = 1000;
+
+export default class LinuxMiniPlayerService {
+  private playerState: PlayerState;
+  private sessionState: SessionState;
+  private stableStatus: MiniPlayerStatus = "idle";
+  private statusOverride: "loading" | "needs-main-app" | null = null;
+  private stateJson = "null";
+  private lastImmediateSignature = "";
+  private lastSignalAt = 0;
+  private progressSignalTimeout: NodeJS.Timeout | null = null;
+  private bus: MessageBus | null = null;
+  private definition: DefinedInterface | null = null;
+  private exported: ExportRegistration | null = null;
+  private ownedName: NameRegistration | null = null;
+
+  constructor(
+    private readonly actions: MiniPlayerActions,
+    initialState: PlayerState,
+    initialSessionState: SessionState
+  ) {
+    this.playerState = initialState;
+    this.sessionState = initialSessionState;
+    this.updateStableStatus(initialState.trackState);
+    this.refreshSnapshot(false);
+  }
+
+  async start() {
+    if (this.bus) return;
+
+    const bus = sessionBus({ reconnect: true });
+    bus.connection.on("error", error => log.error("Linux mini-player D-Bus error", error));
+    bus.connection.on("handlerError", error => log.error("Linux mini-player handler error", error));
+
+    const ownedName = await bus.ownName(MINI_PLAYER_SERVICE, 4);
+    if (!ownedName.isPrimaryOwner) {
+      await bus.close();
+      throw new Error(`Unable to own D-Bus service ${MINI_PLAYER_SERVICE}`);
+    }
+
+    const definition = defineInterface({
+      name: MINI_PLAYER_SERVICE,
+      methods: {
+        GetState: {
+          out: { stateJson: "s" },
+          handler: () => this.stateJson
+        },
+        Command: {
+          in: { command: "s", value: "d" },
+          handler: ({ command, value }: { command: string; value: number }) => {
+            const allowedCommands = new Set<MiniPlayerCommand>(["previous", "playPause", "next", "seekTo"]);
+            if (!allowedCommands.has(command as MiniPlayerCommand)) return;
+            if (command === "seekTo" && (!Number.isFinite(value) || value < 0)) return;
+            this.actions.command(command as MiniPlayerCommand, value);
+          }
+        },
+        ToggleMainWindow: { handler: () => this.actions.toggleMainWindow() },
+        OpenSettings: { handler: () => this.actions.openSettings() },
+        Quit: { handler: () => this.actions.quit() }
+      },
+      signals: {
+        StateChanged: { args: { stateJson: "s" } }
+      }
+    });
+
+    const exported = await bus.export(MINI_PLAYER_PATH, definition);
+    this.bus = bus;
+    this.definition = definition;
+    this.exported = exported;
+    this.ownedName = ownedName;
+    log.info("Started Linux mini-player D-Bus service", MINI_PLAYER_SERVICE);
+  }
+
+  updatePlayerState(state: PlayerState) {
+    this.playerState = state;
+    this.updateStableStatus(state.trackState);
+    if (state.videoDetails) this.statusOverride = null;
+    this.refreshSnapshot(true);
+  }
+
+  updateSessionState(sessionState: SessionState) {
+    this.sessionState = sessionState;
+    if (!sessionState.authenticated) this.statusOverride = null;
+    this.refreshSnapshot(true);
+  }
+
+  setLoading() {
+    this.statusOverride = "loading";
+    this.refreshSnapshot(true);
+  }
+
+  setNeedsMainApp() {
+    this.statusOverride = "needs-main-app";
+    this.refreshSnapshot(true);
+  }
+
+  async stop() {
+    if (this.progressSignalTimeout) clearTimeout(this.progressSignalTimeout);
+    const exported = this.exported;
+    const ownedName = this.ownedName;
+    const bus = this.bus;
+
+    this.progressSignalTimeout = null;
+    this.exported = null;
+    this.ownedName = null;
+    this.definition = null;
+    this.bus = null;
+
+    await exported?.remove();
+    await ownedName?.release();
+    await bus?.close();
+  }
+
+  private updateStableStatus(trackState: VideoState) {
+    if (trackState === VideoState.Playing) this.stableStatus = "playing";
+    if (trackState === VideoState.Paused) this.stableStatus = "paused";
+  }
+
+  private createSnapshot(): MiniPlayerSnapshot {
+    const video = this.playerState.videoDetails;
+    const queueReady = !!video && (this.playerState.queue?.items.length ?? 0) > 0;
+    const artworkUrl = video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null;
+
+    let status: MiniPlayerStatus;
+    let message: string | null = null;
+    if (!this.sessionState.authenticated) {
+      status = "needs-main-app";
+      message = "Sign in or choose a track in YTMusic";
+    } else if (video) {
+      status = this.stableStatus === "playing" ? "playing" : "paused";
+    } else if (this.statusOverride === "loading") {
+      status = "loading";
+      message = "Resuming last track…";
+    } else if (this.statusOverride === "needs-main-app" || !this.sessionState.hasSavedTrack) {
+      status = "needs-main-app";
+      message = "Sign in or choose a track in YTMusic";
+    } else {
+      status = "idle";
+      message = "Resume last track";
+    }
+
+    return {
+      version: 1,
+      authenticated: this.sessionState.authenticated,
+      status,
+      track: video
+        ? {
+            id: video.id,
+            title: video.title,
+            artist: video.author,
+            durationSeconds: video.durationSeconds,
+            artworkUrl
+          }
+        : null,
+      progressSeconds: this.playerState.videoProgress,
+      canPlay: this.sessionState.authenticated && (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app" && status !== "loading",
+      canPrevious: this.sessionState.authenticated && queueReady,
+      canNext: this.sessionState.authenticated && queueReady,
+      message
+    };
+  }
+
+  private refreshSnapshot(emit: boolean) {
+    const snapshot = this.createSnapshot();
+    this.stateJson = JSON.stringify(snapshot);
+    if (!emit || !this.definition) return;
+
+    const immediateSignature = JSON.stringify({ ...snapshot, progressSeconds: 0 });
+    const immediateChange = immediateSignature !== this.lastImmediateSignature;
+    this.lastImmediateSignature = immediateSignature;
+    if (immediateChange) {
+      this.emitState();
+      return;
+    }
+
+    const elapsed = Date.now() - this.lastSignalAt;
+    if (elapsed >= PROGRESS_SIGNAL_INTERVAL_MS) {
+      this.emitState();
+    } else if (!this.progressSignalTimeout) {
+      this.progressSignalTimeout = setTimeout(() => {
+        this.progressSignalTimeout = null;
+        this.emitState();
+      }, PROGRESS_SIGNAL_INTERVAL_MS - elapsed);
+    }
+  }
+
+  private emitState() {
+    if (!this.definition) return;
+    if (this.progressSignalTimeout) clearTimeout(this.progressSignalTimeout);
+    this.progressSignalTimeout = null;
+    this.lastSignalAt = Date.now();
+    this.definition.emit.StateChanged(this.stateJson);
+  }
+}

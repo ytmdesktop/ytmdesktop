@@ -25,8 +25,9 @@ import fs from "fs/promises";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { MiniPlayerCommand, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import LinuxMiniPlayerService from "./linux-mini-player-service";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -46,6 +47,7 @@ declare const YTMD_UPDATE_FEED_REPOSITORY: string;
 
 const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
 const isDarwin = process.platform === "darwin";
+const isLinux = process.platform === "linux";
 
 let applicationExited = false;
 let applicationQuitting = false;
@@ -175,6 +177,10 @@ let settingsWindow: BrowserWindow = null;
 let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
+let linuxMiniPlayerService: LinuxMiniPlayerService = null;
+let ytmAuthenticated = false;
+let resumeLastTrackPending = false;
+let resumeLastTrackTimeout: NodeJS.Timeout | null = null;
 
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
@@ -552,6 +558,10 @@ store.onDidAnyChange(async (newState, oldState) => {
 });
 log.info("Created electron store");
 
+lastUrl = store.get("state.lastUrl");
+lastVideoId = store.get("state.lastVideoId");
+lastPlaylistId = store.get("state.lastPlaylistId");
+
 if (store.get("general").disableHardwareAcceleration) {
   app.disableHardwareAcceleration();
 }
@@ -614,6 +624,8 @@ function setupTaskbarFeatures() {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
 
+    linuxMiniPlayerService?.updatePlayerState(state);
+
     if (process.platform == "win32") {
       const taskbarFlags = [];
       if (!hasVideo) {
@@ -659,7 +671,7 @@ function setupTaskbarFeatures() {
     }
 
     if (mainWindow && store.get("playback.progressInTaskbar")) {
-      mainWindow.setProgressBar(hasVideo ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
+      mainWindow.setProgressBar(state.videoDetails ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
         mode: isPlaying ? "normal" : "paused"
       });
     }
@@ -694,7 +706,66 @@ function getTrayIconPath() {
 }
 
 function setTrayIcon() {
-  tray.setImage(getTrayIconPath());
+  if (tray) tray.setImage(getTrayIconPath());
+}
+
+function toggleMainWindowVisibility() {
+  if (!mainWindow) return;
+
+  if (mainWindow.isVisible() && !mainWindow.isMinimized()) {
+    mainWindow.hide();
+    return;
+  }
+
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+const ytmAuthCookieNames = new Set(["LOGIN_INFO", "SAPISID", "__Secure-1PAPISID", "__Secure-3PAPISID"]);
+
+function getYtmSession() {
+  return session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev");
+}
+
+function hasSavedTrack() {
+  return !!store.get("state.lastVideoId");
+}
+
+async function refreshYtmAuthentication() {
+  try {
+    const cookies = await getYtmSession().cookies.get({ url: "https://music.youtube.com" });
+    ytmAuthenticated = cookies.some(cookie => ytmAuthCookieNames.has(cookie.name));
+  } catch (error) {
+    ytmAuthenticated = false;
+    log.error("Failed to determine YouTube Music authentication state", error);
+  }
+  linuxMiniPlayerService?.updateSessionState({ authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() });
+}
+
+function resumeLastTrack() {
+  const savedState = store.get("state");
+  if (!ytmAuthenticated || !savedState.lastVideoId || !ytmView) {
+    linuxMiniPlayerService?.setNeedsMainApp();
+    return;
+  }
+  if (resumeLastTrackPending) return;
+
+  resumeLastTrackPending = true;
+  linuxMiniPlayerService?.setLoading();
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    watchEndpoint: {
+      videoId: savedState.lastVideoId,
+      playlistId: savedState.lastPlaylistId
+    }
+  });
+
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  resumeLastTrackTimeout = setTimeout(() => {
+    resumeLastTrackPending = false;
+    resumeLastTrackTimeout = null;
+    linuxMiniPlayerService?.setNeedsMainApp();
+  }, 5000);
 }
 
 // Shortcut registration
@@ -1629,6 +1700,14 @@ app.on("ready", async () => {
     lastPlaylistId = playlistId;
 
     playerStateStore.updateVideoDetails(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+    linuxMiniPlayerService?.updateSessionState({ authenticated: ytmAuthenticated, hasSavedTrack: true });
+
+    if (resumeLastTrackPending) {
+      resumeLastTrackPending = false;
+      if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+      resumeLastTrackTimeout = null;
+      ytmView.webContents.send("remoteControl:execute", "play");
+    }
   });
 
   ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying) => {
@@ -1778,7 +1857,8 @@ app.on("ready", async () => {
   log.info("Setup IPC handlers");
 
   // Create the permission handlers
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionCheckHandler((webContents, permission) => {
+  const ytmSession = getYtmSession();
+  ytmSession.setPermissionCheckHandler((webContents, permission) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return true;
@@ -1787,7 +1867,7 @@ app.on("ready", async () => {
 
     return false;
   });
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionRequestHandler((webContents, permission, callback) => {
+  ytmSession.setPermissionRequestHandler((webContents, permission, callback) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return callback(true);
@@ -1796,81 +1876,112 @@ app.on("ready", async () => {
 
     return callback(false);
   });
+  ytmSession.cookies.on("changed", (_event, cookie) => {
+    if (cookie.domain.endsWith("youtube.com") && ytmAuthCookieNames.has(cookie.name)) void refreshYtmAuthentication();
+  });
+  await refreshYtmAuthentication();
 
   log.info("Setup permission handlers");
 
   // Register global shortcuts
   registerShortcuts();
 
-  // Create the tray
-  tray = new Tray(getTrayIconPath());
-  trayContextMenu = Menu.buildFromTemplate([
-    {
-      label: "YouTube Music Desktop",
-      type: "normal",
-      enabled: false
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Show/Hide Window",
-      type: "normal",
-      click: () => {
-        if (mainWindow) {
-          if (mainWindow.isVisible()) {
-            mainWindow.hide();
-          } else {
-            mainWindow.show();
+  // Create the platform tray integration
+  if (isLinux) {
+    linuxMiniPlayerService = new LinuxMiniPlayerService(
+      {
+        command: (command: MiniPlayerCommand, value?: number) => {
+          if (command === "playPause" && !playerStateStore.getState().videoDetails) {
+            resumeLastTrack();
+            return;
+          }
+          if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
+        },
+        toggleMainWindow: toggleMainWindowVisibility,
+        openSettings: createOrShowSettingsWindow,
+        quit: () => app.quit()
+      },
+      playerStateStore.getState(),
+      { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() }
+    );
+
+    try {
+      await linuxMiniPlayerService.start();
+    } catch (error) {
+      log.error("Failed to start Linux mini-player D-Bus service", error);
+      await linuxMiniPlayerService.stop();
+      linuxMiniPlayerService = null;
+    }
+  } else {
+    tray = new Tray(getTrayIconPath());
+    tray.setToolTip("YouTube Music Desktop");
+    trayContextMenu = Menu.buildFromTemplate([
+      {
+        label: "YouTube Music Desktop",
+        type: "normal",
+        enabled: false
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Show/Hide Window",
+        type: "normal",
+        click: () => {
+          if (mainWindow) {
+            if (mainWindow.isVisible()) {
+              mainWindow.hide();
+            } else {
+              mainWindow.show();
+            }
           }
         }
+      },
+      {
+        label: "Play/Pause",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "playPause");
+        }
+      },
+      {
+        label: "Previous",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "previous");
+        }
+      },
+      {
+        label: "Next",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "next");
+        }
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Quit",
+        type: "normal",
+        click: () => {
+          app.quit();
+        }
       }
-    },
-    {
-      label: "Play/Pause",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "playPause");
+    ]);
+    tray.setContextMenu(trayContextMenu);
+    tray.on("click", () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        } else {
+          mainWindow.show();
+        }
       }
-    },
-    {
-      label: "Previous",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "previous");
-      }
-    },
-    {
-      label: "Next",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "next");
-      }
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Quit",
-      type: "normal",
-      click: () => {
-        app.quit();
-      }
-    }
-  ]);
-  tray.setToolTip("YouTube Music Desktop");
-  tray.setContextMenu(trayContextMenu);
-  tray.on("click", () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      } else {
-        mainWindow.show();
-      }
-    }
-  });
+    });
+  }
 
-  log.info("Created tray icon");
+  log.info(isLinux ? "Initialized Linux panel integration" : "Created tray icon");
 
   createMainWindow();
   log.info("Created main window");
@@ -1959,6 +2070,8 @@ app.on("ready", async () => {
 app.on("before-quit", () => {
   log.info("Application quitting\n\n");
   applicationQuitting = true;
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  void linuxMiniPlayerService?.stop();
   saveState();
 });
 

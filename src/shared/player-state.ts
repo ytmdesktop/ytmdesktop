@@ -78,3 +78,27 @@ export type PlayerState = {
   adPlaying: boolean;
   hasFullMetadata: boolean;
 };
+
+export type MiniPlayerCommand = "previous" | "playPause" | "next" | "seekTo";
+
+export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "needs-main-app";
+
+export type MiniPlayerTrack = {
+  id: string;
+  title: string;
+  artist: string;
+  durationSeconds: number;
+  artworkUrl: string | null;
+};
+
+export type MiniPlayerSnapshot = {
+  version: 1;
+  authenticated: boolean;
+  status: MiniPlayerStatus;
+  track: MiniPlayerTrack | null;
+  progressSeconds: number;
+  canPlay: boolean;
+  canPrevious: boolean;
+  canNext: boolean;
+  message: string | null;
+};
