@@ -18,6 +18,7 @@ const SEARCH_DEBOUNCE_MS = 900;
 const LAYOUTS = ['small', 'medium', 'large'];
 const LAYOUT_SIZES = {small: 48, medium: 96, large: 128};
 const SEARCH_ORDERS = ['music', 'video'];
+const ART_OVERLAY_ICON_SIZES = {small: 16, medium: 22, large: 28};
 
 const DBUS_XML = `
 <node>
@@ -30,6 +31,7 @@ const DBUS_XML = `
       <arg type="d" name="value" direction="in"/>
     </method>
     <method name="ToggleMainWindow"/>
+    <method name="ShowMainWindow"/>
     <method name="OpenSettings"/>
     <method name="Quit"/>
     <method name="Search">
@@ -255,12 +257,21 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const playerRow = new St.BoxLayout({vertical: false, style_class: 'ytmd-player-row'});
         root.add_child(playerRow);
 
-        this._artWrap = new St.Bin({
+        this._artWrap = new St.Button({
             style_class: 'ytmd-art-wrap',
             x_expand: false,
             y_expand: false,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
+            accessible_name: 'Show YouTube Music',
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+        });
+        this._artStack = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
         });
         this._art = new St.Widget({
             style_class: 'ytmd-art',
@@ -274,7 +285,30 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._art.add_child(this._artPlaceholder);
-        this._artWrap.set_child(this._art);
+        this._artOverlay = new St.Widget({
+            style_class: 'ytmd-art-overlay',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+            reactive: false,
+            opacity: 0,
+        });
+        this._artOverlayIcon = new St.Icon({
+            gicon: this._fileIcon('open-in-window.svg'),
+            icon_size: ART_OVERLAY_ICON_SIZES.medium,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._artOverlay.add_child(this._artOverlayIcon);
+        this._artStack.add_child(this._art);
+        this._artStack.add_child(this._artOverlay);
+        this._artWrap.set_child(this._artStack);
+        this._artWrap.set_clip_to_allocation(true);
+        this._artStack.set_clip_to_allocation(true);
+        this._artWrap.connect('notify::hover', () => this._updateArtOverlay());
+        this._artWrap.connect('key-focus-in', () => this._updateArtOverlay());
+        this._artWrap.connect('key-focus-out', () => this._updateArtOverlay());
+        this._artWrap.connect('clicked', () => this._call('ShowMainWindow'));
         playerRow.add_child(this._artWrap);
 
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-details'});
@@ -400,10 +434,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._artWrap.set_size(artSize, artSize);
         this._artWrap.set_width(artSize);
         this._artWrap.set_height(artSize);
+        this._artStack.set_size(artSize, artSize);
+        this._artStack.set_width(artSize);
+        this._artStack.set_height(artSize);
         this._art.set_size(artSize, artSize);
         this._art.set_width(artSize);
         this._art.set_height(artSize);
         this._art.set_clip_to_allocation(true);
+        this._artOverlayIcon.icon_size = ART_OVERLAY_ICON_SIZES[size];
         this._artPlaceholder.icon_size = Math.max(16, Math.floor(artSize / 3));
         const artUrl = this._artUrl;
         this._artUrl = null;
@@ -773,6 +811,15 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         return String(status).toLowerCase();
     }
 
+    _updateArtOverlay() {
+        const visible = this._artWrap.hover || this._artWrap.has_key_focus();
+        this._artOverlay.ease({
+            opacity: visible ? 255 : 0,
+            duration: 150,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        });
+    }
+
     _clearLikeOverride() {
         this._likeOverride = null;
         if (this._likeOverrideTimer) {
@@ -873,6 +920,9 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._artWrap.set_size(size, size);
         this._artWrap.set_width(size);
         this._artWrap.set_height(size);
+        this._artStack.set_size(size, size);
+        this._artStack.set_width(size);
+        this._artStack.set_height(size);
         this._art.set_size(size, size);
         this._art.set_width(size);
         this._art.set_height(size);

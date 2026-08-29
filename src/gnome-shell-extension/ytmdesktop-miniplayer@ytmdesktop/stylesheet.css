@@ -38,6 +38,7 @@
 
 .ytmd-size-small .ytmd-title { font-size: 13px; }
 .ytmd-size-small .ytmd-art-wrap,
+.ytmd-size-small .ytmd-art-overlay,
 .ytmd-size-small .ytmd-art {
   width: 48px;
   height: 48px;
@@ -48,6 +49,7 @@
   border-radius: 6px;
 }
 .ytmd-size-medium .ytmd-art-wrap,
+.ytmd-size-medium .ytmd-art-overlay,
 .ytmd-size-medium .ytmd-art {
   width: 96px;
   height: 96px;
@@ -59,6 +61,7 @@
 }
 .ytmd-size-large .ytmd-title { font-size: 18px; }
 .ytmd-size-large .ytmd-art-wrap,
+.ytmd-size-large .ytmd-art-overlay,
 .ytmd-size-large .ytmd-art {
   width: 128px;
   height: 128px;
@@ -187,6 +190,7 @@
 }
 
 .ytmd-art-wrap,
+.ytmd-art-overlay,
 .ytmd-art {
   width: 96px;
   height: 96px;
@@ -199,6 +203,15 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.ytmd-art-wrap {
+  padding: 0;
+  border-width: 0;
+}
+
+.ytmd-art-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .ytmd-mini-progress-track {

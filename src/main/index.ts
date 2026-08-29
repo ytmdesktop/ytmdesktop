@@ -720,6 +720,12 @@ function toggleMainWindowVisibility() {
     return;
   }
 
+  showMainWindow();
+}
+
+function showMainWindow() {
+  if (!mainWindow) return;
+
   if (mainWindow.isMinimized()) mainWindow.restore();
   mainWindow.show();
   mainWindow.focus();
@@ -2060,6 +2066,7 @@ app.on("ready", async () => {
         search: searchYtm,
         playResult: playMiniPlayerResult,
         toggleMainWindow: toggleMainWindowVisibility,
+        showMainWindow,
         openSettings: createOrShowSettingsWindow,
         quit: () => app.quit()
       },

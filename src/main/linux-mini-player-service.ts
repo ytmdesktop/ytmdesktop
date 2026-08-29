@@ -26,6 +26,7 @@ type MiniPlayerActions = {
   search(query: string): Promise<MiniPlayerSearchResult[]>;
   playResult(videoId: string, action: MiniPlayerPlayResultAction): void;
   toggleMainWindow(): void;
+  showMainWindow(): void;
   openSettings(): void;
   quit(): void;
 };
@@ -107,6 +108,7 @@ export default class LinuxMiniPlayerService {
           }
         },
         ToggleMainWindow: { handler: () => this.actions.toggleMainWindow() },
+        ShowMainWindow: { handler: () => this.actions.showMainWindow() },
         OpenSettings: { handler: () => this.actions.openSettings() },
         Quit: { handler: () => this.actions.quit() },
         Search: {
