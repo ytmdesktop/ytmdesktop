@@ -182,6 +182,7 @@ let linuxMiniPlayerService: LinuxMiniPlayerService = null;
 let ytmAuthenticated = false;
 let resumeLastTrackPending = false;
 let resumeLastTrackTimeout: NodeJS.Timeout | null = null;
+let pendingMixSeek: { videoId: string; seconds: number } | null = null;
 
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
@@ -856,16 +857,27 @@ function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
     return;
   }
   if (command === "startMix") {
-    const videoId = playerStateStore.getState().videoDetails?.id || lastVideoId || store.get("state.lastVideoId");
+    const state = playerStateStore.getState();
+    const videoId = state.videoDetails?.id || lastVideoId || store.get("state.lastVideoId");
     if (!ytmView || !videoId) return;
+    const wasPlaying = state.trackState === VideoState.Playing;
+    const playlistId = state.playlistId || lastPlaylistId || "";
+    if (wasPlaying && playlistId.startsWith("RDAMVM")) return;
+    pendingMixSeek = {
+      videoId,
+      seconds: wasPlaying ? state.videoProgress : 0
+    };
+    if (!wasPlaying) ytmView.webContents.send("remoteControl:execute", "seekTo", 0);
     ytmView.webContents.send("remoteControl:execute", "navigate", {
       watchEndpoint: {
         videoId,
         playlistId: `RDAMVM${videoId}`
       }
     });
-    miniPlayerPauseHeld = false;
-    nudgePlayback();
+    if (!wasPlaying) {
+      miniPlayerPauseHeld = false;
+      nudgePlayback();
+    }
     return;
   }
   if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
@@ -1856,6 +1868,11 @@ app.on("ready", async () => {
       if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
       resumeLastTrackTimeout = null;
       ytmView.webContents.send("remoteControl:execute", "play");
+    }
+    if (pendingMixSeek) {
+      const seekTo = videoDetails.videoId === pendingMixSeek.videoId ? pendingMixSeek.seconds : 0;
+      pendingMixSeek = null;
+      ytmView.webContents.send("remoteControl:execute", "seekTo", seekTo);
     }
   });
 
