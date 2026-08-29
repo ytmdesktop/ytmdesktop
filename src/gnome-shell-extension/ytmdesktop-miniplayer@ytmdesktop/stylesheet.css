@@ -1,0 +1,100 @@
+.ytmd-menu .popup-menu-content {
+  padding: 0;
+}
+
+.ytmd-popup {
+  width: 370px;
+  padding: 14px;
+  spacing: 12px;
+}
+
+.ytmd-player-row {
+  spacing: 16px;
+}
+
+.ytmd-art {
+  width: 112px;
+  height: 112px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-details {
+  spacing: 6px;
+}
+
+.ytmd-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ytmd-artist {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+}
+
+.ytmd-slider {
+  height: 14px;
+}
+
+.ytmd-times {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+}
+
+.ytmd-controls {
+  spacing: 10px;
+}
+
+.ytmd-icon-button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: transparent;
+  border-radius: 99px;
+}
+
+.ytmd-icon-button:hover,
+.ytmd-icon-button:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.ytmd-play-button {
+  width: 44px;
+  height: 44px;
+  color: #151515;
+  background-color: #ffffff;
+}
+
+.ytmd-play-button:hover,
+.ytmd-play-button:focus {
+  color: #151515;
+  background-color: #f2f2f2;
+}
+
+.ytmd-open-button {
+  padding: 8px 12px;
+  color: #151515;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+
+.ytmd-open-button:hover,
+.ytmd-open-button:focus {
+  color: #151515;
+  background-color: #f2f2f2;
+}
+
+.ytmd-footer {
+  padding-top: 8px;
+  spacing: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-quit-button:hover,
+.ytmd-quit-button:focus {
+  color: #ffffff;
+  background-color: #c42b2b;
+}

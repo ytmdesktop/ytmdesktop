@@ -1,0 +1,7 @@
+{
+  "uuid": "ytmdesktop-miniplayer@ytmdesktop",
+  "name": "YTMDesktop Mini Player",
+  "description": "A panel-anchored mini player for YouTube Music Desktop App.",
+  "shell-version": ["50"],
+  "version": 2
+}
