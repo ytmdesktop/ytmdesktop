@@ -79,9 +79,23 @@ export type PlayerState = {
   hasFullMetadata: boolean;
 };
 
-export type MiniPlayerCommand = "previous" | "playPause" | "next" | "seekTo";
+export type MiniPlayerCommand =
+  | "previous"
+  | "playPause"
+  | "next"
+  | "seekTo"
+  | "toggleLike"
+  | "toggleDislike"
+  | "repeatMode"
+  | "shuffle"
+  | "setVolume"
+  | "mute"
+  | "startMix";
 
 export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "needs-main-app";
+
+export type MiniPlayerLikeStatus = "like" | "dislike" | "indifferent";
+export type MiniPlayerRepeatMode = "none" | "all" | "one";
 
 export type MiniPlayerTrack = {
   id: string;
@@ -89,6 +103,7 @@ export type MiniPlayerTrack = {
   artist: string;
   durationSeconds: number;
   artworkUrl: string | null;
+  likeStatus: MiniPlayerLikeStatus;
 };
 
 export type MiniPlayerSnapshot = {
@@ -100,5 +115,30 @@ export type MiniPlayerSnapshot = {
   canPlay: boolean;
   canPrevious: boolean;
   canNext: boolean;
+  likeStatus: MiniPlayerLikeStatus;
+  repeatMode: MiniPlayerRepeatMode;
+  volume: number;
+  muted: boolean;
   message: string | null;
 };
+
+export type MiniPlayerSearchResult = {
+  id: string;
+  title: string;
+  artist: string;
+  duration: string | null;
+  artworkUrl: string | null;
+  playlistId: string | null;
+};
+
+export type MiniPlayerSearchStatus = "idle" | "loading" | "ready" | "error";
+
+export type MiniPlayerSearchSnapshot = {
+  version: 1;
+  query: string;
+  status: MiniPlayerSearchStatus;
+  results: MiniPlayerSearchResult[];
+  message: string | null;
+};
+
+export type MiniPlayerPlayResultAction = "now" | "next";

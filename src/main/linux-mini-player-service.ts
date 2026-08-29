@@ -1,13 +1,30 @@
 import log from "electron-log";
 import { defineInterface, DefinedInterface, ExportRegistration, MessageBus, NameRegistration, sessionBus } from "dbus-native";
 
-import { MiniPlayerCommand, MiniPlayerSnapshot, MiniPlayerStatus, PlayerState, VideoState } from "./player-state-store";
+import {
+  LikeStatus,
+  MiniPlayerCommand,
+  MiniPlayerLikeStatus,
+  MiniPlayerPlayResultAction,
+  MiniPlayerRepeatMode,
+  MiniPlayerSearchResult,
+  MiniPlayerSearchSnapshot,
+  MiniPlayerSnapshot,
+  MiniPlayerStatus,
+  PlayerState,
+  RepeatMode,
+  VideoState
+} from "./player-state-store";
 
 export const MINI_PLAYER_SERVICE = "io.github.ytmdesktop.MiniPlayer";
 export const MINI_PLAYER_PATH = "/io/github/ytmdesktop/MiniPlayer";
 
+const MAX_SEARCH_QUERY_LENGTH = 200;
+
 type MiniPlayerActions = {
   command(command: MiniPlayerCommand, value?: number): void;
+  search(query: string): Promise<MiniPlayerSearchResult[]>;
+  playResult(videoId: string, action: MiniPlayerPlayResultAction): void;
   toggleMainWindow(): void;
   openSettings(): void;
   quit(): void;
@@ -29,6 +46,7 @@ export default class LinuxMiniPlayerService {
   private lastImmediateSignature = "";
   private lastSignalAt = 0;
   private progressSignalTimeout: NodeJS.Timeout | null = null;
+  private searchRequestId = 0;
   private bus: MessageBus | null = null;
   private definition: DefinedInterface | null = null;
   private exported: ExportRegistration | null = null;
@@ -68,18 +86,46 @@ export default class LinuxMiniPlayerService {
         Command: {
           in: { command: "s", value: "d" },
           handler: ({ command, value }: { command: string; value: number }) => {
-            const allowedCommands = new Set<MiniPlayerCommand>(["previous", "playPause", "next", "seekTo"]);
+            const allowedCommands = new Set<MiniPlayerCommand>([
+              "previous",
+              "playPause",
+              "next",
+              "seekTo",
+              "toggleLike",
+              "toggleDislike",
+              "repeatMode",
+              "shuffle",
+              "setVolume",
+              "mute",
+              "startMix"
+            ]);
             if (!allowedCommands.has(command as MiniPlayerCommand)) return;
             if (command === "seekTo" && (!Number.isFinite(value) || value < 0)) return;
+            if (command === "setVolume" && (!Number.isFinite(value) || value < 0 || value > 100)) return;
+            if (command === "repeatMode" && ![0, 1, 2].includes(value)) return;
             this.actions.command(command as MiniPlayerCommand, value);
           }
         },
         ToggleMainWindow: { handler: () => this.actions.toggleMainWindow() },
         OpenSettings: { handler: () => this.actions.openSettings() },
-        Quit: { handler: () => this.actions.quit() }
+        Quit: { handler: () => this.actions.quit() },
+        Search: {
+          in: { query: "s" },
+          handler: ({ query }: { query: string }) => {
+            this.startSearch(query);
+          }
+        },
+        PlayResult: {
+          in: { videoId: "s", action: "s" },
+          handler: ({ videoId, action }: { videoId: string; action: string }) => {
+            if (!videoId || (action !== "now" && action !== "next")) return;
+            this.actions.playResult(videoId, action);
+          }
+        }
       },
       signals: {
-        StateChanged: { args: { stateJson: "s" } }
+        StateChanged: { args: { stateJson: "s" } },
+        SearchResultsChanged: { args: { resultsJson: "s" } }
       }
     });
 
@@ -115,6 +161,7 @@ export default class LinuxMiniPlayerService {
   }
 
   async stop() {
+    this.searchRequestId += 1;
     if (this.progressSignalTimeout) clearTimeout(this.progressSignalTimeout);
     const exported = this.exported;
     const ownedName = this.ownedName;
@@ -140,6 +187,8 @@ export default class LinuxMiniPlayerService {
     const video = this.playerState.videoDetails;
     const queueReady = !!video && (this.playerState.queue?.items.length ?? 0) > 0;
     const artworkUrl = video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null;
+    const likeStatus = toLikeStatus(video?.likeStatus);
+    const repeatMode = toRepeatMode(this.playerState.queue?.repeatMode);
 
     let status: MiniPlayerStatus;
     let message: string | null = null;
@@ -169,13 +218,18 @@ export default class LinuxMiniPlayerService {
             title: video.title,
             artist: video.author,
             durationSeconds: video.durationSeconds,
-            artworkUrl
+            artworkUrl,
+            likeStatus
           }
         : null,
       progressSeconds: this.playerState.videoProgress,
-      canPlay: this.sessionState.authenticated && (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app" && status !== "loading",
+      canPlay: this.sessionState.authenticated && (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app",
       canPrevious: this.sessionState.authenticated && queueReady,
       canNext: this.sessionState.authenticated && queueReady,
+      likeStatus,
+      repeatMode,
+      volume: Math.max(0, Math.min(100, this.playerState.volume ?? 0)),
+      muted: !!this.playerState.muted,
       message
     };
   }
@@ -211,4 +265,56 @@ export default class LinuxMiniPlayerService {
     this.lastSignalAt = Date.now();
     this.definition.emit.StateChanged(this.stateJson);
   }
+
+  private startSearch(rawQuery: string) {
+    const query = rawQuery.replace(/\s+/g, " ").trim().slice(0, MAX_SEARCH_QUERY_LENGTH);
+    const requestId = ++this.searchRequestId;
+
+    if (!query) {
+      this.emitSearch({ version: 1, query: "", status: "idle", results: [], message: null });
+      return;
+    }
+
+    this.emitSearch({ version: 1, query, status: "loading", results: [], message: null });
+    void this.actions
+      .search(query)
+      .then(results => {
+        if (requestId !== this.searchRequestId) return;
+        this.emitSearch({
+          version: 1,
+          query,
+          status: "ready",
+          results,
+          message: results.length ? null : "No songs found"
+        });
+      })
+      .catch(error => {
+        if (requestId !== this.searchRequestId) return;
+        log.error("Linux mini-player search failed", error);
+        this.emitSearch({
+          version: 1,
+          query,
+          status: "error",
+          results: [],
+          message: "Search failed"
+        });
+      });
+  }
+
+  private emitSearch(snapshot: MiniPlayerSearchSnapshot) {
+    if (!this.definition) return;
+    this.definition.emit.SearchResultsChanged(JSON.stringify(snapshot));
+  }
+}
+
+function toLikeStatus(status: LikeStatus | undefined): MiniPlayerLikeStatus {
+  if (status === LikeStatus.Like) return "like";
+  if (status === LikeStatus.Dislike) return "dislike";
+  return "indifferent";
+}
+
+function toRepeatMode(mode: RepeatMode | undefined): MiniPlayerRepeatMode {
+  if (mode === RepeatMode.All) return "all";
+  if (mode === RepeatMode.One) return "one";
+  return "none";
 }

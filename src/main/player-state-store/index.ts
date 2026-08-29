@@ -320,7 +320,7 @@ class PlayerStateStore {
           })
         }
       : null;
-    if (this.videoDetails) {
+    if (this.videoDetails && likeStatus) {
       this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
     }
     this.adPlaying = adPlaying === true;

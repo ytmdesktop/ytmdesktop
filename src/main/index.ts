@@ -22,10 +22,11 @@ import Conf from "conf";
 import log from "electron-log";
 import path from "path";
 import fs from "fs/promises";
+import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { MiniPlayerCommand, PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { MiniPlayerCommand, MiniPlayerPlayResultAction, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
 
@@ -365,6 +366,7 @@ const store = new Conf<StoreSchema>({
     playback: {
       continueWhereYouLeftOff: true,
       continueWhereYouLeftOffPaused: true,
+      linuxMiniPlayerAutoplay: false,
       enableSpeakerFill: false,
       progressInTaskbar: false,
       ratioVolume: false
@@ -768,6 +770,119 @@ function resumeLastTrack() {
   }, 5000);
 }
 
+function searchYtm(query: string): Promise<MiniPlayerSearchResult[]> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:search:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Search timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { results?: MiniPlayerSearchResult[]; error?: string }) => {
+      clearTimeout(timeout);
+      if (payload?.error) {
+        reject(new Error(payload.error));
+        return;
+      }
+      resolve(Array.isArray(payload?.results) ? payload.results : []);
+    });
+
+    ytmView.webContents.send("ytmView:search", requestId, query);
+  });
+}
+
+function playMiniPlayerResult(videoId: string, action: MiniPlayerPlayResultAction) {
+  if (!ytmView) return;
+  if (action === "now") {
+    ytmView.webContents.send("remoteControl:execute", "navigate", {
+      watchEndpoint: { videoId }
+    });
+    miniPlayerPauseHeld = false;
+    nudgePlayback();
+    return;
+  }
+  ytmView.webContents.send("remoteControl:execute", "playNext", videoId);
+}
+
+let playbackNudgeTimeout: NodeJS.Timeout | null = null;
+let miniPlayerPauseHeld = false;
+
+function clearPlaybackNudge() {
+  if (playbackNudgeTimeout) {
+    clearTimeout(playbackNudgeTimeout);
+    playbackNudgeTimeout = null;
+  }
+}
+
+function nudgePlayback() {
+  if (!ytmView || miniPlayerPauseHeld) return;
+  ytmView.webContents.send("remoteControl:execute", "play");
+  clearPlaybackNudge();
+  playbackNudgeTimeout = setTimeout(() => {
+    playbackNudgeTimeout = null;
+    if (!ytmView || miniPlayerPauseHeld) return;
+    if (playerStateStore.getState().trackState === VideoState.Playing) return;
+    if (playerStateStore.getState().videoDetails) ytmView.webContents.send("remoteControl:execute", "play");
+  }, 700);
+}
+
+function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
+  if (command === "playPause") {
+    if (!playerStateStore.getState().videoDetails) {
+      miniPlayerPauseHeld = false;
+      resumeLastTrack();
+      return;
+    }
+    const wasPlaying = playerStateStore.getState().trackState === VideoState.Playing;
+    miniPlayerPauseHeld = wasPlaying;
+    clearPlaybackNudge();
+    ytmView?.webContents.send("remoteControl:execute", "playPause");
+    if (!wasPlaying) nudgePlayback();
+    return;
+  }
+  if (command === "repeatMode") {
+    const modes = ["NONE", "ALL", "ONE"] as const;
+    ytmView?.webContents.send("remoteControl:execute", "repeatMode", modes[value ?? 0] ?? "NONE");
+    return;
+  }
+  if (command === "mute") {
+    ytmView?.webContents.send("remoteControl:execute", playerStateStore.getState().muted ? "unmute" : "mute");
+    return;
+  }
+  if (command === "startMix") {
+    const videoId = playerStateStore.getState().videoDetails?.id || lastVideoId || store.get("state.lastVideoId");
+    if (!ytmView || !videoId) return;
+    ytmView.webContents.send("remoteControl:execute", "navigate", {
+      watchEndpoint: {
+        videoId,
+        playlistId: `RDAMVM${videoId}`
+      }
+    });
+    miniPlayerPauseHeld = false;
+    nudgePlayback();
+    return;
+  }
+  if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
+}
+
+function maybeAutoplayMiniPlayer() {
+  if (!isLinux || !store.get("playback.linuxMiniPlayerAutoplay")) return;
+  if (!ytmAuthenticated || !hasSavedTrack()) return;
+
+  setTimeout(() => {
+    if (miniPlayerPauseHeld) return;
+    if (playerStateStore.getState().trackState === VideoState.Playing) return;
+    if (playerStateStore.getState().videoDetails) nudgePlayback();
+    else resumeLastTrack();
+  }, 1800);
+}
+
 // Shortcut registration
 function registerShortcuts() {
   const shortcuts = store.get("shortcuts");
@@ -951,11 +1066,52 @@ function sendMainWindowStateIpc() {
 }
 
 // Functions with call to ytmView renderer
+function isYtmSearchUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === "music.youtube.com" && parsed.pathname.startsWith("/search");
+  } catch {
+    return false;
+  }
+}
+
+function isYtmWatchUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === "music.youtube.com" && parsed.pathname === "/watch";
+  } catch {
+    return false;
+  }
+}
+
+function watchUrlFromLastVideo(): string | null {
+  const videoId = lastVideoId || store.get("state.lastVideoId");
+  if (!videoId) return null;
+  const playlistId = lastPlaylistId || store.get("state.lastPlaylistId");
+  const url = new URL("https://music.youtube.com/watch");
+  url.searchParams.set("v", videoId);
+  if (playlistId) url.searchParams.set("list", playlistId);
+  return url.toString();
+}
+
+function initialYtmUrl(): string {
+  if (!store.get("playback.continueWhereYouLeftOff")) return "https://music.youtube.com/";
+
+  const saved = lastUrl || store.get("state.lastUrl");
+  if (saved && isYtmWatchUrl(saved)) return saved;
+
+  const fromVideo = watchUrlFromLastVideo();
+  if (fromVideo) return fromVideo;
+
+  if (saved?.startsWith("https://music.youtube.com/") && !isYtmSearchUrl(saved)) return saved;
+  return "https://music.youtube.com/";
+}
+
 function ytmViewNavigated() {
   if (ytmView !== null) {
     const url = ytmView.webContents.getURL();
     if (url.startsWith("https://music.youtube.com/")) {
-      lastUrl = url;
+      if (!isYtmSearchUrl(url)) lastUrl = url;
       ytmView.webContents.send("ytmView:navigationStateChanged", {
         canGoBack: ytmView.webContents.navigationHistory.canGoBack(),
         canGoForward: ytmView.webContents.navigationHistory.canGoForward()
@@ -1098,7 +1254,12 @@ const createYTMView = (): void => {
       contextIsolation: true,
       partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
       preload: path.join(__dirname, `../renderer/windows/ytmview/preload.js`),
-      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
+      autoplayPolicy:
+        isLinux && store.get("playback.linuxMiniPlayerAutoplay")
+          ? "no-user-gesture-required"
+          : store.get("playback.continueWhereYouLeftOffPaused")
+            ? "document-user-activation-required"
+            : "no-user-gesture-required"
     }
   });
   companionServer.provide(store, memoryStore, ytmView);
@@ -1246,23 +1407,10 @@ const createYTMView = (): void => {
 
   memoryStore.set("ytmViewLoadingStatus", "Initialized");
 
-  let navigateDefault = true;
-
-  const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
-  if (continueWhereYouLeftOff) {
-    const lastUrl: string = store.get("state.lastUrl");
-    if (lastUrl) {
-      if (lastUrl.startsWith("https://music.youtube.com/")) {
-        ytmView.webContents.loadURL(lastUrl);
-        navigateDefault = false;
-      }
-    }
-  }
-
-  if (navigateDefault) {
-    ytmView.webContents.loadURL("https://music.youtube.com/");
-    store.set("state.lastUrl", "https://music.youtube.com/");
-  }
+  const startupUrl = initialYtmUrl();
+  lastUrl = startupUrl;
+  store.set("state.lastUrl", startupUrl);
+  ytmView.webContents.loadURL(startupUrl);
 
   ytmViewLoadTimeout = setTimeout(() => {
     memoryStore.set("ytmViewLoadTimedout", true);
@@ -1663,6 +1811,7 @@ app.on("ready", async () => {
       ratioVolume.ytmViewLoaded();
       // TODO: this is just a hack fix for custom css to update CSS when the view loads
       customCss.updateCSS();
+      maybeAutoplayMiniPlayer();
     }
   });
 
@@ -1890,13 +2039,9 @@ app.on("ready", async () => {
   if (isLinux) {
     linuxMiniPlayerService = new LinuxMiniPlayerService(
       {
-        command: (command: MiniPlayerCommand, value?: number) => {
-          if (command === "playPause" && !playerStateStore.getState().videoDetails) {
-            resumeLastTrack();
-            return;
-          }
-          if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
-        },
+        command: handleMiniPlayerCommand,
+        search: searchYtm,
+        playResult: playMiniPlayerResult,
         toggleMainWindow: toggleMainWindowVisibility,
         openSettings: createOrShowSettingsWindow,
         quit: () => app.quit()
@@ -2071,6 +2216,7 @@ app.on("before-quit", () => {
   log.info("Application quitting\n\n");
   applicationQuitting = true;
   if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  if (playbackNudgeTimeout) clearTimeout(playbackNudgeTimeout);
   void linuxMiniPlayerService?.stop();
   saveState();
 });

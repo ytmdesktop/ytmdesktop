@@ -13,6 +13,9 @@ import * as Slider from 'resource:///org/gnome/shell/ui/slider.js';
 
 const SERVICE = 'io.github.ytmdesktop.MiniPlayer';
 const OBJECT_PATH = '/io/github/ytmdesktop/MiniPlayer';
+const SEARCH_DEBOUNCE_MS = 900;
+const LAYOUTS = ['small', 'medium', 'large'];
+const LAYOUT_SIZES = {small: 48, medium: 96, large: 128};
 
 const DBUS_XML = `
 <node>
@@ -27,8 +30,18 @@ const DBUS_XML = `
     <method name="ToggleMainWindow"/>
     <method name="OpenSettings"/>
     <method name="Quit"/>
+    <method name="Search">
+      <arg type="s" name="query" direction="in"/>
+    </method>
+    <method name="PlayResult">
+      <arg type="s" name="videoId" direction="in"/>
+      <arg type="s" name="action" direction="in"/>
+    </method>
     <signal name="StateChanged">
       <arg type="s" name="stateJson"/>
+    </signal>
+    <signal name="SearchResultsChanged">
+      <arg type="s" name="resultsJson"/>
     </signal>
   </interface>
 </node>`;
@@ -42,21 +55,63 @@ function formatTime(seconds) {
     return `${minutes}:${remainder.toString().padStart(2, '0')}`;
 }
 
+function addScrollChild(scrollView, actor) {
+    if (scrollView.add_actor)
+        scrollView.add_actor(actor);
+    else
+        scrollView.add_child(actor);
+}
+
+function layoutPath() {
+    return GLib.build_filenamev([GLib.get_user_config_dir(), 'ytmdesktop-miniplayer', 'layout']);
+}
+
+function readLayout() {
+    try {
+        const file = Gio.File.new_for_path(layoutPath());
+        const [, contents] = file.load_contents(null);
+        const text = new TextDecoder().decode(contents).trim();
+        if (LAYOUTS.includes(text))
+            return text;
+    } catch (error) {}
+    return 'medium';
+}
+
+function writeLayout(size) {
+    const dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), 'ytmdesktop-miniplayer']));
+    try {
+        dir.make_directory_with_parents(null);
+    } catch (error) {}
+    dir.get_child('layout').replace_contents(new TextEncoder().encode(size), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+}
+
 const MiniPlayerIndicator = GObject.registerClass(
 class MiniPlayerIndicator extends PanelMenu.Button {
-    _init() {
+    _init(extension) {
         super._init(0.0, 'YTMDesktop Mini Player');
+        this._extensionPath = extension.path;
 
         this._state = null;
+        this._searchState = null;
         this._localProgress = 0;
         this._dragging = false;
         this._seekTarget = null;
         this._seekDeadline = 0;
         this._artUrl = null;
+        this._searchTimer = 0;
+        this._lastSearchQuery = '';
+        this._layout = readLayout();
+        this._volumeDragging = false;
+        this._likeOverride = null;
+        this._likeOverrideTimer = 0;
 
+        this.add_style_class_name('ytmd-tray-button');
         this.add_child(new St.Icon({
-            icon_name: 'youtube-music-desktop-app',
-            style_class: 'system-status-icon',
+            gicon: new Gio.FileIcon({
+                file: Gio.File.new_for_path(`${this._extensionPath}/icons/ytmd-panel.svg`),
+            }),
+            style_class: 'system-status-icon ytmd-tray-icon',
+            icon_size: 16,
         }));
 
         this._buildMenu();
@@ -74,6 +129,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
                 this._ownerChangedId = proxy.connect('notify::g-name-owner', () => this._syncOwner());
                 this._stateChangedId = proxy.connectSignal('StateChanged', (_proxy, _sender, [stateJson]) => this._applyStateJson(stateJson));
+                this._searchChangedId = proxy.connectSignal('SearchResultsChanged', (_proxy, _sender, [resultsJson]) => this._applySearchJson(resultsJson));
                 this._syncOwner();
             },
             null,
@@ -96,9 +152,57 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
     _buildMenu() {
         this.menu.box.add_style_class_name('ytmd-menu');
+
+        const searchWrap = new St.BoxLayout({vertical: true, style_class: 'ytmd-search-wrap', x_expand: true});
+        this._searchWrap = searchWrap;
+        this.menu.box.add_child(searchWrap);
+        searchWrap.connect('key-press-event', (_actor, event) => {
+            if (event.get_key_symbol() === Clutter.KEY_Escape)
+                return Clutter.EVENT_PROPAGATE;
+            return Clutter.EVENT_STOP;
+        });
+
+        this._searchEntry = new St.Entry({
+            style_class: 'ytmd-search-entry',
+            hint_text: 'Search',
+            can_focus: true,
+            track_hover: true,
+            x_expand: true,
+        });
+        this._searchEntry.set_primary_icon(new St.Icon({
+            icon_name: 'edit-find-symbolic',
+            icon_size: 16,
+        }));
+        const searchText = this._searchEntry.get_clutter_text();
+        searchText.connect('activate', () => {
+            this._cancelSearchTimer();
+            this._runSearch();
+        });
+        searchText.connect('text-changed', () => this._onSearchTextChanged());
+        try {
+            searchText.connect('preedit-changed', () => this._onSearchTextChanged());
+        } catch (error) {}
+        searchWrap.add_child(this._searchEntry);
+
+        this._resultsBox = new St.BoxLayout({vertical: true, style_class: 'ytmd-results-box', x_expand: true});
+        this._resultsStatus = new St.Label({text: '', style_class: 'ytmd-results-status'});
+        this._resultsStatus.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this._resultsList = new St.BoxLayout({vertical: true, style_class: 'ytmd-results', x_expand: true});
+        this._resultsScroll = new St.ScrollView({
+            style_class: 'ytmd-results-scroll',
+            overlay_scrollbars: true,
+            x_expand: true,
+            hscrollbar_policy: St.PolicyType.NEVER,
+            vscrollbar_policy: St.PolicyType.AUTOMATIC,
+        });
+        addScrollChild(this._resultsScroll, this._resultsList);
+        this._resultsBox.add_child(this._resultsStatus);
+        this._resultsBox.add_child(this._resultsScroll);
+        this._resultsBox.visible = false;
+        searchWrap.add_child(this._resultsBox);
+
         const item = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
         this.menu.addMenuItem(item);
-
         const root = new St.BoxLayout({vertical: true, style_class: 'ytmd-popup'});
         item.add_child(root);
 
@@ -122,6 +226,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(this._title);
         details.add_child(this._artist);
 
+        this._seekBox = new St.BoxLayout({vertical: true, style_class: 'ytmd-seek-box', x_expand: true});
         this._slider = new Slider.Slider(0);
         this._slider.x_expand = true;
         this._slider.style_class = 'slider ytmd-slider';
@@ -139,23 +244,68 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 this._command('seekTo', target);
             }
         });
-        details.add_child(this._slider);
+        this._seekBox.add_child(this._slider);
 
         const times = new St.BoxLayout({style_class: 'ytmd-times'});
         this._currentTime = new St.Label({text: '0:00'});
         this._totalTime = new St.Label({text: '0:00', x_expand: true, x_align: Clutter.ActorAlign.END});
         times.add_child(this._currentTime);
         times.add_child(this._totalTime);
-        details.add_child(times);
+        this._seekBox.add_child(times);
+        details.add_child(this._seekBox);
+
+        this._miniProgressTrack = new St.BoxLayout({style_class: 'ytmd-mini-progress-track', x_expand: true});
+        this._miniProgress = new St.Widget({style_class: 'ytmd-mini-progress-fill'});
+        this._miniProgressTrack.add_child(this._miniProgress);
+        details.add_child(this._miniProgressTrack);
 
         const controls = new St.BoxLayout({style_class: 'ytmd-controls', x_align: Clutter.ActorAlign.CENTER});
         this._previousButton = this._iconButton('media-skip-backward-symbolic', 'Previous', () => this._command('previous'));
         this._playButton = this._iconButton('media-playback-start-symbolic', 'Play', () => this._command('playPause'), 'ytmd-play-button');
         this._nextButton = this._iconButton('media-skip-forward-symbolic', 'Next', () => this._command('next'));
+        this._likeButton = this._iconButton('thumbs-up-symbolic.svg', 'Like', () => this._toggleLike(), 'ytmd-like-button');
+        this._dislikeButton = this._iconButton('thumbs-down-symbolic.svg', 'Dislike', () => this._toggleDislike());
+        this._mixButton = this._iconButton('mix-symbolic.svg', 'Start mix', () => this._command('startMix'));
+        this._repeatButton = this._iconButton('media-playlist-repeat-symbolic', 'Repeat', () => this._cycleRepeat());
+        this._shuffleButton = this._iconButton('media-playlist-shuffle-symbolic', 'Shuffle', () => this._command('shuffle'));
         controls.add_child(this._previousButton);
         controls.add_child(this._playButton);
         controls.add_child(this._nextButton);
+        controls.add_child(this._likeButton);
+        controls.add_child(this._dislikeButton);
+        controls.add_child(this._mixButton);
+        controls.add_child(this._repeatButton);
+        controls.add_child(this._shuffleButton);
         details.add_child(controls);
+
+        this._volumeRow = new St.BoxLayout({style_class: 'ytmd-volume-row', x_expand: true});
+        this._muteButton = this._iconButton('audio-volume-high-symbolic', 'Mute', () => this._command('mute'), 'ytmd-volume-icon');
+        this._volumeSlider = new Slider.Slider(0);
+        this._volumeSlider.x_expand = true;
+        this._volumeSlider.style_class = 'slider ytmd-volume-slider';
+        this._volumeDragging = false;
+        this._lastSentVolume = -1;
+        this._volumeSlider.connect('drag-begin', () => {
+            this._volumeDragging = true;
+        });
+        this._volumeSlider.connect('notify::value', () => {
+            if (!this._volumeDragging)
+                return;
+            const volume = Math.round(this._volumeSlider.value * 100);
+            if (volume === this._lastSentVolume)
+                return;
+            this._lastSentVolume = volume;
+            this._command('setVolume', volume);
+        });
+        this._volumeSlider.connect('drag-end', () => {
+            this._volumeDragging = false;
+            const volume = Math.round(this._volumeSlider.value * 100);
+            this._lastSentVolume = volume;
+            this._command('setVolume', volume);
+        });
+        this._volumeRow.add_child(this._muteButton);
+        this._volumeRow.add_child(this._volumeSlider);
+        root.add_child(this._volumeRow);
 
         this._openAppButton = new St.Button({
             label: 'Open YTMusic',
@@ -170,9 +320,71 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
         const footer = new St.BoxLayout({style_class: 'ytmd-footer', x_align: Clutter.ActorAlign.END});
         footer.add_child(this._iconButton('focus-windows-symbolic', 'Show or hide window', () => this._call('ToggleMainWindow')));
-        footer.add_child(this._iconButton('emblem-system-symbolic', 'Settings', () => this._call('OpenSettings')));
+        this._sizeButton = this._iconButton('view-fullscreen-symbolic', 'Size: Medium', () => this._cycleLayout());
+        footer.add_child(this._sizeButton);
+        this._settingsButton = this._iconButton('emblem-system-symbolic', 'Settings', () => this._call('OpenSettings'));
+        footer.add_child(this._settingsButton);
         footer.add_child(this._iconButton('system-shutdown-symbolic', 'Quit', () => this._call('Quit'), 'ytmd-quit-button'));
         root.add_child(footer);
+        this._applyLayout();
+    }
+
+    _applyLayout() {
+        const size = this._layout;
+        for (const name of LAYOUTS)
+            this.menu.box.remove_style_class_name(`ytmd-size-${name}`);
+        this.menu.box.add_style_class_name(`ytmd-size-${size}`);
+
+        const artSize = LAYOUT_SIZES[size];
+        this._art.icon_size = artSize;
+        this._art.set_size(artSize, artSize);
+
+        this._searchWrap.visible = size !== 'small';
+        this._seekBox.visible = size !== 'small';
+        this._miniProgressTrack.visible = size === 'small';
+        this._dislikeButton.visible = size !== 'small';
+        this._mixButton.visible = size !== 'small';
+        this._repeatButton.visible = size === 'large';
+        this._shuffleButton.visible = size === 'large';
+        this._volumeRow.visible = true;
+        this._settingsButton.visible = size !== 'small';
+        if (size === 'small')
+            this._resultsBox.visible = false;
+        else
+            this._renderSearch();
+
+        const sizeLabel = size.charAt(0).toUpperCase() + size.slice(1);
+        this._sizeButton.accessible_name = `Size: ${sizeLabel}`;
+        writeLayout(size);
+        this._updateProgress();
+    }
+
+    _cycleLayout() {
+        const index = LAYOUTS.indexOf(this._layout);
+        this._layout = LAYOUTS[(index + 1) % LAYOUTS.length];
+        this._applyLayout();
+    }
+
+    _cycleRepeat() {
+        const order = ['none', 'all', 'one'];
+        const current = this._state?.repeatMode || 'none';
+        const next = (order.indexOf(current) + 1) % order.length;
+        this._command('repeatMode', next);
+    }
+
+    _fileIcon(fileName) {
+        return new Gio.FileIcon({file: Gio.File.new_for_path(`${this._extensionPath}/icons/${fileName}`)});
+    }
+
+    _setButtonIcon(button, iconName) {
+        const icon = button.get_child();
+        if (iconName.endsWith('.svg')) {
+            icon.icon_name = null;
+            icon.gicon = this._fileIcon(iconName);
+        } else {
+            icon.gicon = null;
+            icon.icon_name = iconName;
+        }
     }
 
     _iconButton(iconName, accessibleName, callback, styleClass = '') {
@@ -183,18 +395,188 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             reactive: true,
             track_hover: true,
         });
-        button.set_child(new St.Icon({icon_name: iconName, icon_size: 22}));
+        const icon = new St.Icon({icon_size: 22});
+        button.set_child(icon);
+        this._setButtonIcon(button, iconName);
         button.connect('clicked', callback);
         return button;
+    }
+
+    _textButton(label, accessibleName, callback) {
+        const button = new St.Button({
+            label,
+            style_class: 'ytmd-result-action',
+            accessible_name: accessibleName,
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+        });
+        button.connect('clicked', callback);
+        return button;
+    }
+
+    _isComposing() {
+        const text = this._searchEntry.get_clutter_text();
+        try {
+            if (text.has_preedit)
+                return Boolean(text.has_preedit());
+            if (text.get_preedit_string) {
+                const preedit = text.get_preedit_string();
+                const value = Array.isArray(preedit) ? preedit[0] : preedit;
+                return Boolean(value);
+            }
+        } catch (error) {}
+        return false;
+    }
+
+    _onSearchTextChanged() {
+        this._cancelSearchTimer();
+        if (!this._searchEntry.get_text().trim()) {
+            this._clearSearch();
+            return;
+        }
+        if (this._isComposing())
+            return;
+        this._searchTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, SEARCH_DEBOUNCE_MS, () => {
+            this._searchTimer = 0;
+            if (this._isComposing())
+                return GLib.SOURCE_REMOVE;
+            this._runSearch();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _clearSearch() {
+        this._lastSearchQuery = '';
+        this._searchState = null;
+        this._renderSearch();
+        this._call('Search', '');
+    }
+
+    _cancelSearchTimer() {
+        if (this._searchTimer) {
+            GLib.source_remove(this._searchTimer);
+            this._searchTimer = 0;
+        }
+    }
+
+    _runSearch() {
+        const query = this._searchEntry.get_text().trim();
+        if (!query) {
+            this._clearSearch();
+            return;
+        }
+        if (query === this._lastSearchQuery && this._searchState?.status === 'loading')
+            return;
+
+        this._lastSearchQuery = query;
+        this._call('Search', query);
+    }
+
+    _applySearchJson(resultsJson) {
+        let nextState;
+        try {
+            nextState = JSON.parse(resultsJson);
+        } catch (error) {
+            console.error(`YTMDesktop search parse failed: ${error.message}`);
+            return;
+        }
+
+        const currentQuery = this._searchEntry.get_text().trim();
+        if (nextState.status !== 'idle' && nextState.query !== currentQuery)
+            return;
+
+        this._searchState = nextState;
+        this._renderSearch();
+    }
+
+    _renderSearch() {
+        if (this._layout === 'small') {
+            this._resultsBox.visible = false;
+            return;
+        }
+
+        const children = this._resultsList.get_children();
+        for (const child of children)
+            child.destroy();
+
+        const search = this._searchState;
+        if (!search || search.status === 'idle') {
+            this._resultsBox.visible = false;
+            return;
+        }
+
+        this._resultsBox.visible = true;
+        if (search.status === 'loading') {
+            this._resultsStatus.text = 'Searching…';
+            this._resultsStatus.visible = true;
+            this._resultsScroll.visible = false;
+            return;
+        }
+
+        if (search.status === 'error' || !search.results?.length) {
+            this._resultsStatus.text = search.message || 'No songs found';
+            this._resultsStatus.visible = true;
+            this._resultsScroll.visible = false;
+            return;
+        }
+
+        this._resultsStatus.visible = false;
+        this._resultsScroll.visible = true;
+        for (const result of search.results)
+            this._resultsList.add_child(this._createResultRow(result));
+    }
+
+    _createResultRow(result) {
+        const row = new St.BoxLayout({style_class: 'ytmd-result-row', x_expand: true});
+        const art = new St.Icon({
+            icon_name: 'audio-x-generic-symbolic',
+            icon_size: 40,
+            style_class: 'ytmd-result-art',
+        });
+        if (result.artworkUrl) {
+            try {
+                art.icon_name = null;
+                art.gicon = new Gio.FileIcon({file: Gio.File.new_for_uri(result.artworkUrl)});
+            } catch (error) {
+                console.error(`YTMDesktop artwork failed: ${error.message}`);
+            }
+        }
+
+        const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-result-details'});
+        const title = new St.Label({text: result.title || 'Unknown title', style_class: 'ytmd-result-title', x_expand: true});
+        title.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        const subtitle = new St.Label({
+            text: [result.artist, result.duration].filter(Boolean).join(' • ') || 'Unknown artist',
+            style_class: 'ytmd-result-artist',
+            x_expand: true,
+        });
+        subtitle.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        details.add_child(title);
+        details.add_child(subtitle);
+
+        const actions = new St.BoxLayout({style_class: 'ytmd-result-actions', y_align: Clutter.ActorAlign.CENTER});
+        actions.add_child(this._iconButton('media-playback-start-symbolic', 'Play now', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
+        actions.add_child(this._iconButton('list-add-symbolic', 'Play next', () => this._call('PlayResult', result.id, 'next'), 'ytmd-result-action'));
+
+        row.add_child(art);
+        row.add_child(details);
+        row.add_child(actions);
+        return row;
     }
 
     _syncOwner() {
         const running = Boolean(this._proxy?.g_name_owner);
         this.visible = running;
-        if (running)
+        if (running) {
             this._requestState();
-        else
+        } else {
+            this._cancelSearchTimer();
+            this._searchState = null;
+            this._lastSearchQuery = '';
+            this._renderSearch();
             this.menu.close();
+        }
     }
 
     _requestState() {
@@ -221,14 +603,35 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
         const incomingProgress = nextState?.progressSeconds ?? 0;
         const trackChanged = this._state?.track?.id !== nextState?.track?.id;
+        const wasPlaying = this._state?.status === 'playing';
+        const duration = this._state?.track?.durationSeconds ?? 0;
+        const incomingLike = nextState?.likeStatus || nextState?.track?.likeStatus;
+        if (trackChanged)
+            this._clearLikeOverride();
+        else if (this._likeOverride && incomingLike === this._likeOverride)
+            this._clearLikeOverride();
         this._state = nextState;
         if (!this._dragging) {
-            if (!trackChanged && this._seekTarget !== null && Math.abs(incomingProgress - this._seekTarget) > 1.5 && Date.now() < this._seekDeadline) {
-                this._updateUi();
-                return;
+            if (trackChanged) {
+                this._seekTarget = null;
+                this._localProgress = incomingProgress;
+            } else if (this._seekTarget !== null && Date.now() < this._seekDeadline) {
+                if (Math.abs(incomingProgress - this._seekTarget) <= 1.5) {
+                    this._seekTarget = null;
+                    this._localProgress = incomingProgress;
+                }
+            } else if (wasPlaying && nextState?.status === 'playing' && duration > 0 && this._localProgress > duration - 2 && incomingProgress < 1.5) {
+                // end-of-track glitch: keep local until the next song id arrives
+            } else if (wasPlaying && nextState?.status === 'playing') {
+                const delta = incomingProgress - this._localProgress;
+                if (delta > 0.35 && delta <= 2.5)
+                    this._localProgress = incomingProgress;
+                else if (delta < -1.25 || delta > 2.5)
+                    this._localProgress = incomingProgress;
+            } else {
+                this._seekTarget = null;
+                this._localProgress = incomingProgress;
             }
-            this._seekTarget = null;
-            this._localProgress = incomingProgress;
         }
         this._updateUi();
     }
@@ -250,8 +653,80 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._setButtonEnabled(this._nextButton, Boolean(this._state?.canNext));
 
         this._slider.reactive = Boolean(track) && this._duration() > 0;
-        this._openAppButton.visible = needsMainApp;
+        this._openAppButton.visible = needsMainApp && this._layout !== 'small';
+        this._updateLikeButtons();
+        this._updateRepeatButton();
+        this._updateVolume();
         this._updateProgress();
+    }
+
+    _currentLikeStatus() {
+        return this._likeOverride || this._state?.likeStatus || this._state?.track?.likeStatus || 'indifferent';
+    }
+
+    _clearLikeOverride() {
+        this._likeOverride = null;
+        if (this._likeOverrideTimer) {
+            GLib.source_remove(this._likeOverrideTimer);
+            this._likeOverrideTimer = 0;
+        }
+    }
+
+    _setLikeOverride(status) {
+        this._likeOverride = status;
+        if (this._likeOverrideTimer)
+            GLib.source_remove(this._likeOverrideTimer);
+        this._likeOverrideTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, () => {
+            this._likeOverrideTimer = 0;
+            this._likeOverride = null;
+            this._updateLikeButtons();
+            return GLib.SOURCE_REMOVE;
+        });
+        this._updateLikeButtons();
+    }
+
+    _toggleLike() {
+        this._setLikeOverride(this._currentLikeStatus() === 'like' ? 'indifferent' : 'like');
+        this._command('toggleLike');
+    }
+
+    _toggleDislike() {
+        this._setLikeOverride(this._currentLikeStatus() === 'dislike' ? 'indifferent' : 'dislike');
+        this._command('toggleDislike');
+    }
+
+    _updateLikeButtons() {
+        const likeStatus = this._currentLikeStatus();
+        const liked = likeStatus === 'like';
+        const disliked = likeStatus === 'dislike';
+        this._setButtonIcon(this._likeButton, liked ? 'thumbs-up-filled-symbolic.svg' : 'thumbs-up-symbolic.svg');
+        this._setButtonIcon(this._dislikeButton, disliked ? 'thumbs-down-filled-symbolic.svg' : 'thumbs-down-symbolic.svg');
+        this._likeButton.accessible_name = liked ? 'Unlike' : 'Like';
+        this._dislikeButton.accessible_name = disliked ? 'Remove dislike' : 'Dislike';
+        this._likeButton[liked ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-like-on');
+        this._dislikeButton[disliked ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-dislike-on');
+    }
+
+    _updateRepeatButton() {
+        const mode = this._state?.repeatMode || 'none';
+        const icon = this._repeatButton.get_child();
+        icon.icon_name = mode === 'one' ? 'media-playlist-repeat-song-symbolic' : 'media-playlist-repeat-symbolic';
+        this._repeatButton.opacity = mode === 'none' ? 120 : 255;
+        this._repeatButton.accessible_name = `Repeat: ${mode}`;
+    }
+
+    _updateVolume() {
+        if (this._volumeDragging)
+            return;
+        const muted = Boolean(this._state?.muted);
+        const volume = this._state?.volume ?? 0;
+        const icon = this._muteButton.get_child();
+        icon.icon_name = muted || volume === 0
+            ? 'audio-volume-muted-symbolic'
+            : volume < 40
+                ? 'audio-volume-low-symbolic'
+                : 'audio-volume-high-symbolic';
+        this._volumeSlider.value = muted ? 0 : Math.max(0, Math.min(1, volume / 100));
     }
 
     _setButtonEnabled(button, enabled) {
@@ -292,11 +767,12 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._totalTime.text = formatTime(duration);
 
         this._slider.value = duration > 0 ? Math.min(1, progress / duration) : 0;
+        const ratio = duration > 0 ? Math.min(1, progress / duration) : 0;
+        const trackWidth = Math.max(this._miniProgressTrack.width || 0, 80);
+        this._miniProgress.set_width(Math.max(2, Math.round(trackWidth * ratio)));
     }
 
     _command(command, value = 0) {
-        if (command === 'playPause' && !this._state?.canPlay)
-            return;
         if (command === 'previous' && !this._state?.canPrevious)
             return;
         if (command === 'next' && !this._state?.canNext)
@@ -316,11 +792,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 console.error(`YTMDesktop ${method} failed: ${error.message}`);
         });
 
-        if (method !== 'Command')
+        if (!['Command', 'Search', 'PlayResult'].includes(method))
             this.menu.close();
     }
 
     destroy() {
+        this._cancelSearchTimer();
+        this._clearLikeOverride();
         if (this._tickId)
             GLib.source_remove(this._tickId);
         if (this._menuOpenId)
@@ -329,6 +807,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             this._proxy.disconnect(this._ownerChangedId);
         if (this._proxy && this._stateChangedId)
             this._proxy.disconnectSignal(this._stateChangedId);
+        if (this._proxy && this._searchChangedId)
+            this._proxy.disconnectSignal(this._searchChangedId);
         this._proxy = null;
         super.destroy();
     }
@@ -336,7 +816,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
 export default class YTMDesktopMiniPlayerExtension extends Extension {
     enable() {
-        this._indicator = new MiniPlayerIndicator();
+        this._indicator = new MiniPlayerIndicator(this);
         Main.panel.addToStatusArea('ytmdesktop-miniplayer', this._indicator, 1, 'right');
     }
 

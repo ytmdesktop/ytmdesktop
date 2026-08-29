@@ -2,10 +2,105 @@
   padding: 0;
 }
 
+#panel .panel-button.ytmd-tray-button .ytmd-tray-icon {
+  icon-size: 16px;
+}
+
+.ytmd-search-wrap {
+  padding: 14px 14px 8px 14px;
+  spacing: 10px;
+}
+
 .ytmd-popup {
-  width: 370px;
-  padding: 14px;
+  padding: 6px 14px 14px 14px;
   spacing: 12px;
+}
+
+.ytmd-size-small .ytmd-search-wrap,
+.ytmd-size-small .ytmd-popup { width: 280px; }
+.ytmd-size-medium .ytmd-search-wrap,
+.ytmd-size-medium .ytmd-popup { width: 400px; }
+.ytmd-size-large .ytmd-search-wrap,
+.ytmd-size-large .ytmd-popup { width: 520px; }
+
+.ytmd-size-small .ytmd-results-scroll { max-height: 0; }
+.ytmd-size-medium .ytmd-results-scroll { max-height: 180px; }
+.ytmd-size-large .ytmd-results-scroll { max-height: 280px; }
+
+.ytmd-size-small .ytmd-title { font-size: 13px; }
+.ytmd-size-small .ytmd-art { border-radius: 8px; }
+.ytmd-size-large .ytmd-title { font-size: 18px; }
+
+.ytmd-search-entry {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-results-box {
+  spacing: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-results-scroll {
+  max-height: 240px;
+}
+
+.ytmd-results {
+  spacing: 2px;
+}
+
+.ytmd-results-status {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  padding: 6px 2px;
+}
+
+.ytmd-result-row {
+  spacing: 10px;
+  padding: 6px 2px;
+  border-radius: 10px;
+}
+
+.ytmd-result-art {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-result-details {
+  spacing: 2px;
+}
+
+.ytmd-result-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ytmd-result-artist {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+
+.ytmd-result-actions {
+  spacing: 4px;
+}
+
+.ytmd-result-action {
+  padding: 4px 8px;
+  color: #151515;
+  background-color: #ffffff;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ytmd-result-action:hover,
+.ytmd-result-action:focus {
+  color: #151515;
+  background-color: #f2f2f2;
 }
 
 .ytmd-player-row {
@@ -13,10 +108,48 @@
 }
 
 .ytmd-art {
-  width: 112px;
-  height: 112px;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-mini-progress-track {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+}
+
+.ytmd-mini-progress-fill {
+  height: 3px;
+  background-color: #ffffff;
+  border-radius: 99px;
+}
+
+.ytmd-volume-row {
+  spacing: 10px;
+  padding: 2px 0 6px 0;
+}
+
+.ytmd-volume-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.ytmd-volume-slider {
+  height: 16px;
+  -barlevel-height: 4px;
+  -barlevel-background-color: rgba(255, 255, 255, 0.18);
+  -barlevel-active-background-color: #e95420;
+  -barlevel-overdrive-color: #e95420;
+  -barlevel-border-width: 0;
+  color: #ffffff;
+}
+
+.ytmd-like-on {
+  color: #ff5544;
+}
+
+.ytmd-dislike-on {
+  color: #8ab4f8;
 }
 
 .ytmd-details {

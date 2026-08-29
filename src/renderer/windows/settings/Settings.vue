@@ -50,6 +50,7 @@ const trayIconStyle = ref<number>(appearance.trayIconStyle);
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
+const linuxMiniPlayerAutoplay = ref<boolean>(playback.linuxMiniPlayerAutoplay ?? false);
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
@@ -88,6 +89,7 @@ store.onDidAnyChange(async newState => {
 
   continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
+  linuxMiniPlayerAutoplay.value = newState.playback.linuxMiniPlayerAutoplay ?? false;
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
@@ -161,6 +163,7 @@ async function settingsChanged() {
 
   store.set("playback.continueWhereYouLeftOff", continueWhereYouLeftOff.value);
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
+  store.set("playback.linuxMiniPlayerAutoplay", linuxMiniPlayerAutoplay.value);
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
@@ -333,6 +336,13 @@ window.ytmd.handleUpdateDownloaded(() => {
             type="checkbox"
             indented
             name="Pause on application launch"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="isLinux"
+            v-model="linuxMiniPlayerAutoplay"
+            type="checkbox"
+            name="Autoplay last track from the Linux mini player"
             @change="settingsChanged"
           />
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />

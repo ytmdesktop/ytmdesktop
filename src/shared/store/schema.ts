@@ -25,6 +25,7 @@ export type StoreSchema = {
   playback: {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
+    linuxMiniPlayerAutoplay: boolean;
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
