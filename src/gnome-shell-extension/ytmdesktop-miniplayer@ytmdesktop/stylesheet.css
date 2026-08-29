@@ -258,6 +258,10 @@
   spacing: 6px;
 }
 
+.ytmd-marquee-clip {
+  min-width: 0;
+}
+
 .ytmd-title {
   font-size: 16px;
   font-weight: 700;

@@ -7,6 +7,7 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import {logErrorUnlessCancelled} from 'resource:///org/gnome/shell/misc/errorUtils.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
@@ -19,6 +20,7 @@ const LAYOUTS = ['small', 'medium', 'large'];
 const LAYOUT_SIZES = {small: 48, medium: 96, large: 128};
 const SEARCH_ORDERS = ['music', 'video'];
 const ART_OVERLAY_ICON_SIZES = {small: 16, medium: 22, large: 28};
+const MARQUEE_SPEED_PX_PER_SECOND = 24;
 
 const DBUS_XML = `
 <node>
@@ -139,6 +141,11 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._volumeDragging = false;
         this._likeOverride = null;
         this._likeOverrideTimer = 0;
+        this._menuIsOpen = false;
+        this._destroyed = false;
+        this._marquees = [];
+        this._stSettings = St.Settings.get();
+        this._animationsChangedId = this._stSettings.connect('notify::enable-animations', () => this._restartMarquees());
 
         this.add_style_class_name('ytmd-tray-button');
         const trayIcon = new St.Icon({
@@ -176,8 +183,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         );
 
         this._menuOpenId = this.menu.connect('open-state-changed', (_menu, open) => {
-            if (open)
+            this._menuIsOpen = open;
+            if (open) {
                 this._requestState();
+                this._restartMarquees();
+            } else {
+                this._stopMarquees();
+            }
         });
         this._tickId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
             if (this._state?.status === 'playing' && this._state?.track && !this._dragging) {
@@ -314,12 +326,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-details'});
         playerRow.add_child(details);
 
-        this._title = new St.Label({text: 'Nothing playing', style_class: 'ytmd-title', x_expand: true});
-        this._title.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-        this._artist = new St.Label({text: 'Open YouTube Music to start playing', style_class: 'ytmd-artist', x_expand: true});
-        this._artist.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-        details.add_child(this._title);
-        details.add_child(this._artist);
+        this._titleMarquee = this._createMarquee('Nothing playing', 'ytmd-title');
+        this._artistMarquee = this._createMarquee('Open YouTube Music to start playing', 'ytmd-artist');
+        details.add_child(this._titleMarquee.clip);
+        details.add_child(this._artistMarquee.clip);
 
         this._seekBox = new St.BoxLayout({vertical: true, style_class: 'ytmd-seek-box', x_expand: true});
         this._slider = new Slider.Slider(0);
@@ -464,6 +474,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._sizeButton.accessible_name = `Size: ${sizeLabel}`;
         writeLayout(size);
         this._updateProgress();
+        this._restartMarquees();
     }
 
     _cycleLayout() {
@@ -521,6 +532,125 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         });
         button.connect('clicked', callback);
         return button;
+    }
+
+    _createMarquee(text, styleClass) {
+        const clip = new St.Widget({
+            style_class: 'ytmd-marquee-clip',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+        });
+        clip.set_clip_to_allocation(true);
+        const label = new St.Label({
+            text,
+            style_class: styleClass,
+            x_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        label.clutter_text.single_line_mode = true;
+        clip.add_child(label);
+
+        const marquee = {
+            clip,
+            label,
+            generation: 0,
+            pendingId: 0,
+            lastClipWidth: -1,
+            allocationId: 0,
+            mappedId: 0,
+        };
+        marquee.allocationId = clip.connect('notify::allocation', () => {
+            const width = Math.round(clip.width);
+            if (width === marquee.lastClipWidth)
+                return;
+            marquee.lastClipWidth = width;
+            this._restartMarquee(marquee);
+        });
+        marquee.mappedId = label.connect('notify::mapped', () => this._restartMarquee(marquee));
+        this._marquees.push(marquee);
+        return marquee;
+    }
+
+    _setMarqueeText(marquee, text) {
+        if (marquee.label.text === text)
+            return;
+        marquee.label.text = text;
+        this._restartMarquee(marquee);
+    }
+
+    _canRunMarquee(marquee) {
+        return !this._destroyed &&
+            this._menuIsOpen &&
+            this._stSettings.enable_animations &&
+            marquee.label.mapped &&
+            marquee.clip.width > 0;
+    }
+
+    _cancelMarquee(marquee) {
+        marquee.generation += 1;
+        if (marquee.pendingId) {
+            GLib.source_remove(marquee.pendingId);
+            marquee.pendingId = 0;
+        }
+        marquee.label.remove_transition('translation-x');
+        marquee.label.translation_x = 0;
+    }
+
+    _restartMarquee(marquee) {
+        this._cancelMarquee(marquee);
+        if (!this._canRunMarquee(marquee))
+            return;
+        marquee.pendingId = GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+            marquee.pendingId = 0;
+            void this._runMarquee(marquee);
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _restartMarquees() {
+        for (const marquee of this._marquees)
+            this._restartMarquee(marquee);
+    }
+
+    _stopMarquees() {
+        for (const marquee of this._marquees)
+            this._cancelMarquee(marquee);
+    }
+
+    async _runMarquee(marquee) {
+        if (!this._canRunMarquee(marquee))
+            return;
+        const [, naturalWidth] = marquee.label.get_preferred_width(-1);
+        const overflow = Math.max(0, Math.ceil(naturalWidth - marquee.clip.width));
+        if (overflow <= 1)
+            return;
+
+        const generation = marquee.generation;
+        const duration = Math.max(1, Math.round(overflow / MARQUEE_SPEED_PX_PER_SECOND * 1000));
+        let firstPass = true;
+        try {
+            while (generation === marquee.generation && this._canRunMarquee(marquee)) {
+                await marquee.label.easeAsync({
+                    translation_x: -overflow,
+                    delay: firstPass ? 1500 : 1800,
+                    duration,
+                    mode: Clutter.AnimationMode.LINEAR,
+                });
+                if (generation !== marquee.generation || !this._canRunMarquee(marquee))
+                    return;
+                await marquee.label.easeAsync({
+                    translation_x: 0,
+                    delay: 1200,
+                    duration,
+                    mode: Clutter.AnimationMode.LINEAR,
+                });
+                firstPass = false;
+            }
+        } catch (error) {
+            if (generation === marquee.generation && this._canRunMarquee(marquee))
+                logErrorUnlessCancelled(error);
+        }
     }
 
     _orderButton(label, accessibleName, order) {
@@ -788,8 +918,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const playing = this._state?.status === 'playing';
         const needsMainApp = this._state?.status === 'needs-main-app';
 
-        this._title.text = track?.title || 'Nothing playing';
-        this._artist.text = track?.artist || this._state?.message || 'Open YouTube Music to start playing';
+        this._setMarqueeText(this._titleMarquee, track?.title || 'Nothing playing');
+        this._setMarqueeText(this._artistMarquee, track?.artist || this._state?.message || 'Open YouTube Music to start playing');
         this._setArtwork(track?.artworkUrl ?? null);
 
         this._setButtonIcon(this._playButton, playing ? 'pause-dark.svg' : 'play-dark.svg');
@@ -1012,6 +1142,19 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     destroy() {
+        this._destroyed = true;
+        this._stopMarquees();
+        for (const marquee of this._marquees) {
+            if (marquee.allocationId)
+                marquee.clip.disconnect(marquee.allocationId);
+            if (marquee.mappedId)
+                marquee.label.disconnect(marquee.mappedId);
+        }
+        this._marquees = [];
+        if (this._stSettings && this._animationsChangedId)
+            this._stSettings.disconnect(this._animationsChangedId);
+        this._animationsChangedId = 0;
+        this._stSettings = null;
         this._cancelSearchTimer();
         this._clearLikeOverride();
         if (this._tickId)
