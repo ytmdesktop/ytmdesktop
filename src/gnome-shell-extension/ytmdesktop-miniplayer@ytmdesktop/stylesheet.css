@@ -2,8 +2,17 @@
   padding: 0;
 }
 
+#panel .panel-button.ytmd-tray-button {
+  -natural-hpadding: 12px;
+  -minimum-hpadding: 6px;
+}
+
 #panel .panel-button.ytmd-tray-button .ytmd-tray-icon {
   icon-size: 16px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
 }
 
 .ytmd-search-wrap {
@@ -28,6 +37,7 @@
 .ytmd-size-large .ytmd-results-scroll { max-height: 280px; }
 
 .ytmd-size-small .ytmd-title { font-size: 13px; }
+.ytmd-size-small .ytmd-art-wrap,
 .ytmd-size-small .ytmd-art {
   width: 48px;
   height: 48px;
@@ -37,6 +47,7 @@
   max-height: 48px;
   border-radius: 6px;
 }
+.ytmd-size-medium .ytmd-art-wrap,
 .ytmd-size-medium .ytmd-art {
   width: 96px;
   height: 96px;
@@ -47,6 +58,7 @@
   border-radius: 8px;
 }
 .ytmd-size-large .ytmd-title { font-size: 18px; }
+.ytmd-size-large .ytmd-art-wrap,
 .ytmd-size-large .ytmd-art {
   width: 128px;
   height: 128px;
@@ -133,6 +145,7 @@
   spacing: 16px;
 }
 
+.ytmd-art-wrap,
 .ytmd-art {
   width: 96px;
   height: 96px;

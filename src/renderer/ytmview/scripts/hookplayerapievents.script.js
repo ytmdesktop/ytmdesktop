@@ -33,8 +33,9 @@
 
   function likeStatusFromRenderer(renderer) {
     if (!renderer) return null;
-    const fromData = normalizeLikeStatus(renderer.data?.likeStatus) || normalizeLikeStatus(renderer.likeStatus);
-    if (fromData) return fromData;
+    const fromAttr = normalizeLikeStatus(renderer.getAttribute?.("like-status")) ||
+      normalizeLikeStatus(renderer.data?.likeStatus) ||
+      normalizeLikeStatus(renderer.likeStatus);
 
     const buttons = [];
     const collect = root => {
@@ -48,22 +49,31 @@
     if (renderer.shadowRoot) collect(renderer.shadowRoot);
 
     for (const button of buttons) {
-      if (button.getAttribute("aria-pressed") !== "true") continue;
+      const pressed = button.getAttribute("aria-pressed") === "true";
       const label = (button.getAttribute("aria-label") || "").toLowerCase();
-      if (label.includes("dislike")) return "DISLIKE";
-      if (label.includes("like")) return "LIKE";
+      if (label.includes("dislike") && (pressed || label.includes("remove"))) return "DISLIKE";
+      if ((label.includes("unlike") || label.includes("remove like") || label.includes("좋아요 취소")) && pressed !== false)
+        return "LIKE";
+      if (pressed && label.includes("like") && !label.includes("dislike")) return "LIKE";
     }
-    return null;
+    return fromAttr;
+  }
+
+  function pickLikeStatus(...values) {
+    const statuses = values.map(normalizeLikeStatus).filter(Boolean);
+    if (statuses.includes("LIKE")) return "LIKE";
+    if (statuses.includes("DISLIKE")) return "DISLIKE";
+    if (statuses.includes("INDIFFERENT")) return "INDIFFERENT";
+    return "UNKNOWN";
   }
 
   function getLikeStatus(videoId) {
     const renderer = queryDeep(playerBar, "ytmusic-like-button-renderer") || queryDeep(document, "ytmusic-like-button-renderer");
     const state = ytmStore.getState();
-    return (
-      likeStatusFromRenderer(renderer) ||
-      normalizeLikeStatus(state.likeStatus?.videos?.[videoId]) ||
-      normalizeLikeStatus(playerBar.likeStatus) ||
-      "UNKNOWN"
+    return pickLikeStatus(
+      likeStatusFromRenderer(renderer),
+      state.likeStatus?.videos?.[videoId],
+      playerBar.likeStatus
     );
   }
 

@@ -109,13 +109,17 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._likeOverrideTimer = 0;
 
         this.add_style_class_name('ytmd-tray-button');
-        this.add_child(new St.Icon({
+        const trayIcon = new St.Icon({
             gicon: new Gio.FileIcon({
                 file: Gio.File.new_for_path(`${this._extensionPath}/icons/ytmd-panel.svg`),
             }),
-            style_class: 'system-status-icon ytmd-tray-icon',
+            style_class: 'ytmd-tray-icon',
             icon_size: 16,
-        }));
+            x_expand: false,
+            y_expand: false,
+        });
+        trayIcon.set_size(16, 16);
+        this.add_child(trayIcon);
 
         this._buildMenu();
         this.visible = false;
@@ -212,12 +216,17 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const playerRow = new St.BoxLayout({vertical: false, style_class: 'ytmd-player-row'});
         root.add_child(playerRow);
 
-        this._art = new St.Widget({
-            style_class: 'ytmd-art',
-            layout_manager: new Clutter.BinLayout(),
+        this._artWrap = new St.Bin({
+            style_class: 'ytmd-art-wrap',
             x_expand: false,
             y_expand: false,
+            x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
+        });
+        this._art = new St.Widget({
+            style_class: 'ytmd-art',
+            x_expand: false,
+            y_expand: false,
         });
         this._artPlaceholder = new St.Icon({
             icon_name: 'audio-x-generic-symbolic',
@@ -226,7 +235,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._art.add_child(this._artPlaceholder);
-        playerRow.add_child(this._art);
+        this._artWrap.set_child(this._art);
+        playerRow.add_child(this._artWrap);
 
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-details'});
         playerRow.add_child(details);
@@ -275,9 +285,9 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._previousButton = this._iconButton('media-skip-backward-symbolic', 'Previous', () => this._command('previous'));
         this._playButton = this._iconButton('media-playback-start-symbolic', 'Play', () => this._command('playPause'), 'ytmd-play-button');
         this._nextButton = this._iconButton('media-skip-forward-symbolic', 'Next', () => this._command('next'));
-        this._likeButton = this._iconButton('thumbs-up-symbolic.svg', 'Like', () => this._toggleLike(), 'ytmd-like-button');
-        this._dislikeButton = this._iconButton('thumbs-down-symbolic.svg', 'Dislike', () => this._toggleDislike());
-        this._mixButton = this._iconButton('mix-symbolic.svg', 'Start mix', () => this._command('startMix'));
+        this._likeButton = this._iconButton('thumbs-up.png', 'Like', () => this._toggleLike(), 'ytmd-like-button');
+        this._dislikeButton = this._iconButton('thumbs-down.png', 'Dislike', () => this._toggleDislike());
+        this._mixButton = this._iconButton('mix-symbolic.png', 'Start mix', () => this._command('startMix'));
         this._repeatButton = this._iconButton('media-playlist-repeat-symbolic', 'Repeat', () => this._cycleRepeat());
         this._shuffleButton = this._iconButton('media-playlist-shuffle-symbolic', 'Shuffle', () => this._command('shuffle'));
         controls.add_child(this._previousButton);
@@ -348,7 +358,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this.menu.box.add_style_class_name(`ytmd-size-${size}`);
 
         const artSize = LAYOUT_SIZES[size];
+        this._artWrap.set_size(artSize, artSize);
+        this._artWrap.set_width(artSize);
+        this._artWrap.set_height(artSize);
         this._art.set_size(artSize, artSize);
+        this._art.set_width(artSize);
+        this._art.set_height(artSize);
+        this._art.set_clip_to_allocation(true);
         this._artPlaceholder.icon_size = Math.max(16, Math.floor(artSize / 3));
         const artUrl = this._artUrl;
         this._artUrl = null;
@@ -395,7 +411,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         button._ytmdIconName = iconName;
         const icon = new St.Icon({icon_size: 22});
-        if (iconName.endsWith('.svg'))
+        if (iconName.endsWith('.svg') || iconName.endsWith('.png'))
             icon.gicon = this._fileIcon(iconName);
         else
             icon.icon_name = iconName;
@@ -676,7 +692,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _currentLikeStatus() {
-        return this._likeOverride || this._state?.likeStatus || this._state?.track?.likeStatus || 'indifferent';
+        const status = this._likeOverride || this._state?.likeStatus || this._state?.track?.likeStatus || 'indifferent';
+        return String(status).toLowerCase();
     }
 
     _clearLikeOverride() {
@@ -714,8 +731,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const likeStatus = this._currentLikeStatus();
         const liked = likeStatus === 'like';
         const disliked = likeStatus === 'dislike';
-        this._setButtonIcon(this._likeButton, liked ? 'thumbs-up-filled-symbolic.svg' : 'thumbs-up-symbolic.svg');
-        this._setButtonIcon(this._dislikeButton, disliked ? 'thumbs-down-filled-symbolic.svg' : 'thumbs-down-symbolic.svg');
+        this._setButtonIcon(this._likeButton, liked ? 'thumbs-up-filled.png' : 'thumbs-up.png');
+        this._setButtonIcon(this._dislikeButton, disliked ? 'thumbs-down-filled.png' : 'thumbs-down.png');
         this._likeButton.accessible_name = liked ? 'Unlike' : 'Like';
         this._dislikeButton.accessible_name = disliked ? 'Remove dislike' : 'Dislike';
         this._likeButton[liked ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-like-on');
@@ -777,7 +794,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
         this._artPath = path;
         this._artPlaceholder.visible = false;
+        this._artWrap.set_size(size, size);
+        this._artWrap.set_width(size);
+        this._artWrap.set_height(size);
         this._art.set_size(size, size);
+        this._art.set_width(size);
+        this._art.set_height(size);
+        this._art.set_clip_to_allocation(true);
         const uri = GLib.filename_to_uri(path, null);
         this._art.set_style(`background-image: url("${uri}"); background-size: cover; background-position: center; background-repeat: no-repeat;`);
     }
