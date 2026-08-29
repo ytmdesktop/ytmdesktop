@@ -665,8 +665,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(subtitle);
 
         const actions = new St.BoxLayout({style_class: 'ytmd-result-actions', y_align: Clutter.ActorAlign.CENTER});
-        actions.add_child(this._iconButton('play-dark.svg', 'Play now', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
-        actions.add_child(this._iconButton('queue-next-dark.svg', 'Play next', () => this._call('PlayResult', result.id, 'next'), 'ytmd-result-action'));
+        actions.add_child(this._iconButton('play.svg', 'Play now', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
+        actions.add_child(this._iconButton('queue-next.svg', 'Play next', () => this._call('PlayResult', result.id, 'next'), 'ytmd-result-action'));
 
         row.add_child(art);
         row.add_child(details);
