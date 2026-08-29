@@ -177,7 +177,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             x_expand: true,
         });
         this._searchEntry.set_primary_icon(new St.Icon({
-            icon_name: 'edit-find-symbolic',
+            gicon: this._fileIcon('search.svg'),
             icon_size: 16,
         }));
         const searchText = this._searchEntry.get_clutter_text();
@@ -282,14 +282,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(this._miniProgressTrack);
 
         const controls = new St.BoxLayout({style_class: 'ytmd-controls', x_align: Clutter.ActorAlign.CENTER});
-        this._previousButton = this._iconButton('media-skip-backward-symbolic', 'Previous', () => this._command('previous'));
-        this._playButton = this._iconButton('media-playback-start-symbolic', 'Play', () => this._command('playPause'), 'ytmd-play-button');
-        this._nextButton = this._iconButton('media-skip-forward-symbolic', 'Next', () => this._command('next'));
-        this._likeButton = this._iconButton('thumbs-up.png', 'Like', () => this._toggleLike(), 'ytmd-like-button');
-        this._dislikeButton = this._iconButton('thumbs-down.png', 'Dislike', () => this._toggleDislike());
+        this._previousButton = this._iconButton('previous.svg', 'Previous', () => this._command('previous'));
+        this._playButton = this._iconButton('play-dark.svg', 'Play', () => this._command('playPause'), 'ytmd-play-button');
+        this._nextButton = this._iconButton('next.svg', 'Next', () => this._command('next'));
+        this._likeButton = this._iconButton('thumbs-up.svg', 'Like', () => this._toggleLike(), 'ytmd-like-button');
+        this._dislikeButton = this._iconButton('thumbs-down.svg', 'Dislike', () => this._toggleDislike());
         this._mixButton = this._iconButton('mix-symbolic.png', 'Start mix', () => this._command('startMix'));
-        this._repeatButton = this._iconButton('media-playlist-repeat-symbolic', 'Repeat', () => this._cycleRepeat());
-        this._shuffleButton = this._iconButton('media-playlist-shuffle-symbolic', 'Shuffle', () => this._command('shuffle'));
+        this._repeatButton = this._iconButton('repeat.svg', 'Repeat', () => this._cycleRepeat());
+        this._shuffleButton = this._iconButton('shuffle.svg', 'Shuffle', () => this._command('shuffle'));
         controls.add_child(this._previousButton);
         controls.add_child(this._playButton);
         controls.add_child(this._nextButton);
@@ -301,7 +301,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(controls);
 
         this._volumeRow = new St.BoxLayout({style_class: 'ytmd-volume-row', x_expand: true});
-        this._muteButton = this._iconButton('audio-volume-high-symbolic', 'Mute', () => this._command('mute'), 'ytmd-volume-icon');
+        this._muteButton = this._iconButton('volume-high.svg', 'Mute', () => this._command('mute'), 'ytmd-volume-icon');
         this._volumeSlider = new Slider.Slider(0);
         this._volumeSlider.x_expand = true;
         this._volumeSlider.style_class = 'slider ytmd-volume-slider';
@@ -341,12 +341,12 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(this._openAppButton);
 
         const footer = new St.BoxLayout({style_class: 'ytmd-footer', x_align: Clutter.ActorAlign.END});
-        footer.add_child(this._iconButton('focus-windows-symbolic', 'Show or hide window', () => this._call('ToggleMainWindow')));
-        this._sizeButton = this._iconButton('view-fullscreen-symbolic', 'Size: Medium', () => this._cycleLayout());
+        footer.add_child(this._iconButton('window.svg', 'Show or hide window', () => this._call('ToggleMainWindow')));
+        this._sizeButton = this._iconButton('size.svg', 'Size: Medium', () => this._cycleLayout());
         footer.add_child(this._sizeButton);
-        this._settingsButton = this._iconButton('emblem-system-symbolic', 'Settings', () => this._call('OpenSettings'));
+        this._settingsButton = this._iconButton('settings.svg', 'Settings', () => this._call('OpenSettings'));
         footer.add_child(this._settingsButton);
-        footer.add_child(this._iconButton('system-shutdown-symbolic', 'Quit', () => this._call('Quit'), 'ytmd-quit-button'));
+        footer.add_child(this._iconButton('quit.svg', 'Quit', () => this._call('Quit'), 'ytmd-quit-button'));
         root.add_child(footer);
         this._applyLayout();
     }
@@ -587,8 +587,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(subtitle);
 
         const actions = new St.BoxLayout({style_class: 'ytmd-result-actions', y_align: Clutter.ActorAlign.CENTER});
-        actions.add_child(this._iconButton('media-playback-start-symbolic', 'Play now', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
-        actions.add_child(this._iconButton('list-add-symbolic', 'Play next', () => this._call('PlayResult', result.id, 'next'), 'ytmd-result-action'));
+        actions.add_child(this._iconButton('play-dark.svg', 'Play now', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
+        actions.add_child(this._iconButton('queue-next-dark.svg', 'Play next', () => this._call('PlayResult', result.id, 'next'), 'ytmd-result-action'));
 
         row.add_child(art);
         row.add_child(details);
@@ -676,8 +676,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._artist.text = track?.artist || this._state?.message || 'Open YouTube Music to start playing';
         this._setArtwork(track?.artworkUrl ?? null);
 
-        const playIcon = this._playButton.get_child();
-        playIcon.icon_name = playing ? 'media-playback-pause-symbolic' : 'media-playback-start-symbolic';
+        this._setButtonIcon(this._playButton, playing ? 'pause-dark.svg' : 'play-dark.svg');
         this._playButton.accessible_name = playing ? 'Pause' : 'Play';
         this._setButtonEnabled(this._previousButton, Boolean(this._state?.canPrevious));
         this._setButtonEnabled(this._playButton, Boolean(this._state?.canPlay));
@@ -731,8 +730,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const likeStatus = this._currentLikeStatus();
         const liked = likeStatus === 'like';
         const disliked = likeStatus === 'dislike';
-        this._setButtonIcon(this._likeButton, liked ? 'thumbs-up-filled.png' : 'thumbs-up.png');
-        this._setButtonIcon(this._dislikeButton, disliked ? 'thumbs-down-filled.png' : 'thumbs-down.png');
+        this._setButtonIcon(this._likeButton, liked ? 'thumbs-up-filled.svg' : 'thumbs-up.svg');
+        this._setButtonIcon(this._dislikeButton, disliked ? 'thumbs-down-filled.svg' : 'thumbs-down.svg');
         this._likeButton.accessible_name = liked ? 'Unlike' : 'Like';
         this._dislikeButton.accessible_name = disliked ? 'Remove dislike' : 'Dislike';
         this._likeButton[liked ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-like-on');
@@ -741,8 +740,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
     _updateRepeatButton() {
         const mode = this._state?.repeatMode || 'none';
-        const icon = this._repeatButton.get_child();
-        icon.icon_name = mode === 'one' ? 'media-playlist-repeat-song-symbolic' : 'media-playlist-repeat-symbolic';
+        this._setButtonIcon(this._repeatButton, mode === 'one' ? 'repeat-one.svg' : 'repeat.svg');
         this._repeatButton.opacity = mode === 'none' ? 120 : 255;
         this._repeatButton.accessible_name = `Repeat: ${mode}`;
     }
@@ -752,12 +750,12 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         const muted = Boolean(this._state?.muted);
         const volume = this._state?.volume ?? 0;
-        const icon = this._muteButton.get_child();
-        icon.icon_name = muted || volume === 0
-            ? 'audio-volume-muted-symbolic'
+        const iconName = muted || volume === 0
+            ? 'volume-muted.svg'
             : volume < 40
-                ? 'audio-volume-low-symbolic'
-                : 'audio-volume-high-symbolic';
+                ? 'volume-low.svg'
+                : 'volume-high.svg';
+        this._setButtonIcon(this._muteButton, iconName);
         this._volumeSlider.value = muted ? 0 : Math.max(0, Math.min(1, volume / 100));
     }
 
