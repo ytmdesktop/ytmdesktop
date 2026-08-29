@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -98,6 +99,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._seekTarget = null;
         this._seekDeadline = 0;
         this._artUrl = null;
+        this._artPath = null;
+        this._artLoadId = 0;
         this._searchTimer = 0;
         this._lastSearchQuery = '';
         this._layout = readLayout();
@@ -209,11 +212,20 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const playerRow = new St.BoxLayout({vertical: false, style_class: 'ytmd-player-row'});
         root.add_child(playerRow);
 
-        this._art = new St.Icon({
-            icon_name: 'audio-x-generic-symbolic',
-            icon_size: 112,
+        this._art = new St.Widget({
             style_class: 'ytmd-art',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: false,
+            y_expand: false,
+            y_align: Clutter.ActorAlign.START,
         });
+        this._artPlaceholder = new St.Icon({
+            icon_name: 'audio-x-generic-symbolic',
+            icon_size: 20,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._art.add_child(this._artPlaceholder);
         playerRow.add_child(this._art);
 
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-details'});
@@ -336,14 +348,16 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this.menu.box.add_style_class_name(`ytmd-size-${size}`);
 
         const artSize = LAYOUT_SIZES[size];
-        this._art.icon_size = artSize;
         this._art.set_size(artSize, artSize);
+        this._artPlaceholder.icon_size = Math.max(16, Math.floor(artSize / 3));
+        const artUrl = this._artUrl;
+        this._artUrl = null;
+        this._setArtwork(artUrl);
 
         this._searchWrap.visible = size !== 'small';
         this._seekBox.visible = size !== 'small';
         this._miniProgressTrack.visible = size === 'small';
         this._dislikeButton.visible = size !== 'small';
-        this._mixButton.visible = size !== 'small';
         this._repeatButton.visible = size === 'large';
         this._shuffleButton.visible = size === 'large';
         this._volumeRow.visible = true;
@@ -377,14 +391,15 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _setButtonIcon(button, iconName) {
-        const icon = button.get_child();
-        if (iconName.endsWith('.svg')) {
-            icon.icon_name = null;
+        if (button._ytmdIconName === iconName && button.get_child())
+            return;
+        button._ytmdIconName = iconName;
+        const icon = new St.Icon({icon_size: 22});
+        if (iconName.endsWith('.svg'))
             icon.gicon = this._fileIcon(iconName);
-        } else {
-            icon.gicon = null;
+        else
             icon.icon_name = iconName;
-        }
+        button.set_child(icon);
     }
 
     _iconButton(iconName, accessibleName, callback, styleClass = '') {
@@ -735,24 +750,75 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         button.opacity = enabled ? 255 : 90;
     }
 
+    _artFallback() {
+        this._art.set_style('');
+        this._artPlaceholder.visible = true;
+    }
+
+    _applyArtPixbuf(pixbuf) {
+        const size = LAYOUT_SIZES[this._layout];
+        const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor || 1;
+        const px = Math.max(1, Math.round(size * scale));
+        const width = pixbuf.get_width();
+        const height = pixbuf.get_height();
+        const side = Math.max(1, Math.min(width, height));
+        const square = pixbuf.new_subpixbuf(Math.floor((width - side) / 2), Math.floor((height - side) / 2), side, side);
+        const scaled = square.scale_simple(px, px, GdkPixbuf.InterpType.BILINEAR);
+        const dir = GLib.build_filenamev([GLib.get_user_cache_dir(), 'ytmdesktop-miniplayer']);
+        try {
+            Gio.File.new_for_path(dir).make_directory_with_parents(null);
+        } catch (error) {}
+        const path = GLib.build_filenamev([dir, `cover-${this._artLoadId}.png`]);
+        scaled.savev(path, 'png', [], []);
+        if (this._artPath && this._artPath !== path) {
+            try {
+                Gio.File.new_for_path(this._artPath).delete(null);
+            } catch (error) {}
+        }
+        this._artPath = path;
+        this._artPlaceholder.visible = false;
+        this._art.set_size(size, size);
+        const uri = GLib.filename_to_uri(path, null);
+        this._art.set_style(`background-image: url("${uri}"); background-size: cover; background-position: center; background-repeat: no-repeat;`);
+    }
+
     _setArtwork(url) {
         if (url === this._artUrl)
             return;
 
         this._artUrl = url;
+        this._artLoadId = (this._artLoadId || 0) + 1;
+        const loadId = this._artLoadId;
         if (!url) {
-            this._art.gicon = null;
-            this._art.icon_name = 'audio-x-generic-symbolic';
+            this._artFallback();
             return;
         }
 
         try {
-            this._art.icon_name = null;
-            this._art.gicon = new Gio.FileIcon({file: Gio.File.new_for_uri(url)});
+            const file = Gio.File.new_for_uri(url);
+            file.read_async(GLib.PRIORITY_DEFAULT, null, (source, readResult) => {
+                if (loadId !== this._artLoadId)
+                    return;
+                try {
+                    const stream = source.read_finish(readResult);
+                    GdkPixbuf.Pixbuf.new_from_stream_async(stream, null, (_obj, pixbufResult) => {
+                        if (loadId !== this._artLoadId)
+                            return;
+                        try {
+                            this._applyArtPixbuf(GdkPixbuf.Pixbuf.new_from_stream_finish(pixbufResult));
+                        } catch (error) {
+                            console.error(`YTMDesktop artwork decode failed: ${error.message}`);
+                            this._artFallback();
+                        }
+                    });
+                } catch (error) {
+                    console.error(`YTMDesktop artwork read failed: ${error.message}`);
+                    this._artFallback();
+                }
+            });
         } catch (error) {
             console.error(`YTMDesktop artwork failed: ${error.message}`);
-            this._art.gicon = null;
-            this._art.icon_name = 'audio-x-generic-symbolic';
+            this._artFallback();
         }
     }
 

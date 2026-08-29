@@ -28,8 +28,34 @@
 .ytmd-size-large .ytmd-results-scroll { max-height: 280px; }
 
 .ytmd-size-small .ytmd-title { font-size: 13px; }
-.ytmd-size-small .ytmd-art { border-radius: 8px; }
+.ytmd-size-small .ytmd-art {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  border-radius: 6px;
+}
+.ytmd-size-medium .ytmd-art {
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  max-width: 96px;
+  max-height: 96px;
+  border-radius: 8px;
+}
 .ytmd-size-large .ytmd-title { font-size: 18px; }
+.ytmd-size-large .ytmd-art {
+  width: 128px;
+  height: 128px;
+  min-width: 128px;
+  min-height: 128px;
+  max-width: 128px;
+  max-height: 128px;
+  border-radius: 10px;
+}
 
 .ytmd-search-entry {
   padding: 6px 8px;
@@ -108,8 +134,17 @@
 }
 
 .ytmd-art {
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.08);
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  max-width: 96px;
+  max-height: 96px;
+  border-radius: 8px;
+  background-color: #111111;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .ytmd-mini-progress-track {
@@ -177,6 +212,13 @@
 
 .ytmd-controls {
   spacing: 10px;
+}
+
+.ytmd-size-small .ytmd-player-row { spacing: 10px; }
+.ytmd-size-small .ytmd-controls { spacing: 6px; }
+.ytmd-size-small .ytmd-icon-button {
+  width: 34px;
+  height: 34px;
 }
 
 .ytmd-icon-button {

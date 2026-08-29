@@ -186,7 +186,7 @@ export default class LinuxMiniPlayerService {
   private createSnapshot(): MiniPlayerSnapshot {
     const video = this.playerState.videoDetails;
     const queueReady = !!video && (this.playerState.queue?.items.length ?? 0) > 0;
-    const artworkUrl = video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null;
+    const artworkUrl = cleanArtworkUrl(video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null);
     const likeStatus = toLikeStatus(video?.likeStatus);
     const repeatMode = toRepeatMode(this.playerState.queue?.repeatMode);
 
@@ -305,6 +305,18 @@ export default class LinuxMiniPlayerService {
     if (!this.definition) return;
     this.definition.emit.SearchResultsChanged(JSON.stringify(snapshot));
   }
+}
+
+function cleanArtworkUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url
+    .replace(/-l90-rj\b/g, "")
+    .replace(/-rw\b/g, "")
+    .replace(/-rj\b/g, "")
+    .replace(/=w(\d+)-h(\d+)/, (_match, width, height) => {
+      const side = Math.max(Number(width), Number(height), 512);
+      return `=w${side}-h${side}-c`;
+    });
 }
 
 function toLikeStatus(status: LikeStatus | undefined): MiniPlayerLikeStatus {
