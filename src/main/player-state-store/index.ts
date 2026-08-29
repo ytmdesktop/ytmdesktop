@@ -155,8 +155,15 @@ function transformRepeatMode(repeatMode: YTMRepeatMode) {
   }
 }
 
-function transformLikeStatus(likeStatus: YTMLikeStatus) {
-  switch (likeStatus) {
+function concreteLikeStatus(likeStatus: string | null | undefined): YTMLikeStatus | null {
+  if (typeof likeStatus !== "string") return null;
+  const status = likeStatus.toUpperCase();
+  if (status === "LIKE" || status === "DISLIKE" || status === "INDIFFERENT") return status;
+  return null;
+}
+
+function transformLikeStatus(likeStatus: YTMLikeStatus | string | null | undefined) {
+  switch (concreteLikeStatus(likeStatus)) {
     case "DISLIKE": {
       return LikeStatus.Dislike;
     }
@@ -320,8 +327,9 @@ class PlayerStateStore {
           })
         }
       : null;
-    if (this.videoDetails && likeStatus) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
+    const nextLikeStatus = concreteLikeStatus(likeStatus);
+    if (this.videoDetails && nextLikeStatus) {
+      this.videoDetails.likeStatus = transformLikeStatus(nextLikeStatus);
     }
     this.adPlaying = adPlaying === true;
     this.muted = muted === true;
