@@ -127,7 +127,11 @@ const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("com
 
 const autoUpdaterDisabled = ref<boolean>(await memoryStore.get("autoUpdaterDisabled"));
 
+const linuxMiniPlayerActive = ref<boolean>(await memoryStore.get("linuxMiniPlayerActive"));
+
 memoryStore.onStateChanged(newState => {
+  linuxMiniPlayerActive.value = newState.linuxMiniPlayerActive;
+
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
 
   shortcutsPlayPauseRegisterFailed.value = newState.shortcutsPlayPauseRegisterFailed;
@@ -319,7 +323,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           />
           <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
           <YTMDSetting
-            v-if="isLinux"
+            v-if="isLinux && !linuxMiniPlayerActive"
             v-model="trayIconStyle"
             :options-map="{ [TrayIconStyle.Auto]: 'Auto', [TrayIconStyle.White]: 'White', [TrayIconStyle.Black]: 'Black' }"
             type="select"
@@ -339,7 +343,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-if="isLinux"
+            v-if="linuxMiniPlayerActive"
             v-model="linuxMiniPlayerAutoplay"
             type="checkbox"
             name="Autoplay last track from the Linux mini player"

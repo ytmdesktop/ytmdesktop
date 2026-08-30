@@ -82,6 +82,7 @@ export type MemoryStoreSchema = {
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
   ytmViewUnresponsive: boolean;
+  linuxMiniPlayerActive: boolean;
   appUpdateAvailable: boolean;
   appUpdateDownloaded: boolean;
 };

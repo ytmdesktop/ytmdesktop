@@ -29,6 +29,7 @@ import MemoryStore from "./memory-store";
 import playerStateStore, { MiniPlayerCommand, MiniPlayerPlayResultAction, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
+import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -179,6 +180,7 @@ let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
 let linuxMiniPlayerService: LinuxMiniPlayerService = null;
+let gnomeShellExtensionWatcher: GnomeShellExtensionWatcher = null;
 let ytmAuthenticated = false;
 let resumeLastTrackPending = false;
 let resumeLastTrackTimeout: NodeJS.Timeout | null = null;
@@ -712,6 +714,103 @@ function setTrayIcon() {
   if (tray) tray.setImage(getTrayIconPath());
 }
 
+function createTray() {
+  if (tray) return;
+
+  tray = new Tray(getTrayIconPath());
+  tray.setToolTip("YouTube Music Desktop");
+  trayContextMenu = Menu.buildFromTemplate([
+    {
+      label: "YouTube Music Desktop",
+      type: "normal",
+      enabled: false
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Show/Hide Window",
+      type: "normal",
+      click: () => {
+        if (mainWindow) {
+          if (mainWindow.isVisible()) {
+            mainWindow.hide();
+          } else {
+            mainWindow.show();
+          }
+        }
+      }
+    },
+    {
+      label: "Play/Pause",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "playPause");
+      }
+    },
+    {
+      label: "Previous",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "previous");
+      }
+    },
+    {
+      label: "Next",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "next");
+      }
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click: () => {
+        app.quit();
+      }
+    }
+  ]);
+  tray.setContextMenu(trayContextMenu);
+  tray.on("click", () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      } else {
+        mainWindow.show();
+      }
+    }
+  });
+}
+
+function destroyTray() {
+  if (!tray) return;
+
+  tray.destroy();
+  tray = null;
+  trayContextMenu = null;
+}
+
+/** Whether the GNOME extension is currently drawing the panel mini-player for this session. */
+function miniPlayerServingPanel() {
+  return !!linuxMiniPlayerService && !!gnomeShellExtensionWatcher?.isEnabled;
+}
+
+/** Swap between the panel mini-player and the tray icon, so a session always has exactly one of them. */
+function applyLinuxPanelIntegration() {
+  const servingPanel = miniPlayerServingPanel();
+
+  if (servingPanel) {
+    destroyTray();
+  } else {
+    createTray();
+  }
+
+  memoryStore.set("linuxMiniPlayerActive", servingPanel);
+}
+
 function toggleMainWindowVisibility() {
   if (!mainWindow) return;
 
@@ -890,7 +989,7 @@ function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
 }
 
 function maybeAutoplayMiniPlayer() {
-  if (!isLinux || !store.get("playback.linuxMiniPlayerAutoplay")) return;
+  if (!miniPlayerServingPanel() || !store.get("playback.linuxMiniPlayerAutoplay")) return;
   if (!ytmAuthenticated || !hasSavedTrack()) return;
 
   setTimeout(() => {
@@ -1273,7 +1372,7 @@ const createYTMView = (): void => {
       partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
       preload: path.join(__dirname, `../renderer/windows/ytmview/preload.js`),
       autoplayPolicy:
-        isLinux && store.get("playback.linuxMiniPlayerAutoplay")
+        miniPlayerServingPanel() && store.get("playback.linuxMiniPlayerAutoplay")
           ? "no-user-gesture-required"
           : store.get("playback.continueWhereYouLeftOffPaused")
             ? "document-user-activation-required"
@@ -2058,8 +2157,12 @@ app.on("ready", async () => {
   // Register global shortcuts
   registerShortcuts();
 
-  // Create the platform tray integration
-  if (isLinux) {
+  // Create the platform tray integration.
+  //
+  // On Linux the panel UI lives in a GNOME Shell extension that is installed separately from the
+  // application, so it can be absent, disabled, or added while the app is running. Any session the
+  // extension is not currently serving keeps the tray icon, because it has no other UI.
+  if (isLinux && isGnomeSession()) {
     linuxMiniPlayerService = new LinuxMiniPlayerService(
       {
         command: handleMiniPlayerCommand,
@@ -2081,76 +2184,26 @@ app.on("ready", async () => {
       await linuxMiniPlayerService.stop();
       linuxMiniPlayerService = null;
     }
-  } else {
-    tray = new Tray(getTrayIconPath());
-    tray.setToolTip("YouTube Music Desktop");
-    trayContextMenu = Menu.buildFromTemplate([
-      {
-        label: "YouTube Music Desktop",
-        type: "normal",
-        enabled: false
-      },
-      {
-        type: "separator"
-      },
-      {
-        label: "Show/Hide Window",
-        type: "normal",
-        click: () => {
-          if (mainWindow) {
-            if (mainWindow.isVisible()) {
-              mainWindow.hide();
-            } else {
-              mainWindow.show();
-            }
-          }
-        }
-      },
-      {
-        label: "Play/Pause",
-        type: "normal",
-        click: () => {
-          ytmView.webContents.send("remoteControl:execute", "playPause");
-        }
-      },
-      {
-        label: "Previous",
-        type: "normal",
-        click: () => {
-          ytmView.webContents.send("remoteControl:execute", "previous");
-        }
-      },
-      {
-        label: "Next",
-        type: "normal",
-        click: () => {
-          ytmView.webContents.send("remoteControl:execute", "next");
-        }
-      },
-      {
-        type: "separator"
-      },
-      {
-        label: "Quit",
-        type: "normal",
-        click: () => {
-          app.quit();
-        }
-      }
-    ]);
-    tray.setContextMenu(trayContextMenu);
-    tray.on("click", () => {
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore();
-        } else {
-          mainWindow.show();
-        }
-      }
-    });
   }
 
-  log.info(isLinux ? "Initialized Linux panel integration" : "Created tray icon");
+  if (linuxMiniPlayerService) {
+    gnomeShellExtensionWatcher = new GnomeShellExtensionWatcher(() => {
+      if (applicationQuitting) return;
+      applyLinuxPanelIntegration();
+    });
+
+    try {
+      await gnomeShellExtensionWatcher.start();
+    } catch (error) {
+      log.error("Failed to watch the GNOME mini-player extension", error);
+      await gnomeShellExtensionWatcher.stop();
+      gnomeShellExtensionWatcher = null;
+    }
+  }
+
+  applyLinuxPanelIntegration();
+
+  log.info(miniPlayerServingPanel() ? "Initialized GNOME mini-player integration" : "Created tray icon");
 
   createMainWindow();
   log.info("Created main window");
@@ -2241,6 +2294,7 @@ app.on("before-quit", () => {
   applicationQuitting = true;
   if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
   if (playbackNudgeTimeout) clearTimeout(playbackNudgeTimeout);
+  void gnomeShellExtensionWatcher?.stop();
   void linuxMiniPlayerService?.stop();
   saveState();
 });
