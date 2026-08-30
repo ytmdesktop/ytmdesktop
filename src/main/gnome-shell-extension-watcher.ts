@@ -57,6 +57,8 @@ export default class GnomeShellExtensionWatcher {
 
     const bus = sessionBus({ reconnect: true });
     bus.connection.on("error", error => log.error("GNOME extension watcher D-Bus error", error));
+    // Signals that fired while the connection was down were missed, so re-read the current state.
+    bus.on("reconnected", () => void this.refresh());
     this.bus = bus;
 
     await this.watchSignal(
