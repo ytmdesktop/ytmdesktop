@@ -82,6 +82,14 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      /* Narrow windows put the player page into YouTube Music's mobile sheet layout, which sizes the
+         expanded side panel against the window bottom instead of the player bar, so the panel's
+         scrollbar is drawn over the player bar. */
+      ytmusic-player-page[is-mweb-modernization-enabled][player-page-ui-state="TABS_VIEW"] #side-panel.ytmusic-player-page {
+        height: auto;
+        bottom: var(--ytmusic-player-page-player-bar-height);
+      }
     `)
   );
   document.head.appendChild(css);
