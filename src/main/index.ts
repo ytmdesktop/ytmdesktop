@@ -180,6 +180,7 @@ let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
 let linuxMiniPlayerService: LinuxMiniPlayerService = null;
+let linuxMiniPlayerServiceStarting: Promise<void> | null = null;
 let gnomeShellExtensionWatcher: GnomeShellExtensionWatcher = null;
 let ytmAuthenticated = false;
 let resumeLastTrackPending = false;
@@ -798,8 +799,50 @@ function miniPlayerServingPanel() {
   return !!linuxMiniPlayerService && !!gnomeShellExtensionWatcher?.isEnabled;
 }
 
-/** Swap between the panel mini-player and the tray icon, so a session always has exactly one of them. */
-function applyLinuxPanelIntegration() {
+/**
+ * Serve the mini-player D-Bus interface.
+ *
+ * Startup and an extension that enables itself mid-startup can both ask for this, so concurrent
+ * callers share one attempt and only see the service once it is actually exported.
+ */
+function startLinuxMiniPlayerService() {
+  if (!linuxMiniPlayerServiceStarting) {
+    linuxMiniPlayerServiceStarting = (async () => {
+      const service = new LinuxMiniPlayerService(
+        {
+          command: handleMiniPlayerCommand,
+          search: searchYtm,
+          playResult: playMiniPlayerResult,
+          toggleMainWindow: toggleMainWindowVisibility,
+          showMainWindow,
+          openSettings: createOrShowSettingsWindow,
+          quit: () => app.quit()
+        },
+        playerStateStore.getState(),
+        { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() }
+      );
+
+      try {
+        await service.start();
+        linuxMiniPlayerService = service;
+      } catch (error) {
+        log.error("Failed to start Linux mini-player D-Bus service", error);
+        await service.stop();
+        // Let a later extension state change try again, in case the bus name frees up.
+        linuxMiniPlayerServiceStarting = null;
+      }
+    })();
+  }
+
+  return linuxMiniPlayerServiceStarting;
+}
+
+/** Give the session exactly one of the panel mini-player and the tray icon. */
+async function applyPlatformTrayIntegration() {
+  // An extension enabled after launch still needs the D-Bus interface, even in a session whose
+  // desktop variables never named GNOME.
+  if (gnomeShellExtensionWatcher?.isEnabled) await startLinuxMiniPlayerService();
+
   const servingPanel = miniPlayerServingPanel();
 
   if (servingPanel) {
@@ -2162,34 +2205,10 @@ app.on("ready", async () => {
   // On Linux the panel UI lives in a GNOME Shell extension that is installed separately from the
   // application, so it can be absent, disabled, or added while the app is running. Any session the
   // extension is not currently serving keeps the tray icon, because it has no other UI.
-  if (isLinux && isGnomeSession()) {
-    linuxMiniPlayerService = new LinuxMiniPlayerService(
-      {
-        command: handleMiniPlayerCommand,
-        search: searchYtm,
-        playResult: playMiniPlayerResult,
-        toggleMainWindow: toggleMainWindowVisibility,
-        showMainWindow,
-        openSettings: createOrShowSettingsWindow,
-        quit: () => app.quit()
-      },
-      playerStateStore.getState(),
-      { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() }
-    );
-
-    try {
-      await linuxMiniPlayerService.start();
-    } catch (error) {
-      log.error("Failed to start Linux mini-player D-Bus service", error);
-      await linuxMiniPlayerService.stop();
-      linuxMiniPlayerService = null;
-    }
-  }
-
-  if (linuxMiniPlayerService) {
+  if (isLinux) {
     gnomeShellExtensionWatcher = new GnomeShellExtensionWatcher(() => {
       if (applicationQuitting) return;
-      applyLinuxPanelIntegration();
+      void applyPlatformTrayIntegration();
     });
 
     try {
@@ -2199,9 +2218,13 @@ app.on("ready", async () => {
       await gnomeShellExtensionWatcher.stop();
       gnomeShellExtensionWatcher = null;
     }
+
+    // The desktop session variables can be unset even under GNOME, so an extension that is already
+    // enabled also counts as reason enough to serve the D-Bus interface it talks to.
+    if (isGnomeSession() || gnomeShellExtensionWatcher?.isEnabled) await startLinuxMiniPlayerService();
   }
 
-  applyLinuxPanelIntegration();
+  await applyPlatformTrayIntegration();
 
   log.info(miniPlayerServingPanel() ? "Initialized GNOME mini-player integration" : "Created tray icon");
 
