@@ -185,7 +185,11 @@ let gnomeShellExtensionWatcher: GnomeShellExtensionWatcher = null;
 let ytmAuthenticated = false;
 let resumeLastTrackPending = false;
 let resumeLastTrackTimeout: NodeJS.Timeout | null = null;
-let pendingMixSeek: { videoId: string; seconds: number } | null = null;
+// The mix seek only exists to survive the navigation that starts the mix. It is consumed by the
+// next video data change, which YTM also fires for metadata updates on the track already playing,
+// so it has to expire rather than wait indefinitely for a load that may never come.
+const MIX_SEEK_RESTORE_WINDOW_MS = 10000;
+let pendingMixSeek: { videoId: string; seconds: number; expiresAt: number } | null = null;
 
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
@@ -1013,7 +1017,8 @@ function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
     if (wasPlaying && playlistId.startsWith("RDAMVM")) return;
     pendingMixSeek = {
       videoId,
-      seconds: wasPlaying ? state.videoProgress : 0
+      seconds: wasPlaying ? state.videoProgress : 0,
+      expiresAt: Date.now() + MIX_SEEK_RESTORE_WINDOW_MS
     };
     if (!wasPlaying) ytmView.webContents.send("remoteControl:execute", "seekTo", 0);
     ytmView.webContents.send("remoteControl:execute", "navigate", {
@@ -2018,9 +2023,14 @@ app.on("ready", async () => {
       ytmView.webContents.send("remoteControl:execute", "play");
     }
     if (pendingMixSeek) {
-      const seekTo = videoDetails.videoId === pendingMixSeek.videoId ? pendingMixSeek.seconds : 0;
+      const { videoId, seconds, expiresAt } = pendingMixSeek;
       pendingMixSeek = null;
-      ytmView.webContents.send("remoteControl:execute", "seekTo", seekTo);
+      // Only restore the position onto the track the mix was started from, and only while the
+      // navigation that would load it is still in flight. Seeking anything else would rewind a
+      // track the user is already listening to.
+      if (Date.now() <= expiresAt && videoDetails.videoId === videoId && seconds > 0) {
+        ytmView.webContents.send("remoteControl:execute", "seekTo", seconds);
+      }
     }
   });
 
