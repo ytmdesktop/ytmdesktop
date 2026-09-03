@@ -17,8 +17,15 @@ import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw"
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
+import LyricsOverlay from "./lyrics/overlay";
 
 const store = new Store<StoreSchema>();
+const lyricsOverlay = new LyricsOverlay();
+const DEFAULT_LYRICS_FONT_SIZE_PX = 26;
+
+lyricsOverlay.setSeekCallback(positionSeconds => {
+  ipcRenderer.send("ytmView:lyricsSeekTo", positionSeconds);
+});
 
 contextBridge.exposeInMainWorld("ytmd", {
   sendVideoProgress: (volume: number) => ipcRenderer.send("ytmView:videoProgressChanged", volume),
@@ -175,7 +182,6 @@ async function hookPlayerApiEvents() {
 }
 
 function overrideHistoryButtonDisplay() {
-  // @ts-expect-error Style is reported as readonly but this still works
   document.querySelector<HTMLElement>("#history-link .history-button").style = "display: inline-block !important;";
 }
 
@@ -282,6 +288,14 @@ window.addEventListener("load", async () => {
 
   const state = await store.get("state");
   const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
+  const playbackSettings = await store.get("playback");
+
+  lyricsOverlay.setSettings({
+    enabled: playbackSettings.lyricsEnabled ?? false,
+    fontSize: Number(playbackSettings.lyricsFontSizePx ?? DEFAULT_LYRICS_FONT_SIZE_PX),
+    debug: playbackSettings.lyricsDebug ?? false,
+    wordHighlight: playbackSettings.lyricsPreferSynced ?? true
+  });
 
   if (continueWhereYouLeftOff) {
     // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
@@ -599,6 +613,13 @@ window.addEventListener("load", async () => {
   });
 
   store.onDidAnyChange(newState => {
+    lyricsOverlay.setSettings({
+      enabled: newState.playback.lyricsEnabled ?? false,
+      fontSize: Number(newState.playback.lyricsFontSizePx ?? DEFAULT_LYRICS_FONT_SIZE_PX),
+      debug: newState.playback.lyricsDebug ?? false,
+      wordHighlight: newState.playback.lyricsPreferSynced ?? true
+    });
+
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
       if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
@@ -633,6 +654,14 @@ window.addEventListener("load", async () => {
         (await webFrame.executeJavaScript(script))();
       }
     }
+  });
+
+  ipcRenderer.on("ytmView:lyricsState", (_event, viewState) => {
+    lyricsOverlay.setState(viewState);
+  });
+
+  ipcRenderer.on("ytmView:lyricsSync", (_event, syncState) => {
+    lyricsOverlay.setSyncState(syncState);
   });
 
   ipcRenderer.send("ytmView:loaded");
