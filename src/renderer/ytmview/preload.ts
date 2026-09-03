@@ -16,6 +16,7 @@ import playerBarControlsScript from "./scripts/playerbarcontrols.script?raw";
 import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw";
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import searchScript from "./scripts/search.script?raw";
+import startMixScript from "./scripts/startmix.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
 
@@ -674,6 +675,15 @@ window.addEventListener("load", async () => {
         );
         break;
       }
+    }
+  });
+
+  ipcRenderer.on("ytmView:startMix", async (_event, requestId) => {
+    try {
+      const seed = await (await webFrame.executeJavaScript(startMixScript))();
+      ipcRenderer.send(`ytmView:startMix:response:${requestId}`, { seed });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:startMix:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
     }
   });
 

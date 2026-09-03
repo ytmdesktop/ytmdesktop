@@ -950,6 +950,35 @@ function searchYtm(query: string): Promise<MiniPlayerSearchResult[]> {
   });
 }
 
+type MiniPlayerMixSeed = { videoId: string; playlistId: string | null };
+
+function startMixInYtm(): Promise<MiniPlayerMixSeed> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:startMix:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Start mix timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { seed?: MiniPlayerMixSeed; error?: string }) => {
+      clearTimeout(timeout);
+      if (payload?.error || !payload?.seed?.videoId) {
+        reject(new Error(payload?.error ?? "Start mix returned no track"));
+        return;
+      }
+      resolve(payload.seed);
+    });
+
+    ytmView.webContents.send("ytmView:startMix", requestId);
+  });
+}
+
 function playMiniPlayerResult(videoId: string, action: MiniPlayerPlayResultAction) {
   if (!ytmView) return;
   if (action === "now") {
@@ -1015,18 +1044,24 @@ function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
     const wasPlaying = state.trackState === VideoState.Playing;
     const playlistId = state.playlistId || lastPlaylistId || "";
     if (wasPlaying && playlistId.startsWith("RDAMVM")) return;
+    const seconds = wasPlaying ? state.videoProgress : 0;
     pendingMixSeek = {
       videoId,
-      seconds: wasPlaying ? state.videoProgress : 0,
+      seconds,
       expiresAt: Date.now() + MIX_SEEK_RESTORE_WINDOW_MS
     };
     if (!wasPlaying) ytmView.webContents.send("remoteControl:execute", "seekTo", 0);
-    ytmView.webContents.send("remoteControl:execute", "navigate", {
-      watchEndpoint: {
-        videoId,
-        playlistId: `RDAMVM${videoId}`
-      }
-    });
+    // The page picks the radio endpoint so the mix keeps YTM's own audio/video hint. The seed can be
+    // the audio counterpart of a music video, which is the track the restore has to match.
+    void startMixInYtm()
+      .then(seed => {
+        if (!pendingMixSeek) return;
+        pendingMixSeek = { videoId: seed.videoId, seconds, expiresAt: Date.now() + MIX_SEEK_RESTORE_WINDOW_MS };
+      })
+      .catch(error => {
+        pendingMixSeek = null;
+        log.error("Linux mini-player start mix failed", error);
+      });
     if (!wasPlaying) {
       miniPlayerPauseHeld = false;
       nudgePlayback();
