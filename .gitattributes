@@ -4,3 +4,6 @@
 /.yarn/plugins/** binary
 /src/assets/** binary
 /.github/images/** binary
+# Git's `* text eol=lf` rule above rewrites CRLF inside binaries, which silently
+# corrupted every PNG that used to live here (the PNG signature contains 0D 0A).
+/src/gnome-shell-extension/**/icons/** -text

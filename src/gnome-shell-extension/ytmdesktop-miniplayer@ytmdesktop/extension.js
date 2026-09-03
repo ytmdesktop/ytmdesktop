@@ -375,7 +375,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._nextButton = this._iconButton('next.svg', 'Next', () => this._command('next'));
         this._likeButton = this._iconButton('thumbs-up.svg', 'Like', () => this._toggleLike(), 'ytmd-like-button');
         this._dislikeButton = this._iconButton('thumbs-down.svg', 'Dislike', () => this._toggleDislike());
-        this._mixButton = this._iconButton('mix-symbolic.png', 'Start mix', () => this._command('startMix'));
+        this._mixButton = this._iconButton('mix.svg', 'Start mix', () => this._command('startMix'));
         this._repeatButton = this._iconButton('repeat.svg', 'Repeat', () => this._cycleRepeat());
         this._shuffleButton = this._iconButton('shuffle.svg', 'Shuffle', () => this._command('shuffle'));
         this._skipAdButton = this._iconButton('skip-ad.svg', 'Skip ad', () => this._command('skipAd'), 'ytmd-skip-ad-button');
