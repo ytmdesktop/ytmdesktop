@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { StoreSchema, TrayIconStyle, ThemeMode } from "~shared/store/schema"; // CtrlAubDel added ThemeMode
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -47,6 +47,7 @@ const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
 const customCSSPath = ref<string>(appearance.customCSSPath);
 const zoom = ref<number>(appearance.zoom);
 const trayIconStyle = ref<number>(appearance.trayIconStyle);
+const themeMode = ref<ThemeMode>(appearance.themeMode ?? ThemeMode.System); // Added by CtrlAubDel
 
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
@@ -158,6 +159,8 @@ async function settingsChanged() {
   store.set("appearance.customCSSEnabled", customCSSEnabled.value);
   store.set("appearance.zoom", zoom.value);
   store.set("appearance.trayIconStyle", trayIconStyle.value);
+
+  store.set("appearance.themeMode", themeMode.value); // Added by CtrlAubDel
 
   store.set("playback.continueWhereYouLeftOff", continueWhereYouLeftOff.value);
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
@@ -315,6 +318,19 @@ window.ytmd.handleUpdateDownloaded(() => {
             @clear="removeCustomCSSPath"
           />
           <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
+
+          <YTMDSetting
+            v-model="themeMode"
+            :options-map="{
+              [ThemeMode.System]: 'System',
+              [ThemeMode.Light]: 'Light',
+              [ThemeMode.Dark]: 'Dark'
+            }"
+            type="select"
+            name="Theme"
+            @change="settingsChanged"
+          />
+
           <YTMDSetting
             v-if="isLinux"
             v-model="trayIconStyle"

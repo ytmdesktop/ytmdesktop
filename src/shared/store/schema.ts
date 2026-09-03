@@ -4,6 +4,12 @@ export enum TrayIconStyle {
   Black = 2
 }
 
+export enum ThemeMode { // Added by CtrlAubDel
+  System = 0, //
+  Light = 1, //
+  Dark = 2 //
+}
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -21,6 +27,7 @@ export type StoreSchema = {
     customCSSPath: string | null;
     zoom: number;
     trayIconStyle: TrayIconStyle;
+    themeMode: ThemeMode; // Addde by CtrlAubDel
   };
   playback: {
     continueWhereYouLeftOff: boolean;
