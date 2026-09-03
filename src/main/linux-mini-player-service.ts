@@ -196,19 +196,19 @@ export default class LinuxMiniPlayerService {
     const adPlaying = !!this.playerState.adPlaying;
     const ad = adPlaying ? toMiniPlayerAd(this.playerState.adDetails) : null;
 
+    // Signing in is not required to play YouTube Music, so it gates nothing but the account-bound
+    // actions below. A signed-out listener still gets ads and free playback, and the panel has to
+    // drive it.
     let status: MiniPlayerStatus;
     let message: string | null = null;
-    if (!this.sessionState.authenticated) {
-      status = "needs-main-app";
-      message = "Sign in or choose a track in YTMusic";
-    } else if (video) {
+    if (video) {
       status = this.stableStatus === "playing" ? "playing" : "paused";
     } else if (this.statusOverride === "loading") {
       status = "loading";
       message = "Resuming last track…";
     } else if (this.statusOverride === "needs-main-app" || !this.sessionState.hasSavedTrack) {
       status = "needs-main-app";
-      message = "Sign in or choose a track in YTMusic";
+      message = "Choose a track in YouTube Music";
     } else {
       status = "idle";
       message = "Resume last track";
@@ -229,9 +229,11 @@ export default class LinuxMiniPlayerService {
           }
         : null,
       progressSeconds: this.playerState.videoProgress,
-      canPlay: this.sessionState.authenticated && (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app",
-      canPrevious: this.sessionState.authenticated && queueReady,
-      canNext: this.sessionState.authenticated && queueReady,
+      canPlay: (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app",
+      canPrevious: queueReady,
+      canNext: queueReady,
+      // Rating a track is the only thing here that actually needs an account.
+      canLike: this.sessionState.authenticated && !!video && !adPlaying,
       likeStatus,
       repeatMode,
       volume: Math.max(0, Math.min(100, this.playerState.volume ?? 0)),

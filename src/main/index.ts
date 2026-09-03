@@ -900,7 +900,7 @@ async function refreshYtmAuthentication() {
 
 function resumeLastTrack() {
   const savedState = store.get("state");
-  if (!ytmAuthenticated || !savedState.lastVideoId || !ytmView) {
+  if (!savedState.lastVideoId || !ytmView) {
     linuxMiniPlayerService?.setNeedsMainApp();
     return;
   }
@@ -1073,7 +1073,7 @@ function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
 
 function maybeAutoplayMiniPlayer() {
   if (!miniPlayerServingPanel() || !store.get("playback.linuxMiniPlayerAutoplay")) return;
-  if (!ytmAuthenticated || !hasSavedTrack()) return;
+  if (!hasSavedTrack()) return;
 
   setTimeout(() => {
     if (miniPlayerPauseHeld) return;

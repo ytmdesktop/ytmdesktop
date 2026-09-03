@@ -984,19 +984,24 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _toggleLike() {
+        if (!this._state?.canLike)
+            return;
         this._setLikeOverride(this._currentLikeStatus() === 'like' ? 'indifferent' : 'like');
         this._command('toggleLike');
     }
 
     _toggleDislike() {
+        if (!this._state?.canLike)
+            return;
         this._setLikeOverride(this._currentLikeStatus() === 'dislike' ? 'indifferent' : 'dislike');
         this._command('toggleDislike');
     }
 
     _updateLikeButtons() {
-        const adPlaying = Boolean(this._adState());
-        this._setButtonEnabled(this._likeButton, !adPlaying);
-        this._setButtonEnabled(this._dislikeButton, !adPlaying);
+        // Rating needs an account; playback does not, so this is the only auth-gated control.
+        const canLike = Boolean(this._state?.canLike);
+        this._setButtonEnabled(this._likeButton, canLike);
+        this._setButtonEnabled(this._dislikeButton, canLike);
         const likeStatus = this._currentLikeStatus();
         const liked = likeStatus === 'like';
         const disliked = likeStatus === 'dislike';
@@ -1145,6 +1150,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         if (command === 'next' && !this._state?.canNext)
             return;
         if (command === 'seekTo' && (!this._state?.track || this._state?.adPlaying))
+            return;
+        if ((command === 'toggleLike' || command === 'toggleDislike') && !this._state?.canLike)
             return;
         this._call('Command', command, value);
     }

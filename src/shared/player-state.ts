@@ -130,6 +130,7 @@ export type MiniPlayerSnapshot = {
   canPlay: boolean;
   canPrevious: boolean;
   canNext: boolean;
+  canLike: boolean;
   likeStatus: MiniPlayerLikeStatus;
   repeatMode: MiniPlayerRepeatMode;
   volume: number;

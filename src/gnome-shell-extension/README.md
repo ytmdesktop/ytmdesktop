@@ -109,6 +109,7 @@ Unknown commands are ignored, as are out-of-range values.
   "canPlay": true,
   "canPrevious": true,
   "canNext": true,
+  "canLike": true, // false when signed out or during an ad; playback is never gated on sign-in
   "likeStatus": "indifferent",
   "repeatMode": "none", // none | all | one
   "volume": 51,
@@ -124,6 +125,9 @@ Unknown commands are ignored, as are out-of-range values.
   "message": null // human-readable reason when status is not playable
 }
 ```
+
+`authenticated` reports whether a Google account is signed in. It gates only `canLike` — a
+signed-out listener still gets ads and free playback, and every transport control stays live.
 
 While `adPlaying` is true, `progressSeconds` is the ad's progress and should be read against
 `ad.durationSeconds`. `canNext` stays true — skipping works during ads.
