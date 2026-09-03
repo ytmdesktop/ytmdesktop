@@ -19,10 +19,7 @@ export const APIV1CommandRequestBody = Type.Union([
   }),
   Type.Object({
     command: Type.Literal("setVolume"),
-    data: Type.Number({
-      minimum: 0,
-      maximum: 100
-    })
+    data: Type.Number()
   }),
   Type.Object({
     command: Type.Literal("mute")
@@ -32,9 +29,7 @@ export const APIV1CommandRequestBody = Type.Union([
   }),
   Type.Object({
     command: Type.Literal("seekTo"),
-    data: Type.Number({
-      minimum: 0
-    })
+    data: Type.Number()
   }),
   Type.Object({
     command: Type.Literal("next")
@@ -51,9 +46,7 @@ export const APIV1CommandRequestBody = Type.Union([
   }),
   Type.Object({
     command: Type.Literal("playQueueIndex"),
-    data: Type.Number({
-      minimum: 0
-    })
+    data: Type.Number()
   }),
   Type.Object({
     command: Type.Literal("changeVideo"),

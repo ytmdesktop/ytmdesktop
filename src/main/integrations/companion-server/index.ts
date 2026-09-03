@@ -61,6 +61,19 @@ export default class CompanionServer implements IIntegration {
 
       reply.send(error);
     });
+    // Schema validation produces a lot of unhelpful errors,
+    // filter out only the relevant error when possible
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    this.fastifyServer.setSchemaErrorFormatter((errors, _) => {
+      for (const error of errors) {
+        if (error.message == "must match a schema in anyOf") return new Error("invalid command");
+        else if (error.message?.startsWith("must have required property") ?? false) {
+          return new Error(error.message);
+        }
+      }
+      // if all else fails, just send all errors as a string
+      return new Error(errors.toString());
+    });
     this.fastifyServer.get("/metadata", (request, reply) => {
       reply.send({
         apiVersions: ["v1"]

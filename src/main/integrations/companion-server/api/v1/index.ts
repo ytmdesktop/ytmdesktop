@@ -210,7 +210,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           const index = commandRequest.data;
           const state = playerStateStore.getState();
 
-          if (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1) {
+          if (isNaN(index) || index < 0 || index > state.queue.items.length + state.queue.automixItems.length - 1) {
             throw new InvalidQueueIndexError(index);
           }
 
