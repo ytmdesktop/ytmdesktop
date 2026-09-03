@@ -372,6 +372,19 @@ window.addEventListener("load", async () => {
         break;
       }
 
+      case "stop": {
+        (
+          await webFrame.executeJavaScript(`
+            (function() {
+              var playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+              playerBar.playerApi.pauseVideo();
+              playerBar.playerApi.seekTo(0);
+            })
+          `)
+        )();
+        break;
+      }
+
       case "next": {
         (
           await webFrame.executeJavaScript(`
