@@ -7,7 +7,6 @@ import {
   MiniPlayerAd,
   MiniPlayerCommand,
   MiniPlayerLikeStatus,
-  MiniPlayerPlayResultAction,
   MiniPlayerRepeatMode,
   MiniPlayerSearchResult,
   MiniPlayerSearchSnapshot,
@@ -26,7 +25,7 @@ const MAX_SEARCH_QUERY_LENGTH = 200;
 type MiniPlayerActions = {
   command(command: MiniPlayerCommand, value?: number): void;
   search(query: string): Promise<MiniPlayerSearchResult[]>;
-  playResult(videoId: string, action: MiniPlayerPlayResultAction): void;
+  playResult(videoId: string): void;
   toggleMainWindow(): void;
   showMainWindow(): void;
   openSettings(): void;
@@ -123,8 +122,8 @@ export default class LinuxMiniPlayerService {
         PlayResult: {
           in: { videoId: "s", action: "s" },
           handler: ({ videoId, action }: { videoId: string; action: string }) => {
-            if (!videoId || (action !== "now" && action !== "next")) return;
-            this.actions.playResult(videoId, action);
+            if (!videoId || action !== "now") return;
+            this.actions.playResult(videoId);
           }
         }
       },

@@ -167,4 +167,3 @@ export type MiniPlayerSearchSnapshot = {
   message: string | null;
 };
 
-export type MiniPlayerPlayResultAction = "now" | "next";

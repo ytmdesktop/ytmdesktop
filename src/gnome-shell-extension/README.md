@@ -63,7 +63,7 @@ Implemented in `src/main/linux-mini-player-service.ts`.
 | `GetState`         | `() → s`                | Current player snapshot, as JSON                                                                                          |
 | `Command`          | `(s command, d value)`  | See the command table; `value` is ignored where unused                                                                    |
 | `Search`           | `(s query)`             | Asynchronous; results arrive on `SearchResultsChanged`. Whitespace is collapsed and the query is capped at 200 characters |
-| `PlayResult`       | `(s videoId, s action)` | `action` is `now` or `next`; any other value is ignored                                                                   |
+| `PlayResult`       | `(s videoId, s action)` | `action` must be `now`; any other value is ignored                                                                              |
 | `ShowMainWindow`   | `()`                    | Restore, show, and focus the main window                                                                                  |
 | `ToggleMainWindow` | `()`                    | Show or hide the main window                                                                                              |
 | `OpenSettings`     | `()`                    | Open the settings window                                                                                                  |

@@ -26,7 +26,7 @@ import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { MiniPlayerCommand, MiniPlayerPlayResultAction, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { MiniPlayerCommand, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
 import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
@@ -979,17 +979,14 @@ function startMixInYtm(): Promise<MiniPlayerMixSeed> {
   });
 }
 
-function playMiniPlayerResult(videoId: string, action: MiniPlayerPlayResultAction) {
+function playMiniPlayerResult(videoId: string) {
   if (!ytmView) return;
-  if (action === "now") {
-    ytmView.webContents.send("remoteControl:execute", "navigate", {
-      watchEndpoint: { videoId }
-    });
-    miniPlayerPauseHeld = false;
-    nudgePlayback();
-    return;
-  }
-  ytmView.webContents.send("remoteControl:execute", "playNext", videoId);
+  // A bare videoId is enough: YouTube Music builds the radio queue around it by itself.
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    watchEndpoint: { videoId }
+  });
+  miniPlayerPauseHeld = false;
+  nudgePlayback();
 }
 
 let playbackNudgeTimeout: NodeJS.Timeout | null = null;

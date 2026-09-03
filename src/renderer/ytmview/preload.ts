@@ -634,38 +634,6 @@ window.addEventListener("load", async () => {
         break;
       }
 
-      case "playNext": {
-        (
-          await webFrame.executeJavaScript(`
-            (function(videoId) {
-              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
-              if (!playerBar) return;
-              const returnValue = [];
-              playerBar.dispatchEvent(new CustomEvent("yt-action", {
-                bubbles: true,
-                cancelable: false,
-                composed: true,
-                detail: {
-                  actionName: "yt-service-request",
-                  args: [
-                    playerBar,
-                    {
-                      queueAddEndpoint: {
-                        queueInsertPosition: "INSERT_AFTER_CURRENT_VIDEO",
-                        queueTarget: { videoId }
-                      }
-                    }
-                  ],
-                  optionalAction: false,
-                  returnValue
-                }
-              }));
-            })
-          `, true)
-        )(value);
-        break;
-      }
-
       case "skipAd": {
         (
           await webFrame.executeJavaScript(
