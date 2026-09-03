@@ -44,6 +44,7 @@ export type StoreSchema = {
     thumbsDown: string;
     volumeUp: string;
     volumeDown: string;
+    volumeDelta: number;
   };
   state: {
     lastUrl: string;
