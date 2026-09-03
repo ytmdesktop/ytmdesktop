@@ -20,8 +20,12 @@ type YTMThumbnail = {
 type YTMAdDetails = {
   title: string | null;
   advertiser: string | null;
-  thumbnails: YTMThumbnail[];
+  badge: string | null;
   durationSeconds: number;
+  progressSeconds: number;
+  isPlaying: boolean;
+  canSkip: boolean;
+  skipHint: string | null;
 };
 
 type YTMTextRun = {
@@ -256,6 +260,25 @@ class PlayerStateStore {
     return this.playlistId;
   }
 
+  // Ads are observed straight off the real player element; nothing in the YTM playerApi or its
+  // store reports them reliably.
+  public updateAdState(adDetails: YTMAdDetails | null) {
+    this.adPlaying = !!adDetails;
+    this.adDetails = adDetails
+      ? {
+          title: adDetails.title ?? null,
+          advertiser: adDetails.advertiser ?? null,
+          badge: adDetails.badge ?? null,
+          durationSeconds: adDetails.durationSeconds ?? 0,
+          progressSeconds: adDetails.progressSeconds ?? 0,
+          isPlaying: adDetails.isPlaying === true,
+          canSkip: adDetails.canSkip === true,
+          skipHint: adDetails.skipHint ?? null
+        }
+      : null;
+    this.eventEmitter.emit("stateChanged", this.getState());
+  }
+
   public updateVideoProgress(progress: number) {
     this.videoProgress = progress;
     this.eventEmitter.emit("stateChanged", this.getState());
@@ -315,9 +338,7 @@ class PlayerStateStore {
     queueState: YTMPlayerQueue | null,
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
-    muted: boolean | null,
-    adPlaying: boolean | null,
-    adDetails: YTMAdDetails | null
+    muted: boolean | null
   ) {
     const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
     const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
@@ -341,16 +362,6 @@ class PlayerStateStore {
     if (this.videoDetails && nextLikeStatus) {
       this.videoDetails.likeStatus = transformLikeStatus(nextLikeStatus);
     }
-    this.adPlaying = adPlaying === true;
-    this.adDetails =
-      this.adPlaying && adDetails
-        ? {
-            title: adDetails.title ?? null,
-            advertiser: adDetails.advertiser ?? null,
-            thumbnails: adDetails.thumbnails ? adDetails.thumbnails.map(mapYTMThumbnails) : [],
-            durationSeconds: adDetails.durationSeconds ?? 0
-          }
-        : null;
     this.muted = muted === true;
     if (typeof volume === "number" && volume >= 0) this.volume = volume;
 

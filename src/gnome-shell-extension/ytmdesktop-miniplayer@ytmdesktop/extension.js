@@ -192,7 +192,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             }
         });
         this._tickId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
-            if (this._state?.status === 'playing' && this._state?.track && !this._dragging) {
+            if (this._state?.status === 'playing' && (this._state?.track || this._state?.adPlaying) && !this._dragging) {
                 const duration = this._duration();
                 this._localProgress = Math.min(this._localProgress + 0.25, duration || Number.POSITIVE_INFINITY);
                 this._updateProgress();
@@ -378,6 +378,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._mixButton = this._iconButton('mix-symbolic.png', 'Start mix', () => this._command('startMix'));
         this._repeatButton = this._iconButton('repeat.svg', 'Repeat', () => this._cycleRepeat());
         this._shuffleButton = this._iconButton('shuffle.svg', 'Shuffle', () => this._command('shuffle'));
+        this._skipAdButton = this._iconButton('skip-ad.svg', 'Skip ad', () => this._command('skipAd'), 'ytmd-skip-ad-button');
+        this._skipAdButton.visible = false;
         controls.add_child(this._previousButton);
         controls.add_child(this._playButton);
         controls.add_child(this._nextButton);
@@ -386,6 +388,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         controls.add_child(this._mixButton);
         controls.add_child(this._repeatButton);
         controls.add_child(this._shuffleButton);
+        controls.add_child(this._skipAdButton);
         details.add_child(controls);
 
         this._volumeRow = new St.BoxLayout({style_class: 'ytmd-volume-row', x_expand: true});
@@ -925,20 +928,28 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const playing = this._state?.status === 'playing';
         const needsMainApp = this._state?.status === 'needs-main-app';
 
-        // An ad does not change track, so without this the panel keeps claiming the song is playing.
+        // An ad does not change track, so the panel would otherwise keep showing the interrupted
+        // song while something else is audible.
         this._adBadge.visible = Boolean(ad);
         this._setMarqueeText(this._titleMarquee, ad ? `(AD) ${ad.title || 'Advertisement'}` : track?.title || 'Nothing playing');
         this._setMarqueeText(
             this._artistMarquee,
-            ad ? ad.advertiser || 'Advertisement' : track?.artist || this._state?.message || 'Open YouTube Music to start playing'
+            ad
+                ? ad.skipHint || ad.advertiser || 'Advertisement'
+                : track?.artist || this._state?.message || 'Open YouTube Music to start playing'
         );
-        this._setArtwork((ad ? ad.artworkUrl : track?.artworkUrl) ?? null);
+        // Video ads carry no artwork, and reusing the song's art is exactly what made the card lie.
+        this._setArtwork(ad ? (ad.artworkUrl ?? null) : (track?.artworkUrl ?? null));
 
         this._setButtonIcon(this._playButton, playing ? 'pause-dark.svg' : 'play-dark.svg');
         this._playButton.accessible_name = playing ? 'Pause' : 'Play';
         this._setButtonEnabled(this._previousButton, Boolean(this._state?.canPrevious));
         this._setButtonEnabled(this._playButton, Boolean(this._state?.canPlay));
         this._setButtonEnabled(this._nextButton, Boolean(this._state?.canNext));
+
+        this._skipAdButton.visible = Boolean(ad);
+        this._setButtonEnabled(this._skipAdButton, Boolean(this._state?.canSkipAd));
+        this._skipAdButton.accessible_name = this._state?.canSkipAd ? 'Skip ad' : ad?.skipHint || 'Ad cannot be skipped yet';
 
         this._slider.reactive = !ad && Boolean(track) && this._duration() > 0;
         this._openAppButton.visible = needsMainApp && this._layout !== 'small';
@@ -1152,6 +1163,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         if (command === 'seekTo' && (!this._state?.track || this._state?.adPlaying))
             return;
         if ((command === 'toggleLike' || command === 'toggleDislike') && !this._state?.canLike)
+            return;
+        if (command === 'skipAd' && !this._state?.canSkipAd)
             return;
         this._call('Command', command, value);
     }

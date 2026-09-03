@@ -27,8 +27,10 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: unknown, playlistId: string, album: { id: string; text: string }, likeStatus: unknown, hasFullMetadata: boolean) =>
     ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId, album, likeStatus, hasFullMetadata),
-  sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean, adDetails: unknown) =>
-    ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted, adPlaying, adDetails),
+  sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean) =>
+    ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted),
+  sendAdState: (adState: unknown) => ipcRenderer.send("ytmView:adStateChanged", adState),
+  sendAdDiagnostic: (message: string) => ipcRenderer.send("ytmView:adDiagnostic", message),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
@@ -661,6 +663,29 @@ window.addEventListener("load", async () => {
             })
           `, true)
         )(value);
+        break;
+      }
+
+      case "skipAd": {
+        (
+          await webFrame.executeJavaScript(
+            `
+            (function() {
+              const moviePlayer = document.querySelector("#movie_player");
+              if (!moviePlayer) return;
+              const selectors = [".ytp-ad-skip-button-modern", ".ytp-ad-skip-button", ".ytp-skip-ad-button"];
+              for (const selector of selectors) {
+                const button = moviePlayer.querySelector(selector);
+                if (button && button.offsetParent !== null) {
+                  button.click();
+                  return;
+                }
+              }
+            })
+          `,
+            true
+          )
+        )();
         break;
       }
 

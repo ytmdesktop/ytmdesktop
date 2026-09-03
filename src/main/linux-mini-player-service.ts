@@ -100,7 +100,8 @@ export default class LinuxMiniPlayerService {
               "shuffle",
               "setVolume",
               "mute",
-              "startMix"
+              "startMix",
+              "skipAd"
             ]);
             if (!allowedCommands.has(command as MiniPlayerCommand)) return;
             if (command === "seekTo" && (!Number.isFinite(value) || value < 0)) return;
@@ -193,15 +194,20 @@ export default class LinuxMiniPlayerService {
     const artworkUrl = cleanArtworkUrl(video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null);
     const likeStatus = toLikeStatus(video?.likeStatus);
     const repeatMode = toRepeatMode(this.playerState.queue?.repeatMode);
+    const adDetails = this.playerState.adDetails;
     const adPlaying = !!this.playerState.adPlaying;
-    const ad = adPlaying ? toMiniPlayerAd(this.playerState.adDetails) : null;
+    const ad = adPlaying ? toMiniPlayerAd(adDetails) : null;
 
     // Signing in is not required to play YouTube Music, so it gates nothing but the account-bound
     // actions below. A signed-out listener still gets ads and free playback, and the panel has to
     // drive it.
     let status: MiniPlayerStatus;
     let message: string | null = null;
-    if (video) {
+    if (adPlaying) {
+      // stableStatus is stuck on "paused" for the whole ad: YTM reports the song pausing but the
+      // ad player never reports itself playing. The ad element is the only truth here.
+      status = adDetails?.isPlaying ? "playing" : "paused";
+    } else if (video) {
       status = this.stableStatus === "playing" ? "playing" : "paused";
     } else if (this.statusOverride === "loading") {
       status = "loading";
@@ -228,12 +234,13 @@ export default class LinuxMiniPlayerService {
             likeStatus
           }
         : null,
-      progressSeconds: this.playerState.videoProgress,
+      progressSeconds: adPlaying ? (adDetails?.progressSeconds ?? 0) : this.playerState.videoProgress,
       canPlay: (!!video || this.sessionState.hasSavedTrack) && status !== "needs-main-app",
       canPrevious: queueReady,
       canNext: queueReady,
       // Rating a track is the only thing here that actually needs an account.
       canLike: this.sessionState.authenticated && !!video && !adPlaying,
+      canSkipAd: adPlaying && !!adDetails?.canSkip,
       likeStatus,
       repeatMode,
       volume: Math.max(0, Math.min(100, this.playerState.volume ?? 0)),
@@ -330,12 +337,14 @@ function cleanArtworkUrl(url: string | null | undefined): string | null {
 }
 
 function toMiniPlayerAd(details: AdDetails | null): MiniPlayerAd {
-  const largest = details?.thumbnails.length ? [...details.thumbnails].sort((left, right) => right.width - left.width)[0].url : null;
   return {
     title: details?.title || "Advertisement",
-    advertiser: details?.advertiser ?? null,
-    artworkUrl: cleanArtworkUrl(largest),
-    durationSeconds: details?.durationSeconds ?? 0
+    // The badge ("Sponsored 1 of 2") is the only advertiser text most video ads expose.
+    advertiser: details?.advertiser || details?.badge || null,
+    // Video ads carry no artwork; the panel shows its placeholder rather than the interrupted song.
+    artworkUrl: null,
+    durationSeconds: details?.durationSeconds ?? 0,
+    skipHint: details?.skipHint ?? null
   };
 }
 

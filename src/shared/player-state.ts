@@ -50,8 +50,12 @@ export type VideoDetails = {
 export type AdDetails = {
   title: string | null;
   advertiser: string | null;
-  thumbnails: Thumbnail[];
+  badge: string | null;
   durationSeconds: number;
+  progressSeconds: number;
+  isPlaying: boolean;
+  canSkip: boolean;
+  skipHint: string | null;
 };
 
 export type PlayerQueueItem = {
@@ -98,7 +102,8 @@ export type MiniPlayerCommand =
   | "shuffle"
   | "setVolume"
   | "mute"
-  | "startMix";
+  | "startMix"
+  | "skipAd";
 
 export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "needs-main-app";
 
@@ -110,6 +115,7 @@ export type MiniPlayerAd = {
   advertiser: string | null;
   artworkUrl: string | null;
   durationSeconds: number;
+  skipHint: string | null;
 };
 
 export type MiniPlayerTrack = {
@@ -131,6 +137,7 @@ export type MiniPlayerSnapshot = {
   canPrevious: boolean;
   canNext: boolean;
   canLike: boolean;
+  canSkipAd: boolean;
   likeStatus: MiniPlayerLikeStatus;
   repeatMode: MiniPlayerRepeatMode;
   volume: number;

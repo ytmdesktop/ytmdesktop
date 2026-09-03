@@ -81,36 +81,110 @@
     return (element?.textContent ?? "").replace(/\s+/g, " ").trim();
   }
 
-  // onVideoDataChange ignores the ad player, so videoDetails stays on the song while an ad runs.
-  // The player response does follow the ad, which is the only place its title and artwork exist.
-  function getAdDetails() {
-    const videoDetails = playerApi.getPlayerResponse()?.videoDetails;
-    const title = videoDetails?.title || textOf(queryDeep(playerBar, ".title.ytmusic-player-bar")) || null;
-    const advertiser = videoDetails?.author || textOf(queryDeep(playerBar, ".byline.ytmusic-player-bar")) || null;
-    const lengthSeconds = parseInt(videoDetails?.lengthSeconds ?? "", 10);
-    if (!title && !advertiser) return null;
+  function pickText(root, selectors) {
+    for (const selector of selectors) {
+      const text = textOf(root?.querySelector(selector));
+      if (text) return text;
+    }
+    return null;
+  }
+
+  function visible(element) {
+    return !!element && element.offsetParent !== null;
+  }
+
+  const SKIP_SELECTORS = [".ytp-ad-skip-button-modern", ".ytp-ad-skip-button", ".ytp-skip-ad-button"];
+
+  function findSkipButton(root) {
+    for (const selector of SKIP_SELECTORS) {
+      const button = root?.querySelector(selector);
+      if (visible(button)) return button;
+    }
+    return null;
+  }
+
+  // The ad runs on a player the YTM playerApi callbacks never report on: no progress, no state
+  // change, no data change, and getPlayerResponse() keeps returning the interrupted song. Every
+  // fact about an ad has to be read off the real player element.
+  function getMoviePlayer() {
+    return document.querySelector("#movie_player") || queryDeep(document, "#movie_player");
+  }
+
+  function readAdState() {
+    const moviePlayer = getMoviePlayer();
+    const adShowing = !!moviePlayer && moviePlayer.classList.contains("ad-showing");
+    let adState = false;
+    try {
+      adState = playerApi.getAdState?.() === 1;
+    } catch {
+      adState = false;
+    }
+    const storeAd = ytmStore.getState()?.player?.adPlaying === true;
+    if (!adShowing && !adState && !storeAd) return null;
+
+    // While an ad shows, this video element IS the ad.
+    const video = moviePlayer?.querySelector("video");
+    const duration = Number.isFinite(video?.duration) ? video.duration : 0;
 
     return {
-      title,
-      advertiser,
-      thumbnails: videoDetails?.thumbnail?.thumbnails ?? [],
-      durationSeconds: Number.isFinite(lengthSeconds) ? lengthSeconds : 0
+      title: pickText(moviePlayer, [".ytp-ad-visit-advertiser-button .ytp-ad-button-text", ".ytp-ad-title"]),
+      advertiser: pickText(moviePlayer, [".ytp-ad-visit-advertiser-button", ".ytp-ad-hover-text-button"]),
+      badge: pickText(moviePlayer, [".ytp-ad-simple-ad-badge", ".ytp-ad-badge", ".ytp-ad-text"]),
+      durationSeconds: duration,
+      progressSeconds: Number.isFinite(video?.currentTime) ? video.currentTime : 0,
+      isPlaying: !!video && !video.paused,
+      canSkip: !!findSkipButton(moviePlayer),
+      skipHint: pickText(moviePlayer, [".ytp-ad-preview-text", ".ytp-ad-preview-container"]),
+      signals: { adShowing, adState, storeAd }
     };
+  }
+
+  let adTickId = null;
+  let adActive = false;
+
+  function pushAdState() {
+    const ad = readAdState();
+    const active = !!ad;
+
+    if (active !== adActive) {
+      adActive = active;
+      // One line per transition, so a stale selector is diagnosable from the log instead of guessed at.
+      window.ytmd.sendAdDiagnostic(
+        active ? `ad started ${JSON.stringify(ad.signals)} duration=${ad.durationSeconds} canSkip=${ad.canSkip}` : "ad ended"
+      );
+    }
+
+    window.ytmd.sendAdState(ad);
+
+    if (active && adTickId === null) {
+      adTickId = setInterval(pushAdState, 500);
+    } else if (!active && adTickId !== null) {
+      clearInterval(adTickId);
+      adTickId = null;
+    }
+  }
+
+  let watchAttempts = 0;
+
+  function watchForAds() {
+    const moviePlayer = getMoviePlayer();
+    if (!moviePlayer) {
+      watchAttempts += 1;
+      // Say so rather than retrying in silence: without this element there is no ad reporting at all.
+      if (watchAttempts === 30) window.ytmd.sendAdDiagnostic("#movie_player never appeared; ad reporting is off");
+      if (watchAttempts <= 30) setTimeout(watchForAds, 1000);
+      return;
+    }
+    // Ads start and end without dispatching a store action, so the class attribute is the trigger.
+    new MutationObserver(pushAdState).observe(moviePlayer, { attributes: true, attributeFilter: ["class"] });
+    pushAdState();
   }
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     const state = ytmStore.getState();
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const adPlaying = state.player.adPlaying;
-    window.ytmd.sendStoreUpdate(
-      state.queue,
-      getLikeStatus(videoId),
-      state.player.volume,
-      state.player.muted,
-      adPlaying,
-      adPlaying ? getAdDetails() : null
-    );
+    window.ytmd.sendStoreUpdate(state.queue, getLikeStatus(videoId), state.player.volume, state.player.muted);
   }
 
   function sendVideoData() {
@@ -160,6 +234,7 @@
     sendStoreState();
   });
   sendCurrentPlayerState();
+  watchForAds();
 
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {

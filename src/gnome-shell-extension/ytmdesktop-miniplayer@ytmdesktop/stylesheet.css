@@ -262,6 +262,11 @@
   min-width: 0;
 }
 
+.ytmd-skip-ad-button {
+  background-color: rgba(255, 0, 51, 0.18);
+  border-radius: 999px;
+}
+
 .ytmd-title-row {
   spacing: 6px;
 }

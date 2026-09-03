@@ -2069,10 +2069,22 @@ app.on("ready", async () => {
     }
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying, adDetails) => {
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted) => {
     if (event.sender !== ytmView.webContents) return;
 
-    playerStateStore.updateFromStore(queue, likeStatus, volume, muted, adPlaying, adDetails);
+    playerStateStore.updateFromStore(queue, likeStatus, volume, muted);
+  });
+
+  ipcMain.on("ytmView:adStateChanged", (event, adState) => {
+    if (event.sender !== ytmView.webContents) return;
+
+    playerStateStore.updateAdState(adState ?? null);
+  });
+
+  ipcMain.on("ytmView:adDiagnostic", (event, message) => {
+    if (event.sender !== ytmView.webContents) return;
+
+    log.info("YTM ad state:", message);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {

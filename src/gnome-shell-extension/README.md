@@ -84,7 +84,7 @@ Unknown commands are ignored, as are out-of-range values.
 | ------------------------------------------------ | -------------------------- |
 | `previous`, `playPause`, `next`                  | unused                     |
 | `toggleLike`, `toggleDislike`, `shuffle`, `mute` | unused                     |
-| `startMix`                                       | unused                     |
+| `startMix`, `skipAd`                             | unused                     |
 | `seekTo`                                         | seconds, finite and `>= 0` |
 | `setVolume`                                      | `0`–`100`                  |
 | `repeatMode`                                     | `0` none, `1` all, `2` one |
@@ -110,6 +110,7 @@ Unknown commands are ignored, as are out-of-range values.
   "canPrevious": true,
   "canNext": true,
   "canLike": true, // false when signed out or during an ad; playback is never gated on sign-in
+  "canSkipAd": false, // true once YouTube's own Skip Ad button is clickable
   "likeStatus": "indifferent",
   "repeatMode": "none", // none | all | one
   "volume": 51,
@@ -117,10 +118,11 @@ Unknown commands are ignored, as are out-of-range values.
   "adPlaying": false,
   "ad": {
     // null unless adPlaying is true; track keeps the song the ad interrupted
-    "title": "…", // "Advertisement" when YTM exposes nothing
-    "advertiser": "…", // may be null
-    "artworkUrl": "https://…", // may be null
-    "durationSeconds": 15
+    "title": "…", // "Advertisement" when the ad exposes nothing
+    "advertiser": "…", // advertiser, else the badge ("Sponsored 1 of 2"); may be null
+    "artworkUrl": null, // video ads carry no artwork
+    "durationSeconds": 15,
+    "skipHint": "You can skip to video in 4" // countdown text, null once skippable
   },
   "message": null // human-readable reason when status is not playable
 }
@@ -129,8 +131,21 @@ Unknown commands are ignored, as are out-of-range values.
 `authenticated` reports whether a Google account is signed in. It gates only `canLike` — a
 signed-out listener still gets ads and free playback, and every transport control stays live.
 
-While `adPlaying` is true, `progressSeconds` is the ad's progress and should be read against
-`ad.durationSeconds`. `canNext` stays true — skipping works during ads.
+## Ad behavior
+
+Ads are read off the page's real player element (`#movie_player`), not the YouTube Music player
+API: during an ad that API reports no progress, no state change, and keeps returning the
+interrupted song from `getPlayerResponse()`. A `MutationObserver` on the player's `class`
+attribute catches the ad starting and ending, and a 500 ms poll runs only while one is showing.
+
+While `adPlaying` is true:
+
+- `progressSeconds` is the ad's progress, read against `ad.durationSeconds`.
+- `status` follows the ad's own play state, not the interrupted song's.
+- `track` still holds the song the ad interrupted, so playback resumes cleanly — but a client
+  should render `ad`, not `track`, or the card will describe something the listener cannot hear.
+- `canNext` stays true, and `canSkipAd` turns true once YouTube's Skip Ad button is clickable.
+  The `skipAd` command clicks that button.
 
 ### `SearchResultsChanged` payload
 
