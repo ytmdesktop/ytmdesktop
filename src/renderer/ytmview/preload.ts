@@ -512,6 +512,37 @@ window.addEventListener("load", async () => {
         )(value);
         break;
 
+      case "restartTrack":
+        (
+          await webFrame.executeJavaScript(`
+            (function() {
+              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+              playerBar.playerApi.seekTo(0);
+              playerBar.playerApi.pauseVideo();
+            })
+          `)
+        )();
+        break;
+
+      case "nextAndPause":
+        (
+          await webFrame.executeJavaScript(`
+            (function() {
+              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+              const handler = (state) => {
+                // State 1 = playing. Pause as soon as the next track starts.
+                if (state === 1) {
+                  playerBar.playerApi.removeEventListener("onStateChange", handler);
+                  playerBar.playerApi.pauseVideo();
+                }
+              };
+              playerBar.playerApi.addEventListener("onStateChange", handler);
+              playerBar.playerApi.nextVideo();
+            })
+          `)
+        )();
+        break;
+
       case "shuffle":
         (
           await webFrame.executeJavaScript(`

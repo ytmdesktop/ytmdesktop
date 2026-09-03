@@ -328,6 +328,8 @@ function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<
   if (newState.shortcuts.thumbsUp !== oldState.shortcuts.thumbsUp) return true;
   if (newState.shortcuts.volumeDown !== oldState.shortcuts.volumeDown) return true;
   if (newState.shortcuts.volumeUp !== oldState.shortcuts.volumeUp) return true;
+  if (newState.shortcuts.restartTrack !== oldState.shortcuts.restartTrack) return true;
+  if (newState.shortcuts.nextAndPause !== oldState.shortcuts.nextAndPause) return true;
 
   return false;
 }
@@ -377,7 +379,9 @@ const store = new Conf<StoreSchema>({
       thumbsUp: "",
       thumbsDown: "",
       volumeUp: "",
-      volumeDown: ""
+      volumeDown: "",
+      restartTrack: "",
+      nextAndPause: ""
     },
     state: {
       lastUrl: "https://music.youtube.com/",
@@ -863,6 +867,52 @@ function registerShortcuts() {
     }
   } else {
     memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
+  }
+
+  if (shortcuts.restartTrack) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.restartTrack, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "restartTrack");
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: restartTrack");
+      memoryStore.set("shortcutsRestartTrackRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: restartTrack");
+      memoryStore.set("shortcutsRestartTrackRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsRestartTrackRegisterFailed", false);
+  }
+
+  if (shortcuts.nextAndPause) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.nextAndPause, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "nextAndPause");
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: nextAndPause");
+      memoryStore.set("shortcutsNextAndPauseRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: nextAndPause");
+      memoryStore.set("shortcutsNextAndPauseRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsNextAndPauseRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");

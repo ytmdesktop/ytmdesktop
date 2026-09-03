@@ -69,6 +69,8 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+const shortcutRestartTrack = ref<string>(shortcuts.restartTrack ?? "");
+const shortcutNextAndPause = ref<string>(shortcuts.nextAndPause ?? "");
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
@@ -109,6 +111,8 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+  shortcutRestartTrack.value = newState.shortcuts.restartTrack;
+  shortcutNextAndPause.value = newState.shortcuts.nextAndPause;
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -120,6 +124,8 @@ const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shor
 const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsDownRegisterFailed"));
 const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
 const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
+const shortcutsRestartTrackRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsRestartTrackRegisterFailed"));
+const shortcutsNextAndPauseRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNextAndPauseRegisterFailed"));
 
 const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
 
@@ -135,6 +141,8 @@ memoryStore.onStateChanged(newState => {
   shortcutsThumbsDownRegisterFailed.value = newState.shortcutsThumbsDownRegisterFailed;
   shortcutsVolumeUpRegisterFailed.value = newState.shortcutsVolumeUpRegisterFailed;
   shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
+  shortcutsRestartTrackRegisterFailed.value = newState.shortcutsRestartTrackRegisterFailed;
+  shortcutsNextAndPauseRegisterFailed.value = newState.shortcutsNextAndPauseRegisterFailed;
 
   companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
 
@@ -178,6 +186,8 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+  store.set("shortcuts.restartTrack", shortcutRestartTrack.value);
+  store.set("shortcuts.nextAndPause", shortcutNextAndPause.value);
 }
 
 async function settingChangedRequiresRestart() {
@@ -516,6 +526,28 @@ window.ytmd.handleUpdateDownloaded(() => {
               >
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Restart Track &amp; Pause<span
+                v-if="shortcutsRestartTrackRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutRestartTrack" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Next Track &amp; Pause<span
+                v-if="shortcutsNextAndPauseRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutNextAndPause" @change="settingsChanged" />
           </div>
         </div>
 
