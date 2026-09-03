@@ -1882,8 +1882,17 @@ app.on("ready", async () => {
   if (app.isPackaged && !shouldDisableUpdates() && !YTMD_DISABLE_UPDATES) {
     autoUpdater.checkForUpdates();
     await new Promise<void>(resolve => {
-      setInterval(() => {
-        if (!appLaunchUpdateCheck) resolve();
+      const timeout = setTimeout(() => {
+        log.warn("Update check timed out, continuing app launch");
+        appLaunchUpdateCheck = false;
+        resolve();
+      }, 10000);
+      const interval = setInterval(() => {
+        if (!appLaunchUpdateCheck) {
+          clearTimeout(timeout);
+          clearInterval(interval);
+          resolve();
+        }
       }, 250);
     });
   } else {
