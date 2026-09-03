@@ -16,6 +16,8 @@
   let libraryFeedbackToggledToken = "";
 
   let sleepTimerTimeout = null;
+  let sleepTimerSongCount = null;
+  let sleepTimerMode = null; // 'time' or 'songs'
 
   let libraryButton = document.createElement("yt-button-shape");
   libraryButton.classList.add("ytmd-player-bar-control");
@@ -157,7 +159,19 @@
 
   document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      currentVideoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+      const newVideoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+
+      if (sleepTimerMode === "songs" && sleepTimerSongCount !== null && newVideoId !== currentVideoId) {
+        sleepTimerSongCount--;
+        if (sleepTimerSongCount <= 0) {
+          clearSleepTimer();
+          showExpiredDialog();
+        } else {
+          sleepTimerButton.setAttribute("title", `Sleep timer ${humanizeSongs(sleepTimerSongCount)} remaining`);
+        }
+      }
+
+      currentVideoId = newVideoId;
     }
   });
 
@@ -172,8 +186,38 @@
   sleepTimerButton.classList.add("ytmusic-player-bar");
   sleepTimerButton.classList.add("ytmd-player-bar-control");
   sleepTimerButton.classList.add("sleep-timer-button");
-  sleepTimerButton.onclick = () => {
-    sleepTimerButton.dispatchEvent(
+
+  const timeOptions = [
+    { value: 5, label: "5 minutes" },
+    { value: 10, label: "10 minutes" },
+    { value: 15, label: "15 minutes" },
+    { value: 30, label: "30 minutes" },
+    { value: 45, label: "45 minutes" },
+    { value: 60, label: "1 hour" }
+  ];
+
+  const songOptions = [
+    { value: 1, label: "1 song" },
+    { value: 3, label: "3 songs" },
+    { value: 5, label: "5 songs" },
+    { value: 10, label: "10 songs" },
+    { value: 15, label: "15 songs" },
+    { value: 20, label: "20 songs" }
+  ];
+
+  const humanizeTime = time => {
+    if (time === 1) return `${time} minute`;
+    if (time > 1 && time < 60) return `${time} minutes`;
+    if (time >= 60 && time < 120) return `${time / 60} hour`;
+    if (time >= 120) return `${time / 60} hours`;
+  };
+
+  const humanizeSongs = count => {
+    return count === 1 ? `${count} song` : `${count} songs`;
+  };
+
+  function showToast(text) {
+    document.body.dispatchEvent(
       new CustomEvent("yt-action", {
         bubbles: true,
         cancelable: false,
@@ -184,313 +228,222 @@
             {
               openPopupAction: {
                 popup: {
-                  menuPopupRenderer: {
-                    accessibilityData: {
-                      label: "Action menu"
-                    },
-                    items: [
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 5
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "5 minutes"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 10
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "10 minutes"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 15
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "15 minutes"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 30
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "30 minutes"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 45
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "45 minutes"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        menuServiceItemRenderer: {
-                          icon: {
-                            iconType: "CLOCK"
-                          },
-                          serviceEndpoint: {
-                            ytmdSleepTimerServiceEndpoint: {
-                              time: 60
-                            }
-                          },
-                          text: {
-                            runs: [
-                              {
-                                text: "1 hour"
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      sleepTimerTimeout !== null
-                        ? {
-                          menuServiceItemRenderer: {
-                            icon: {
-                              iconType: "DELETE"
-                            },
-                            serviceEndpoint: {
-                              ytmdSleepTimerServiceEndpoint: {
-                                time: 0
-                              }
-                            },
-                            text: {
-                              runs: [
-                                {
-                                  text: "Clear sleep timer"
-                                }
-                              ]
-                            }
-                          }
-                        }
-                        : {}
-                    ]
+                  notificationActionRenderer: {
+                    responseText: {
+                      runs: [{ text }]
+                    }
                   }
                 },
-                popupType: "DROPDOWN"
+                popupType: "TOAST",
+                uniqueId: crypto.randomUUID()
               }
             },
-            sleepTimerButton
+            document.querySelector("ytmusic-app")
           ],
           optionalAction: false,
           returnValue: []
         }
       })
     );
-  };
-  rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
+  }
 
-  const humanizeTime = time => {
-    // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
-    if (time === 1) return `${time} minute`;
-    if (time > 1 && time < 60) return `${time} minutes`;
-    if (time >= 60 && time < 120) return `${time / 60} hour`;
-    if (time >= 120) return `${time / 60} hours`;
-  };
+  function pauseAndShowDialog() {
+    const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+    playerBar.playerApi.pauseVideo();
 
-  window.addEventListener("yt-action", e => {
-    if (e.detail.actionName === "yt-service-request") {
-      if (e.detail.args[1].ytmdSleepTimerServiceEndpoint) {
-        if (sleepTimerTimeout !== null) {
-          clearTimeout(sleepTimerTimeout);
-          sleepTimerTimeout = null;
-          if (sleepTimerButton.classList.contains("active")) {
-            sleepTimerButton.classList.remove("active");
-            sleepTimerButton.setAttribute("title", "Sleep timer off");
-          }
-        }
-
-        if (e.detail.args[1].ytmdSleepTimerServiceEndpoint.time > 0) {
-          if (!sleepTimerButton.classList.contains("active")) {
-            sleepTimerButton.classList.add("active");
-            sleepTimerButton.setAttribute("title", `Sleep timer ${humanizeTime(e.detail.args[1].ytmdSleepTimerServiceEndpoint.time)}`);
-          }
-
-          document.body.dispatchEvent(
-            new CustomEvent("yt-action", {
-              bubbles: true,
-              cancelable: false,
-              composed: true,
-              detail: {
-                actionName: "yt-open-popup-action",
-                args: [
-                  // Endpoint details
-                  {
-                    openPopupAction: {
-                      popup: {
-                        notificationActionRenderer: {
-                          responseText: {
-                            runs: [
-                              {
-                                text: `Sleep timer set to ${humanizeTime(e.detail.args[1].ytmdSleepTimerServiceEndpoint.time)}`
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      popupType: "TOAST",
-                      uniqueId: crypto.randomUUID()
-                    }
-                  },
-                  document.querySelector("ytmusic-app")
-                ],
-                optionalAction: false,
-                returnValue: []
-              }
-            })
-          );
-
-          sleepTimerTimeout = setTimeout(
-            () => {
-              sleepTimerTimeout = null;
-              sleepTimerButton.classList.remove("active");
-              sleepTimerButton.setAttribute("title", "Sleep timer off");
-
-              if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.pauseVideo();
-
-                document.body.dispatchEvent(
-                  new CustomEvent("yt-action", {
-                    bubbles: true,
-                    cancelable: false,
-                    composed: true,
-                    detail: {
-                      actionName: "yt-open-popup-action",
-                      args: [
-                        {
-                          openPopupAction: {
-                            popup: {
-                              dismissableDialogRenderer: {
-                                title: {
-                                  runs: [
-                                    {
-                                      text: "Music paused"
-                                    }
-                                  ]
-                                },
-                                dialogMessages: [
-                                  {
-                                    runs: [
-                                      {
-                                        text: "Sleep timer expired and your music has been paused"
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            },
-                            popupType: "DIALOG"
-                          }
-                        },
-                        document.querySelector("ytmusic-app")
-                      ],
-                      optionalAction: false,
-                      returnValue: []
-                    }
-                  })
-                );
+    document.body.dispatchEvent(
+      new CustomEvent("yt-action", {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: {
+          actionName: "yt-open-popup-action",
+          args: [
+            {
+              openPopupAction: {
+                popup: {
+                  dismissableDialogRenderer: {
+                    title: {
+                      runs: [{ text: "Music paused" }]
+                    },
+                    dialogMessages: [
+                      {
+                        runs: [{ text: "Sleep timer expired and your music has been paused" }]
+                      }
+                    ]
+                  }
+                },
+                popupType: "DIALOG"
               }
             },
-            e.detail.args[1].ytmdSleepTimerServiceEndpoint.time * 1000 * 60
-          );
-        } else {
-          document.body.dispatchEvent(
-            new CustomEvent("yt-action", {
-              bubbles: true,
-              cancelable: false,
-              composed: true,
-              detail: {
-                actionName: "yt-open-popup-action",
-                args: [
-                  // Endpoint details
-                  {
-                    openPopupAction: {
-                      popup: {
-                        notificationActionRenderer: {
-                          responseText: {
-                            runs: [
-                              {
-                                text: `Sleep timer cleared`
-                              }
-                            ]
-                          }
-                        }
-                      },
-                      popupType: "TOAST",
-                      uniqueId: crypto.randomUUID()
-                    }
-                  },
-                  document.querySelector("ytmusic-app")
-                ],
-                optionalAction: false,
-                returnValue: []
-              }
-            })
-          );
+            document.querySelector("ytmusic-app")
+          ],
+          optionalAction: false,
+          returnValue: []
         }
-      }
+      })
+    );
+  }
+
+  function showExpiredDialog() {
+    const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+    if (playerBar.playing) {
+      pauseAndShowDialog();
+    } else {
+      // Song transition: mute immediately so the next song isn't audible, then pause once it starts
+      const previousVolume = playerBar.playerApi.getVolume();
+      playerBar.playerApi.setVolume(0);
+
+      const onStateChange = state => {
+        if (state === 1) { // 1 = playing
+          playerBar.playerApi.removeEventListener("onStateChange", onStateChange);
+          pauseAndShowDialog();
+          playerBar.playerApi.setVolume(previousVolume);
+        }
+      };
+      playerBar.playerApi.addEventListener("onStateChange", onStateChange);
+      // Safety: restore volume if it never starts playing
+      setTimeout(() => {
+        playerBar.playerApi.removeEventListener("onStateChange", onStateChange);
+        playerBar.playerApi.setVolume(previousVolume);
+      }, 10000);
     }
-  });
+  }
+
+  function clearSleepTimer() {
+    if (sleepTimerTimeout !== null) {
+      clearTimeout(sleepTimerTimeout);
+      sleepTimerTimeout = null;
+    }
+    sleepTimerSongCount = null;
+    sleepTimerMode = null;
+    sleepTimerButton.classList.remove("active");
+    sleepTimerButton.setAttribute("title", "Sleep timer off");
+  }
+
+  function setSleepTimerTime(minutes) {
+    clearSleepTimer();
+    sleepTimerMode = "time";
+    sleepTimerButton.classList.add("active");
+    sleepTimerButton.setAttribute("title", `Sleep timer ${humanizeTime(minutes)}`);
+    showToast(`Sleep timer set to ${humanizeTime(minutes)}`);
+
+    sleepTimerTimeout = setTimeout(() => {
+      clearSleepTimer();
+      showExpiredDialog();
+    }, minutes * 1000 * 60);
+  }
+
+  function setSleepTimerSongs(count) {
+    clearSleepTimer();
+    sleepTimerMode = "songs";
+    sleepTimerSongCount = count;
+    sleepTimerButton.classList.add("active");
+    sleepTimerButton.setAttribute("title", `Sleep timer ${humanizeSongs(count)} remaining`);
+    showToast(`Sleep timer set to ${humanizeSongs(count)}`);
+  }
+
+  function closeSleepTimerPopup() {
+    const existing = document.querySelector(".ytmd-sleep-timer-popup");
+    const backdrop = document.querySelector(".ytmd-sleep-timer-backdrop");
+    if (existing) existing.remove();
+    if (backdrop) backdrop.remove();
+  }
+
+  function openSleepTimerPopup() {
+    closeSleepTimerPopup();
+
+    const backdrop = document.createElement("div");
+    backdrop.classList.add("ytmd-sleep-timer-backdrop");
+    backdrop.onclick = closeSleepTimerPopup;
+
+    const popup = document.createElement("div");
+    popup.classList.add("ytmd-sleep-timer-popup");
+    // Tabs
+    const tabs = document.createElement("div");
+    tabs.classList.add("ytmd-sleep-timer-tabs");
+
+    const timeTab = document.createElement("div");
+    timeTab.classList.add("ytmd-sleep-timer-tab", "active");
+    timeTab.textContent = "Time";
+
+    const songsTab = document.createElement("div");
+    songsTab.classList.add("ytmd-sleep-timer-tab");
+    songsTab.textContent = "Songs";
+
+    tabs.appendChild(timeTab);
+    tabs.appendChild(songsTab);
+
+    // Time options panel
+    const timePanel = document.createElement("div");
+    timePanel.classList.add("ytmd-sleep-timer-options", "active");
+    timeOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.classList.add("ytmd-sleep-timer-option");
+      btn.textContent = opt.label;
+      btn.onclick = () => {
+        setSleepTimerTime(opt.value);
+        closeSleepTimerPopup();
+      };
+      timePanel.appendChild(btn);
+    });
+
+    // Songs options panel
+    const songsPanel = document.createElement("div");
+    songsPanel.classList.add("ytmd-sleep-timer-options");
+    songOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.classList.add("ytmd-sleep-timer-option");
+      btn.textContent = opt.label;
+      btn.onclick = () => {
+        setSleepTimerSongs(opt.value);
+        closeSleepTimerPopup();
+      };
+      songsPanel.appendChild(btn);
+    });
+
+    // Tab switching
+    timeTab.onclick = () => {
+      timeTab.classList.add("active");
+      songsTab.classList.remove("active");
+      timePanel.classList.add("active");
+      songsPanel.classList.remove("active");
+    };
+    songsTab.onclick = () => {
+      songsTab.classList.add("active");
+      timeTab.classList.remove("active");
+      songsPanel.classList.add("active");
+      timePanel.classList.remove("active");
+    };
+
+    popup.appendChild(tabs);
+    popup.appendChild(timePanel);
+    popup.appendChild(songsPanel);
+
+    // Clear button when timer is active
+    if (sleepTimerMode !== null) {
+      const clearBtn = document.createElement("button");
+      clearBtn.classList.add("ytmd-sleep-timer-option", "clear");
+      clearBtn.textContent = "Clear sleep timer";
+      clearBtn.onclick = () => {
+        clearSleepTimer();
+        showToast("Sleep timer cleared");
+        closeSleepTimerPopup();
+      };
+      popup.appendChild(clearBtn);
+    }
+
+    const rect = sleepTimerButton.getBoundingClientRect();
+    popup.style.position = "fixed";
+    popup.style.bottom = (window.innerHeight - rect.top + 8) + "px";
+    popup.style.right = (window.innerWidth - rect.right) + "px";
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(popup);
+  }
+
+  sleepTimerButton.onclick = openSleepTimerPopup;
+  rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
 
   ytmStore.subscribe(() => {
     let state = ytmStore.getState();
