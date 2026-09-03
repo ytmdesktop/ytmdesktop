@@ -45,5 +45,11 @@ contextBridge.exposeInMainWorld("ytmd", {
   handleUpdateDownloaded: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:updateDownloaded", callback),
   isAppUpdateAvailable: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateAvailable"),
   isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateDownloaded"),
-  getTrueFilePath: (file: File) => webUtils.getPathForFile(file)
+  getTrueFilePath: (file: File) => webUtils.getPathForFile(file),
+  listeningParty: {
+    create: async (displayName: string) => await ipcRenderer.invoke("listeningParty:create", displayName),
+    join: async (hostIp: string, partyCode: string, displayName: string) => await ipcRenderer.invoke("listeningParty:join", hostIp, partyCode, displayName),
+    leave: () => ipcRenderer.send("listeningParty:leave"),
+    getLocalIp: async (): Promise<string | null> => await ipcRenderer.invoke("listeningParty:getLocalIp")
+  }
 });

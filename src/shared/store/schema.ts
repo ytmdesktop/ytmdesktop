@@ -35,6 +35,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    listeningPartyDisplayName: string;
   };
   shortcuts: {
     playPause: string;
@@ -83,4 +84,9 @@ export type MemoryStoreSchema = {
   ytmViewUnresponsive: boolean;
   appUpdateAvailable: boolean;
   appUpdateDownloaded: boolean;
+  listeningPartyState: string; // "inactive" | "hosting" | "joined" | "connecting"
+  listeningPartyCode: string | null;
+  listeningPartyMembers: Array<{ socketId: string; displayName: string; joinedAt: number }>;
+  listeningPartyHostIp: string | null;
+  listeningPartyError: string | null;
 };
