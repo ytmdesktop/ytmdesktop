@@ -14,6 +14,8 @@ onMounted(() => {
       keyboardFocusZero.value.focus();
       keyboardFocusZero.value.blur();
     }
+    // Forward focus to the YTM view so keyboard shortcuts (e.g. spacebar for play/pause) work immediately after Alt-tabbing back
+    window.ytmd.switchFocus("ytm");
   };
 
   keyboardFocus.value.onfocus = () => {
