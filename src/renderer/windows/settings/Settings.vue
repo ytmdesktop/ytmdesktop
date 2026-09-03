@@ -41,6 +41,7 @@ const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
 const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
+const proxyServer = ref<string>(general.proxyServer);
 
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
 const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
@@ -79,6 +80,7 @@ store.onDidAnyChange(async newState => {
   showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
   startOnBoot.value = newState.general.startOnBoot;
   startMinimized.value = newState.general.startMinimized;
+  proxyServer.value = newState.general.proxyServer;
 
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
   customCSSEnabled.value = newState.appearance.customCSSEnabled;
@@ -153,6 +155,7 @@ async function settingsChanged() {
   store.set("general.startOnBoot", startOnBoot.value);
   store.set("general.startMinimized", startMinimized.value);
   store.set("general.disableHardwareAcceleration", disableHardwareAcceleration.value);
+  store.set("general.proxyServer", proxyServer.value);
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
   store.set("appearance.customCSSEnabled", customCSSEnabled.value);
@@ -299,6 +302,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             name="Disable hardware acceleration"
             @change="settingChangedRequiresRestart"
           />
+          <YTMDSetting v-model="proxyServer" type="text" restart-required name="Proxy server" @change="settingChangedRequiresRestart" />
         </div>
 
         <div v-if="currentTab === 2" class="appearance-tab">
