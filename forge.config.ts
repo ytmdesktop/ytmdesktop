@@ -31,7 +31,9 @@ const config: ForgeConfig = {
       "./src/assets/icons/controls/pause-button.png",
       "./src/assets/icons/controls/play-button.png",
       "./src/assets/icons/controls/play-next-button.png",
-      "./src/assets/icons/controls/play-previous-button.png"
+      "./src/assets/icons/controls/play-previous-button.png",
+
+      "./src/assets/custom-css-template.css"
     ],
     protocols: [
       {

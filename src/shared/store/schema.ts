@@ -17,6 +17,7 @@ export type StoreSchema = {
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
+    presetTheme: string | null;
     customCSSEnabled: boolean;
     customCSSPath: string | null;
     zoom: number;
