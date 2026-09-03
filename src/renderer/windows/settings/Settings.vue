@@ -63,6 +63,7 @@ const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled)
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
+const shortcutShuffle = ref<string>(shortcuts.shuffle);
 const shortcutNext = ref<string>(shortcuts.next);
 const shortcutPrevious = ref<string>(shortcuts.previous);
 const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
@@ -103,6 +104,7 @@ store.onDidAnyChange(async newState => {
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
+  shortcutShuffle.value = newState.shortcuts.shuffle;
   shortcutNext.value = newState.shortcuts.next;
   shortcutPrevious.value = newState.shortcuts.previous;
   shortcutThumbsUp.value = newState.shortcuts.thumbsUp;
@@ -114,6 +116,7 @@ store.onDidAnyChange(async newState => {
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
 
 const shortcutsPlayPauseRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsPlayPauseRegisterFailed"));
+const shortcutsShuffleRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsShuffleRegisterFailed"));
 const shortcutsNextRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNextRegisterFailed"));
 const shortcutsPreviousRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsPreviousRegisterFailed"));
 const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsUpRegisterFailed"));
@@ -129,6 +132,7 @@ memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
 
   shortcutsPlayPauseRegisterFailed.value = newState.shortcutsPlayPauseRegisterFailed;
+  shortcutsShuffleRegisterFailed.value = newState.shortcutsShuffleRegisterFailed;
   shortcutsNextRegisterFailed.value = newState.shortcutsNextRegisterFailed;
   shortcutsPreviousRegisterFailed.value = newState.shortcutsPreviousRegisterFailed;
   shortcutsThumbsUpRegisterFailed.value = newState.shortcutsThumbsUpRegisterFailed;
@@ -172,6 +176,7 @@ async function settingsChanged() {
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
+  store.set("shortcuts.shuffle", shortcutShuffle.value);
   store.set("shortcuts.next", shortcutNext.value);
   store.set("shortcuts.previous", shortcutPrevious.value);
   store.set("shortcuts.thumbsUp", shortcutThumbsUp.value);
@@ -450,6 +455,17 @@ window.ytmd.handleUpdateDownloaded(() => {
               >
             </p>
             <KeybindInput v-model="shortcutPlayPause" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Shuffle<span
+                v-if="shortcutsShuffleRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutShuffle" @change="settingsChanged" />
           </div>
           <div class="setting">
             <p class="shortcut-title">
