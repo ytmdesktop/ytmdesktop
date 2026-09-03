@@ -330,6 +330,32 @@ window.addEventListener("load", async () => {
         `)
       )();
     }
+
+    // Restore playback position from last session
+    if (state.lastVideoProgress > 0) {
+      const savedProgress = state.lastVideoProgress;
+      (
+        await webFrame.executeJavaScript(`
+          (function() {
+            const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+
+            // Try seeking immediately in case video is already loaded
+            try {
+              playerBar.playerApi.seekTo(${savedProgress});
+            } catch(e) {}
+
+            // Also listen for state changes as a fallback
+            const onStateChange = (newState) => {
+              if (newState === 1 || newState === 2 || newState === 3 || newState === 5) {
+                playerBar.playerApi.seekTo(${savedProgress});
+                playerBar.playerApi.removeEventListener("onStateChange", onStateChange);
+              }
+            };
+            playerBar.playerApi.addEventListener("onStateChange", onStateChange);
+          })
+        `)
+      )();
+    }
   }
 
   const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
