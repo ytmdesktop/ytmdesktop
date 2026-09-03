@@ -47,6 +47,13 @@ export type VideoDetails = {
   isLive: boolean;
 };
 
+export type AdDetails = {
+  title: string | null;
+  advertiser: string | null;
+  thumbnails: Thumbnail[];
+  durationSeconds: number;
+};
+
 export type PlayerQueueItem = {
   thumbnails: Thumbnail[];
   title: string;
@@ -76,6 +83,7 @@ export type PlayerState = {
   volume: number;
   muted: boolean;
   adPlaying: boolean;
+  adDetails: AdDetails | null;
   hasFullMetadata: boolean;
 };
 
@@ -96,6 +104,13 @@ export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "need
 
 export type MiniPlayerLikeStatus = "like" | "dislike" | "indifferent";
 export type MiniPlayerRepeatMode = "none" | "all" | "one";
+
+export type MiniPlayerAd = {
+  title: string;
+  advertiser: string | null;
+  artworkUrl: string | null;
+  durationSeconds: number;
+};
 
 export type MiniPlayerTrack = {
   id: string;
@@ -119,6 +134,8 @@ export type MiniPlayerSnapshot = {
   repeatMode: MiniPlayerRepeatMode;
   volume: number;
   muted: boolean;
+  adPlaying: boolean;
+  ad: MiniPlayerAd | null;
   message: string | null;
 };
 

@@ -328,7 +328,12 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
         this._titleMarquee = this._createMarquee('Nothing playing', 'ytmd-title');
         this._artistMarquee = this._createMarquee('Open YouTube Music to start playing', 'ytmd-artist');
-        details.add_child(this._titleMarquee.clip);
+        const titleRow = new St.BoxLayout({style_class: 'ytmd-title-row', x_expand: true});
+        this._adBadge = new St.Label({text: 'AD', style_class: 'ytmd-ad-badge', y_align: Clutter.ActorAlign.CENTER});
+        this._adBadge.visible = false;
+        titleRow.add_child(this._adBadge);
+        titleRow.add_child(this._titleMarquee.clip);
+        details.add_child(titleRow);
         details.add_child(this._artistMarquee.clip);
 
         this._seekBox = new St.BoxLayout({vertical: true, style_class: 'ytmd-seek-box', x_expand: true});
@@ -879,9 +884,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
 
         const incomingProgress = nextState?.progressSeconds ?? 0;
-        const trackChanged = this._state?.track?.id !== nextState?.track?.id;
+        const adChanged = Boolean(this._state?.adPlaying) !== Boolean(nextState?.adPlaying);
+        const trackChanged = adChanged || this._state?.track?.id !== nextState?.track?.id;
         const wasPlaying = this._state?.status === 'playing';
-        const duration = this._state?.track?.durationSeconds ?? 0;
+        const duration = this._duration();
         const incomingLike = nextState?.likeStatus || nextState?.track?.likeStatus;
         if (trackChanged)
             this._clearLikeOverride();
@@ -915,12 +921,18 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
     _updateUi() {
         const track = this._state?.track ?? null;
+        const ad = this._adState();
         const playing = this._state?.status === 'playing';
         const needsMainApp = this._state?.status === 'needs-main-app';
 
-        this._setMarqueeText(this._titleMarquee, track?.title || 'Nothing playing');
-        this._setMarqueeText(this._artistMarquee, track?.artist || this._state?.message || 'Open YouTube Music to start playing');
-        this._setArtwork(track?.artworkUrl ?? null);
+        // An ad does not change track, so without this the panel keeps claiming the song is playing.
+        this._adBadge.visible = Boolean(ad);
+        this._setMarqueeText(this._titleMarquee, ad ? `(AD) ${ad.title || 'Advertisement'}` : track?.title || 'Nothing playing');
+        this._setMarqueeText(
+            this._artistMarquee,
+            ad ? ad.advertiser || 'Advertisement' : track?.artist || this._state?.message || 'Open YouTube Music to start playing'
+        );
+        this._setArtwork((ad ? ad.artworkUrl : track?.artworkUrl) ?? null);
 
         this._setButtonIcon(this._playButton, playing ? 'pause-dark.svg' : 'play-dark.svg');
         this._playButton.accessible_name = playing ? 'Pause' : 'Play';
@@ -928,7 +940,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._setButtonEnabled(this._playButton, Boolean(this._state?.canPlay));
         this._setButtonEnabled(this._nextButton, Boolean(this._state?.canNext));
 
-        this._slider.reactive = Boolean(track) && this._duration() > 0;
+        this._slider.reactive = !ad && Boolean(track) && this._duration() > 0;
         this._openAppButton.visible = needsMainApp && this._layout !== 'small';
         this._updateLikeButtons();
         this._updateRepeatButton();
@@ -982,6 +994,9 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _updateLikeButtons() {
+        const adPlaying = Boolean(this._adState());
+        this._setButtonEnabled(this._likeButton, !adPlaying);
+        this._setButtonEnabled(this._dislikeButton, !adPlaying);
         const likeStatus = this._currentLikeStatus();
         const liked = likeStatus === 'like';
         const disliked = likeStatus === 'dislike';
@@ -1101,7 +1116,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
     }
 
+    _adState() {
+        return this._state?.adPlaying ? this._state.ad ?? {} : null;
+    }
+
     _duration() {
+        const ad = this._adState();
+        if (ad)
+            return ad.durationSeconds ?? 0;
         return this._state?.track?.durationSeconds ?? 0;
     }
 
@@ -1122,7 +1144,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         if (command === 'next' && !this._state?.canNext)
             return;
-        if (command === 'seekTo' && !this._state?.track)
+        if (command === 'seekTo' && (!this._state?.track || this._state?.adPlaying))
             return;
         this._call('Command', command, value);
     }

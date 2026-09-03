@@ -2069,10 +2069,10 @@ app.on("ready", async () => {
     }
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying) => {
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying, adDetails) => {
     if (event.sender !== ytmView.webContents) return;
 
-    playerStateStore.updateFromStore(queue, likeStatus, volume, muted, adPlaying);
+    playerStateStore.updateFromStore(queue, likeStatus, volume, muted, adPlaying, adDetails);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {

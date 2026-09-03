@@ -77,11 +77,40 @@
     );
   }
 
+  function textOf(element) {
+    return (element?.textContent ?? "").replace(/\s+/g, " ").trim();
+  }
+
+  // onVideoDataChange ignores the ad player, so videoDetails stays on the song while an ad runs.
+  // The player response does follow the ad, which is the only place its title and artwork exist.
+  function getAdDetails() {
+    const videoDetails = playerApi.getPlayerResponse()?.videoDetails;
+    const title = videoDetails?.title || textOf(queryDeep(playerBar, ".title.ytmusic-player-bar")) || null;
+    const advertiser = videoDetails?.author || textOf(queryDeep(playerBar, ".byline.ytmusic-player-bar")) || null;
+    const lengthSeconds = parseInt(videoDetails?.lengthSeconds ?? "", 10);
+    if (!title && !advertiser) return null;
+
+    return {
+      title,
+      advertiser,
+      thumbnails: videoDetails?.thumbnail?.thumbnails ?? [],
+      durationSeconds: Number.isFinite(lengthSeconds) ? lengthSeconds : 0
+    };
+  }
+
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     const state = ytmStore.getState();
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    window.ytmd.sendStoreUpdate(state.queue, getLikeStatus(videoId), state.player.volume, state.player.muted, state.player.adPlaying);
+    const adPlaying = state.player.adPlaying;
+    window.ytmd.sendStoreUpdate(
+      state.queue,
+      getLikeStatus(videoId),
+      state.player.volume,
+      state.player.muted,
+      adPlaying,
+      adPlaying ? getAdDetails() : null
+    );
   }
 
   function sendVideoData() {

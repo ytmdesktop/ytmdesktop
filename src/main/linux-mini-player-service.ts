@@ -2,7 +2,9 @@ import log from "electron-log";
 import { defineInterface, DefinedInterface, ExportRegistration, MessageBus, NameRegistration, sessionBus } from "dbus-native";
 
 import {
+  AdDetails,
   LikeStatus,
+  MiniPlayerAd,
   MiniPlayerCommand,
   MiniPlayerLikeStatus,
   MiniPlayerPlayResultAction,
@@ -191,6 +193,8 @@ export default class LinuxMiniPlayerService {
     const artworkUrl = cleanArtworkUrl(video?.thumbnails.length ? [...video.thumbnails].sort((left, right) => right.width - left.width)[0].url : null);
     const likeStatus = toLikeStatus(video?.likeStatus);
     const repeatMode = toRepeatMode(this.playerState.queue?.repeatMode);
+    const adPlaying = !!this.playerState.adPlaying;
+    const ad = adPlaying ? toMiniPlayerAd(this.playerState.adDetails) : null;
 
     let status: MiniPlayerStatus;
     let message: string | null = null;
@@ -232,6 +236,8 @@ export default class LinuxMiniPlayerService {
       repeatMode,
       volume: Math.max(0, Math.min(100, this.playerState.volume ?? 0)),
       muted: !!this.playerState.muted,
+      adPlaying,
+      ad,
       message
     };
   }
@@ -319,6 +325,16 @@ function cleanArtworkUrl(url: string | null | undefined): string | null {
       const side = Math.max(Number(width), Number(height), 512);
       return `=w${side}-h${side}-c`;
     });
+}
+
+function toMiniPlayerAd(details: AdDetails | null): MiniPlayerAd {
+  const largest = details?.thumbnails.length ? [...details.thumbnails].sort((left, right) => right.width - left.width)[0].url : null;
+  return {
+    title: details?.title || "Advertisement",
+    advertiser: details?.advertiser ?? null,
+    artworkUrl: cleanArtworkUrl(largest),
+    durationSeconds: details?.durationSeconds ?? 0
+  };
 }
 
 function toLikeStatus(status: LikeStatus | undefined): MiniPlayerLikeStatus {

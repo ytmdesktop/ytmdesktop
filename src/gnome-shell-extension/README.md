@@ -113,9 +113,20 @@ Unknown commands are ignored, as are out-of-range values.
   "repeatMode": "none", // none | all | one
   "volume": 51,
   "muted": false,
+  "adPlaying": false,
+  "ad": {
+    // null unless adPlaying is true; track keeps the song the ad interrupted
+    "title": "…", // "Advertisement" when YTM exposes nothing
+    "advertiser": "…", // may be null
+    "artworkUrl": "https://…", // may be null
+    "durationSeconds": 15
+  },
   "message": null // human-readable reason when status is not playable
 }
 ```
+
+While `adPlaying` is true, `progressSeconds` is the ad's progress and should be read against
+`ad.durationSeconds`. `canNext` stays true — skipping works during ads.
 
 ### `SearchResultsChanged` payload
 
@@ -166,6 +177,9 @@ gdbus monitor --session --dest io.github.ytmdesktop.MiniPlayer
 - While playing and not already in the mix, the current track keeps its position; the next track
   starts at `0:00`.
 - While playing and already in the mix, it does nothing.
+- The radio endpoint comes from YouTube Music itself, so a mix started from a song stays on songs
+  rather than switching to music videos. Starting one from a music video seeds it from that track's
+  song counterpart when there is one.
 
 ## Troubleshooting
 

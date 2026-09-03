@@ -262,6 +262,19 @@
   min-width: 0;
 }
 
+.ytmd-title-row {
+  spacing: 6px;
+}
+
+.ytmd-ad-badge {
+  background-color: #ff0033;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
 .ytmd-title {
   font-size: 16px;
   font-weight: 700;

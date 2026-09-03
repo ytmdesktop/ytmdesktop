@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 export * from "../../shared/player-state";
-import { LikeStatus, PlayerQueue, PlayerQueueItem, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "../../shared/player-state";
+import { AdDetails, LikeStatus, PlayerQueue, PlayerQueueItem, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "../../shared/player-state";
 
 enum YTMVideoState {
   Unstarted = -1,
@@ -15,6 +15,13 @@ type YTMThumbnail = {
   height: number;
   url: string;
   width: number;
+};
+
+type YTMAdDetails = {
+  title: string | null;
+  advertiser: string | null;
+  thumbnails: YTMThumbnail[];
+  durationSeconds: number;
 };
 
 type YTMTextRun = {
@@ -216,6 +223,7 @@ class PlayerStateStore {
   private volume: number = 0;
   private muted: boolean = false;
   private adPlaying: boolean = false;
+  private adDetails: AdDetails | null = null;
   private hasFullMetadata: boolean = false;
   private eventEmitter = new EventEmitter();
 
@@ -235,6 +243,7 @@ class PlayerStateStore {
       volume: this.volume,
       muted: this.muted,
       adPlaying: this.adPlaying,
+      adDetails: this.adDetails,
       hasFullMetadata: this.hasFullMetadata
     };
   }
@@ -307,7 +316,8 @@ class PlayerStateStore {
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
     muted: boolean | null,
-    adPlaying: boolean | null
+    adPlaying: boolean | null,
+    adDetails: YTMAdDetails | null
   ) {
     const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
     const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
@@ -332,6 +342,15 @@ class PlayerStateStore {
       this.videoDetails.likeStatus = transformLikeStatus(nextLikeStatus);
     }
     this.adPlaying = adPlaying === true;
+    this.adDetails =
+      this.adPlaying && adDetails
+        ? {
+            title: adDetails.title ?? null,
+            advertiser: adDetails.advertiser ?? null,
+            thumbnails: adDetails.thumbnails ? adDetails.thumbnails.map(mapYTMThumbnails) : [],
+            durationSeconds: adDetails.durationSeconds ?? 0
+          }
+        : null;
     this.muted = muted === true;
     if (typeof volume === "number" && volume >= 0) this.volume = volume;
 
