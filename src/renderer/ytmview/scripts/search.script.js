@@ -48,6 +48,20 @@
     );
   }
 
+  // YouTube Music leads a search subtitle with a type label ("Song", "Artist", ...) and a
+  // separator run. Dropping the separators and joining what is left glued the label onto the
+  // artist ("SongOkasian"), so skip the label structurally instead and keep YTM's own separators.
+  function subtitleFromRuns(runs) {
+    const texts = runs.map(run => run.text ?? "");
+    const hasTypeLabel = texts.length >= 2 && texts[1].trim() === "•" && !runs[0].navigationEndpoint;
+    return texts
+      .slice(hasTypeLabel ? 2 : 0)
+      .filter(text => !/^\d+:\d{2}(?::\d{2})?$/.test(text))
+      .join("")
+      .replace(/^(\s*•\s*)+|(\s*•\s*)+$/g, "")
+      .trim();
+  }
+
   function parseSong(renderer) {
     if (!renderer) return null;
     const watchEndpoint = watchEndpointFromRenderer(renderer);
@@ -67,14 +81,7 @@
       if (/^\d+:\d{2}(?::\d{2})?$/.test(run.text ?? "")) duration = run.text;
     }
 
-    const artist =
-      artists.join(", ") ||
-      subtitleRuns
-        .map(run => run.text ?? "")
-        .filter(text => text && text !== " • " && !/^\d+:\d{2}(?::\d{2})?$/.test(text))
-        .join("")
-        .replace(/^•\s*|\s*•$/g, "")
-        .trim();
+    const artist = artists.join(", ") || subtitleFromRuns(subtitleRuns);
 
     return {
       id: videoId,
@@ -113,14 +120,7 @@
     return {
       id: videoId,
       title,
-      artist:
-        artists.join(", ") ||
-        subtitleRuns
-          .map(run => run.text ?? "")
-          .filter(text => text && text !== " • " && !/^(Song|노래|Video|동영상)$/i.test(text) && !/^\d+:\d{2}(?::\d{2})?$/.test(text))
-          .join("")
-          .replace(/^•\s*|\s*•$/g, "")
-          .trim(),
+      artist: artists.join(", ") || subtitleFromRuns(subtitleRuns),
       duration,
       artworkUrl: pickArtworkUrl(renderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails),
       playlistId: watchEndpoint?.playlistId ?? null,
