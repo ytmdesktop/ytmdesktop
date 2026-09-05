@@ -145,11 +145,34 @@
   border-radius: 10px;
 }
 
+.ytmd-result-art-wrap,
+.ytmd-result-art-overlay,
 .ytmd-result-art {
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
   border-radius: 8px;
+}
+
+.ytmd-result-art {
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-result-art-wrap {
+  padding: 0;
+  border-width: 0;
+  background-color: transparent;
+}
+
+.ytmd-result-art-wrap:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.ytmd-result-art-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
 }
 
 .ytmd-result-details {
@@ -164,25 +187,6 @@
 .ytmd-result-artist {
   color: rgba(255, 255, 255, 0.62);
   font-size: 11px;
-}
-
-.ytmd-result-actions {
-  spacing: 4px;
-}
-
-.ytmd-result-action {
-  padding: 4px 8px;
-  color: #151515;
-  background-color: #ffffff;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.ytmd-result-action:hover,
-.ytmd-result-action:focus {
-  color: #151515;
-  background-color: #f2f2f2;
 }
 
 .ytmd-player-row {

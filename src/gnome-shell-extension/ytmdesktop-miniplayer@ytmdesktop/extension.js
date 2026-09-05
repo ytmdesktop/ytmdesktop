@@ -529,19 +529,6 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         return button;
     }
 
-    _textButton(label, accessibleName, callback) {
-        const button = new St.Button({
-            label,
-            style_class: 'ytmd-result-action',
-            accessible_name: accessibleName,
-            can_focus: true,
-            reactive: true,
-            track_hover: true,
-        });
-        button.connect('clicked', callback);
-        return button;
-    }
-
     _createMarquee(text, styleClass) {
         const clip = new St.Widget({
             style_class: 'ytmd-marquee-clip',
@@ -814,6 +801,18 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
     _createResultRow(result) {
         const row = new St.BoxLayout({style_class: 'ytmd-result-row', x_expand: true});
+
+        // The thumbnail is the play control: hovering or focusing it reveals a play overlay and
+        // clicking plays the result. Same pattern as the main artwork, which opens the app.
+        const artWrap = new St.Button({
+            style_class: 'ytmd-result-art-wrap',
+            accessible_name: `Play ${result.title || 'result'}`,
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        const artStack = new St.Widget({layout_manager: new Clutter.BinLayout(), x_expand: true, y_expand: true});
         const art = new St.Icon({
             icon_name: 'audio-x-generic-symbolic',
             icon_size: 40,
@@ -827,6 +826,33 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 console.error(`YTMDesktop artwork failed: ${error.message}`);
             }
         }
+        const artOverlay = new St.Widget({
+            style_class: 'ytmd-result-art-overlay',
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+            reactive: false,
+            opacity: 0,
+        });
+        artOverlay.add_child(new St.Icon({
+            gicon: this._fileIcon('play.svg'),
+            icon_size: 18,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        }));
+        artStack.add_child(art);
+        artStack.add_child(artOverlay);
+        artWrap.set_child(artStack);
+        artWrap.set_clip_to_allocation(true);
+        artStack.set_clip_to_allocation(true);
+        const updateOverlay = () => {
+            const visible = artWrap.hover || artWrap.has_key_focus();
+            artOverlay.ease({opacity: visible ? 255 : 0, duration: 150, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
+        };
+        artWrap.connect('notify::hover', updateOverlay);
+        artWrap.connect('key-focus-in', updateOverlay);
+        artWrap.connect('key-focus-out', updateOverlay);
+        artWrap.connect('clicked', () => this._call('PlayResult', result.id, 'now'));
 
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-result-details'});
         const title = new St.Label({text: result.title || 'Unknown title', style_class: 'ytmd-result-title', x_expand: true});
@@ -840,12 +866,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(title);
         details.add_child(subtitle);
 
-        const actions = new St.BoxLayout({style_class: 'ytmd-result-actions', y_align: Clutter.ActorAlign.CENTER});
-        actions.add_child(this._iconButton('play.svg', 'Play', () => this._call('PlayResult', result.id, 'now'), 'ytmd-result-action'));
-
-        row.add_child(art);
+        row.add_child(artWrap);
         row.add_child(details);
-        row.add_child(actions);
         return row;
     }
 
