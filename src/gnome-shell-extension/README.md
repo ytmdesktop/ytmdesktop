@@ -325,8 +325,8 @@ the D-Bus object stopped responding. Existing fallback icons remain until a pane
 `package.json` explicitly sets `desktopName` to `youtube-music-desktop-app.desktop`, matching the
 installed launcher and pinned Dock entry. Electron 40.4.0 otherwise derives its Wayland app ID from
 the product name, which does not match that file. These two changes do not alter search or playback.
-The user confirmed that v44 removed the stale tray; final Dock verification awaits the corrected
-Debian package. The remaining Electron logo was the actual installed pixmap, not merely a window
+The user confirmed that v44 removed the stale tray and that the rebuilt Debian package restored
+the correct Dock icon. The remaining Electron logo was the actual installed pixmap, not merely a window
 matching failure: invoking Forge with `--targets=@electron-forge/maker-deb` bypasses this repository's
 configured maker instance (named `deb`) and falls back to Electron's default icon.
 
