@@ -154,10 +154,42 @@ export type MiniPlayerSearchResult = {
   duration: string | null;
   artworkUrl: string | null;
   playlistId: string | null;
-  kind: "music" | "video" | "unknown";
+  kind: "music" | "video" | "artist" | "unknown";
+  // UC… browseId for artist results; their `id` is a radio videoId when YTM offers one, else a
+  // display-only "artist:<browseId>" key that must never be sent to PlayResult.
+  artistId: string | null;
 };
 
 export type MiniPlayerSearchStatus = "idle" | "loading" | "ready" | "error";
+
+export type MiniPlayerArtistSection = "" | "songs" | "videos";
+
+export type MiniPlayerArtistBrowseRequest = {
+  artistId: string;
+  section: MiniPlayerArtistSection;
+  // null for the artist page itself; "browse:<id>[:<params>]" for the first page of a section's
+  // full list; "token:<continuation>" for the pages after it.
+  continuation: string | null;
+};
+
+// One page of an artist. The artist page fills everything; a section page fills only that
+// section's list and its next-page pointer.
+export type MiniPlayerArtistBrowsePage = {
+  section: MiniPlayerArtistSection;
+  name: string | null;
+  artworkUrl: string | null;
+  songs: MiniPlayerSearchResult[];
+  videos: MiniPlayerSearchResult[];
+  songsNext: string | null;
+  videosNext: string | null;
+};
+
+export type MiniPlayerArtistBrowseSnapshot = MiniPlayerArtistBrowsePage & {
+  version: 1;
+  artistId: string;
+  status: "loading" | "ready" | "error";
+  message: string | null;
+};
 
 export type MiniPlayerSearchSnapshot = {
   version: 1;

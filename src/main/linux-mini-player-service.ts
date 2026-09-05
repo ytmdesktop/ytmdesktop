@@ -5,6 +5,10 @@ import {
   AdDetails,
   LikeStatus,
   MiniPlayerAd,
+  MiniPlayerArtistBrowsePage,
+  MiniPlayerArtistBrowseRequest,
+  MiniPlayerArtistBrowseSnapshot,
+  MiniPlayerArtistSection,
   MiniPlayerCommand,
   MiniPlayerLikeStatus,
   MiniPlayerRepeatMode,
@@ -21,10 +25,16 @@ export const MINI_PLAYER_SERVICE = "io.github.ytmdesktop.MiniPlayer";
 export const MINI_PLAYER_PATH = "/io/github/ytmdesktop/MiniPlayer";
 
 const MAX_SEARCH_QUERY_LENGTH = 200;
+const BROWSE_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+// "browse:<browseId>[:<params>]" or "token:<continuation>", opaque strings handed back by the page.
+const CONTINUATION_PATTERN = /^(browse|token):[A-Za-z0-9_%=+/.:-]{1,4096}$/;
+const ARTIST_SECTIONS = new Set<MiniPlayerArtistSection>(["", "songs", "videos"]);
 
 type MiniPlayerActions = {
   command(command: MiniPlayerCommand, value?: number): void;
   search(query: string): Promise<MiniPlayerSearchResult[]>;
+  artistBrowse(request: MiniPlayerArtistBrowseRequest): Promise<MiniPlayerArtistBrowsePage>;
+  openArtist(browseId: string): void;
   playResult(videoId: string): void;
   toggleMainWindow(): void;
   showMainWindow(): void;
@@ -49,6 +59,7 @@ export default class LinuxMiniPlayerService {
   private lastSignalAt = 0;
   private progressSignalTimeout: NodeJS.Timeout | null = null;
   private searchRequestId = 0;
+  private artistRequestId = 0;
   private bus: MessageBus | null = null;
   private definition: DefinedInterface | null = null;
   private exported: ExportRegistration | null = null;
@@ -125,11 +136,28 @@ export default class LinuxMiniPlayerService {
             if (!videoId || action !== "now") return;
             this.actions.playResult(videoId);
           }
+        },
+        ArtistBrowse: {
+          in: { artistId: "s", section: "s", continuation: "s" },
+          handler: ({ artistId, section, continuation }: { artistId: string; section: string; continuation: string }) => {
+            if (!BROWSE_ID_PATTERN.test(artistId)) return;
+            if (!ARTIST_SECTIONS.has(section as MiniPlayerArtistSection)) return;
+            if (continuation && !CONTINUATION_PATTERN.test(continuation)) return;
+            this.startArtistBrowse(artistId, section as MiniPlayerArtistSection, continuation || null);
+          }
+        },
+        OpenArtist: {
+          in: { browseId: "s" },
+          handler: ({ browseId }: { browseId: string }) => {
+            if (!BROWSE_ID_PATTERN.test(browseId)) return;
+            this.actions.openArtist(browseId);
+          }
         }
       },
       signals: {
         StateChanged: { args: { stateJson: "s" } },
-        SearchResultsChanged: { args: { resultsJson: "s" } }
+        SearchResultsChanged: { args: { resultsJson: "s" } },
+        ArtistBrowseChanged: { args: { artistBrowseJson: "s" } }
       }
     });
 
@@ -166,6 +194,7 @@ export default class LinuxMiniPlayerService {
 
   async stop() {
     this.searchRequestId += 1;
+    this.artistRequestId += 1;
     if (this.progressSignalTimeout) clearTimeout(this.progressSignalTimeout);
     const exported = this.exported;
     const ownedName = this.ownedName;
@@ -320,6 +349,43 @@ export default class LinuxMiniPlayerService {
   private emitSearch(snapshot: MiniPlayerSearchSnapshot) {
     if (!this.definition) return;
     this.definition.emit.SearchResultsChanged(JSON.stringify(snapshot));
+  }
+
+  // Its own request counter: the panel drops the artist view on a new search, so artist pages and
+  // searches never need to invalidate each other.
+  private startArtistBrowse(artistId: string, section: MiniPlayerArtistSection, continuation: string | null) {
+    const requestId = ++this.artistRequestId;
+    const base: Omit<MiniPlayerArtistBrowseSnapshot, "status"> = {
+      version: 1,
+      artistId,
+      section,
+      name: null,
+      artworkUrl: null,
+      songs: [],
+      videos: [],
+      songsNext: null,
+      videosNext: null,
+      message: null
+    };
+
+    this.emitArtistBrowse({ ...base, status: "loading" });
+    void this.actions
+      .artistBrowse({ artistId, section, continuation })
+      .then(page => {
+        if (requestId !== this.artistRequestId) return;
+        const empty = !page.songs.length && !page.videos.length;
+        this.emitArtistBrowse({ ...base, ...page, status: "ready", message: empty ? "Nothing found" : null });
+      })
+      .catch(error => {
+        if (requestId !== this.artistRequestId) return;
+        log.error("Linux mini-player artist browse failed", error);
+        this.emitArtistBrowse({ ...base, status: "error", message: "Could not load artist" });
+      });
+  }
+
+  private emitArtistBrowse(snapshot: MiniPlayerArtistBrowseSnapshot) {
+    if (!this.definition) return;
+    this.definition.emit.ArtistBrowseChanged(JSON.stringify(snapshot));
   }
 }
 

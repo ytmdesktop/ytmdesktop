@@ -43,11 +43,22 @@ const DBUS_XML = `
       <arg type="s" name="videoId" direction="in"/>
       <arg type="s" name="action" direction="in"/>
     </method>
+    <method name="ArtistBrowse">
+      <arg type="s" name="artistId" direction="in"/>
+      <arg type="s" name="section" direction="in"/>
+      <arg type="s" name="continuation" direction="in"/>
+    </method>
+    <method name="OpenArtist">
+      <arg type="s" name="browseId" direction="in"/>
+    </method>
     <signal name="StateChanged">
       <arg type="s" name="stateJson"/>
     </signal>
     <signal name="SearchResultsChanged">
       <arg type="s" name="resultsJson"/>
+    </signal>
+    <signal name="ArtistBrowseChanged">
+      <arg type="s" name="artistBrowseJson"/>
     </signal>
   </interface>
 </node>`;
@@ -176,6 +187,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 this._ownerChangedId = proxy.connect('notify::g-name-owner', () => this._syncOwner());
                 this._stateChangedId = proxy.connectSignal('StateChanged', (_proxy, _sender, [stateJson]) => this._applyStateJson(stateJson));
                 this._searchChangedId = proxy.connectSignal('SearchResultsChanged', (_proxy, _sender, [resultsJson]) => this._applySearchJson(resultsJson));
+                this._artistBrowseChangedId = proxy.connectSignal('ArtistBrowseChanged', (_proxy, _sender, [artistBrowseJson]) => this._applyArtistBrowseJson(artistBrowseJson));
                 this._syncOwner();
             },
             null,
@@ -208,8 +220,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._searchWrap = searchWrap;
         this.menu.box.add_child(searchWrap);
         searchWrap.connect('key-press-event', (_actor, event) => {
-            if (event.get_key_symbol() === Clutter.KEY_Escape)
+            if (event.get_key_symbol() === Clutter.KEY_Escape) {
+                if (this._artistView) {
+                    this._closeArtist();
+                    return Clutter.EVENT_STOP;
+                }
                 return Clutter.EVENT_PROPAGATE;
+            }
             return Clutter.EVENT_STOP;
         });
 
@@ -244,6 +261,17 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         orderToggle.add_child(this._musicFirstButton);
         orderToggle.add_child(this._videoFirstButton);
         this._resultsHeader.add_child(orderToggle);
+
+        // The artist view's header lives outside the scroll list so Back and Open stay pinned.
+        this._artistHeader = new St.BoxLayout({style_class: 'ytmd-artist-header', x_expand: true, visible: false});
+        this._artistHeader.add_child(this._artistActionButton('‹ Back', 'Back to results', () => this._closeArtist()));
+        this._artistNameLabel = new St.Label({style_class: 'ytmd-artist-name', x_expand: true, y_align: Clutter.ActorAlign.CENTER});
+        this._artistNameLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this._artistHeader.add_child(this._artistNameLabel);
+        this._artistHeader.add_child(this._artistActionButton('Open in YTMusic', 'Open this artist in YouTube Music', () => {
+            if (this._artistView)
+                this._call('OpenArtist', this._artistView.artistId);
+        }));
         this._resultsStatus = new St.Label({text: '', style_class: 'ytmd-results-status'});
         this._resultsStatus.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._resultsList = new St.BoxLayout({vertical: true, style_class: 'ytmd-results', x_expand: true});
@@ -256,6 +284,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         });
         addScrollChild(this._resultsScroll, this._resultsList);
         this._resultsBox.add_child(this._resultsHeader);
+        this._resultsBox.add_child(this._artistHeader);
         this._resultsBox.add_child(this._resultsStatus);
         this._resultsBox.add_child(this._resultsScroll);
         this._resultsBox.visible = false;
@@ -670,9 +699,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _orderedSearchResults(results) {
+        // An artist match is the strongest signal a query can produce, so it always leads.
         const ranks = this._searchOrder === 'video'
-            ? {video: 0, music: 1, unknown: 2}
-            : {music: 0, video: 1, unknown: 2};
+            ? {artist: 0, video: 1, music: 2, unknown: 3}
+            : {artist: 0, music: 1, video: 2, unknown: 3};
         return results
             .map((result, index) => ({result, index}))
             .sort((left, right) => {
@@ -717,6 +747,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     _clearSearch() {
         this._lastSearchQuery = '';
         this._searchState = null;
+        this._artistView = null;
         this._renderSearch();
         this._call('Search', '');
     }
@@ -737,8 +768,94 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         if (query === this._lastSearchQuery && this._searchState?.status === 'loading')
             return;
 
+        if (query !== this._lastSearchQuery)
+            this._artistView = null;
         this._lastSearchQuery = query;
         this._call('Search', query);
+    }
+
+    // The artist view is state, not actors: _renderSearch destroys every row on each render (order
+    // toggle, layout change, new page), so it is rebuilt from here every time.
+    _openArtist(result) {
+        if (!result?.artistId)
+            return;
+        this._artistView = {
+            artistId: result.artistId,
+            title: result.title || 'Artist',
+            artworkUrl: result.artworkUrl ?? null,
+            songs: [],
+            videos: [],
+            songsNext: null,
+            videosNext: null,
+            loading: 'page',
+            message: null,
+        };
+        this._renderSearch();
+        this._call('ArtistBrowse', result.artistId, '', '');
+    }
+
+    _closeArtist() {
+        if (!this._artistView)
+            return;
+        this._artistView = null;
+        this._renderSearch();
+    }
+
+    _loadMoreArtist(section) {
+        const view = this._artistView;
+        if (!view || view.loading)
+            return;
+        const key = `${section}Next`;
+        const next = view[key];
+        if (!next)
+            return;
+        // A browse id is only good for the first page; after that the page hands back tokens.
+        view[key] = null;
+        view.loading = section;
+        this._renderSearch();
+        this._call('ArtistBrowse', view.artistId, section, next);
+    }
+
+    _applyArtistBrowseJson(artistBrowseJson) {
+        let next;
+        try {
+            next = JSON.parse(artistBrowseJson);
+        } catch (error) {
+            console.error(`YTMDesktop artist browse parse failed: ${error.message}`);
+            return;
+        }
+
+        const view = this._artistView;
+        if (!view || next?.artistId !== view.artistId)
+            return;
+        if (next.status === 'loading')
+            return;
+
+        view.loading = null;
+        view.message = next.status === 'error' ? (next.message || 'Could not load artist') : null;
+        if (next.status === 'ready') {
+            if (next.section === '') {
+                view.title = next.name || view.title;
+                view.artworkUrl = next.artworkUrl ?? view.artworkUrl;
+                view.songs = next.songs ?? [];
+                view.videos = next.videos ?? [];
+                view.songsNext = next.songsNext ?? null;
+                view.videosNext = next.videosNext ?? null;
+                if (!view.songs.length && !view.videos.length)
+                    view.message = next.message || 'Nothing found';
+            } else {
+                const list = view[next.section];
+                const seen = new Set(list.map(item => item.id));
+                for (const item of next[next.section] ?? []) {
+                    if (!seen.has(item.id)) {
+                        seen.add(item.id);
+                        list.push(item);
+                    }
+                }
+                view[`${next.section}Next`] = next[`${next.section}Next`] ?? null;
+            }
+        }
+        this._renderSearch();
     }
 
     _applySearchJson(resultsJson) {
@@ -767,6 +884,12 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const children = this._resultsList.get_children();
         for (const child of children)
             child.destroy();
+
+        if (this._artistView) {
+            this._renderArtistView();
+            return;
+        }
+        this._artistHeader.visible = false;
 
         const search = this._searchState;
         if (!search || search.status === 'idle') {
@@ -799,17 +922,74 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             this._resultsList.add_child(this._createResultRow(result));
     }
 
+    // iPod-style drill-down: the results list is replaced wholesale by the artist's page, with
+    // Back and Open pinned in the header above the scroll area.
+    _renderArtistView() {
+        const view = this._artistView;
+        this._resultsBox.visible = true;
+        this._resultsHeader.visible = false;
+        this._resultsStatus.visible = false;
+        this._resultsScroll.visible = true;
+        this._artistHeader.visible = true;
+        this._artistNameLabel.text = view.title;
+
+        if (view.loading === 'page') {
+            this._resultsList.add_child(new St.Label({text: 'Loading…', style_class: 'ytmd-artist-status'}));
+            return;
+        }
+        if (view.message && !view.songs.length && !view.videos.length) {
+            this._resultsList.add_child(new St.Label({text: view.message, style_class: 'ytmd-artist-status'}));
+            return;
+        }
+
+        this._addArtistSection('Songs', 'songs', 'More songs', view);
+        if (view.videos.length || view.videosNext || view.loading === 'videos')
+            this._addArtistSection('Videos', 'videos', 'More videos', view);
+    }
+
+    _addArtistSection(label, section, moreLabel, view) {
+        this._resultsList.add_child(new St.Label({text: label, style_class: 'ytmd-results-label ytmd-artist-section'}));
+        for (const item of view[section])
+            this._resultsList.add_child(this._createResultRow(item));
+
+        if (view.loading === section) {
+            this._resultsList.add_child(new St.Label({text: 'Loading…', style_class: 'ytmd-artist-status'}));
+        } else if (view[`${section}Next`]) {
+            const actions = new St.BoxLayout({style_class: 'ytmd-artist-actions', x_expand: true});
+            actions.add_child(this._artistActionButton(moreLabel, `${moreLabel} by ${view.title}`, () => this._loadMoreArtist(section)));
+            this._resultsList.add_child(actions);
+        } else if (!view[section].length) {
+            this._resultsList.add_child(new St.Label({text: 'None', style_class: 'ytmd-artist-status'}));
+        }
+    }
+
+    _artistActionButton(label, accessibleName, callback) {
+        const button = new St.Button({
+            label,
+            style_class: 'ytmd-artist-action',
+            accessible_name: accessibleName,
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+        });
+        button.connect('clicked', callback);
+        return button;
+    }
+
     _createResultRow(result) {
         const row = new St.BoxLayout({style_class: 'ytmd-result-row', x_expand: true});
 
         // The thumbnail is the play control: hovering or focusing it reveals a play overlay and
         // clicking plays the result. Same pattern as the main artwork, which opens the app.
+        const isArtist = result.kind === 'artist' && Boolean(result.artistId);
+        // Artist rows without a radio id have nothing to play; their id is only a display key.
+        const playable = !String(result.id).startsWith('artist:');
         const artWrap = new St.Button({
             style_class: 'ytmd-result-art-wrap',
-            accessible_name: `Play ${result.title || 'result'}`,
-            can_focus: true,
-            reactive: true,
-            track_hover: true,
+            accessible_name: playable ? `Play ${result.title || 'result'}` : result.title || 'result',
+            can_focus: playable,
+            reactive: playable,
+            track_hover: playable,
             y_align: Clutter.ActorAlign.CENTER,
         });
         const artStack = new St.Widget({layout_manager: new Clutter.BinLayout(), x_expand: true, y_expand: true});
@@ -852,7 +1032,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         artWrap.connect('notify::hover', updateOverlay);
         artWrap.connect('key-focus-in', updateOverlay);
         artWrap.connect('key-focus-out', updateOverlay);
-        artWrap.connect('clicked', () => this._call('PlayResult', result.id, 'now'));
+        if (playable)
+            artWrap.connect('clicked', () => this._call('PlayResult', result.id, 'now'));
 
         const details = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'ytmd-result-details'});
         const title = new St.Label({text: result.title || 'Unknown title', style_class: 'ytmd-result-title', x_expand: true});
@@ -867,7 +1048,22 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(subtitle);
 
         row.add_child(artWrap);
-        row.add_child(details);
+        if (isArtist) {
+            // The row body opens the artist's page; the thumbnail keeps playing the radio.
+            const detailsButton = new St.Button({
+                style_class: 'ytmd-result-details-button',
+                accessible_name: `Open ${result.title}`,
+                can_focus: true,
+                reactive: true,
+                track_hover: true,
+                x_expand: true,
+            });
+            detailsButton.set_child(details);
+            detailsButton.connect('clicked', () => this._openArtist(result));
+            row.add_child(detailsButton);
+        } else {
+            row.add_child(details);
+        }
         return row;
     }
 
@@ -1200,7 +1396,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 console.error(`YTMDesktop ${method} failed: ${error.message}`);
         });
 
-        if (!['Command', 'Search', 'PlayResult'].includes(method))
+        if (!['Command', 'Search', 'PlayResult', 'ArtistBrowse'].includes(method))
             this.menu.close();
     }
 
@@ -1230,6 +1426,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             this._proxy.disconnectSignal(this._stateChangedId);
         if (this._proxy && this._searchChangedId)
             this._proxy.disconnectSignal(this._searchChangedId);
+        if (this._proxy && this._artistBrowseChangedId)
+            this._proxy.disconnectSignal(this._artistBrowseChangedId);
         this._proxy = null;
         super.destroy();
     }

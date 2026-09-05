@@ -64,6 +64,8 @@ Implemented in `src/main/linux-mini-player-service.ts`.
 | `Command`          | `(s command, d value)`  | See the command table; `value` is ignored where unused                                                                    |
 | `Search`           | `(s query)`             | Asynchronous; results arrive on `SearchResultsChanged`. Whitespace is collapsed and the query is capped at 200 characters |
 | `PlayResult`       | `(s videoId, s action)` | `action` must be `now`; any other value is ignored                                                                              |
+| `ArtistBrowse`     | `(s artistId, s section, s continuation)` | Asynchronous; pages arrive on `ArtistBrowseChanged`. `section` is `""` (the artist page), `songs` or `videos`; empty `continuation` fetches the page, `browse:<id>[:<params>]` / `token:<token>` page through a section's full list |
+| `OpenArtist`       | `(s browseId)`          | Show the main window and navigate it to the artist page                                                                  |
 | `ShowMainWindow`   | `()`                    | Restore, show, and focus the main window                                                                                  |
 | `ToggleMainWindow` | `()`                    | Show or hide the main window                                                                                              |
 | `OpenSettings`     | `()`                    | Open the settings window                                                                                                  |
@@ -75,6 +77,7 @@ Implemented in `src/main/linux-mini-player-service.ts`.
 | ---------------------- | ----------------- | --------------------------------------------------------------------------------- |
 | `StateChanged`         | `(s stateJson)`   | Emitted on real changes, and at most once per second while the position advances  |
 | `SearchResultsChanged` | `(s resultsJson)` | Emitted for the most recent `Search` only; earlier in-flight searches are dropped |
+| `ArtistBrowseChanged`  | `(s artistBrowseJson)` | Emitted for the most recent `ArtistBrowse` only; carries one page, the client appends |
 
 ### Commands
 
@@ -162,7 +165,8 @@ While `adPlaying` is true:
       "duration": "3:32", // display string, or null
       "artworkUrl": "https://…",
       "playlistId": "RDAMVM…", // null when the result has no mix
-      "kind": "music" // music | video | unknown
+      "kind": "music", // music | video | artist | unknown
+      "artistId": null // UC… browseId for artist results
     }
   ],
   "message": null
@@ -170,7 +174,31 @@ While `adPlaying` is true:
 ```
 
 `kind` is what drives the Music-first and Video-first orderings; the sort is stable, so results
-within a group keep the order YouTube Music returned them in.
+within a group keep the order YouTube Music returned them in. Artist results always sort first. An artist's `id` is a radio videoId when YouTube Music offers one, otherwise a display-only
+`artist:<browseId>` key that must not be sent to `PlayResult`.
+
+### `ArtistBrowseChanged` payload
+
+```jsonc
+{
+  "version": 1,
+  "artistId": "UC…",
+  "section": "", // "" for the artist page, else the section this page belongs to
+  "status": "ready", // loading | ready | error
+  "name": "…", // artist page only
+  "artworkUrl": "https://…", // artist page only
+  "songs": [ /* same shape as search results; YouTube Music's own popularity order */ ],
+  "videos": [ /* music videos, kind "video" */ ],
+  "songsNext": "browse:VL…", // pass back as `continuation` with section "songs"; null at the end
+  "videosNext": "browse:MPAD…:params", // same, with section "videos"
+  "message": null
+}
+```
+
+The artist page fills every field. A section page fills only that section's list and its
+`…Next` pointer (a `token:` value once paging has started). Each signal carries one page; the
+client appends and deduplicates on `id`. Only the most recent `ArtistBrowse` call is answered, and
+a new `Search` is expected to drop the artist view on the client side.
 
 ### Talking to it by hand
 

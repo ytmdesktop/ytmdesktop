@@ -167,6 +167,58 @@
   background-color: transparent;
 }
 
+.ytmd-result-details-button {
+  padding: 2px 6px;
+  border-width: 0;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+.ytmd-result-details-button:hover,
+.ytmd-result-details-button:focus {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.ytmd-artist-header {
+  spacing: 8px;
+  padding: 2px;
+}
+
+.ytmd-artist-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ytmd-artist-section {
+  padding-top: 6px;
+}
+
+.ytmd-artist-status {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  padding: 4px 2px;
+}
+
+.ytmd-artist-actions {
+  spacing: 6px;
+  padding: 4px 2px;
+}
+
+.ytmd-artist-action {
+  padding: 3px 8px;
+  color: rgba(255, 255, 255, 0.72);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ytmd-artist-action:hover,
+.ytmd-artist-action:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
 .ytmd-result-art-wrap:focus {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
 }

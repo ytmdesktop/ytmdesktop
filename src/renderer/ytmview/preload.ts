@@ -682,10 +682,19 @@ window.addEventListener("load", async () => {
 
   ipcRenderer.on("ytmView:search", async (_event, requestId, query) => {
     try {
-      const results = await (await webFrame.executeJavaScript(searchScript))(query);
+      const results = await (await webFrame.executeJavaScript(searchScript)).search(query);
       ipcRenderer.send(`ytmView:search:response:${requestId}`, { results });
     } catch (error) {
       ipcRenderer.send(`ytmView:search:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  ipcRenderer.on("ytmView:artistBrowse", async (_event, requestId, request) => {
+    try {
+      const page = await (await webFrame.executeJavaScript(searchScript)).artistBrowse(request);
+      ipcRenderer.send(`ytmView:artistBrowse:response:${requestId}`, { page });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:artistBrowse:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
     }
   });
 

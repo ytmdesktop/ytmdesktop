@@ -26,7 +26,7 @@ import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { MiniPlayerCommand, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { MiniPlayerArtistBrowsePage, MiniPlayerArtistBrowseRequest, MiniPlayerCommand, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
 import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
@@ -816,6 +816,8 @@ function startLinuxMiniPlayerService() {
         {
           command: handleMiniPlayerCommand,
           search: searchYtm,
+          artistBrowse: artistBrowseYtm,
+          openArtist: openArtistInYtm,
           playResult: playMiniPlayerResult,
           toggleMainWindow: toggleMainWindowVisibility,
           showMainWindow,
@@ -947,6 +949,61 @@ function searchYtm(query: string): Promise<MiniPlayerSearchResult[]> {
     });
 
     ytmView.webContents.send("ytmView:search", requestId, query);
+  });
+}
+
+type RawArtistBrowsePage = Partial<MiniPlayerArtistBrowsePage> & { items?: MiniPlayerSearchResult[]; continuation?: string | null };
+
+function artistBrowseYtm(request: MiniPlayerArtistBrowseRequest): Promise<MiniPlayerArtistBrowsePage> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:artistBrowse:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Artist browse timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { page?: RawArtistBrowsePage; error?: string }) => {
+      clearTimeout(timeout);
+      const page = payload?.page;
+      if (payload?.error || !page) {
+        reject(new Error(payload?.error ?? "Artist browse returned nothing"));
+        return;
+      }
+      // A section page arrives as a flat list plus a token; fold it into the page shape so the
+      // panel only ever deals with one structure.
+      const section = page.section === "songs" || page.section === "videos" ? page.section : "";
+      const items = Array.isArray(page.items) ? page.items : [];
+      const next = page.continuation ? `token:${page.continuation}` : null;
+      resolve({
+        section,
+        name: page.name ?? null,
+        artworkUrl: page.artworkUrl ?? null,
+        songs: section === "songs" ? items : Array.isArray(page.songs) ? page.songs : [],
+        videos: section === "videos" ? items : Array.isArray(page.videos) ? page.videos : [],
+        songsNext: section === "songs" ? next : (page.songsNext ?? null),
+        videosNext: section === "videos" ? next : (page.videosNext ?? null)
+      });
+    });
+
+    ytmView.webContents.send("ytmView:artistBrowse", requestId, request);
+  });
+}
+
+function openArtistInYtm(browseId: string) {
+  if (!ytmView) return;
+  showMainWindow();
+  // The preload passes the endpoint through untouched, so a browse endpoint works like a watch one.
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    browseEndpoint: {
+      browseId,
+      browseEndpointContextSupportedConfigs: { browseEndpointContextMusicConfig: { pageType: "MUSIC_PAGE_TYPE_ARTIST" } }
+    }
   });
 }
 
