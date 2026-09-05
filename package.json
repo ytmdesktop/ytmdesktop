@@ -1,6 +1,7 @@
 {
   "name": "youtube-music-desktop-app",
   "productName": "YouTube Music Desktop App",
+  "desktopName": "youtube-music-desktop-app.desktop",
   "version": "2.0.12",
   "description": "YouTube Music Desktop App",
   "main": ".vite/main/index.js",

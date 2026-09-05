@@ -11,9 +11,10 @@ the D-Bus interface below can replace it.
 - GNOME Shell 50 (`metadata.json` declares that version only)
 - The desktop app running, so the D-Bus service is on the session bus
 
-## Install
+## Manual installation
 
-The `.deb` does not install the extension. Install it from a checkout:
+This PR does not bundle or automatically install the GNOME extension. Distribution and reload
+experiments remain the separate proposal in ytmdesktop/ytmdesktop#1805.
 
 ```sh
 rsync -a --delete \
@@ -22,28 +23,11 @@ rsync -a --delete \
 gnome-extensions enable ytmdesktop-miniplayer@ytmdesktop
 ```
 
-On Wayland, log out and back in after installing or updating. Disabling and re-enabling the
-extension does not reload changed JavaScript.
-
-```sh
-gnome-extensions disable ytmdesktop-miniplayer@ytmdesktop     # stop using it
-rm -rf ~/.local/share/gnome-shell/extensions/ytmdesktop-miniplayer@ytmdesktop   # remove it
-```
-
-## Tray fallback
-
-The app asks GNOME Shell whether this extension is actually enabled, and follows
-`ExtensionStateChanged` and `NameOwnerChanged` for as long as it runs.
-
-| Session                              | Panel mini player | Electron tray |
-| ------------------------------------ | ----------------- | ------------- |
-| GNOME, extension enabled             | yes               | no            |
-| GNOME, extension missing or disabled | no                | yes           |
-| Non-GNOME Linux                      | no                | yes           |
-| Windows, macOS                       | no                | yes           |
-
-A session always ends up with exactly one of the two, and enabling or removing the extension swaps
-them without restarting the app. See `src/main/gnome-shell-extension-watcher.ts`.
+On Wayland, log out and back in after installing or updating this single-file extension.
+The app and extension must use the same version. The app keeps an existing fallback tray until
+the attached panel reports the expected version and current session through `ReportPanelReady`.
+On startup, it waits up to ten seconds before creating a fallback tray, avoiding a transient icon
+that GNOME may cache after its removal. A timeout or missing extension restores the tray.
 
 ## D-Bus interface
 
@@ -60,9 +44,17 @@ Implemented in `src/main/linux-mini-player-service.ts`.
 
 | Method             | Signature               | Notes                                                                                                                     |
 | ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `GetPanelSession` | `() → s` | JSON containing the expected extension version and fresh readiness session. |
+| `ReportPanelReady` | `(u version, s session) → b` | Called after panel attachment, state subscriptions and initial state; false on a stale version/session or timeout. |
 | `GetState`         | `() → s`                | Current player snapshot, as JSON                                                                                          |
 | `Command`          | `(s command, d value)`  | See the command table; `value` is ignored where unused                                                                    |
 | `Search`           | `(s query)`             | Asynchronous; results arrive on `SearchResultsChanged`. Whitespace is collapsed and the query is capped at 200 characters |
+| `SearchMusic` | `(s query, s category, s requestKey, s continuation)` | Dedicated Music categories; echoes request identity on `MusicSearchChanged`. |
+| `StartResultMix` | `(s videoId)` | Start the cached result radio endpoint and report confirmation on `MixResultChanged`. |
+| `AlbumBrowse` | `(s albumId, s continuation)` | Load album tracks in release order. Empty continuation requests the first page. |
+| `OpenAlbum` | `(s albumId)` | Open the album in the main app. |
+| `PlayNext` | `(s videoId)` | Use a trusted menu action saved by the page and confirm insertion after the current item. |
+| `SearchByMode` | `(s query, s mode)` | `music` searches tracks and albums; `video` requests the Videos filter and returns video items only. |
 | `PlayResult`       | `(s videoId, s action)` | `action` must be `now`; any other value is ignored                                                                              |
 | `ArtistBrowse`     | `(s artistId, s section, s continuation)` | Asynchronous; pages arrive on `ArtistBrowseChanged`. `section` is `""` (the artist page), `songs` or `videos`; empty `continuation` fetches the page, `browse:<id>[:<params>]` / `token:<token>` page through a section's full list |
 | `OpenArtist`       | `(s browseId)`          | Show the main window and navigate it to the artist page                                                                  |
@@ -76,7 +68,11 @@ Implemented in `src/main/linux-mini-player-service.ts`.
 | Signal                 | Signature         | Notes                                                                             |
 | ---------------------- | ----------------- | --------------------------------------------------------------------------------- |
 | `StateChanged`         | `(s stateJson)`   | Emitted on real changes, and at most once per second while the position advances  |
-| `SearchResultsChanged` | `(s resultsJson)` | Emitted for the most recent `Search` only; earlier in-flight searches are dropped |
+| `MusicSearchChanged` | `(s resultJson)` | Query, category, requestKey, append flag, status, results, sectionOrder and artistsNext. |
+| `MixResultChanged` | `(s resultJson)` | Video ID and loading/ready/error status; title on confirmation, message on error. |
+| `AlbumBrowseChanged` | `(s pageJson)` | Album ID, status, name, artworkUrl, items, continuation and optional error message. |
+| `PlayNextChanged` | `(s resultJson)` | Video ID and loading/ready/error status; title on success, message on error. |
+| `SearchResultsChanged` | `(s resultsJson)` | Emitted for the most recent `Search` or `SearchByMode` only; earlier in-flight searches are dropped |
 | `ArtistBrowseChanged`  | `(s artistBrowseJson)` | Emitted for the most recent `ArtistBrowse` only; carries one page, the client appends |
 
 ### Commands
@@ -156,6 +152,7 @@ While `adPlaying` is true:
 {
   "version": 1,
   "query": "…",
+  "mode": "music", // music | video; legacy Search defaults to music
   "status": "ready", // idle | loading | ready | error
   "results": [
     {
@@ -165,7 +162,10 @@ While `adPlaying` is true:
       "duration": "3:32", // display string, or null
       "artworkUrl": "https://…",
       "playlistId": "RDAMVM…", // null when the result has no mix
-      "kind": "music", // music | video | artist | unknown
+      "kind": "music", // music | video | artist | album | unknown
+      "playCount": null, // parsed display count; approximate, not an exact analytics metric
+      "canPlayNext": true, // only when the page supplied a matching menu action
+      "albumId": null, // populated for albums
       "artistId": null // UC… browseId for artist results
     }
   ],
@@ -173,9 +173,59 @@ While `adPlaying` is true:
 }
 ```
 
-`kind` is what drives the Music-first and Video-first orderings; the sort is stable, so results
-within a group keep the order YouTube Music returned them in. Artist results always sort first. An artist's `id` is a radio videoId when YouTube Music offers one, otherwise a display-only
+Music uses `SearchMusic(query, category, requestKey, continuation)` with All, Songs, Artists and
+Albums. It requests each selected category separately and preserves each API's result order.
+All orders sections by exact title/name match, full query inclusion, then partial inclusion;
+ties use the mixed response's first matching type and finally Songs, Artists, Albums. Music
+excludes videos, podcasts and unknown types. UI/status text is English; returned names are not
+translated by the client. Videos retains its existing filtered request, classification and ranking.
+
+`MusicSearchChanged` echoes the query, category and request key. Stale responses are ignored.
+Artists initially shows five results; See more reveals ten already fetched items before requesting
+continuation. Browse IDs deduplicate artists, and errors preserve the list and continuation for retry.
+Category controls remain available during loading, errors and empty results, and survive Back.
+
+Clients should reject responses whose query or mode differs from their current selection. Switching
+modes reruns the query, including when the previous result was empty or failed. `Search(query)` is
+kept for older clients and uses `music`. Deploy the updated app and extension together: older apps
+do not implement `SearchByMode`.
+
+Live signed-out API checks for `Okasian` and `Okasian Spread the Word` returned video results;
+the latter included the official upload `Hd3PbHNA98Q`. These API checks do not establish installed
+mini-player interaction or playback correctness; those still need an on-device pass.
+
+An artist's `id` is a radio videoId when YouTube Music offers one, otherwise a display-only
 `artist:<browseId>` key that must not be sent to `PlayResult`.
+
+### Album browsing and next-track insertion
+
+Album rows open in the panel with the existing Back/Escape navigation, cover, title, track list,
+and Open in YTMusic action. Tracks retain release order, including continuation pages; search
+ranking never reorders an album. Missing track artwork uses the currently browsed album cover,
+including continuation tracks. A thumbnail plays an individual track immediately.
+
+Individual tracks expose Start mix and Play next SVG buttons. Unsupported actions are disabled
+with an explanation; a separate scrollbar gutter protects the buttons. `StartResultMix(videoId)`
+uses the cached radio endpoint and emits `MixResultChanged` only after confirming its target.
+Play next is offered on individual tracks with a page-supplied menu action. The endpoint stays
+inside the YTM page in a bounded cache; the panel only sends the video ID. Expired IDs require
+searching again. The app serializes requests and rejects duplicates while one is pending.
+
+Calling generic service handlers did not change the queue in the browser reproduction. Using a
+connected `ytmusic-menu-service-item-renderer` and its normal `onTap` path did insert a searched
+track immediately after the current track; Next then selected that track. The temporary hidden
+menu component is removed after dispatch, and the queue itself is never edited directly.
+
+Success requires an observed insertion, unchanged current item and playback state, and a bounded
+position change. The panel then shows a single-line, ellipsized `“Title” added to next` message for
+three seconds in a reserved status row. Failures are shown as failures, never success toasts. Empty
+queues, advertisements, unready playback and stale actions are rejected. The internal YouTube Music
+menu API may change; absence of the handler or a five-second confirmation timeout is an error.
+
+The signed-out browser check covered live song insertion and Next selection. Video insertion was
+observed, but an advertisement interrupted the paused-state test. The later logged-in song checks
+are recorded below; the complete playback matrix, panel controls and layout remain pending. Run
+`node scripts/test-mini-player.cjs` for focused parser/ranking/album/queue failure-path checks.
 
 ### `ArtistBrowseChanged` payload
 
@@ -235,8 +285,52 @@ gdbus monitor --session --dest io.github.ytmdesktop.MiniPlayer
   `gdbus introspect --session --dest io.github.ytmdesktop.MiniPlayer --object-path /io/github/ytmdesktop/MiniPlayer`.
 - **A tray icon appears instead.** The app could not confirm the extension is enabled, so it fell
   back to the tray. Enabling the extension removes the tray without an app restart.
-- **Edits to `extension.js` do nothing.** On Wayland, log out and back in.
-- **Extension errors.** `journalctl --user -f -o cat /usr/bin/gnome-shell`, or
-  `gnome-extensions info ytmdesktop-miniplayer@ytmdesktop` for the recorded error.
+- **Edits to `extension.js` do nothing.** Reinstall the extension, then log out and back in.
+  This PR keeps the single-file entry module. Package updates do not replace the user extension.
+  Match its version to the app's expected version and check the Shell log for readiness errors.
 - **App-side logs.** The main process logs through `electron-log`; look for
   `Initialized GNOME mini-player integration` or `Created tray icon` at startup.
+
+### Validation (2026-09-05)
+
+The installed-package observations below used the local distribution experiment, not an automatic
+installer in this PR. Search, playback and panel behavior use the same feature implementation.
+
+- Local parser/state regression tests cover dedicated filters, strict song types, section ranking,
+  API order, hidden artists, continuation, deduplication, stale replies and retry.
+- In the connected **logged-in installed Electron session**, current source scripts confirmed
+  song insertion while playing and paused, unchanged current track/state/position, and actual Next
+  selection. At startup, player API state was -1 with paused media at zero and no ad; the real Play
+  button moved both into playback. Unstarted/cued states now explicitly request pressing Play once.
+  This observation does not establish the cause of every earlier readiness error.
+- Live Music searches returned 20 songs and 20 albums for `소문내`, with Songs first; `Okasian`
+  put Artists first and returned seven artists. Its album returned nine ordered tracks without
+  track art and a valid album cover. Live artist continuation was unavailable for this example.
+- A different-track Start mix confirmed the requested RD playlist. Starting a mix from the current
+  track in a QP queue timed out, and is still unresolved; no success is reported in that case.
+- Earlier signed-out browser checks are separate evidence, not equivalent login-state coverage.
+- After user installation, logs confirmed v42 → v43 and UI readiness at 09:03:55. No GNOME
+  JavaScript errors were found in the startup interval. Installed D-Bus search round trips returned
+  40 All results for `소문내` (songs/albums only), then 8 Artists, 20 Songs and 10 Albums for
+  `Okasian`, each with only its selected type. The user subsequently accepted the panel features and
+  limited the remaining work to the stale fallback tray and Dock icon.
+
+### v44 desktop icon fixes
+
+The initial fallback tray is deferred while an enabled panel is waiting for readiness. A readiness
+timeout or unavailable extension still creates the fallback. This avoids registering and immediately
+destroying a startup StatusNotifierItem, which was observed to leave a cached GNOME icon/menu after
+the D-Bus object stopped responding. Existing fallback icons remain until a panel is ready.
+
+`package.json` explicitly sets `desktopName` to `youtube-music-desktop-app.desktop`, matching the
+installed launcher and pinned Dock entry. Electron 40.4.0 otherwise derives its Wayland app ID from
+the product name, which does not match that file. These two changes do not alter search or playback.
+The user confirmed that v44 removed the stale tray; final Dock verification awaits the corrected
+Debian package. The remaining Electron logo was the actual installed pixmap, not merely a window
+matching failure: invoking Forge with `--targets=@electron-forge/maker-deb` bypasses this repository's
+configured maker instance (named `deb`) and falls back to Electron's default icon.
+
+Build with `yarn make --platform=linux --arch=x64 --targets=deb`. Use `--skip-package` only when the
+existing packaged app is known to match current source. Verify the deb's
+`usr/share/pixmaps/youtube-music-desktop-app.png` against `src/assets/icons/ytmd.png` before delivery.
+Focused startup/timeout tests pass; unrelated features are unchanged.

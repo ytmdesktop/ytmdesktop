@@ -26,10 +26,11 @@ import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { MiniPlayerArtistBrowsePage, MiniPlayerArtistBrowseRequest, MiniPlayerCommand, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, { MiniPlayerAlbumPage, MiniPlayerQueueResult, MiniPlayerMusicRequest, MiniPlayerMusicPage, MiniPlayerArtistBrowsePage, MiniPlayerArtistBrowseRequest, MiniPlayerCommand, MiniPlayerSearchMode, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
 import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
+import miniPlayerMetadata from "../gnome-shell-extension/ytmdesktop-miniplayer@ytmdesktop/metadata.json";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -800,7 +801,7 @@ function destroyTray() {
 
 /** Whether the GNOME extension is currently drawing the panel mini-player for this session. */
 function miniPlayerServingPanel() {
-  return !!linuxMiniPlayerService && !!gnomeShellExtensionWatcher?.isEnabled;
+  return !!linuxMiniPlayerService?.isPanelReady && !!gnomeShellExtensionWatcher?.isEnabled;
 }
 
 /**
@@ -812,11 +813,17 @@ function miniPlayerServingPanel() {
 function startLinuxMiniPlayerService() {
   if (!linuxMiniPlayerServiceStarting) {
     linuxMiniPlayerServiceStarting = (async () => {
+      const metadata = miniPlayerMetadata;
       const service = new LinuxMiniPlayerService(
         {
           command: handleMiniPlayerCommand,
           search: searchYtm,
+          searchMusic: (request: MiniPlayerMusicRequest) => miniPlayerPageRequest<MiniPlayerMusicPage>("searchMusic", request),
+          startResultMix: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("startResultMix", videoId),
           artistBrowse: artistBrowseYtm,
+          albumBrowse: (albumId, continuation) => miniPlayerPageRequest<MiniPlayerAlbumPage>("albumBrowse", {albumId, continuation}),
+          playNext: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("playNext", videoId),
+          openAlbum: browseId => openArtistInYtm(browseId, "MUSIC_PAGE_TYPE_ALBUM"),
           openArtist: openArtistInYtm,
           playResult: playMiniPlayerResult,
           toggleMainWindow: toggleMainWindowVisibility,
@@ -825,7 +832,8 @@ function startLinuxMiniPlayerService() {
           quit: () => app.quit()
         },
         playerStateStore.getState(),
-        { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() }
+        { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() },
+        { version: metadata.version, changed: () => { if (!applicationQuitting) void applyPlatformTrayIntegration(); } }
       );
 
       try {
@@ -853,7 +861,9 @@ async function applyPlatformTrayIntegration() {
 
   if (servingPanel) {
     destroyTray();
-  } else {
+  } else if (!gnomeShellExtensionWatcher?.isEnabled || !linuxMiniPlayerService?.isPanelPending) {
+    // A short-lived startup tray can remain cached by GNOME after Tray.destroy(). Wait for
+    // panel readiness or its timeout before creating the initial fallback icon.
     createTray();
   }
 
@@ -925,7 +935,7 @@ function resumeLastTrack() {
   }, 5000);
 }
 
-function searchYtm(query: string): Promise<MiniPlayerSearchResult[]> {
+function searchYtm(query: string, mode: MiniPlayerSearchMode): Promise<MiniPlayerSearchResult[]> {
   return new Promise((resolve, reject) => {
     if (!ytmView) {
       reject(new Error("YouTube Music is not ready"));
@@ -948,7 +958,26 @@ function searchYtm(query: string): Promise<MiniPlayerSearchResult[]> {
       resolve(Array.isArray(payload?.results) ? payload.results : []);
     });
 
-    ytmView.webContents.send("ytmView:search", requestId, query);
+    ytmView.webContents.send("ytmView:search", requestId, query, mode);
+  });
+}
+
+function miniPlayerPageRequest<T>(method: "albumBrowse" | "playNext" | "searchMusic" | "startResultMix", request: unknown): Promise<T> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) return reject(new Error("YouTube Music is not ready"));
+    const sender = ytmView.webContents;
+    const requestId = randomUUID();
+    const channel = `ytmView:miniPlayer:response:${requestId}`;
+    const timeout = setTimeout(() => { ipcMain.removeListener(channel, handler); reject(new Error(`${method} timed out`)); }, 10000);
+    const handler = (event: Electron.IpcMainEvent, payload: {result?: T; error?: string}) => {
+      if (event.sender !== sender) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(channel, handler);
+      if (payload?.error || !payload?.result) reject(new Error(payload?.error || `${method} returned nothing`));
+      else resolve(payload.result);
+    };
+    ipcMain.on(channel, handler);
+    sender.send("ytmView:miniPlayer", requestId, method, request);
   });
 }
 
@@ -995,14 +1024,14 @@ function artistBrowseYtm(request: MiniPlayerArtistBrowseRequest): Promise<MiniPl
   });
 }
 
-function openArtistInYtm(browseId: string) {
+function openArtistInYtm(browseId: string, pageType = "MUSIC_PAGE_TYPE_ARTIST") {
   if (!ytmView) return;
   showMainWindow();
   // The preload passes the endpoint through untouched, so a browse endpoint works like a watch one.
   ytmView.webContents.send("remoteControl:execute", "navigate", {
     browseEndpoint: {
       browseId,
-      browseEndpointContextSupportedConfigs: { browseEndpointContextMusicConfig: { pageType: "MUSIC_PAGE_TYPE_ARTIST" } }
+      browseEndpointContextSupportedConfigs: { browseEndpointContextMusicConfig: { pageType } }
     }
   });
 }
@@ -2317,7 +2346,8 @@ app.on("ready", async () => {
   // application, so it can be absent, disabled, or added while the app is running. Any session the
   // extension is not currently serving keeps the tray icon, because it has no other UI.
   if (isLinux) {
-    gnomeShellExtensionWatcher = new GnomeShellExtensionWatcher(() => {
+    gnomeShellExtensionWatcher = new GnomeShellExtensionWatcher(enabled => {
+      if (!enabled) linuxMiniPlayerService?.invalidatePanel();
       if (applicationQuitting) return;
       void applyPlatformTrayIntegration();
     });

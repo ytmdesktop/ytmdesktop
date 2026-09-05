@@ -13,6 +13,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Slider from 'resource:///org/gnome/shell/ui/slider.js';
 
+const UI_VERSION = 44;
 const SERVICE = 'io.github.ytmdesktop.MiniPlayer';
 const OBJECT_PATH = '/io/github/ytmdesktop/MiniPlayer';
 const SEARCH_DEBOUNCE_MS = 900;
@@ -28,6 +29,8 @@ const DBUS_XML = `
     <method name="GetState">
       <arg type="s" name="stateJson" direction="out"/>
     </method>
+    <method name="GetPanelSession"><arg type="s" name="sessionJson" direction="out"/></method>
+    <method name="ReportPanelReady"><arg type="u" name="version" direction="in"/><arg type="s" name="session" direction="in"/><arg type="b" name="accepted" direction="out"/></method>
     <method name="Command">
       <arg type="s" name="command" direction="in"/>
       <arg type="d" name="value" direction="in"/>
@@ -39,6 +42,19 @@ const DBUS_XML = `
     <method name="Search">
       <arg type="s" name="query" direction="in"/>
     </method>
+    <method name="SearchByMode">
+      <arg type="s" name="query" direction="in"/>
+      <arg type="s" name="mode" direction="in"/>
+    </method>
+    <method name="SearchMusic"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
+    <method name="StartResultMix"><arg type="s" direction="in"/></method>
+    <signal name="MusicSearchChanged"><arg type="s"/></signal>
+    <signal name="MixResultChanged"><arg type="s"/></signal>
+    <method name="AlbumBrowse"><arg type="s" name="albumId" direction="in"/><arg type="s" name="continuation" direction="in"/></method>
+    <method name="OpenAlbum"><arg type="s" name="albumId" direction="in"/></method>
+    <method name="PlayNext"><arg type="s" name="videoId" direction="in"/></method>
+    <signal name="AlbumBrowseChanged"><arg type="s" name="pageJson"/></signal>
+    <signal name="PlayNextChanged"><arg type="s" name="resultJson"/></signal>
     <method name="PlayResult">
       <arg type="s" name="videoId" direction="in"/>
       <arg type="s" name="action" direction="in"/>
@@ -136,6 +152,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._extensionPath = extension.path;
 
         this._state = null;
+        this._musicCategory = 'all';
+        this._musicSerial = 0;
         this._searchState = null;
         this._localProgress = 0;
         this._dragging = false;
@@ -188,6 +206,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 this._stateChangedId = proxy.connectSignal('StateChanged', (_proxy, _sender, [stateJson]) => this._applyStateJson(stateJson));
                 this._searchChangedId = proxy.connectSignal('SearchResultsChanged', (_proxy, _sender, [resultsJson]) => this._applySearchJson(resultsJson));
                 this._artistBrowseChangedId = proxy.connectSignal('ArtistBrowseChanged', (_proxy, _sender, [artistBrowseJson]) => this._applyArtistBrowseJson(artistBrowseJson));
+                this._musicChangedId = proxy.connectSignal('MusicSearchChanged', (_proxy, _sender, [json]) => this._applyMusicJson(json));
+                this._mixChangedId = proxy.connectSignal('MixResultChanged', (_proxy, _sender, [json]) => this._applyQueueJson(json));
+                this._albumChangedId = proxy.connectSignal('AlbumBrowseChanged', (_proxy, _sender, [json]) => this._applyAlbumJson(json));
+                this._queueChangedId = proxy.connectSignal('PlayNextChanged', (_proxy, _sender, [json]) => this._applyQueueJson(json));
                 this._syncOwner();
             },
             null,
@@ -256,8 +278,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._resultsHeader = new St.BoxLayout({style_class: 'ytmd-results-header', x_expand: true});
         this._resultsHeader.add_child(new St.Label({text: 'Results', style_class: 'ytmd-results-label', x_expand: true}));
         const orderToggle = new St.BoxLayout({style_class: 'ytmd-order-toggle'});
-        this._musicFirstButton = this._orderButton('Music ↑', 'Music results first', 'music');
-        this._videoFirstButton = this._orderButton('Video ↑', 'Video results first', 'video');
+        this._musicFirstButton = this._orderButton('Music', 'Music search', 'music');
+        this._videoFirstButton = this._orderButton('Videos', 'Video-only search', 'video');
         orderToggle.add_child(this._musicFirstButton);
         orderToggle.add_child(this._videoFirstButton);
         this._resultsHeader.add_child(orderToggle);
@@ -265,12 +287,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         // The artist view's header lives outside the scroll list so Back and Open stay pinned.
         this._artistHeader = new St.BoxLayout({style_class: 'ytmd-artist-header', x_expand: true, visible: false});
         this._artistHeader.add_child(this._artistActionButton('‹ Back', 'Back to results', () => this._closeArtist()));
+        this._albumCover = new St.Icon({icon_name: 'audio-x-generic-symbolic', icon_size: 32, visible: false});
+        this._artistHeader.add_child(this._albumCover);
         this._artistNameLabel = new St.Label({style_class: 'ytmd-artist-name', x_expand: true, y_align: Clutter.ActorAlign.CENTER});
         this._artistNameLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._artistHeader.add_child(this._artistNameLabel);
         this._artistHeader.add_child(this._artistActionButton('Open in YTMusic', 'Open this artist in YouTube Music', () => {
             if (this._artistView)
-                this._call('OpenArtist', this._artistView.artistId);
+                this._call(this._artistView.album ? 'OpenAlbum' : 'OpenArtist', this._artistView.artistId);
         }));
         this._resultsStatus = new St.Label({text: '', style_class: 'ytmd-results-status'});
         this._resultsStatus.clutter_text.ellipsize = Pango.EllipsizeMode.END;
@@ -284,9 +308,27 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         });
         addScrollChild(this._resultsScroll, this._resultsList);
         this._resultsBox.add_child(this._resultsHeader);
+        this._musicCategories = new St.BoxLayout({style_class: 'ytmd-order-toggle'});
+        this._categoryButtons = new Map();
+        for (const category of ['all', 'songs', 'artists', 'albums']) {
+            const label = category[0].toUpperCase() + category.slice(1);
+            const button = this._artistActionButton(label, `Search ${label}`, () => {
+                if (category === this._musicCategory) return;
+                this._musicCategory = category;
+                this._searchState = null;
+                this._runSearch();
+            });
+            this._categoryButtons.set(category, button);
+            this._musicCategories.add_child(button);
+        }
+        this._resultsBox.add_child(this._musicCategories);
         this._resultsBox.add_child(this._artistHeader);
         this._resultsBox.add_child(this._resultsStatus);
         this._resultsBox.add_child(this._resultsScroll);
+        this._queueStatus = new St.Label({text: ' ', style_class: 'ytmd-results-status', x_expand: true});
+        this._queueStatus.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this._queueStatus.opacity = 0;
+        this._resultsBox.add_child(this._queueStatus);
         this._resultsBox.visible = false;
         searchWrap.add_child(this._resultsBox);
 
@@ -695,22 +737,75 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         this._searchOrder = order;
         writeSearchOrder(order);
-        this._renderSearch();
+        this._artistView = null;
+        this._searchState = null;
+        this._cancelSearchTimer();
+        this._runSearch();
     }
 
     _orderedSearchResults(results) {
-        // An artist match is the strongest signal a query can produce, so it always leads.
-        const ranks = this._searchOrder === 'video'
-            ? {artist: 0, video: 1, music: 2, unknown: 3}
-            : {artist: 0, music: 1, video: 2, unknown: 3};
-        return results
-            .map((result, index) => ({result, index}))
-            .sort((left, right) => {
-                const leftRank = ranks[left.result.kind] ?? ranks.unknown;
-                const rightRank = ranks[right.result.kind] ?? ranks.unknown;
-                return leftRank - rightRank || left.index - right.index;
-            })
-            .map(({result}) => result);
+        if (this._searchOrder === 'video')
+            return results.filter(result => result.kind === 'video');
+        const kinds = {songs: 'music', artists: 'artist', albums: 'album'};
+        return (this._searchState?.sectionOrder || ['songs', 'artists', 'albums'])
+            .flatMap(section => results.filter(result => result.kind === kinds[section]));
+    }
+
+    _requestMusic(continuation = '') {
+        const state = this._searchState;
+        state.requestKey = String(++this._musicSerial);
+        state.moreLoading = Boolean(continuation);
+        this._call('SearchMusic', state.query, this._musicCategory, state.requestKey, continuation);
+    }
+
+    _applyMusicJson(json) {
+        let next;
+        try { next = JSON.parse(json); } catch (error) { console.error(`YTMDesktop music response failed: ${error.message}`); return; }
+        const state = this._searchState;
+        const query = this._searchEntry.get_text().trim().replace(/\s+/g, ' ').slice(0, 200);
+        if (this._searchOrder !== 'music' || !state || next.requestKey !== state.requestKey ||
+            next.query !== query || next.category !== this._musicCategory || next.status === 'loading') return;
+        if (next.append) {
+            state.moreLoading = false;
+            state.moreError = next.status === 'error' ? next.message : null;
+            if (next.status === 'ready') {
+                const seen = new Set(state.results.filter(item => item.kind === 'artist').map(item => item.artistId));
+                for (const item of next.results || []) {
+                    if (item.kind === 'artist' && item.artistId && !seen.has(item.artistId)) {
+                        seen.add(item.artistId);
+                        state.results.push(item);
+                    }
+                }
+                state.artistsNext = next.artistsNext;
+                state.artistsVisible += 10;
+            }
+            this._renderKeepingScroll();
+        } else {
+            this._searchState = {...next, mode: 'music', artistsVisible: 5};
+            this._renderSearch();
+        }
+    }
+
+    _renderKeepingScroll() {
+        const adjustment = this._resultsScroll.vadjustment;
+        const value = adjustment.value;
+        this._renderSearch();
+        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+            if (!this._destroyed) adjustment.value = value;
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _moreArtists() {
+        const state = this._searchState;
+        if (!state || state.moreLoading) return;
+        if (state.artistsVisible < state.results.filter(item => item.kind === 'artist').length) {
+            state.artistsVisible += 10;
+            this._renderKeepingScroll();
+        } else if (state.artistsNext) {
+            this._requestMusic(state.artistsNext);
+            this._renderKeepingScroll();
+        }
     }
 
     _isComposing() {
@@ -749,7 +844,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._searchState = null;
         this._artistView = null;
         this._renderSearch();
-        this._call('Search', '');
+        this._call('SearchByMode', '', this._searchOrder);
     }
 
     _cancelSearchTimer() {
@@ -760,7 +855,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
     }
 
     _runSearch() {
-        const query = this._searchEntry.get_text().trim();
+        const query = this._searchEntry.get_text().trim().replace(/\s+/g, ' ').slice(0, 200);
         if (!query) {
             this._clearSearch();
             return;
@@ -771,7 +866,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         if (query !== this._lastSearchQuery)
             this._artistView = null;
         this._lastSearchQuery = query;
-        this._call('Search', query);
+        this._searchState = {query, mode: this._searchOrder, status: 'loading', results: []};
+        this._renderSearch();
+        if (this._searchOrder === 'music') this._requestMusic();
+        else this._call('SearchByMode', query, this._searchOrder);
     }
 
     // The artist view is state, not actors: _renderSearch destroys every row on each render (order
@@ -781,6 +879,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         this._artistView = {
             artistId: result.artistId,
+            section: this._searchOrder === 'video' ? 'videos' : 'songs',
             title: result.title || 'Artist',
             artworkUrl: result.artworkUrl ?? null,
             songs: [],
@@ -794,6 +893,62 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._call('ArtistBrowse', result.artistId, '', '');
     }
 
+    _openAlbum(result) {
+        this._artistView = {album: true, artistId: result.albumId, title: result.title, artworkUrl: result.artworkUrl,
+            section: 'songs', songs: [], videos: [], songsNext: null, videosNext: null, loading: 'page', message: null};
+        this._renderSearch();
+        this._call('AlbumBrowse', result.albumId, '');
+    }
+
+    _applyAlbumJson(json) {
+        let next;
+        try { next = JSON.parse(json); } catch (error) { console.error(`YTMDesktop album response failed: ${error.message}`); return; }
+        const view = this._artistView;
+        if (!view?.album || view.artistId !== next.albumId || next.status === 'loading') return;
+        const initial = view.loading === 'page';
+        view.loading = null;
+        view.message = next.status === 'error' ? next.message : null;
+        if (next.status === 'ready') {
+            if (initial) view.songs = [];
+            view.title = next.name || view.title;
+            view.artworkUrl = next.artworkUrl || view.artworkUrl;
+            view.songs.push(...(next.items || []));
+            view.songsNext = next.continuation || null;
+        }
+        this._renderSearch();
+    }
+
+    _playNext(result, mix = false) {
+        if (this._queuePending) return;
+        this._queuePending = result.id;
+        this._queueMix = mix;
+        this._queueStatus.text = mix ? 'Starting mix…' : 'Adding next…';
+        this._queueStatus.opacity = 255;
+        if (this._queueMessageTimer) GLib.source_remove(this._queueMessageTimer);
+        this._queueMessageTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 12000, () => {
+            this._queueMessageTimer = 0;
+            if (!this._destroyed) this._applyQueueJson(JSON.stringify({videoId: result.id, status: 'error', message: 'Play next timed out'}));
+            return GLib.SOURCE_REMOVE;
+        });
+        this._call(mix ? 'StartResultMix' : 'PlayNext', result.id);
+    }
+
+    _applyQueueJson(json) {
+        let result;
+        try { result = JSON.parse(json); } catch (error) { console.error(`YTMDesktop queue response failed: ${error.message}`); return; }
+        if (result.videoId !== this._queuePending || result.status === 'loading') return;
+        this._queuePending = null;
+        if (this._queueMessageTimer) GLib.source_remove(this._queueMessageTimer);
+        this._queueStatus.text = result.status === 'ready' ? (this._queueMix ? `Mix started for “${result.title}”` : `“${result.title}” added to next`) : result.message || 'Could not add next track';
+        this._queueStatus.accessible_name = this._queueStatus.text;
+        this._queueStatus.opacity = 255;
+        this._queueMessageTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, result.status === 'ready' ? 3000 : 6000, () => {
+            this._queueMessageTimer = 0;
+            this._queueStatus.opacity = 0;
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
     _closeArtist() {
         if (!this._artistView)
             return;
@@ -803,7 +958,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
     _loadMoreArtist(section) {
         const view = this._artistView;
-        if (!view || view.loading)
+        if (!view || view.loading || section !== view.section)
             return;
         const key = `${section}Next`;
         const next = view[key];
@@ -813,7 +968,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         view[key] = null;
         view.loading = section;
         this._renderSearch();
-        this._call('ArtistBrowse', view.artistId, section, next);
+        if (view.album)
+            this._call('AlbumBrowse', view.artistId, next);
+        else
+            this._call('ArtistBrowse', view.artistId, section, next);
     }
 
     _applyArtistBrowseJson(artistBrowseJson) {
@@ -841,8 +999,6 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 view.videos = next.videos ?? [];
                 view.songsNext = next.songsNext ?? null;
                 view.videosNext = next.videosNext ?? null;
-                if (!view.songs.length && !view.videos.length)
-                    view.message = next.message || 'Nothing found';
             } else {
                 const list = view[next.section];
                 const seen = new Set(list.map(item => item.id));
@@ -867,7 +1023,9 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         }
 
-        const currentQuery = this._searchEntry.get_text().trim();
+        if ((nextState.mode ?? 'music') !== this._searchOrder)
+            return;
+        const currentQuery = this._searchEntry.get_text().trim().replace(/\s+/g, ' ').slice(0, 200);
         if (nextState.status !== 'idle' && nextState.query !== currentQuery)
             return;
 
@@ -881,12 +1039,20 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             return;
         }
 
+        // Opening an artist replaces the whole list with a one-line "Loading…" until the page
+        // arrives, which made the popup shrink and grow again. Keep the height it had until then.
+        const previousHeight = this._resultsScroll.visible ? this._resultsScroll.get_height() : 0;
+        this._resultsScroll.set_style(null);
+
         const children = this._resultsList.get_children();
         for (const child of children)
             child.destroy();
 
+        this._musicCategories.visible = this._searchOrder === 'music' && !this._artistView;
+        for (const [category, button] of this._categoryButtons)
+            button[category === this._musicCategory ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
         if (this._artistView) {
-            this._renderArtistView();
+            this._renderArtistView(previousHeight);
             return;
         }
         this._artistHeader.visible = false;
@@ -898,7 +1064,9 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
 
         this._resultsBox.visible = true;
-        this._resultsHeader.visible = false;
+        this._resultsHeader.visible = true;
+        this._musicFirstButton[this._searchOrder === 'music' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
+        this._videoFirstButton[this._searchOrder === 'video' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
         if (search.status === 'loading') {
             this._resultsStatus.text = 'Searching…';
             this._resultsStatus.visible = true;
@@ -907,7 +1075,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         }
 
         if (search.status === 'error' || !search.results?.length) {
-            this._resultsStatus.text = search.message || 'No songs found';
+            this._resultsStatus.text = search.message || (this._searchOrder === 'video' ? 'No videos found' : 'No songs found');
             this._resultsStatus.visible = true;
             this._resultsScroll.visible = false;
             return;
@@ -918,13 +1086,40 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._resultsScroll.visible = true;
         this._musicFirstButton[this._searchOrder === 'music' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
         this._videoFirstButton[this._searchOrder === 'video' ? 'add_style_class_name' : 'remove_style_class_name']('ytmd-order-button-selected');
-        for (const result of this._orderedSearchResults(search.results))
+        let lastKind = null;
+        const ordered = this._orderedSearchResults(search.results);
+        let artistCount = 0;
+        for (let index = 0; index < ordered.length; index++) {
+            const result = ordered[index];
+            if (result.kind === 'artist' && ++artistCount > search.artistsVisible) continue;
+            const kind = ['artist', 'album', 'video'].includes(result.kind) ? result.kind : 'music';
+            if (kind !== lastKind) {
+                this._resultsList.add_child(this._sectionDivider({artist: 'Artists', album: 'Albums', video: 'Videos', music: 'Songs'}[kind]));
+                lastKind = kind;
+            }
             this._resultsList.add_child(this._createResultRow(result));
+            if (result.kind === 'artist' && (artistCount === search.artistsVisible || ordered[index + 1]?.kind !== 'artist')) {
+                if (search.moreError) this._resultsList.add_child(new St.Label({text: search.moreError, style_class: 'ytmd-artist-status'}));
+                if (ordered.filter(item => item.kind === 'artist').length > artistCount || search.artistsNext) {
+                    const more = this._artistActionButton(search.moreLoading ? 'Loading…' : 'See more', 'See more artists', () => this._moreArtists());
+                    more.reactive = !search.moreLoading;
+                    this._resultsList.add_child(more);
+                }
+            }
+        }
+    }
+
+    // "Songs ─────": a tiny grey label with a rule running to the edge.
+    _sectionDivider(text) {
+        const row = new St.BoxLayout({style_class: 'ytmd-section-divider', x_expand: true});
+        row.add_child(new St.Label({text, style_class: 'ytmd-section-divider-label', y_align: Clutter.ActorAlign.CENTER}));
+        row.add_child(new St.Widget({style_class: 'ytmd-section-divider-line', x_expand: true, y_align: Clutter.ActorAlign.CENTER}));
+        return row;
     }
 
     // iPod-style drill-down: the results list is replaced wholesale by the artist's page, with
     // Back and Open pinned in the header above the scroll area.
-    _renderArtistView() {
+    _renderArtistView(previousHeight = 0) {
         const view = this._artistView;
         this._resultsBox.visible = true;
         this._resultsHeader.visible = false;
@@ -932,25 +1127,34 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._resultsScroll.visible = true;
         this._artistHeader.visible = true;
         this._artistNameLabel.text = view.title;
+        this._albumCover.visible = Boolean(view.album);
+        if (view.album) {
+            this._albumCover.gicon = view.artworkUrl ? new Gio.FileIcon({file: Gio.File.new_for_uri(view.artworkUrl)}) : null;
+            if (!view.artworkUrl) this._albumCover.icon_name = 'audio-x-generic-symbolic';
+        }
 
         if (view.loading === 'page') {
+            if (previousHeight > 0)
+                this._resultsScroll.set_style(`min-height: ${Math.round(previousHeight)}px;`);
             this._resultsList.add_child(new St.Label({text: 'Loading…', style_class: 'ytmd-artist-status'}));
             return;
         }
-        if (view.message && !view.songs.length && !view.videos.length) {
+        if (view.message) {
             this._resultsList.add_child(new St.Label({text: view.message, style_class: 'ytmd-artist-status'}));
-            return;
+            if (!view[view.section].length)
+                return;
         }
 
-        this._addArtistSection('Songs', 'songs', 'More songs', view);
-        if (view.videos.length || view.videosNext || view.loading === 'videos')
+        if (view.section === 'videos')
             this._addArtistSection('Videos', 'videos', 'More videos', view);
+        else
+            this._addArtistSection('Songs', 'songs', 'More songs', view);
     }
 
     _addArtistSection(label, section, moreLabel, view) {
-        this._resultsList.add_child(new St.Label({text: label, style_class: 'ytmd-results-label ytmd-artist-section'}));
+        this._resultsList.add_child(this._sectionDivider(label));
         for (const item of view[section])
-            this._resultsList.add_child(this._createResultRow(item));
+            this._resultsList.add_child(this._createResultRow(view.album && !item.artworkUrl ? {...item, artworkUrl: view.artworkUrl} : item));
 
         if (view.loading === section) {
             this._resultsList.add_child(new St.Label({text: 'Loading…', style_class: 'ytmd-artist-status'}));
@@ -959,7 +1163,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             actions.add_child(this._artistActionButton(moreLabel, `${moreLabel} by ${view.title}`, () => this._loadMoreArtist(section)));
             this._resultsList.add_child(actions);
         } else if (!view[section].length) {
-            this._resultsList.add_child(new St.Label({text: 'None', style_class: 'ytmd-artist-status'}));
+            this._resultsList.add_child(new St.Label({text: `No ${section} found`, style_class: 'ytmd-artist-status'}));
         }
     }
 
@@ -983,12 +1187,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         // clicking plays the result. Same pattern as the main artwork, which opens the app.
         const isArtist = result.kind === 'artist' && Boolean(result.artistId);
         // Artist rows without a radio id have nothing to play; their id is only a display key.
-        const playable = !String(result.id).startsWith('artist:');
+        const isAlbum = result.kind === 'album' && Boolean(result.albumId);
+        const playable = /^[A-Za-z0-9_-]{11}$/.test(result.id);
         const artWrap = new St.Button({
             style_class: 'ytmd-result-art-wrap',
             accessible_name: playable ? `Play ${result.title || 'result'}` : result.title || 'result',
-            can_focus: playable,
-            reactive: playable,
+            can_focus: playable || isAlbum,
+            reactive: playable || isAlbum,
             track_hover: playable,
             y_align: Clutter.ActorAlign.CENTER,
         });
@@ -1032,6 +1237,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         artWrap.connect('notify::hover', updateOverlay);
         artWrap.connect('key-focus-in', updateOverlay);
         artWrap.connect('key-focus-out', updateOverlay);
+        if (isAlbum) artWrap.connect('clicked', () => this._openAlbum(result));
         if (playable)
             artWrap.connect('clicked', () => this._call('PlayResult', result.id, 'now'));
 
@@ -1048,7 +1254,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         details.add_child(subtitle);
 
         row.add_child(artWrap);
-        if (isArtist) {
+        if (isArtist || isAlbum) {
             // The row body opens the artist's page; the thumbnail keeps playing the radio.
             const detailsButton = new St.Button({
                 style_class: 'ytmd-result-details-button',
@@ -1059,17 +1265,44 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 x_expand: true,
             });
             detailsButton.set_child(details);
-            detailsButton.connect('clicked', () => this._openArtist(result));
+            detailsButton.connect('clicked', () => isAlbum ? this._openAlbum(result) : this._openArtist(result));
             row.add_child(detailsButton);
         } else {
             row.add_child(details);
+        }
+        if (playable && !isArtist && !isAlbum) {
+            for (const [icon, action, supported, mix] of [
+                ['mix.svg', 'Start mix', result.canStartMix, true],
+                ['play-next.svg', 'Play next', result.canPlayNext, false],
+            ]) {
+                const label = `${action}: ${result.title}${supported ? '' : ' — unavailable: no supported endpoint'}`;
+                const button = this._iconButton(icon, label, () => { if (supported) this._playNext(result, mix); });
+                button.opacity = supported ? 255 : 90;
+                button.reactive = Boolean(supported);
+                const hover = new St.BoxLayout({reactive: true, track_hover: true});
+                hover.add_child(button);
+                const tip = new St.Label({text: label, style_class: 'ytmd-action-tooltip', visible: false});
+                Main.layoutManager.addChrome(tip);
+                hover.connect('notify::hover', () => {
+                    tip.visible = hover.hover;
+                    if (hover.hover) {
+                        const [x, y] = button.get_transformed_position();
+                        tip.set_position(Math.max(0, x - tip.width + button.width), y + button.height);
+                    }
+                });
+                button.connect('destroy', () => tip.destroy());
+                row.add_child(hover);
+            }
         }
         return row;
     }
 
     _syncOwner() {
         const running = Boolean(this._proxy?.g_name_owner);
-        this.visible = running;
+        this.visible = false;
+        this._readyOwner = null;
+        this._reportingOwner = null;
+        if (this._readyTimer) { GLib.source_remove(this._readyTimer); this._readyTimer = 0; }
         if (running) {
             this._requestState();
         } else {
@@ -1091,7 +1324,41 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 return;
             }
             this._applyStateJson(result[0]);
+            this._reportReady();
         });
+    }
+
+    _reportReady() {
+        const owner = this._proxy?.g_name_owner;
+        if (!owner || this._readyOwner === owner || this._reportingOwner === owner || !this._state) return;
+        this._reportingOwner = owner;
+        const deadline = GLib.get_monotonic_time() + 10000000;
+        const report = () => {
+            if (this._destroyed || this._proxy?.g_name_owner !== owner) return GLib.SOURCE_REMOVE;
+            if (!this.get_parent()) {
+                if (GLib.get_monotonic_time() < deadline) return GLib.SOURCE_CONTINUE;
+                console.error(`YTMDesktop UI v${UI_VERSION} was not attached to the panel`);
+                this._readyTimer = 0;
+                return GLib.SOURCE_REMOVE;
+            }
+            this._readyTimer = 0;
+            this._proxy.GetPanelSessionRemote((result, error) => {
+                if (this._destroyed || this._proxy?.g_name_owner !== owner) return;
+                if (error) { console.error(`YTMDesktop UI readiness failed: ${error.message}`); return; }
+                let session;
+                try { session = JSON.parse(result[0]); } catch (error) { console.error(`YTMDesktop invalid panel session: ${error.message}`); return; }
+                if (session.version !== UI_VERSION) { console.error(`YTMDesktop UI version mismatch: loaded ${UI_VERSION}, app ${session.version}`); return; }
+                this._proxy.ReportPanelReadyRemote(UI_VERSION, session.session, (reply, reportError) => {
+                    if (this._destroyed || this._proxy?.g_name_owner !== owner) return;
+                    if (reportError || reply?.[0] !== true) { console.error(`YTMDesktop UI readiness rejected: ${reportError?.message || 'expired session'}`); return; }
+                    this._readyOwner = owner;
+                    this.visible = true;
+                    console.log(`YTMDesktop UI v${UI_VERSION} ready`);
+                });
+            });
+            return GLib.SOURCE_REMOVE;
+        };
+        this._readyTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, report);
     }
 
     _applyStateJson(stateJson) {
@@ -1396,12 +1663,14 @@ class MiniPlayerIndicator extends PanelMenu.Button {
                 console.error(`YTMDesktop ${method} failed: ${error.message}`);
         });
 
-        if (!['Command', 'Search', 'PlayResult', 'ArtistBrowse'].includes(method))
+        if (!['Command', 'Search', 'SearchByMode', 'PlayResult', 'ArtistBrowse', 'AlbumBrowse', 'PlayNext', 'SearchMusic', 'StartResultMix'].includes(method))
             this.menu.close();
     }
 
     destroy() {
         this._destroyed = true;
+        if (this._readyTimer) GLib.source_remove(this._readyTimer);
+        if (this._queueMessageTimer) GLib.source_remove(this._queueMessageTimer);
         this._stopMarquees();
         for (const marquee of this._marquees) {
             if (marquee.allocationId)
@@ -1428,6 +1697,10 @@ class MiniPlayerIndicator extends PanelMenu.Button {
             this._proxy.disconnectSignal(this._searchChangedId);
         if (this._proxy && this._artistBrowseChangedId)
             this._proxy.disconnectSignal(this._artistBrowseChangedId);
+        if (this._proxy && this._albumChangedId) this._proxy.disconnectSignal(this._albumChangedId);
+        if (this._proxy && this._queueChangedId) this._proxy.disconnectSignal(this._queueChangedId);
+        if (this._proxy && this._musicChangedId) this._proxy.disconnectSignal(this._musicChangedId);
+        if (this._proxy && this._mixChangedId) this._proxy.disconnectSignal(this._mixChangedId);
         this._proxy = null;
         super.destroy();
     }

@@ -154,11 +154,17 @@ export type MiniPlayerSearchResult = {
   duration: string | null;
   artworkUrl: string | null;
   playlistId: string | null;
-  kind: "music" | "video" | "artist" | "unknown";
+  kind: "music" | "video" | "artist" | "album" | "unknown";
+  albumId?: string;
+  canPlayNext?: boolean;
+  canStartMix?: boolean;
+  playCount?: number | null;
   // UC… browseId for artist results; their `id` is a radio videoId when YTM offers one, else a
   // display-only "artist:<browseId>" key that must never be sent to PlayResult.
   artistId: string | null;
 };
+
+export type MiniPlayerSearchMode = "music" | "video";
 
 export type MiniPlayerSearchStatus = "idle" | "loading" | "ready" | "error";
 
@@ -193,9 +199,22 @@ export type MiniPlayerArtistBrowseSnapshot = MiniPlayerArtistBrowsePage & {
 
 export type MiniPlayerSearchSnapshot = {
   version: 1;
+  mode: MiniPlayerSearchMode;
   query: string;
   status: MiniPlayerSearchStatus;
   results: MiniPlayerSearchResult[];
   message: string | null;
 };
 
+export type MiniPlayerAlbumPage = {
+  albumId: string;
+  name: string | null;
+  artworkUrl: string | null;
+  items: MiniPlayerSearchResult[];
+  continuation: string | null;
+};
+export type MiniPlayerQueueResult = { videoId: string; title: string };
+
+export type MiniPlayerMusicCategory = "all" | "songs" | "artists" | "albums";
+export type MiniPlayerMusicRequest = {query: string; category: MiniPlayerMusicCategory; continuation: string | null};
+export type MiniPlayerMusicPage = {results: MiniPlayerSearchResult[]; sectionOrder: string[]; artistsNext: string | null};

@@ -130,6 +130,7 @@
 }
 
 .ytmd-results {
+  padding-right: 16px;
   spacing: 2px;
 }
 
@@ -189,8 +190,20 @@
   font-weight: 700;
 }
 
-.ytmd-artist-section {
-  padding-top: 6px;
+.ytmd-section-divider {
+  spacing: 6px;
+  padding: 6px 2px 1px;
+}
+
+.ytmd-section-divider-label {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.ytmd-section-divider-line {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .ytmd-artist-status {
@@ -417,4 +430,12 @@
 .ytmd-quit-button:focus {
   color: #ffffff;
   background-color: #c42b2b;
+}
+
+.ytmd-action-tooltip {
+  background-color: #202020;
+  color: #f1f1f1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  max-width: 360px;
 }

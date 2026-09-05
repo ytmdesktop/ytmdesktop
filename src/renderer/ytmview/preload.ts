@@ -680,12 +680,23 @@ window.addEventListener("load", async () => {
     }
   });
 
-  ipcRenderer.on("ytmView:search", async (_event, requestId, query) => {
+  ipcRenderer.on("ytmView:search", async (_event, requestId, query, mode = "music") => {
     try {
-      const results = await (await webFrame.executeJavaScript(searchScript)).search(query);
+      const results = await (await webFrame.executeJavaScript(searchScript)).search(query, mode);
       ipcRenderer.send(`ytmView:search:response:${requestId}`, { results });
     } catch (error) {
       ipcRenderer.send(`ytmView:search:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  ipcRenderer.on("ytmView:miniPlayer", async (_event, requestId, method, request) => {
+    if (!["albumBrowse", "playNext", "searchMusic", "startResultMix"].includes(method)) return;
+    try {
+      const api = await webFrame.executeJavaScript(searchScript);
+      const result = await api[method](request);
+      ipcRenderer.send(`ytmView:miniPlayer:response:${requestId}`, { result });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:miniPlayer:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
     }
   });
 

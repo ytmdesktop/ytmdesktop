@@ -1,4 +1,5 @@
 import log from "electron-log";
+import GnomePanelReadiness from "./gnome-panel-readiness";
 import { defineInterface, DefinedInterface, ExportRegistration, MessageBus, NameRegistration, sessionBus } from "dbus-native";
 
 import {
@@ -12,6 +13,12 @@ import {
   MiniPlayerCommand,
   MiniPlayerLikeStatus,
   MiniPlayerRepeatMode,
+  MiniPlayerMusicRequest,
+  MiniPlayerMusicPage,
+  MiniPlayerMusicCategory,
+  MiniPlayerAlbumPage,
+  MiniPlayerQueueResult,
+  MiniPlayerSearchMode,
   MiniPlayerSearchResult,
   MiniPlayerSearchSnapshot,
   MiniPlayerSnapshot,
@@ -32,7 +39,12 @@ const ARTIST_SECTIONS = new Set<MiniPlayerArtistSection>(["", "songs", "videos"]
 
 type MiniPlayerActions = {
   command(command: MiniPlayerCommand, value?: number): void;
-  search(query: string): Promise<MiniPlayerSearchResult[]>;
+  searchMusic(request: MiniPlayerMusicRequest): Promise<MiniPlayerMusicPage>;
+  startResultMix(videoId: string): Promise<MiniPlayerQueueResult>;
+  albumBrowse(albumId: string, continuation: string | null): Promise<MiniPlayerAlbumPage>;
+  playNext(videoId: string): Promise<MiniPlayerQueueResult>;
+  openAlbum(albumId: string): void;
+  search(query: string, mode: MiniPlayerSearchMode): Promise<MiniPlayerSearchResult[]>;
   artistBrowse(request: MiniPlayerArtistBrowseRequest): Promise<MiniPlayerArtistBrowsePage>;
   openArtist(browseId: string): void;
   playResult(videoId: string): void;
@@ -60,6 +72,9 @@ export default class LinuxMiniPlayerService {
   private progressSignalTimeout: NodeJS.Timeout | null = null;
   private searchRequestId = 0;
   private artistRequestId = 0;
+  private albumRequestId = 0;
+  private queueBusy = false;
+  private readonly panelReadiness: GnomePanelReadiness;
   private bus: MessageBus | null = null;
   private definition: DefinedInterface | null = null;
   private exported: ExportRegistration | null = null;
@@ -68,12 +83,29 @@ export default class LinuxMiniPlayerService {
   constructor(
     private readonly actions: MiniPlayerActions,
     initialState: PlayerState,
-    initialSessionState: SessionState
+    initialSessionState: SessionState,
+    panel: { version: number; changed: (ready: boolean) => void }
   ) {
+    this.panelReadiness = new GnomePanelReadiness(panel.version, ready => {
+      if (ready) log.info(`GNOME mini-player UI ready (v${panel.version}); update verified`);
+      panel.changed(ready);
+    }, () => log.error(`GNOME mini-player UI readiness timed out (expected v${panel.version}); keeping tray fallback`));
     this.playerState = initialState;
     this.sessionState = initialSessionState;
     this.updateStableStatus(initialState.trackState);
     this.refreshSnapshot(false);
+  }
+
+  get isPanelReady() {
+    return this.panelReadiness.isReady;
+  }
+
+  get isPanelPending() {
+    return this.panelReadiness.isPending;
+  }
+
+  invalidatePanel() {
+    this.panelReadiness.begin();
   }
 
   async start() {
@@ -92,6 +124,19 @@ export default class LinuxMiniPlayerService {
     const definition = defineInterface({
       name: MINI_PLAYER_SERVICE,
       methods: {
+        GetPanelSession: {
+          out: { sessionJson: "s" },
+          handler: () => JSON.stringify(this.panelReadiness.description)
+        },
+        ReportPanelReady: {
+          in: { version: "u", session: "s" },
+          out: { accepted: "b" },
+          handler: ({version, session}: {version: number; session: string}) => {
+            const accepted = this.panelReadiness.report(version, session);
+            if (!accepted) log.warn(`GNOME mini-player UI readiness rejected (reported v${version}, expected v${this.panelReadiness.version})`);
+            return accepted;
+          }
+        },
         GetState: {
           out: { stateJson: "s" },
           handler: () => this.stateJson
@@ -130,6 +175,86 @@ export default class LinuxMiniPlayerService {
             this.startSearch(query);
           }
         },
+        SearchMusic: {
+          in: {query:"s", category:"s", requestKey:"s", continuation:"s"},
+          handler: ({query:raw,category,requestKey,continuation}: {query:string; category:string; requestKey:string; continuation:string}) => {
+            if (!["all","songs","artists","albums"].includes(category) || requestKey.length > 64 || continuation.length > 4096) return;
+            const query=raw.replace(/\s+/g," ").trim().slice(0,MAX_SEARCH_QUERY_LENGTH);
+            const id=++this.searchRequestId;
+            const emit=(data:object)=>{if(id===this.searchRequestId)this.definition?.emit.MusicSearchChanged(JSON.stringify({query,category,requestKey,append:Boolean(continuation),...data}));};
+            if(!query){emit({status:"idle",results:[]});return;}
+            emit({status:"loading"});
+            void this.actions.searchMusic({query,category:category as MiniPlayerMusicCategory,continuation:continuation||null})
+              .then(page=>emit({...page,status:"ready"}))
+              .catch(error=>{log.error("Music search failed",error);emit({status:"error",message:"Music search failed"});});
+          }
+        },
+        StartResultMix: {
+          in:{videoId:"s"},
+          handler:({videoId}:{videoId:string})=>{
+            if(!/^[A-Za-z0-9_-]{11}$/.test(videoId))return;
+            const emit=(data:object)=>this.definition?.emit.MixResultChanged(JSON.stringify({videoId,...data}));
+            if(this.queueBusy){emit({status:"error",message:"Another action is still running"});return;}
+            this.queueBusy=true;
+            emit({status:"loading"});
+            void this.actions.startResultMix(videoId).then(result=>emit({...result,status:"ready"}))
+              .catch(error=>{log.error("Result mix failed",error);emit({status:"error",message:error instanceof Error?error.message:"Could not start mix"});})
+              .finally(()=>{this.queueBusy=false;});
+          }
+        },
+        SearchByMode: {
+          in: { query: "s", mode: "s" },
+          handler: ({ query, mode }: { query: string; mode: string }) => {
+            if (mode === "music" || mode === "video") this.startSearch(query, mode);
+          }
+        },
+        AlbumBrowse: {
+          in: { albumId: "s", continuation: "s" },
+          handler: ({ albumId, continuation }: { albumId: string; continuation: string }) => {
+            if (!/^[A-Za-z0-9_-]{1,128}$/.test(albumId) || continuation.length > 4096) return;
+            const requestId = ++this.albumRequestId;
+            const emit = (page: object) => {
+              if (requestId === this.albumRequestId) this.definition?.emit.AlbumBrowseChanged(JSON.stringify({ albumId, ...page }));
+            };
+            emit({ status: "loading" });
+            void this.actions
+              .albumBrowse(albumId, continuation || null)
+              .then(page => emit({ ...page, status: "ready" }))
+              .catch(error => {
+                log.error("Album browse failed", error);
+                emit({ status: "error", message: "Could not load album" });
+              });
+          }
+        },
+        OpenAlbum: {
+          in: { albumId: "s" },
+          handler: ({ albumId }: { albumId: string }) => {
+            if (/^[A-Za-z0-9_-]{1,128}$/.test(albumId)) this.actions.openAlbum(albumId);
+          }
+        },
+        PlayNext: {
+          in: { videoId: "s" },
+          handler: ({ videoId }: { videoId: string }) => {
+            if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return;
+            const emit = (result: object) => this.definition?.emit.PlayNextChanged(JSON.stringify({ videoId, ...result }));
+            if (this.queueBusy) {
+              emit({ status: "error", message: "Another queue request is still running" });
+              return;
+            }
+            this.queueBusy = true;
+            emit({ status: "loading" });
+            void this.actions
+              .playNext(videoId)
+              .then(result => emit({ ...result, status: "ready" }))
+              .catch(error => {
+                log.error("Play next failed", error);
+                emit({ status: "error", message: error instanceof Error ? error.message : "Could not add next track" });
+              })
+              .finally(() => {
+                this.queueBusy = false;
+              });
+          }
+        },
         PlayResult: {
           in: { videoId: "s", action: "s" },
           handler: ({ videoId, action }: { videoId: string; action: string }) => {
@@ -155,12 +280,17 @@ export default class LinuxMiniPlayerService {
         }
       },
       signals: {
+        MusicSearchChanged: {args:{resultJson:"s"}},
+        MixResultChanged: {args:{resultJson:"s"}},
         StateChanged: { args: { stateJson: "s" } },
+        AlbumBrowseChanged: { args: { pageJson: "s" } },
+        PlayNextChanged: { args: { resultJson: "s" } },
         SearchResultsChanged: { args: { resultsJson: "s" } },
         ArtistBrowseChanged: { args: { artistBrowseJson: "s" } }
       }
     });
 
+    this.panelReadiness.begin();
     const exported = await bus.export(MINI_PLAYER_PATH, definition);
     this.bus = bus;
     this.definition = definition;
@@ -193,6 +323,7 @@ export default class LinuxMiniPlayerService {
   }
 
   async stop() {
+    this.panelReadiness.stop();
     this.searchRequestId += 1;
     this.artistRequestId += 1;
     if (this.progressSignalTimeout) clearTimeout(this.progressSignalTimeout);
@@ -311,26 +442,27 @@ export default class LinuxMiniPlayerService {
     this.definition.emit.StateChanged(this.stateJson);
   }
 
-  private startSearch(rawQuery: string) {
+  private startSearch(rawQuery: string, mode: MiniPlayerSearchMode = "music") {
     const query = rawQuery.replace(/\s+/g, " ").trim().slice(0, MAX_SEARCH_QUERY_LENGTH);
     const requestId = ++this.searchRequestId;
 
     if (!query) {
-      this.emitSearch({ version: 1, query: "", status: "idle", results: [], message: null });
+      this.emitSearch({ version: 1, mode, query: "", status: "idle", results: [], message: null });
       return;
     }
 
-    this.emitSearch({ version: 1, query, status: "loading", results: [], message: null });
+    this.emitSearch({ version: 1, mode, query, status: "loading", results: [], message: null });
     void this.actions
-      .search(query)
+      .search(query, mode)
       .then(results => {
         if (requestId !== this.searchRequestId) return;
         this.emitSearch({
           version: 1,
+          mode,
           query,
           status: "ready",
           results,
-          message: results.length ? null : "No songs found"
+          message: results.length ? null : mode === "video" ? "No videos found" : "No songs found"
         });
       })
       .catch(error => {
@@ -338,6 +470,7 @@ export default class LinuxMiniPlayerService {
         log.error("Linux mini-player search failed", error);
         this.emitSearch({
           version: 1,
+          mode,
           query,
           status: "error",
           results: [],

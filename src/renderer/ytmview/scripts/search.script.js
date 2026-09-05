@@ -1,5 +1,71 @@
 (function () {
-  const MAX_RESULTS = 20;
+  const MAX_RESULTS = 40;
+  // Keep trusted menu data in the page; D-Bus clients only send a result ID.
+  const cache = (window.__YTMD_MINI_RESULTS__ ??= new Map());
+  function remember(renderer, result) {
+    if (!result) return result;
+    const menu = renderer?.menu?.menuRenderer?.items
+      ?.map(item => item.menuServiceItemRenderer)
+      .find(item => item?.serviceEndpoint?.queueAddEndpoint?.queueInsertPosition === "INSERT_AFTER_CURRENT_VIDEO");
+    const mix = renderer?.menu?.menuRenderer?.items?.map(item => item.menuNavigationItemRenderer?.navigationEndpoint)
+      .find(endpoint => endpoint?.watchEndpoint?.playlistId?.startsWith("RD") && endpoint.watchEndpoint.videoId === result.id);
+    const canPlayNext = menu?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.videoId === result.id;
+    if (canPlayNext || mix) {
+      cache.set(result.id, {menu: canPlayNext ? menu : null, mix, title: result.title});
+      if (cache.size > 500) cache.delete(cache.keys().next().value);
+    }
+    result.canPlayNext = Boolean(canPlayNext);
+    result.canStartMix = Boolean(mix);
+    const text = JSON.stringify(renderer?.flexColumns?.slice(1) ?? renderer?.subtitle ?? []);
+    const match = text.match(/([\d,.]+)\s*(K|M|B|thousand|million|billion|만|억)?\s*(?:plays|views|회)/i);
+    result.playCount = match
+      ? Number(match[1].replace(/,/g, "")) *
+        ({ k: 1e3, m: 1e6, b: 1e9, thousand: 1e3, million: 1e6, billion: 1e9, 만: 1e4, 억: 1e8 }[match[2]?.toLowerCase()] ?? 1)
+      : null;
+    return result;
+  }
+  function normalized(text) {
+    return text
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim();
+  }
+  function rankResults(results, query) {
+    const q = normalized(query),
+      tokens = q.split(/\s+/).filter(Boolean);
+    const rank = item => {
+      const title = normalized(item.title),
+        all = normalized(`${item.title} ${item.artist}`);
+      if (title === q) return 0;
+      if (tokens.length && tokens.every(t => all.includes(t))) return 1;
+      if (tokens.some(t => all.includes(t))) return 2;
+      return 3;
+    };
+    return results
+      .map((item, index) => ({ item, index }))
+      .sort((a, b) => rank(a.item) - rank(b.item) || (b.item.playCount ?? -1) - (a.item.playCount ?? -1) || a.index - b.index)
+      .map(entry => entry.item);
+  }
+  function parseAlbum(renderer) {
+    const endpoint = renderer?.navigationEndpoint?.browseEndpoint;
+    if (endpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType !== "MUSIC_PAGE_TYPE_ALBUM") return null;
+    const title = runsText(renderer.title?.runs ?? renderer.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs).trim();
+    if (!title) return null;
+    return {
+      id: `album:${endpoint.browseId}`,
+      albumId: endpoint.browseId,
+      title,
+      artist: subtitleFromRuns(renderer.subtitle?.runs ?? renderer.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs ?? []),
+      kind: "album",
+      artistId: null,
+      playlistId: null,
+      duration: null,
+      artworkUrl: pickArtworkUrl(
+        renderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails ?? renderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails
+      )
+    };
+  }
   const MUSIC_VIDEO_TYPES = new Set([
     "MUSIC_VIDEO_TYPE_ATV",
     "MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK",
@@ -86,6 +152,8 @@
 
   function parseSong(renderer) {
     if (!renderer) return null;
+    const album = parseAlbum(renderer);
+    if (album) return album;
     const watchEndpoint = watchEndpointFromRenderer(renderer);
     const videoId = renderer.playlistItemData?.videoId ?? watchEndpoint?.videoId;
     const artistId = artistBrowseIdFromRenderer(renderer);
@@ -106,7 +174,7 @@
 
     const artist = artists.join(", ") || subtitleFromRuns(subtitleRuns);
 
-    return {
+    return remember(renderer, {
       // Without a radio videoId the id is only a dedup/display key; PlayResult must never see it.
       id: videoId ?? `artist:${artistId}`,
       title,
@@ -116,11 +184,13 @@
       playlistId: watchEndpoint?.playlistId ?? renderer.playlistItemData?.playlistId ?? null,
       kind: artistId ? "artist" : resultKind(watchEndpoint, renderer, subtitleRuns),
       artistId
-    };
+    });
   }
 
   function parseCard(renderer) {
     if (!renderer) return null;
+    const album = parseAlbum(renderer);
+    if (album) return album;
     const nestedRenderer = renderer.contents?.[0]?.musicResponsiveListItemRenderer ?? null;
     const watchEndpoint =
       watchEndpointFromRenderer(renderer) ??
@@ -143,7 +213,7 @@
       if (/^\d+:\d{2}(?::\d{2})?$/.test(run.text ?? "")) duration = run.text;
     }
 
-    return {
+    return remember(renderer, {
       id: videoId ?? `artist:${artistId}`,
       title,
       artist: artists.join(", ") || subtitleFromRuns(subtitleRuns),
@@ -152,7 +222,7 @@
       playlistId: watchEndpoint?.playlistId ?? null,
       kind: artistId ? "artist" : resultKind(watchEndpoint, nestedRenderer ?? renderer, subtitleRuns),
       artistId
-    };
+    });
   }
 
   function addResult(results, seen, song) {
@@ -177,6 +247,7 @@
         collectFromSections(section.musicShelfRenderer.contents, results, seen);
         continue;
       }
+      if (section.musicTwoRowItemRenderer) addResult(results, seen, parseAlbum(section.musicTwoRowItemRenderer));
       if (section.musicResponsiveListItemRenderer) {
         addResult(results, seen, parseSong(section.musicResponsiveListItemRenderer));
       }
@@ -200,7 +271,7 @@
     for (const child of Object.values(node)) fallbackCollect(child, results, seen);
   }
 
-  async function innertube(endpoint, body) {
+  async function innertube(endpoint, body, language = null) {
     const ytcfg = window.ytcfg;
     const apiKey = ytcfg?.get?.("INNERTUBE_API_KEY");
     const context = ytcfg?.get?.("INNERTUBE_CONTEXT");
@@ -214,7 +285,7 @@
         "X-YouTube-Client-Name": String(ytcfg.get("INNERTUBE_CONTEXT_CLIENT_NAME") ?? "67"),
         "X-YouTube-Client-Version": String(ytcfg.get("INNERTUBE_CLIENT_VERSION") ?? context.client?.clientVersion ?? "")
       },
-      body: JSON.stringify({ context, ...body }),
+      body: JSON.stringify({ context: language ? {...context, client: {...context.client, hl: language}} : context, ...body }),
       credentials: "include"
     });
 
@@ -222,8 +293,16 @@
     return response.json();
   }
 
-  async function search(query) {
-    const payload = await innertube("search", { query });
+  async function search(query, mode = "music") {
+    if (mode !== "music" && mode !== "video") throw new Error("Invalid search mode");
+    // From YouTube Music's Videos chip searchEndpoint (verified against the live page).
+    // This requests the video shelf instead of sorting the limited mixed search response.
+    const params = "EgWKAQIQAWoQEAUQCRADEAQQChAVEBAQDg%3D%3D";
+    const language = /[가-힣]/.test(query) ? "ko" : null;
+    const [payload, albums] = await Promise.all([
+      innertube("search", mode === "video" ? { query, params } : { query }, language),
+      mode === "music" ? innertube("search", {query, params:"EgWKAQIYAWoQEAUQCRADEAQQChAVEBAQDg%3D%3D"}, language) : Promise.resolve(null)
+    ]);
     const results = [];
     const seen = new Set();
     const sections =
@@ -232,7 +311,94 @@
       [];
     collectFromSections(sections, results, seen);
     if (!results.length) fallbackCollect(payload, results, seen);
-    return results;
+    if (albums) {
+      const albumResults = [];
+      fallbackCollect(albums, albumResults, new Set());
+      for (const item of albumResults.filter(item => item.kind === "album")) {
+        if (!seen.has(item.id)) { seen.add(item.id); results.push(item); }
+      }
+    }
+    return rankResults(mode === "video" ? results.filter(result => result.kind === "video") : results, query);
+  }
+
+  // Params captured from the site's Songs, Artists and Albums chips. Keep video search separate.
+  const MUSIC_FILTERS = {
+    songs: "EgWKAQIIAWoQEAUQCRADEAQQChAVEBAQDg%3D%3D",
+    artists: "EgWKAQIgAWoQEAUQCRADEAQQChAVEBAQDg%3D%3D",
+    albums: "EgWKAQIYAWoQEAUQCRADEAQQChAVEBAQDg%3D%3D"
+  };
+  function searchItems(payload) {
+    const items = [], seen = new Set();
+    // Preserve every fetched item, including hidden artists, in response order.
+    const visit = node => {
+      if (!node || typeof node !== "object") return;
+      const renderer = node.musicResponsiveListItemRenderer ?? node.musicTwoRowItemRenderer ?? node.musicCardShelfRenderer;
+      if (renderer) {
+        const item = node.musicCardShelfRenderer ? parseCard(renderer) : parseSong(node.musicTwoRowItemRenderer ? {...renderer, thumbnail: renderer.thumbnailRenderer, flexColumns: [{musicResponsiveListItemFlexColumnRenderer: {text: renderer.title}}, {musicResponsiveListItemFlexColumnRenderer: {text: renderer.subtitle}}]} : renderer);
+        const key = item?.kind === "artist" ? item.artistId : item?.id;
+        if (item && key && !seen.has(key)) { seen.add(key); items.push(item); }
+        if (node.musicCardShelfRenderer) visit(renderer.contents);
+        return;
+      }
+      for (const child of Object.values(node)) visit(child);
+    };
+    visit(payload);
+    return items;
+  }
+  async function searchMusic(request) {
+    const {query, category = "all", continuation = null} = request;
+    if (!["all", "songs", "artists", "albums"].includes(category)) throw new Error("Invalid music category");
+    const kinds = {songs:"music", artists:"artist", albums:"album"};
+    const sections = category === "all" ? ["songs", "artists", "albums"] : [category];
+    if (continuation && !["all", "artists"].includes(category)) throw new Error("Invalid artist continuation");
+    const load = async section => {
+      const payload = await innertube("search", continuation ? {continuation} : {query, params:MUSIC_FILTERS[section]}, "en");
+      let items = searchItems(payload).filter(item => item.kind === kinds[section]);
+      if (section === "songs") {
+        // Podcast episodes use watch endpoints too, but are not songs.
+        const songIds = new Set();
+        for (const renderer of findAll(payload, "musicResponsiveListItemRenderer")) {
+          const endpoint = watchEndpointFromRenderer(renderer);
+          const type = endpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig?.musicVideoType ?? renderer.playlistItemData?.musicVideoType ?? renderer.musicVideoType;
+          if (["MUSIC_VIDEO_TYPE_ATV", "MUSIC_VIDEO_TYPE_PRIVATELY_OWNED_TRACK"].includes(type)) songIds.add(renderer.playlistItemData?.videoId ?? endpoint?.videoId);
+        }
+        items = items.filter(item => songIds.has(item.id));
+      }
+      return {section, items, next:section === "artists" ? continuationTokenFrom(payload) : null};
+    };
+    if (continuation) {
+      const page = await load("artists");
+      return {results:page.items, artistsNext:page.next, sectionOrder:["artists"]};
+    }
+    const [pages, mixed] = await Promise.all([
+      Promise.all(sections.map(load)),
+      category === "all" ? innertube("search", {query}, "en").then(searchItems) : Promise.resolve([])
+    ]);
+    const q = normalized(query), words = q.split(/\s+/).filter(Boolean);
+    const relevance = item => {
+      const title = normalized(item.title);
+      return title === q ? 0 : q && title.includes(q) ? 1 : words.some(word => title.includes(word)) ? 2 : 3;
+    };
+    const mixedIndex = section => {const index = mixed.findIndex(item => item.kind === kinds[section]);return index < 0 ? Number.MAX_SAFE_INTEGER : index;};
+    const order = pages.map(page => page.section).sort((left,right) => {
+      const best = section => Math.min(4,...pages.find(page=>page.section===section).items.map(relevance));
+      return best(left)-best(right) || mixedIndex(left)-mixedIndex(right) || sections.indexOf(left)-sections.indexOf(right);
+    });
+    return {results:pages.flatMap(page=>page.items), sectionOrder:order, artistsNext:pages.find(page=>page.section==="artists")?.next ?? null};
+  }
+  async function startResultMix(videoId) {
+    const saved = cache.get(videoId), endpoint = saved?.mix?.watchEndpoint;
+    if (!endpoint) throw new Error("Start mix is unavailable; refresh the results");
+    const api = document.querySelector("ytmusic-player-bar")?.playerApi;
+    if (!api) throw new Error("Player unavailable");
+    document.dispatchEvent(new CustomEvent("yt-navigate", {detail:{endpoint:saved.mix}}));
+    const deadline = Date.now()+7000;
+    while (Date.now()<deadline) {
+      if (api.getPlayerResponse()?.videoDetails?.videoId === endpoint.videoId && api.getPlaylistId?.() === endpoint.playlistId)
+        return {videoId, title:saved.title};
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    throw new Error("YouTube Music did not confirm the selected mix");
   }
 
   // Depth-first search for the first object carrying `key`, so the artist page layout can move
@@ -265,7 +431,7 @@
     const title = runsText(renderer.title?.runs).trim();
     if (!title) return null;
     const subtitleRuns = renderer.subtitle?.runs ?? [];
-    return {
+    return remember(renderer, {
       id: videoId,
       title,
       artist: runsText(subtitleRuns).replace(/^(\s*•\s*)+|(\s*•\s*)+$/g, "").trim(),
@@ -274,7 +440,7 @@
       playlistId: watchEndpoint.playlistId ?? null,
       kind: resultKind(watchEndpoint, renderer, subtitleRuns) === "music" ? "music" : "video",
       artistId: null
-    };
+    });
   }
 
   // Song shelves and playlist pages use list items; the videos carousel and grid pages use two-row
@@ -373,5 +539,63 @@
     };
   }
 
-  return { search, artistBrowse };
+  async function albumBrowse(request) {
+    if (!request?.albumId) throw new Error("No album to look up");
+    const payload = await innertube("browse", request.continuation ? { continuation: request.continuation } : { browseId: request.albumId });
+    const header = findFirst(payload, "musicResponsiveHeaderRenderer") ?? findFirst(payload, "musicDetailHeaderRenderer");
+    const shelf =
+      findFirst(payload, "musicPlaylistShelfRenderer") ?? findFirst(payload, "musicShelfRenderer") ?? findFirst(payload, "musicPlaylistShelfContinuation");
+    const appended = payload.onResponseReceivedActions?.flatMap(action => action.appendContinuationItemsAction?.continuationItems ?? []) ?? [];
+    return {
+      albumId: request.albumId,
+      name: runsText(header?.title?.runs) || null,
+      artworkUrl: pickArtworkUrl(header?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails),
+      items: itemsFrom(shelf?.contents ?? appended),
+      continuation: continuationTokenFrom(shelf ?? payload)
+    };
+  }
+  async function playNext(videoId) {
+    const saved = cache.get(videoId);
+    if (!saved?.menu) throw new Error("Search again to refresh this item's Play next action");
+    const app = document.querySelector("ytmusic-app"),
+      bar = document.querySelector("ytmusic-player-bar");
+    const queue = bar?.queue,
+      api = bar?.playerApi;
+    const unwrap = item => item?.playlistPanelVideoRenderer ?? item?.playlistPanelVideoWrapperRenderer?.primaryRenderer?.playlistPanelVideoRenderer;
+    if (!queue || !api || !app) throw new Error("Player queue unavailable");
+    if (document.querySelector("#movie_player")?.classList.contains("ad-showing")) throw new Error("Wait until the advertisement finishes");
+    const index = queue.getCurrentItemIndex(),
+      before = queue.getItems().map(item => unwrap(item)?.videoId);
+    if (index < 0 || !before[index]) throw new Error("Start playback before adding a next track");
+    const state = api.getPlayerState(),
+      time = api.getCurrentTime(),
+      current = before[index];
+    if (state === -1 || state === 5) throw new Error("Press Play once before adding a next track");
+    if (![1, 2].includes(state)) throw new Error("Wait until playback is ready");
+    const menu = document.createElement("ytmusic-menu-service-item-renderer");
+    menu.hidden = true;
+    app.appendChild(menu);
+    try {
+      menu.data = saved.menu;
+      await Promise.resolve();
+      if (typeof menu.onTap !== "function") throw new Error("YouTube Music menu handler unavailable");
+      menu.onTap();
+    } finally {
+      menu.remove();
+    }
+    const deadline = Date.now() + 5000;
+    while (Date.now() < deadline) {
+      const after = queue.getItems().map(item => unwrap(item)?.videoId),
+        selected = queue.getCurrentItemIndex();
+      if (selected !== index || after[selected] !== current) throw new Error("Current track changed during Play next");
+      if (after.length > before.length && after[selected + 1] === videoId) {
+        if (api.getPlayerState() !== state || Math.abs(api.getCurrentTime() - time) > (state === 2 ? 0.5 : 7))
+          throw new Error("Playback changed during Play next");
+        return { videoId, title: saved.title };
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error("YouTube Music did not confirm insertion into the next queue position");
+  }
+  return { search, searchMusic, artistBrowse, albumBrowse, playNext, startResultMix };
 })()
