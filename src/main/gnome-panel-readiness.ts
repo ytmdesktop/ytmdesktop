@@ -26,6 +26,13 @@ export default class GnomePanelReadiness {
     return { version: this.version, session: this.session };
   }
 
+  requestSession() {
+    // The extension can return long after a lock screen or disable interval. Only a fresh
+    // handshake renews an expired deadline; late reports for the old session still fail.
+    if (!this.ready && (!this.deadline || Date.now() >= this.deadline)) this.begin();
+    return this.description;
+  }
+
   begin() {
     this.stop();
     this.session = randomUUID();

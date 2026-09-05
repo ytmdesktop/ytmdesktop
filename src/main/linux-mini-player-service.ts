@@ -126,7 +126,7 @@ export default class LinuxMiniPlayerService {
       methods: {
         GetPanelSession: {
           out: { sessionJson: "s" },
-          handler: () => JSON.stringify(this.panelReadiness.description)
+          handler: () => JSON.stringify(this.panelReadiness.requestSession())
         },
         ReportPanelReady: {
           in: { version: "u", session: "s" },

@@ -334,3 +334,16 @@ Build with `yarn make --platform=linux --arch=x64 --targets=deb`. Use `--skip-pa
 existing packaged app is known to match current source. Verify the deb's
 `usr/share/pixmaps/youtube-music-desktop-app.png` against `src/assets/icons/ytmd.png` before delivery.
 Focused startup/timeout tests pass; unrelated features are unchanged.
+
+### v45 reactivation recovery
+
+An extension disabled for longer than the readiness window could later report the correct version
+but remain invisible because its app session had expired. Reopening an already-running app did
+not replace that session. `GetPanelSession` now starts a fresh bounded handshake when the previous
+window has expired, including when timer delivery was delayed during suspension. Pending and ready
+sessions remain stable; reports carrying an old session or wrong version still fail. Regression
+checks cover hours-late reactivation, delivered timeouts, stale reports and the D-Bus handler.
+
+The local installed-package log confirmed v44 → v45 and UI readiness at 14:16:42 on
+2026-09-05 after the user reinstalled and restarted. Long-delay reactivation and stale reports
+are covered by the regression harness; a complete lock/unlock cycle was not rerun in this check.

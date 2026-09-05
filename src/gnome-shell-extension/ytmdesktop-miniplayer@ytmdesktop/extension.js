@@ -13,7 +13,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Slider from 'resource:///org/gnome/shell/ui/slider.js';
 
-const UI_VERSION = 44;
+const UI_VERSION = 45;
 const SERVICE = 'io.github.ytmdesktop.MiniPlayer';
 const OBJECT_PATH = '/io/github/ytmdesktop/MiniPlayer';
 const SEARCH_DEBOUNCE_MS = 900;
