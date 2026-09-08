@@ -172,6 +172,7 @@ const ytmViewIntegrationScripts: { [name: string]: { [name: string]: string } } 
 
 let mainWindow: BrowserWindow = null;
 let settingsWindow: BrowserWindow = null;
+let playerWindow: BrowserWindow = null;
 let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
@@ -614,6 +615,15 @@ function setupTaskbarFeatures() {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
 
+    // macOS pushes state to the popover; other platforms refresh the native menu.
+    // The macOS tray icon stays the static YTMD logo (set once at creation).
+    updateTrayContextMenu();
+
+    // Push live state to the popover only while it's visible (avoids needless IPC on every tick)
+    if (playerWindow && !playerWindow.isDestroyed() && playerWindow.isVisible()) {
+      playerWindow.webContents.send("playerState:changed", state);
+    }
+
     if (process.platform == "win32") {
       const taskbarFlags = [];
       if (!hasVideo) {
@@ -695,6 +705,242 @@ function getTrayIconPath() {
 
 function setTrayIcon() {
   tray.setImage(getTrayIconPath());
+}
+
+// Builds a small icon suitable for a tray context menu item
+function getTrayMenuIcon(icon: string) {
+  const image = nativeImage.createFromPath(getControlsIconPath(icon)).resize({ width: 16, height: 16 });
+  // On macOS template images automatically adapt to light/dark menu appearance
+  if (isDarwin) image.setTemplateImage(true);
+  return image;
+}
+
+function truncateForTray(text: string, max = 50) {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 1).trimEnd()}…`;
+}
+
+function toggleMainWindowVisibility() {
+  if (!mainWindow) return;
+  if (mainWindow.isVisible()) {
+    mainWindow.hide();
+  } else {
+    mainWindow.show();
+  }
+}
+
+function buildTrayContextMenu() {
+  // On macOS the left-click popover mini-player carries the now-playing UI, so the
+  // right-click menu only needs the essential window/app actions.
+  if (isDarwin) {
+    return Menu.buildFromTemplate([
+      {
+        label: "Show/Hide Window",
+        type: "normal",
+        click: toggleMainWindowVisibility
+      },
+      {
+        label: "Settings",
+        type: "normal",
+        click: () => createOrShowSettingsWindow()
+      },
+      {
+        type: "separator"
+      },
+      {
+        label: "Quit",
+        type: "normal",
+        click: () => app.quit()
+      }
+    ]);
+  }
+
+  // Windows/Linux keep the full native menu (no popover on these platforms)
+  const state = playerStateStore.getState();
+  const video = state?.videoDetails;
+  const isPlaying = state?.trackState === VideoState.Playing;
+
+  const nowPlaying: MenuItemConstructorOptions[] = video
+    ? [
+        {
+          label: truncateForTray(video.title),
+          type: "normal",
+          click: toggleMainWindowVisibility
+        },
+        ...(video.author
+          ? [
+              {
+                label: truncateForTray(video.author),
+                type: "normal" as const,
+                enabled: false
+              }
+            ]
+          : [])
+      ]
+    : [
+        {
+          label: "Nothing playing",
+          type: "normal",
+          enabled: false
+        }
+      ];
+
+  return Menu.buildFromTemplate([
+    ...nowPlaying,
+    {
+      type: "separator"
+    },
+    {
+      label: "Show/Hide Window",
+      type: "normal",
+      click: toggleMainWindowVisibility
+    },
+    {
+      label: isPlaying ? "Pause" : "Play",
+      type: "normal",
+      icon: getTrayMenuIcon(isPlaying ? "pause-button.png" : "play-button.png"),
+      enabled: !!video,
+      click: () => {
+        if (ytmView) ytmView.webContents.send("remoteControl:execute", "playPause");
+      }
+    },
+    {
+      label: "Previous",
+      type: "normal",
+      icon: getTrayMenuIcon("play-previous-button.png"),
+      enabled: !!video,
+      click: () => {
+        if (ytmView) ytmView.webContents.send("remoteControl:execute", "previous");
+      }
+    },
+    {
+      label: "Next",
+      type: "normal",
+      icon: getTrayMenuIcon("play-next-button.png"),
+      enabled: !!video,
+      click: () => {
+        if (ytmView) ytmView.webContents.send("remoteControl:execute", "next");
+      }
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click: () => {
+        app.quit();
+      }
+    }
+  ]);
+}
+
+// Tracks the last rendered tray menu content so we can skip rebuilds on frequent
+// player state changes (e.g. video progress ticks) that don't affect what's shown.
+// Windows/Linux only — macOS uses the popover for now-playing and a static right-click menu.
+let lastTrayMenuSignature: string | null = null;
+
+function updateTrayContextMenu() {
+  if (!tray || isDarwin) return;
+
+  const state = playerStateStore.getState();
+  const video = state?.videoDetails;
+  const signature = `${video?.title ?? ""} ${video?.author ?? ""} ${state?.trackState ?? ""}`;
+  if (signature === lastTrayMenuSignature) return;
+  lastTrayMenuSignature = signature;
+
+  trayContextMenu = buildTrayContextMenu();
+  tray.setContextMenu(trayContextMenu);
+}
+
+// The tray mini-player popover (macOS only). Created once and shown/hidden on tray click.
+function createPlayerPopover() {
+  if (playerWindow) return;
+
+  playerWindow = new BrowserWindow({
+    width: 300,
+    height: 470,
+    show: false,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    acceptFirstMouse: true, // first click acts on a control instead of just focusing the window
+    hasShadow: true,
+    roundedCorners: true,
+    vibrancy: "popover",
+    visualEffectState: "active",
+    webPreferences: {
+      sandbox: true,
+      contextIsolation: true,
+      preload: path.join(__dirname, `../renderer/windows/miniplayer/preload.js`),
+      devTools: store.get("developer.enableDevTools")
+    }
+  });
+
+  // Float the popover on the active space and over fullscreen apps, like a menu bar extra.
+  playerWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+
+  if (ALL_WINDOWS_VITE_DEV_SERVER_URL) playerWindow.loadURL(ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/miniplayer/index.html");
+  else playerWindow.loadFile(path.join(__dirname, `../renderer/windows/miniplayer/index.html`));
+
+  // Auto-hide when the user clicks away, but not while DevTools are open (dev convenience)
+  playerWindow.on("blur", () => {
+    if (applicationQuitting || !playerWindow || playerWindow.isDestroyed()) return;
+    if (playerWindow.webContents.isDevToolsOpened()) return;
+    playerWindow.hide();
+    playerPopoverHiddenAt = Date.now();
+  });
+}
+
+// Position the popover centered under the tray icon, clamped to the display work area
+function positionPlayerPopover() {
+  if (!tray || !playerWindow) return;
+
+  const trayBounds = tray.getBounds();
+  const { workArea } = screen.getDisplayMatching(trayBounds);
+  const [width, height] = playerWindow.getSize();
+  const margin = 8;
+
+  let x = Math.round(trayBounds.x + trayBounds.width / 2 - width / 2);
+  let y = Math.round(trayBounds.y + trayBounds.height + 6);
+
+  x = Math.max(workArea.x + margin, Math.min(x, workArea.x + workArea.width - width - margin));
+  y = Math.max(workArea.y + margin, Math.min(y, workArea.y + workArea.height - height - margin));
+
+  playerWindow.setPosition(x, y, false);
+}
+
+// Timestamp of the last blur-driven hide, used to swallow the tray click that caused it
+let playerPopoverHiddenAt = 0;
+
+function togglePlayerPopover() {
+  if (!playerWindow) createPlayerPopover();
+  if (playerWindow.isVisible()) {
+    playerWindow.hide();
+    return;
+  }
+
+  // Clicking the tray while the popover is open blurs it, which hides it just before
+  // this handler runs. Without this guard the click would immediately reopen it,
+  // and rapid clicks would thrash show/hide. Treat a click right after a blur-hide
+  // as "leave it closed".
+  if (Date.now() - playerPopoverHiddenAt < 250) return;
+
+  positionPlayerPopover();
+  // Send the current state right away so the popover never opens blank
+  playerWindow.webContents.send("playerState:changed", playerStateStore.getState());
+  // Show it focused: only a key window receives the blur that drives click-away dismissal
+  // (issue: an inactive popover lingered across every Space), and only a focused window
+  // reliably delivers clicks to the controls. It's visibleOnAllWorkspaces, so focusing it
+  // lands on the current Space rather than pulling the main window's Space forward.
+  playerWindow.show();
+  playerWindow.focus();
 }
 
 // Shortcut registration
@@ -1529,6 +1775,40 @@ app.on("ready", async () => {
     createOrShowSettingsWindow();
   });
 
+  // Handle tray mini-player popover ipc. The popover is macOS-only, so its handlers are
+  // never registered on other platforms (the popover renderer that sends these only loads
+  // on macOS anyway).
+  if (isDarwin) {
+    ipcMain.handle("playerState:request", () => playerStateStore.getState());
+
+    ipcMain.on("miniplayer:command", (event, command: string, value?: unknown) => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
+    });
+
+    ipcMain.on("miniplayer:openSettings", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      createOrShowSettingsWindow();
+    });
+
+    ipcMain.on("miniplayer:showMainWindow", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      playerWindow.hide(); // dismiss the popover before bringing the window up
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+        // Pull the app (and the Space hosting the main window) to the foreground; without
+        // stealing focus macOS leaves us on the current Space and the window never surfaces.
+        app.focus({ steal: true });
+      }
+    });
+
+    ipcMain.on("miniplayer:hide", event => {
+      if (playerWindow === null || event.sender !== playerWindow.webContents) return;
+      playerWindow.hide();
+    });
+  }
+
   ipcMain.on("settingsWindow:minimize", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;
@@ -1804,71 +2084,28 @@ app.on("ready", async () => {
 
   // Create the tray
   tray = new Tray(getTrayIconPath());
-  trayContextMenu = Menu.buildFromTemplate([
-    {
-      label: "YouTube Music Desktop",
-      type: "normal",
-      enabled: false
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Show/Hide Window",
-      type: "normal",
-      click: () => {
-        if (mainWindow) {
-          if (mainWindow.isVisible()) {
-            mainWindow.hide();
-          } else {
-            mainWindow.show();
-          }
+  tray.setToolTip("YouTube Music Desktop");
+
+  if (isDarwin) {
+    // macOS: left-click opens the popover mini-player, right-click shows the menu.
+    // We must NOT call setContextMenu here or it would hijack the left-click.
+    createPlayerPopover();
+    tray.on("click", () => togglePlayerPopover());
+    tray.on("right-click", () => tray.popUpContextMenu(buildTrayContextMenu()));
+  } else {
+    // Windows/Linux: keep the native context menu and click-to-show-window behavior.
+    trayContextMenu = buildTrayContextMenu();
+    tray.setContextMenu(trayContextMenu);
+    tray.on("click", () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        } else {
+          mainWindow.show();
         }
       }
-    },
-    {
-      label: "Play/Pause",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "playPause");
-      }
-    },
-    {
-      label: "Previous",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "previous");
-      }
-    },
-    {
-      label: "Next",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "next");
-      }
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Quit",
-      type: "normal",
-      click: () => {
-        app.quit();
-      }
-    }
-  ]);
-  tray.setToolTip("YouTube Music Desktop");
-  tray.setContextMenu(trayContextMenu);
-  tray.on("click", () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      } else {
-        mainWindow.show();
-      }
-    }
-  });
+    });
+  }
 
   log.info("Created tray icon");
 
