@@ -43,6 +43,7 @@ const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
 
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
+const centeredPlayerControls = ref<boolean>(appearance.centeredPlayerControls);
 const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
 const customCSSPath = ref<string>(appearance.customCSSPath);
 const zoom = ref<number>(appearance.zoom);
@@ -81,6 +82,7 @@ store.onDidAnyChange(async newState => {
   startMinimized.value = newState.general.startMinimized;
 
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
+  centeredPlayerControls.value = newState.appearance.centeredPlayerControls;
   customCSSEnabled.value = newState.appearance.customCSSEnabled;
   customCSSPath.value = newState.appearance.customCSSPath;
   zoom.value = newState.appearance.zoom;
@@ -155,6 +157,7 @@ async function settingsChanged() {
   store.set("general.disableHardwareAcceleration", disableHardwareAcceleration.value);
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
+  store.set("appearance.centeredPlayerControls", centeredPlayerControls.value);
   store.set("appearance.customCSSEnabled", customCSSEnabled.value);
   store.set("appearance.zoom", zoom.value);
   store.set("appearance.trayIconStyle", trayIconStyle.value);
@@ -315,6 +318,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             @clear="removeCustomCSSPath"
           />
           <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
+          <YTMDSetting v-model="centeredPlayerControls" type="checkbox" name="Center player controls" @change="settingsChanged" />
           <YTMDSetting
             v-if="isLinux"
             v-model="trayIconStyle"

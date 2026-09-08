@@ -17,6 +17,7 @@ export type StoreSchema = {
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
+    centeredPlayerControls: boolean;
     customCSSEnabled: boolean;
     customCSSPath: string | null;
     zoom: number;
