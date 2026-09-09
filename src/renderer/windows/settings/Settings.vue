@@ -318,7 +318,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-if="isLinux"
             v-model="trayIconStyle"
-            :options-map="{ [TrayIconStyle.Auto]: 'Auto', [TrayIconStyle.White]: 'White', [TrayIconStyle.Black]: 'Black' }"
+            :options-map="{ [TrayIconStyle.Auto]: 'Auto', [TrayIconStyle.White]: 'White', [TrayIconStyle.Black]: 'Black', [TrayIconStyle.Red]: 'Red' }"
             type="select"
             name="Tray icon style"
             @change="settingsChanged"
