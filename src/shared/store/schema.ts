@@ -62,6 +62,11 @@ export type StoreSchema = {
   developer: {
     enableDevTools: boolean;
   };
+  extensions: {
+    extensionPaths: string[];
+    /** Paths in this list are not loaded at startup until re-enabled. */
+    disabledPaths: string[];
+  };
 };
 
 export type MemoryStoreSchema = {
