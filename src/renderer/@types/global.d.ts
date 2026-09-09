@@ -43,6 +43,7 @@ declare global {
 
       // App specific
       getAppVersion(): Promise<string>;
+      testYtmProxy(): Promise<{ ok: boolean; message: string }>;
       checkForUpdates(): void;
       handleCheckingForUpdate(callback: (event: Electron.IpcRendererEvent) => void);
       handleUpdateAvailable(callback: (event: Electron.IpcRendererEvent) => void);
