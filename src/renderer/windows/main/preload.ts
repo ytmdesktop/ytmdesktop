@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   switchFocus: (context: string) => ipcRenderer.send("ytmView:switchFocus", context),
   ytmViewNavigateDefault: () => ipcRenderer.send("ytmView:navigateDefault"),
   ytmViewRecreate: () => ipcRenderer.send("ytmView:recreate"),
+  openCurrentSongInBrowser: () => ipcRenderer.send("ytmView:openCurrentSongInBrowser"),
   memoryStore: {
     set: (key: string, value: unknown) => memoryStore.set(key, value),
     get: async (key: keyof MemoryStoreSchema) => await memoryStore.get(key),
