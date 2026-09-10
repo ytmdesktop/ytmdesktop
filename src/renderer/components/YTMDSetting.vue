@@ -6,7 +6,7 @@ type ModelValue = {
   file: string;
   range: number;
   custom: never;
-  select: number;
+  select: number | string;
 };
 
 const props = defineProps<{
@@ -24,7 +24,7 @@ const props = defineProps<{
   disabledMessage?: string;
   flexColumn?: boolean;
   beta?: boolean;
-  optionsMap?: { [key: number]: string }; // This is for the select menu
+  optionsMap?: { [key: number | string]: string }; // This is for the select menu
 }>();
 const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
@@ -50,7 +50,7 @@ const selectedOption = computed(() => {
 
 // This function should be using ModelValue[T] but because it's bound to @click it doesn't interpret it as correct
 function select(optionKey: string) {
-  value.value = Number.parseInt(optionKey) as ModelValue[T];
+  value.value = (typeof props.modelValue === "number" ? Number.parseInt(optionKey) : optionKey) as ModelValue[T];
   selectOpen.value = false;
   emit("change");
 }
@@ -299,6 +299,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .select.open {
   border-radius: 4px 4px 0 0;
+  z-index: 10;
 }
 
 .select .selected {
@@ -319,7 +320,7 @@ input[type="range"]::-webkit-slider-thumb {
   position: absolute;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 11;
   border-radius: 0 0 4px 4px;
   width: 100%;
 }
