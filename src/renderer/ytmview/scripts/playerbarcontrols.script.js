@@ -155,9 +155,9 @@
   };
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
+  window.__YTMD_HOOK__.ytmPlayerBar.playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      currentVideoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+      currentVideoId = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId;
     }
   });
 
@@ -407,7 +407,7 @@
               sleepTimerButton.setAttribute("title", "Sleep timer off");
 
               if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.pauseVideo();
+                window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
 
                 document.body.dispatchEvent(
                   new CustomEvent("yt-action", {
