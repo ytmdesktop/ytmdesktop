@@ -1,6 +1,7 @@
 {
   "name": "youtube-music-desktop-app",
   "productName": "YouTube Music Desktop App",
+  "desktopName": "youtube-music-desktop-app.desktop",
   "version": "2.0.12",
   "description": "YouTube Music Desktop App",
   "main": ".vite/main/index.js",
@@ -60,6 +61,7 @@
     "@fastify/type-provider-typebox": "^5.2.0",
     "@sinclair/typebox": "^0.34.48",
     "conf": "^10.2.0",
+    "dbus-native": "^0.15.2",
     "electron-log": "5.4.3",
     "electron-squirrel-startup": "^1.0.1",
     "fastify": "^5.7.4",

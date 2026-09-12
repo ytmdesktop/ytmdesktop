@@ -15,6 +15,8 @@ import { StoreSchema } from "~shared/store/schema";
 import playerBarControlsScript from "./scripts/playerbarcontrols.script?raw";
 import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw";
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
+import searchScript from "./scripts/search.script?raw";
+import startMixScript from "./scripts/startmix.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
 
@@ -25,11 +27,65 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendVideoState: (state: number) => ipcRenderer.send("ytmView:videoStateChanged", state),
   sendVideoData: (videoDetails: unknown, playlistId: string, album: { id: string; text: string }, likeStatus: unknown, hasFullMetadata: boolean) =>
     ipcRenderer.send("ytmView:videoDataChanged", videoDetails, playlistId, album, likeStatus, hasFullMetadata),
-  sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
-    ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted, adPlaying),
+  sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean) =>
+    ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted),
+  sendAdState: (adState: unknown) => ipcRenderer.send("ytmView:adStateChanged", adState),
+  sendAdDiagnostic: (message: string) => ipcRenderer.send("ytmView:adDiagnostic", message),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
   sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
 });
+
+const dismissStartPlaybackScript = `(() => {
+  if (window.__ytmdStartPlaybackFix) return;
+  window.__ytmdStartPlaybackFix = true;
+  const hints = new Set(["start playback", "start playing", "재생 시작", "재생하기"]);
+  const normalize = value => (value || "").replace(/\\s+/g, " ").trim().toLowerCase();
+  const isHint = el => {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.closest && el.closest("ytmusic-player-bar")) return false;
+    if (hints.has(normalize(el.getAttribute("aria-label")))) return true;
+    const text = normalize(el.textContent);
+    return text.length <= 32 && hints.has(text);
+  };
+  const hide = el => {
+    const host = el.closest("tp-yt-iron-dropdown, tp-yt-paper-dialog, yt-tooltip-renderer, tp-yt-paper-tooltip") || el;
+    host.style.setProperty("display", "none", "important");
+    host.style.setProperty("visibility", "hidden", "important");
+    host.style.setProperty("opacity", "0", "important");
+    host.style.setProperty("pointer-events", "none", "important");
+    host.setAttribute("hidden", "");
+    if ("opened" in host) host.opened = false;
+  };
+  const walk = root => {
+    if (!root || !root.querySelectorAll) return;
+    for (const el of root.querySelectorAll("*")) {
+      if (isHint(el)) hide(el);
+      if (el.shadowRoot) walk(el.shadowRoot);
+    }
+  };
+  const run = () => {
+    walk(document);
+    const popup = document.querySelector("ytmusic-popup-container");
+    if (popup) {
+      walk(popup);
+      try { popup.refitPopups_ && popup.refitPopups_(); } catch {}
+    }
+  };
+  let frame = 0;
+  const schedule = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      run();
+    });
+  };
+  run();
+  new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+})()`;
+
+async function dismissStartPlaybackOverlay() {
+  await webFrame.executeJavaScript(dismissStartPlaybackScript);
+}
 
 function createStyleSheet() {
   const css = document.createElement("style");
@@ -218,13 +274,22 @@ function getYTMTextRun(runs: { text: string }[]) {
   )();
 })();
 
-window.addEventListener("load", async () => {
+window.addEventListener("load", () => {
+  void initializeYtmView().catch(error => {
+    console.error("YouTube Music initialization failed", error);
+    ipcRenderer.send("ytmView:initializationFailed");
+  });
+});
+
+async function initializeYtmView() {
   if (window.location.hostname !== "music.youtube.com") {
     if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
     }
     return;
   }
+
+  void dismissStartPlaybackOverlay();
 
   await new Promise<void>(resolve => {
     const interval = setInterval(async () => {
@@ -273,6 +338,7 @@ window.addEventListener("load", async () => {
   });
 
   createStyleSheet();
+  void dismissStartPlaybackOverlay();
   createNavigationMenuArrows();
   createKeyboardNavigation();
   await createAdditionalPlayerBarControls();
@@ -346,55 +412,70 @@ window.addEventListener("load", async () => {
     switch (command) {
       case "playPause": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "play": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "pause": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "next": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.nextVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "previous": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.previousVideo();
             })
-          `)
+          `,
+            true
+          )
         )();
         break;
       }
@@ -509,11 +590,14 @@ window.addEventListener("load", async () => {
 
       case "seekTo":
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function(value) {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.seekTo(value);
             })
-          `)
+          `,
+            true
+          )
         )(value);
         break;
 
@@ -575,6 +659,29 @@ window.addEventListener("load", async () => {
         break;
       }
 
+      case "skipAd": {
+        (
+          await webFrame.executeJavaScript(
+            `
+            (function() {
+              const moviePlayer = document.querySelector("#movie_player");
+              if (!moviePlayer) return;
+              const selectors = [".ytp-ad-skip-button-modern", ".ytp-ad-skip-button", ".ytp-skip-ad-button"];
+              for (const selector of selectors) {
+                const button = moviePlayer.querySelector(selector);
+                if (button && button.offsetParent !== null) {
+                  button.click();
+                  return;
+                }
+              }
+            })
+          `,
+            true
+          )
+        )();
+        break;
+      }
+
       case "navigate": {
         const endpoint = value;
         document.dispatchEvent(
@@ -586,6 +693,44 @@ window.addEventListener("load", async () => {
         );
         break;
       }
+    }
+  });
+
+  ipcRenderer.on("ytmView:startMix", async (_event, requestId) => {
+    try {
+      const seed = await (await webFrame.executeJavaScript(startMixScript))();
+      ipcRenderer.send(`ytmView:startMix:response:${requestId}`, { seed });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:startMix:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  ipcRenderer.on("ytmView:search", async (_event, requestId, query, mode = "music") => {
+    try {
+      const results = await (await webFrame.executeJavaScript(searchScript)).search(query, mode);
+      ipcRenderer.send(`ytmView:search:response:${requestId}`, { results });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:search:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  ipcRenderer.on("ytmView:miniPlayer", async (_event, requestId, method, request) => {
+    if (!["albumBrowse", "playNext", "searchMusic", "startResultMix"].includes(method)) return;
+    try {
+      const api = await webFrame.executeJavaScript(searchScript);
+      const result = await api[method](request);
+      ipcRenderer.send(`ytmView:miniPlayer:response:${requestId}`, { result });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:miniPlayer:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  ipcRenderer.on("ytmView:artistBrowse", async (_event, requestId, request) => {
+    try {
+      const page = await (await webFrame.executeJavaScript(searchScript)).artistBrowse(request);
+      ipcRenderer.send(`ytmView:artistBrowse:response:${requestId}`, { page });
+    } catch (error) {
+      ipcRenderer.send(`ytmView:artistBrowse:response:${requestId}`, { error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -640,5 +785,6 @@ window.addEventListener("load", async () => {
     }
   });
 
+  ipcRenderer.send("ytmView:playerReady");
   ipcRenderer.send("ytmView:loaded");
-});
+}

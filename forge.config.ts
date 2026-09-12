@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
@@ -52,7 +54,7 @@ const config: ForgeConfig = {
       options: {
         categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
-        icon: "./src/assets/icons/ytmd.png"
+        icon: path.resolve(__dirname, "src/assets/icons/ytmd.png")
       }
     }),
     new MakerDeb({
@@ -60,7 +62,7 @@ const config: ForgeConfig = {
         categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
         section: "sound",
-        icon: "./src/assets/icons/ytmd.png"
+        icon: path.resolve(__dirname, "src/assets/icons/ytmd.png")
       }
     })
   ],
