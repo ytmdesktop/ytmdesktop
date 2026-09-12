@@ -13,7 +13,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Slider from 'resource:///org/gnome/shell/ui/slider.js';
 
-const UI_VERSION = 45;
+const UI_VERSION = 46;
 const SERVICE = 'io.github.ytmdesktop.MiniPlayer';
 const OBJECT_PATH = '/io/github/ytmdesktop/MiniPlayer';
 const SEARCH_DEBOUNCE_MS = 900;
@@ -39,6 +39,7 @@ const DBUS_XML = `
     <method name="ShowMainWindow"/>
     <method name="OpenSettings"/>
     <method name="Quit"/>
+    <method name="Refresh"/>
     <method name="Search">
       <arg type="s" name="query" direction="in"/>
     </method>
@@ -240,6 +241,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
 
         const searchWrap = new St.BoxLayout({vertical: true, style_class: 'ytmd-search-wrap', x_expand: true});
         this._searchWrap = searchWrap;
+        searchWrap.connect('captured-event', () => this._musicUnavailable() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
         this.menu.box.add_child(searchWrap);
         searchWrap.connect('key-press-event', (_actor, event) => {
             if (event.get_key_symbol() === Clutter.KEY_Escape) {
@@ -337,8 +339,13 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         const root = new St.BoxLayout({vertical: true, style_class: 'ytmd-popup'});
         item.add_child(root);
 
+        const playerStack = new St.Widget({layout_manager: new Clutter.BinLayout(), x_expand: true});
+        this._playerContent = new St.BoxLayout({vertical: true, x_expand: true});
+        this._playerContent.connect('captured-event', () => this._musicUnavailable() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
+        playerStack.add_child(this._playerContent);
+        root.add_child(playerStack);
         const playerRow = new St.BoxLayout({vertical: false, style_class: 'ytmd-player-row'});
-        root.add_child(playerRow);
+        this._playerContent.add_child(playerRow);
 
         this._artWrap = new St.Button({
             style_class: 'ytmd-art-wrap',
@@ -489,7 +496,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         });
         this._volumeRow.add_child(this._muteButton);
         this._volumeRow.add_child(this._volumeSlider);
-        root.add_child(this._volumeRow);
+        this._playerContent.add_child(this._volumeRow);
 
         this._openAppButton = new St.Button({
             label: 'Open YTMusic',
@@ -501,6 +508,24 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         });
         this._openAppButton.connect('clicked', () => this._call('ToggleMainWindow'));
         details.add_child(this._openAppButton);
+
+        this._recoveryOverlay = new St.BoxLayout({
+            vertical: true, style_class: 'ytmd-recovery-overlay', reactive: true,
+            x_expand: true, y_expand: true,
+        });
+        const recovery = new St.BoxLayout({vertical: true, x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER, x_expand: true, y_expand: true});
+        this._recoveryLabel = new St.Label({style_class: 'ytmd-recovery-message', x_align: Clutter.ActorAlign.CENTER});
+        this._recoveryLabel.clutter_text.line_wrap = true;
+        this._recoveryLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        recovery.add_child(this._recoveryLabel);
+        this._refreshButton = new St.Button({label: 'Refresh', style_class: 'ytmd-open-button',
+            accessible_name: 'Refresh YouTube Music', reactive: true, can_focus: true,
+            x_align: Clutter.ActorAlign.CENTER, track_hover: true});
+        this._refreshButton.connect('clicked', () => this._refreshPlayer());
+        recovery.add_child(this._refreshButton);
+        this._recoveryOverlay.add_child(recovery);
+        playerStack.add_child(this._recoveryOverlay);
 
         const footer = new St.BoxLayout({style_class: 'ytmd-footer', x_align: Clutter.ActorAlign.END});
         footer.add_child(this._iconButton('window.svg', 'Show or hide window', () => this._call('ToggleMainWindow')));
@@ -1321,6 +1346,8 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._proxy.GetStateRemote((result, error) => {
             if (error) {
                 console.error(`YTMDesktop GetState failed: ${error.message}`);
+                this._state = {...this._state, viewStatus: 'error', status: 'error', message: 'Could not read player state. Try refreshing.'};
+                this._updateUi();
                 return;
             }
             this._applyStateJson(result[0]);
@@ -1406,6 +1433,36 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._updateUi();
     }
 
+    _musicUnavailable() {
+        return this._state?.viewStatus !== 'ready';
+    }
+
+    _refreshPlayer() {
+        if (this._state?.viewStatus !== 'error' || !this._proxy?.g_name_owner)
+            return;
+        this._state = {...this._state, viewStatus: 'loading', status: 'loading', message: 'Reconnecting…'};
+        this._updateUi();
+        this._call('Refresh');
+    }
+
+    _updateRecoveryUi() {
+        const unavailable = this._musicUnavailable();
+        const failed = this._state?.viewStatus === 'error';
+        this._recoveryOverlay.visible = unavailable;
+        this._recoveryLabel.text = this._state?.message || 'Connecting to YouTube Music…';
+        this._refreshButton.label = failed ? 'Refresh' : 'Reconnecting…';
+        this._setButtonEnabled(this._refreshButton, failed);
+        this._playerContent.opacity = unavailable ? 65 : 255;
+        this._searchWrap.opacity = unavailable ? 65 : 255;
+        this._searchEntry.get_clutter_text().set_editable(!unavailable);
+        this._searchEntry.can_focus = !unavailable;
+        if (unavailable && this._menuIsOpen) {
+            const focus = global.stage.get_key_focus();
+            if (focus && (this._playerContent.contains(focus) || this._searchWrap.contains(focus)))
+                (failed ? this._refreshButton : this._settingsButton).grab_key_focus();
+        }
+    }
+
     _updateUi() {
         const track = this._state?.track ?? null;
         const ad = this._adState();
@@ -1441,6 +1498,7 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         this._updateRepeatButton();
         this._updateVolume();
         this._updateProgress();
+        this._updateRecoveryUi();
     }
 
     _currentLikeStatus() {
@@ -1657,13 +1715,21 @@ class MiniPlayerIndicator extends PanelMenu.Button {
         if (!this._proxy?.g_name_owner)
             return;
 
+        const lifecycle = ['Refresh', 'ToggleMainWindow', 'ShowMainWindow', 'OpenSettings', 'Quit'];
+        if (this._musicUnavailable() && !lifecycle.includes(method))
+            return;
         const remoteMethod = this._proxy[`${method}Remote`];
         remoteMethod.call(this._proxy, ...args, (_result, error) => {
-            if (error)
+            if (error) {
                 console.error(`YTMDesktop ${method} failed: ${error.message}`);
+                if (method === 'Refresh') {
+                    this._state = {...this._state, viewStatus: 'error', status: 'error', message: 'Could not refresh YouTube Music. Try again.'};
+                    this._updateUi();
+                }
+            }
         });
 
-        if (!['Command', 'Search', 'SearchByMode', 'PlayResult', 'ArtistBrowse', 'AlbumBrowse', 'PlayNext', 'SearchMusic', 'StartResultMix'].includes(method))
+        if (!['Refresh', 'Command', 'Search', 'SearchByMode', 'PlayResult', 'ArtistBrowse', 'AlbumBrowse', 'PlayNext', 'SearchMusic', 'StartResultMix'].includes(method))
             this.menu.close();
     }
 

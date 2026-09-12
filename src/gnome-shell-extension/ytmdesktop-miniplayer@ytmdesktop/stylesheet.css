@@ -439,3 +439,17 @@
   border-radius: 6px;
   max-width: 360px;
 }
+
+.ytmd-recovery-overlay {
+    background-color: rgba(55, 55, 55, 0.88);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.ytmd-recovery-message {
+    color: #eeeeee;
+    text-align: center;
+    max-width: 230px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}

@@ -1,7 +1,8 @@
 (function() {
   const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
   if (!playerBar) throw new Error("Player bar unavailable");
-  const playerApi = playerBar.playerApi;
+  const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+  if (!playerApi) throw new Error("Player unavailable");
 
   function unwrapRenderer(item) {
     if (!item) return null;

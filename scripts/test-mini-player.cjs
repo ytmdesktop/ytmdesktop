@@ -14,7 +14,7 @@ const song = (id, title, type, count) => ({
       { musicResponsiveListItemFlexColumnRenderer: { text: { runs: [{ text: count || "" }] } } }
     ],
     navigationEndpoint: { watchEndpoint: { videoId: id, watchEndpointMusicSupportedConfigs: { watchEndpointMusicConfig: { musicVideoType: type } } } },
-    menu: { menuRenderer: { items: [{ menuServiceItemRenderer: menu(id) }] } }
+    menu: { menuRenderer: { items: [{ menuServiceItemRenderer: menu(id) }, {menuNavigationItemRenderer: {navigationEndpoint: {watchEndpoint: {videoId: id, playlistId: `RDAMVM${id}`}}}}] } }
   }
 });
 const album = {
@@ -41,15 +41,22 @@ const bar = {
   queue: { getCurrentItemIndex: () => 0, getItems: () => queue.map(videoId => ({ playlistPanelVideoRenderer: { videoId } })) },
   playerApi: { getPlayerState: () => state, getCurrentTime: () => time }
 };
+const playerApi = bar.playerApi;
+delete bar.playerApi; // Current YTM exposes the API only on the hooked controller.
+let mixVideo = "CURRENT0001", mixPlaylist = "", confirmMix = true;
+playerApi.getPlayerResponse = () => ({videoDetails: {videoId: mixVideo}});
+playerApi.getPlaylistId = () => mixPlaylist;
 const requests = [];
 const api = vm.runInNewContext(source, {
-  window: { ytcfg: { get: key => (key === "INNERTUBE_CONTEXT" ? { client: { hl: "en" } } : "test") } },
+  window: { __YTMD_HOOK__: {ytmPlayerBar: {playerApi}}, ytcfg: { get: key => (key === "INNERTUBE_CONTEXT" ? { client: { hl: "en" } } : "test") } },
   Date: { now: () => clock },
   setTimeout: (fn, ms) => {
     clock += ms;
     fn();
   },
+  CustomEvent: class {constructor(type, options) {this.detail = options.detail;}},
   document: {
+    dispatchEvent: event => {if (confirmMix) {mixVideo = event.detail.endpoint.watchEndpoint.videoId; mixPlaylist = event.detail.endpoint.watchEndpoint.playlistId;}},
     querySelector: s => (s === "ytmusic-app" ? { appendChild() {} } : s === "ytmusic-player-bar" ? bar : { classList: { contains: () => ad } }),
     createElement: () => ({
       remove() {
@@ -110,6 +117,10 @@ const api = vm.runInNewContext(source, {
   insert = false;
   await assert.rejects(api.playNext("ORIGINAL001"), /did not confirm/);
   await assert.rejects(api.playNext("MISSING0001"), /Search again/);
+  assert.equal((await api.startResultMix("ORIGINAL001")).videoId, "ORIGINAL001");
+  assert.equal(mixPlaylist, "RDAMVMORIGINAL001");
+  confirmMix = false;
+  await assert.rejects(api.startResultMix("OTHER000001"), /did not confirm/);
   fail = true;
   await assert.rejects(api.search("query", "video"), /503/);
   const uiSource = fs.readFileSync('src/gnome-shell-extension/ytmdesktop-miniplayer@ytmdesktop/extension.js', 'utf8');

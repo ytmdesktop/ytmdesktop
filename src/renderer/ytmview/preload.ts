@@ -274,7 +274,14 @@ function getYTMTextRun(runs: { text: string }[]) {
   )();
 })();
 
-window.addEventListener("load", async () => {
+window.addEventListener("load", () => {
+  void initializeYtmView().catch(error => {
+    console.error("YouTube Music initialization failed", error);
+    ipcRenderer.send("ytmView:initializationFailed");
+  });
+});
+
+async function initializeYtmView() {
   if (window.location.hostname !== "music.youtube.com") {
     if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
@@ -405,55 +412,70 @@ window.addEventListener("load", async () => {
     switch (command) {
       case "playPause": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
-          `, true)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "play": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
-          `, true)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "pause": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
             })
-          `, true)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "next": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.nextVideo();
             })
-          `, true)
+          `,
+            true
+          )
         )();
         break;
       }
 
       case "previous": {
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function() {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.previousVideo();
             })
-          `, true)
+          `,
+            true
+          )
         )();
         break;
       }
@@ -568,11 +590,14 @@ window.addEventListener("load", async () => {
 
       case "seekTo":
         (
-          await webFrame.executeJavaScript(`
+          await webFrame.executeJavaScript(
+            `
             (function(value) {
               window.__YTMD_HOOK__.ytmPlayerBar.playerApi.seekTo(value);
             })
-          `, true)
+          `,
+            true
+          )
         )(value);
         break;
 
@@ -760,5 +785,6 @@ window.addEventListener("load", async () => {
     }
   });
 
+  ipcRenderer.send("ytmView:playerReady");
   ipcRenderer.send("ytmView:loaded");
-});
+}

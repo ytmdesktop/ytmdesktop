@@ -26,7 +26,19 @@ import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { MiniPlayerAlbumPage, MiniPlayerQueueResult, MiniPlayerMusicRequest, MiniPlayerMusicPage, MiniPlayerArtistBrowsePage, MiniPlayerArtistBrowseRequest, MiniPlayerCommand, MiniPlayerSearchMode, MiniPlayerSearchResult, PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, {
+  MiniPlayerAlbumPage,
+  MiniPlayerQueueResult,
+  MiniPlayerMusicRequest,
+  MiniPlayerMusicPage,
+  MiniPlayerArtistBrowsePage,
+  MiniPlayerArtistBrowseRequest,
+  MiniPlayerCommand,
+  MiniPlayerSearchMode,
+  MiniPlayerSearchResult,
+  PlayerState,
+  VideoState
+} from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
 import LinuxMiniPlayerService from "./linux-mini-player-service";
 import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
@@ -199,6 +211,29 @@ let lastPlaylistId = "";
 
 let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
 let ytmViewLoadTimeout: NodeJS.Timeout | null = null;
+let ytmViewStatus: "loading" | "ready" | "error" = "loading";
+let ytmViewMessage = "Connecting to YouTube Music…";
+let ytmPlayerInitialized = false;
+
+function setYtmViewStatus(status: "loading" | "ready" | "error", message = "") {
+  ytmViewStatus = status;
+  ytmViewMessage = message;
+  linuxMiniPlayerService?.updateViewState(status, message);
+}
+
+function beginYtmViewLoad() {
+  ytmPlayerInitialized = false;
+  if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+  memoryStore.set("ytmViewLoadTimedout", false);
+  memoryStore.set("ytmViewLoadingError", false);
+  memoryStore.set("ytmViewUnresponsive", false);
+  memoryStore.set("ytmViewLoading", true);
+  setYtmViewStatus("loading", "Reconnecting…");
+  ytmViewLoadTimeout = setTimeout(() => {
+    memoryStore.set("ytmViewLoadTimedout", true);
+    setYtmViewStatus("error", "YouTube Music did not become ready. Try refreshing.");
+  }, 30 * 1000);
+}
 
 // Single Instances Lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -821,7 +856,7 @@ function startLinuxMiniPlayerService() {
           searchMusic: (request: MiniPlayerMusicRequest) => miniPlayerPageRequest<MiniPlayerMusicPage>("searchMusic", request),
           startResultMix: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("startResultMix", videoId),
           artistBrowse: artistBrowseYtm,
-          albumBrowse: (albumId, continuation) => miniPlayerPageRequest<MiniPlayerAlbumPage>("albumBrowse", {albumId, continuation}),
+          albumBrowse: (albumId, continuation) => miniPlayerPageRequest<MiniPlayerAlbumPage>("albumBrowse", { albumId, continuation }),
           playNext: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("playNext", videoId),
           openAlbum: browseId => openArtistInYtm(browseId, "MUSIC_PAGE_TYPE_ALBUM"),
           openArtist: openArtistInYtm,
@@ -829,16 +864,23 @@ function startLinuxMiniPlayerService() {
           toggleMainWindow: toggleMainWindowVisibility,
           showMainWindow,
           openSettings: createOrShowSettingsWindow,
+          refresh: () => createYTMView(),
           quit: () => app.quit()
         },
         playerStateStore.getState(),
         { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() },
-        { version: metadata.version, changed: () => { if (!applicationQuitting) void applyPlatformTrayIntegration(); } }
+        {
+          version: metadata.version,
+          changed: () => {
+            if (!applicationQuitting) void applyPlatformTrayIntegration();
+          }
+        }
       );
 
       try {
         await service.start();
         linuxMiniPlayerService = service;
+        service.updateViewState(ytmViewStatus, ytmViewMessage);
       } catch (error) {
         log.error("Failed to start Linux mini-player D-Bus service", error);
         await service.stop();
@@ -968,8 +1010,11 @@ function miniPlayerPageRequest<T>(method: "albumBrowse" | "playNext" | "searchMu
     const sender = ytmView.webContents;
     const requestId = randomUUID();
     const channel = `ytmView:miniPlayer:response:${requestId}`;
-    const timeout = setTimeout(() => { ipcMain.removeListener(channel, handler); reject(new Error(`${method} timed out`)); }, 10000);
-    const handler = (event: Electron.IpcMainEvent, payload: {result?: T; error?: string}) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(channel, handler);
+      reject(new Error(`${method} timed out`));
+    }, 10000);
+    const handler = (event: Electron.IpcMainEvent, payload: { result?: T; error?: string }) => {
       if (event.sender !== sender) return;
       clearTimeout(timeout);
       ipcMain.removeListener(channel, handler);
@@ -1527,8 +1572,19 @@ function isPreventedNavOrRedirect(url: URL): boolean {
 }
 
 const createYTMView = (): void => {
-  memoryStore.set("ytmViewLoadTimedout", false);
-  memoryStore.set("ytmViewLoading", true);
+  clearPlaybackNudge();
+  pendingMixSeek = null;
+  resumeLastTrackPending = false;
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  if (ytmView) {
+    mainWindow?.removeBrowserView(ytmView);
+    if (!ytmView.webContents.isDestroyed()) {
+      ytmView.webContents.removeAllListeners();
+      ytmView.webContents.close();
+    }
+    ytmView = null;
+  }
+  beginYtmViewLoad();
   memoryStore.set("ytmViewLoadingStatus", "Initializing...");
 
   ytmView = new BrowserView({
@@ -1548,6 +1604,11 @@ const createYTMView = (): void => {
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
+
+  // A full navigation replaces the preload and must complete a fresh player handshake.
+  ytmView.webContents.on("did-start-navigation", (_event, _url, isInPlace, isMainFrame) => {
+    if (isMainFrame && !isInPlace) beginYtmViewLoad();
+  });
 
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
@@ -1655,9 +1716,11 @@ const createYTMView = (): void => {
   });
   ytmView.webContents.on("unresponsive", () => {
     memoryStore.set("ytmViewUnresponsive", true);
+    setYtmViewStatus("error", "YouTube Music stopped responding. Try refreshing.");
   });
   ytmView.webContents.on("responsive", () => {
     memoryStore.set("ytmViewUnresponsive", false);
+    if (ytmPlayerInitialized && !memoryStore.get("ytmViewLoadingError")) setYtmViewStatus("ready");
   });
 
   ytmView.webContents.setWindowOpenHandler(details => {
@@ -1680,7 +1743,8 @@ const createYTMView = (): void => {
   });
 
   ytmView.webContents.on("did-fail-load", (_event, errorCode, errorDescription, _validatedURL, isMainFrame) => {
-    if (isMainFrame) {
+    if (isMainFrame && errorCode !== -3) {
+      setYtmViewStatus("error", "Could not load YouTube Music. Check your connection and refresh.");
       if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
 
       memoryStore.set("ytmViewLoadingError", true);
@@ -1693,11 +1757,9 @@ const createYTMView = (): void => {
   const startupUrl = initialYtmUrl();
   lastUrl = startupUrl;
   store.set("state.lastUrl", startupUrl);
-  ytmView.webContents.loadURL(startupUrl);
-
-  ytmViewLoadTimeout = setTimeout(() => {
-    memoryStore.set("ytmViewLoadTimedout", true);
-  }, 30 * 1000);
+  void ytmView.webContents.loadURL(startupUrl).catch(error => {
+    if (error.code !== "ERR_ABORTED") log.error("YouTube Music navigation failed", error);
+  });
 };
 
 const createMainWindow = (): void => {
@@ -2070,6 +2132,19 @@ app.on("ready", async () => {
     app.quit();
   });
 
+  // Only the current view can complete or fail the player initialization handshake.
+  ipcMain.on("ytmView:playerReady", event => {
+    if (event.sender !== ytmView?.webContents) return;
+    ytmPlayerInitialized = true;
+    if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+    setYtmViewStatus("ready");
+  });
+  ipcMain.on("ytmView:initializationFailed", event => {
+    if (event.sender !== ytmView?.webContents) return;
+    if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+    setYtmViewStatus("error", "YouTube Music could not initialize. Try refreshing.");
+  });
+
   // Handle ytm view ipc
   ipcMain.on("ytmView:loaded", event => {
     if (ytmView !== null && mainWindow !== null) {
@@ -2077,6 +2152,7 @@ app.on("ready", async () => {
 
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
+      if (!ytmPlayerInitialized) setYtmViewStatus("error", "Complete sign-in in YouTube Music, then refresh.");
       mainWindow.addBrowserView(ytmView);
       ytmView.setBounds({
         x: 0,
@@ -2195,16 +2271,7 @@ app.on("ready", async () => {
   ipcMain.on("ytmView:recreate", event => {
     if (event.sender !== mainWindow.webContents) return;
 
-    if (ytmView) {
-      if (mainWindow) {
-        mainWindow.removeBrowserView(ytmView);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ytmView.webContents as any).destroy();
-      ytmView = null;
-      createYTMView();
-    }
+    if (ytmView) createYTMView();
   });
 
   ipcMain.handle("ytmView:getIntegrationScripts", event => {

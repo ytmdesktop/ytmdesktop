@@ -389,7 +389,7 @@
   async function startResultMix(videoId) {
     const saved = cache.get(videoId), endpoint = saved?.mix?.watchEndpoint;
     if (!endpoint) throw new Error("Start mix is unavailable; refresh the results");
-    const api = document.querySelector("ytmusic-player-bar")?.playerApi;
+    const api = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
     if (!api) throw new Error("Player unavailable");
     document.dispatchEvent(new CustomEvent("yt-navigate", {detail:{endpoint:saved.mix}}));
     const deadline = Date.now()+7000;
@@ -560,7 +560,7 @@
     const app = document.querySelector("ytmusic-app"),
       bar = document.querySelector("ytmusic-player-bar");
     const queue = bar?.queue,
-      api = bar?.playerApi;
+      api = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
     const unwrap = item => item?.playlistPanelVideoRenderer ?? item?.playlistPanelVideoWrapperRenderer?.primaryRenderer?.playlistPanelVideoRenderer;
     if (!queue || !api || !app) throw new Error("Player queue unavailable");
     if (document.querySelector("#movie_player")?.classList.contains("ad-showing")) throw new Error("Wait until the advertisement finishes");

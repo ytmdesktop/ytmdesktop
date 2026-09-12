@@ -105,7 +105,8 @@ export type MiniPlayerCommand =
   | "startMix"
   | "skipAd";
 
-export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "needs-main-app";
+export type MiniPlayerStatus = "idle" | "loading" | "paused" | "playing" | "needs-main-app" | "error";
+export type MiniPlayerViewStatus = "loading" | "ready" | "error";
 
 export type MiniPlayerLikeStatus = "like" | "dislike" | "indifferent";
 export type MiniPlayerRepeatMode = "none" | "all" | "one";
@@ -131,6 +132,7 @@ export type MiniPlayerSnapshot = {
   version: 1;
   authenticated: boolean;
   status: MiniPlayerStatus;
+  viewStatus: MiniPlayerViewStatus;
   track: MiniPlayerTrack | null;
   progressSeconds: number;
   canPlay: boolean;
@@ -216,5 +218,5 @@ export type MiniPlayerAlbumPage = {
 export type MiniPlayerQueueResult = { videoId: string; title: string };
 
 export type MiniPlayerMusicCategory = "all" | "songs" | "artists" | "albums";
-export type MiniPlayerMusicRequest = {query: string; category: MiniPlayerMusicCategory; continuation: string | null};
-export type MiniPlayerMusicPage = {results: MiniPlayerSearchResult[]; sectionOrder: string[]; artistsNext: string | null};
+export type MiniPlayerMusicRequest = { query: string; category: MiniPlayerMusicCategory; continuation: string | null };
+export type MiniPlayerMusicPage = { results: MiniPlayerSearchResult[]; sectionOrder: string[]; artistsNext: string | null };
