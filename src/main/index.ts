@@ -1198,10 +1198,40 @@ const createYTMView = (): void => {
   }, 30 * 1000);
 };
 
+// Window bounds are restored from the store on every launch which means bounds saved on a display that is no longer connected
+// (or that has since moved within the display layout) place the window off-screen where it can't be reached, and restarting the
+// application doesn't help because the very same bounds get applied again
+const ensureBoundsAreVisible = (bounds: Electron.Rectangle): Electron.Rectangle => {
+  // Enough of the window has to overlap a display for its title bar to still be grabbable
+  const minimumVisibleSize = 64;
+  const boundsAreVisible = screen.getAllDisplays().some(display => {
+    const workArea = display.workArea;
+    const visibleWidth = Math.min(bounds.x + bounds.width, workArea.x + workArea.width) - Math.max(bounds.x, workArea.x);
+    const visibleHeight = Math.min(bounds.y + bounds.height, workArea.y + workArea.height) - Math.max(bounds.y, workArea.y);
+    return visibleWidth >= Math.min(minimumVisibleSize, bounds.width) && visibleHeight >= Math.min(minimumVisibleSize, bounds.height);
+  });
+
+  if (boundsAreVisible) {
+    return bounds;
+  }
+
+  // Center the window on whichever display sits closest to the saved bounds
+  const workArea = screen.getDisplayMatching(bounds).workArea;
+  const width = Math.min(bounds.width, workArea.width);
+  const height = Math.min(bounds.height, workArea.height);
+  return {
+    width,
+    height,
+    x: Math.round(workArea.x + (workArea.width - width) / 2),
+    y: Math.round(workArea.y + (workArea.height - height) / 2)
+  };
+};
+
 const createMainWindow = (): void => {
   // Create the browser window.
   const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
-  const windowBounds = store.get("state").windowBounds;
+  const savedBounds = store.get("state").windowBounds;
+  const windowBounds = savedBounds ? ensureBoundsAreVisible(savedBounds) : null;
   mainWindow = new BrowserWindow({
     width: windowBounds?.width ?? 1280 / scaleFactor,
     height: windowBounds?.height ?? 720 / scaleFactor,
