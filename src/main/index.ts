@@ -16,7 +16,8 @@ import {
   screen,
   session,
   shell,
-  Tray
+  Tray,
+  WebContents
 } from "electron";
 import Conf from "conf";
 import log from "electron-log";
@@ -697,6 +698,21 @@ function setTrayIcon() {
   tray.setImage(getTrayIconPath());
 }
 
+// The app has no window-scoped shortcuts of its own: the application menu is null on Windows and
+// Linux, and globalShortcut is system-wide, so binding Ctrl+W there would swallow it from every
+// other app. before-input-event is the only way to listen inside a window.
+function registerCloseWindowShortcut(webContents: WebContents, close: () => void) {
+  webContents.on("before-input-event", (event, input) => {
+    if (input.type !== "keyDown") return;
+    if (input.key.toLowerCase() !== "w") return;
+    if (input.alt || input.shift) return;
+    if (isDarwin ? !input.meta || input.control : !input.control || input.meta) return;
+
+    event.preventDefault();
+    close();
+  });
+}
+
 // Shortcut registration
 function registerShortcuts() {
   const shortcuts = store.get("shortcuts");
@@ -955,6 +971,7 @@ const createOrShowSettingsWindow = (): void => {
   });
 
   // Attach events to settings window
+  registerCloseWindowShortcut(settingsWindow.webContents, () => settingsWindow?.close());
   settingsWindow.on("maximize", sendSettingsWindowStateIpc);
   settingsWindow.on("unmaximize", sendSettingsWindowStateIpc);
   settingsWindow.on("minimize", sendSettingsWindowStateIpc);
@@ -1035,6 +1052,8 @@ const createYTMView = (): void => {
   ratioVolume.provide(ytmView);
 
   // Attach events to ytm view
+  // The YTM page owns focus nearly always, so without this Ctrl+W would look dead in normal use.
+  registerCloseWindowShortcut(ytmView.webContents, () => mainWindow?.close());
   ytmView.webContents.on("will-navigate", event => {
     const url = new URL(event.url);
     if (isPreventedNavOrRedirect(url)) {
@@ -1285,6 +1304,8 @@ const createMainWindow = (): void => {
   mainWindow.on("unmaximize", sendMainWindowStateIpc);
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
+  registerCloseWindowShortcut(mainWindow.webContents, () => mainWindow?.close());
+
   mainWindow.on("close", event => {
     if (!applicationQuitting && (store.get("general").hideToTrayOnClose || isDarwin)) {
       event.preventDefault();
@@ -1508,11 +1529,10 @@ app.on("ready", async () => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
-      if (store.get("general").hideToTrayOnClose || isDarwin) {
-        mainWindow.hide();
-      } else {
-        app.quit();
-      }
+      // Go through the window's own close handler so the titlebar button, Alt+F4 and Ctrl+W all
+      // take one path. Deciding hide-vs-quit here as well left the two out of step, and skipping
+      // the close event meant the window bounds were never saved on the hide path.
+      mainWindow.close();
     }
   });
 
