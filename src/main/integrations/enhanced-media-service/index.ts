@@ -5,6 +5,7 @@ import Integration from "../integration";
 import ConfigStore from "../../services/configstore";
 import { PlayerState, RepeatMode, Thumbnail, VideoState } from "~shared/playerstatestore/types";
 import ProtectedAPIManager from "../../services/protectedapimanager";
+import os from "node:os";
 
 function getHighestResThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 0;
@@ -104,7 +105,11 @@ export default class EnhancedMediaService extends Integration {
     });
     this.mediaPlayer.setVolumeChangedCallback(volume => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      remoteControlApi.postMessage("execute", "setVolume", volume);
+      let newVolume = volume;
+      if (os.platform() === "linux") {
+        newVolume = newVolume * 100;
+      }
+      remoteControlApi.postMessage("execute", "setVolume", newVolume);
     });
 
     this.mediaPlayer.nextButtonEnabled = true;
@@ -173,7 +178,11 @@ export default class EnhancedMediaService extends Integration {
 
       if (state.volume !== this.lastVolume) {
         this.lastVolume = state.volume;
-        this.mediaPlayer.volume = state.volume;
+        let volume = state.volume;
+        if (os.platform() === "linux") {
+          volume = volume / 100;
+        }
+        this.mediaPlayer.volume = volume;
 
         needUpdate = true;
       }
