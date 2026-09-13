@@ -472,7 +472,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         rateLimit: {
           hook: "preHandler",
           max: 1,
-          timeWindow: 1000 * 5,
+          timeWindow: 100,
           keyGenerator: request => {
             return request.authId || request.ip;
           }
@@ -493,8 +493,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       config: {
         rateLimit: {
           hook: "preHandler",
-          max: 2,
-          timeWindow: 1000 * 1,
+          max: 1,
+          timeWindow: 100,
           keyGenerator: request => {
             return request.authId || request.ip;
           }
