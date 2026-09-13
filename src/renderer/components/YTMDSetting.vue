@@ -6,7 +6,7 @@ type ModelValue = {
   file: string;
   range: number;
   custom: never;
-  select: number;
+  select: number | string;
 };
 
 const props = defineProps<{
@@ -24,7 +24,7 @@ const props = defineProps<{
   disabledMessage?: string;
   flexColumn?: boolean;
   beta?: boolean;
-  optionsMap?: { [key: number]: string }; // This is for the select menu
+  optionsMap?: { [key: string | number]: string }; // This is for the select menu
 }>();
 const emit = defineEmits(["update:modelValue", "file-change", "change", "clear"]);
 
@@ -45,12 +45,13 @@ const fileInput = ref(null);
 
 const selectOpen = ref(false);
 const selectedOption = computed(() => {
-  return props.optionsMap[props.modelValue as number];
+  if (!props.optionsMap) return "";
+  return props.optionsMap[props.modelValue as number | string] ?? "";
 });
 
-// This function should be using ModelValue[T] but because it's bound to @click it doesn't interpret it as correct
-function select(optionKey: string) {
-  value.value = Number.parseInt(optionKey) as ModelValue[T];
+function select(optionKey: string | number) {
+  const isNumeric = typeof props.modelValue === "number";
+  value.value = (isNumeric ? Number.parseInt(String(optionKey), 10) : String(optionKey)) as ModelValue[T];
   selectOpen.value = false;
   emit("change");
 }
@@ -86,7 +87,16 @@ function select(optionKey: string) {
     />
     <div v-if="type == 'range'" class="range-selector">
       <span class="range-value">{{ value }}</span>
-      <input v-model="value" :disabled="disabled" :type="props.type" :max="props.max" :min="props.min" :step="props.step" @change="$emit('change', $event)" />
+      <input
+        v-model="value"
+        :disabled="disabled"
+        :type="props.type"
+        :max="props.max"
+        :min="props.min"
+        :step="props.step"
+        @input="$emit('change', $event)"
+        @change="$emit('change', $event)"
+      />
     </div>
     <div v-if="type == 'file'" class="file-picker">
       <input ref="fileInput" :disabled="disabled" type="file" accept=".css" :data-setting="bindSetting" @change="$emit('file-change', $event)" />
