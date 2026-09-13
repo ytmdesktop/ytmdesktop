@@ -2,6 +2,7 @@ import { WindowsEventArguments } from "~shared/types";
 import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
+import { PlayerState } from "~shared/player-state";
 
 declare global {
   interface Window {
@@ -40,6 +41,14 @@ declare global {
       closeWindow(): void;
       handleWindowEvents(callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void);
       requestWindowState(): void;
+
+      // Mini-player popover specific
+      requestPlayerState(): Promise<PlayerState | null>;
+      onPlayerState(callback: (state: PlayerState) => void): void;
+      sendCommand(command: string, value?: unknown): void;
+      openSettings(): void;
+      showMainWindow(): void;
+      hide(): void;
 
       // App specific
       getAppVersion(): Promise<string>;
