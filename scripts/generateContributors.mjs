@@ -26,8 +26,12 @@ function fetchContributors() {
 
       response.on('end', () => {
         if (response.statusCode === 200) {
-          const contributors = JSON.parse(data);
-          resolve(contributors);
+          try {
+            const contributors = JSON.parse(data);
+            resolve(contributors);
+          } catch (error) {
+            reject(`Error parsing JSON: ${error.message}`);
+          }
         } else {
           reject(`Error fetching contributors. Status code: ${response.statusCode}`);
         }
@@ -43,27 +47,19 @@ function fetchContributors() {
 }
 
 function generateMarkdown(contributors) {
-  const markdownContent = contributors.map(contributor => {
-    if (contributor.type === 'Bot') {
-      return null;
-    }
-
-    return (
-      `[<img alt="${contributor.login}" src="${contributor.avatar_url}&s=240" width="120" height="120">]`+
-      `(${contributor.html_url})`
-    );
-  })
-  .filter(contributor => contributor !== null)
-  .slice(0, 30)
-  .join('\n');
+  const markdownContent = contributors
+    .filter(contributor => contributor.type !== 'Bot')
+    .slice(0, 30)
+    .map(contributor => (
+      `[<img alt="${contributor.login}" src="${contributor.avatar_url}&s=240" width="120" height="120">](${contributor.html_url})`
+    ))
+    .join('\n');
 
   const readmeContent = (
-    `## Contributors`+
-    `\n\n`+
-    `A Thank you to all the contributors throughout the project, `+
-    `without their work this project would have just been a small project `+
-    `and never expanded to where it is now.`+
-    `\n\n`+
+    `## Contributors\n\n` +
+    `A Thank you to all the contributors throughout the project, ` +
+    `without their work this project would have just been a small project ` +
+    `and never expanded to where it is now.\n\n` +
     `${markdownContent}`
   );
 
