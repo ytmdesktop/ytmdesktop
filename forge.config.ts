@@ -7,6 +7,8 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
+import path from "node:path";
+import fs from "node:fs";
 
 // There is probably a better way to do this, such as fetching it directly from forge
 let makerArch = null;
@@ -146,7 +148,31 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
       [FuseV1Options.GrantFileProtocolExtraPrivileges]: false
     })
-  ]
+  ],
+  hooks: {
+    packageAfterCopy: async (_config, buildPath) => {
+      const srcRoot = path.resolve(__dirname, "node_modules");
+      const destRoot = path.join(buildPath, "node_modules");
+
+      for (const pkg of ["xosms"]) {
+        const src = path.join(srcRoot, pkg);
+        const dest = path.join(destRoot, pkg);
+        if (fs.existsSync(src)) {
+          fs.mkdirSync(path.dirname(dest), { recursive: true });
+          fs.cpSync(src, dest, { recursive: true, dereference: true });
+        }
+      }
+
+      // Also copy the platform-specific optional packages that xosms loads
+      const xosmsPlatform = path.join(srcRoot, "@xosms");
+      if (fs.existsSync(xosmsPlatform)) {
+        fs.cpSync(xosmsPlatform, path.join(destRoot, "@xosms"), {
+          recursive: true,
+          dereference: true
+        });
+      }
+    }
+  }
 };
 
 export default config;
