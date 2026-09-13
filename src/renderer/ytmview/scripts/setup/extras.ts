@@ -573,6 +573,7 @@ export async function createAdditionalPlayerBarControls() {
 
 export async function addTimedLyrics() {
   const ytmStore = polymerhook.ytmStore;
+  const playerApi = polymerhook.ytmPlayerBar.playerApi;
 
   let currentLyricBrowseId = "";
   let currentTimedLyrics = null;
@@ -673,7 +674,7 @@ export async function addTimedLyrics() {
           lyricElement.setAttribute("data-end-ms", lyric.cueRange.endTimeMilliseconds);
           lyricElement.onclick = () => {
             enableAutoScroll();
-            document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.seekTo(parseInt(lyric.cueRange.startTimeMilliseconds) / 1000);
+            playerApi.seekTo(parseInt(lyric.cueRange.startTimeMilliseconds) / 1000);
           };
           lyricElements.push(lyricElement);
         }
@@ -790,7 +791,7 @@ export async function addTimedLyrics() {
     }
   });
 
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
+  playerApi.addEventListener("onVideoProgress", progress => {
     updateLyricLines(progress);
   });
 }
