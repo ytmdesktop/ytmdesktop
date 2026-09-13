@@ -46,7 +46,7 @@
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "@vitejs/plugin-vue": "^5.2.4",
-    "electron": "^43.4.0",
+    "electron": "^44.3.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -79,7 +79,7 @@
     "socket.io": "^4.8.1",
     "unleash-client": "^6.7.0",
     "vue": "^3.5.18",
-    "xosms": "patch:xosms@npm%3A0.6.2#~/.yarn/patches/xosms-npm-0.6.2-71193f184f.patch"
+    "xosms": "^0.7.0-rc.1"
   },
   "lint-staged": {
     "*.{ts,tsx,vue}": [

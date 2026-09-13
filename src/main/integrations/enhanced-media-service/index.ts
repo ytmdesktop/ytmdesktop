@@ -1,9 +1,9 @@
 import { app } from "electron";
 import PlayerStateStore from "../../services/playerstatestore";
-import { MediaPlayer, MediaPlayerMediaType, MediaPlayerPlaybackStatus, MediaPlayerThumbnail, MediaPlayerThumbnailType } from "xosms";
+import { MediaPlayer, MediaPlayerThumbnail } from "xosms";
 import Integration from "../integration";
 import ConfigStore from "../../services/configstore";
-import { PlayerState, Thumbnail, VideoState } from "~shared/playerstatestore/types";
+import { PlayerState, RepeatMode, Thumbnail, VideoState } from "~shared/playerstatestore/types";
 import ProtectedAPIManager from "../../services/protectedapimanager";
 
 function getHighestResThumbnail(thumbnails: Thumbnail[]) {
@@ -25,8 +25,8 @@ export default class EnhancedMediaService extends Integration {
   public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.enhancedMediaServiceEnabled";
   public override disableFlags = ["disable_enhanced_media_service"];
 
-  private stateCallback: (event: PlayerState) => void = null;
-  private mediaPlayer: MediaPlayer = new MediaPlayer("ytmdesktop", "YouTube Music Desktop App");
+  private stateCallback: ((event: PlayerState) => void) | null = null;
+  private mediaPlayer: MediaPlayer = new MediaPlayer("ytmdesktop", "YTMDesktop");
 
   private lastVideoDetailsTitle: string | null = null;
   private lastVideoDetailsAlbum: string | null = null;
@@ -36,11 +36,14 @@ export default class EnhancedMediaService extends Integration {
   private lastThumbnail: string | null = null;
   private lastDurationSeconds: number | null = null;
   private lastVideoProgress: number | null = null;
+  private lastVolume: number | null = null;
+  private lastShuffleEnabled: boolean | null = null;
+  private lastRepeatMode: RepeatMode | null = null;
 
   constructor() {
     super();
 
-    this.mediaPlayer.on("buttonpressed", (_error: unknown, button: string) => {
+    this.mediaPlayer.setButtonPressedCallback(button => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
       switch (button) {
         case "playpause":
@@ -63,12 +66,12 @@ export default class EnhancedMediaService extends Integration {
           break;
       }
     });
-    this.mediaPlayer.on("positionchanged", (_error: unknown, position: number) => {
+    this.mediaPlayer.setPositionChangedCallback(position => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
       const playerStateStore = this.getService(PlayerStateStore);
       if (position >= 0 && position <= playerStateStore.getState().videoDetails.durationSeconds) remoteControlApi.postMessage("execute", "seekTo", position);
     });
-    this.mediaPlayer.on("positionseeked", (_error: unknown, seek: number) => {
+    this.mediaPlayer.setPositionSeekedCallback(seek => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
       const playerStateStore = this.getService(PlayerStateStore);
       let newProgress = playerStateStore.getState().videoProgress + seek;
@@ -81,14 +84,34 @@ export default class EnhancedMediaService extends Integration {
         remoteControlApi.postMessage("execute", "seekTo", newProgress);
       }
     });
+    this.mediaPlayer.setLoopChangedCallback(loop => {
+      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+      switch (loop) {
+        case "none":
+          remoteControlApi.postMessage("execute", "repeatMode", "NONE");
+          break;
+        case "playlist":
+          remoteControlApi.postMessage("execute", "repeatMode", "ALL");
+          break;
+        case "track":
+          remoteControlApi.postMessage("execute", "repeatMode", "ONE");
+          break;
+      }
+    });
+    this.mediaPlayer.setShuffleChangedCallback(() => {
+      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+      remoteControlApi.postMessage("execute", "shuffle");
+    });
+    this.mediaPlayer.setVolumeChangedCallback(volume => {
+      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+      remoteControlApi.postMessage("execute", "setVolume", volume);
+    });
 
     this.mediaPlayer.nextButtonEnabled = true;
     this.mediaPlayer.pauseButtonEnabled = true;
     this.mediaPlayer.playButtonEnabled = true;
     this.mediaPlayer.previousButtonEnabled = true;
     this.mediaPlayer.seekEnabled = true;
-
-    this.mediaPlayer.deactivate();
   }
 
   private async playerStateChanged(state: PlayerState) {
@@ -103,7 +126,7 @@ export default class EnhancedMediaService extends Integration {
 
       if (state.videoDetails.author !== this.lastVideoDetailsAuthor) {
         this.lastVideoDetailsAuthor = state.videoDetails.author;
-        this.mediaPlayer.artist = state.videoDetails.author;
+        this.mediaPlayer.artist = [state.videoDetails.author];
 
         needUpdate = true;
       }
@@ -116,19 +139,19 @@ export default class EnhancedMediaService extends Integration {
       if (state.trackState !== this.lastTrackState) {
         this.lastTrackState = state.trackState;
 
-        if (state.trackState === VideoState.Playing) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Playing;
-        if (state.trackState === VideoState.Paused) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Paused;
+        if (state.trackState === VideoState.Playing) this.mediaPlayer.playbackStatus = "playing";
+        if (state.trackState === VideoState.Paused) this.mediaPlayer.playbackStatus = "paused";
         // No buffering indicator for the media service so we'll indicate it's paused which will keep some controllers happy as well and allow certain functionality to work
-        if (state.trackState === VideoState.Buffering) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Paused;
-        if (state.trackState === VideoState.Unknown) this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Stopped;
+        if (state.trackState === VideoState.Buffering) this.mediaPlayer.playbackStatus = "paused";
+        if (state.trackState === VideoState.Unknown) this.mediaPlayer.playbackStatus = "stopped";
 
         needUpdate = true;
       }
 
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
-      if (thumbnail !== this.lastThumbnail) {
+      if (thumbnail !== null && thumbnail !== this.lastThumbnail) {
         this.lastThumbnail = thumbnail;
-        this.mediaPlayer.setThumbnail(await MediaPlayerThumbnail.create(MediaPlayerThumbnailType.Uri, thumbnail));
+        this.mediaPlayer.thumbnail = await MediaPlayerThumbnail.create("uri", thumbnail);
 
         needUpdate = true;
       }
@@ -148,11 +171,45 @@ export default class EnhancedMediaService extends Integration {
         this.mediaPlayer.setTimeline(state.videoDetails.durationSeconds, Math.max(0, Math.min(state.videoProgress, state.videoDetails.durationSeconds)));
       }
 
+      if (state.volume !== this.lastVolume) {
+        this.lastVolume = state.volume;
+        this.mediaPlayer.volume = state.volume;
+
+        needUpdate = true;
+      }
+
+      if (state.queue.shuffleEnabled !== this.lastShuffleEnabled) {
+        this.lastShuffleEnabled = state.queue.shuffleEnabled;
+        this.mediaPlayer.shuffle = state.queue.shuffleEnabled;
+
+        needUpdate = true;
+      }
+
+      if (state.queue.repeatMode !== this.lastRepeatMode) {
+        this.lastRepeatMode = state.queue.repeatMode;
+        switch (state.queue.repeatMode) {
+          case RepeatMode.None:
+            this.mediaPlayer.loop = "none";
+            break;
+          case RepeatMode.All:
+            this.mediaPlayer.loop = "playlist";
+            break;
+          case RepeatMode.One:
+            this.mediaPlayer.loop = "track";
+            break;
+          default:
+            this.mediaPlayer.loop = "none";
+            break;
+        }
+
+        needUpdate = true;
+      }
+
       if (needUpdate) {
         this.mediaPlayer.update();
       }
     } else if (this.isEnabled && !state.videoDetails) {
-      this.mediaPlayer.playbackStatus = MediaPlayerPlaybackStatus.Stopped;
+      this.mediaPlayer.playbackStatus = "stopped";
     }
   }
 
@@ -164,7 +221,7 @@ export default class EnhancedMediaService extends Integration {
 
   public onEnabled(): void {
     this.mediaPlayer.activate();
-    this.mediaPlayer.mediaType = MediaPlayerMediaType.Music;
+    //this.mediaPlayer.mediaType = MediaPlayerMediaType.Music;
     this.stateCallback = event => {
       this.playerStateChanged(event);
     };

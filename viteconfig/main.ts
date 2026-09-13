@@ -28,7 +28,7 @@ export default defineConfig({
   build: {
     outDir: ".vite/main",
     rollupOptions: {
-      external: ["bufferutil", "utf-8-validate"]
+      external: ["bufferutil", "utf-8-validate", "xosms"]
     }
   },
   plugins: [nodeNativesPlugin()],
