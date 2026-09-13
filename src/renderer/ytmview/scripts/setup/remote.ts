@@ -9,8 +9,8 @@ export default function init() {
     const args = event.detail.args;
     const command = args.shift();
 
-    const playerApi = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi;
     const ytmStore = polymerhook.ytmStore;
+    const playerApi = polymerhook.ytmPlayerBar.playerApi;
 
     switch (command) {
       case "playPause": {
@@ -48,7 +48,7 @@ export default function init() {
       }
 
       case "toggleLike": {
-        const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+        const videoId = playerApi.getPlayerResponse().videoDetails.videoId;
         const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
 
         let likeServiceEndpoint = null;
@@ -102,7 +102,7 @@ export default function init() {
       }
 
       case "toggleDislike": {
-        const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+        const videoId = playerApi.getPlayerResponse().videoDetails.videoId;
         const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
 
         let dislikeServiceEndpoint = null;
@@ -211,7 +211,7 @@ export default function init() {
       }
 
       case "toggleMute": {
-        const isMuted = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.isMuted();
+        const isMuted = playerApi.isMuted();
         if (isMuted) {
           playerApi.unMute();
           ytmStore.dispatch({ type: "SET_MUTED", payload: false });
@@ -389,6 +389,8 @@ export default function init() {
   });
 
   remoteApi.handleMessage("getPlaylists", () => {
+    const playerApi = polymerhook.ytmPlayerBar.playerApi;
+
     return new Promise((resolve, reject) => {
       const returnValue = [];
       const serviceRequestEvent = {
@@ -401,7 +403,7 @@ export default function init() {
             document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
             {
               addToPlaylistEndpoint: {
-                videoId: document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId
+                videoId: playerApi.getPlayerResponse().videoDetails.videoId
               }
             }
           ],

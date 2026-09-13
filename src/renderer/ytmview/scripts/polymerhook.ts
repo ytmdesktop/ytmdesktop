@@ -1,22 +1,31 @@
 export class PolymerHook {
   private _ytmStore;
+  private _ytmPlayerBar;
   public get ytmStore(): unknown {
     return this._ytmStore;
   }
+  public get ytmPlayerBar(): unknown {
+    return this._ytmPlayerBar;
+  }
 
   public init() {
+    window.__YTMD_HOOK__ = {};
+
     // It's OK to alias this here as we're hooking YTMs passed `this`
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const fakeBaseClass = function () {
       try {
+        if (!self._ytmPlayerBar) {
+          if (this.hostElement && this.hostElement.nodeName === "YTMUSIC-PLAYER-BAR") {
+            window.__YTMD_HOOK__.ytmPlayerBar = this;
+            self._ytmPlayerBar = this;
+          }
+        }
+
         if (!self._ytmStore) {
           if (this.store && !!this.store.getState && !!this.store.dispatch && !!this.store.subscribe) {
-            const ytmdHook = {
-              ytmStore: this.store
-            };
-            Object.freeze(ytmdHook);
-            window.__YTMD_HOOK__ = ytmdHook;
+            window.__YTMD_HOOK__.ytmStore = this.store;
             self._ytmStore = this.store;
           }
         }

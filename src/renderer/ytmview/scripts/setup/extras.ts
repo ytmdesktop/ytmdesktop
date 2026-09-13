@@ -10,6 +10,7 @@ export async function hideChromecastButton() {
 
 export async function createAdditionalPlayerBarControls() {
   const ytmStore = polymerhook.ytmStore;
+  const playerApi = polymerhook.ytmPlayerBar.playerApi;
 
   const ytmdControlButtons = {};
 
@@ -158,9 +159,9 @@ export async function createAdditionalPlayerBarControls() {
   };
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
+  playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      currentVideoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails.videoId;
+      currentVideoId = playerApi.getPlayerResponse().videoDetails.videoId;
     }
   });
 
@@ -410,7 +411,7 @@ export async function createAdditionalPlayerBarControls() {
               sleepTimerButton.setAttribute("title", "Sleep timer off");
 
               if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.pauseVideo();
+                playerApi.pauseVideo();
 
                 document.body.dispatchEvent(
                   new CustomEvent("yt-action", {

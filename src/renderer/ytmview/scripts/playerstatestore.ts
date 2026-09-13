@@ -4,12 +4,13 @@ import protectedapimanager from "./protectedapimanager";
 export default function init() {
   const playerStateApi = protectedapimanager.createOrGetAPI("PlayerState");
   const ytmStore = polymerhook.ytmStore;
+  const playerApi = polymerhook.ytmPlayerBar.playerApi;
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     const state = ytmStore.getState();
 
-    const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
+    const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
     const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoId];
@@ -23,8 +24,8 @@ export default function init() {
   }
 
   function sendVideoData() {
-    const videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
-    const playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
+    const videoDetails = playerApi.getPlayerResponse().videoDetails;
+    const playlistId = playerApi.getPlaylistId();
     let album = null;
     let hasFullMetadata = false;
 
@@ -65,22 +66,22 @@ export default function init() {
   function hydrateApplicationState() {
     sendStoreState();
 
-    const progressState = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getProgressState();
+    const progressState = playerApi.getProgressState();
     playerStateApi.postMessage("updateVideoProgress", progressState.current);
 
-    const videoState = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerState();
+    const videoState = playerApi.getPlayerState();
     playerStateApi.postMessage("updateVideoState", videoState);
 
     sendVideoData();
   }
 
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
+  playerApi.addEventListener("onVideoProgress", progress => {
     playerStateApi.postMessage("updateVideoProgress", progress);
   });
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onStateChange", state => {
+  playerApi.addEventListener("onStateChange", state => {
     playerStateApi.postMessage("updateVideoState", state);
   });
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
+  playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
       sendVideoData();
     }
@@ -116,9 +117,11 @@ export default function init() {
 }
 
 export async function waitForYTMPlayerApiReady() {
+  const playerApi = polymerhook.ytmPlayerBar.playerApi;
+
   await new Promise<void>(resolve => {
     const interval = setInterval(async () => {
-      const playerApiReady: boolean = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.isReady();
+      const playerApiReady: boolean = playerApi.isReady();
 
       if (playerApiReady) {
         clearInterval(interval);

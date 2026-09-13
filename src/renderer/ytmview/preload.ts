@@ -56,7 +56,7 @@ window.addEventListener("message", async event => {
         (
           await webFrame.executeJavaScript(`
           (function() {
-            const playerApi = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi;
+            const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
             if (playerApi.getPlayerResponse()) window.ytmd.sendVideoData(playerApi.getPlayerResponse().videoDetails, playerApi.getPlaylistId());
           })
         `)
