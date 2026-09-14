@@ -383,6 +383,7 @@ const store = new Conf<StoreSchema>({
       lastUrl: "https://music.youtube.com/",
       lastPlaylistId: "",
       lastVideoId: "",
+      lastVideoProgress: 0,
       windowBounds: null,
       windowMaximized: false
     },
@@ -564,6 +565,7 @@ function saveState() {
   store.set("state.lastUrl", lastUrl);
   store.set("state.lastVideoId", lastVideoId);
   store.set("state.lastPlaylistId", lastPlaylistId);
+  store.set("state.lastVideoProgress", playerStateStore.getState().videoProgress);
 }
 
 // Automatic background state saving every 5 minutes
