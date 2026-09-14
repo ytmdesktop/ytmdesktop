@@ -69,6 +69,8 @@ const shortcutThumbsUp = ref<string>(shortcuts.thumbsUp);
 const shortcutThumbsDown = ref<string>(shortcuts.thumbsDown);
 const shortcutVolumeUp = ref<string>(shortcuts.volumeUp);
 const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
+const shortcutNavigateBack = ref<string>(shortcuts.navigateBack);
+const shortcutNavigateForward = ref<string>(shortcuts.navigateForward);
 
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
@@ -109,6 +111,8 @@ store.onDidAnyChange(async newState => {
   shortcutThumbsDown.value = newState.shortcuts.thumbsDown;
   shortcutVolumeUp.value = newState.shortcuts.volumeUp;
   shortcutVolumeDown.value = newState.shortcuts.volumeDown;
+  shortcutNavigateBack.value = newState.shortcuts.navigateBack;
+  shortcutNavigateForward.value = newState.shortcuts.navigateForward;
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
@@ -120,6 +124,8 @@ const shortcutsThumbsUpRegisterFailed = ref<boolean>(await memoryStore.get("shor
 const shortcutsThumbsDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsThumbsDownRegisterFailed"));
 const shortcutsVolumeUpRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeUpRegisterFailed"));
 const shortcutsVolumeDownRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsVolumeDownRegisterFailed"));
+const shortcutsNavigateBackRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNavigateBackRegisterFailed"));
+const shortcutsNavigateForwardRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNavigateForwardRegisterFailed"));
 
 const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("companionServerAuthWindowEnabled"));
 
@@ -135,6 +141,8 @@ memoryStore.onStateChanged(newState => {
   shortcutsThumbsDownRegisterFailed.value = newState.shortcutsThumbsDownRegisterFailed;
   shortcutsVolumeUpRegisterFailed.value = newState.shortcutsVolumeUpRegisterFailed;
   shortcutsVolumeDownRegisterFailed.value = newState.shortcutsVolumeDownRegisterFailed;
+  shortcutsNavigateBackRegisterFailed.value = newState.shortcutsNavigateBackRegisterFailed;
+  shortcutsNavigateForwardRegisterFailed.value = newState.shortcutsNavigateForwardRegisterFailed;
 
   companionServerAuthWindowEnabled.value = newState.companionServerAuthWindowEnabled;
 
@@ -178,6 +186,8 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+  store.set("shortcuts.navigateBack", shortcutNavigateBack.value ?? "");
+  store.set("shortcuts.navigateForward", shortcutNavigateForward.value ?? "");
 }
 
 async function settingChangedRequiresRestart() {
@@ -516,6 +526,28 @@ window.ytmd.handleUpdateDownloaded(() => {
               >
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Navigate Back<span
+                v-if="shortcutsNavigateBackRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutNavigateBack" @change="settingsChanged" />
+          </div>
+          <div class="setting">
+            <p class="shortcut-title">
+              Navigate Forward<span
+                v-if="shortcutsNavigateForwardRegisterFailed"
+                class="material-symbols-outlined register-error"
+                title="Failed to register keybind. Does another application have this keybind?"
+                >error</span
+              >
+            </p>
+            <KeybindInput v-model="shortcutNavigateForward" @change="settingsChanged" />
           </div>
         </div>
 

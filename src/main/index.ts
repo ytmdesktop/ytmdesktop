@@ -328,6 +328,8 @@ function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<
   if (newState.shortcuts.thumbsUp !== oldState.shortcuts.thumbsUp) return true;
   if (newState.shortcuts.volumeDown !== oldState.shortcuts.volumeDown) return true;
   if (newState.shortcuts.volumeUp !== oldState.shortcuts.volumeUp) return true;
+  if (newState.shortcuts.navigateBack !== oldState.shortcuts.navigateBack) return true;
+  if (newState.shortcuts.navigateForward !== oldState.shortcuts.navigateForward) return true;
 
   return false;
 }
@@ -377,7 +379,9 @@ const store = new Conf<StoreSchema>({
       thumbsUp: "",
       thumbsDown: "",
       volumeUp: "",
-      volumeDown: ""
+      volumeDown: "",
+      navigateBack: "",
+      navigateForward: ""
     },
     state: {
       lastUrl: "https://music.youtube.com/",
@@ -863,6 +867,52 @@ function registerShortcuts() {
     }
   } else {
     memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
+  }
+
+  if (shortcuts.navigateBack) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.navigateBack, () => {
+        if (ytmView && ytmView.webContents.navigationHistory.canGoBack()) {
+          ytmView.webContents.navigationHistory.goBack();
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: navigateBack");
+      memoryStore.set("shortcutsNavigateBackRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: navigateBack");
+      memoryStore.set("shortcutsNavigateBackRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsNavigateBackRegisterFailed", false);
+  }
+
+  if (shortcuts.navigateForward) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.navigateForward, () => {
+        if (ytmView && ytmView.webContents.navigationHistory.canGoForward()) {
+          ytmView.webContents.navigationHistory.goForward();
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: navigateForward");
+      memoryStore.set("shortcutsNavigateForwardRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: navigateForward");
+      memoryStore.set("shortcutsNavigateForwardRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsNavigateForwardRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");
