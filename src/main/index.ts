@@ -909,7 +909,7 @@ function openExternalFromYtmView(urlString: string) {
   const domainSplit = url.hostname.split(".");
   domainSplit.reverse();
   const domain = `${domainSplit[1]}.${domainSplit[0]}`;
-  if (domain === "google.com" || domain === "youtube.com") {
+  if (domain === "google.com" || domain === "youtube.com" || domain === "t.me" || domain === "telegram.org") {
     shell.openExternal(urlString);
   }
 }
