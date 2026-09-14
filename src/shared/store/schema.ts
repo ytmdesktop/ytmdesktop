@@ -35,6 +35,9 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    nowPlayingFileEnabled: boolean;
+    nowPlayingFilePath: string | null;
+    nowPlayingFileFormat: string;
   };
   shortcuts: {
     playPause: string;

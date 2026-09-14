@@ -20,6 +20,7 @@ declare global {
       restartApplication(): void;
       restartApplicationForUpdate(): void;
       getTrueFilePath(file: File): string;
+      showSaveDialog(options: Electron.SaveDialogOptions): Promise<string | null>;
 
       // Companion Authorization specific
       sendResult(authorized: boolean);

@@ -61,6 +61,9 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const nowPlayingFileEnabled = ref<boolean>(integrations.nowPlayingFileEnabled ?? false);
+const nowPlayingFilePath = ref<string | null>(integrations.nowPlayingFilePath ?? null);
+const nowPlayingFileFormat = ref<string>(integrations.nowPlayingFileFormat ?? "%t - %a");
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -99,6 +102,9 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  nowPlayingFileEnabled.value = newState.integrations.nowPlayingFileEnabled ?? false;
+  nowPlayingFilePath.value = newState.integrations.nowPlayingFilePath ?? null;
+  nowPlayingFileFormat.value = newState.integrations.nowPlayingFileFormat ?? "%t - %a";
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
@@ -169,6 +175,8 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("integrations.nowPlayingFileEnabled", nowPlayingFileEnabled.value);
+  store.set("integrations.nowPlayingFileFormat", nowPlayingFileFormat.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
@@ -217,6 +225,21 @@ async function deleteCompanionAuthToken(appId: string) {
 
 function removeCustomCSSPath() {
   store.set("appearance.customCSSPath", null);
+}
+
+async function chooseNowPlayingFilePath() {
+  const filePath = await window.ytmd.showSaveDialog({
+    title: "Choose now playing file location",
+    defaultPath: "now-playing.txt",
+    filters: [{ name: "Text Files", extensions: ["txt"] }]
+  });
+  if (filePath) {
+    store.set("integrations.nowPlayingFilePath", filePath);
+  }
+}
+
+function removeNowPlayingFilePath() {
+  store.set("integrations.nowPlayingFilePath", null);
 }
 
 function changeTab(newTab: number) {
@@ -437,6 +460,23 @@ window.ytmd.handleUpdateDownloaded(() => {
             step="5"
             @change="settingsChanged"
           />
+          <YTMDSetting
+            v-model="nowPlayingFileEnabled"
+            type="checkbox"
+            name="Now playing file"
+            description="Write current song info to a text file"
+            @change="settingsChanged"
+          />
+          <YTMDSetting v-if="nowPlayingFileEnabled" type="custom" indented name="Output file">
+            <div class="now-playing-file-picker">
+              <button class="choose" @click="chooseNowPlayingFilePath"><span class="material-symbols-outlined">file_open</span></button>
+              <input type="text" readonly class="path" placeholder="No file chosen" :value="nowPlayingFilePath" />
+              <button v-if="nowPlayingFilePath" class="remove" @click="removeNowPlayingFilePath"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+          </YTMDSetting>
+          <YTMDSetting v-if="nowPlayingFileEnabled" type="custom" indented name="Format" description="%t = title, %a = artist, %b = album">
+            <input v-model="nowPlayingFileFormat" type="text" class="text-input" @change="settingsChanged" />
+          </YTMDSetting>
         </div>
 
         <div v-if="currentTab === 5" class="shortcuts-tab">
@@ -844,6 +884,67 @@ window.ytmd.handleUpdateDownloaded(() => {
 .discord-failure {
   margin: 0;
   color: #969696;
+}
+
+.now-playing-file-picker {
+  display: flex;
+  align-items: center;
+  background-color: #212121;
+  border-radius: 4px;
+  width: 216px;
+}
+
+.now-playing-file-picker button {
+  padding: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.now-playing-file-picker button.choose {
+  background-color: #f44336;
+  border-radius: 4px 0 0 4px;
+}
+
+.now-playing-file-picker button.remove {
+  background-color: transparent;
+  border-left: 1px solid #323232;
+  border-radius: 0 4px 4px 0;
+}
+
+.now-playing-file-picker button .material-symbols-outlined {
+  margin-right: 0;
+  font-size: 18px;
+}
+
+.now-playing-file-picker input[type="text"] {
+  margin: 0;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  color: #ffffff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now-playing-file-picker input[type="text"]:focus,
+.now-playing-file-picker input[type="text"]:active {
+  outline: none;
+}
+
+.text-input {
+  background-color: #212121;
+  border: none;
+  border-radius: 4px;
+  padding: 8px;
+  color: #ffffff;
+  width: 216px;
+}
+
+.text-input:focus {
+  outline: 1px solid #f44336;
 }
 
 button {
