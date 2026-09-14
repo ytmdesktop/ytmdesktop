@@ -30,10 +30,12 @@ import {
   YouTubeMusicUnavailableError
 } from "../../api-shared/errors";
 import path from "node:path";
+import ListeningPartyPlugin from "./listening-party/plugin";
+import listeningPartyManager from "./listening-party/manager";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
-const transformPlayerState = (state: PlayerState) => {
+export const transformPlayerState = (state: PlayerState) => {
   return {
     player: {
       trackState: state.trackState,
@@ -513,6 +515,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
+  fastify.register(ListeningPartyPlugin, {
+    transformPlayerState
+  });
+
   fastify.ready().then(() => {
     fastify.io.of("/api/v1/realtime").use((socket, next) => {
       const token = socket.handshake.auth.token;
@@ -558,6 +564,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       playerStateStore.removeEventListener(stateStoreListener);
       ipcMain.off("ytmView:createPlaylistObserved", createPlaylistObservedListener);
       ipcMain.off("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
+      listeningPartyManager.dissolve();
+      listeningPartyManager.removeAllListeners();
     });
   });
 };
