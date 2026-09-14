@@ -53,6 +53,8 @@ const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeft
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
+const crossfadeEnabled = ref<boolean>(playback.crossfadeEnabled ?? false);
+const crossfadeDuration = ref<number>(playback.crossfadeDuration ?? 6);
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthTokens = ref<AuthToken[]>(
@@ -91,6 +93,8 @@ store.onDidAnyChange(async newState => {
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
+  crossfadeEnabled.value = newState.playback.crossfadeEnabled;
+  crossfadeDuration.value = newState.playback.crossfadeDuration;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -164,6 +168,8 @@ async function settingsChanged() {
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
+  store.set("playback.crossfadeEnabled", crossfadeEnabled.value);
+  store.set("playback.crossfadeDuration", crossfadeDuration.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -338,6 +344,24 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="crossfadeEnabled"
+            type="checkbox"
+            name="Crossfade"
+            description="Fade volume out at end of track and fade in on next track"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="crossfadeEnabled"
+            v-model="crossfadeDuration"
+            type="range"
+            indented
+            min="1"
+            max="12"
+            step="1"
+            name="Crossfade duration (seconds)"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">

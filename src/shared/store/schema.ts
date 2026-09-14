@@ -28,6 +28,8 @@ export type StoreSchema = {
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
+    crossfadeEnabled: boolean;
+    crossfadeDuration: number;
   };
   integrations: {
     companionServerEnabled: boolean;
