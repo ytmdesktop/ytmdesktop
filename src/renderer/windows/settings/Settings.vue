@@ -3,6 +3,7 @@ import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { PRESET_THEMES } from "~shared/preset-themes";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -43,6 +44,7 @@ const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
 
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
+const presetTheme = ref<string | null>(appearance.presetTheme);
 const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
 const customCSSPath = ref<string>(appearance.customCSSPath);
 const zoom = ref<number>(appearance.zoom);
@@ -81,6 +83,7 @@ store.onDidAnyChange(async newState => {
   startMinimized.value = newState.general.startMinimized;
 
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
+  presetTheme.value = newState.appearance.presetTheme;
   customCSSEnabled.value = newState.appearance.customCSSEnabled;
   customCSSPath.value = newState.appearance.customCSSPath;
   zoom.value = newState.appearance.zoom;
@@ -155,6 +158,7 @@ async function settingsChanged() {
   store.set("general.disableHardwareAcceleration", disableHardwareAcceleration.value);
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
+  store.set("appearance.presetTheme", presetTheme.value);
   store.set("appearance.customCSSEnabled", customCSSEnabled.value);
   store.set("appearance.zoom", zoom.value);
   store.set("appearance.trayIconStyle", trayIconStyle.value);
@@ -213,6 +217,18 @@ async function deleteCompanionAuthToken(appId: string) {
 
   if (safeStorageAvailable.value)
     store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
+}
+
+function selectTheme(themeId: string | null) {
+  presetTheme.value = themeId;
+  store.set("appearance.presetTheme", themeId);
+}
+
+async function saveCustomCSSTemplate() {
+  const savedPath = await window.ytmd.saveCustomCSSTemplate();
+  if (savedPath && !customCSSPath.value) {
+    store.set("appearance.customCSSPath", savedPath);
+  }
 }
 
 function removeCustomCSSPath() {
@@ -302,8 +318,39 @@ window.ytmd.handleUpdateDownloaded(() => {
         </div>
 
         <div v-if="currentTab === 2" class="appearance-tab">
+          <div class="theme-selector">
+            <p class="section-label">Theme</p>
+            <div class="theme-grid">
+              <div :class="['theme-card', { selected: !presetTheme }]" @click="selectTheme(null)">
+                <div class="theme-preview default-preview">
+                  <span class="material-symbols-outlined">format_paint</span>
+                </div>
+                <p class="theme-name">Default</p>
+              </div>
+              <div
+                v-for="theme in PRESET_THEMES"
+                :key="theme.id"
+                :class="['theme-card', { selected: presetTheme === theme.id }]"
+                @click="selectTheme(theme.id)"
+              >
+                <div class="theme-preview">
+                  <div class="swatch" :style="{ background: theme.palette.background }"></div>
+                  <div class="swatch" :style="{ background: theme.palette.backgroundSecondary }"></div>
+                  <div class="swatch" :style="{ background: theme.palette.accent }"></div>
+                  <div class="swatch" :style="{ background: theme.palette.text }"></div>
+                </div>
+                <p class="theme-name">{{ theme.name }}</p>
+              </div>
+            </div>
+          </div>
           <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" name="Always show volume slider" @change="settingsChanged" />
-          <YTMDSetting v-model="customCSSEnabled" type="checkbox" name="Custom CSS" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="customCSSEnabled"
+            type="checkbox"
+            name="Custom CSS"
+            description="Layer custom CSS on top of the selected theme"
+            @change="settingsChanged"
+          />
           <YTMDSetting
             v-if="customCSSEnabled"
             v-model="customCSSPath"
@@ -314,6 +361,10 @@ window.ytmd.handleUpdateDownloaded(() => {
             @file-change="settingChangedFile"
             @clear="removeCustomCSSPath"
           />
+          <div v-if="customCSSEnabled" class="css-template-hint indented">
+            <p class="hint-text">Not sure where to start? Save a template with documented selectors you can customize.</p>
+            <button class="template-button" @click="saveCustomCSSTemplate"><span class="material-symbols-outlined">download</span>Save CSS template</button>
+          </div>
           <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
           <YTMDSetting
             v-if="isLinux"
@@ -855,6 +906,107 @@ button {
   background-color: #212121;
   cursor: pointer;
   border: none;
+}
+
+.css-template-hint {
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid #212121;
+  margin-bottom: 8px;
+}
+
+.css-template-hint .hint-text {
+  color: #969696;
+  font-size: 13px;
+  margin: 4px 0 8px;
+}
+
+.css-template-hint .template-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #eeeeee;
+}
+
+.css-template-hint .template-button:hover {
+  background-color: #333;
+}
+
+.css-template-hint .template-button .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.theme-selector {
+  margin-bottom: 16px;
+}
+
+.section-label {
+  margin: 8px 0;
+  color: #bbbbbb;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.theme-card {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 6px;
+  background: #1a1a1a;
+  transition: border-color 0.15s ease;
+}
+
+.theme-card:hover {
+  border-color: #555;
+}
+
+.theme-card.selected {
+  border-color: #f44336;
+}
+
+.theme-preview {
+  border-radius: 4px;
+  overflow: hidden;
+  height: 40px;
+  display: flex;
+}
+
+.theme-preview .swatch {
+  flex: 1;
+}
+
+.default-preview {
+  background: #212121;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-preview .material-symbols-outlined {
+  color: #666;
+  font-size: 22px;
+}
+
+.theme-name {
+  text-align: center;
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #eeeeee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .shortcuts-tab .shortcut-title {
