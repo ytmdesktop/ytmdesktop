@@ -29,6 +29,22 @@ contextBridge.exposeInMainWorld("ytmd", {
     decryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:decryptString", value),
     encryptString: async (value: string) => await ipcRenderer.invoke("safeStorage:encryptString", value)
   },
+  extensions: {
+    getItems: async () => await ipcRenderer.invoke("extensions:getItems"),
+    installFromUrlOrId: async (urlOrId: string) => await ipcRenderer.invoke("extensions:installFromUrlOrId", urlOrId),
+    installFromFolder: async () => await ipcRenderer.invoke("extensions:installFromFolder"),
+    installFromArchive: async () => await ipcRenderer.invoke("extensions:installFromArchive"),
+    toggle: async (id: string, enabled: boolean) => await ipcRenderer.invoke("extensions:toggle", id, enabled),
+    remove: async (id: string) => await ipcRenderer.invoke("extensions:remove", id),
+    openFolder: async (id: string) => await ipcRenderer.invoke("extensions:openFolder", id),
+    reloadView: async () => await ipcRenderer.invoke("extensions:reloadView")
+  },
+  downloader: {
+    getDownloadPath: async () => await ipcRenderer.invoke("downloader:getDownloadPath"),
+    openFolder: async () => await ipcRenderer.invoke("downloader:openFolder"),
+    selectFolder: async () => await ipcRenderer.invoke("downloader:selectFolder"),
+    downloadCurrentTrack: () => ipcRenderer.send("ytmView:downloadTrack")
+  },
   restartApplication: () => ipcRenderer.send("settingsWindow:restartapplication"),
   restartApplicationForUpdate: () => ipcRenderer.send("app:restartApplicationForUpdate"),
   minimizeWindow: () => ipcRenderer.send("settingsWindow:minimize"),

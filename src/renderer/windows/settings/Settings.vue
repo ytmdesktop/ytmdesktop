@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { StoreSchema, TrayIconStyle, InstalledExtension } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -53,6 +53,38 @@ const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeft
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
+const skipSilence = ref<boolean>(playback.skipSilence ?? true);
+const adBlock = ref<boolean>(playback.adBlock ?? true);
+
+const downloaderConfig: StoreSchema["downloader"] = (await store.get("downloader")) || {
+  enabled: true,
+  autoDownload: false,
+  downloadPath: null
+};
+const autoDownload = ref<boolean>(downloaderConfig.autoDownload ?? false);
+const downloadFolder = ref<string>("Downloads\\YouTube Music");
+
+try {
+  const p = await window.ytmd.downloader?.getDownloadPath?.();
+  if (p) downloadFolder.value = p;
+} catch {
+  // ignore
+}
+
+async function toggleAutoDownload() {
+  store.set("downloader.autoDownload", autoDownload.value);
+}
+
+async function openDownloadFolder() {
+  await window.ytmd.downloader?.openFolder?.();
+}
+
+async function changeDownloadFolder() {
+  const selected = await window.ytmd.downloader?.selectFolder?.();
+  if (selected) {
+    downloadFolder.value = selected;
+  }
+}
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthTokens = ref<AuthToken[]>(
@@ -91,6 +123,12 @@ store.onDidAnyChange(async newState => {
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
+  skipSilence.value = newState.playback.skipSilence ?? true;
+  adBlock.value = newState.playback.adBlock ?? true;
+
+  if (newState.downloader) {
+    autoDownload.value = newState.downloader.autoDownload ?? false;
+  }
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -164,6 +202,8 @@ async function settingsChanged() {
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
+  store.set("playback.skipSilence", skipSilence.value);
+  store.set("playback.adBlock", adBlock.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -265,6 +305,117 @@ window.ytmd.handleUpdateDownloaded(() => {
   updateAvailable.value = false;
   updateDownloaded.value = true;
 });
+
+// Extensions state & methods
+const extensionsList = ref<InstalledExtension[]>([]);
+const extensionInput = ref("");
+const isInstallingExtension = ref(false);
+const extensionError = ref("");
+const extensionSuccess = ref("");
+
+async function refreshExtensions() {
+  if (window.ytmd?.extensions?.getItems) {
+    try {
+      extensionsList.value = await window.ytmd.extensions.getItems();
+    } catch {
+      extensionsList.value = [];
+    }
+  }
+}
+
+await refreshExtensions();
+
+function isPresetInstalled(id: string): boolean {
+  return extensionsList.value.some(ext => ext.id === id);
+}
+
+async function installFromWebStore() {
+  if (!extensionInput.value.trim()) return;
+  isInstallingExtension.value = true;
+  extensionError.value = "";
+  extensionSuccess.value = "";
+  try {
+    const ext = await window.ytmd.extensions.installFromUrlOrId(extensionInput.value.trim());
+    extensionSuccess.value = `Berhasil memasang "${ext.name}"!`;
+    extensionInput.value = "";
+    await refreshExtensions();
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  } finally {
+    isInstallingExtension.value = false;
+  }
+}
+
+async function installPresetExtension(id: string) {
+  isInstallingExtension.value = true;
+  extensionError.value = "";
+  extensionSuccess.value = "";
+  try {
+    const ext = await window.ytmd.extensions.installFromUrlOrId(id);
+    extensionSuccess.value = `Berhasil memasang "${ext.name}"!`;
+    await refreshExtensions();
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  } finally {
+    isInstallingExtension.value = false;
+  }
+}
+
+async function installFromFolder() {
+  extensionError.value = "";
+  extensionSuccess.value = "";
+  try {
+    const ext = await window.ytmd.extensions.installFromFolder();
+    if (ext) {
+      extensionSuccess.value = `Berhasil memasang "${ext.name}" dari folder!`;
+      await refreshExtensions();
+    }
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+async function installFromArchive() {
+  extensionError.value = "";
+  extensionSuccess.value = "";
+  try {
+    const ext = await window.ytmd.extensions.installFromArchive();
+    if (ext) {
+      extensionSuccess.value = `Berhasil memasang "${ext.name}" dari file arsip!`;
+      await refreshExtensions();
+    }
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+async function toggleExtension(ext: InstalledExtension) {
+  extensionError.value = "";
+  try {
+    await window.ytmd.extensions.toggle(ext.id, ext.enabled);
+    await refreshExtensions();
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+async function removeExtension(id: string) {
+  extensionError.value = "";
+  try {
+    await window.ytmd.extensions.remove(id);
+    await refreshExtensions();
+  } catch (err: unknown) {
+    extensionError.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+async function openExtensionFolder(id: string) {
+  await window.ytmd.extensions.openFolder(id);
+}
+
+async function reloadPlayer() {
+  await window.ytmd.extensions.reloadView();
+}
 </script>
 
 <template>
@@ -276,6 +427,8 @@ window.ytmd.handleUpdateDownloaded(() => {
         <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
         <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <li :class="{ active: currentTab === 6 }" @click="changeTab(6)"><span class="material-symbols-outlined">extension</span>Extensions</li>
+        <li :class="{ active: currentTab === 7 }" @click="changeTab(7)"><span class="material-symbols-outlined">download</span>Downloads</li>
         <span class="push"></span>
         <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
       </ul>
@@ -338,6 +491,20 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="skipSilence"
+            type="checkbox"
+            name="Skip silence (Lewati audio hening)"
+            description="Secara otomatis melewati bagian hening / audio kosong di awal dan di akhir lagu secara presisi"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-model="adBlock"
+            type="checkbox"
+            name="Blokir Iklan Otomatis (Built-in Ad Blocker)"
+            description="Blokir semua iklan audio, banner, dan video secara otomatis di YouTube Music"
+            @change="settingsChanged"
+          />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
@@ -516,6 +683,284 @@ window.ytmd.handleUpdateDownloaded(() => {
               >
             </p>
             <KeybindInput v-model="shortcutVolumeDown" @change="settingsChanged" />
+          </div>
+        </div>
+
+        <div v-if="currentTab === 6" class="extensions-tab">
+          <!-- Notification banners -->
+          <div v-if="extensionSuccess" class="ext-alert success">
+            <span class="material-symbols-outlined">check_circle</span>
+            <p>{{ extensionSuccess }}</p>
+            <button class="ext-alert-close" @click="extensionSuccess = ''"><span class="material-symbols-outlined">close</span></button>
+          </div>
+          <div v-if="extensionError" class="ext-alert error">
+            <span class="material-symbols-outlined">error</span>
+            <p>{{ extensionError }}</p>
+            <button class="ext-alert-close" @click="extensionError = ''"><span class="material-symbols-outlined">close</span></button>
+          </div>
+
+          <!-- Section: Built-in Features -->
+          <div class="ext-section builtin-section">
+            <h3 class="ext-section-title">
+              <span class="material-symbols-outlined">verified</span>
+              Fitur Bawaan Terpasang Otomatis
+            </h3>
+            <p class="ext-section-desc">Fitur lirik tersinkronisasi dan pemblokir iklan sudah terintegrasi secara otomatis saat aplikasi dibuka:</p>
+            <div class="builtin-cards-container">
+              <div class="builtin-feat-card">
+                <div class="builtin-feat-top">
+                  <span class="material-symbols-outlined builtin-feat-icon lyrics">lyrics</span>
+                  <div class="builtin-feat-info">
+                    <strong>Better Lyrics (Lirik Tersinkronisasi)</strong>
+                    <span class="builtin-tag">Aktif Otomatis</span>
+                  </div>
+                </div>
+                <p>Lirik bergulir realtime kata per kata mengikuti lagu, opsi terjemahan, dan kustomisasi tema visual pada panel lirik.</p>
+              </div>
+
+              <div class="builtin-feat-card">
+                <div class="builtin-feat-top">
+                  <span class="material-symbols-outlined builtin-feat-icon adblock">shield</span>
+                  <div class="builtin-feat-info">
+                    <strong>AdBlocker Built-in</strong>
+                    <span class="builtin-tag">Aktif Otomatis</span>
+                  </div>
+                </div>
+                <p>Memfilter request jaringan iklan dan otomatis melewati interupsi iklan video seketika tanpa jeda.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Install from Web Store -->
+          <div class="ext-section">
+            <h3 class="ext-section-title">
+              <span class="material-symbols-outlined">add_circle</span>
+              Pasang dari Chrome Web Store
+            </h3>
+            <p class="ext-section-desc">Masukkan URL dari Chrome Web Store atau Extension ID (32 karakter) untuk mengunduh dan memasang ekstensi langsung.</p>
+            <div class="ext-install-form">
+              <input
+                v-model="extensionInput"
+                type="text"
+                class="ext-url-input"
+                placeholder="Contoh: https://chromewebstore.google.com/detail/... atau ID ekstensi"
+                :disabled="isInstallingExtension"
+                @keyup.enter="installFromWebStore"
+              />
+              <button class="ext-btn primary" :disabled="isInstallingExtension || !extensionInput.trim()" @click="installFromWebStore">
+                <span v-if="!isInstallingExtension" class="material-symbols-outlined">download</span>
+                <span v-else class="material-symbols-outlined spinning">progress_activity</span>
+                {{ isInstallingExtension ? "Memasang..." : "Pasang" }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Section: Recommended Extensions -->
+          <div class="ext-section">
+            <h3 class="ext-section-title">
+              <span class="material-symbols-outlined">recommend</span>
+              Rekomendasi Ekstensi Populer
+            </h3>
+            <div class="ext-presets-grid">
+              <div class="ext-preset-card">
+                <div class="preset-info">
+                  <strong>Better Lyrics</strong>
+                  <p>Lirik tersinkronisasi (time-synced lyrics) kata per kata, terjemahan real-time, dan tema kustom untuk YouTube Music.</p>
+                </div>
+                <button
+                  class="ext-btn small"
+                  :class="{ installed: isPresetInstalled('effdbpeggelllpfkjppbokhmmiinhlmg') }"
+                  :disabled="isInstallingExtension || isPresetInstalled('effdbpeggelllpfkjppbokhmmiinhlmg')"
+                  @click="installPresetExtension('effdbpeggelllpfkjppbokhmmiinhlmg')"
+                >
+                  <span class="material-symbols-outlined">{{ isPresetInstalled("effdbpeggelllpfkjppbokhmmiinhlmg") ? "check" : "add" }}</span>
+                  {{ isPresetInstalled("effdbpeggelllpfkjppbokhmmiinhlmg") ? "Terpasang" : "Pasang" }}
+                </button>
+              </div>
+
+              <div class="ext-preset-card">
+                <div class="preset-info">
+                  <strong>SponsorBlock for YouTube</strong>
+                  <p>Lewati segmen sponsor, intro, dan promosi secara otomatis pada pemutar YouTube Music.</p>
+                </div>
+                <button
+                  class="ext-btn small"
+                  :class="{ installed: isPresetInstalled('mnjggcdmjocbbbhaepdhchncahnbgone') }"
+                  :disabled="isInstallingExtension || isPresetInstalled('mnjggcdmjocbbbhaepdhchncahnbgone')"
+                  @click="installPresetExtension('mnjggcdmjocbbbhaepdhchncahnbgone')"
+                >
+                  <span class="material-symbols-outlined">{{ isPresetInstalled("mnjggcdmjocbbbhaepdhchncahnbgone") ? "check" : "add" }}</span>
+                  {{ isPresetInstalled("mnjggcdmjocbbbhaepdhchncahnbgone") ? "Terpasang" : "Pasang" }}
+                </button>
+              </div>
+
+              <div class="ext-preset-card">
+                <div class="preset-info">
+                  <strong>uBlock Origin Lite</strong>
+                  <p>Pemblokir iklan & pelacak resmi Manifest V3. Memblokir iklan YouTube Music, banner, dan tracker dengan efisiensi tinggi.</p>
+                </div>
+                <button
+                  class="ext-btn small"
+                  :class="{ installed: isPresetInstalled('ddkjiahejlhfcafbddmgiahcphecmpfh') }"
+                  :disabled="isInstallingExtension || isPresetInstalled('ddkjiahejlhfcafbddmgiahcphecmpfh')"
+                  @click="installPresetExtension('ddkjiahejlhfcafbddmgiahcphecmpfh')"
+                >
+                  <span class="material-symbols-outlined">{{ isPresetInstalled("ddkjiahejlhfcafbddmgiahcphecmpfh") ? "check" : "add" }}</span>
+                  {{ isPresetInstalled("ddkjiahejlhfcafbddmgiahcphecmpfh") ? "Terpasang" : "Pasang" }}
+                </button>
+              </div>
+
+              <div class="ext-preset-card">
+                <div class="preset-info">
+                  <strong>Return YouTube Dislike</strong>
+                  <p>Mengembalikan jumlah dislike pada video YouTube Music.</p>
+                </div>
+                <button
+                  class="ext-btn small"
+                  :class="{ installed: isPresetInstalled('gebbhagfogifgggkldgodflihgfeippi') }"
+                  :disabled="isInstallingExtension || isPresetInstalled('gebbhagfogifgggkldgodflihgfeippi')"
+                  @click="installPresetExtension('gebbhagfogifgggkldgodflihgfeippi')"
+                >
+                  <span class="material-symbols-outlined">{{ isPresetInstalled("gebbhagfogifgggkldgodflihgfeippi") ? "check" : "add" }}</span>
+                  {{ isPresetInstalled("gebbhagfogifgggkldgodflihgfeippi") ? "Terpasang" : "Pasang" }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Local file install & reload actions -->
+          <div class="ext-section">
+            <h3 class="ext-section-title">
+              <span class="material-symbols-outlined">folder_zip</span>
+              Pasang dari File Lokal
+            </h3>
+            <div class="ext-actions-row">
+              <button class="ext-btn secondary" @click="installFromFolder">
+                <span class="material-symbols-outlined">folder_open</span>
+                Pilih Folder Unpacked (manifest.json)
+              </button>
+              <button class="ext-btn secondary" @click="installFromArchive">
+                <span class="material-symbols-outlined">archive</span>
+                Pilih File .crx / .zip
+              </button>
+              <button class="ext-btn secondary" title="Muat ulang pemutar YouTube Music untuk menerapkan ekstensi" @click="reloadPlayer">
+                <span class="material-symbols-outlined">refresh</span>
+                Muat Ulang Pemutar
+              </button>
+            </div>
+          </div>
+
+          <!-- Section: Installed Extensions List -->
+          <div class="ext-section">
+            <div class="ext-list-header">
+              <h3 class="ext-section-title">
+                <span class="material-symbols-outlined">list</span>
+                Ekstensi Terpasang
+                <span class="ext-count-badge">{{ extensionsList.length }}</span>
+              </h3>
+            </div>
+
+            <div v-if="extensionsList.length === 0" class="ext-empty-state">
+              <span class="material-symbols-outlined empty-icon">extension_off</span>
+              <h4>Belum Ada Ekstensi yang Terpasang</h4>
+              <p>Anda dapat memasang ekstensi menggunakan form Chrome Web Store di atas atau memilih dari rekomendasi ekstensi.</p>
+            </div>
+
+            <div v-else class="ext-list">
+              <div v-for="ext in extensionsList" :key="ext.id" class="ext-item-card" :class="{ disabled: !ext.enabled }">
+                <div class="ext-item-main">
+                  <img v-if="ext.icon" :src="ext.icon" class="ext-icon-img" alt="icon" />
+                  <span v-else class="material-symbols-outlined ext-icon-placeholder">extension</span>
+
+                  <div class="ext-item-details">
+                    <div class="ext-item-title-row">
+                      <span class="ext-item-name">{{ ext.name }}</span>
+                      <span class="ext-item-version">v{{ ext.version }}</span>
+                      <span class="ext-item-source-badge">{{ ext.source }}</span>
+                    </div>
+                    <p class="ext-item-description">{{ ext.description }}</p>
+                  </div>
+                </div>
+
+                <div class="ext-item-actions">
+                  <input
+                    type="checkbox"
+                    :checked="ext.enabled"
+                    class="ext-toggle"
+                    :title="ext.enabled ? 'Nonaktifkan ekstensi' : 'Aktifkan ekstensi'"
+                    @change="toggleExtension(ext)"
+                  />
+                  <button class="ext-icon-btn" title="Buka Folder Ekstensi" @click="openExtensionFolder(ext.id)">
+                    <span class="material-symbols-outlined">folder</span>
+                  </button>
+                  <button class="ext-icon-btn danger" title="Hapus Ekstensi" @click="removeExtension(ext.id)">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentTab === 7" class="downloads-tab">
+          <div class="ext-section">
+            <h3 class="ext-section-title">
+              <span class="material-symbols-outlined">download_for_offline</span>
+              Pengaturan Unduhan Musik (MP3 320kbps)
+            </h3>
+            <p class="ext-section-desc">
+              Unduh lagu favorit langsung ke komputer Anda dalam format MP3 kualitas tertinggi (320kbps) lengkap dengan cover album dan metadata (judul, artis,
+              album).
+            </p>
+
+            <div class="dl-setting-card">
+              <div class="dl-setting-info">
+                <strong>Download Otomatis (Auto-download Lagu)</strong>
+                <p>Secara otomatis mengunduh setiap lagu yang sedang Anda putar ke folder komputer di latar belakang.</p>
+              </div>
+              <input v-model="autoDownload" type="checkbox" class="ext-toggle" @change="toggleAutoDownload" />
+            </div>
+
+            <div class="dl-setting-card dl-folder-card">
+              <div class="dl-setting-info">
+                <strong>Folder Lokasi Penyimpanan</strong>
+                <p class="dl-folder-path">{{ downloadFolder }}</p>
+              </div>
+              <div class="dl-folder-actions">
+                <button class="ext-btn" @click="openDownloadFolder">
+                  <span class="material-symbols-outlined">folder_open</span>
+                  Buka Folder
+                </button>
+                <button class="ext-btn secondary" @click="changeDownloadFolder">
+                  <span class="material-symbols-outlined">edit</span>
+                  Ubah Lokasi
+                </button>
+              </div>
+            </div>
+
+            <div class="dl-info-cards">
+              <div class="dl-feature-pill">
+                <span class="material-symbols-outlined">music_note</span>
+                <div>
+                  <strong>Format MP3 320kbps</strong>
+                  <p>Bitrate maksimal untuk kualitas suara jernih.</p>
+                </div>
+              </div>
+              <div class="dl-feature-pill">
+                <span class="material-symbols-outlined">image</span>
+                <div>
+                  <strong>Cover Art & ID3 Tag</strong>
+                  <p>Gambar album dan metadata lagu otomatis tertanam.</p>
+                </div>
+              </div>
+              <div class="dl-feature-pill">
+                <span class="material-symbols-outlined">smart_button</span>
+                <div>
+                  <strong>Tombol Player Bar</strong>
+                  <p>Tombol unduh satu klik langsung di player bar YouTube Music.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -866,5 +1311,549 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+/* Extensions Tab Styles */
+.extensions-tab {
+  padding-bottom: 24px;
+}
+
+.ext-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.ext-alert p {
+  margin: 0;
+  flex: 1;
+}
+
+.ext-alert.success {
+  background-color: #2e7d32;
+}
+
+.ext-alert.error {
+  background-color: #c62828;
+}
+
+.ext-alert-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.ext-section {
+  background: #141414;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.ext-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.ext-section-title .material-symbols-outlined {
+  font-size: 20px;
+  color: #f44336;
+}
+
+.ext-section-desc {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #9e9e9e;
+}
+
+.ext-install-form {
+  display: flex;
+  gap: 8px;
+}
+
+.ext-url-input {
+  flex: 1;
+  background: #212121;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ext-url-input:focus {
+  border-color: #f44336;
+}
+
+.ext-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  transition:
+    background-color 0.2s,
+    opacity 0.2s;
+}
+
+.ext-btn.primary {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.ext-btn.primary:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.ext-btn.primary:disabled {
+  background-color: #4a2020;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.ext-btn.secondary {
+  background-color: #212121;
+  color: #eee;
+  border: 1px solid #383838;
+}
+
+.ext-btn.secondary:hover {
+  background-color: #2c2c2c;
+  border-color: #4a4a4a;
+}
+
+.ext-btn.small {
+  padding: 6px 12px;
+  font-size: 12px;
+  background-color: #f44336;
+  color: #fff;
+}
+
+.ext-btn.small.installed {
+  background-color: #2c2c2c;
+  color: #888;
+  border: 1px solid #383838;
+  cursor: default;
+}
+
+.ext-actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ext-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.ext-preset-card {
+  background: #1c1c1c;
+  border: 1px solid #2c2c2c;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preset-info strong {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.preset-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #9e9e9e;
+  line-height: 1.4;
+}
+
+.ext-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ext-count-badge {
+  background: #333;
+  color: #eee;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: normal;
+}
+
+.ext-empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  background: #191919;
+  border-radius: 6px;
+  border: 1px dashed #333;
+}
+
+.ext-empty-state .empty-icon {
+  font-size: 40px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.ext-empty-state h4 {
+  margin: 0 0 6px 0;
+  color: #eee;
+  font-size: 14px;
+}
+
+.ext-empty-state p {
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+}
+
+.ext-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ext-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1c1c1c;
+  border: 1px solid #2b2b2b;
+  border-radius: 6px;
+  padding: 10px 14px;
+  transition:
+    opacity 0.2s,
+    border-color 0.2s;
+}
+
+.ext-item-card:hover {
+  border-color: #383838;
+}
+
+.ext-item-card.disabled {
+  opacity: 0.55;
+}
+
+.ext-item-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ext-icon-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: contain;
+  background: #111;
+  flex-shrink: 0;
+}
+
+.ext-icon-placeholder {
+  font-size: 32px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.ext-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.ext-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.ext-item-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ext-item-version {
+  font-size: 11px;
+  color: #888;
+}
+
+.ext-item-source-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #292929;
+  color: #aaa;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #383838;
+}
+
+.ext-item-description {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ext-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.ext-toggle {
+  appearance: none;
+  width: 50px;
+  height: 26px;
+  background-color: #2b2b2b;
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s;
+  margin: 0;
+}
+
+.ext-toggle::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: left 0.2s;
+}
+
+.ext-toggle:checked {
+  background-color: #f44336;
+}
+
+.ext-toggle:checked::before {
+  left: 27px;
+}
+
+.ext-icon-btn {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
+}
+
+.ext-icon-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.ext-icon-btn:hover {
+  color: #fff;
+  background: #2c2c2c;
+}
+
+.ext-icon-btn.danger:hover {
+  color: #f44336;
+  background: #331515;
+}
+
+.spinning {
+  animation: rotation 1s infinite linear;
+}
+
+.builtin-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.builtin-feat-card {
+  background: #202020;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.builtin-feat-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.builtin-feat-icon {
+  font-size: 28px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.builtin-feat-icon.lyrics {
+  color: #ff4081;
+  background: rgba(255, 64, 129, 0.12);
+}
+
+.builtin-feat-icon.adblock {
+  color: #00e676;
+  background: rgba(0, 230, 118, 0.12);
+}
+
+.builtin-feat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.builtin-feat-info strong {
+  font-size: 14px;
+  color: #eee;
+}
+
+.builtin-tag {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #00e676;
+  background: rgba(0, 230, 118, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.builtin-feat-card p {
+  margin: 0;
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+/* Downloads Tab Styles */
+.dl-setting-card {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dl-setting-info strong {
+  display: block;
+  font-size: 14px;
+  color: #eee;
+  margin-bottom: 4px;
+}
+
+.dl-setting-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.dl-folder-path {
+  color: #3ea6ff !important;
+  font-family: monospace;
+  font-size: 13px !important;
+  background: #181818;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 6px !important;
+  word-break: break-all;
+}
+
+.dl-folder-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.dl-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.dl-feature-pill {
+  background: #1c1c1c;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dl-feature-pill .material-symbols-outlined {
+  color: #3ea6ff;
+  font-size: 24px;
+  background: rgba(62, 166, 255, 0.1);
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.dl-feature-pill strong {
+  display: block;
+  font-size: 13px;
+  color: #eee;
+  margin-bottom: 2px;
+}
+
+.dl-feature-pill p {
+  margin: 0;
+  font-size: 11px;
+  color: #888;
 }
 </style>

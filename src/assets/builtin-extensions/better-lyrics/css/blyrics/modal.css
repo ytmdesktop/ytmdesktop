@@ -1,0 +1,201 @@
+.blyrics-modal-overlay {
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
+.blyrics-modal {
+	display: flex;
+	flex-direction: column;
+	width: 400px;
+	max-width: calc(100vw - 32px);
+	border-radius: 16px;
+	background: rgb(28, 28, 30);
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0px 24px 48px -12px,
+		rgba(0, 0, 0, 0.2) 0px 8px 16px -4px,
+		inset rgba(255, 255, 255, 0.08) 0px 1px 0px 0px;
+	padding: 20px;
+	gap: 14px;
+	font-family: var(--blyrics-footer-font-family);
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.blyrics-modal--header {
+	display: flex;
+	flex-direction: row;
+	gap: 12px;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.blyrics-modal--title {
+	font-size: 16px;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.95);
+	margin: 0;
+	letter-spacing: -0.01em;
+}
+
+.blyrics-modal--close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	background: hsla(0, 0%, 100%, 0);
+	padding: 6px;
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+	border-radius: 6px;
+	color: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+}
+
+.blyrics-modal--close:hover {
+	background: hsla(0, 0%, 100%, 0.1);
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.blyrics-modal--close > svg {
+	width: 16px;
+	height: 16px;
+}
+
+.blyrics-modal--info {
+	font-size: 12px;
+	color: rgba(255, 255, 255, 0.55);
+	line-height: 1.5;
+	margin: 0;
+}
+
+.blyrics-modal--radio {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+	align-items: center;
+	padding: 8px 10px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.12s ease;
+}
+
+.blyrics-modal--radio + .blyrics-modal--radio {
+	margin-top: 2px;
+}
+
+.blyrics-modal--radio:hover {
+	background: hsla(0, 0%, 100%, 0.05);
+}
+
+.blyrics-modal--radio-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	background: none;
+	border-radius: 1000rem;
+	border: 1.5px solid rgba(255, 255, 255, 0.3);
+	width: 16px;
+	height: 16px;
+	transition: border-color 0.15s ease;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.blyrics-modal--radio:hover .blyrics-modal--radio-button {
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.blyrics-modal--radio.blyrics-radio-selected .blyrics-modal--radio-button {
+	border-color: rgb(129, 140, 248);
+}
+
+.blyrics-modal--radio-fill {
+	border-radius: 1000rem;
+	background: rgb(129, 140, 248);
+	width: 0;
+	height: 0;
+	transition: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-modal--radio.blyrics-radio-selected > .blyrics-modal--radio-button > .blyrics-modal--radio-fill {
+	width: 8px;
+	height: 8px;
+}
+
+.blyrics-modal--radio-content {
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.blyrics-modal--details {
+	border: 1px solid hsla(0, 0%, 100%, 0.1);
+	background: hsla(0, 0%, 100%, 0.04);
+	border-radius: 8px;
+	padding: 9px 12px;
+	color: white;
+	font-family: var(--blyrics-footer-font-family);
+	font-size: 13px;
+	outline: none;
+	margin-top: 4px;
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease;
+}
+
+.blyrics-modal--details::placeholder {
+	color: rgba(255, 255, 255, 0.35);
+}
+
+.blyrics-modal--details:focus {
+	border-color: rgba(129, 140, 248, 0.6);
+	background: hsla(0, 0%, 100%, 0.06);
+}
+
+.blyrics-modal--footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.blyrics-modal--button {
+	font-family: var(--blyrics-footer-font-family);
+	font-size: 13px;
+	font-weight: 500;
+	border: none;
+	background: hsla(0, 0%, 100%, 0.06);
+	border-radius: 8px;
+	padding: 8px 16px;
+	color: rgba(255, 255, 255, 0.85);
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+	cursor: pointer;
+}
+
+.blyrics-modal--button:hover {
+	background: hsla(0, 0%, 100%, 0.1);
+	color: white;
+}
+
+.blyrics-modal--footer > .blyrics-modal--button:first-child {
+	background: rgb(129, 140, 248);
+	color: white;
+}
+
+.blyrics-modal--footer > .blyrics-modal--button:first-child:hover {
+	background: rgb(149, 160, 255);
+}

@@ -1,0 +1,122 @@
+:root {
+	--noto-sans-universal:
+		"Noto Sans", "Noto Sans HK", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC",
+		"Noto Sans TC", "Noto Sans Arabic", "Noto Sans Armenian",
+		"Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Georgian",
+		"Noto Sans Gujarati", "Noto Sans Hebrew", "Noto Sans Kannada",
+		"Noto Sans Khmer", "Noto Sans Lao Looped", "Noto Sans Lao",
+		"Noto Sans Malayalam", "Noto Sans Marchen", "Noto Sans Meetei Mayek",
+		"Noto Sans Multani", "Noto Sans NKo", "Noto Sans Old Permic",
+		"Noto Sans Shavian", "Noto Sans Sinhala", "Noto Sans Sunuwar",
+		"Noto Sans Takri", "Noto Sans Tamil", "Noto Sans Telugu",
+		"Noto Sans Thai Looped", "Noto Sans Thai", "Noto Sans Vithkuqi",
+		"Noto Sans Warang Citi";
+
+	/* Colors */
+	--blyrics-ui-text-color: var(
+		--blyrics-text-color,
+		color(display-p3 1 1 1 / 1)
+	);
+	--blyrics-glow-color: var(
+		--blyrics-highlight-color,
+		color(display-p3 1 1 1 / 0.5)
+	);
+	--blyrics-error-color: color(display-p3 0.992 0.882 0.882);
+	--blyrics-footer-bg-color: hsla(0, 0%, 100%, 0.1);
+	--blyrics-footer-border-color: hsla(0, 0%, 100%, 0.1);
+	--blyrics-footer-text-color: #aaa;
+	--blyrics-footer-link-color: #fff;
+	--blyrics-discord-hover-color: #5865f2;
+	--blyrics-vote-hover-color: hsla(0, 0%, 100%, 0.2);
+	--blyrics-lyric-active-color: var(
+		--blyrics-text-color,
+		color(display-p3 1 1 1 / var(--blyrics-active-opacity, 1))
+	);
+	--blyrics-lyric-inactive-color: color(
+		from var(--blyrics-text-color, color(display-p3 1 1 1)) display-p3 r g b /
+			var(--blyrics-inactive-opacity, 0.3)
+	);
+
+	--blyrics-richsync-timing-offset: 0.150s;
+	--blyrics-timing-offset: 0.115s;
+
+	--blyrics-scroll-timing-offset: 0.5s;
+
+	/* Typography */
+	--blyrics-font-family:
+		Satoshi, var(--noto-sans-universal), Avenir, -apple-system,
+		BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans,
+		Helvetica Neue, sans-serif;
+	--blyrics-font-size: 3rem;
+	--blyrics-font-weight: 700;
+	--blyrics-line-height: 1.333;
+
+	--blyrics-translated-font-size: 2rem;
+	--blyrics-translated-font-weight: 600;
+	--blyrics-translated-font-family: var(--blyrics-font-family);
+	--blyrics-translated-color: color(
+		display-p3 1 1 1 / var(--blyrics-translated-opacity, 0.6)
+	);
+
+	--blyrics-footer-font-family: Satoshi, Roboto, Noto Naskh Arabic UI, Arial, sans-serif;
+	--blyrics-footer-font-size: 14px;
+	--blyrics-footer-font-weight: 400;
+
+	/* Animations */
+	--blyrics-loader-transition-duration: 0.6s;
+	--blyrics-loader-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
+	--blyrics-scale-transition-duration: var(
+		--blyrics-transition-duration,
+		0.166s
+	);
+	--blyrics-lyric-highlight-fade-in-duration: var(
+		--blyrics-opacity-transition,
+		0.33s
+	);
+	--blyrics-lyric-highlight-fade-out-duration: var(
+		--blyrics-opacity-transition,
+		0.5s
+	);
+	--blyrics-wobble-duration: 1s;
+
+	/* Layout */
+	--blyrics-padding: 2rem;
+	--blyrics-margin: 2rem;
+	--blyrics-small-border-radius: 1rem;
+	--blyrics-border-radius: 1000rem;
+
+	/* Effects */
+	--blyrics-blur-amount: 30px;
+	--blyrics-scale: 0.95;
+	--blyrics-active-scale: 1;
+	--blyrics-error-opacity: 0.33;
+	--blyrics-background-blur: 100px;
+	--blyrics-background-saturate: 2;
+
+	/* Lyric Transition Properties */
+	--blyrics-lyric-scroll-duration: var(
+		--blyrics-lyric-transition-duration,
+		750ms
+	);
+	--blyrics-lyric-scroll-timing-function: var(
+		--blyrics-lyric-transition-timing-function,
+		cubic-bezier(0.86, 0, 0.07, 1)
+	);
+
+	/* Gradient stops */
+	--blyrics-gradient-stops:
+		transparent 0%, rgba(0, 0, 0, 0.013) 8.1%, rgba(0, 0, 0, 0.049) 15.5%,
+		rgba(0, 0, 0, 0.104) 22.5%, rgba(0, 0, 0, 0.175) 29%,
+		rgba(0, 0, 0, 0.259) 35.3%, rgba(0, 0, 0, 0.352) 41.2%,
+		rgba(0, 0, 0, 0.45) 47.1%, rgba(0, 0, 0, 0.55) 52.9%,
+		rgba(0, 0, 0, 0.648) 58.8%, rgba(0, 0, 0, 0.741) 64.7%,
+		rgba(0, 0, 0, 0.825) 71%, rgba(0, 0, 0, 0.896) 77.5%,
+		rgba(0, 0, 0, 0.951) 84.5%, rgba(0, 0, 0, 0.987) 91.9%, #000 100%;
+
+	--blyrics-shimmer-gradient: linear-gradient(
+    	110deg,
+    	color-mix(in srgb, var(--blyrics-ui-text-color) 50%, transparent) 30%,
+    	var(--blyrics-ui-text-color) 50%,
+    	color-mix(in srgb, var(--blyrics-ui-text-color) 50%, transparent) 70%
+  	);
+}
