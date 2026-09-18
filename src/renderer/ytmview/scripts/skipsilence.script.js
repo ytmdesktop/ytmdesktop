@@ -12,8 +12,8 @@
   let lastCheckTime = performance.now();
   let lastVideoId = "";
 
-  // Threshold: ~ -50 dBFS in normalized amplitude
-  const SILENCE_THRESHOLD = 0.0035;
+  // Threshold: ~ -54 dBFS in normalized amplitude (prevents false positives on quiet acoustic intros)
+  const SILENCE_THRESHOLD = 0.002;
 
   function initAudioNodes(video) {
     if (!video) return;
@@ -67,12 +67,14 @@
     return rms / vol;
   }
 
-    let hasPlayedMusic = false;
+  let hasPlayedMusic = false;
+  let leadingSilenceMs = 0;
 
   function resetTrackState() {
     leadingDone = false;
     trailingDone = false;
     hasPlayedMusic = false;
+    leadingSilenceMs = 0;
     trailingSilenceMs = 0;
     if (currentVideo && currentVideo.playbackRate !== 1.0) {
       currentVideo.playbackRate = 1.0;
@@ -104,12 +106,21 @@
     }
 
     // If user looped or seeked back to start, re-enable leading silence skip
-    if (video.currentTime < 0.5 && leadingDone) {
+    if (video.currentTime < 0.3 && leadingDone) {
       leadingDone = false;
+      leadingSilenceMs = 0;
     }
 
     // Must be actively playing and buffered
-    if (video.readyState < 3 || video.paused || video.ended || video.seeking || !video.duration || isNaN(video.duration)) {
+    if (video.readyState < 3 || video.paused || video.ended || video.seeking || !video.duration || isNaN(video.duration) || video.muted) {
+      return;
+    }
+
+    // Never skip silence if AudioContext is not running yet
+    if (!audioCtx || audioCtx.state !== "running") {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().catch(function() {});
+      }
       return;
     }
 
@@ -127,25 +138,29 @@
       hasPlayedMusic = true;
     }
 
-    // 1. LEADING SILENCE (Intro of the track, first 8 seconds)
-    if (!leadingDone && currentTime < 8) {
-      if (normRms < SILENCE_THRESHOLD) {
-        if (gainNode && audioCtx) {
-          gainNode.gain.setValueAtTime(0.0, audioCtx.currentTime);
+    // 1. LEADING SILENCE (Intro of the track, first 6 seconds)
+    if (!leadingDone && currentTime < 6) {
+      if (normRms >= SILENCE_THRESHOLD) {
+        // Music detected! Smoothly ensure normal playback speed without any seeking stutter
+        hasPlayedMusic = true;
+        leadingDone = true;
+        if (video.playbackRate !== 1.0) {
+          video.playbackRate = 1.0;
         }
-        video.playbackRate = 4.0;
-      } else {
-        video.playbackRate = 1.0;
         if (gainNode && audioCtx) {
           gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
         }
-
-        const safeStart = Math.max(0, video.currentTime - 0.08);
-        video.currentTime = safeStart;
-        leadingDone = true;
+      } else {
+        // Give audio stream 400ms buffer grace period before accelerating dead silence
+        if (currentTime >= 0.4) {
+          leadingSilenceMs += deltaMs;
+          if (leadingSilenceMs > 350) {
+            video.playbackRate = 2.5;
+          }
+        }
       }
       return;
-    } else if (!leadingDone && currentTime >= 8) {
+    } else if (!leadingDone && currentTime >= 6) {
       leadingDone = true;
       if (video.playbackRate !== 1.0) video.playbackRate = 1.0;
       if (gainNode && audioCtx) gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
@@ -155,7 +170,7 @@
     if (!trailingDone && hasPlayedMusic && duration > 20 && currentTime >= duration - 5) {
       if (normRms < SILENCE_THRESHOLD) {
         trailingSilenceMs += deltaMs;
-        if (trailingSilenceMs >= 1200) {
+        if (trailingSilenceMs >= 1000) {
           trailingDone = true;
           const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
           if (playerApi && typeof playerApi.nextVideo === "function") {
