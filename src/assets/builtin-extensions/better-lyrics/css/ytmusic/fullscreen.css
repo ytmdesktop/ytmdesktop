@@ -1,0 +1,257 @@
+#layout[player-fullscreened]:not([blyrics-dfs])[cursor-hidden]:not([show-fullscreen-controls]) * {
+  cursor: none !important;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+#player.ytmusic-player-page {
+  mask-image: none !important;
+  box-shadow:
+          rgba(0, 0, 0, 0.2) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(
+                  0,
+                  0,
+                  0,
+                  0.17
+          ) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+#blyrics-watermark {
+  display: none;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+#main-panel.ytmusic-player-page {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+> [slot="player-page"] {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+> [slot="player-page"]
+.tab-header-container {
+  display: none !important;
+} 
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] .content.ytmusic-player-page {
+  padding: 0 var(--ytmusic-player-page-horizontal-padding) 0;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] .content.ytmusic-player-page {
+  padding: 0 calc(var(--ytmusic-player-page-horizontal-padding) / 2) 0;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]) .av.ytmusic-player-page {
+  position: relative;
+  width: fit-content;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+#blyrics-song-info {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+  transform: translateY( calc(var(--ytmusic-nav-bar-height) * -1));
+  padding-top: 2rem;
+}
+
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+#player.ytmusic-player-page {
+  flex: none;
+  margin: 0 auto;
+}
+
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #movie_player,
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #song-media-window,
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
+  aspect-ratio: var(--blyrics-video-aspect-ratio);
+  height: auto;
+  min-height: 0;
+}
+
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #player.ytmusic-player-page {
+  background-color: transparent;
+}
+
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #av-id {
+  padding-bottom: 10px;
+}
+
+/* Cap #player width so width / aspect-ratio (its derived height) fits in the
+   available vertical space. Without this, tall videos like 4:3 overflow on
+   wide screens: the bottom is hidden by the player bar in non-fullscreen, or
+   pushes the song-info off-screen in fullscreen. */
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-fullscreened]):not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
+  width: min(
+    100%,
+    calc((100vh - 80px - var(--ytmusic-player-page-vertical-padding) - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-bar-height)) * (var(--blyrics-video-aspect-ratio)))
+  );
+  max-width: 100%;
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] #player.ytmusic-player-page {
+  width: min(
+    100%,
+    calc((100vh - 18rem) * var(--blyrics-video-aspect-ratio))
+  );
+  max-width: 100%;
+}
+
+/* Center Player When No Lyrics */
+ytmusic-player-page[player-fullscreened]:not([blyrics-video-mode]):not([blyrics-dfs]):has(.blyrics-container[data-no-lyrics="true"]) #main-panel {
+  position: relative;
+  z-index: 2;
+  transform: translateX(calc(50vw - 50% - var(--ytmusic-player-page-horizontal-padding)));
+  transition: transform 0.3s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-video-mode]:not([blyrics-dfs]):has(.blyrics-container[data-no-lyrics="true"]) #main-panel {
+  transform: translateX(calc(50vw - 50% - var(--ytmusic-player-page-horizontal-padding) / 2));
+  transition: transform 0.3s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-video-mode]):not([blyrics-dfs]):has(.blyrics-container[data-no-lyrics="true"]) #player {
+  max-width: 500px !important;
+  transition: max-width 0.5s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) .blyrics-no-lyrics-button-container {
+  display: none;
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-wrapper:has(.blyrics-container[data-no-lyrics="true"]) {
+  display: flex !important;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+/* Reset fullscreen layout when disabled - video mode */
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] {
+  top: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+ytmusic-app-layout[player-fullscreened][blyrics-dfs]:has([blyrics-video-mode]) > [slot="player-page"] {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+ytmusic-app-layout[player-fullscreened][blyrics-dfs] > [slot="player-page"] #side-panel {
+  transform: none !important;
+}
+
+/* Native YTM fullscreen for songs when fullscreen disabled */
+ytmusic-player-page[player-fullscreened][blyrics-dfs]:not([blyrics-video-mode]) #side-panel {
+  display: none !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs]:not([blyrics-video-mode]) #song-image,
+ytmusic-player-page[player-fullscreened][blyrics-dfs]:not([blyrics-video-mode]) #thumbnail img {
+  position: fixed !important;
+  top: calc(var(--ytmusic-nav-bar-height, 64px) * -1) !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  z-index: 1 !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] #main-panel.ytmusic-player-page {
+  display: block !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] #player.ytmusic-player-page {
+  height: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  mask-image: unset !important;
+  box-shadow: none !important;
+  top: calc(var(--ytmusic-nav-bar-height, 64px) * -0.5) !important;
+  position: relative !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] ytmusic-player {
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] .content.ytmusic-player-page {
+  padding: 0 !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs] #blyrics-song-info {
+  display: none !important;
+}
+
+ytmusic-player-page[player-fullscreened][blyrics-dfs][blyrics-video-mode] .av.ytmusic-player-page {
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  padding: 0 !important;
+}
+
+ytmusic-app-layout[player-fullscreened][blyrics-dfs] > [slot="player-bar"],
+ytmusic-app-layout[player-fullscreened][blyrics-dfs] ytmusic-player-bar,
+ytmusic-app-layout[player-fullscreened][blyrics-dfs] #player-bar-background {
+  width: 100% !important;
+}
+
+ytmusic-app-layout[player-fullscreened][blyrics-dfs] > [slot="player-bar"]:before {
+  display: none !important;
+}
+
+ytmusic-app-layout[player-fullscreened][blyrics-dfs]:has([blyrics-video-mode]) #nav-bar-background {
+  display: none !important;
+}
+
+ytmusic-player-bar[player-fullscreened]:not([blyrics-dfs]) #play-pause-button>.yt-icon-button>yt-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Fix YTM A/B test: player bar not auto-hiding */
+
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"] {
+  animation: none !important;
+  width: 100%;
+}
+
+/* Top-anchored Unison dock: tab header is hidden in fullscreen, so no 48px buffer needed */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-dock[data-position^="top-"] {
+  top: 16px;
+}
+
+/* The proximity listener owns this attribute, including a corridor that covers the gap the
+   shift opens, so no CSS hover-bridge is needed to keep it latched. */
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -88px);
+}
+
+/* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */
+#layout[player-fullscreened]:not([blyrics-dfs]) #side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-dock[data-position="top-center"] {
+  --dock-y-shift: 52px;
+}
