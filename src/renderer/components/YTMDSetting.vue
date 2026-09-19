@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'select' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'select' | 'custom' | 'text'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
@@ -7,6 +7,7 @@ type ModelValue = {
   range: number;
   custom: never;
   select: number;
+  text: string;
 };
 
 const props = defineProps<{
@@ -78,12 +79,15 @@ function select(optionKey: string) {
     </div>
 
     <input
-      v-if="type !== 'file' && type !== 'range' && type !== 'select' && type !== 'custom'"
+      v-if="type !== 'file' && type !== 'range' && type !== 'select' && type !== 'custom' && type !== 'text'"
       v-model="value"
       :disabled="disabled"
       :type="props.type"
       @change="$emit('change', $event)"
     />
+    <div v-if="type == 'text'" class="text-input">
+      <input v-model="value" :disabled="disabled" type="text" @change="$emit('change', $event)" />
+    </div>
     <div v-if="type == 'range'" class="range-selector">
       <span class="range-value">{{ value }}</span>
       <input v-model="value" :disabled="disabled" :type="props.type" :max="props.max" :min="props.min" :step="props.step" @change="$emit('change', $event)" />
@@ -337,5 +341,25 @@ input[type="range"]::-webkit-slider-thumb {
 
 .select:not(.open) .options {
   display: none;
+}
+
+.text-input {
+  background-color: #212121;
+  border-radius: 4px;
+  width: 216px;
+}
+
+.text-input input {
+  margin: 0;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.text-input input:focus,
+.text-input input:active {
+  outline: none;
 }
 </style>
