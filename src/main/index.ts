@@ -377,7 +377,8 @@ const store = new Conf<StoreSchema>({
       thumbsUp: "",
       thumbsDown: "",
       volumeUp: "",
-      volumeDown: ""
+      volumeDown: "",
+      volumeDelta: 10
     },
     state: {
       lastUrl: "https://music.youtube.com/",
