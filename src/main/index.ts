@@ -1030,6 +1030,17 @@ const createYTMView = (): void => {
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
+
+  if (mainWindow) {
+    mainWindow.addBrowserView(ytmView);
+    ytmView.setBounds({
+      x: 0,
+      y: 36,
+      width: mainWindow.getContentBounds().width,
+      height: mainWindow.getContentBounds().height - 36
+    });
+  }
+
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
@@ -1981,6 +1992,8 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createMainWindow();
     createYTMView();
+  } else if (mainWindow && !mainWindow.isVisible()) {
+    mainWindow.show();
   }
 });
 
