@@ -16,7 +16,8 @@ import {
   screen,
   session,
   shell,
-  Tray
+  Tray,
+  WebContents
 } from "electron";
 import Conf from "conf";
 import log from "electron-log";
@@ -26,7 +27,7 @@ import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
-import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import { MemoryStoreSchema, StoreSchema, TrayIconStyle, ThemeMode } from "../shared/store/schema";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -354,7 +355,8 @@ const store = new Conf<StoreSchema>({
       customCSSEnabled: false,
       customCSSPath: null,
       zoom: 100,
-      trayIconStyle: TrayIconStyle.Auto
+      trayIconStyle: TrayIconStyle.Auto,
+      themeMode: 0 // Added by CtrlAubDel
     },
     playback: {
       continueWhereYouLeftOff: true,
@@ -425,6 +427,164 @@ const store = new Conf<StoreSchema>({
     }
   }
 });
+
+// START Theme additions by CtrlAubDel
+// START CSS Light/Dark Mode starters (pls fix this, I am bad at CSS!) - CtrlAubDel
+
+const LIGHT_THEME_CSS = `
+:root {
+  color-scheme: light;
+}
+
+/* Overall app background */
+html,
+body,
+ytmusic-app {
+  background-color: #f5f5f5 !important;
+  color: #111111 !important;
+}
+
+/* Main layout surfaces */
+ytmusic-app-layout,
+ytmusic-app-layout[has-bkg] #layout,
+ytmusic-browse-response {
+  background-color: #f5f5f5 !important;
+}
+
+/* Top nav bar */
+ytmusic-nav-bar {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Left sidebar */
+ytmusic-guide-renderer {
+  background-color: #ffffff !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Bottom player bar */
+ytmusic-player-bar {
+  background-color: #ffffff !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Common text elements (titles, labels) */
+yt-formatted-string,
+ytmusic-responsive-list-item-renderer .title,
+ytmusic-two-row-item-renderer .title,
+ytmusic-description-shelf-renderer,
+ytmusic-detail-header-renderer {
+  color: #111111 !important;
+}
+
+/* Make buttons/controls match light surface */
+ytmusic-like-button-renderer,
+ytmusic-menu-renderer,
+ytmusic-play-button-renderer {
+  --ytmusic-button-background: #ffffff;
+}
+`;
+
+const DARK_THEME_CSS = `
+:root {
+  color-scheme: dark;
+}
+
+/* Overall app background */
+html,
+body,
+ytmusic-app {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+
+/* Main layout surfaces */
+ytmusic-app-layout,
+ytmusic-app-layout[has-bkg] #layout,
+ytmusic-browse-response {
+  background-color: #121212 !important;
+}
+
+/* Top nav bar */
+ytmusic-nav-bar {
+  background-color: #181818 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Left sidebar */
+ytmusic-guide-renderer {
+  background-color: #181818 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Bottom player bar */
+ytmusic-player-bar {
+  background-color: #181818 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Common text elements */
+yt-formatted-string,
+ytmusic-responsive-list-item-renderer .title,
+ytmusic-two-row-item-renderer .title,
+ytmusic-description-shelf-renderer,
+ytmusic-detail-header-renderer {
+  color: #ffffff !important;
+}
+
+/* Buttons/controls on dark background */
+ytmusic-like-button-renderer,
+ytmusic-menu-renderer,
+ytmusic-play-button-renderer {
+  --ytmusic-button-background: #181818;
+}
+`;
+
+// END CSS Light/Dark Mode starters (pls fix these, I am not the best at CSS) - CtrlAubDel
+
+let currentThemeCssKey: string | null = null;
+const currentThemeMode: ThemeMode = ThemeMode.System;
+
+async function applyThemeCssForCurrentSettings(): Promise<void> {
+  if (!ytmView || !ytmView.webContents) return;
+
+  const appearance = store.get("appearance") as StoreSchema["appearance"];
+  const mode = appearance.themeMode ?? ThemeMode.System;
+  const systemPrefersDark = nativeTheme.shouldUseDarkColors;
+
+  let css = "";
+  switch (mode) {
+    case ThemeMode.Light:
+      css = LIGHT_THEME_CSS;
+      break;
+    case ThemeMode.Dark:
+      css = DARK_THEME_CSS;
+      break;
+    case ThemeMode.System:
+    default:
+      css = systemPrefersDark ? DARK_THEME_CSS : LIGHT_THEME_CSS;
+      break;
+  }
+
+  const wc = ytmView.webContents as WebContents;
+
+  try {
+    if (currentThemeCssKey && wc.removeInsertedCSS) {
+      await wc.removeInsertedCSS(currentThemeCssKey);
+      currentThemeCssKey = null;
+    }
+
+    if (css && wc.insertCSS) {
+      currentThemeCssKey = await wc.insertCSS(css);
+    }
+  } catch (error) {
+    log.error("Failed to apply theme CSS", error);
+  }
+}
+
+// END Theme additions by CtrlAubDel
+
 store.onDidAnyChange(async (newState, oldState) => {
   if (settingsWindow !== null) {
     settingsWindow.webContents.send("settings:stateChanged", newState, oldState);
@@ -469,6 +629,12 @@ store.onDidAnyChange(async (newState, oldState) => {
     log.info("Integration disabled: Custom CSS");
   }
   if (oldState.appearance.trayIconStyle !== newState.appearance.trayIconStyle) setTrayIcon();
+
+  if (oldState.appearance.themeMode !== newState.appearance.themeMode) {
+    applyThemeMode(newState.appearance.themeMode);
+    void applyThemeCssForCurrentSettings();
+    log.info(`Appearance: theme mode set to ${newState.appearance.themeMode}`);
+  }
 
   // Playback
   if (newState.playback.ratioVolume) {
@@ -695,6 +861,21 @@ function getTrayIconPath() {
 
 function setTrayIcon() {
   tray.setImage(getTrayIconPath());
+}
+
+function applyThemeMode(mode: ThemeMode) {
+  // Added by CtrlAubDel
+  switch (mode) {
+    case ThemeMode.Light:
+      nativeTheme.themeSource = "light";
+      break;
+    case ThemeMode.Dark:
+      nativeTheme.themeSource = "dark";
+      break;
+    case ThemeMode.System:
+      nativeTheme.themeSource = "system";
+      break;
+  }
 }
 
 // Shortcut registration
@@ -1162,6 +1343,8 @@ const createYTMView = (): void => {
     if (!memoryStore.get("ytmViewLoadingError")) {
       memoryStore.set("ytmViewLoadingStatus", "Loaded YouTube Music");
     }
+
+    void applyThemeCssForCurrentSettings(); // Added by CtrlAubDel
   });
 
   ytmView.webContents.on("did-fail-load", (_event, errorCode, errorDescription, _validatedURL, isMainFrame) => {
@@ -1331,6 +1514,9 @@ const createMainWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
   log.info("Application ready");
+
+  const appearance = store.get("appearance") as StoreSchema["appearance"]; // Added by CtrlAubDel
+  applyThemeMode(appearance.themeMode ?? ThemeMode.System); //
 
   // First run checks
   const firstRunPath = path.join(app.getPath("userData"), ".first-run");
@@ -1953,7 +2139,15 @@ app.on("ready", async () => {
     log.info("Integration enabled: Last.fm");
   }
 
-  nativeTheme.on("updated", setTrayIcon);
+  nativeTheme.on("updated", () => {
+    // Added by CtrlAubDel
+    setTrayIcon(); //
+
+    if (currentThemeMode === ThemeMode.System) {
+      //
+      void applyThemeCssForCurrentSettings(); //
+    }
+  });
 });
 
 app.on("before-quit", () => {
