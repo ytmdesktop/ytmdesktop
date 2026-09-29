@@ -197,7 +197,7 @@ function getYTMTextRun(runs: { text: string }[]) {
       let fakeBaseClass = function() {
         try {
           if (window.__YTMD_HOOK__) {
-            if (this.hostElement && (this.hostElement.nodeName === "YTMUSIC-PLAYER-BAR" || this.hostElement.nodeName === "YTMUSIC-PLAYER")) {
+            if (this.hostElement && this.hostElement.nodeName === "YTMUSIC-APP-LAYOUT") {
               window.__YTMD_HOOK__.ytmPlayerBar = this
             }
 
