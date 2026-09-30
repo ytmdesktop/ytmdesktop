@@ -6,6 +6,12 @@
     return !!flag;
   }
 
+  if (isExperimentEnabled('music_web_enable_wiz_miniplayer')) {
+    // Lazy fix :(
+    // But the new Miniplayer basically needs to entirely re-write this.
+    return;
+  }
+
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
   let ytmdControlButtons = {};

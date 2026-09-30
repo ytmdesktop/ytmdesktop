@@ -8,7 +8,7 @@
       detail: {
         actionName: "yt-service-request",
         args: [
-          document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
+          window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0],
           {
             addToPlaylistEndpoint: {
               videoId: window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId
@@ -19,7 +19,7 @@
         returnValue
       }
     };
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+    window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0].dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
     returnValue[0].ajaxPromise.then(
       response => {
         resolve(response.data.contents[0].addToPlaylistRenderer.playlists);

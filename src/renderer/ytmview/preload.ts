@@ -292,7 +292,7 @@ window.addEventListener("load", async () => {
         // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
         let heightTransitionCount = 0;
         const transitionEnd = async (e: TransitionEvent) => {
-          if (e.target === document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
+          if (e.target === window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0]) {
             if (e.propertyName === "height") {
               (
                 await webFrame.executeJavaScript(`
@@ -303,12 +303,12 @@ window.addEventListener("load", async () => {
               )();
               heightTransitionCount++;
               if (heightTransitionCount >= 2) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
+                window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0].removeEventListener("transitionend", transitionEnd);
               }
             }
           }
         };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+        window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0].addEventListener("transitionend", transitionEnd);
 
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
@@ -337,10 +337,10 @@ window.addEventListener("load", async () => {
     }
   }
 
-  const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
-  if (alwaysShowVolumeSlider) {
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
-  }
+  // const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
+  // if (alwaysShowVolumeSlider) {
+  //   document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+  // }
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
     switch (command) {
@@ -348,7 +348,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              (window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState() === 1) ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
           `)
         )();
