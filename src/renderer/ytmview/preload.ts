@@ -376,9 +376,9 @@ const startInit = async () => {
       (
         await webFrame.executeJavaScript(`
           (function() {
-            let playerResponse = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse();
-            if (playerResponse) {
-              window.ytmd.sendVideoData(playerResponse.videoDetails, window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlaylistId());
+            let playerResponse = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.getPlayerResponse?.();
+            if (playerResponse?.videoDetails) {
+              window.ytmd.sendVideoData(playerResponse.videoDetails, window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.getPlaylistId?.() || "", null, null, false);
             }
           })
         `)
