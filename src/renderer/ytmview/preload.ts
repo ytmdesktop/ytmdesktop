@@ -166,7 +166,13 @@ async function hideChromecastButton() {
   (
     await webFrame.executeJavaScript(`
       (function() {
-        window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_CAST_AVAILABLE', payload: false });
+        try {
+          if (window.__YTMD_HOOK__?.ytmStore?.dispatch) {
+            window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_CAST_AVAILABLE', payload: false });
+          }
+        } catch (e) {
+          console.warn("Error hiding cast button:", e);
+        }
       })
     `)
   )();
@@ -242,11 +248,7 @@ const startInit = async () => {
               window.__YTMD_HOOK__ = {};
             }
             if (!window.__YTMD_HOOK__.ytmPlayerBar) {
-              const playerElem = (
-                document.querySelector("ytmusic-player-bar") ||
-                document.querySelector("ytmusic-player-controls") ||
-                document.querySelector("ytmusic-player-page #main-panel ytmusic-player-controls")
-              );
+              const playerElem = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
               if (playerElem) {
                 if (playerElem.inst && playerElem.inst.playerApi) {
                   window.__YTMD_HOOK__.ytmPlayerBar = playerElem.inst;
@@ -298,16 +300,27 @@ const startInit = async () => {
     }, 250);
   });
 
+  createStyleSheet();
+  createNavigationMenuArrows();
+  createKeyboardNavigation();
+  overrideHistoryButtonDisplay();
+
   try {
-    createStyleSheet();
-    createNavigationMenuArrows();
-    createKeyboardNavigation();
-    await createAdditionalPlayerBarControls();
-    await hideChromecastButton();
     await hookPlayerApiEvents();
-    overrideHistoryButtonDisplay();
   } catch (err) {
-    console.error("Error setting up player bar controls:", err);
+    console.error("Error hooking player API events:", err);
+  }
+
+  try {
+    await createAdditionalPlayerBarControls();
+  } catch (err) {
+    console.error("Error creating player bar controls:", err);
+  }
+
+  try {
+    await hideChromecastButton();
+  } catch (err) {
+    console.error("Error hiding Chromecast button:", err);
   }
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
@@ -321,7 +334,7 @@ const startInit = async () => {
       if (state.lastVideoId) {
         // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
         let heightTransitionCount = 0;
-        const playerBarEl = document.querySelector("ytmusic-app-layout>ytmusic-player-bar, ytmusic-player-bar, ytmusic-player-controls");
+        const playerBarEl = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
         const transitionEnd = async (e: TransitionEvent) => {
           if (playerBarEl && e.target === playerBarEl) {
             if (e.propertyName === "height") {
@@ -375,7 +388,7 @@ const startInit = async () => {
 
   const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
   if (alwaysShowVolumeSlider) {
-    const volumeSlider = document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider, ytmusic-player-controls #volume-slider, #volume-slider");
+    const volumeSlider = document.querySelector("#volume-slider");
     if (volumeSlider) {
       volumeSlider.classList.add("ytmd-persist-volume-slider");
     }
@@ -387,14 +400,20 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
+              const playerBar = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
               let isPlaying = false;
               if (playerBar && typeof playerBar.playing === "boolean") {
                 isPlaying = playerBar.playing;
-              } else if (window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi && typeof window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState === "function") {
+              } else if (window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.getPlayerState) {
                 isPlaying = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState() === 1;
               }
-              isPlaying ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+              if (playerApi) {
+                isPlaying ? playerApi.pauseVideo() : playerApi.playVideo();
+              } else {
+                const btn = document.querySelector("#play-pause-button, .play-pause-button");
+                if (btn) btn.click();
+              }
             })
           `)
         )();
@@ -405,7 +424,13 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+              if (playerApi && typeof playerApi.playVideo === "function") {
+                playerApi.playVideo();
+              } else {
+                const btn = document.querySelector("#play-pause-button, .play-pause-button");
+                if (btn) btn.click();
+              }
             })
           `)
         )();
@@ -416,7 +441,13 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
+              const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+              if (playerApi && typeof playerApi.pauseVideo === "function") {
+                playerApi.pauseVideo();
+              } else {
+                const btn = document.querySelector("#play-pause-button, .play-pause-button");
+                if (btn) btn.click();
+              }
             })
           `)
         )();
@@ -427,7 +458,13 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.nextVideo();
+              const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+              if (playerApi && typeof playerApi.nextVideo === "function") {
+                playerApi.nextVideo();
+              } else {
+                const btn = document.querySelector(".next-button, #next-button, tp-yt-paper-icon-button.next-button");
+                if (btn) btn.click();
+              }
             })
           `)
         )();
@@ -438,7 +475,13 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.previousVideo();
+              const playerApi = window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi;
+              if (playerApi && typeof playerApi.previousVideo === "function") {
+                playerApi.previousVideo();
+              } else {
+                const btn = document.querySelector(".previous-button, #previous-button, tp-yt-paper-icon-button.previous-button");
+                if (btn) btn.click();
+              }
             })
           `)
         )();
@@ -459,20 +502,20 @@ const startInit = async () => {
         const currentVolumeUp: number = (
           await webFrame.executeJavaScript(`
             (function() {
-              return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getVolume();
+              return window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.getVolume?.() ?? 50;
             })
           `)
         )();
 
         let newVolumeUp = currentVolumeUp + 10;
-        if (currentVolumeUp > 100) {
+        if (newVolumeUp > 100) {
           newVolumeUp = 100;
         }
         (
           await webFrame.executeJavaScript(`
             (function(newVolumeUp) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(newVolumeUp);
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: newVolumeUp });
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.setVolume?.(newVolumeUp);
+              window.__YTMD_HOOK__?.ytmStore?.dispatch?.({ type: 'SET_VOLUME', payload: newVolumeUp });
             })
           `)
         )(newVolumeUp);
@@ -483,20 +526,20 @@ const startInit = async () => {
         const currentVolumeDown: number = (
           await webFrame.executeJavaScript(`
             (function() {
-              return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getVolume();
+              return window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.getVolume?.() ?? 50;
             })
           `)
         )();
 
         let newVolumeDown = currentVolumeDown - 10;
-        if (currentVolumeDown < 0) {
+        if (newVolumeDown < 0) {
           newVolumeDown = 0;
         }
         (
           await webFrame.executeJavaScript(`
             (function(newVolumeDown) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(newVolumeDown);
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: newVolumeDown });
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.setVolume?.(newVolumeDown);
+              window.__YTMD_HOOK__?.ytmStore?.dispatch?.({ type: 'SET_VOLUME', payload: newVolumeDown });
             })
           `)
         )(newVolumeDown);
@@ -513,8 +556,8 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function(valueInt) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(valueInt);
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: valueInt });
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.setVolume?.(valueInt);
+              window.__YTMD_HOOK__?.ytmStore?.dispatch?.({ type: 'SET_VOLUME', payload: valueInt });
             })
           `)
         )(valueInt);
@@ -525,8 +568,8 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.mute();
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_MUTED', payload: true });
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.mute?.();
+              window.__YTMD_HOOK__?.ytmStore?.dispatch?.({ type: 'SET_MUTED', payload: true });
             })
           `)
         )();
@@ -536,8 +579,8 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.unMute();
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_MUTED', payload: false });
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.unMute?.();
+              window.__YTMD_HOOK__?.ytmStore?.dispatch?.({ type: 'SET_MUTED', payload: false });
             })
           `)
         )();
@@ -547,7 +590,12 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function(value) {
-              window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_REPEAT', payload: value });
+              if (window.__YTMD_HOOK__?.ytmStore?.dispatch) {
+                window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_REPEAT', payload: value });
+              } else {
+                const repeatBtn = document.querySelector(".repeat, tp-yt-paper-icon-button.repeat");
+                if (repeatBtn) repeatBtn.click();
+              }
             })
           `)
         )(value);
@@ -557,7 +605,7 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function(value) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.seekTo(value);
+              window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.seekTo?.(value);
             })
           `)
         )(value);
@@ -567,7 +615,7 @@ const startInit = async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
+              const playerBar = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
               if (playerBar && playerBar.queue && typeof playerBar.queue.shuffle === "function") {
                 playerBar.queue.shuffle();
               } else if (window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.queue && typeof window.__YTMD_HOOK__.ytmPlayerBar.queue.shuffle === "function") {

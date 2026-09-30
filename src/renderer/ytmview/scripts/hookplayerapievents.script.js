@@ -2,21 +2,25 @@
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
   const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
 
+  function getLikeStatus(state, videoId) {
+    if (videoId && state?.likeStatus?.videos?.[videoId]) {
+      return state.likeStatus.videos[videoId];
+    }
+    const likeButtonRenderer = document.querySelector("ytmusic-like-button-renderer");
+    return (
+      likeButtonRenderer?.getAttribute?.("like-status") ||
+      likeButtonRenderer?.likeStatus ||
+      likeButtonRenderer?.data?.likeStatus ||
+      "INDIFFERENT"
+    );
+  }
+
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = ytmStore.getState();
 
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const likeButtonRenderer = (
-      document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer") ||
-      document.querySelector("ytmusic-player-controls ytmusic-like-button-renderer") ||
-      document.querySelector("ytmusic-like-button-renderer")
-    );
-    const likeButtonData = likeButtonRenderer?.data;
-    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-    const storeLikeStatus = state.likeStatus.videos[videoId];
-    
-    const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
+    const likeStatus = getLikeStatus(state, videoId);
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
     const muted = state.player.muted;
@@ -38,7 +42,7 @@
       let hasFullMetadata = false;
 
       // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
-      const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
+      const playerBar = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
       let currentItem = playerBar?.currentItem || window.__YTMD_HOOK__?.ytmPlayerBar?.currentItem;
       if (currentItem !== null && currentItem !== undefined) {
         hasFullMetadata = true;
@@ -54,23 +58,14 @@
               album = {
                 id: item.navigationEndpoint.browseEndpoint.browseId,
                 text: item.text
-              }
+              };
             }
           }
         }
       }
 
       let state = ytmStore.getState();
-      const likeButtonRenderer = (
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer") ||
-        document.querySelector("ytmusic-player-controls ytmusic-like-button-renderer") ||
-        document.querySelector("ytmusic-like-button-renderer")
-      );
-      const likeButtonData = likeButtonRenderer?.data;
-      const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-      const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
-      
-      const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+      const likeStatus = getLikeStatus(state, videoDetails?.videoId);
 
       window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
     }

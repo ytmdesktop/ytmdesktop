@@ -69,11 +69,7 @@
     iconName: "yt-sys-icons:library_add",
     data: libraryButtonData
   };
-  const likeButton = (
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer") ||
-    document.querySelector("ytmusic-player-controls ytmusic-like-button-renderer") ||
-    document.querySelector("ytmusic-like-button-renderer")
-  );
+  const likeButton = document.querySelector("ytmusic-like-button-renderer");
   if (likeButton) {
     likeButton.insertAdjacentElement("afterend", libraryButton);
   }
@@ -167,12 +163,7 @@
     }
   });
 
-  let rightControls = (
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar .right-controls-buttons") ||
-    document.querySelector("ytmusic-player-controls .right-controls-buttons") ||
-    document.querySelector(".right-controls-buttons") ||
-    document.querySelector("ytmusic-player-controls")
-  );
+  let rightControls = document.querySelector(".right-controls-buttons, ytmusic-player-bar, ytmusic-player-controls");
   let sleepTimerButton = document.createElement("yt-icon-button");
 
   let sleepTimerIcon = document.createElement("yt-icon");
@@ -518,79 +509,93 @@
   });
 
   ytmStore.subscribe(() => {
-    let state = ytmStore.getState();
+    try {
+      let state = ytmStore.getState();
 
-    // Update library button for current data
-    const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
-    const currentMenu = (
-      (playerBar && typeof playerBar.getMenuRenderer === "function" ? playerBar.getMenuRenderer() : null) ||
-      (window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmPlayerBar && typeof window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer === "function" ? window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer() : null)
-    );
-    if (currentMenu) {
-      if (playlistButton.classList.contains("hidden")) {
-        playlistButton.classList.remove("hidden");
+      // Update library button for current data
+      const playerBar = document.querySelector("ytmusic-player-bar, ytmusic-player-controls");
+      let currentMenu = null;
+      try {
+        if (playerBar && playerBar.data && playerBar.data.menu && typeof playerBar.getMenuRenderer === "function") {
+          currentMenu = playerBar.getMenuRenderer();
+        } else if (window.__YTMD_HOOK__?.ytmPlayerBar?.data?.menu && typeof window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer === "function") {
+          currentMenu = window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer();
+        }
+      } catch {
+        currentMenu = null;
       }
+      if (!currentMenu) {
+        const menuElem = (
+          playerBar?.querySelector?.("ytmusic-menu-renderer") ||
+          document.querySelector("ytmusic-player-controls ytmusic-menu-renderer, ytmusic-player-bar ytmusic-menu-renderer")
+        );
+        currentMenu = menuElem?.data || menuElem?.inst?.data || null;
+      }
+      if (currentMenu && Array.isArray(currentMenu.items)) {
+        if (playlistButton.classList.contains("hidden")) {
+          playlistButton.classList.remove("hidden");
+        }
 
-      let foundLibraryButton = false;
-      for (let i = 0; i < currentMenu.items.length; i++) {
-        const item = currentMenu.items[i];
-        if (item.toggleMenuServiceItemRenderer) {
-          if (
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER" ||
-            item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK"
-          ) {
-            foundLibraryButton = true;
-            libraryFeedbackDefaultToken = item.toggleMenuServiceItemRenderer.defaultServiceEndpoint.feedbackEndpoint.feedbackToken;
-            libraryFeedbackToggledToken = item.toggleMenuServiceItemRenderer.toggledServiceEndpoint.feedbackEndpoint.feedbackToken;
-
+        let foundLibraryButton = false;
+        for (let i = 0; i < currentMenu.items.length; i++) {
+          const item = currentMenu.items[i];
+          if (item?.toggleMenuServiceItemRenderer) {
             if (
-              state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken] !== undefined &&
-              state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken] !== null
+              item.toggleMenuServiceItemRenderer.defaultIcon?.iconType === "BOOKMARK_BORDER" ||
+              item.toggleMenuServiceItemRenderer.defaultIcon?.iconType === "BOOKMARK"
             ) {
-              libraryButtonData.toggled = state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken];
-              libraryButton.setters.data(libraryButtonData); 
-            } else {
-              libraryButtonData.toggled = false;
-              libraryButton.setters.data(libraryButtonData); 
-            }
+              foundLibraryButton = true;
+              libraryFeedbackDefaultToken = item.toggleMenuServiceItemRenderer.defaultServiceEndpoint?.feedbackEndpoint?.feedbackToken;
+              libraryFeedbackToggledToken = item.toggleMenuServiceItemRenderer.toggledServiceEndpoint?.feedbackEndpoint?.feedbackToken;
 
-            // Dev note 2/12/26: I think this if check got reversed the comments are probably outdated. Didn't bother investigating further to update comments
-            if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK_BORDER") {
-              // Default value is saved to library (false == remove from library, true == add to library)
-              if (libraryButtonData.toggled) {
-                libraryButton.setters.iconName("yt-sys-icons:library_saved");
+              if (
+                state?.toggleStates?.feedbackToggleStates?.[libraryFeedbackDefaultToken] !== undefined &&
+                state?.toggleStates?.feedbackToggleStates?.[libraryFeedbackDefaultToken] !== null
+              ) {
+                libraryButtonData.toggled = state.toggleStates.feedbackToggleStates[libraryFeedbackDefaultToken];
+                libraryButton.setters.data(libraryButtonData); 
               } else {
-                libraryButton.setters.iconName("yt-sys-icons:library_add");
+                libraryButtonData.toggled = false;
+                libraryButton.setters.data(libraryButtonData); 
               }
-            } else if (item.toggleMenuServiceItemRenderer.defaultIcon.iconType === "BOOKMARK") {
-              // Default value is add to library (false == add to library, true == remove from library)
-              if (libraryButtonData.toggled) {
-                libraryButton.setters.iconName("yt-sys-icons:library_add");
-              } else {
-                libraryButton.setters.iconName("yt-sys-icons:library_saved");
+
+              if (item.toggleMenuServiceItemRenderer.defaultIcon?.iconType === "BOOKMARK_BORDER") {
+                if (libraryButtonData.toggled) {
+                  libraryButton.setters.iconName("yt-sys-icons:library_saved");
+                } else {
+                  libraryButton.setters.iconName("yt-sys-icons:library_add");
+                }
+              } else if (item.toggleMenuServiceItemRenderer.defaultIcon?.iconType === "BOOKMARK") {
+                if (libraryButtonData.toggled) {
+                  libraryButton.setters.iconName("yt-sys-icons:library_add");
+                } else {
+                  libraryButton.setters.iconName("yt-sys-icons:library_saved");
+                }
               }
+              break;
             }
-            break;
           }
         }
-      }
 
-      if (!foundLibraryButton) {
+        if (!foundLibraryButton) {
+          if (!libraryButton.classList.contains("hidden")) {
+            libraryButton.classList.add("hidden");
+          }
+        } else {
+          if (libraryButton.classList.contains("hidden")) {
+            libraryButton.classList.remove("hidden");
+          }
+        }
+      } else {
         if (!libraryButton.classList.contains("hidden")) {
           libraryButton.classList.add("hidden");
         }
-      } else {
-        if (libraryButton.classList.contains("hidden")) {
-          libraryButton.classList.remove("hidden");
+        if (!playlistButton.classList.contains("hidden")) {
+          playlistButton.classList.add("hidden");
         }
       }
-    } else {
-      if (!libraryButton.classList.contains("hidden")) {
-        libraryButton.classList.add("hidden");
-      }
-      if (!playlistButton.classList.contains("hidden")) {
-        playlistButton.classList.add("hidden");
-      }
+    } catch (e) {
+      console.warn("YTMD subscriber error:", e);
     }
   });
 
