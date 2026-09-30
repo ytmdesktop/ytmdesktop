@@ -56,7 +56,7 @@ window.addEventListener("message", async event => {
         (
           await webFrame.executeJavaScript(`
           (function() {
-            const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
+            const playerApi = window.__YTMD_HOOK__.ytmPlayerController.playerApi;
             if (playerApi.getPlayerResponse()) window.ytmd.sendVideoData(playerApi.getPlayerResponse().videoDetails, playerApi.getPlaylistId());
           })
         `)
@@ -66,18 +66,18 @@ window.addEventListener("message", async event => {
 
     const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
     if (alwaysShowVolumeSlider) {
-      document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+      document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
     }
 
     store.onDidAnyChange(newState => {
       if (newState.appearance.alwaysShowVolumeSlider) {
         const volumeSlider = document.querySelector("#volume-slider");
-        if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+        if (volumeSlider && !volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
           volumeSlider.classList.add("ytmd-persist-volume-slider");
         }
       } else {
         const volumeSlider = document.querySelector("#volume-slider");
-        if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+        if (volumeSlider && volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
           volumeSlider.classList.remove("ytmd-persist-volume-slider");
         }
       }

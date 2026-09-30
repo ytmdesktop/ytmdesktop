@@ -1,16 +1,16 @@
-import polymerhook from "../polymerhook";
+import ytmhook from "../ytmhook";
 
 export function overrideHistoryButtonDisplay() {
   document.querySelector<HTMLElement>("#history-link .history-button").style = "display: inline-block !important;";
 }
 
 export async function hideChromecastButton() {
-  polymerhook.ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+  ytmhook.ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
 }
 
 export async function createAdditionalPlayerBarControls() {
-  const ytmStore = polymerhook.ytmStore;
-  const playerApi = polymerhook.ytmPlayerBar.playerApi;
+  const ytmStore = ytmhook.ytmStateStore.store;
+  const playerApi = ytmhook.ytmPlayerController.playerApi;
 
   const ytmdControlButtons = {};
 
@@ -59,7 +59,7 @@ export async function createAdditionalPlayerBarControls() {
       };
       this.dispatchEvent(new CustomEvent("yt-action", closePopupEvent));
       this.dispatchEvent(new CustomEvent("yt-action", feedbackEvent));
-      polymerhook.ytmStore.dispatch({
+      ytmhook.ytmStateStore.store.dispatch({
         type: "SET_FEEDBACK_TOGGLE_STATE",
         payload: { defaultEndpointFeedbackToken: libraryFeedbackDefaultToken, isToggled: !libraryButtonData.toggled }
       });
@@ -572,8 +572,8 @@ export async function createAdditionalPlayerBarControls() {
 }
 
 export async function addTimedLyrics() {
-  const ytmStore = polymerhook.ytmStore;
-  const playerApi = polymerhook.ytmPlayerBar.playerApi;
+  const ytmStore = ytmhook.ytmStateStore.store;
+  const playerApi = ytmhook.ytmPlayerController.playerApi;
 
   let currentLyricBrowseId = "";
   let currentTimedLyrics = null;

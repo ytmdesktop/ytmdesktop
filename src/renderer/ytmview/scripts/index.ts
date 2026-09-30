@@ -1,6 +1,6 @@
 import { YTMViewSetupCompletionFlags } from "~shared/types";
 import initPlayerStateStore, { waitForYTMPlayerApiReady } from "./playerstatestore";
-import polymerhook from "./polymerhook";
+import ytmhook from "./ytmhook";
 import protectedapimanager from "./protectedapimanager";
 import { createMaterialSymbolsLink, createStyleSheet } from "./setup/styles";
 import { createNavigationMenuArrows } from "./setup/navigation";
@@ -8,13 +8,17 @@ import initRemote from "./setup/remote";
 import { addTimedLyrics, createAdditionalPlayerBarControls, hideChromecastButton, overrideHistoryButtonDisplay } from "./setup/extras";
 
 protectedapimanager.init();
-polymerhook.init();
+ytmhook.init();
 
 window.addEventListener("load", async () => {
   let setupCompletions = 0;
   try {
     {
-      await polymerhook.ready();
+      await ytmhook.ready();
+      window.__YTMD_HOOK__ = Object.freeze({
+        ytmPlayerController: ytmhook.ytmPlayerController,
+        ytmStateStore: ytmhook.ytmStateStore
+      });
 
       setupCompletions |= YTMViewSetupCompletionFlags.Early;
     }

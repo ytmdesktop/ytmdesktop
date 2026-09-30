@@ -390,7 +390,9 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });
-      authorizationWindow.loadURL(app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/settings/index.html");
+      authorizationWindow.loadURL(
+        app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html"
+      );
       authorizationWindow.show();
       authorizationWindow.flashFrame(true);
 

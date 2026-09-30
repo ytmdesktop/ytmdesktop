@@ -1,18 +1,39 @@
-import polymerhook from "./polymerhook";
+import ytmhook from "./ytmhook";
 import protectedapimanager from "./protectedapimanager";
+
+function getLikeStatus() {
+  try {
+    const ytmStore = ytmhook.ytmStateStore.store;
+    const state = ytmStore.getState();
+
+    let status = "INDIFFERENT";
+    if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
+      status = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0].likeButtonRenderer.likeStatus;
+    } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+      // New player bar
+      const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+      const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
+      status = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+    }
+    return status;
+  } catch (err) {
+    console.log("[ytmd-err(getLikeStatus)]", err);
+    return null;
+  }
+}
 
 export default function init() {
   const playerStateApi = protectedapimanager.createOrGetAPI("PlayerState");
-  const ytmStore = polymerhook.ytmStore;
-  const playerApi = polymerhook.ytmPlayerBar.playerApi;
+  const ytmStore = ytmhook.ytmStateStore.store;
+  //const playerBar = ytmhook.ytmPlayerController;
+  const playerApi = ytmhook.ytmPlayerController.playerApi;
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     const state = ytmStore.getState();
 
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+    const defaultLikeStatus = getLikeStatus() ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoId];
 
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
@@ -24,13 +45,17 @@ export default function init() {
   }
 
   function sendVideoData() {
+    const state = ytmStore.getState();
     const videoDetails = playerApi.getPlayerResponse().videoDetails;
     const playlistId = playerApi.getPlaylistId();
     let album = null;
     let hasFullMetadata = false;
 
-    // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
-    const currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
+    const selectedItemIndex = state.queue.items.findIndex(item => {
+      return item.playlistPanelVideoRenderer?.selected ?? item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer.selected;
+    });
+    let currentItem = state.queue.items[selectedItemIndex];
+    currentItem = currentItem?.playlistPanelVideoRenderer ?? currentItem?.playlistPanelVideoWrapperRenderer?.primaryRenderer?.playlistPanelVideoRenderer;
     if (currentItem !== null && currentItem !== undefined) {
       hasFullMetadata = true;
 
@@ -38,6 +63,7 @@ export default function init() {
       videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
       videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
 
+      // Maybe obtain the album information from a text run
       for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
         const item = currentItem.longBylineText.runs[i];
         if (item.navigationEndpoint) {
@@ -53,9 +79,7 @@ export default function init() {
       }
     }
 
-    const state = ytmStore.getState();
-    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+    const defaultLikeStatus = getLikeStatus() ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
 
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
@@ -75,19 +99,36 @@ export default function init() {
     sendVideoData();
   }
 
+  // It is mandatory that try catch be used within these so that we handle errors for YTMD and not throw them back to YTM
   playerApi.addEventListener("onVideoProgress", progress => {
-    playerStateApi.postMessage("updateVideoProgress", progress);
+    try {
+      playerStateApi.postMessage("updateVideoProgress", progress);
+    } catch (err) {
+      console.error("[ytmd-err(playerApi.onVideoProgress)]", err);
+    }
   });
   playerApi.addEventListener("onStateChange", state => {
-    playerStateApi.postMessage("updateVideoState", state);
+    try {
+      playerStateApi.postMessage("updateVideoState", state);
+    } catch (err) {
+      console.log("[ytmd-err(playerApi.onStateChange)]", err);
+    }
   });
   playerApi.addEventListener("onVideoDataChange", event => {
-    if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      sendVideoData();
+    try {
+      if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
+        sendVideoData();
+      }
+    } catch (err) {
+      console.log("[ytmd-err(playerApi.onVideoDataChange)]", err);
     }
   });
   ytmStore.subscribe(() => {
-    sendStoreState();
+    try {
+      sendStoreState();
+    } catch (err) {
+      console.log("[ytmd-err(stateStore.subscribe)]", err);
+    }
   });
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
@@ -117,7 +158,7 @@ export default function init() {
 }
 
 export async function waitForYTMPlayerApiReady() {
-  const playerApi = polymerhook.ytmPlayerBar.playerApi;
+  const playerApi = ytmhook.ytmPlayerController.playerApi;
 
   await new Promise<void>(resolve => {
     const interval = setInterval(async () => {

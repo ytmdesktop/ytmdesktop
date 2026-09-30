@@ -1,4 +1,4 @@
-import polymerhook from "../polymerhook";
+import ytmhook from "../ytmhook";
 import protectedapimanager from "../protectedapimanager";
 import { getYTMTextRun } from "../utils";
 
@@ -9,12 +9,13 @@ export default function init() {
     const args = event.detail.args;
     const command = args.shift();
 
-    const ytmStore = polymerhook.ytmStore;
-    const playerApi = polymerhook.ytmPlayerBar.playerApi;
+    const ytmStore = ytmhook.ytmStateStore.store;
+    const playerApi = ytmhook.ytmPlayerController.playerApi;
 
     switch (command) {
       case "playPause": {
-        if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
+        // 1 = Playing
+        if (playerApi.getPlayerState() === 1) {
           playerApi.pauseVideo();
         } else {
           playerApi.playVideo();
@@ -48,28 +49,41 @@ export default function init() {
       }
 
       case "toggleLike": {
+        const state = ytmStore.getState();
         const videoId = playerApi.getPlayerResponse().videoDetails.videoId;
-        const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
 
-        let likeServiceEndpoint = null;
-        let indifferentServiceEndpoint = null;
+        let serviceEndpoint = null;
+        let toggledServiceEndpoint = null;
 
-        for (const endpoint of likeButtonData.serviceEndpoints) {
-          if (endpoint.likeEndpoint.status === "LIKE") {
-            likeServiceEndpoint = endpoint;
-          } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
-            indifferentServiceEndpoint = endpoint;
+        let defaultLikeStatus = "INDIFFERENT";
+        if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
+          const buttonData = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
+          defaultLikeStatus = buttonData.likeButtonRenderer.likeStatus;
+
+          for (const endpoint of buttonData.likeButtonRenderer.serviceEndpoints) {
+            if (endpoint.likeEndpoint.status === "LIKE") {
+              serviceEndpoint = endpoint;
+            } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
+              toggledServiceEndpoint = endpoint;
+            }
           }
+        } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+          // New player bar
+          const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+          const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
+          defaultLikeStatus = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+
+          const toggleButtonViewModel = viewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
+          serviceEndpoint = toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap.innertubeCommand;
+          toggledServiceEndpoint = toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap.innertubeCommand;
         }
+
+        const storeLikeStatus = state.likeStatus.videos[videoId];
+        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
 
         let serviceEvent = null;
 
-        const defaultLikeStatus = likeButtonData.likeStatus;
-        const state = ytmStore.getState();
-        const storeLikeStatus = state.likeStatus.videos[videoId];
-
-        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
-
+        const ytmusicAppElement = document.querySelector("ytmusic-app");
         if (likeStatus === "LIKE") {
           serviceEvent = {
             bubbles: true,
@@ -77,53 +91,66 @@ export default function init() {
             composed: true,
             detail: {
               actionName: "yt-service-request",
-              args: [document.querySelector("ytmusic-like-button-renderer"), indifferentServiceEndpoint],
+              args: [ytmusicAppElement, toggledServiceEndpoint],
               optionalAction: false,
               returnValue: []
             }
           };
-        } else if (likeStatus === "DISLIKE" || likeStatus === "INDIFFERENT") {
+        } else {
           serviceEvent = {
             bubbles: true,
             cancelable: false,
             composed: true,
             detail: {
               actionName: "yt-service-request",
-              args: [document.querySelector("ytmusic-like-button-renderer"), likeServiceEndpoint],
+              args: [ytmusicAppElement, serviceEndpoint],
               optionalAction: false,
               returnValue: []
             }
           };
         }
 
-        if (serviceEvent) document.querySelector("ytmusic-like-button-renderer").dispatchEvent(new CustomEvent("yt-action", serviceEvent));
+        if (serviceEvent) ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceEvent));
 
         break;
       }
 
       case "toggleDislike": {
+        const state = ytmStore.getState();
         const videoId = playerApi.getPlayerResponse().videoDetails.videoId;
-        const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
 
-        let dislikeServiceEndpoint = null;
-        let indifferentServiceEndpoint = null;
+        let serviceEndpoint = null;
+        let toggledServiceEndpoint = null;
 
-        for (const endpoint of likeButtonData.serviceEndpoints) {
-          if (endpoint.likeEndpoint.status === "DISLIKE") {
-            dislikeServiceEndpoint = endpoint;
-          } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
-            indifferentServiceEndpoint = endpoint;
+        let defaultLikeStatus = "INDIFFERENT";
+        if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
+          const buttonData = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
+          defaultLikeStatus = buttonData.likeButtonRenderer.likeStatus;
+
+          for (const endpoint of buttonData.likeButtonRenderer.serviceEndpoints) {
+            if (endpoint.likeEndpoint.status === "DISLIKE") {
+              serviceEndpoint = endpoint;
+            } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
+              toggledServiceEndpoint = endpoint;
+            }
           }
+        } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+          // New player bar
+          const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+          const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
+          defaultLikeStatus = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+
+          const toggleButtonViewModel = viewModel.dislikeButtonViewModel.dislikeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
+          serviceEndpoint = toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap.innertubeCommand;
+          toggledServiceEndpoint = toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap.innertubeCommand;
         }
+
+        const storeLikeStatus = state.likeStatus.videos[videoId];
+        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
 
         let serviceEvent = null;
 
-        const defaultLikeStatus = likeButtonData.likeStatus;
-        const state = ytmStore.getState();
-        const storeLikeStatus = state.likeStatus.videos[videoId];
-
-        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
-
+        const ytmusicAppElement = document.querySelector("ytmusic-app");
         if (likeStatus === "DISLIKE") {
           serviceEvent = {
             bubbles: true,
@@ -131,26 +158,26 @@ export default function init() {
             composed: true,
             detail: {
               actionName: "yt-service-request",
-              args: [document.querySelector("ytmusic-like-button-renderer"), indifferentServiceEndpoint],
+              args: [ytmusicAppElement, toggledServiceEndpoint],
               optionalAction: false,
               returnValue: []
             }
           };
-        } else if (likeStatus === "LIKE" || likeStatus === "INDIFFERENT") {
+        } else {
           serviceEvent = {
             bubbles: true,
             cancelable: false,
             composed: true,
             detail: {
               actionName: "yt-service-request",
-              args: [document.querySelector("ytmusic-like-button-renderer"), dislikeServiceEndpoint],
+              args: [ytmusicAppElement, serviceEndpoint],
               optionalAction: false,
               returnValue: []
             }
           };
         }
 
-        if (serviceEvent) document.querySelector("ytmusic-like-button-renderer").dispatchEvent(new CustomEvent("yt-action", serviceEvent));
+        if (serviceEvent) ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceEvent));
 
         break;
       }
@@ -254,7 +281,7 @@ export default function init() {
       }
 
       case "shuffle": {
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").queue.shuffle();
+        ytmhook.ytmPlayerController.queue.shuffle();
 
         break;
       }
@@ -319,6 +346,7 @@ export default function init() {
         const playlistId = args[0].playlistId;
         const index = args[0].index;
 
+        const ytmusicAppElement = document.querySelector("ytmusic-app");
         const returnValue = [];
         const serviceRequestEvent = {
           bubbles: true,
@@ -327,7 +355,7 @@ export default function init() {
           detail: {
             actionName: "yt-service-request",
             args: [
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
+              ytmusicAppElement,
               {
                 queueAddEndpoint: {
                   queueTarget: {
@@ -341,7 +369,7 @@ export default function init() {
             returnValue
           }
         };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+        ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
         returnValue[0].ajaxPromise.then(
           response => {
             const items = response.data.queueDatas.map(data => data.content);
@@ -389,9 +417,10 @@ export default function init() {
   });
 
   remoteApi.handleMessage("getPlaylists", () => {
-    const playerApi = polymerhook.ytmPlayerBar.playerApi;
+    const playerApi = ytmhook.ytmPlayerController.playerApi;
 
     return new Promise((resolve, reject) => {
+      const ytmusicAppElement = document.querySelector("ytmusic-app");
       const returnValue = [];
       const serviceRequestEvent = {
         bubbles: true,
@@ -400,7 +429,7 @@ export default function init() {
         detail: {
           actionName: "yt-service-request",
           args: [
-            document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
+            ytmusicAppElement,
             {
               addToPlaylistEndpoint: {
                 videoId: playerApi.getPlayerResponse().videoDetails.videoId
@@ -411,19 +440,26 @@ export default function init() {
           returnValue
         }
       };
-      document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+      ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
       returnValue[0].ajaxPromise.then(
         response => {
-          const rawPlaylists = response.data.contents[0].addToPlaylistRenderer.playlists;
-          const playlists = [];
-          for (const rawPlaylist of rawPlaylists) {
-            const playlist = rawPlaylist.playlistAddToOptionRenderer;
-            playlists.push({
-              id: playlist.playlistId,
-              title: getYTMTextRun(playlist.title.runs)
-            });
+          try {
+            const rawPlaylists = response.data.contents[0].addToPlaylistRenderer.playlists;
+            const playlists = [];
+            if (rawPlaylists) {
+              for (const rawPlaylist of rawPlaylists) {
+                const playlist = rawPlaylist.playlistAddToOptionRenderer;
+                playlists.push({
+                  id: playlist.playlistId,
+                  title: getYTMTextRun(playlist.title.runs)
+                });
+              }
+            }
+            resolve([playlists]);
+          } catch (err) {
+            console.log("[ytmd-err(getPlaylists)]", err);
+            resolve([[]]);
           }
-          resolve([playlists]);
         },
         () => {
           reject();
