@@ -1,5 +1,11 @@
 (function() {
   return new Promise((resolve, reject) => {
+    var targetElement = (
+      document.querySelector("ytmusic-app-layout>ytmusic-player-bar") ||
+      document.querySelector("ytmusic-player-controls") ||
+      document.querySelector("ytmusic-app") ||
+      document.body
+    );
     var returnValue = [];
     var serviceRequestEvent = {
       bubbles: true,
@@ -8,7 +14,7 @@
       detail: {
         actionName: "yt-service-request",
         args: [
-          document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
+          targetElement,
           {
             addToPlaylistEndpoint: {
               videoId: window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId
@@ -19,7 +25,9 @@
         returnValue
       }
     };
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+    if (targetElement) {
+      targetElement.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+    }
     returnValue[0].ajaxPromise.then(
       response => {
         resolve(response.data.contents[0].addToPlaylistRenderer.playlists);

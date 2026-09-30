@@ -2,7 +2,13 @@
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
   const videoId = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId;
-  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+  const likeButtonRenderer = (
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer") ||
+    document.querySelector("ytmusic-player-controls ytmusic-like-button-renderer") ||
+    document.querySelector("ytmusic-like-button-renderer")
+  );
+  const likeButtonData = likeButtonRenderer?.data;
+  if (!likeButtonData || !likeButtonData.serviceEndpoints) return;
   
   let likeServiceEndpoint = null;
   let indifferentServiceEndpoint = null;

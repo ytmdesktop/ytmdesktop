@@ -69,10 +69,14 @@
     iconName: "yt-sys-icons:library_add",
     data: libraryButtonData
   };
-  document
-    .querySelector("ytmusic-app-layout>ytmusic-player-bar")
-    .querySelector("ytmusic-like-button-renderer")
-    .insertAdjacentElement("afterend", libraryButton);
+  const likeButton = (
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer") ||
+    document.querySelector("ytmusic-player-controls ytmusic-like-button-renderer") ||
+    document.querySelector("ytmusic-like-button-renderer")
+  );
+  if (likeButton) {
+    likeButton.insertAdjacentElement("afterend", libraryButton);
+  }
 
   let playlistButton = document.createElement("yt-button-shape");
   playlistButton.classList.add("ytmd-player-bar-control");
@@ -153,7 +157,9 @@
     iconName: "yt-sys-icons:playlist_add",
     data: playlistButtonData
   };
-  libraryButton.insertAdjacentElement("afterend", playlistButton);
+  if (likeButton) {
+    libraryButton.insertAdjacentElement("afterend", playlistButton);
+  }
 
   window.__YTMD_HOOK__.ytmPlayerBar.playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
@@ -161,7 +167,12 @@
     }
   });
 
-  let rightControls = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector(".right-controls-buttons");
+  let rightControls = (
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar .right-controls-buttons") ||
+    document.querySelector("ytmusic-player-controls .right-controls-buttons") ||
+    document.querySelector(".right-controls-buttons") ||
+    document.querySelector("ytmusic-player-controls")
+  );
   let sleepTimerButton = document.createElement("yt-icon-button");
 
   let sleepTimerIcon = document.createElement("yt-icon");
@@ -170,6 +181,7 @@
 
   sleepTimerButton.setAttribute("title", "Sleep timer off");
   sleepTimerButton.classList.add("ytmusic-player-bar");
+  sleepTimerButton.classList.add("ytmusic-player-controls");
   sleepTimerButton.classList.add("ytmd-player-bar-control");
   sleepTimerButton.classList.add("sleep-timer-button");
   sleepTimerButton.onclick = () => {
@@ -338,7 +350,12 @@
       })
     );
   };
-  rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
+  const shuffleButton = rightControls?.querySelector(".shuffle") || document.querySelector(".shuffle");
+  if (shuffleButton) {
+    shuffleButton.insertAdjacentElement("afterend", sleepTimerButton);
+  } else if (rightControls) {
+    rightControls.appendChild(sleepTimerButton);
+  }
 
   const humanizeTime = time => {
     // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
@@ -406,7 +423,15 @@
               sleepTimerButton.classList.remove("active");
               sleepTimerButton.setAttribute("title", "Sleep timer off");
 
-              if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
+              const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
+              let isPlaying = false;
+              if (playerBar && typeof playerBar.playing === "boolean") {
+                isPlaying = playerBar.playing;
+              } else if (window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi && typeof window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState === "function") {
+                isPlaying = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState() === 1;
+              }
+
+              if (isPlaying) {
                 window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
 
                 document.body.dispatchEvent(
@@ -496,7 +521,11 @@
     let state = ytmStore.getState();
 
     // Update library button for current data
-    const currentMenu = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").getMenuRenderer();
+    const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") || document.querySelector("ytmusic-player-controls");
+    const currentMenu = (
+      (playerBar && typeof playerBar.getMenuRenderer === "function" ? playerBar.getMenuRenderer() : null) ||
+      (window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmPlayerBar && typeof window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer === "function" ? window.__YTMD_HOOK__.ytmPlayerBar.getMenuRenderer() : null)
+    );
     if (currentMenu) {
       if (playlistButton.classList.contains("hidden")) {
         playlistButton.classList.remove("hidden");
