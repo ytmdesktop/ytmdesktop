@@ -1,0 +1,14 @@
+:root {
+    /* Add variables from: https://github.com/better-lyrics/better-lyrics/blob/master/STYLING.md#colors
+    to customize them.
+
+    For instance, if you'd like to change the color of the text you'd add:
+    --blyrics-ui-text-color: green;
+
+    Or to change the scroll timing offsets you'd do:
+
+    --blyrics-scroll-timing-offset: 0.6s;
+
+    The docs have all the variables you can change and what their defaults are!
+    */
+}

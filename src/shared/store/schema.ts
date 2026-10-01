@@ -28,6 +28,13 @@ export type StoreSchema = {
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
+    skipSilence: boolean;
+    adBlock: boolean;
+  };
+  downloader: {
+    enabled: boolean;
+    autoDownload: boolean;
+    downloadPath: string | null;
   };
   integrations: {
     companionServerEnabled: boolean;
@@ -62,6 +69,22 @@ export type StoreSchema = {
   developer: {
     enableDevTools: boolean;
   };
+  extensions: {
+    enabled: boolean;
+    items: InstalledExtension[];
+  };
+};
+
+export type InstalledExtension = {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  enabled: boolean;
+  path: string;
+  icon?: string;
+  source: "webstore" | "folder" | "archive" | "builtin";
+  isBuiltin?: boolean;
 };
 
 export type MemoryStoreSchema = {

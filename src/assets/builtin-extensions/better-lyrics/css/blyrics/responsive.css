@@ -1,0 +1,68 @@
+@media (max-width: 936px) {
+	/* Styles for medium-sized screens */
+	#blyrics-wrapper {
+		margin-inline: -1.5rem;
+	}
+}
+
+@media (max-width: 615px) {
+	/* Styles for smaller screens */
+	.blyrics-container > div {
+		margin-inline: 4rem !important;
+	}
+	.blyrics-container:before {
+		background:
+			linear-gradient(to right, #030303 4rem, rgba(3, 3, 3, 0.5), #030303 96%),
+			var(--blyrics-background-img) !important;
+		background-position: 50% !important;
+		background-size: cover !important;
+		border-radius: 1rem;
+		bottom: 0;
+		filter: blur(80px) saturate(2);
+		top: 0;
+	}
+	.blyrics-container:after,
+	.blyrics-container:before {
+		content: "";
+		left: 0;
+		position: absolute;
+		right: 0;
+		z-index: -1;
+	}
+	.blyrics-container:after {
+		background: radial-gradient(
+			circle at center,
+			rgba(3, 3, 3, 0.1),
+			rgba(3, 3, 3, 0.5)
+		) !important;
+		bottom: -8rem;
+		top: -2rem;
+		transform: translateX(0) translateY(0) !important;
+	}
+	#blyrics-wrapper {
+		margin-top: 0;
+	}
+	.blyrics-footer {
+		row-gap: 1.25rem;
+	}
+}
+
+/* Fullscreen autoscroll button fix */
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-wrapper {
+	position: fixed;
+	top: 1rem;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	width: fit-content;
+}
+
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-button {
+	position: relative;
+	left: unset;
+	transform: none;
+}
+
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-button[autoscroll-hidden="true"] {
+	transform: translateY(-3rem);
+}

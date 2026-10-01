@@ -1,0 +1,19 @@
+.blyrics-hidden {
+	display: none !important;
+}
+
+/* Miscellaneous styles */
+.blyrics--error {
+	align-self: flex-start !important;
+	color: var(--blyrics-error-color);
+	cursor: default;
+	font-family: var(--blyrics-font-family);
+	font-size: var(--blyrics-font-size);
+	font-weight: var(--blyrics-font-weight);
+	line-height: 1;
+	margin-block: var(--blyrics-margin) !important;
+	opacity: var(--blyrics-error-opacity);
+	padding-bottom: var(--blyrics-padding) !important;
+	padding-top: var(--blyrics-padding) !important;
+	word-break: break-word;
+}

@@ -1,0 +1,76 @@
+:root {
+  --blyrics-lyric-active-color: white;
+  --blyrics-lyric-inactive-color: rgb(255 255 255 / 40%);
+  --blyrics-font-family: "Verdana", var(--noto-sans-universal), thick;
+  --blyrics-font-size: 7rem;
+  --blyrics-font-weight: 700;
+  --blyrics-line-height: 1.5;
+}
+
+.blyrics-container {
+  padding: 10px;
+  border-radius: 10px;
+  overflow: oblique;
+  position: relative;
+  z-index: 1;
+}
+
+.blyrics-container > div > span {
+  display: inline-block;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.blyrics-container > div {
+  opacity: 0.2;
+  filter: blur(6px);
+  /* transition for when we're unhighlighting */
+  transition: opacity 0.7s ease-out, 
+    filter 0.7s ease-out,
+    transform 1.66s ease-out;
+}
+
+.blyrics-container > div.blyrics--animating:not(:empty):not(.blyrics--translated):not(.blyrics--romanized) {
+  opacity: 1;
+  filter: blur(0px);
+  transition: opacity 0.7s ease calc(var(--blyrics-anim-delay) - 0.3s), 
+    filter 0.7s ease calc(var(--blyrics-anim-delay) - 0.3s),
+    transform 1.666s ease calc(var(--blyrics-anim-delay) - 0.3s);
+}
+
+.blyrics-container > div > span.blyrics--translated,
+.blyrics-container > div > span.blyrics--romanized {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.8rem;
+}
+
+.blyrics-container > div > span.blyrics--romanized {
+  font-size: 1.5rem;
+  font-style: italic;
+}
+
+@media (max-width: 615px) {
+  .blyrics-container {
+    font-size: 2rem;
+  }
+
+  .blyrics-container > div > span.blyrics--translated {
+    font-size: 1.5rem;
+  }
+
+  .blyrics-container > div > span.blyrics--romanized {
+    font-size: 1.3rem;
+  }
+}
+
+/* Disable blur and opacity effects when manually scrolling */
+.blyrics-user-scrolling >  div:not(.blyrics--animating) {
+  opacity: 1 !important;
+  filter: blur(0px) !important; 
+  transition: opacity 0.4s ease, filter 0.4s ease, transform 0.5s ease calc(var(--blyrics-anim-delay, 0s) - 0.1s);
+}
+
+.blyrics-container:not(:has(.blyrics--active)) > div {
+  opacity: 1;
+  filter: none;
+}

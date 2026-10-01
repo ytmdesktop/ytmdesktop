@@ -340,6 +340,88 @@
   };
   rightControls.querySelector(".shuffle").insertAdjacentElement("afterend", sleepTimerButton);
 
+  let downloadButton = document.createElement("yt-icon-button");
+  downloadButton.setAttribute("title", "Unduh Lagu (Download MP3)");
+  downloadButton.classList.add("ytmusic-player-bar");
+  downloadButton.classList.add("ytmd-player-bar-control");
+  downloadButton.classList.add("download-button");
+
+  const PATH_DOWNLOAD = "M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z";
+  const PATH_SPINNER = "M12 4V2C6.48 2 2 6.48 2 12h2c0-4.41 3.59-8 8-8zm0 16c-4.41 0-8-3.59-8-8H2c0 5.52 4.48 10 10 10v-2zm8-8c0-4.41-3.59-8-8-8v2c3.31 0 6 2.69 6 6h2zm-2 0c0 3.31-2.69 6-6 6v2c4.42 0 8-3.58 8-8h-2z";
+  const PATH_CHECK = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
+
+  function createSvgIcon(pathData) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("width", "20");
+    svg.setAttribute("height", "20");
+    svg.style.fill = "currentColor";
+    svg.style.pointerEvents = "none";
+    svg.style.display = "block";
+    svg.style.margin = "auto";
+
+    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathEl.setAttribute("d", pathData);
+    svg.appendChild(pathEl);
+    return svg;
+  }
+
+  function setButtonIcon(button, pathData) {
+    while (button.firstChild) {
+      button.removeChild(button.firstChild);
+    }
+    button.appendChild(createSvgIcon(pathData));
+  }
+
+  setButtonIcon(downloadButton, PATH_DOWNLOAD);
+
+  downloadButton.onclick = () => {
+    let videoId = currentVideoId;
+    let title = "";
+    let artist = "";
+    try {
+      const resp = window.__YTMD_HOOK__.ytmPlayerBar?.playerApi?.getPlayerResponse();
+      if (resp && resp.videoDetails) {
+        videoId = resp.videoDetails.videoId || videoId;
+        title = resp.videoDetails.title || "";
+        artist = resp.videoDetails.author || "";
+      }
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent("ytmd:downloadCurrentTrack", {
+      detail: { videoId, title, artist }
+    }));
+  };
+
+  window.addEventListener("ytmd:downloadStatus", e => {
+    const detail = e.detail;
+    if (!detail) return;
+
+    if (detail.status === "downloading") {
+      downloadButton.classList.add("downloading");
+      downloadButton.classList.remove("completed");
+      downloadButton.setAttribute("title", `Sedang mengunduh "${detail.title || "lagu"}"...`);
+      setButtonIcon(downloadButton, PATH_SPINNER);
+    } else if (detail.status === "completed") {
+      downloadButton.classList.remove("downloading");
+      downloadButton.classList.add("completed");
+      downloadButton.setAttribute("title", `Unduhan selesai! "${detail.title || "Lagu"}" tersimpan.`);
+      setButtonIcon(downloadButton, PATH_CHECK);
+      setTimeout(() => {
+        downloadButton.classList.remove("completed");
+        downloadButton.setAttribute("title", "Unduh Lagu (Download MP3)");
+        setButtonIcon(downloadButton, PATH_DOWNLOAD);
+      }, 4000);
+    } else if (detail.status === "error") {
+      downloadButton.classList.remove("downloading");
+      downloadButton.classList.remove("completed");
+      downloadButton.setAttribute("title", `Unduhan gagal: ${detail.error || "Terjadi kesalahan"}`);
+      setButtonIcon(downloadButton, PATH_DOWNLOAD);
+    }
+  });
+
+  sleepTimerButton.insertAdjacentElement("afterend", downloadButton);
+
   const humanizeTime = time => {
     // This is just a hacked together function to provide a humanization for the sleep timer. It serves no purpose outside that and isn't some complicated humanizer
     if (time === 1) return `${time} minute`;

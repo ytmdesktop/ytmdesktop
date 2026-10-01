@@ -1,0 +1,116 @@
+{
+  "manifest_version": 3,
+  "version": "2.3.3",
+  "default_locale": "en",
+  "name": "Better Lyrics (Lyrics for YouTube Music)",
+  "description": "__MSG_extensionDescription__",
+  "homepage_url": "https://betterlyrics.org",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "512": "icons/icon-512.png"
+  },
+  "host_permissions": [
+    "*://music.youtube.com/*"
+  ],
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://unison.boidu.dev/*",
+      "https://blrcunison.vercel.app/*"
+    ]
+  },
+  "optional_permissions": [
+    "downloads"
+  ],
+  "optional_host_permissions": [],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co; connect-src https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://better-lyrics-themes-api.boidu.dev; frame-src https://better-lyrics-themes-api.boidu.dev;"
+  },
+  "options_ui": {
+    "page": "options_ui/page.html",
+    "open_in_tab": false
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "*.js.map",
+        "css/blyrics/*.css",
+        "css/disablestylizedanimations.css",
+        "css/themes/*.css",
+        "css/themesong.css",
+        "css/ytmusic/*.css",
+        "images/icons/shaders.png",
+        "pages/marketplace.html",
+        "pages/standalone-editor.html",
+        "pages/unison.html"
+      ],
+      "matches": [
+        "*://music.youtube.com/*"
+      ]
+    },
+    {
+      "resources": [
+        "pages/auth.html"
+      ],
+      "matches": [
+        "https://blrcunison.vercel.app/*",
+        "https://unison.boidu.dev/*"
+      ]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "betterlyrics@boidu.dev",
+      "strict_min_version": "100.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "content_scripts/content-0.js"
+      ],
+      "run_at": "document_start",
+      "world": "ISOLATED",
+      "css": []
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "earlyInject.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "css": []
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "script.js"
+      ],
+      "run_at": "document_end",
+      "world": "MAIN",
+      "css": []
+    }
+  ],
+  "action": {
+    "default_popup": "action/default_popup.html"
+  },
+  "version_name": "2.3.3",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4RTGjLjI1KqxGLgE7d3tD4O+mTA6pKDPZ29V4/uP9nBicHRst7R7n5wdFW1qvLiILyUqRm1fURMBeShb0mcPEMC6iW3cr4i8NG+52VxFcPIYbsegPHJsQFVWe6lgorVw20yn2mWshGKIppgN14FJCSFc7mS/CX4JL88E82AIaFJiVBgmpBu5RMcglUfSwMH5ePlRV68dOhMjX8bdoHH6FoAARh7igtyKBKEzA811PWRIBiKZBGAZc2ew6+5O2mERuFq0PRvfEcD4KsBRiWHltyUcYzVjIMF4soC8i6lNOJx8it0kAn5PN6G7TdiD3HbU5eLqk+iCr+cK/pS1ybiACQIDAQAB",
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+  "update_url": "https://clients2.google.com/service/update2/crx"
+}

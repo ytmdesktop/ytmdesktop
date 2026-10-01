@@ -1,0 +1,886 @@
+<!DOCTYPE html><html lang="en-US"><head>
+		<meta name="color-scheme" content="dark">
+		<title>Better Lyrics Settings</title>
+		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+		<link href="https://api.fontshare.com/v2.0.5/css?f[]=satoshi@1&amp;display=swap" rel="stylesheet">
+		
+		
+		<style>body:not(.i18n-ready){opacity:0}</style>
+	<link rel="stylesheet" href="/action/default_popup.css"></head>
+	<body class="options-page">
+		<nav id="navbar">
+			<h1>
+				<img src="https://betterlyrics.org/icon-512.png" alt="Better Lyrics" width="24" height="24">
+				<div class="heading">Better Lyrics <span>2.3.3</span></div>
+			</h1>
+			<div class="nav-container">
+				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20" width="20" fill="currentColor">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M12.026 2c-5.509 0-9.974 4.465-9.974 9.974 0 4.406 2.857 8.145 6.821 9.465.499.09.679-.217.679-.481 0-.237-.008-.865-.011-1.696-2.775.602-3.361-1.338-3.361-1.338-.452-1.152-1.107-1.459-1.107-1.459-.905-.619.069-.605.069-.605 1.002.07 1.527 1.028 1.527 1.028.89 1.524 2.336 1.084 2.902.829.091-.645.351-1.085.635-1.334-2.214-.251-4.542-1.107-4.542-4.93 0-1.087.389-1.979 1.024-2.675-.101-.253-.446-1.268.099-2.64 0 0 .837-.269 2.742 1.021a9.582 9.582 0 0 1 2.496-.336 9.554 9.554 0 0 1 2.496.336c1.906-1.291 2.742-1.021 2.742-1.021.545 1.372.203 2.387.099 2.64.64.696 1.024 1.587 1.024 2.675 0 3.833-2.33 4.675-4.552 4.922.355.308.675.916.675 1.846 0 1.334-.012 2.41-.012 2.737 0 .267.178.577.687.479C19.146 20.115 22 16.379 22 11.974 22 6.465 17.535 2 12.026 2z"></path>
+					</svg>
+				</a>
+				<a href="https://betterlyrics.org" target="_blank">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20" width="20">
+						<path strokelinecap="round" strokelinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path>
+					</svg>
+				</a>
+				<a href="https://x.com/betterlyric" target="_blank">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 256 209" fill="currentColor">
+						<path d="M256 25.45a105.04 105.04 0 0 1-30.166 8.27c10.845-6.5 19.172-16.793 23.093-29.057a105.183 105.183 0 0 1-33.351 12.745C205.995 7.201 192.346.822 177.239.822c-29.006 0-52.523 23.516-52.523 52.52c0 4.117.465 8.125 1.36 11.97c-43.65-2.191-82.35-23.1-108.255-54.876c-4.52 7.757-7.11 16.78-7.11 26.404c0 18.222 9.273 34.297 23.365 43.716a52.312 52.312 0 0 1-23.79-6.57c-.003.22-.003.44-.003.661c0 25.447 18.104 46.675 42.13 51.5a52.592 52.592 0 0 1-23.718.9c6.683 20.866 26.08 36.05 49.062 36.475c-17.975 14.086-40.622 22.483-65.228 22.483c-4.24 0-8.42-.249-12.529-.734c23.243 14.902 50.85 23.597 80.51 23.597c96.607 0 149.434-80.031 149.434-149.435c0-2.278-.05-4.543-.152-6.795A106.748 106.748 0 0 0 256 25.45"></path>
+					</svg>
+				</a>
+				<a class="discord-btn" href="https://discord.gg/UsHE3d5fWF" target="_blank">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02M8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12m6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12"></path>
+					</svg>
+				</a>
+			</div>
+		</nav>
+		<div id="options">
+			<div class="tab-container">
+				<button class="tab active" id="general-tab" data-target="#general-content">
+					__MSG_options_tab_general__
+				</button>
+				<button class="tab" id="display-tab" data-target="#display-content">
+					__MSG_options_tab_display__
+				</button>
+				<button class="tab" id="language-tab" data-target="#language-content">
+					__MSG_options_tab_language__
+				</button>
+				<button class="tab" id="sources-tab" data-target="#sources-content">
+					__MSG_options_tab_sources__
+				</button>
+				<button class="tab" id="identity-tab" data-target="#identity-content">
+					__MSG_options_tab_identity__
+				</button>
+				<button class="tab" id="themes-tab" data-target="#themes-content">
+					__MSG_options_tab_themes__
+				</button>
+			</div>
+			<div class="tab-content active" id="general-content">
+				<div class="settings-group">
+					<h2>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd"></path>
+						</svg>
+
+						__MSG_options_general_title__
+					</h2>
+					<p>__MSG_options_general_description__</p>
+					<div class="container">
+						<span>__MSG_options_general_showLogs__</span>
+						<label>
+							<input type="checkbox" id="logs">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_general_autoSwitch__</span>
+						<label>
+							<input type="checkbox" id="autoSwitch">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container container--small">
+						<p>__MSG_options_general_cache__</p>
+						<button class="small-btn btn-danger" id="clear-cache">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+								<path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd"></path>
+							</svg>
+
+							<span style="padding-top: 0.1rem">__MSG_options_general_clearCache__</span>
+						</button>
+					</div>
+					<div class="text-group">
+						<p>
+							<span class="text-group__title">__MSG_options_general_totalLyrics__</span>
+							<span class="dots"></span>
+							<span id="lyrics-count">0</span>
+						</p>
+						<p>
+							<span class="text-group__title">__MSG_options_general_cacheSize__</span>
+							<span class="dots"></span>
+							<span id="cache-size">0 Bytes</span>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="tab-content" id="display-content">
+				<div class="settings-group">
+					<h2>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd"></path>
+						</svg>
+
+						__MSG_options_display_title__
+					</h2>
+					<p>__MSG_options_display_description__</p>
+					<div class="container">
+						<span>__MSG_options_display_disableFullscreen__</span>
+						<label>
+							<input type="checkbox" id="isFullScreenDisabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_autoHideCursor__</span>
+						<label>
+							<input type="checkbox" id="cursorAutoHide">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_albumArt__</span>
+						<label>
+							<input type="checkbox" id="albumArt">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_stylizedAnimations__</span>
+						<label>
+							<input type="checkbox" id="isStylizedAnimationsEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_passiveScroll__</span>
+						<label>
+							<input type="checkbox" id="isPassiveScrollEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_shadersPromo__</span>
+						<label>
+							<input type="checkbox" id="isShadersPromoEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_unisonActions__</span>
+						<button class="small-btn" id="unison-actions-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+								<path fill-rule="evenodd" d="M11.828 2.25c-.916 0-1.699.663-1.85 1.567l-.091.549a.798.798 0 0 1-.517.608 7.45 7.45 0 0 0-.478.198.798.798 0 0 1-.796-.064l-.453-.324a1.875 1.875 0 0 0-2.416.2l-.243.243a1.875 1.875 0 0 0-.2 2.416l.324.453a.798.798 0 0 1 .064.796 7.448 7.448 0 0 0-.198.478.798.798 0 0 1-.608.517l-.55.092a1.875 1.875 0 0 0-1.566 1.849v.344c0 .916.663 1.699 1.567 1.85l.549.091c.281.047.508.25.608.517.06.162.127.321.198.478a.798.798 0 0 1-.064.796l-.324.453a1.875 1.875 0 0 0 .2 2.416l.243.243c.648.648 1.67.733 2.416.2l.453-.324a.798.798 0 0 1 .796-.064c.157.071.316.137.478.198.267.1.47.327.517.608l.092.55c.15.903.932 1.566 1.849 1.566h.344c.916 0 1.699-.663 1.85-1.567l.091-.549a.798.798 0 0 1 .517-.608 7.52 7.52 0 0 0 .478-.198.798.798 0 0 1 .796.064l.453.324a1.875 1.875 0 0 0 2.416-.2l.243-.243c.648-.648.733-1.67.2-2.416l-.324-.453a.798.798 0 0 1-.064-.796c.071-.157.137-.316.198-.478.1-.267.327-.47.608-.517l.55-.091a1.875 1.875 0 0 0 1.566-1.85v-.344c0-.916-.663-1.699-1.567-1.85l-.549-.091a.798.798 0 0 1-.608-.517 7.507 7.507 0 0 0-.198-.478.798.798 0 0 1 .064-.796l.324-.453a1.875 1.875 0 0 0-.2-2.416l-.243-.243a1.875 1.875 0 0 0-2.416-.2l-.453.324a.798.798 0 0 1-.796.064 7.462 7.462 0 0 0-.478-.198.798.798 0 0 1-.517-.608l-.091-.55a1.875 1.875 0 0 0-1.85-1.566h-.344ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd"></path>
+							</svg>
+							<span>__MSG_options_manage__</span>
+						</button>
+					</div>
+					<div class="container">
+						<span>__MSG_options_unisonModal_controlOffset__</span>
+						<button class="small-btn" id="offset-settings-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12m10-4a1 1 0 1 0-2 0v5a1 1 0 0 0 1 1h5a1 1 0 1 0 0-2h-4z" clip-rule="evenodd"></path></svg>
+							<span>__MSG_options_manage__</span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="tab-content" id="language-content">
+				<div class="settings-group">
+					<h2>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M9 2.25a.75.75 0 0 1 .75.75v1.506a49.384 49.384 0 0 1 5.343.371.75.75 0 1 1-.186 1.489c-.66-.083-1.323-.151-1.99-.206a18.67 18.67 0 0 1-2.97 6.323c.318.384.65.753 1 1.107a.75.75 0 0 1-1.07 1.052A18.902 18.902 0 0 1 9 13.687a18.823 18.823 0 0 1-5.656 4.482.75.75 0 0 1-.688-1.333 17.323 17.323 0 0 0 5.396-4.353A18.72 18.72 0 0 1 5.89 8.598a.75.75 0 0 1 1.388-.568A17.21 17.21 0 0 0 9 11.224a17.168 17.168 0 0 0 2.391-5.165 48.04 48.04 0 0 0-8.298.307.75.75 0 0 1-.186-1.489 49.159 49.159 0 0 1 5.343-.371V3A.75.75 0 0 1 9 2.25ZM15.75 9a.75.75 0 0 1 .68.433l5.25 11.25a.75.75 0 1 1-1.36.634l-1.198-2.567h-6.744l-1.198 2.567a.75.75 0 0 1-1.36-.634l5.25-11.25A.75.75 0 0 1 15.75 9Zm-2.672 8.25h5.344l-2.672-5.726-2.672 5.726Z" clip-rule="evenodd"></path>
+						</svg>
+
+						__MSG_options_language_title__
+					</h2>
+					<p>__MSG_options_language_description__</p>
+					<div class="container">
+						<span>__MSG_options_language_displayLanguage__</span>
+						<div class="select">
+							<select id="uiLanguage"></select>
+						</div>
+					</div>
+					<div class="container">
+						<span>__MSG_options_language_romanization__</span>
+						<label>
+							<input type="checkbox" id="isRomanizationEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_language_translate__</span>
+						<label>
+							<input type="checkbox" id="translate">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_language_translationLanguage__</span>
+						<div class="select">
+							<select id="translationLanguage">
+								<option value="af">Afrikaans</option>
+								<option value="sq">Albanian</option>
+								<option value="am">Amharic</option>
+								<option value="ar">Arabic</option>
+								<option value="hy">Armenian</option>
+								<option value="as">Assamese</option>
+								<option value="ay">Aymara</option>
+								<option value="az">Azerbaijani</option>
+								<option value="bm">Bambara</option>
+								<option value="eu">Basque</option>
+								<option value="be">Belarusian</option>
+								<option value="bn">Bengali</option>
+								<option value="bho">Bhojpuri</option>
+								<option value="bs">Bosnian</option>
+								<option value="bg">Bulgarian</option>
+								<option value="ca">Catalan</option>
+								<option value="ceb">Cebuano</option>
+								<option value="zh-CN">Chinese (Simplified)</option>
+								<option value="zh-TW">Chinese (Traditional)</option>
+								<option value="co">Corsican</option>
+								<option value="hr">Croatian</option>
+								<option value="cs">Czech</option>
+								<option value="da">Danish</option>
+								<option value="dv">Dhivehi</option>
+								<option value="doi">Dogri</option>
+								<option value="nl">Dutch</option>
+								<option value="en">English</option>
+								<option value="eo">Esperanto</option>
+								<option value="et">Estonian</option>
+								<option value="ee">Ewe</option>
+								<option value="fil">Filipino (Tagalog)</option>
+								<option value="fi">Finnish</option>
+								<option value="fr">French</option>
+								<option value="fy">Frisian</option>
+								<option value="gl">Galician</option>
+								<option value="ka">Georgian</option>
+								<option value="de">German</option>
+								<option value="el">Greek</option>
+								<option value="gn">Guarani</option>
+								<option value="gu">Gujarati</option>
+								<option value="ht">Haitian Creole</option>
+								<option value="ha">Hausa</option>
+								<option value="haw">Hawaiian</option>
+								<option value="he">Hebrew</option>
+								<option value="hi">Hindi</option>
+								<option value="hmn">Hmong</option>
+								<option value="hu">Hungarian</option>
+								<option value="is">Icelandic</option>
+								<option value="ig">Igbo</option>
+								<option value="ilo">Ilocano</option>
+								<option value="id">Indonesian</option>
+								<option value="ga">Irish</option>
+								<option value="it">Italian</option>
+								<option value="ja">Japanese</option>
+								<option value="jv">Javanese</option>
+								<option value="kn">Kannada</option>
+								<option value="kk">Kazakh</option>
+								<option value="km">Khmer</option>
+								<option value="rw">Kinyarwanda</option>
+								<option value="gom">Konkani</option>
+								<option value="ko">Korean</option>
+								<option value="kri">Krio</option>
+								<option value="ku">Kurdish</option>
+								<option value="ckb">Kurdish (Sorani)</option>
+								<option value="ky">Kyrgyz</option>
+								<option value="lo">Lao</option>
+								<option value="la">Latin</option>
+								<option value="lv">Latvian</option>
+								<option value="ln">Lingala</option>
+								<option value="lt">Lithuanian</option>
+								<option value="lg">Luganda</option>
+								<option value="lb">Luxembourgish</option>
+								<option value="mk">Macedonian</option>
+								<option value="mai">Maithili</option>
+								<option value="mg">Malagasy</option>
+								<option value="ms">Malay</option>
+								<option value="ml">Malayalam</option>
+								<option value="mt">Maltese</option>
+								<option value="mi">Maori</option>
+								<option value="mr">Marathi</option>
+								<option value="mni-Mtei">Meiteilon (Manipuri)</option>
+								<option value="lus">Mizo</option>
+								<option value="mn">Mongolian</option>
+								<option value="my">Myanmar (Burmese)</option>
+								<option value="ne">Nepali</option>
+								<option value="no">Norwegian</option>
+								<option value="ny">Nyanja (Chichewa)</option>
+								<option value="or">Odia (Oriya)</option>
+								<option value="om">Oromo</option>
+								<option value="ps">Pashto</option>
+								<option value="fa">Persian</option>
+								<option value="pl">Polish</option>
+								<option value="pt">Portuguese (Portugal, Brazil)</option>
+								<option value="pa">Punjabi</option>
+								<option value="qu">Quechua</option>
+								<option value="ro">Romanian</option>
+								<option value="ru">Russian</option>
+								<option value="sm">Samoan</option>
+								<option value="sa">Sanskrit</option>
+								<option value="gd">Scots Gaelic</option>
+								<option value="nso">Sepedi</option>
+								<option value="sr">Serbian</option>
+								<option value="st">Sesotho</option>
+								<option value="sn">Shona</option>
+								<option value="sd">Sindhi</option>
+								<option value="si">Sinhala (Sinhalese)</option>
+								<option value="sk">Slovak</option>
+								<option value="sl">Slovenian</option>
+								<option value="so">Somali</option>
+								<option value="es">Spanish</option>
+								<option value="su">Sundanese</option>
+								<option value="sw">Swahili</option>
+								<option value="sv">Swedish</option>
+								<option value="tl">Tagalog (Filipino)</option>
+								<option value="tg">Tajik</option>
+								<option value="ta">Tamil</option>
+								<option value="tt">Tatar</option>
+								<option value="te">Telugu</option>
+								<option value="th">Thai</option>
+								<option value="ti">Tigrinya</option>
+								<option value="ts">Tsonga</option>
+								<option value="tr">Turkish</option>
+								<option value="tk">Turkmen</option>
+								<option value="ak">Twi (Akan)</option>
+								<option value="uk">Ukrainian</option>
+								<option value="ur">Urdu</option>
+								<option value="ug">Uyghur</option>
+								<option value="uz">Uzbek</option>
+								<option value="vi">Vietnamese</option>
+								<option value="cy">Welsh</option>
+								<option value="xh">Xhosa</option>
+								<option value="yi">Yiddish</option>
+								<option value="yo">Yoruba</option>
+								<option value="zu">Zulu</option>
+							</select>
+						</div>
+					</div>
+					<div class="container" id="romanization-config-container" style="display: none;">
+						<span>__MSG_options_language_exclusions__</span>
+						<button class="small-btn" id="romanization-config-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+								<path fill-rule="evenodd" d="M11.828 2.25c-.916 0-1.699.663-1.85 1.567l-.091.549a.798.798 0 0 1-.517.608 7.45 7.45 0 0 0-.478.198.798.798 0 0 1-.796-.064l-.453-.324a1.875 1.875 0 0 0-2.416.2l-.243.243a1.875 1.875 0 0 0-.2 2.416l.324.453a.798.798 0 0 1 .064.796 7.448 7.448 0 0 0-.198.478.798.798 0 0 1-.608.517l-.55.092a1.875 1.875 0 0 0-1.566 1.849v.344c0 .916.663 1.699 1.567 1.85l.549.091c.281.047.508.25.608.517.06.162.127.321.198.478a.798.798 0 0 1-.064.796l-.324.453a1.875 1.875 0 0 0 .2 2.416l.243.243c.648.648 1.67.733 2.416.2l.453-.324a.798.798 0 0 1 .796-.064c.157.071.316.137.478.198.267.1.47.327.517.608l.092.55c.15.903.932 1.566 1.849 1.566h.344c.916 0 1.699-.663 1.85-1.567l.091-.549a.798.798 0 0 1 .517-.608 7.52 7.52 0 0 0 .478-.198.798.798 0 0 1 .796.064l.453.324a1.875 1.875 0 0 0 2.416-.2l.243-.243c.648-.648.733-1.67.2-2.416l-.324-.453a.798.798 0 0 1-.064-.796c.071-.157.137-.316.198-.478.1-.267.327-.47.608-.517l.55-.091a1.875 1.875 0 0 0 1.566-1.85v-.344c0-.916-.663-1.699-1.567-1.85l-.549-.091a.798.798 0 0 1-.608-.517 7.507 7.507 0 0 0-.198-.478.798.798 0 0 1 .064-.796l.324-.453a1.875 1.875 0 0 0-.2-2.416l-.243-.243a1.875 1.875 0 0 0-2.416-.2l-.453.324a.798.798 0 0 1-.796.064 7.462 7.462 0 0 0-.478-.198.798.798 0 0 1-.517-.608l-.091-.55a1.875 1.875 0 0 0-1.85-1.566h-.344ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd"></path>
+							</svg>
+							<span>__MSG_options_manage__</span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="tab-content" id="sources-content">
+				<div class="settings-group">
+					<h2>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20" width="20">
+							<path strokelinecap="round" strokelinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path>
+						</svg>
+
+						__MSG_options_sources_title__
+						<button class="unison-open-btn" id="open-unison-btn">
+							<img src="https://betterlyrics.org/icon-512.png" alt="" width="14" height="14">
+							__MSG_options_sources_openUnison__
+						</button>
+					</h2>
+					<p>
+						__MSG_options_sources_description__
+					</p>
+					<div class="container" style="margin-bottom: 0.2rem">
+						<ul id="providers-list" class="sortable-list"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-content" id="themes-content">
+			<div class="settings-group">
+				<h2>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path fill-rule="evenodd" d="M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z" clip-rule="evenodd"></path>
+					</svg>
+
+					__MSG_options_themes_title__
+				</h2>
+				<p>__MSG_options_themes_description__</p>
+				<div class="theme-preview-card" id="theme-preview-card">
+					<div class="theme-preview-info">
+						<div class="theme-preview-header">
+							<span class="theme-preview-name" id="theme-preview-name">__MSG_options_themes_chooseTheme__</span>
+							<span class="theme-preview-badge" id="theme-preview-badge"></span>
+						</div>
+						<span class="theme-preview-author" id="theme-preview-author"></span>
+					</div>
+					<button class="theme-preview-change-btn" id="theme-selector-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0" opacity=".66"></path><path fill-rule="evenodd" d="M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m2.212-6.712a.983.983 0 0 1 0 1.39l-.058.058a.24.24 0 0 1-.211.067a1.6 1.6 0 0 1-.81-.436a1.6 1.6 0 0 1-.436-.81a.24.24 0 0 1 .067-.211l.058-.058a.983.983 0 0 1 1.39 0M17.35 8.04a3 3 0 0 1-.296.279a1.6 1.6 0 0 1-.303.187c-.09.043-.188.076-.381.14l-1.021.34a.265.265 0 0 1-.335-.335l.34-1.02c.064-.194.097-.291.14-.382q.077-.163.187-.303c.062-.08.134-.152.279-.296l1.799-1.799c.043-.043.118-.023.138.035a1.98 1.98 0 0 0 1.217 1.217c.058.02.078.095.035.138z" clip-rule="evenodd"></path></svg>
+							__MSG_options_themes_change__
+						</button>
+				</div>
+				<div class="container">
+					<span>__MSG_options_themes_customStyles__</span>
+					<button class="small-btn" id="edit-css-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+							<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
+							<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+						</svg>
+						<span id="edit-css-btn-text">__MSG_options_themes_create__</span>
+					</button>
+				</div>
+				<div class="store-buttons-row">
+					<button class="small-btn" id="browse-themes-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z"></path>
+							<path fill-rule="evenodd" d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd"></path>
+						</svg>
+						__MSG_options_themes_marketplace__
+					</button>
+					<div class="your-themes-container">
+						<button class="small-btn" id="your-themes-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="installed-icon">
+								<path fill="currentColor" fill-rule="evenodd" d="M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.455-2.784c-.765-.67-1.545-1.564-1.545-2.418c0-1.773 1.65-2.435 3-1.065c1.35-1.37 3-.708 3 1.065c0 .854-.78 1.747-1.545 2.418c-.596.523-.894.784-1.455.784c-.56 0-.859-.261-1.455-.784" clip-rule="evenodd"></path><path fill="currentColor" d="M21.904 16.441c.083-1.024.094-2.274.096-3.743a.697.697 0 1 0-1.396 0c-.001 1.477-.012 2.658-.091 3.63c-.084 1.032-.242 1.763-.507 2.32l-2.633-2.37a2.79 2.79 0 0 0-3.471-.21l-.277.196a1.86 1.86 0 0 1-2.386-.207l-3.99-3.99a2.14 2.14 0 0 0-2.922-.097l-.931.814V12c0-2.212 0-3.801.163-5.01c.16-1.19.464-1.907.994-2.437S5.8 3.72 6.99 3.56c1.079-.145 2.458-.161 4.313-.163a.699.699 0 0 0 0-1.396c-1.829.002-3.33.02-4.499.177c-1.343.18-2.404.557-3.236 1.39s-1.21 1.893-1.39 3.236C2 8.116 2 9.8 2 11.947V12q0 .736.002 1.396c.007 1.729.044 3.121.243 4.24c.203 1.14.584 2.058 1.322 2.796c.832.833 1.893 1.21 3.236 1.39C8.116 22 9.8 22 11.947 22h.106c2.148 0 3.83 0 5.144-.177c1.344-.18 2.404-.557 3.236-1.39a4.2 4.2 0 0 0 .73-.983c.445-.825.644-1.82.74-3.009" opacity="0.66"></path>
+							</svg>
+							<span>__MSG_options_themes_installedThemes__</span>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="chevron-icon">
+								<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"></path>
+							</svg>
+						</button>
+						<div id="your-themes-dropdown"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-content" id="identity-content">
+			<div class="settings-group">
+				<h2>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M10.95 19.55q.5.3 1.05.288t1.05-.313l4.55-2.775q-1.25-.875-2.675-1.312T12 15t-2.937.438t-2.713 1.287zM12 13q1.45 0 2.475-1.025T15.5 9.5t-1.025-2.475T12 6T9.525 7.025T8.5 9.5t1.025 2.475T12 13m-1.05 8.875l-7-4.3q-.45-.275-.7-.725T3 15.875v-7.75q0-.525.25-.975t.7-.725l7-4.3q.5-.3 1.05-.3t1.05.3l7 4.3q.45.275.7.725t.25.975v7.75q0 .525-.25.975t-.7.725l-7 4.3q-.5.3-1.05.3t-1.05-.3"></path>
+					</svg>
+					__MSG_options_identity_title__
+				</h2>
+				<p>__MSG_options_identity_description__</p>
+				<div class="identity-warning" role="note">
+					<svg class="identity-warning__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+						<path fill-rule="evenodd" d="M6.701 2.252a1.5 1.5 0 0 1 2.598 0l5.196 9.001A1.5 1.5 0 0 1 13.196 13.5H2.804a1.5 1.5 0 0 1-1.299-2.247l5.196-9.001ZM8 5.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 5.5Zm0 6.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"></path>
+					</svg>
+					<p class="identity-warning__text">__MSG_options_identity_warning__</p>
+				</div>
+				<div class="container container--small">
+					<p class="text-group__title">__MSG_options_identity_yourIdentity__</p>
+					<div class="identity-edit-row">
+						<code id="identity-display-name">__MSG_options_identity_loading__</code>
+						<button class="small-btn" id="nickname-edit-btn" aria-label="__MSG_options_nickname_editLabel__">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+								<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
+								<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+							</svg>
+							__MSG_options_nickname_edit__
+						</button>
+					</div>
+				</div>
+				<div class="container container--small">
+					<p>__MSG_options_identity_exportImport__</p>
+					<div class="button-row">
+						<button class="small-btn" id="export-identity-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+								<path fill-rule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-3.22-3.22V16.5a.75.75 0 0 1-1.5 0V4.81L8.03 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM3 15.75a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
+							</svg>
+							__MSG_options_identity_exportKey__
+						</button>
+						<button class="small-btn" id="import-identity-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+								<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
+							</svg>
+							__MSG_options_identity_importKey__
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="status"></div>
+
+		<div id="modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="modal-message" class="modal-message"></p>
+					<input type="text" id="modal-input" class="modal-input" placeholder="">
+				</div>
+				<div class="modal-footer">
+					<button id="modal-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="modal-confirm" class="modal-btn modal-btn-primary">
+						__MSG_options_modal_confirm__
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="lang-exclusions-modal-overlay" class="modal-overlay">
+			<div class="modal lang-exclusions-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_language_exclusionsTitle__</h3>
+					<button id="lang-exclusions-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+
+				<!-- Tabs -->
+				<div class="modal-tab-container">
+					<button class="modal-tab active" data-tab="romanization">__MSG_options_romanization_tab__</button>
+					<button class="modal-tab" data-tab="translation">__MSG_options_translation_tab__</button>
+				</div>
+
+				<!-- Romanization Tab Content -->
+				<div class="lang-exclusions-tab-content active" id="romanization-tab-content">
+					<div class="lang-search-container">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="lang-search-icon">
+							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"></path>
+						</svg>
+						<input type="text" id="romanization-search" placeholder="__MSG_options_searchLanguages__" class="lang-search-input">
+					</div>
+					<p class="lang-hint">__MSG_options_romanization_hint__</p>
+					<div id="romanization-pills-container" class="lang-pills"></div>
+				</div>
+
+				<!-- Translation Tab Content -->
+				<div class="lang-exclusions-tab-content" id="translation-tab-content">
+					<div class="lang-search-container">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="lang-search-icon">
+							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"></path>
+						</svg>
+						<input type="text" id="translation-search" placeholder="__MSG_options_searchLanguages__" class="lang-search-input">
+					</div>
+					<p class="lang-hint">__MSG_options_translation_hint__</p>
+					<div id="translation-pills-container" class="lang-pills"></div>
+				</div>
+
+				<div class="modal-footer">
+					<button id="lang-exclusions-reset-btn" class="modal-btn modal-btn-secondary">__MSG_options_resetToDefault__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="unison-actions-modal-overlay" class="modal-overlay">
+			<div class="modal unison-actions-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_unisonModal_title__</h3>
+					<button id="unison-actions-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="modal-body" id="unison-actions-modal-body">
+					<div class="container unison-modal-row">
+						<div class="unison-modal-row__text">
+							<span>__MSG_options_unisonModal_showPinned__</span>
+							<p class="modal-row-hint">__MSG_options_unisonModal_showPinned_hint__</p>
+						</div>
+						<label>
+							<input type="checkbox" id="isUnisonPinnedDockEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container unison-modal-row unison-modal-row--dependent">
+						<div class="unison-modal-row__text">
+							<span>__MSG_options_unisonModal_autoHide__</span>
+							<p class="modal-row-hint">__MSG_options_unisonModal_autoHide_hint__</p>
+						</div>
+						<label>
+							<input type="checkbox" id="isUnisonAutoHideInFullscreenEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="position-section unison-modal-row--dependent">
+						<span class="position-section__label">__MSG_options_unisonModal_controlsShown__</span>
+						<div class="controls-shown-picker">
+							<label class="control-cell" data-control="source" title="__MSG_options_unisonModal_controlSource__">
+								<input type="checkbox" id="isDockSourceEnabled">
+								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><!-- Icon from Streamline by Streamline - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x=".5" y=".5" rx="3"></rect><path d="m6 10.5l-2-2h6m-2-5l2 2H4"></path></g></svg></span>
+							</label>
+							<label class="control-cell" data-control="translate" title="__MSG_options_translation_tab__">
+								<input type="checkbox" id="isDockTranslateEnabled">
+								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M9 3a1 1 0 0 1 .993.883L10 4v1h4a1 1 0 0 1 .116 1.993L14 7h-1.055c-.223 2.032-1.116 3.99-2.545 5.688q.785.683 1.735 1.266l.386.228l2.067-4.592a1 1 0 0 1 1.763-.115l.06.115l4.5 10a1 1 0 0 1-1.77.924l-.053-.104L18.003 18h-5.007l-1.084 2.41a1 1 0 0 1-1.866-.711l.042-.11l1.61-3.576a15.2 15.2 0 0 1-2.7-1.894c-1.287 1.136-2.848 2.098-4.627 2.81a1 1 0 1 1-.743-1.857c1.557-.623 2.887-1.441 3.972-2.382a11.5 11.5 0 0 1-1.978-3.34a1 1 0 0 1 1.873-.702A9.4 9.4 0 0 0 9 11.244c.989-1.227 1.625-2.576 1.877-3.931L10.928 7H4a1 1 0 0 1-.117-1.993L4 5h4V4a1 1 0 0 1 1-1m8.103 13L15.5 12.437L13.898 16z"></path></svg></span>
+							</label>
+							<label class="control-cell" data-control="romanize" title="__MSG_options_romanization_tab__">
+								<input type="checkbox" id="isDockRomanizeEnabled">
+								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M17 11a1 1 0 0 1 1 1v1h1.5a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5H18v1a1 1 0 1 1-2 0v-1h-1.5a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5H16v-1a1 1 0 0 1 1-1M5 15a1 1 0 0 1 1 1v1a1 1 0 0 0 1 1h3a1 1 0 1 1 0 2H7a3 3 0 0 1-3-3v-1a1 1 0 0 1 1-1m14 0h-1v2h1zm-3 0h-1v2h1zM9.5 3a1 1 0 1 1 0 2H5v2h4a1 1 0 0 1 0 2H5v2h5a1 1 0 1 1 0 2H4.1A1.1 1.1 0 0 1 3 11.9V4.1A1.1 1.1 0 0 1 4.1 3ZM17 4a3 3 0 0 1 3 3v2a1 1 0 1 1-2 0V7a1 1 0 0 0-1-1h-3a1 1 0 1 1 0-2Z"></path></svg></span>
+							</label>
+							<label class="control-cell" data-control="offset" title="__MSG_options_unisonModal_controlOffset__">
+								<input type="checkbox" id="isDockOffsetEnabled">
+								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 8v5h5"></path></svg></span>
+							</label>
+						</div>
+					</div>
+					<div class="position-section unison-modal-row--dependent">
+						<span class="position-section__label">__MSG_options_unisonModal_position__</span>
+						<div class="position-picker">
+							<div class="position-frame" id="unison-position-frame">
+								<div class="position-cell" data-pos="top-left" title="__MSG_options_unisonModal_position_topLeft__"></div>
+								<div class="position-cell" data-pos="top-center" title="__MSG_options_unisonModal_position_topCenter__"></div>
+								<div class="position-cell" data-pos="top-right" title="__MSG_options_unisonModal_position_topRight__"></div>
+								<div class="position-cell" data-pos="bottom-left" title="__MSG_options_unisonModal_position_bottomLeft__"></div>
+								<div class="position-cell" data-pos="bottom-center" title="__MSG_options_unisonModal_position_bottomCenter__"></div>
+								<div class="position-cell" data-pos="bottom-right" title="__MSG_options_unisonModal_position_bottomRight__"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="dock-settings-reset" class="modal-btn modal-btn-secondary">__MSG_options_reset__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="offset-modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_unisonModal_controlOffset__</h3>
+					<button id="offset-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="container offset-row">
+						<div class="offset-info">
+							<span>__MSG_lyricsDock_offsetGlobal__</span>
+							<div class="offset-applies" data-offset-scope="globalLyricOffset">
+								<span class="offset-applies__label">__MSG_options_offsetModal_appliesTo__</span>
+							</div>
+						</div>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="globalLyricOffset" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"></path></svg></button>
+							<span class="offset-stepper__value" data-for="globalLyricOffset">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="globalLyricOffset" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"></path></svg></button>
+							<input type="hidden" id="globalLyricOffset">
+						</div>
+					</div>
+					<div class="container offset-row">
+						<div class="offset-info">
+							<span>__MSG_unison_syncRichsync__</span>
+							<div class="offset-applies" data-offset-scope="richsyncOffsetTrim">
+								<span class="offset-applies__label">__MSG_options_offsetModal_appliesTo__</span>
+							</div>
+						</div>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="richsyncOffsetTrim" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"></path></svg></button>
+							<span class="offset-stepper__value" data-for="richsyncOffsetTrim">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="richsyncOffsetTrim" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"></path></svg></button>
+							<input type="hidden" id="richsyncOffsetTrim">
+						</div>
+					</div>
+					<div class="container offset-row">
+						<div class="offset-info">
+							<span>__MSG_unison_syncLinesync__</span>
+							<div class="offset-applies" data-offset-scope="lineOffsetTrim">
+								<span class="offset-applies__label">__MSG_options_offsetModal_appliesTo__</span>
+							</div>
+						</div>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="lineOffsetTrim" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"></path></svg></button>
+							<span class="offset-stepper__value" data-for="lineOffsetTrim">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="lineOffsetTrim" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"></path></svg></button>
+							<input type="hidden" id="lineOffsetTrim">
+						</div>
+					</div>
+					<div class="container container--small">
+						<p>__MSG_options_offsetModal_perSong__</p>
+						<button class="small-btn btn-danger" id="clear-offsets">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+								<path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd"></path>
+							</svg>
+							<span style="padding-top: 0.1rem">__MSG_options_offsetModal_perSongClear__</span>
+						</button>
+					</div>
+					<div class="text-group">
+						<p>
+							<span class="text-group__title">__MSG_options_offsetModal_perSongCount__</span>
+							<span class="dots"></span>
+							<span id="offset-count">0</span>
+						</p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="offset-modal-reset" class="modal-btn modal-btn-secondary">__MSG_options_reset__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="import-identity-modal-overlay" class="modal-overlay">
+			<div class="modal import-identity-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_identityImport_title__</h3>
+					<button id="import-identity-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<button id="import-identity-file-btn" class="modal-btn modal-btn-secondary import-identity-file-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+							<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
+						</svg>
+						<span>__MSG_options_identityImport_chooseFile__</span>
+					</button>
+					<div class="modal-divider">
+						<span>__MSG_options_identityImport_or__</span>
+					</div>
+					<textarea id="import-identity-textarea" class="modal-textarea" rows="6" spellcheck="false" placeholder="__MSG_options_identityImport_pastePlaceholder__"></textarea>
+				</div>
+				<div class="modal-footer">
+					<button id="import-identity-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="import-identity-confirm" class="modal-btn modal-btn-primary">
+						__MSG_options_identityImport_import__
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="nickname-modal-overlay" class="modal-overlay">
+			<div class="modal nickname-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_nickname_modalTitle__</h3>
+					<button id="nickname-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-message">__MSG_options_nickname_description__</p>
+					<input type="text" id="nickname-modal-input" class="modal-input" maxlength="20" autocomplete="off" spellcheck="false" placeholder="__MSG_options_nickname_placeholder__">
+					<p id="nickname-modal-status" role="status"></p>
+				</div>
+				<div class="modal-footer">
+					<button id="nickname-modal-reset" class="modal-btn modal-btn-secondary">
+						__MSG_options_nickname_reset__
+					</button>
+					<button id="nickname-modal-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="nickname-modal-save" class="modal-btn modal-btn-primary">
+						__MSG_options_nickname_save__
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="theme-modal-overlay" class="modal-overlay">
+			<div class="modal theme-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_modal_selectTheme__</h3>
+					<button id="theme-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="theme-modal-body">
+					<div id="theme-modal-grid"></div>
+				</div>
+			</div>
+		</div>
+
+		<div id="css">
+			<div id="theme-name-display" class="theme-name-display">
+				<div class="theme-name-container">
+					<div class="theme-name-wrapper">
+						<svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
+							<defs>
+								<linearGradient id="gradient" x1="0%" y1="0%" x2="50%" y2="100%">
+									<stop offset="0%" style="stop-color: hsl(0deg 0% 100%); stop-opacity: 1"></stop>
+									<stop offset="100%" style="stop-color: hsl(0deg 0% 50%); stop-opacity: 1"></stop>
+								</linearGradient>
+							</defs>
+							<path fill="url(#gradient)" fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd"></path>
+						</svg>
+
+						<span id="theme-name-text" class="theme-name-text" title="__MSG_options_editor_doubleClickRename__"></span>
+					</div>
+					<span id="theme-source-badge" class="theme-source-badge"></span>
+					<div class="theme-btn-container">
+						<button id="edit-theme-btn" class="edit-theme-btn" title="__MSG_options_editor_renameTheme__">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+								<path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path>
+								<path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path>
+							</svg>
+						</button>
+						<button id="delete-theme-btn" class="delete-theme-btn" title="__MSG_options_editor_deleteTheme__">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+								<path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path>
+							</svg>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="editor-container">
+				<div id="editor" style="height: 300px; overflow: auto"></div>
+				<div id="sync-indicator">__MSG_options_editor_saving__</div>
+			</div>
+			<div class="ie-utils-container">
+				<div class="ie-utils">
+					<button id="file-import-btn" class="icon-btn" data-tooltip="__MSG_options_editor_importFile__">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+							<path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"></path>
+						</svg>
+					</button>
+					<button id="file-export-btn" class="icon-btn" data-tooltip="__MSG_options_editor_exportFile__">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+							<path fill="currentColor" d="M12 15.575q-.2 0-.375-.062T11.3 15.3l-3.6-3.6q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L11 12.15V5q0-.425.288-.712T12 4t.713.288T13 5v7.15l1.875-1.875q.3-.3.713-.288t.712.313q.275.3.288.7t-.288.7l-3.6 3.6q-.15.15-.325.213t-.375.062M6 20q-.825 0-1.412-.587T4 18v-2q0-.425.288-.712T5 15t.713.288T6 16v2h12v-2q0-.425.288-.712T19 15t.713.288T20 16v2q0 .825-.587 1.413T18 20z"></path>
+						</svg>
+					</button>
+					<button id="save-theme-btn" class="icon-btn" data-tooltip="__MSG_options_editor_saveAsTheme__">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
+						</svg>
+					</button>
+						<button id="editor-popout-button" class="icon-btn" data-tooltip="__MSG_options_editor_openInNewTab__">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+						</svg>
+					</button>
+				</div>
+				<button id="back-btn">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
+					</svg>
+					__MSG_options_editor_backToSettings__
+				</button>
+			</div>
+			<p class="note" style="opacity: 0.8;">
+				<svg xmlns="http://www.w3.org/2000/svg" style="display:inline-block;margin-top: -1px;" width="0.75rem" height="0.75rem" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21v-5h2v3h3v2zm13 0v-2h3v-3h2v5zM3 8V3h5v2H5v3zm16 0V5h-3V3h5v5z"></path></svg>
+				<span>
+					__MSG_options_editor_fullExperienceNote__<a href="#" id="editor-popout-link" class="note-link">__MSG_options_editor_openInNewTabLink__</a>.
+				</span>
+			</p>
+			<div class="rics-footer" style="margin:0;">
+				<div class="rics-footer-left">
+					Powered by
+					<a href="https://github.com/better-lyrics/rics" target="_blank" class="rics-logo-link">
+						<svg class="rics-logo" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M512 0C753.359 0 874.039 -0.000198364 949.02 74.9805C1024 149.961 1024 270.641 1024 512C1024 753.359 1024 874.039 949.02 949.02C874.039 1024 753.359 1024 512 1024C270.641 1024 149.961 1024 74.9805 949.02C18.4008 892.44 4.51695 809.839 1.10938 669H166.184V627.784H97.1924V553.864C97.1924 536.84 101.971 522.205 111.528 509.96C121.086 497.715 134.675 491.592 152.296 491.592H200.68V441.416H166.184C145.277 441.416 129.299 445.747 118.248 454.408C107.496 462.771 100.478 475.315 97.1924 492.04H94.9521V486.664C94.9521 474.12 91.0691 464.413 83.3037 457.544C75.5384 450.376 65.5333 446.792 53.2881 446.792H0.0634766C0.668918 248.257 7.08006 142.881 74.9805 74.9805C149.961 -0.000198364 270.641 0 512 0ZM546.186 441.416C525.578 441.416 507.21 446.344 491.082 456.2C474.954 465.757 462.111 479.197 452.554 496.52C443.295 513.842 438.666 534.301 438.666 557.896C438.666 581.49 443.295 602.098 452.554 619.72C461.812 637.042 474.506 650.483 490.634 660.04C507.06 669.597 525.578 674.376 546.186 674.376C573.663 674.376 596.063 667.208 613.386 652.872C630.708 638.536 642.357 619.123 648.33 594.632H598.602C595.018 605.682 588.896 614.344 580.234 620.616C571.573 626.888 560.074 630.024 545.738 630.024C535.584 630.024 525.877 627.336 516.618 621.96C507.658 616.285 500.341 608.072 494.666 597.32C489.29 586.568 486.602 573.426 486.602 557.896C486.602 542.066 489.29 528.925 494.666 518.472C500.341 507.72 507.658 499.656 516.618 494.28C525.877 488.904 535.584 486.216 545.738 486.216C559.775 486.216 571.274 489.352 580.234 495.624C589.493 501.896 595.615 510.408 598.602 521.16H648.33C643.551 496.371 632.352 476.957 614.73 462.92C597.408 448.584 574.559 441.416 546.186 441.416ZM764.187 441.416C737.008 441.416 715.803 447.389 700.571 459.336C685.339 471.283 677.723 486.963 677.723 506.376C677.723 520.115 681.307 531.613 688.475 540.872C695.643 549.832 705.349 557 717.595 562.376C730.139 567.453 744.027 570.888 759.259 572.68C776.88 574.77 790.171 577.907 799.131 582.088C808.389 586.269 813.018 594.035 813.019 605.384C813.019 613.149 809.136 620.019 801.371 625.992C793.904 631.667 783.152 634.504 769.115 634.504C754.481 634.504 742.683 631.219 733.723 624.648C725.061 618.078 719.835 609.566 718.043 599.112H669.211C671.6 621.811 681.457 640.029 698.779 653.768C716.102 667.506 739.398 674.376 768.667 674.376C787.184 674.376 803.312 671.24 817.051 664.968C831.088 658.696 841.99 650.184 849.755 639.432C857.819 628.68 861.702 616.583 861.403 603.144C861.403 586.717 857.67 574.024 850.203 565.064C842.737 555.806 832.582 549.086 819.739 544.904C806.897 540.424 792.262 537.288 775.835 535.496C741.19 531.912 723.867 522.056 723.867 505.928C723.867 498.461 727.451 492.488 734.619 488.008C741.787 483.229 751.494 480.84 763.739 480.84C775.686 480.84 785.691 483.528 793.755 488.904C801.819 493.982 806.448 501 807.643 509.96H853.339C850.95 488.755 842.289 472.029 827.355 459.784C812.422 447.539 791.365 441.416 764.187 441.416ZM0.400391 627.784C0.56225 642.053 0.789595 655.783 1.10938 669H-4.50391V627.784H0.400391ZM231.865 446.792V488.008H281.145C290.702 488.008 295.481 492.936 295.481 502.792V627.784H225.593V669H412.857V627.784H342.969V500.104C342.969 481.586 338.638 468.147 329.977 459.784C321.614 451.123 308.174 446.792 289.657 446.792H231.865ZM35.3682 488.008C44.9254 488.008 49.7041 492.936 49.7041 502.792V627.784H0.400391C0.001313 592.602 0 554.141 0 512C0 503.867 6.03083e-05 495.87 0.00292969 488.008H35.3682ZM0.0634766 446.792C0.0228747 460.106 0.00810066 473.839 0.00292969 488.008H-0.0244141V446.792H0.0634766ZM314.745 343.304C304.292 343.304 295.481 346.59 288.313 353.16C281.444 359.731 278.009 367.944 278.009 377.8C278.009 387.656 281.444 396.018 288.313 402.888C295.481 409.458 304.292 412.744 314.745 412.744C325.497 412.744 334.307 409.458 341.177 402.888C348.345 396.018 351.929 387.656 351.929 377.8C351.929 367.944 348.345 359.731 341.177 353.16C334.307 346.59 325.497 343.304 314.745 343.304Z" fill="#F20C32"></path>
+							<path d="M-4.50391 669V627.784H49.7041V502.792C49.7041 492.936 44.9254 488.008 35.3681 488.008H-0.0239072V446.792H53.2881C65.5334 446.792 75.5388 450.376 83.3041 457.544C91.0694 464.414 94.9521 474.12 94.9521 486.664V492.04H97.1921C100.477 475.315 107.496 462.771 118.248 454.408C129.299 445.747 145.277 441.416 166.184 441.416H200.68V491.592H152.296C134.675 491.592 121.085 497.715 111.528 509.96C101.971 522.206 97.1921 536.84 97.1921 553.864V627.784H166.184V669H-4.50391Z" fill="#fff"></path>
+							<path d="M314.745 412.744C304.292 412.744 295.481 409.459 288.313 402.888C281.444 396.019 278.009 387.656 278.009 377.8C278.009 367.944 281.444 359.731 288.313 353.16C295.481 346.59 304.292 343.304 314.745 343.304C325.497 343.304 334.308 346.59 341.177 353.16C348.345 359.731 351.929 367.944 351.929 377.8C351.929 387.656 348.345 396.019 341.177 402.888C334.308 409.459 325.497 412.744 314.745 412.744ZM225.593 669V627.784H295.481V502.792C295.481 492.936 290.702 488.008 281.145 488.008H231.865V446.792H289.657C308.174 446.792 321.614 451.123 329.977 459.784C338.638 468.147 342.969 481.587 342.969 500.104V627.784H412.857V669H225.593Z" fill="#fff"></path>
+							<path d="M546.186 674.376C525.578 674.376 507.061 669.598 490.634 660.04C474.506 650.483 461.813 637.043 452.554 619.72C443.295 602.099 438.666 581.491 438.666 557.896C438.666 534.302 443.295 513.843 452.554 496.52C462.111 479.198 474.954 465.758 491.082 456.2C507.21 446.344 525.578 441.416 546.186 441.416C574.559 441.416 597.407 448.584 614.73 462.92C632.351 476.958 643.551 496.371 648.33 521.16H598.602C595.615 510.408 589.493 501.896 580.234 495.624C571.274 489.352 559.775 486.216 545.738 486.216C535.583 486.216 525.877 488.904 516.618 494.28C507.658 499.656 500.341 507.72 494.666 518.472C489.29 528.926 486.602 542.067 486.602 557.896C486.602 573.427 489.29 586.568 494.666 597.32C500.341 608.072 507.658 616.286 516.618 621.96C525.877 627.336 535.583 630.024 545.738 630.024C560.074 630.024 571.573 626.888 580.234 620.616C588.895 614.344 595.018 605.683 598.602 594.632H648.33C642.357 619.123 630.709 638.536 613.386 652.872C596.063 667.208 573.663 674.376 546.186 674.376Z" fill="#fff"></path>
+							<path d="M768.667 674.376C739.398 674.376 716.102 667.507 698.779 653.768C681.456 640.03 671.6 621.811 669.211 599.112H718.043C719.835 609.566 725.062 618.078 733.723 624.648C742.683 631.219 754.48 634.504 769.115 634.504C783.152 634.504 793.904 631.667 801.371 625.992C809.136 620.019 813.019 613.15 813.019 605.384C813.019 594.035 808.39 586.27 799.131 582.088C790.171 577.907 776.88 574.771 759.259 572.68C744.027 570.888 730.139 567.454 717.595 562.376C705.35 557 695.643 549.832 688.475 540.872C681.307 531.614 677.723 520.115 677.723 506.376C677.723 486.963 685.339 471.283 700.571 459.336C715.803 447.39 737.008 441.416 764.187 441.416C791.366 441.416 812.422 447.539 827.355 459.784C842.288 472.03 850.95 488.755 853.339 509.96H807.643C806.448 501 801.819 493.982 793.755 488.904C785.691 483.528 775.686 480.84 763.739 480.84C751.494 480.84 741.787 483.23 734.619 488.008C727.451 492.488 723.867 498.462 723.867 505.928C723.867 522.056 741.19 531.912 775.835 535.496C792.262 537.288 806.896 540.424 819.739 544.904C832.582 549.086 842.736 555.806 850.203 565.064C857.67 574.024 861.403 586.718 861.403 603.144C861.702 616.584 857.819 628.68 849.755 639.432C841.99 650.184 831.088 658.696 817.051 664.968C803.312 671.24 787.184 674.376 768.667 674.376Z" fill="#fff"></path>
+						</svg>
+					</a>
+					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
+					<a href="https://rics.boidu.dev" target="_blank">Playground</a>
+					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
+					<a href="https://github.com/better-lyrics/rics" target="_blank">Docs</a>
+				</div>
+				<a href="https://github.com/better-lyrics/better-lyrics/blob/master/STYLING.md" target="_blank" id="styling-guide-btn">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M7.25 7A.75.75 0 0 1 8 6.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 7M8 9.75a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5z"></path><path fill="currentColor" fill-rule="evenodd" d="M9.945 1.25c-1.367 0-2.47 0-3.337.117c-.9.12-1.658.38-2.26.981c-.602.602-.86 1.36-.981 2.26c-.117.867-.117 1.97-.117 3.337v8.11c0 1.367 0 2.47.117 3.337c.12.9.38 1.658.981 2.26c.602.602 1.36.86 2.26.982c.867.116 1.97.116 3.337.116h4.11c1.367 0 2.47 0 3.337-.116c.9-.122 1.658-.38 2.26-.982s.86-1.36.982-2.26c.116-.867.116-1.97.116-3.337v-8.11c0-1.367 0-2.47-.116-3.337c-.122-.9-.38-1.658-.982-2.26s-1.36-.86-2.26-.981c-.867-.117-1.97-.117-3.337-.117zM5.41 3.409c.277-.277.665-.457 1.4-.556c.754-.101 1.756-.103 3.191-.103h4c1.435 0 2.436.002 3.192.103c.734.099 1.122.28 1.399.556c.277.277.457.665.556 1.4c.101.754.103 1.756.103 3.191v7.25H7.782c-.818 0-1.376 0-1.855.128a3.8 3.8 0 0 0-1.177.548V8c0-1.435.002-2.437.103-3.192c.099-.734.28-1.122.556-1.399m-.632 14.84c.015.354.039.665.076.943c.099.734.28 1.122.556 1.399c.277.277.665.457 1.4.556c.754.101 1.756.103 3.191.103h4c1.435 0 2.436-.002 3.192-.103c.734-.099 1.122-.28 1.399-.556c.277-.277.457-.665.556-1.4c.083-.615.099-1.395.102-2.441H7.898c-.978 0-1.32.006-1.583.077a2.25 2.25 0 0 0-1.538 1.422" clip-rule="evenodd"></path></svg>
+					__MSG_options_editor_stylingGuide__
+				</a>
+			</div>
+			<div id="status-css"></div>
+		</div>
+		
+		
+	
+
+<script src="/action/default_popup.js" type="module" defer=""></script></body></html>
