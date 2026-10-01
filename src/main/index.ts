@@ -22,11 +22,27 @@ import Conf from "conf";
 import log from "electron-log";
 import path from "path";
 import fs from "fs/promises";
+import { randomUUID } from "crypto";
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
-import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
+import playerStateStore, {
+  MiniPlayerAlbumPage,
+  MiniPlayerQueueResult,
+  MiniPlayerMusicRequest,
+  MiniPlayerMusicPage,
+  MiniPlayerArtistBrowsePage,
+  MiniPlayerArtistBrowseRequest,
+  MiniPlayerCommand,
+  MiniPlayerSearchMode,
+  MiniPlayerSearchResult,
+  PlayerState,
+  VideoState
+} from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import LinuxMiniPlayerService from "./linux-mini-player-service";
+import GnomeShellExtensionWatcher, { isGnomeSession } from "./gnome-shell-extension-watcher";
+import miniPlayerMetadata from "../gnome-shell-extension/ytmdesktop-miniplayer@ytmdesktop/metadata.json";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -46,6 +62,7 @@ declare const YTMD_UPDATE_FEED_REPOSITORY: string;
 
 const assetFolder = path.join(process.env.NODE_ENV === "development" ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
 const isDarwin = process.platform === "darwin";
+const isLinux = process.platform === "linux";
 
 let applicationExited = false;
 let applicationQuitting = false;
@@ -175,6 +192,17 @@ let settingsWindow: BrowserWindow = null;
 let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
+let linuxMiniPlayerService: LinuxMiniPlayerService = null;
+let linuxMiniPlayerServiceStarting: Promise<void> | null = null;
+let gnomeShellExtensionWatcher: GnomeShellExtensionWatcher = null;
+let ytmAuthenticated = false;
+let resumeLastTrackPending = false;
+let resumeLastTrackTimeout: NodeJS.Timeout | null = null;
+// The mix seek only exists to survive the navigation that starts the mix. It is consumed by the
+// next video data change, which YTM also fires for metadata updates on the track already playing,
+// so it has to expire rather than wait indefinitely for a load that may never come.
+const MIX_SEEK_RESTORE_WINDOW_MS = 10000;
+let pendingMixSeek: { videoId: string; seconds: number; expiresAt: number } | null = null;
 
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
@@ -183,6 +211,29 @@ let lastPlaylistId = "";
 
 let companionAuthWindowEnableTimeout: NodeJS.Timeout | null = null;
 let ytmViewLoadTimeout: NodeJS.Timeout | null = null;
+let ytmViewStatus: "loading" | "ready" | "error" = "loading";
+let ytmViewMessage = "Connecting to YouTube Music…";
+let ytmPlayerInitialized = false;
+
+function setYtmViewStatus(status: "loading" | "ready" | "error", message = "") {
+  ytmViewStatus = status;
+  ytmViewMessage = message;
+  linuxMiniPlayerService?.updateViewState(status, message);
+}
+
+function beginYtmViewLoad() {
+  ytmPlayerInitialized = false;
+  if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+  memoryStore.set("ytmViewLoadTimedout", false);
+  memoryStore.set("ytmViewLoadingError", false);
+  memoryStore.set("ytmViewUnresponsive", false);
+  memoryStore.set("ytmViewLoading", true);
+  setYtmViewStatus("loading", "Reconnecting…");
+  ytmViewLoadTimeout = setTimeout(() => {
+    memoryStore.set("ytmViewLoadTimedout", true);
+    setYtmViewStatus("error", "YouTube Music did not become ready. Try refreshing.");
+  }, 30 * 1000);
+}
 
 // Single Instances Lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -359,6 +410,7 @@ const store = new Conf<StoreSchema>({
     playback: {
       continueWhereYouLeftOff: true,
       continueWhereYouLeftOffPaused: true,
+      linuxMiniPlayerAutoplay: false,
       enableSpeakerFill: false,
       progressInTaskbar: false,
       ratioVolume: false
@@ -552,6 +604,10 @@ store.onDidAnyChange(async (newState, oldState) => {
 });
 log.info("Created electron store");
 
+lastUrl = store.get("state.lastUrl");
+lastVideoId = store.get("state.lastVideoId");
+lastPlaylistId = store.get("state.lastPlaylistId");
+
 if (store.get("general").disableHardwareAcceleration) {
   app.disableHardwareAcceleration();
 }
@@ -614,6 +670,8 @@ function setupTaskbarFeatures() {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
 
+    linuxMiniPlayerService?.updatePlayerState(state);
+
     if (process.platform == "win32") {
       const taskbarFlags = [];
       if (!hasVideo) {
@@ -659,7 +717,7 @@ function setupTaskbarFeatures() {
     }
 
     if (mainWindow && store.get("playback.progressInTaskbar")) {
-      mainWindow.setProgressBar(hasVideo ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
+      mainWindow.setProgressBar(state.videoDetails ? state.videoProgress / state.videoDetails.durationSeconds : -1, {
         mode: isPlaying ? "normal" : "paused"
       });
     }
@@ -694,7 +752,463 @@ function getTrayIconPath() {
 }
 
 function setTrayIcon() {
-  tray.setImage(getTrayIconPath());
+  if (tray) tray.setImage(getTrayIconPath());
+}
+
+function createTray() {
+  if (tray) return;
+
+  tray = new Tray(getTrayIconPath());
+  tray.setToolTip("YouTube Music Desktop");
+  trayContextMenu = Menu.buildFromTemplate([
+    {
+      label: "YouTube Music Desktop",
+      type: "normal",
+      enabled: false
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Show/Hide Window",
+      type: "normal",
+      click: () => {
+        if (mainWindow) {
+          if (mainWindow.isVisible()) {
+            mainWindow.hide();
+          } else {
+            mainWindow.show();
+          }
+        }
+      }
+    },
+    {
+      label: "Play/Pause",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "playPause");
+      }
+    },
+    {
+      label: "Previous",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "previous");
+      }
+    },
+    {
+      label: "Next",
+      type: "normal",
+      click: () => {
+        ytmView.webContents.send("remoteControl:execute", "next");
+      }
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click: () => {
+        app.quit();
+      }
+    }
+  ]);
+  tray.setContextMenu(trayContextMenu);
+  tray.on("click", () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      } else {
+        mainWindow.show();
+      }
+    }
+  });
+}
+
+function destroyTray() {
+  if (!tray) return;
+
+  tray.destroy();
+  tray = null;
+  trayContextMenu = null;
+}
+
+/** Whether the GNOME extension is currently drawing the panel mini-player for this session. */
+function miniPlayerServingPanel() {
+  return !!linuxMiniPlayerService?.isPanelReady && !!gnomeShellExtensionWatcher?.isEnabled;
+}
+
+/**
+ * Serve the mini-player D-Bus interface.
+ *
+ * Startup and an extension that enables itself mid-startup can both ask for this, so concurrent
+ * callers share one attempt and only see the service once it is actually exported.
+ */
+function startLinuxMiniPlayerService() {
+  if (!linuxMiniPlayerServiceStarting) {
+    linuxMiniPlayerServiceStarting = (async () => {
+      const metadata = miniPlayerMetadata;
+      const service = new LinuxMiniPlayerService(
+        {
+          command: handleMiniPlayerCommand,
+          search: searchYtm,
+          searchMusic: (request: MiniPlayerMusicRequest) => miniPlayerPageRequest<MiniPlayerMusicPage>("searchMusic", request),
+          startResultMix: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("startResultMix", videoId),
+          artistBrowse: artistBrowseYtm,
+          albumBrowse: (albumId, continuation) => miniPlayerPageRequest<MiniPlayerAlbumPage>("albumBrowse", { albumId, continuation }),
+          playNext: videoId => miniPlayerPageRequest<MiniPlayerQueueResult>("playNext", videoId),
+          openAlbum: browseId => openArtistInYtm(browseId, "MUSIC_PAGE_TYPE_ALBUM"),
+          openArtist: openArtistInYtm,
+          playResult: playMiniPlayerResult,
+          toggleMainWindow: toggleMainWindowVisibility,
+          showMainWindow,
+          openSettings: createOrShowSettingsWindow,
+          refresh: () => createYTMView(),
+          quit: () => app.quit()
+        },
+        playerStateStore.getState(),
+        { authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() },
+        {
+          version: metadata.version,
+          changed: () => {
+            if (!applicationQuitting) void applyPlatformTrayIntegration();
+          }
+        }
+      );
+
+      try {
+        await service.start();
+        linuxMiniPlayerService = service;
+        service.updateViewState(ytmViewStatus, ytmViewMessage);
+      } catch (error) {
+        log.error("Failed to start Linux mini-player D-Bus service", error);
+        await service.stop();
+        // Let a later extension state change try again, in case the bus name frees up.
+        linuxMiniPlayerServiceStarting = null;
+      }
+    })();
+  }
+
+  return linuxMiniPlayerServiceStarting;
+}
+
+/** Give the session exactly one of the panel mini-player and the tray icon. */
+async function applyPlatformTrayIntegration() {
+  // An extension enabled after launch still needs the D-Bus interface, even in a session whose
+  // desktop variables never named GNOME.
+  if (gnomeShellExtensionWatcher?.isEnabled) await startLinuxMiniPlayerService();
+
+  const servingPanel = miniPlayerServingPanel();
+
+  if (servingPanel) {
+    destroyTray();
+  } else if (!gnomeShellExtensionWatcher?.isEnabled || !linuxMiniPlayerService?.isPanelPending) {
+    // A short-lived startup tray can remain cached by GNOME after Tray.destroy(). Wait for
+    // panel readiness or its timeout before creating the initial fallback icon.
+    createTray();
+  }
+
+  memoryStore.set("linuxMiniPlayerActive", servingPanel);
+}
+
+function toggleMainWindowVisibility() {
+  if (!mainWindow) return;
+
+  if (mainWindow.isVisible() && !mainWindow.isMinimized()) {
+    mainWindow.hide();
+    return;
+  }
+
+  showMainWindow();
+}
+
+function showMainWindow() {
+  if (!mainWindow) return;
+
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+const ytmAuthCookieNames = new Set(["LOGIN_INFO", "SAPISID", "__Secure-1PAPISID", "__Secure-3PAPISID"]);
+
+function getYtmSession() {
+  return session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev");
+}
+
+function hasSavedTrack() {
+  return !!store.get("state.lastVideoId");
+}
+
+async function refreshYtmAuthentication() {
+  try {
+    const cookies = await getYtmSession().cookies.get({ url: "https://music.youtube.com" });
+    ytmAuthenticated = cookies.some(cookie => ytmAuthCookieNames.has(cookie.name));
+  } catch (error) {
+    ytmAuthenticated = false;
+    log.error("Failed to determine YouTube Music authentication state", error);
+  }
+  linuxMiniPlayerService?.updateSessionState({ authenticated: ytmAuthenticated, hasSavedTrack: hasSavedTrack() });
+}
+
+function resumeLastTrack() {
+  const savedState = store.get("state");
+  if (!savedState.lastVideoId || !ytmView) {
+    linuxMiniPlayerService?.setNeedsMainApp();
+    return;
+  }
+  if (resumeLastTrackPending) return;
+
+  resumeLastTrackPending = true;
+  linuxMiniPlayerService?.setLoading();
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    watchEndpoint: {
+      videoId: savedState.lastVideoId,
+      playlistId: savedState.lastPlaylistId
+    }
+  });
+
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  resumeLastTrackTimeout = setTimeout(() => {
+    resumeLastTrackPending = false;
+    resumeLastTrackTimeout = null;
+    linuxMiniPlayerService?.setNeedsMainApp();
+  }, 5000);
+}
+
+function searchYtm(query: string, mode: MiniPlayerSearchMode): Promise<MiniPlayerSearchResult[]> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:search:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Search timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { results?: MiniPlayerSearchResult[]; error?: string }) => {
+      clearTimeout(timeout);
+      if (payload?.error) {
+        reject(new Error(payload.error));
+        return;
+      }
+      resolve(Array.isArray(payload?.results) ? payload.results : []);
+    });
+
+    ytmView.webContents.send("ytmView:search", requestId, query, mode);
+  });
+}
+
+function miniPlayerPageRequest<T>(method: "albumBrowse" | "playNext" | "searchMusic" | "startResultMix", request: unknown): Promise<T> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) return reject(new Error("YouTube Music is not ready"));
+    const sender = ytmView.webContents;
+    const requestId = randomUUID();
+    const channel = `ytmView:miniPlayer:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(channel, handler);
+      reject(new Error(`${method} timed out`));
+    }, 10000);
+    const handler = (event: Electron.IpcMainEvent, payload: { result?: T; error?: string }) => {
+      if (event.sender !== sender) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(channel, handler);
+      if (payload?.error || !payload?.result) reject(new Error(payload?.error || `${method} returned nothing`));
+      else resolve(payload.result);
+    };
+    ipcMain.on(channel, handler);
+    sender.send("ytmView:miniPlayer", requestId, method, request);
+  });
+}
+
+type RawArtistBrowsePage = Partial<MiniPlayerArtistBrowsePage> & { items?: MiniPlayerSearchResult[]; continuation?: string | null };
+
+function artistBrowseYtm(request: MiniPlayerArtistBrowseRequest): Promise<MiniPlayerArtistBrowsePage> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:artistBrowse:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Artist browse timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { page?: RawArtistBrowsePage; error?: string }) => {
+      clearTimeout(timeout);
+      const page = payload?.page;
+      if (payload?.error || !page) {
+        reject(new Error(payload?.error ?? "Artist browse returned nothing"));
+        return;
+      }
+      // A section page arrives as a flat list plus a token; fold it into the page shape so the
+      // panel only ever deals with one structure.
+      const section = page.section === "songs" || page.section === "videos" ? page.section : "";
+      const items = Array.isArray(page.items) ? page.items : [];
+      const next = page.continuation ? `token:${page.continuation}` : null;
+      resolve({
+        section,
+        name: page.name ?? null,
+        artworkUrl: page.artworkUrl ?? null,
+        songs: section === "songs" ? items : Array.isArray(page.songs) ? page.songs : [],
+        videos: section === "videos" ? items : Array.isArray(page.videos) ? page.videos : [],
+        songsNext: section === "songs" ? next : (page.songsNext ?? null),
+        videosNext: section === "videos" ? next : (page.videosNext ?? null)
+      });
+    });
+
+    ytmView.webContents.send("ytmView:artistBrowse", requestId, request);
+  });
+}
+
+function openArtistInYtm(browseId: string, pageType = "MUSIC_PAGE_TYPE_ARTIST") {
+  if (!ytmView) return;
+  showMainWindow();
+  // The preload passes the endpoint through untouched, so a browse endpoint works like a watch one.
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    browseEndpoint: {
+      browseId,
+      browseEndpointContextSupportedConfigs: { browseEndpointContextMusicConfig: { pageType } }
+    }
+  });
+}
+
+type MiniPlayerMixSeed = { videoId: string; playlistId: string | null };
+
+function startMixInYtm(): Promise<MiniPlayerMixSeed> {
+  return new Promise((resolve, reject) => {
+    if (!ytmView) {
+      reject(new Error("YouTube Music is not ready"));
+      return;
+    }
+
+    const requestId = randomUUID();
+    const responseChannel = `ytmView:startMix:response:${requestId}`;
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(responseChannel);
+      reject(new Error("Start mix timed out"));
+    }, 10000);
+
+    ipcMain.once(responseChannel, (_event, payload: { seed?: MiniPlayerMixSeed; error?: string }) => {
+      clearTimeout(timeout);
+      if (payload?.error || !payload?.seed?.videoId) {
+        reject(new Error(payload?.error ?? "Start mix returned no track"));
+        return;
+      }
+      resolve(payload.seed);
+    });
+
+    ytmView.webContents.send("ytmView:startMix", requestId);
+  });
+}
+
+function playMiniPlayerResult(videoId: string) {
+  if (!ytmView) return;
+  // A bare videoId is enough: YouTube Music builds the radio queue around it by itself.
+  ytmView.webContents.send("remoteControl:execute", "navigate", {
+    watchEndpoint: { videoId }
+  });
+  miniPlayerPauseHeld = false;
+  nudgePlayback();
+}
+
+let playbackNudgeTimeout: NodeJS.Timeout | null = null;
+let miniPlayerPauseHeld = false;
+
+function clearPlaybackNudge() {
+  if (playbackNudgeTimeout) {
+    clearTimeout(playbackNudgeTimeout);
+    playbackNudgeTimeout = null;
+  }
+}
+
+function nudgePlayback() {
+  if (!ytmView || miniPlayerPauseHeld) return;
+  ytmView.webContents.send("remoteControl:execute", "play");
+  clearPlaybackNudge();
+  playbackNudgeTimeout = setTimeout(() => {
+    playbackNudgeTimeout = null;
+    if (!ytmView || miniPlayerPauseHeld) return;
+    if (playerStateStore.getState().trackState === VideoState.Playing) return;
+    if (playerStateStore.getState().videoDetails) ytmView.webContents.send("remoteControl:execute", "play");
+  }, 700);
+}
+
+function handleMiniPlayerCommand(command: MiniPlayerCommand, value?: number) {
+  if (command === "playPause") {
+    if (!playerStateStore.getState().videoDetails) {
+      miniPlayerPauseHeld = false;
+      resumeLastTrack();
+      return;
+    }
+    const wasPlaying = playerStateStore.getState().trackState === VideoState.Playing;
+    miniPlayerPauseHeld = wasPlaying;
+    clearPlaybackNudge();
+    ytmView?.webContents.send("remoteControl:execute", "playPause");
+    if (!wasPlaying) nudgePlayback();
+    return;
+  }
+  if (command === "repeatMode") {
+    const modes = ["NONE", "ALL", "ONE"] as const;
+    ytmView?.webContents.send("remoteControl:execute", "repeatMode", modes[value ?? 0] ?? "NONE");
+    return;
+  }
+  if (command === "mute") {
+    ytmView?.webContents.send("remoteControl:execute", playerStateStore.getState().muted ? "unmute" : "mute");
+    return;
+  }
+  if (command === "startMix") {
+    const state = playerStateStore.getState();
+    const videoId = state.videoDetails?.id || lastVideoId || store.get("state.lastVideoId");
+    if (!ytmView || !videoId) return;
+    const wasPlaying = state.trackState === VideoState.Playing;
+    const playlistId = state.playlistId || lastPlaylistId || "";
+    if (wasPlaying && playlistId.startsWith("RDAMVM")) return;
+    const seconds = wasPlaying ? state.videoProgress : 0;
+    pendingMixSeek = {
+      videoId,
+      seconds,
+      expiresAt: Date.now() + MIX_SEEK_RESTORE_WINDOW_MS
+    };
+    if (!wasPlaying) ytmView.webContents.send("remoteControl:execute", "seekTo", 0);
+    // The page picks the radio endpoint so the mix keeps YTM's own audio/video hint. The seed can be
+    // the audio counterpart of a music video, which is the track the restore has to match.
+    void startMixInYtm()
+      .then(seed => {
+        if (!pendingMixSeek) return;
+        pendingMixSeek = { videoId: seed.videoId, seconds, expiresAt: Date.now() + MIX_SEEK_RESTORE_WINDOW_MS };
+      })
+      .catch(error => {
+        pendingMixSeek = null;
+        log.error("Linux mini-player start mix failed", error);
+      });
+    if (!wasPlaying) {
+      miniPlayerPauseHeld = false;
+      nudgePlayback();
+    }
+    return;
+  }
+  if (ytmView) ytmView.webContents.send("remoteControl:execute", command, value);
+}
+
+function maybeAutoplayMiniPlayer() {
+  if (!miniPlayerServingPanel() || !store.get("playback.linuxMiniPlayerAutoplay")) return;
+  if (!hasSavedTrack()) return;
+
+  setTimeout(() => {
+    if (miniPlayerPauseHeld) return;
+    if (playerStateStore.getState().trackState === VideoState.Playing) return;
+    if (playerStateStore.getState().videoDetails) nudgePlayback();
+    else resumeLastTrack();
+  }, 1800);
 }
 
 // Shortcut registration
@@ -880,11 +1394,52 @@ function sendMainWindowStateIpc() {
 }
 
 // Functions with call to ytmView renderer
+function isYtmSearchUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === "music.youtube.com" && parsed.pathname.startsWith("/search");
+  } catch {
+    return false;
+  }
+}
+
+function isYtmWatchUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === "music.youtube.com" && parsed.pathname === "/watch";
+  } catch {
+    return false;
+  }
+}
+
+function watchUrlFromLastVideo(): string | null {
+  const videoId = lastVideoId || store.get("state.lastVideoId");
+  if (!videoId) return null;
+  const playlistId = lastPlaylistId || store.get("state.lastPlaylistId");
+  const url = new URL("https://music.youtube.com/watch");
+  url.searchParams.set("v", videoId);
+  if (playlistId) url.searchParams.set("list", playlistId);
+  return url.toString();
+}
+
+function initialYtmUrl(): string {
+  if (!store.get("playback.continueWhereYouLeftOff")) return "https://music.youtube.com/";
+
+  const saved = lastUrl || store.get("state.lastUrl");
+  if (saved && isYtmWatchUrl(saved)) return saved;
+
+  const fromVideo = watchUrlFromLastVideo();
+  if (fromVideo) return fromVideo;
+
+  if (saved?.startsWith("https://music.youtube.com/") && !isYtmSearchUrl(saved)) return saved;
+  return "https://music.youtube.com/";
+}
+
 function ytmViewNavigated() {
   if (ytmView !== null) {
     const url = ytmView.webContents.getURL();
     if (url.startsWith("https://music.youtube.com/")) {
-      lastUrl = url;
+      if (!isYtmSearchUrl(url)) lastUrl = url;
       ytmView.webContents.send("ytmView:navigationStateChanged", {
         canGoBack: ytmView.webContents.navigationHistory.canGoBack(),
         canGoForward: ytmView.webContents.navigationHistory.canGoForward()
@@ -1017,8 +1572,19 @@ function isPreventedNavOrRedirect(url: URL): boolean {
 }
 
 const createYTMView = (): void => {
-  memoryStore.set("ytmViewLoadTimedout", false);
-  memoryStore.set("ytmViewLoading", true);
+  clearPlaybackNudge();
+  pendingMixSeek = null;
+  resumeLastTrackPending = false;
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  if (ytmView) {
+    mainWindow?.removeBrowserView(ytmView);
+    if (!ytmView.webContents.isDestroyed()) {
+      ytmView.webContents.removeAllListeners();
+      ytmView.webContents.close();
+    }
+    ytmView = null;
+  }
+  beginYtmViewLoad();
   memoryStore.set("ytmViewLoadingStatus", "Initializing...");
 
   ytmView = new BrowserView({
@@ -1027,12 +1593,22 @@ const createYTMView = (): void => {
       contextIsolation: true,
       partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
       preload: path.join(__dirname, `../renderer/windows/ytmview/preload.js`),
-      autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
+      autoplayPolicy:
+        miniPlayerServingPanel() && store.get("playback.linuxMiniPlayerAutoplay")
+          ? "no-user-gesture-required"
+          : store.get("playback.continueWhereYouLeftOffPaused")
+            ? "document-user-activation-required"
+            : "no-user-gesture-required"
     }
   });
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
+
+  // A full navigation replaces the preload and must complete a fresh player handshake.
+  ytmView.webContents.on("did-start-navigation", (_event, _url, isInPlace, isMainFrame) => {
+    if (isMainFrame && !isInPlace) beginYtmViewLoad();
+  });
 
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
@@ -1140,9 +1716,11 @@ const createYTMView = (): void => {
   });
   ytmView.webContents.on("unresponsive", () => {
     memoryStore.set("ytmViewUnresponsive", true);
+    setYtmViewStatus("error", "YouTube Music stopped responding. Try refreshing.");
   });
   ytmView.webContents.on("responsive", () => {
     memoryStore.set("ytmViewUnresponsive", false);
+    if (ytmPlayerInitialized && !memoryStore.get("ytmViewLoadingError")) setYtmViewStatus("ready");
   });
 
   ytmView.webContents.setWindowOpenHandler(details => {
@@ -1165,7 +1743,8 @@ const createYTMView = (): void => {
   });
 
   ytmView.webContents.on("did-fail-load", (_event, errorCode, errorDescription, _validatedURL, isMainFrame) => {
-    if (isMainFrame) {
+    if (isMainFrame && errorCode !== -3) {
+      setYtmViewStatus("error", "Could not load YouTube Music. Check your connection and refresh.");
       if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
 
       memoryStore.set("ytmViewLoadingError", true);
@@ -1175,27 +1754,12 @@ const createYTMView = (): void => {
 
   memoryStore.set("ytmViewLoadingStatus", "Initialized");
 
-  let navigateDefault = true;
-
-  const continueWhereYouLeftOff: boolean = store.get("playback.continueWhereYouLeftOff");
-  if (continueWhereYouLeftOff) {
-    const lastUrl: string = store.get("state.lastUrl");
-    if (lastUrl) {
-      if (lastUrl.startsWith("https://music.youtube.com/")) {
-        ytmView.webContents.loadURL(lastUrl);
-        navigateDefault = false;
-      }
-    }
-  }
-
-  if (navigateDefault) {
-    ytmView.webContents.loadURL("https://music.youtube.com/");
-    store.set("state.lastUrl", "https://music.youtube.com/");
-  }
-
-  ytmViewLoadTimeout = setTimeout(() => {
-    memoryStore.set("ytmViewLoadTimedout", true);
-  }, 30 * 1000);
+  const startupUrl = initialYtmUrl();
+  lastUrl = startupUrl;
+  store.set("state.lastUrl", startupUrl);
+  void ytmView.webContents.loadURL(startupUrl).catch(error => {
+    if (error.code !== "ERR_ABORTED") log.error("YouTube Music navigation failed", error);
+  });
 };
 
 const createMainWindow = (): void => {
@@ -1568,6 +2132,19 @@ app.on("ready", async () => {
     app.quit();
   });
 
+  // Only the current view can complete or fail the player initialization handshake.
+  ipcMain.on("ytmView:playerReady", event => {
+    if (event.sender !== ytmView?.webContents) return;
+    ytmPlayerInitialized = true;
+    if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+    setYtmViewStatus("ready");
+  });
+  ipcMain.on("ytmView:initializationFailed", event => {
+    if (event.sender !== ytmView?.webContents) return;
+    if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+    setYtmViewStatus("error", "YouTube Music could not initialize. Try refreshing.");
+  });
+
   // Handle ytm view ipc
   ipcMain.on("ytmView:loaded", event => {
     if (ytmView !== null && mainWindow !== null) {
@@ -1575,6 +2152,7 @@ app.on("ready", async () => {
 
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
+      if (!ytmPlayerInitialized) setYtmViewStatus("error", "Complete sign-in in YouTube Music, then refresh.");
       mainWindow.addBrowserView(ytmView);
       ytmView.setBounds({
         x: 0,
@@ -1592,6 +2170,7 @@ app.on("ready", async () => {
       ratioVolume.ytmViewLoaded();
       // TODO: this is just a hack fix for custom css to update CSS when the view loads
       customCss.updateCSS();
+      maybeAutoplayMiniPlayer();
     }
   });
 
@@ -1629,12 +2208,42 @@ app.on("ready", async () => {
     lastPlaylistId = playlistId;
 
     playerStateStore.updateVideoDetails(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+    linuxMiniPlayerService?.updateSessionState({ authenticated: ytmAuthenticated, hasSavedTrack: true });
+
+    if (resumeLastTrackPending) {
+      resumeLastTrackPending = false;
+      if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+      resumeLastTrackTimeout = null;
+      ytmView.webContents.send("remoteControl:execute", "play");
+    }
+    if (pendingMixSeek) {
+      const { videoId, seconds, expiresAt } = pendingMixSeek;
+      pendingMixSeek = null;
+      // Only restore the position onto the track the mix was started from, and only while the
+      // navigation that would load it is still in flight. Seeking anything else would rewind a
+      // track the user is already listening to.
+      if (Date.now() <= expiresAt && videoDetails.videoId === videoId && seconds > 0) {
+        ytmView.webContents.send("remoteControl:execute", "seekTo", seconds);
+      }
+    }
   });
 
-  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted, adPlaying) => {
+  ipcMain.on("ytmView:storeStateChanged", (event, queue, likeStatus, volume, muted) => {
     if (event.sender !== ytmView.webContents) return;
 
-    playerStateStore.updateFromStore(queue, likeStatus, volume, muted, adPlaying);
+    playerStateStore.updateFromStore(queue, likeStatus, volume, muted);
+  });
+
+  ipcMain.on("ytmView:adStateChanged", (event, adState) => {
+    if (event.sender !== ytmView.webContents) return;
+
+    playerStateStore.updateAdState(adState ?? null);
+  });
+
+  ipcMain.on("ytmView:adDiagnostic", (event, message) => {
+    if (event.sender !== ytmView.webContents) return;
+
+    log.info("YTM ad state:", message);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {
@@ -1662,16 +2271,7 @@ app.on("ready", async () => {
   ipcMain.on("ytmView:recreate", event => {
     if (event.sender !== mainWindow.webContents) return;
 
-    if (ytmView) {
-      if (mainWindow) {
-        mainWindow.removeBrowserView(ytmView);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ytmView.webContents as any).destroy();
-      ytmView = null;
-      createYTMView();
-    }
+    if (ytmView) createYTMView();
   });
 
   ipcMain.handle("ytmView:getIntegrationScripts", event => {
@@ -1778,7 +2378,8 @@ app.on("ready", async () => {
   log.info("Setup IPC handlers");
 
   // Create the permission handlers
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionCheckHandler((webContents, permission) => {
+  const ytmSession = getYtmSession();
+  ytmSession.setPermissionCheckHandler((webContents, permission) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return true;
@@ -1787,7 +2388,7 @@ app.on("ready", async () => {
 
     return false;
   });
-  session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionRequestHandler((webContents, permission, callback) => {
+  ytmSession.setPermissionRequestHandler((webContents, permission, callback) => {
     if (webContents == ytmView.webContents) {
       if (permission === "fullscreen") {
         return callback(true);
@@ -1796,81 +2397,44 @@ app.on("ready", async () => {
 
     return callback(false);
   });
+  ytmSession.cookies.on("changed", (_event, cookie) => {
+    if (cookie.domain.endsWith("youtube.com") && ytmAuthCookieNames.has(cookie.name)) void refreshYtmAuthentication();
+  });
+  await refreshYtmAuthentication();
 
   log.info("Setup permission handlers");
 
   // Register global shortcuts
   registerShortcuts();
 
-  // Create the tray
-  tray = new Tray(getTrayIconPath());
-  trayContextMenu = Menu.buildFromTemplate([
-    {
-      label: "YouTube Music Desktop",
-      type: "normal",
-      enabled: false
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Show/Hide Window",
-      type: "normal",
-      click: () => {
-        if (mainWindow) {
-          if (mainWindow.isVisible()) {
-            mainWindow.hide();
-          } else {
-            mainWindow.show();
-          }
-        }
-      }
-    },
-    {
-      label: "Play/Pause",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "playPause");
-      }
-    },
-    {
-      label: "Previous",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "previous");
-      }
-    },
-    {
-      label: "Next",
-      type: "normal",
-      click: () => {
-        ytmView.webContents.send("remoteControl:execute", "next");
-      }
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Quit",
-      type: "normal",
-      click: () => {
-        app.quit();
-      }
-    }
-  ]);
-  tray.setToolTip("YouTube Music Desktop");
-  tray.setContextMenu(trayContextMenu);
-  tray.on("click", () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      } else {
-        mainWindow.show();
-      }
-    }
-  });
+  // Create the platform tray integration.
+  //
+  // On Linux the panel UI lives in a GNOME Shell extension that is installed separately from the
+  // application, so it can be absent, disabled, or added while the app is running. Any session the
+  // extension is not currently serving keeps the tray icon, because it has no other UI.
+  if (isLinux) {
+    gnomeShellExtensionWatcher = new GnomeShellExtensionWatcher(enabled => {
+      if (!enabled) linuxMiniPlayerService?.invalidatePanel();
+      if (applicationQuitting) return;
+      void applyPlatformTrayIntegration();
+    });
 
-  log.info("Created tray icon");
+    try {
+      await gnomeShellExtensionWatcher.start();
+    } catch (error) {
+      log.error("Failed to watch the GNOME mini-player extension", error);
+      await gnomeShellExtensionWatcher.stop();
+      gnomeShellExtensionWatcher = null;
+    }
+
+    // The desktop session variables can be unset even under GNOME, so an extension that is already
+    // enabled also counts as reason enough to serve the D-Bus interface it talks to.
+    if (isGnomeSession() || gnomeShellExtensionWatcher?.isEnabled) await startLinuxMiniPlayerService();
+  }
+
+  await applyPlatformTrayIntegration();
+
+  log.info(miniPlayerServingPanel() ? "Initialized GNOME mini-player integration" : "Created tray icon");
 
   createMainWindow();
   log.info("Created main window");
@@ -1959,6 +2523,10 @@ app.on("ready", async () => {
 app.on("before-quit", () => {
   log.info("Application quitting\n\n");
   applicationQuitting = true;
+  if (resumeLastTrackTimeout) clearTimeout(resumeLastTrackTimeout);
+  if (playbackNudgeTimeout) clearTimeout(playbackNudgeTimeout);
+  void gnomeShellExtensionWatcher?.stop();
+  void linuxMiniPlayerService?.stop();
   saveState();
 });
 
