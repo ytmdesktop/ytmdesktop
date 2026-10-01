@@ -63,7 +63,9 @@ log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}][{processType}][{lev
 log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
 const isSpamLogMessage = (data: unknown): boolean => typeof data === "string" && /third-party cookie will be blocked\./i.test(data);
+const isPerformanceIssueSpam = (data: unknown): boolean => typeof data === "string" && data.includes("No handler registered for issue code PerformanceIssue");
 log.hooks.push((message, transport) => {
+  if (message?.data?.some(isPerformanceIssueSpam)) return false;
   // If the transport is not a file transport then return as is
   if (transport !== log.transports.file) {
     return message;
@@ -613,6 +615,7 @@ function setupTaskbarFeatures() {
   playerStateStore.addEventListener((state: PlayerState) => {
     const hasVideo = !!state.videoDetails;
     const isPlaying = state.trackState === VideoState.Playing;
+    setTrayTooltip(state);
 
     if (process.platform == "win32") {
       const taskbarFlags = [];
@@ -695,6 +698,28 @@ function getTrayIconPath() {
 
 function setTrayIcon() {
   tray.setImage(getTrayIconPath());
+}
+
+const trayTooltipIdle = "YouTube Music Desktop";
+let currentTrayTooltip = trayTooltipIdle;
+
+function setTrayTooltip(state: PlayerState): void {
+  if (!tray) return;
+
+  const title = state.videoDetails?.title?.trim();
+  const author = state.videoDetails?.author?.trim();
+  let tooltip = trayTooltipIdle;
+  if (title && author) tooltip = `${title} — ${author}`;
+  else if (title) tooltip = title;
+
+  // Windows rejects tray tooltips longer than 128 characters.
+  if (process.platform === "win32" && tooltip.length > 127) {
+    tooltip = `${tooltip.slice(0, 124)}...`;
+  }
+  if (tooltip === currentTrayTooltip) return;
+
+  currentTrayTooltip = tooltip;
+  tray.setToolTip(tooltip);
 }
 
 // Shortcut registration
@@ -1776,6 +1801,11 @@ app.on("ready", async () => {
   });
 
   log.info("Setup IPC handlers");
+
+  ipcMain.on("miniplayer:pip", (event, active: boolean) => {
+    if (!ytmView || event.sender !== ytmView.webContents || ytmView.webContents.isDestroyed()) return;
+    ytmView.webContents.setBackgroundThrottling(!active);
+  });
 
   // Create the permission handlers
   session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev").setPermissionCheckHandler((webContents, permission) => {
