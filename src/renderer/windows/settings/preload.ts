@@ -45,5 +45,44 @@ contextBridge.exposeInMainWorld("ytmd", {
   handleUpdateDownloaded: (callback: (event: Electron.IpcRendererEvent) => void) => ipcRenderer.on("app:updateDownloaded", callback),
   isAppUpdateAvailable: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateAvailable"),
   isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("app:isUpdateDownloaded"),
-  getTrueFilePath: (file: File) => webUtils.getPathForFile(file)
+  getTrueFilePath: (file: File) => webUtils.getPathForFile(file),
+  selectExtensionFolder: async (): Promise<string | null> => await ipcRenderer.invoke("app:selectExtensionFolder"),
+  installExtensionFromStoreUrl: async (url: string): Promise<{ path: string | null; error: string | null }> => {
+    const raw = (await ipcRenderer.invoke("app:installExtensionFromStoreUrl", url)) as string;
+    try {
+      const parsed = JSON.parse(raw) as { path: string | null; error: string | null };
+      return { path: parsed.path ?? null, error: parsed.error ?? null };
+    } catch {
+      return { path: null, error: raw || "Unknown error" };
+    }
+  },
+  installExtensionFromCrxFile: async (): Promise<{ path: string | null; error: string | null }> => {
+    const raw = (await ipcRenderer.invoke("app:installExtensionFromCrxFile")) as string;
+    try {
+      const parsed = JSON.parse(raw) as { path: string | null; error: string | null };
+      return { path: parsed.path ?? null, error: parsed.error ?? null };
+    } catch {
+      return { path: null, error: raw || "Unknown error" };
+    }
+  },
+  getExtensionManifest: async (extPath: string) => {
+    const raw = (await ipcRenderer.invoke("app:getExtensionManifest", extPath)) as string;
+    try {
+      return JSON.parse(raw) as {
+        name: string;
+        version: string;
+        description: string;
+        author: string;
+        iconDataUrl: string | null;
+        extensionId: string | null;
+        webStoreUrl: string | null;
+        optionsPage: string | null;
+      } | null;
+    } catch {
+      return null;
+    }
+  },
+  setExtensionDisabled: (extPath: string, disabled: boolean) => ipcRenderer.invoke("app:setExtensionDisabled", extPath, disabled),
+  openExtensionOptions: (extPath: string) => ipcRenderer.invoke("app:openExtensionOptions", extPath),
+  openExternalUrl: (url: string) => ipcRenderer.invoke("app:openExternalUrl", url)
 });

@@ -85,6 +85,16 @@ Building the project on Linux only requires you to install:
 
 *please note that by default both packages are built if you try building this application on a linux distro*
 
+## Chrome extensions (adblocker, etc.)
+
+You can load Chrome extensions into YouTube Music via **Settings → Extensions**:
+
+- **From the Chrome Web Store**: Paste the extension page URL or the 32-character extension ID (e.g. `cjpalhdlnbpafiamejdnhcphjbkeiagm` or the full store URL) and click "Add from store". Edge Add-ons URLs are also supported.
+- **From a .crx file**: Click "Add from .crx file" and choose a packed extension file.
+- **Unpacked folder**: Click "Add unpacked folder" and select a folder that contains a `manifest.json`.
+
+Extensions installed from the store or a .crx are saved under your app data and won't break when the app updates. In the list you'll see each extension's name, version, and icon. Use the **info** button to view details (version, extension ID, Chrome Web Store link, author, description). If an extension provides an options/settings page (e.g. Music Mode for YouTube), a **settings** (gear) button appears on the card and in the info modal—click it to open the extension's options (they open in the same view as YouTube Music so your settings are saved). You can also use the **Extensions** (puzzle) icon in the top title bar to pick an extension and open its options quickly, like in a browser. You can **enable or disable** an extension temporarily without removing it. Restart the app after adding, removing, or toggling extensions.
+
 <!--
 ### Note to the note, I suspect this has been fixed now, testing myself I was able to run the software without anything extra, although did have to sepecify `--disable-gpu` to run.
 **Note:** If you're using Windows Subsystem for Linux (WSL2), [see this guide][more] or use `node` from the command prompt. -->

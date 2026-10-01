@@ -50,6 +50,24 @@ declare global {
       handleUpdateDownloaded(callback: (event: Electron.IpcRendererEvent) => void);
       isAppUpdateAvailable(): Promise<boolean>;
       isAppUpdateDownloaded(): Promise<boolean>;
+      selectExtensionFolder(): Promise<string | null>;
+      installExtensionFromStoreUrl(url: string): Promise<{ path: string | null; error: string | null }>;
+      installExtensionFromCrxFile(): Promise<{ path: string | null; error: string | null }>;
+      getExtensionManifest(extPath: string): Promise<{
+        name: string;
+        version: string;
+        description: string;
+        author: string;
+        iconDataUrl: string | null;
+        extensionId: string | null;
+        webStoreUrl: string | null;
+        optionsPage: string | null;
+      } | null>;
+      setExtensionDisabled(extPath: string, disabled: boolean): Promise<void>;
+      openExtensionOptions(extPath: string): Promise<void>;
+      getExtensionsWithOptions(): Promise<{ path: string; name: string; iconDataUrl: string | null }[]>;
+      showExtensionOptionsMenu(clientX: number, clientY: number): Promise<void>;
+      openExternalUrl(url: string): Promise<void>;
     };
   }
 
