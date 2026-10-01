@@ -82,6 +82,21 @@ function createStyleSheet() {
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
       }
+
+      /* Narrow windows put the player page into YouTube Music's mobile sheet layout, which sizes the
+         expanded side panel against the window bottom instead of the player bar, so the panel's
+         scrollbar is drawn over the player bar. */
+      ytmusic-player-page[is-mweb-modernization-enabled][player-page-ui-state="TABS_VIEW"] #side-panel.ytmusic-player-page {
+        height: auto;
+        bottom: var(--ytmusic-player-page-player-bar-height);
+      }
+
+      /* Browse pages scroll the document, so the classic scrollbar spans the whole window and runs
+         down the side of the fixed player bar, which then cannot reach the window edge. The wheel
+         and keyboard still scroll without it. Inner scrollers keep their own scrollbars. */
+      html {
+        scrollbar-width: none;
+      }
     `)
   );
   document.head.appendChild(css);
