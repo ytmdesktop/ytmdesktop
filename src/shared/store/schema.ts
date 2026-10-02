@@ -14,6 +14,7 @@ export type StoreSchema = {
     showNotificationOnSongChange: boolean;
     startOnBoot: boolean;
     startMinimized: boolean;
+    proxyServer: string;
   };
   appearance: {
     alwaysShowVolumeSlider: boolean;
