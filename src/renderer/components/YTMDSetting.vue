@@ -319,7 +319,7 @@ input[type="range"]::-webkit-slider-thumb {
   position: absolute;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 3;
   border-radius: 0 0 4px 4px;
   width: 100%;
 }
