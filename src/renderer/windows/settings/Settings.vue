@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { LyricsFontSize, StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -53,6 +53,17 @@ const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeft
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
+const lyricsEnabled = ref<boolean>(playback.lyricsEnabled ?? false);
+const lyricsPreferSynced = ref<boolean>(playback.lyricsPreferSynced ?? true);
+const lyricsFontSize = ref<number>(playback.lyricsFontSize ?? LyricsFontSize.Medium);
+const lyricsFontSizePx = ref<number>(playback.lyricsFontSizePx ?? 26);
+const lyricsDebug = ref<boolean>(playback.lyricsDebug ?? false);
+const lyricsCacheEntries = ref<number>(0);
+const lyricsCacheBytes = ref<number>(0);
+
+const initialLyricsCacheStats = await window.ytmd.getLyricsCacheStats();
+lyricsCacheEntries.value = initialLyricsCacheStats?.entries ?? 0;
+lyricsCacheBytes.value = initialLyricsCacheStats?.diskBytes ?? 0;
 
 const companionServerEnabled = ref<boolean>(integrations.companionServerEnabled);
 const companionServerAuthTokens = ref<AuthToken[]>(
@@ -91,6 +102,11 @@ store.onDidAnyChange(async newState => {
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
+  lyricsEnabled.value = newState.playback.lyricsEnabled;
+  lyricsPreferSynced.value = newState.playback.lyricsPreferSynced;
+  lyricsFontSize.value = newState.playback.lyricsFontSize;
+  lyricsFontSizePx.value = newState.playback.lyricsFontSizePx;
+  lyricsDebug.value = newState.playback.lyricsDebug;
 
   companionServerEnabled.value = newState.integrations.companionServerEnabled;
   companionServerAuthTokens.value = safeStorageAvailable.value
@@ -164,6 +180,11 @@ async function settingsChanged() {
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
   store.set("playback.ratioVolume", ratioVolume.value);
+  store.set("playback.lyricsEnabled", lyricsEnabled.value ?? false);
+  store.set("playback.lyricsPreferSynced", lyricsPreferSynced.value ?? true);
+  store.set("playback.lyricsFontSize", lyricsFontSize.value ?? LyricsFontSize.Medium);
+  store.set("playback.lyricsFontSizePx", Number(lyricsFontSizePx.value ?? 26));
+  store.set("playback.lyricsDebug", lyricsDebug.value ?? false);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
@@ -178,6 +199,32 @@ async function settingsChanged() {
   store.set("shortcuts.thumbsDown", shortcutThumbsDown.value);
   store.set("shortcuts.volumeUp", shortcutVolumeUp.value);
   store.set("shortcuts.volumeDown", shortcutVolumeDown.value);
+}
+
+function lyricsFontSizeChanged() {
+  store.set("playback.lyricsFontSizePx", Number(lyricsFontSizePx.value ?? 26));
+}
+
+async function refreshLyricsCacheStats() {
+  const stats = await window.ytmd.getLyricsCacheStats();
+  lyricsCacheEntries.value = stats?.entries ?? 0;
+  lyricsCacheBytes.value = stats?.diskBytes ?? 0;
+}
+
+async function clearLyricsCache() {
+  const stats = await window.ytmd.clearLyricsCache();
+  lyricsCacheEntries.value = stats?.entries ?? 0;
+  lyricsCacheBytes.value = stats?.diskBytes ?? 0;
+}
+
+function formatCacheBytes(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 async function settingChangedRequiresRestart() {
@@ -338,6 +385,38 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
           <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
           <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting v-model="lyricsEnabled" type="checkbox" name="Enable synced lyrics" @change="settingsChanged" />
+          <YTMDSetting
+            v-if="lyricsEnabled"
+            v-model="lyricsPreferSynced"
+            type="checkbox"
+            indented
+            name="Prefer synced word highlight"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="lyricsEnabled"
+            v-model="lyricsFontSizePx"
+            indented
+            type="range"
+            name="Lyrics text size"
+            min="18"
+            max="42"
+            step="1"
+            :realtime="true"
+            @change="lyricsFontSizeChanged"
+          />
+          <YTMDSetting v-if="lyricsEnabled" v-model="lyricsDebug" type="checkbox" indented name="Lyrics debug info" @change="settingsChanged" />
+          <div v-if="lyricsEnabled" class="setting indented lyrics-cache-row">
+            <div>
+              <p>Lyrics cache</p>
+              <p class="lyrics-cache-hint">{{ lyricsCacheEntries }} entries - {{ formatCacheBytes(lyricsCacheBytes) }}</p>
+            </div>
+            <div>
+              <button class="lyrics-cache-btn" @click="refreshLyricsCacheStats">Refresh</button>
+              <button class="lyrics-cache-btn" @click="clearLyricsCache">Clear cache</button>
+            </div>
+          </div>
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
@@ -866,5 +945,27 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.musixmatch-key-input {
+  width: 216px;
+  background-color: #212121;
+  border: 1px solid #323232;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.lyrics-cache-row {
+  align-items: flex-start;
+}
+
+.lyrics-cache-hint {
+  margin-top: 4px;
+  color: #969696;
+  font-size: 13px;
+}
+
+.lyrics-cache-btn {
+  margin-left: 6px;
 }
 </style>

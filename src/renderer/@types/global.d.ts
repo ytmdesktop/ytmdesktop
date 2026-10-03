@@ -43,6 +43,8 @@ declare global {
 
       // App specific
       getAppVersion(): Promise<string>;
+      getLyricsCacheStats(): Promise<{ entries: number; diskBytes: number }>;
+      clearLyricsCache(): Promise<{ entries: number; diskBytes: number }>;
       checkForUpdates(): void;
       handleCheckingForUpdate(callback: (event: Electron.IpcRendererEvent) => void);
       handleUpdateAvailable(callback: (event: Electron.IpcRendererEvent) => void);
