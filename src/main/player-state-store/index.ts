@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import log from "electron-log";
 
 export enum VideoState {
   Unknown = -1,
@@ -179,7 +180,11 @@ function mapYTMThumbnails(thumbnail: YTMThumbnail) {
 function mapCounterpart(counterpart: YTMPlayerQueueItemCounterpart) {
   // Explicit mapping to keep a consistent API
   // If YouTube Music changes how this is presented internally then it's easier to update without breaking the API
-  return transformPlaylistPanelVideoRenderer(counterpart.counterpartRenderer.playlistPanelVideoRenderer);
+  // YouTube Music has been observed to send counterpart entries without a usable renderer
+  // (e.g. for removed/unavailable videos), so guard the whole chain
+  const renderer = counterpart?.counterpartRenderer?.playlistPanelVideoRenderer;
+  if (!renderer) return null;
+  return transformPlaylistPanelVideoRenderer(renderer);
 }
 
 function transformPlaylistPanelVideoRenderer(
@@ -187,23 +192,26 @@ function transformPlaylistPanelVideoRenderer(
   counterpart?: YTMPlayerQueueItemCounterpart[]
 ): PlayerQueueItem {
   return {
-    thumbnails: playlistPanelVideoRenderer.thumbnail ? playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails) : [],
+    // The thumbnail object can exist while the inner thumbnails array is missing
+    // (observed for removed/unavailable videos), so guard both levels
+    thumbnails: playlistPanelVideoRenderer.thumbnail?.thumbnails?.map(mapYTMThumbnails) ?? [],
     title: getYTMTextRun(playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }]),
     author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }]),
     duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }]),
     selected: playlistPanelVideoRenderer.selected,
     videoId: playlistPanelVideoRenderer.videoId,
-    counterparts: counterpart ? counterpart.map(mapCounterpart) : null
+    counterparts: counterpart?.map(mapCounterpart)?.filter(Boolean) ?? null
   };
 }
 
-function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem {
+function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem | null {
   let playlistPanelVideoRenderer;
   let counterpart;
-  if (item.playlistPanelVideoRenderer) {
+  if (item?.playlistPanelVideoRenderer) {
     playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
-  } else if (item.playlistPanelVideoWrapperRenderer) {
-    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
+  } else if (item?.playlistPanelVideoWrapperRenderer) {
+    // primaryRenderer can be missing for malformed entries, so guard it as well
+    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer?.playlistPanelVideoRenderer;
     counterpart = item.playlistPanelVideoWrapperRenderer.counterpart;
   }
 
@@ -363,7 +371,7 @@ class PlayerStateStore {
       album: album?.text ?? null,
       albumId: album?.id ?? null,
       likeStatus: transformLikeStatus(likeStatus),
-      thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
+      thumbnails: videoDetails.thumbnail?.thumbnails?.map(mapYTMThumbnails) ?? [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
       durationSeconds: parseInt(videoDetails.lengthSeconds),
       id: videoDetails.videoId,
       videoType: transformVideoType(videoDetails.musicVideoType),
@@ -381,32 +389,41 @@ class PlayerStateStore {
     muted: boolean | null,
     adPlaying: boolean | null
   ) {
-    const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
-    const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
-    this.queue = queueState
-      ? {
-          // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
-          automixItems: automixItems,
-          autoplay: queueState.autoplay,
-          isGenerating: queueState.isGenerating,
-          // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
-          isInfinite: queueState.isInfinite,
-          items: queueItems,
-          repeatMode: transformRepeatMode(queueState.repeatMode),
-          // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
-          selectedItemIndex: queueItems.findIndex(item => {
-            return item.selected;
-          })
-        }
-      : null;
-    if (this.videoDetails) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
-    }
-    this.adPlaying = adPlaying === true;
-    this.muted = muted === true;
-    if (typeof volume === "number" && volume >= 0) this.volume = volume;
+    try {
+      // mapYTMQueueItems returns null for entries it can't map (e.g. removed/unavailable videos).
+      // Drop those so they can't crash downstream consumers.
+      const queueItems = (queueState ? (queueState.items ?? []).map(mapYTMQueueItems) : []).filter(Boolean);
+      const automixItems = (queueState ? (queueState.automixItems ?? []).map(mapYTMQueueItems) : []).filter(Boolean);
+      this.queue = queueState
+        ? {
+            // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
+            automixItems: automixItems,
+            autoplay: queueState.autoplay,
+            isGenerating: queueState.isGenerating,
+            // Observed state seems to be a radio having infinite true while an autoplay queue has infinite false
+            isInfinite: queueState.isInfinite,
+            items: queueItems,
+            repeatMode: transformRepeatMode(queueState.repeatMode),
+            // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
+            selectedItemIndex: queueItems.findIndex(item => {
+              return item.selected;
+            })
+          }
+        : null;
+      if (this.videoDetails) {
+        this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
+      }
+      this.adPlaying = adPlaying === true;
+      this.muted = muted === true;
+      if (typeof volume === "number" && volume >= 0) this.volume = volume;
 
-    this.eventEmitter.emit("stateChanged", this.getState());
+      this.eventEmitter.emit("stateChanged", this.getState());
+    } catch (error) {
+      // A malformed queue payload (YouTube Music sends degraded renderers for removed
+      // videos and the like) must never take down the whole app. Log and keep the
+      // last known good state instead.
+      log.error("PlayerStateStore.updateFromStore failed, keeping previous state", error);
+    }
   }
 
   public addEventListener(listener: (state: PlayerState) => void) {
