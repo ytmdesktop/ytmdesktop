@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { proxyProtocolSupportsHttpAuth } from "~shared/proxy";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -35,6 +36,7 @@ const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
+const proxy: StoreSchema["proxy"] = await store.get("proxy");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
@@ -73,6 +75,39 @@ const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
 
+function getValidProxyPort(value: unknown): number | null {
+  const normalizedValue = String(value ?? "").trim();
+  const parsedPort = Number.parseInt(normalizedValue, 10);
+  return /^\d+$/.test(normalizedValue) && Number.isInteger(parsedPort) && parsedPort >= 1 && parsedPort <= 65535 ? parsedPort : null;
+}
+
+const proxyEnabled = ref<boolean>(proxy.enabled);
+const proxyProtocol = ref<StoreSchema["proxy"]["protocol"]>(proxy.protocol);
+const proxyHost = ref<string>(proxy.host);
+let persistedProxyPort = getValidProxyPort(proxy.port) ?? 1080;
+const proxyPort = ref<string>(String(persistedProxyPort));
+const proxyUsername = ref<string>(proxy.username);
+const proxyPasswordEncrypted = ref<string | null>(proxy.passwordEncrypted);
+const proxyPassword = ref<string>("");
+const proxyTesting = ref(false);
+const proxyTestMessage = ref<string | null>(null);
+const proxyTestOk = ref(false);
+const proxySupportsAuth = computed(() => proxyProtocolSupportsHttpAuth(proxyProtocol.value));
+
+async function decryptProxyPassword(passwordEncrypted: string | null) {
+  if (!safeStorageAvailable.value || !passwordEncrypted) return "";
+
+  try {
+    return (await safeStorage.decryptString(passwordEncrypted)) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+proxyPassword.value = await decryptProxyPassword(proxyPasswordEncrypted.value);
+let persistedProxyPassword = proxyPassword.value;
+let proxyPasswordGeneration = 0;
+
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
   hideToTrayOnClose.value = newState.general.hideToTrayOnClose;
@@ -102,6 +137,26 @@ store.onDidAnyChange(async newState => {
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
+  proxyEnabled.value = newState.proxy.enabled;
+  proxyProtocol.value = newState.proxy.protocol;
+  proxyHost.value = newState.proxy.host;
+  const newProxyPort = getValidProxyPort(newState.proxy.port);
+  if (newProxyPort !== null) {
+    persistedProxyPort = newProxyPort;
+    proxyPort.value = String(newProxyPort);
+  }
+  proxyUsername.value = newState.proxy.username;
+  if (proxyPasswordEncrypted.value !== newState.proxy.passwordEncrypted) {
+    const passwordEncrypted = newState.proxy.passwordEncrypted;
+    const passwordGeneration = ++proxyPasswordGeneration;
+    proxyPasswordEncrypted.value = passwordEncrypted;
+    const password = await decryptProxyPassword(passwordEncrypted);
+    if (passwordGeneration === proxyPasswordGeneration && proxyPasswordEncrypted.value === passwordEncrypted) {
+      proxyPassword.value = password;
+      persistedProxyPassword = password;
+    }
+  }
+
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
   shortcutPrevious.value = newState.shortcuts.previous;
@@ -112,6 +167,8 @@ store.onDidAnyChange(async newState => {
 });
 
 const discordPresenceConnectionFailed = ref<boolean>(await memoryStore.get("discordPresenceConnectionFailed"));
+const proxyMisconfigured = ref<boolean>((await memoryStore.get("proxyMisconfigured")) ?? false);
+const proxyApplyFailed = ref<boolean>((await memoryStore.get("proxyApplyFailed")) ?? false);
 
 const shortcutsPlayPauseRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsPlayPauseRegisterFailed"));
 const shortcutsNextRegisterFailed = ref<boolean>(await memoryStore.get("shortcutsNextRegisterFailed"));
@@ -127,6 +184,8 @@ const autoUpdaterDisabled = ref<boolean>(await memoryStore.get("autoUpdaterDisab
 
 memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
+  proxyMisconfigured.value = newState.proxyMisconfigured;
+  proxyApplyFailed.value = newState.proxyApplyFailed;
 
   shortcutsPlayPauseRegisterFailed.value = newState.shortcutsPlayPauseRegisterFailed;
   shortcutsNextRegisterFailed.value = newState.shortcutsNextRegisterFailed;
@@ -170,6 +229,37 @@ async function settingsChanged() {
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
+
+  const nextProxyPort = getValidProxyPort(proxyPort.value) ?? persistedProxyPort;
+  persistedProxyPort = nextProxyPort;
+  proxyPort.value = String(nextProxyPort);
+
+  let nextPasswordEncrypted = proxyPasswordEncrypted.value;
+  if (safeStorageAvailable.value && proxyPassword.value !== persistedProxyPassword) {
+    const password = proxyPassword.value;
+    const passwordGeneration = ++proxyPasswordGeneration;
+    if (password.length === 0) {
+      nextPasswordEncrypted = null;
+      persistedProxyPassword = "";
+      proxyPasswordEncrypted.value = null;
+    } else {
+      const passwordEncrypted = await safeStorage.encryptString(password);
+      if (passwordGeneration === proxyPasswordGeneration && proxyPassword.value === password) {
+        nextPasswordEncrypted = passwordEncrypted as unknown as string;
+        persistedProxyPassword = password;
+        proxyPasswordEncrypted.value = nextPasswordEncrypted;
+      }
+    }
+  }
+
+  store.set("proxy", {
+    enabled: proxyEnabled.value,
+    protocol: proxyProtocol.value,
+    host: proxyHost.value.trim(),
+    port: nextProxyPort,
+    username: proxyUsername.value,
+    passwordEncrypted: nextPasswordEncrypted
+  });
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -236,6 +326,22 @@ function checkForUpdates() {
   checkingForUpdate.value = true;
 }
 
+async function testProxyConnection() {
+  proxyTesting.value = true;
+  proxyTestMessage.value = null;
+  try {
+    await settingsChanged();
+    const result = await window.ytmd.testYtmProxy();
+    proxyTestOk.value = result.ok;
+    proxyTestMessage.value = result.message;
+  } catch (error) {
+    proxyTestOk.value = false;
+    proxyTestMessage.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    proxyTesting.value = false;
+  }
+}
+
 async function logoutLastFM() {
   store.set("lastfm.sessionKey", null);
   lastFMEnabled.value = false;
@@ -276,6 +382,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
         <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <li :class="{ active: currentTab === 6 }" @click="changeTab(6)"><span class="material-symbols-outlined">vpn_lock</span>Network</li>
         <span class="push"></span>
         <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
       </ul>
@@ -519,6 +626,61 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
         </div>
 
+        <div v-if="currentTab === 6" class="network-tab">
+          <YTMDSetting
+            v-model="proxyEnabled"
+            type="checkbox"
+            name="Proxy"
+            description="Routes YouTube Music through a proxy. App settings and integrations stay direct."
+            @change="settingsChanged"
+          />
+          <template v-if="proxyEnabled">
+            <div v-if="proxyMisconfigured" class="setting indented">
+              <p class="proxy-failure">Proxy is enabled, but its host or port is invalid. YouTube Music is using a direct connection.</p>
+            </div>
+            <div v-if="proxyApplyFailed" class="setting indented">
+              <p class="proxy-failure">Proxy settings could not be applied. YouTube Music may not be using the selected proxy.</p>
+            </div>
+            <YTMDSetting type="custom" name="Protocol">
+              <select v-model="proxyProtocol" class="proxy-protocol" @change="settingsChanged">
+                <option value="socks5">SOCKS5</option>
+                <option value="socks4">SOCKS4</option>
+                <option value="http">HTTP</option>
+                <option value="https">HTTPS</option>
+              </select>
+            </YTMDSetting>
+            <YTMDSetting v-model="proxyHost" type="text" name="Host" @change="settingsChanged" />
+            <YTMDSetting v-model="proxyPort" type="text" name="Port" @change="settingsChanged" />
+            <template v-if="proxySupportsAuth">
+              <YTMDSetting
+                v-model="proxyUsername"
+                type="text"
+                name="Username"
+                :disabled="!safeStorageAvailable"
+                disabled-message="Proxy credentials cannot be configured because safeStorage is unavailable"
+                @change="settingsChanged"
+              />
+              <YTMDSetting
+                v-model="proxyPassword"
+                type="password"
+                name="Password"
+                :disabled="!safeStorageAvailable"
+                disabled-message="Proxy credentials cannot be configured because safeStorage is unavailable"
+                @change="settingsChanged"
+              />
+            </template>
+            <div class="setting proxy-test-row">
+              <button :disabled="proxyTesting || proxyMisconfigured" @click="testProxyConnection">
+                <span class="material-symbols-outlined" :class="{ spinning: proxyTesting }">{{ proxyTesting ? "progress_activity" : "network_check" }}</span>
+                {{ proxyTesting ? "Testing..." : "Test proxy" }}
+              </button>
+            </div>
+            <div v-if="proxyTestMessage" class="setting indented">
+              <p :class="proxyTestOk ? 'proxy-success' : 'proxy-failure'">{{ proxyTestMessage }}</p>
+            </div>
+          </template>
+        </div>
+
         <div v-if="currentTab === 99" class="about-tab">
           <img class="icon" :src="logo" />
           <h2 class="app-name">YouTube Music Desktop App</h2>
@@ -648,6 +810,10 @@ window.ytmd.handleUpdateDownloaded(() => {
   border-left: 1px solid #212121;
 }
 
+.proxy-test-row {
+  justify-content: flex-end;
+}
+
 .name-with-description .name {
   margin-bottom: unset;
 }
@@ -757,6 +923,10 @@ window.ytmd.handleUpdateDownloaded(() => {
   animation: rotation 1s infinite linear;
 }
 
+.spinning {
+  animation: rotation 1s infinite linear;
+}
+
 @keyframes rotation {
   from {
     transform: rotate(0deg);
@@ -841,9 +1011,15 @@ window.ytmd.handleUpdateDownloaded(() => {
   padding: 4px;
 }
 
-.discord-failure {
+.discord-failure,
+.proxy-failure {
   margin: 0;
   color: #969696;
+}
+
+.proxy-success {
+  margin: 0;
+  color: #8bc34a;
 }
 
 button {
@@ -855,6 +1031,24 @@ button {
   background-color: #212121;
   cursor: pointer;
   border: none;
+}
+
+.proxy-test-row button:disabled {
+  color: #969696;
+  cursor: not-allowed;
+}
+
+.proxy-protocol {
+  width: 232px;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #212121;
+  color: inherit;
+}
+
+.proxy-protocol:focus {
+  outline: none;
 }
 
 .shortcuts-tab .shortcut-title {

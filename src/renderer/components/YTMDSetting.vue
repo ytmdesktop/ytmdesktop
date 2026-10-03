@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'select' | 'custom'">
+<script setup lang="ts" generic="T extends 'checkbox' | 'file' | 'range' | 'select' | 'custom' | 'text' | 'password'">
 import { computed, ref } from "vue";
 
 type ModelValue = {
@@ -7,6 +7,8 @@ type ModelValue = {
   range: number;
   custom: never;
   select: number;
+  text: string;
+  password: string;
 };
 
 const props = defineProps<{
@@ -206,6 +208,21 @@ input[type="checkbox"]:disabled {
 
 input[type="checkbox"]:disabled::before {
   background-color: #969696;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 216px;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #212121;
+  color: inherit;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
 }
 
 input[type="file"] {
