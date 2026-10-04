@@ -1529,6 +1529,17 @@ app.on("ready", async () => {
     createOrShowSettingsWindow();
   });
 
+  // Open the current song on music.youtube.com in the default browser
+  ipcMain.on("ytmView:openCurrentSongInBrowser", event => {
+    if (event.sender !== mainWindow.webContents) return;
+
+    const state = playerStateStore.getState();
+    const videoId = state.videoDetails?.id;
+    if (!videoId) return;
+
+    shell.openExternal(`https://music.youtube.com/watch?v=${videoId}`);
+  });
+
   ipcMain.on("settingsWindow:minimize", event => {
     if (settingsWindow !== null) {
       if (event.sender !== settingsWindow.webContents) return;

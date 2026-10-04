@@ -32,6 +32,7 @@ declare global {
       // YTM view specific
       ytmViewNavigateDefault(): void;
       ytmViewRecreate(): void;
+      openCurrentSongInBrowser(): void;
 
       // Window control
       minimizeWindow(): void;
