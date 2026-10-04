@@ -142,8 +142,18 @@ const config: ForgeConfig = {
     async packageAfterCopy(_config, buildPath, _electronVersion, platform, arch) {
       const srcRoot = path.join(__dirname, "node_modules");
       const destRoot = path.join(buildPath, "node_modules");
-
-      const pkgs = ["xosms", `@xosms/xosms-${platform}-${arch}${platform === "linux" ? "-gnu" : ""}`];
+      
+      const xosmsPlatformSuffix = (() => {
+        switch (platform) {
+          case "linux":
+            return "-gnu"
+          case "win32":
+            return "-msvc"
+          default:
+            return ""
+        }
+      })()
+      const pkgs = ["xosms", `@xosms/xosms-${platform}-${arch}${xosmsPlatformSuffix}`];
 
       await Promise.all(
         pkgs.map(async pkg => {
