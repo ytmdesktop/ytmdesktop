@@ -1030,6 +1030,15 @@ const createYTMView = (): void => {
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
+  // Initialize the hidden view at its real size. A zero-width viewport makes
+  // YTM construct a mobile player and replace it after our API hooks are bound.
+  const contentBounds = mainWindow.getContentBounds();
+  ytmView.setBounds({
+    x: 0,
+    y: mainWindow.fullScreen ? 0 : 36,
+    width: contentBounds.width,
+    height: contentBounds.height - (mainWindow.fullScreen ? 0 : 36)
+  });
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
