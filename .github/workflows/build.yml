@@ -11,21 +11,23 @@ jobs:
       matrix:
         os:
           [
-            { name: "linux", image: "ubuntu-latest" },
-            { name: "windows", image: "windows-latest" },
-            { name: "macos", image: "macos-latest" },
+            { name: "linux-x64", image: "ubuntu-26.04", arch: "x64" },
+            { name: "linux-arm64", image: "ubuntu-26.04-arm", arch: "arm64" },
+            { name: "windows-x64", image: "windows-2025", arch: "x64" },
+            { name: "windows-arm64", image: "windows-11-arm", arch: "arm64" },
+            { name: "macos-x64", image: "macos-26-intel", arch: "x64" },
+            { name: "macos-arm64", image: "macos-26", arch: "arm64" },
           ]
-        arch: ["x64", "arm64"]
       fail-fast: false
 
     runs-on: ${{ matrix.os.image }}
 
     steps:
       - name: Github checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/setup@v3.0.0
+        uses: pnpm/setup@v3
         with:
           runtime: node@lts
           cache: true
@@ -34,18 +36,18 @@ jobs:
         if: matrix.os.name == 'linux'
         run: sudo apt-get install libdbus-1-dev pkg-config -y
 
-      - name: Make (${{ matrix.arch }})
+      - name: Make (${{ matrix.os.arch }})
         env:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
-        run: pnpm make --arch ${{ matrix.arch }}
+        run: pnpm make --arch ${{ matrix.os.arch }}
 
-      - name: Upload artifacts (${{ matrix.arch }})
+      - name: Upload artifacts (${{ matrix.os.arch }})
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.os.name }}-${{ matrix.arch }}
+          name: dist-${{ matrix.os.name }}-${{ matrix.os.arch }}
           path: |
-            out/make/squirrel.windows/${{ matrix.arch }}/*.exe
-            out/make/deb/${{ matrix.arch }}/*.deb
-            out/make/rpm/${{ matrix.arch }}/*.rpm
-            out/make/zip/darwin/${{ matrix.arch }}/*.zip
+            out/make/squirrel.windows/${{ matrix.os.arch }}/*.exe
+            out/make/deb/${{ matrix.os.arch }}/*.deb
+            out/make/rpm/${{ matrix.os.arch }}/*.rpm
+            out/make/zip/darwin/${{ matrix.os.arch }}/*.zip
