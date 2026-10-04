@@ -21,6 +21,8 @@ export type StoreSchema = {
     customCSSPath: string | null;
     zoom: number;
     trayIconStyle: TrayIconStyle;
+    liveLyricsEnabled?: boolean;
+    liveLyricsGradientBg?: boolean;
   };
   playback: {
     continueWhereYouLeftOff: boolean;
@@ -28,6 +30,12 @@ export type StoreSchema = {
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
+    liveLyricsEnabled: boolean;
+    liveLyricsDefaultMode: "line" | "karaoke";
+    liveLyricsLanguage: string;
+    liveLyricsFontSize: number;
+    liveLyricsGradientBg: boolean;
+    liveLyricsInstrumentalBreaks: boolean;
   };
   integrations: {
     companionServerEnabled: boolean;
@@ -44,6 +52,7 @@ export type StoreSchema = {
     thumbsDown: string;
     volumeUp: string;
     volumeDown: string;
+    toggleLyrics: string;
   };
   state: {
     lastUrl: string;
@@ -73,6 +82,7 @@ export type MemoryStoreSchema = {
   shortcutsThumbsDownRegisterFailed: boolean;
   shortcutsVolumeUpRegisterFailed: boolean;
   shortcutsVolumeDownRegisterFailed: boolean;
+  shortcutsToggleLyricsRegisterFailed: boolean;
   companionServerAuthWindowEnabled: boolean;
   safeStorageAvailable: boolean;
   autoUpdaterDisabled: boolean;

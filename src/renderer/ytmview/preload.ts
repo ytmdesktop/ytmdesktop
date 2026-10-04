@@ -17,6 +17,7 @@ import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw"
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
+import liveLyricsScript from "./scripts/livelyrics.script?raw";
 
 const store = new Store<StoreSchema>();
 
@@ -160,6 +161,18 @@ async function createAdditionalPlayerBarControls() {
   (await webFrame.executeJavaScript(playerBarControlsScript))();
 }
 
+async function createLiveLyrics() {
+  const playbackSettings = await store.get("playback");
+  (
+    await webFrame.executeJavaScript(`
+      (function(initialSettings) {
+        window.__YTMD_LYRICS_SETTINGS__ = initialSettings;
+      })
+    `)
+  )(playbackSettings);
+  (await webFrame.executeJavaScript(liveLyricsScript))();
+}
+
 async function hideChromecastButton() {
   (
     await webFrame.executeJavaScript(`
@@ -175,8 +188,10 @@ async function hookPlayerApiEvents() {
 }
 
 function overrideHistoryButtonDisplay() {
-  // @ts-expect-error Style is reported as readonly but this still works
-  document.querySelector<HTMLElement>("#history-link .history-button").style = "display: inline-block !important;";
+  const historyBtn = document.querySelector<HTMLElement>("#history-link .history-button");
+  if (historyBtn) {
+    historyBtn.style.cssText = "display: inline-block !important;";
+  }
 }
 
 function getYTMTextRun(runs: { text: string }[]) {
@@ -276,6 +291,7 @@ window.addEventListener("load", async () => {
   createNavigationMenuArrows();
   createKeyboardNavigation();
   await createAdditionalPlayerBarControls();
+  await createLiveLyrics();
   await hideChromecastButton();
   await hookPlayerApiEvents();
   overrideHistoryButtonDisplay();
@@ -586,6 +602,11 @@ window.addEventListener("load", async () => {
         );
         break;
       }
+
+      case "toggleLyrics": {
+        window.dispatchEvent(new CustomEvent("ytmd:toggleLyrics"));
+        break;
+      }
     }
   });
 
@@ -614,6 +635,22 @@ window.addEventListener("load", async () => {
       if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
+    }
+
+    if (newState.playback) {
+      (async () => {
+        (
+          await webFrame.executeJavaScript(`
+            (function(settings) {
+              window.dispatchEvent(
+                new CustomEvent("ytmd:lyricsSettingsChanged", {
+                  detail: settings
+                })
+              );
+            })
+          `)
+        )(newState.playback);
+      })();
     }
   });
 
