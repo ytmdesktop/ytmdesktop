@@ -66,7 +66,7 @@ window.addEventListener("load", async () => {
     {
       overrideHistoryButtonDisplay();
       hideChromecastButton();
-      createAdditionalPlayerBarControls();
+      createAdditionalPlayerBarControls(); // Sort of broken as of new YTM player bar (10/03/26)
       addTimedLyrics();
 
       setupCompletions |= YTMViewSetupCompletionFlags.Extras;

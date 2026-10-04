@@ -7,13 +7,15 @@ function getLikeStatus() {
     const state = ytmStore.getState();
 
     let status = "INDIFFERENT";
-    if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
-      status = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0].likeButtonRenderer.likeStatus;
-    } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
-      // New player bar
-      const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
-      const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
-      status = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+    if (state.playerPage && state.playerPage.playerOverlay && state.playerPage.playerOverlay.playerOverlayRenderer) {
+      if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
+        status = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0].likeButtonRenderer.likeStatus;
+      } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+        // New player bar
+        const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+        const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
+        status = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+      }
     }
     return status;
   } catch (err) {

@@ -28,7 +28,6 @@ import { MemoryStoreSchema, TrayIconStyle } from "~shared/store/schema";
 import ProtocolManager from "./services/protocolmanager";
 import PlayerStateStore from "./services/playerstatestore";
 import ProtectedAPIManager from "./services/protectedapimanager";
-import FlagManager from "./services/flagmanager";
 import { VideoType } from "~shared/playerstatestore/types";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
@@ -44,7 +43,6 @@ serviceCollection.addServices([
   WatchDog,
   ConfigStore,
   AppWindowManager,
-  FlagManager,
   MemoryStore<MemoryStoreSchema>,
   AutoUpdater,
   StateManager,
@@ -84,7 +82,7 @@ log.info("Application launched");
 app.enableSandbox();
 
 // appMenu allows for some basic windows management, editMenu allow for copy and paste shortcuts on MacOS
-const template: MenuItemConstructorOptions[] = [{ role: "appMenu", label: "YouTube Music Desktop App" }, { role: "editMenu" }];
+const template: MenuItemConstructorOptions[] = [{ role: "appMenu", label: "YTMDesktop" }, { role: "editMenu" }];
 const builtMenu = process.platform === "darwin" ? Menu.buildFromTemplate(template) : null; // null for performance https://www.electronjs.org/docs/latest/tutorial/performance#8-call-menusetapplicationmenunull-when-you-do-not-need-a-default-menu
 Menu.setApplicationMenu(builtMenu);
 
@@ -139,17 +137,17 @@ app.on("ready", async () => {
       webPreferences: {
         sandbox: true,
         contextIsolation: true,
-        preload: path.join(import.meta.dirname, `../renderer/windows/updater/preload.js`),
+        preload: path.join(__dirname, `../renderer/windows/updater/preload.cjs`),
         devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
       }
     }
   });
   const autoUpdaterCallbacks = {
-    checking: () => updaterWindow.webContents.send("autoUpdater:checking"),
-    available: () => updaterWindow.webContents.send("autoUpdater:available"),
-    notAvailable: () => updaterWindow.webContents.send("autoUpdater:not-available"),
-    downloaded: () => updaterWindow.webContents.send("autoUpdater:downloaded"),
-    error: () => updaterWindow.webContents.send("autoUpdater:error")
+    checking: () => updaterWindow.webContents?.send("autoUpdater:checking"),
+    available: () => updaterWindow.webContents?.send("autoUpdater:available"),
+    notAvailable: () => updaterWindow.webContents?.send("autoUpdater:not-available"),
+    downloaded: () => updaterWindow.webContents?.send("autoUpdater:downloaded"),
+    error: () => updaterWindow.webContents?.send("autoUpdater:error")
   };
   autoUpdater.once("checking", autoUpdaterCallbacks.checking);
   autoUpdater.once("available", autoUpdaterCallbacks.available);
@@ -178,7 +176,7 @@ app.on("ready", async () => {
   // At this stage the next lifecycle is PostInitialized
   serviceHost.runNextLifecycle();
 
-  v1ConfigMigration();
+  v1ConfigMigration(serviceHost.getService(ConfigStore));
 
   //#region safeStorage setup and checks
   if (!safeStorage.isEncryptionAvailable()) {
@@ -238,7 +236,7 @@ app.on("ready", async () => {
         transparent: true,
         sandbox: true,
         contextIsolation: true,
-        preload: path.join(import.meta.dirname, `../renderer/windows/main/preload.js`),
+        preload: path.join(__dirname, `../renderer/windows/main/preload.cjs`),
         devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
       }
     }
@@ -278,7 +276,7 @@ app.on("ready", async () => {
       webPreferences: {
         sandbox: true,
         contextIsolation: true,
-        preload: path.join(import.meta.dirname, `../renderer/windows/titlebar/preload.js`),
+        preload: path.join(__dirname, `../renderer/windows/titlebar/preload.cjs`),
         devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools"),
         additionalArguments: ["is-main-window"]
       }
@@ -355,7 +353,7 @@ app.on("ready", async () => {
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(import.meta.dirname, `../renderer/windows/settings/preload.js`),
+          preload: path.join(__dirname, `../renderer/windows/settings/preload.cjs`),
           devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
         }
       }
@@ -402,7 +400,7 @@ app.on("ready", async () => {
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(import.meta.dirname, `../renderer/windows/miniplayer/preload.js`),
+          preload: path.join(__dirname, `../renderer/windows/miniplayer/preload.cjs`),
           devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
         }
       }
@@ -486,7 +484,7 @@ app.on("ready", async () => {
   tray = new Tray(getTrayIconPath());
   trayContextMenu = Menu.buildFromTemplate([
     {
-      label: "YouTube Music Desktop",
+      label: "YTMDesktop",
       type: "normal",
       enabled: false
     },
@@ -543,7 +541,7 @@ app.on("ready", async () => {
       }
     }
   ]);
-  tray.setToolTip("YouTube Music Desktop");
+  tray.setToolTip("YTMDesktop");
   tray.setContextMenu(trayContextMenu);
   tray.on("click", () => {
     mainWindow.showAndFocus();
@@ -570,12 +568,12 @@ app.on("ready", async () => {
         const unsetFlags = setupFlagNames.filter(key => (setupFlags & YTMViewSetupCompletionFlags[key]) === 0);
 
         const dialogMessage =
-          `Features from YouTube Music Desktop App may not be present or function correctly\n\nThis usually means there's a bug and a bug report should be filed on the GitHub\n\nHook log:\n${setFlags.map(flag => `    ${flag}... OK\n`).join("")}${unsetFlags.map(flag => `    ${flag}... FAIL\n`).join("")}\n` +
-          `${hookError.stack}`;
+          `Features from YTMDesktop may not be present or function correctly\n\nThis usually means there's a bug and a bug report should be filed on the GitHub\n\nHook log:\n${setFlags.map(flag => `    ${flag}... OK\n`).join("")}${unsetFlags.map(flag => `    ${flag}... FAIL\n`).join("")}\n` +
+          `${hookError?.stack}`;
         dialog
           .showMessageBox({
             title: "Hook Error",
-            message: "YouTube Music Desktop App could not hook YouTube Music",
+            message: "YTMDesktop could not hook YouTube Music",
             detail: dialogMessage,
             type: "warning",
             buttons: ["Copy to Clipboard and I understand", "I understand"]
@@ -644,15 +642,34 @@ app.on("ready", async () => {
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(import.meta.dirname, `../renderer/windows/changelog/preload.js`),
+          preload: path.join(__dirname, `../renderer/windows/changelog/preload.cjs`),
           devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
         }
       }
     });
     changelogWindow.ipcHandle("changelog:getReleaseMetadata", async () => {
-      const feedUrl = autoUpdater.getFeedUrlNoVersion();
-      const res = await fetch(`${feedUrl}/${configStore.get("metadata.appVersion") ?? app.getVersion()}`);
-      return await res.json();
+      try {
+        const feedUrl = autoUpdater.getFeedUrlNoPlatform();
+        // Not all platforms are supported so we just use win32 to grab the notes
+        const res = await fetch(`${feedUrl}/win32/${configStore.get("metadata.appVersion")}`);
+        if (res.ok) {
+          if (res.status != 204) {
+            const json = await res.json();
+            return json
+          } else {
+            return {
+              name: app.getVersion(),
+              notes: "# Failed to retrieve changelog"
+            }
+          }
+        }
+      } catch(err) {
+        log.warn("Failed to retrieve changelog", err);
+        return {
+          name: app.getVersion(),
+          notes: "# Failed to retrieve changelog"
+        }
+      }
     });
     changelogWindow.setWindowOpenHandler(details => {
       shell.openExternal(details.url);
@@ -661,11 +678,11 @@ app.on("ready", async () => {
         action: "deny"
       };
     });
-    changelogWindow.webContents.on("will-navigate", event => {
+    changelogWindow.webContents?.on("will-navigate", event => {
       event.preventDefault();
       shell.openExternal(event.url);
     });
-    changelogWindow.webContents.on("will-redirect", event => {
+    changelogWindow.webContents?.on("will-redirect", event => {
       event.preventDefault();
       shell.openExternal(event.url);
     });
@@ -679,8 +696,8 @@ app.on("open-url", (_, url) => {
   if (serviceHost.initialized) serviceHost.getService(ProtocolManager).handleYTMDProtocol(url);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- powerMonitor doesn't have proper types?
-powerMonitor.on("shutdown", (event: any) => {
+// @ts-expect-error powerMonitor doesn't have the correct type here
+powerMonitor.on("shutdown", (event: Electron.Event) => {
   event.preventDefault();
   const stateManager = serviceHost.getService(StateManager);
   stateManager.forceWrite();

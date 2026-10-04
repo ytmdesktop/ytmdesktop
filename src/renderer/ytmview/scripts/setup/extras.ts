@@ -5,7 +5,20 @@ export function overrideHistoryButtonDisplay() {
 }
 
 export async function hideChromecastButton() {
-  ytmhook.ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+  const ytmStore = ytmhook.ytmStateStore.store;
+
+  ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+  // YTM has independent code which sets the cast available so we're subscribing to ensure it's overriden if they do later call it
+  ytmStore.subscribe(() => {
+    try {
+      const ytmStore = ytmhook.ytmStateStore.store;
+      if (ytmStore.getState().castStatus.castAvailable) {
+        ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+      }
+    } catch(err) {
+      console.log("[ytmd-err(hideChromecastButton)]", err);
+    }
+  })
 }
 
 export async function createAdditionalPlayerBarControls() {

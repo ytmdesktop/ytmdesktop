@@ -40,7 +40,7 @@ function openMiniplayer() {
     :has-settings-button="isMainWindow"
     has-minimize-button
     has-maximize-button
-    title="YouTube Music Desktop App"
+    title="YTMDesktop"
     :icon-file="logo"
   >
     <template #app-buttons>

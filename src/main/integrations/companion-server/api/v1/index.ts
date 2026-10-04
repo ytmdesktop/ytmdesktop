@@ -386,7 +386,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(import.meta.dirname, `../renderer/windows/authorize-companion/preload.js`),
+          preload: path.join(__dirname, `../renderer/windows/authorize-companion/preload.cjs`),
           additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });
@@ -564,52 +564,50 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.ready().then(() => {
-    const playerStateStore = options.getService(PlayerStateStore);
+  const playerStateStore = options.getService(PlayerStateStore);
 
-    fastify.io.of("/api/v1/realtime").use((socket, next) => {
-      const token = socket.handshake.auth.token;
-      const [validSession, tokenId] = isAuthValid(options.getService(ConfigStore), token);
-      if (validSession) {
-        socket.data.tokenId = tokenId;
-        next();
-      } else {
-        next(new UnauthenticatedError());
-      }
+  fastify.io.of("/api/v1/realtime").use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    const [validSession, tokenId] = isAuthValid(options.getService(ConfigStore), token);
+    if (validSession) {
+      socket.data.tokenId = tokenId;
+      next();
+    } else {
+      next(new UnauthenticatedError());
+    }
+  });
+  // Will look into enabling sending commands/requests over the websocket at a later point in time
+  /*fastify.io.of("/api/v1/realtime").on("connection", socket => {
+    socket.on("command", (command: RemoteCommand) => {
+      sendCommand(command);
     });
-    // Will look into enabling sending commands/requests over the websocket at a later point in time
-    /*fastify.io.of("/api/v1/realtime").on("connection", socket => {
-      socket.on("command", (command: RemoteCommand) => {
-        sendCommand(command);
-      });
-    });*/
+  });*/
 
-    const stateStoreListener = (state: PlayerState) => {
-      fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
-    };
-    playerStateStore.on("state-changed", stateStoreListener);
+  const stateStoreListener = (state: PlayerState) => {
+    fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
+  };
+  playerStateStore.on("state-changed", stateStoreListener);
 
-    const createPlaylistObservedListener = (playlist: Playlist) => {
-      fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
-    };
-    playerStateStore.on("playlist-created", createPlaylistObservedListener);
+  const createPlaylistObservedListener = (playlist: Playlist) => {
+    fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
+  };
+  playerStateStore.on("playlist-created", createPlaylistObservedListener);
 
-    const deletePlaylistObservedListener = (playlistId: string) => {
-      fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
-    };
-    playerStateStore.on("playlist-deleted", deletePlaylistObservedListener);
+  const deletePlaylistObservedListener = (playlistId: string) => {
+    fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
+  };
+  playerStateStore.on("playlist-deleted", deletePlaylistObservedListener);
 
-    fastify.addHook("onClose", () => {
-      // This should normally close on its own but we'll make sure it's closed out
-      fastify.io.close();
-      playerStateStore.off("state-changed", stateStoreListener);
-      playerStateStore.off("playlist-created", createPlaylistObservedListener);
-      playerStateStore.off("playlist-deleted", deletePlaylistObservedListener);
-    });
+  fastify.addHook("onClose", () => {
+    // This should normally close on its own but we'll make sure it's closed out
+    fastify.io.close();
+    playerStateStore.off("state-changed", stateStoreListener);
+    playerStateStore.off("playlist-created", createPlaylistObservedListener);
+    playerStateStore.off("playlist-deleted", deletePlaylistObservedListener);
   });
 };
 
-// @ts-expect-error This is for ESM purposes so that Fastify isn't trying to use CJS require.cache to get the name
-CompanionServerAPIv1[Symbol.for("fastify.display-name")] = "CompanionServerAPIv1";
+//// @ts-expect-error This is for ESM purposes so that Fastify isn't trying to use CJS require.cache to get the name
+//CompanionServerAPIv1[Symbol.for("fastify.display-name")] = "CompanionServerAPIv1";
 
 export default CompanionServerAPIv1;

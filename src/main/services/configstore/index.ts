@@ -1,5 +1,4 @@
 import Conf from "conf";
-import { OnDidAnyChangeCallback, OnDidChangeCallback } from "conf/dist/source/types";
 import { app, ipcMain } from "electron";
 import log from "electron-log";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
@@ -10,7 +9,7 @@ import AppWindowManager from "../windowmanager";
 export default class ConfigStore extends Service {
   public static override readonly dependencies: DependencyConstructor<Service>[] = [AppWindowManager];
 
-  private conf: Conf<StoreSchema>;
+  private conf!: Conf<StoreSchema>;
 
   private _initialized = false;
   public get initialized() {
@@ -180,28 +179,19 @@ export default class ConfigStore extends Service {
 
   public override onTerminated() {}
 
-  public get<Key extends Paths<StoreSchema>>(key: Key, defaultValue?: ValueAtPath<StoreSchema, Key>): ValueAtPath<StoreSchema, Key> {
-    return this.conf.get(key as string, defaultValue);
-  }
-
-  public set<Key extends Paths<StoreSchema>>(key: Key, value?: ValueAtPath<StoreSchema, Key>) {
-    return this.conf.set(key as string, value);
-  }
-
-  public onDidChange<Key extends keyof StoreSchema>(key: Key, callback: OnDidChangeCallback<StoreSchema[Key]>) {
-    return this.conf.onDidChange(key, callback);
-  }
-
-  public onDidAnyChange(callback: OnDidAnyChangeCallback<StoreSchema>) {
-    return this.conf.onDidAnyChange(callback);
-  }
+  public get = this.conf.get.bind(this.conf);
+  public set = this.conf.set.bind(this.conf);
+  public onDidChange = this.conf.onDidChange.bind(this.conf);
+  public onDidAnyChange = this.conf.onDidAnyChange.bind(this.conf);
 
   // TODO: This should probably be moved somewhere else as this isn't the job of the config store
-  private reconcileConfig(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema>) {
-    if (newState.general.startOnBoot != oldState.general.startOnBoot) {
-      app.setLoginItemSettings({
-        openAtLogin: newState.general.startOnBoot
-      });
+  private reconcileConfig(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema> | undefined) {
+    if (oldState) {
+      if (newState.general.startOnBoot != oldState.general.startOnBoot) {
+        app.setLoginItemSettings({
+          openAtLogin: newState.general.startOnBoot
+        });
+      }
     }
   }
 }

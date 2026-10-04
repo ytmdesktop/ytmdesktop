@@ -25,6 +25,7 @@ export enum AutoUpdaterState {
   Error
 }
 
+const UPDATE_FEED_URL_NO_PLATFORM = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}`;
 const UPDATE_FEED_URL_NO_VERSION = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/${process.platform}-${process.arch}`;
 export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> {
   public static override readonly dependencies: DependencyConstructor<Service>[] = [MemoryStore<MemoryStoreSchema>];
@@ -136,6 +137,10 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
 
   public quitAndInstall() {
     autoUpdater.quitAndInstall();
+  }
+
+  public getFeedUrlNoPlatform() {
+    return UPDATE_FEED_URL_NO_PLATFORM;
   }
 
   public getFeedUrlNoVersion() {

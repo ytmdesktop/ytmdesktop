@@ -82,7 +82,7 @@ export default class WatchDog extends Service {
           `${error.stack}`;
 
         if (!app.isReady()) {
-          dialog.showErrorBox(`YouTube Music Desktop App Crashed`, `Application crashed before ready\n\n${dialogMessage}`);
+          dialog.showErrorBox(`YTMDesktop Crashed`, `Application crashed before ready\n\n${dialogMessage}`);
         } else {
           const options = ["Copy to Clipboard and Exit", "Exit"];
           if (!app.isPackaged) {
@@ -91,7 +91,7 @@ export default class WatchDog extends Service {
 
           result = dialog.showMessageBoxSync({
             title: "Error",
-            message: "YouTube Music Desktop App Crashed",
+            message: "YTMDesktop Crashed",
             detail: dialogMessage,
             type: "error",
             buttons: options
@@ -99,7 +99,7 @@ export default class WatchDog extends Service {
 
           // Copy to Clipboard
           if (result === 0 || result === 2) {
-            clipboard.writeText(`YouTube Music Desktop App Crashed\n\n${dialogMessage}`);
+            clipboard.writeText(`YTMDesktop Crashed\n\n${dialogMessage}`);
           }
         }
 

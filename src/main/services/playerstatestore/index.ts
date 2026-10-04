@@ -367,12 +367,12 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
 
     if (state.hasFullMetadata) {
       if (windowManager.hasWindow("Main"))
-        windowManager.getWindow("Main").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YouTube Music Desktop App`);
+        windowManager.getWindow("Main").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop`);
       if (windowManager.hasWindow("Miniplayer"))
-        windowManager.getWindow("Miniplayer").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YouTube Music Desktop App - Miniplayer`);
+        windowManager.getWindow("Miniplayer").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop - Miniplayer`);
     } else {
-      if (windowManager.hasWindow("Main")) windowManager.getWindow("Main").setTitle(`YouTube Music Desktop App`);
-      if (windowManager.hasWindow("Miniplayer")) windowManager.getWindow("Miniplayer").setTitle("YouTube Music Desktop App - Miniplayer");
+      if (windowManager.hasWindow("Main")) windowManager.getWindow("Main").setTitle(`YTMDesktop`);
+      if (windowManager.hasWindow("Miniplayer")) windowManager.getWindow("Miniplayer").setTitle("YTMDesktop - Miniplayer");
     }
 
     const stateManager = this.getDependency(StateManager);

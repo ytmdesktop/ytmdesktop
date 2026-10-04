@@ -1,6 +1,8 @@
 import path from "node:path";
 import { build, defineConfig } from "vite";
 
+const root = path.resolve(__dirname, "../../..");
+
 // https://vitejs.dev/config
 export default defineConfig({
   plugins: [
@@ -22,8 +24,8 @@ export default defineConfig({
             },
             resolve: {
               alias: {
-                "~shared": path.resolve(__dirname, "../../src/shared"),
-                "~assets": path.resolve(__dirname, "../../src/assets")
+                "~shared": path.resolve(root, "src/shared"),
+                "~assets": path.resolve(root, "src/assets")
               }
             }
           });
@@ -42,8 +44,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~shared": path.resolve(__dirname, "../../src/shared"),
-      "~assets": path.resolve(__dirname, "../../src/assets")
+      "~shared": path.resolve(root, "src/shared"),
+      "~assets": path.resolve(root, "src/assets")
     }
   }
 });

@@ -4,7 +4,7 @@ import CompanionServerAPIv1, { transformPlayerState as transformPlayerStatev1 } 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import { RemoteSocket } from "socket.io";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { DefaultEventsMap } from "socket.io";
 import cors from "@fastify/cors";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";

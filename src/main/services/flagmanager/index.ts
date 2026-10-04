@@ -1,3 +1,5 @@
+// This service is deliberately not used right now
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import Service, { EventEmitterService } from "../service";

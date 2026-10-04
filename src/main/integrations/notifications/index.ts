@@ -1,8 +1,8 @@
 import { Notification, NotificationConstructorOptions, nativeImage } from "electron";
-import playerStateStore from "../../services/playerstatestore";
 import https from "https";
 import Integration from "../integration";
 import { PlayerState, Thumbnail, VideoDetails, VideoState } from "~shared/playerstatestore/types";
+import PlayerStateStore from "../../services/playerstatestore";
 
 // Visualiser - https://apps.microsoft.com/store/detail/notifications-visualizer/9NBLGGH5XSL1?hl=en-gb&gl=gb&rtc=1
 // Documentation / Examples - https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/adaptive-interactive-toasts?tabs=xml
@@ -108,10 +108,13 @@ export default class NowPlayingNotifications extends Integration {
 
   public onEnabled() {
     this.playerStateFunction = (state: PlayerState) => this.updateVideoDetails(state);
-    playerStateStore.addEventListener(this.playerStateFunction);
+
+    const playerStateStore = this.getService(PlayerStateStore);
+    playerStateStore.on("state-changed", this.playerStateFunction);
   }
 
   public onDisabled(): void {
-    playerStateStore.removeEventListener(this.playerStateFunction);
+    const playerStateStore = this.getService(PlayerStateStore);
+    playerStateStore.off("state-changed", this.playerStateFunction);
   }
 }

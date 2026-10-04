@@ -6,17 +6,22 @@ on:
     tags:
       - "v*"
 
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
 jobs:
   build:
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        arch: [ 'x64', 'arm64' ]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        arch: ["x64", "arm64"]
         exclude:
           # Mitigation for Electron Forge naming conflict. See #1183.
-          - os: 'windows-latest'
-            arch: 'arm64'
-        
+          - os: "windows-latest"
+            arch: "arm64"
+
       fail-fast: true # Explicitly failing fast because this is a publish. We want to bail the entire release if something went wrong with another build
 
     runs-on: ${{ matrix.os }}
@@ -25,27 +30,25 @@ jobs:
       - name: Github checkout
         uses: actions/checkout@v4
 
-      - name: Corepack Enable Yarn
-        run: corepack enable yarn
-
-      - name: Setup Node (v20)
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/setup@v6.1.0
         with:
-          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
-          cache: 'yarn'
-          node-version: "20.9.0"
+          runtime: node@lts
+          cache: true
 
-      - name: Install dependencies
-        run: yarn --immutable
-
-      - name: Publish Dry (${{ matrix.arch }})
+      - name: Make (${{ matrix.arch }})
         env:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
-        run: yarn publish:dry --arch ${{ matrix.arch }}
+        run: pnpm make --arch ${{ matrix.arch }}
 
-      - name: Publish From Dry (${{ matrix.arch }})
-        run: yarn publish:fromdry
+      - name: Generate artifact attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: out/make/**/*
+
+      - name: Release From Make (${{ matrix.arch }})
+        run: pnpm release:frommake
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}

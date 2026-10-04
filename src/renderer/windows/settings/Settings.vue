@@ -759,7 +759,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             :src="logo"
           >
           <h2 class="app-name">
-            YouTube Music Desktop App
+            YTMDesktop
           </h2>
           <p class="made-by">
             Made by YTMDesktop Team
@@ -808,6 +808,9 @@ window.ytmd.handleUpdateDownloaded(() => {
             </button>
             <p class="no-auto-updater">
               Auto updater disabled
+            </p>
+            <p class="no-auto-updater">
+              Platform or build does not support automatic updates
             </p>
           </template>
           <span class="version-info">

@@ -1,27 +1,18 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "preserve",
     "moduleResolution": "bundler",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
     "resolveJsonModule": true,
-    "noImplicitOverride": true,
     "paths": {
-      "*": [
-        "node_modules/*"
-      ],
-      "~shared/*": [
-        "src/shared/*"
-      ],
-      "~assets/*": [
-        "src/assets/*"
-      ]
+      "~shared/*": ["./src/shared/*"],
+      "~assets/*": ["./src/assets/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "*.ts", "*.mts", "config/**/*"]
 }

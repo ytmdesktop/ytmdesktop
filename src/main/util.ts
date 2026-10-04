@@ -1,7 +1,7 @@
 import { app, dialog } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
-import configStore from "./services/configstore";
+import ConfigStore from "./services/configstore";
 
 export const assetFolder = path.join(!app.isPackaged ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
 
@@ -12,7 +12,7 @@ export function getControlsIconPath(icon: string) {
   return getIconPath(`${!app.isPackaged ? "controls/" : ""}${icon}`);
 }
 
-export async function v1ConfigMigration() {
+export async function v1ConfigMigration(configStore: ConfigStore) {
   const firstRunPath = path.join(app.getPath("userData"), ".first-run");
   try {
     await fs.access(firstRunPath, fs.constants.F_OK);
@@ -28,7 +28,7 @@ export async function v1ConfigMigration() {
         type: "question",
         message: "Would you like to migrate your settings?",
         detail:
-          "A configuration file for YouTube Music Desktop App v1 was found. Your settings can be migrated.\n\nWARNING: Not all settings will be migrated as they may no longer be available in v2.",
+          "A configuration file for YTMDesktop v1 was found. Your settings can be migrated.\n\nWARNING: Not all settings will be migrated as they may no longer be available in v2.",
         buttons: ["No", "Migrate Settings"]
       });
 

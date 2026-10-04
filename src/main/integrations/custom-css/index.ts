@@ -1,7 +1,6 @@
 import fs from "fs";
 
 import Integration from "../integration";
-import { Unsubscribe } from "conf/dist/source/types";
 import YTMViewManager from "../../services/ytmviewmanager";
 import ConfigStore from "../../services/configstore";
 
@@ -13,7 +12,7 @@ export default class CustomCSS extends Integration {
   private injected = false;
 
   private customCSSKey: string | null = null;
-  private storeListener: Unsubscribe | null = null;
+  private storeListener: ReturnType<ConfigStore["onDidChange"]> | null = null;
 
   private currentWatcher: fs.FSWatcher | null = null;
 
@@ -30,8 +29,12 @@ export default class CustomCSS extends Integration {
 
     ytmViewManager.on("view-recreated", this.ytmViewRecreatedListener);
     this.storeListener = configStore.onDidChange("appearance", (newState, oldState) => {
-      if (newState.customCSSEnabled && newState.customCSSPath != oldState.customCSSPath) {
+      if (newState === undefined || oldState === undefined) {
         this.updateCSS();
+      } else {
+        if (newState && (newState.customCSSEnabled && newState.customCSSPath !== oldState.customCSSPath)) {
+          this.updateCSS();
+        }
       }
     });
 

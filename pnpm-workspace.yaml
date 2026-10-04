@@ -1,0 +1,6 @@
+allowBuilds:
+  electron: true
+  electron-winstaller: true
+  fastify-socket.io: set this to true or false
+
+nodeLinker: hoisted

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import markdownit from "markdown-it";
 const md = markdownit({
-  linkify: true
+  linkify: true,
+  html: true
 });
 
 const releaseMetadata = await window.ytmd.getReleaseMetadata();
@@ -16,7 +17,7 @@ const appVersion = await window.ytmd.getAppVersion();
       YTMDesktop has Updated!
     </h1>
     <h2 class="app-version">
-      {{ appVersion }}
+      {{ releaseMetadata.name }}
     </h2>
     <div
       class="release-notes"
