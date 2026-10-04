@@ -201,6 +201,12 @@ function getYTMTextRun(runs: { text: string }[]) {
               window.__YTMD_HOOK__.ytmPlayerBar = this
             }
 
+            // The new miniplayer no longer creates a YTMUSIC-PLAYER-BAR.
+            // Keep the underlying player as a fallback for the shared player API.
+            if (this.hostElement && this.hostElement.nodeName === "YTMUSIC-PLAYER") {
+              window.__YTMD_HOOK__.ytmPlayer = this
+            }
+
             if (this.store && !!this.store.getState && !!this.store.dispatch && !!this.store.subscribe) {
               window.__YTMD_HOOK__.ytmStore = this.store
             }
@@ -231,6 +237,9 @@ window.addEventListener("load", async () => {
       const hooked = (
         await webFrame.executeJavaScript(`
         (function() {
+          if (!window.__YTMD_HOOK__.ytmPlayerBar && document.querySelector("ytmusic-miniplayer") && window.__YTMD_HOOK__.ytmPlayer?.playerApi) {
+            window.__YTMD_HOOK__.ytmPlayerBar = window.__YTMD_HOOK__.ytmPlayer;
+          }
           if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi)) {
             return true;
           }
@@ -275,7 +284,10 @@ window.addEventListener("load", async () => {
   createStyleSheet();
   createNavigationMenuArrows();
   createKeyboardNavigation();
-  await createAdditionalPlayerBarControls();
+  // These additions target the legacy bar's DOM; the miniplayer has native controls.
+  if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
+    await createAdditionalPlayerBarControls();
+  }
   await hideChromecastButton();
   await hookPlayerApiEvents();
   overrideHistoryButtonDisplay();
@@ -308,7 +320,7 @@ window.addEventListener("load", async () => {
             }
           }
         };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+        document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.addEventListener("transitionend", transitionEnd);
 
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
@@ -339,7 +351,7 @@ window.addEventListener("load", async () => {
 
   const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
   if (alwaysShowVolumeSlider) {
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
   }
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
@@ -348,7 +360,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState() === 1 ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
           `)
         )();
@@ -521,7 +533,8 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").queue.shuffle();
+              const queue = document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.queue ?? document.querySelector("ytmusic-player-queue")?.polymerController?.queue;
+              queue?.shuffle();
             })
           `)
         )();
@@ -606,12 +619,12 @@ window.addEventListener("load", async () => {
   store.onDidAnyChange(newState => {
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider && !volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.add("ytmd-persist-volume-slider");
       }
     } else {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider?.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
     }
