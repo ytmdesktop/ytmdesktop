@@ -1075,6 +1075,14 @@ const createYTMView = (): void => {
       mainWindow.setFullScreen(false);
     }
   });
+  ytmView.webContents.on("before-input-event", (event, input) => {
+    if (input.key === "F11" && input.type === "keyDown") {
+      if (mainWindow) {
+        mainWindow.setFullScreen(!mainWindow.isFullScreen());
+        event.preventDefault();
+      }
+    }
+  });
   ytmView.webContents.on("render-process-gone", () => {
     store.set("state.lastUrl", lastUrl);
     store.set("state.lastVideoId", lastVideoId);
@@ -1309,6 +1317,13 @@ const createMainWindow = (): void => {
     if (process.env.NODE_ENV === "development") if (event.url.startsWith("http://localhost")) return;
 
     event.preventDefault();
+  });
+
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (input.key === "F11" && input.type === "keyDown") {
+      mainWindow.setFullScreen(!mainWindow.isFullScreen());
+      event.preventDefault();
+    }
   });
 
   mainWindow.on("ready-to-show", () => {
