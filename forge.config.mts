@@ -150,12 +150,8 @@ const config: ForgeConfig = {
           const src = path.join(srcRoot, pkg);
           const dest = path.join(destRoot, pkg);
 
-          try {
-            if ((await fs.stat(src)).isDirectory()) {
-              await fs.cp(src, dest, { dereference: true, recursive: true });
-            }
-          } catch(err) {
-            console.warn(err);
+          if ((await fs.stat(src)).isDirectory()) {
+            await fs.cp(src, dest, { dereference: true, recursive: true });
           }
         })
       )
