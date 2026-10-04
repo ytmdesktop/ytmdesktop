@@ -1,4 +1,5 @@
 (function() {
+  const player = document.querySelector("ytmusic-app-layout>ytmusic-player-bar") ?? document.querySelector("ytmusic-player");
   return new Promise((resolve, reject) => {
     var returnValue = [];
     var serviceRequestEvent = {
@@ -8,7 +9,7 @@
       detail: {
         actionName: "yt-service-request",
         args: [
-          document.querySelector("ytmusic-app-layout>ytmusic-player-bar"),
+          player,
           {
             addToPlaylistEndpoint: {
               videoId: window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId
@@ -19,7 +20,7 @@
         returnValue
       }
     };
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar").dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+    player.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
     returnValue[0].ajaxPromise.then(
       response => {
         resolve(response.data.contents[0].addToPlaylistRenderer.playlists);
