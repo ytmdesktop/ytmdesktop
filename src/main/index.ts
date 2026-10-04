@@ -1017,6 +1017,8 @@ function isPreventedNavOrRedirect(url: URL): boolean {
 }
 
 const createYTMView = (): void => {
+  memoryStore.set("ytmViewLoadingError", false);
+  memoryStore.set("ytmViewUnresponsive", false);
   memoryStore.set("ytmViewLoadTimedout", false);
   memoryStore.set("ytmViewLoading", true);
   memoryStore.set("ytmViewLoadingStatus", "Initializing...");
@@ -1084,7 +1086,19 @@ const createYTMView = (): void => {
       mainWindow.setFullScreen(false);
     }
   });
-  ytmView.webContents.on("render-process-gone", () => {
+  const currentView = ytmView;
+  ytmView.webContents.on("render-process-gone", (_event, details) => {
+    log.error("YouTube Music renderer exited", details);
+    if (applicationQuitting || ytmView !== currentView) return;
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.removeBrowserView(currentView);
+    }
+    if (ytmViewLoadTimeout) clearTimeout(ytmViewLoadTimeout);
+    // Release the crashed WebContents before creating its replacement.
+    currentView.webContents.removeAllListeners();
+    currentView.webContents.close();
+    ytmView = null;
     store.set("state.lastUrl", lastUrl);
     store.set("state.lastVideoId", lastVideoId);
     store.set("state.lastPlaylistId", lastPlaylistId);
