@@ -1,11 +1,12 @@
 (function() {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
+  const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = ytmStore.getState();
 
-    const videoId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse()?.videoDetails?.videoId;
+    const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
     const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoId];
@@ -18,16 +19,16 @@
     window.ytmd.sendStoreUpdate(state.queue, likeStatus, volume, muted, adPlaying);
   }
 
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoProgress", progress => {
+  playerApi.addEventListener("onVideoProgress", progress => {
     window.ytmd.sendVideoProgress(progress);
   });
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onStateChange", state => {
+  playerApi.addEventListener("onStateChange", state => {
     window.ytmd.sendVideoState(state);
   });
-  document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.addEventListener("onVideoDataChange", event => {
+  playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      let videoDetails = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlayerResponse().videoDetails;
-      let playlistId = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playerApi.getPlaylistId();
+      let videoDetails = playerApi.getPlayerResponse().videoDetails;
+      let playlistId = playerApi.getPlaylistId();
       let album = null;
       let hasFullMetadata = false;
 
