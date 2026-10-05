@@ -179,10 +179,18 @@ export default class ConfigStore extends Service {
 
   public override onTerminated() {}
 
-  public get = this.conf.get.bind(this.conf);
-  public set = this.conf.set.bind(this.conf);
-  public onDidChange = this.conf.onDidChange.bind(this.conf);
-  public onDidAnyChange = this.conf.onDidAnyChange.bind(this.conf);
+  public get get() {
+    return this.conf.get.bind(this.conf);
+  }
+  public get set() {
+    return this.conf.set.bind(this.conf);
+  }
+  public get onDidChange() {
+    return this.conf.onDidChange.bind(this.conf);
+  }
+  public get onDidAnyChange() {
+    return this.conf.onDidAnyChange.bind(this.conf);
+  }
 
   // TODO: This should probably be moved somewhere else as this isn't the job of the config store
   private reconcileConfig(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema> | undefined) {
