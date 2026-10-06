@@ -6,11 +6,11 @@ import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
-declare const YTMD_GIT_COMMIT_HASH: string;
-declare const YTMD_GIT_BRANCH: string;
+declare const YTMD_GIT_COMMIT_HASH: string | undefined;
+declare const YTMD_GIT_BRANCH: string | undefined;
 
 const ytmdVersion = await window.ytmd.getAppVersion();
-const ytmdCommitHash = YTMD_GIT_COMMIT_HASH.substring(0, 7);
+const ytmdCommitHash = YTMD_GIT_COMMIT_HASH?.substring(0, 7);
 const ytmdBranch = YTMD_GIT_BRANCH;
 
 const isDarwin = window.ytmd.isDarwin;
@@ -815,8 +815,8 @@ window.ytmd.handleUpdateDownloaded(() => {
           </template>
           <span class="version-info">
             <p class="version">Version: {{ ytmdVersion }}</p>
-            <p class="branch">Branch: {{ ytmdBranch }}</p>
-            <p class="commit">Commit: {{ ytmdCommitHash }}</p>
+            <p class="branch">Branch: {{ ytmdBranch ?? "None" }}</p>
+            <p class="commit">Commit: {{ ytmdCommitHash ?? "None" }}</p>
           </span>
           <div class="links">
             <a
