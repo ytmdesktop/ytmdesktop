@@ -231,10 +231,14 @@ window.addEventListener("load", async () => {
       const hooked = (
         await webFrame.executeJavaScript(`
         (function() {
+          if (window.__YTMD_HOOK__ && !window.__YTMD_HOOK__.ytmPlayerBar) {
+            window.__YTMD_HOOK__.ytmPlayerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+          }
+
           if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi)) {
             return true;
           }
-          
+
           return false;
         })
       `)
