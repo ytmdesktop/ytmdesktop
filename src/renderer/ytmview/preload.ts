@@ -590,6 +590,24 @@ window.addEventListener("load", async () => {
   });
 
   ipcRenderer.on("ytmView:getPlaylists", async (_event, requestId) => {
+    // Inject last known video id as context for the playlists request, so it
+    // also works when no video is currently loaded in the player.
+    let fallbackVideoId = "";
+    try {
+      const state = await store.get("state");
+      fallbackVideoId = state?.lastVideoId ?? "";
+    } catch {
+      // store unavailable — anchor video will be used
+    }
+    if (!fallbackVideoId) {
+      // The playlists service request needs any valid video id as context
+      // (the returned list is identical regardless of the video). Use a
+      // known public video as anchor when no playback context is available.
+      fallbackVideoId = "jNQXAC9IVRw";
+    }
+
+    await webFrame.executeJavaScript(`window.__YTMD_PLAYLISTS_FALLBACK_VIDEO_ID__ = ${JSON.stringify(fallbackVideoId)};`);
+
     const rawPlaylists = await (await webFrame.executeJavaScript(getPlaylistsScript))();
 
     const playlists = [];

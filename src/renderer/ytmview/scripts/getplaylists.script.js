@@ -11,7 +11,19 @@
           window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0],
           {
             addToPlaylistEndpoint: {
-              videoId: window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId
+              videoId:
+                (function() {
+                  // Prefer the currently loaded video; fall back to the last
+                  // known video id injected by the preload script so the
+                  // playlists list also works when nothing is playing.
+                  try {
+                    var playerResponse = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse();
+                    if (playerResponse && playerResponse.videoDetails && playerResponse.videoDetails.videoId) {
+                      return playerResponse.videoDetails.videoId;
+                    }
+                  } catch (e) {}
+                  return window.__YTMD_PLAYLISTS_FALLBACK_VIDEO_ID__;
+                })()
             }
           }
         ],
