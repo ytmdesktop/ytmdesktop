@@ -595,9 +595,15 @@ window.addEventListener("load", async () => {
     const playlists = [];
     for (const rawPlaylist of rawPlaylists) {
       const playlist = rawPlaylist.playlistAddToOptionRenderer;
+      // Largest available playlist thumbnail (playlist cover).
+      // YTM CDNs allow resizing via the trailing "=w<px>-h<px>" parameter.
+      const thumbnails = playlist.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails ?? [];
+      const rawThumb = thumbnails.length ? (thumbnails[thumbnails.length - 1]?.url ?? undefined) : undefined;
+      const thumbnail = rawThumb?.replace(/=w\d+-h\d+(-\S*)?$/, "=w300-h300");
       playlists.push({
         id: playlist.playlistId,
-        title: getYTMTextRun(playlist.title.runs)
+        title: getYTMTextRun(playlist.title.runs),
+        thumbnail
       });
     }
     ipcRenderer.send(`ytmView:getPlaylists:response:${requestId}`, playlists);
