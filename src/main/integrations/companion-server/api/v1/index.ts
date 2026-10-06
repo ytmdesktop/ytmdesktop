@@ -428,7 +428,10 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         // API users: Please cache playlists, they are unlikely to change often. A websocket event will be emitted if a playlist is created or deleted
         rateLimit: {
           hook: "preHandler",
-          max: 1,
+          // Multiple companion UIs (property inspector + action tiles with
+          // playlist covers) legitimately fetch this list around the same
+          // time, so allow a small burst instead of a hard 1/30s.
+          max: 3,
           timeWindow: 1000 * 30,
           keyGenerator: request => {
             return request.authId || request.ip;
