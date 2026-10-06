@@ -11,6 +11,6 @@ export default defineConfig({
     define: {
         YTMD_UPDATE_FEED_OWNER: `"ytmdesktop"`,
         YTMD_UPDATE_FEED_REPOSITORY: `"ytmdesktop"`,
-        YTMD_DISABLE_UPDATES: true
+        YTMD_DISABLE_UPDATES: process.env.NODE_ENV !== "production"
     }
 });
