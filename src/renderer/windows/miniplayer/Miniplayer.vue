@@ -6,9 +6,7 @@ import RangeInput from "../../components/RangeInput.vue";
 const state = ref<PlayerState | null>(null);
 state.value = await window.ytmd.playerStore.getState();
 
-const volume = ref(state.value.volume);
-
-const thumbnailUrl = ref("");
+const volume = ref(state.value?.volume ?? 0);
 
 const videoProgress = ref(0);
 const videoLength = ref(0);
@@ -27,11 +25,16 @@ function getHighestResThumbnail(thumbnails: Thumbnail[]): string {
 
 let seekbarDragging = false;
 
-function stateChanged(newState) {
+async function stateChanged(newState) {
   state.value = newState;
 
   if (newState.videoDetails && newState.videoDetails.id != videoId.value) {
-    thumbnailUrl.value = getHighestResThumbnail(newState.videoDetails?.thumbnails);
+    const thumbnailUrl = getHighestResThumbnail(newState.videoDetails?.thumbnails);
+    if (thumbnailUrl) {
+      document.body.style.backgroundImage = `url("${thumbnailUrl}")`;
+    } else {
+      document.body.style.backgroundImage = "";
+    }
     videoLength.value = newState.videoDetails.durationSeconds;
     videoId.value = newState.videoDetails.id;
 
@@ -109,7 +112,7 @@ document.addEventListener("mouseup", () => {
   if (seekbarDragging) {
     seekbarDragging = false;
 
-    document.body.style.userSelect = null;
+    document.body.style.userSelect = "";
   }
 });
 
@@ -129,7 +132,7 @@ function volumeChanged() {
   window.ytmd.executeCommandInYTMView("setVolume", volume.value);
 }
 function toggleMute() {
-  if (!state.value.muted) {
+  if (!state.value?.muted) {
     window.ytmd.executeCommandInYTMView("mute");
   } else {
     window.ytmd.executeCommandInYTMView("unmute");
@@ -141,17 +144,18 @@ window.addEventListener("resize", reconcileMarquee);
 
 <template>
   <div
-    v-if="state.videoDetails != null"
+    v-if="state?.videoDetails != null"
     class="container"
   >
-    <div class="thumbnail-container">
+    <!--<div class="thumbnail-container">
       <img
         class="thumbnail"
         :src="thumbnailUrl"
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
       >
-    </div>
+    </div>-->
+    <div class="pusher"></div>
     <div class="video-data">
       <div class="backdrop" />
       <div
@@ -161,7 +165,7 @@ window.addEventListener("resize", reconcileMarquee);
         <span
           ref="infoTitle"
           class="title"
-        >{{ state.videoDetails?.title }} • {{ state.videoDetails?.author }}</span>
+        >{{ state?.videoDetails?.title }} • {{ state?.videoDetails?.author }}</span>
       </div>
       <div
         ref="seekbarContainer"
@@ -197,19 +201,19 @@ window.addEventListener("resize", reconcileMarquee);
             @click="playPauseVideo"
           >
             <span
-              v-if="state.trackState == VideoState.Paused"
+              v-if="state?.trackState == VideoState.Paused"
               class="icon material-symbols-outlined"
             >play_arrow</span>
             <span
-              v-if="state.trackState == VideoState.Playing"
+              v-if="state?.trackState == VideoState.Playing"
               class="icon material-symbols-outlined"
             >pause</span>
             <span
-              v-if="state.trackState == VideoState.Buffering"
+              v-if="state?.trackState == VideoState.Buffering"
               class="icon material-symbols-outlined"
             >data_saver_off</span>
             <span
-              v-if="state.trackState == VideoState.Unknown"
+              v-if="state?.trackState == VideoState.Unknown"
               class="icon material-symbols-outlined"
             >play_arrow</span>
           </button>
@@ -234,15 +238,15 @@ window.addEventListener("resize", reconcileMarquee);
               @click="toggleMute"
             >
               <span
-                v-if="volume <= 50 && !state.muted"
+                v-if="volume <= 50 && !state?.muted"
                 class="icon material-symbols-outlined"
               >volume_down</span>
               <span
-                v-if="volume > 50 && !state.muted"
+                v-if="volume > 50 && !state?.muted"
                 class="icon material-symbols-outlined"
               >volume_up</span>
               <span
-                v-if="state.muted"
+                v-if="state?.muted"
                 class="icon material-symbols-outlined"
               >volume_off</span>
             </button>
@@ -252,15 +256,15 @@ window.addEventListener("resize", reconcileMarquee);
             @click="cycleRepeat"
           >
             <span
-              v-if="state.queue.repeatMode === RepeatMode.None || state.queue.repeatMode === RepeatMode.Unknown"
+              v-if="state?.queue.repeatMode === RepeatMode.None || state?.queue.repeatMode === RepeatMode.Unknown"
               class="icon material-symbols-outlined"
             >repeat</span>
             <span
-              v-if="state.queue.repeatMode === RepeatMode.All"
+              v-if="state?.queue.repeatMode === RepeatMode.All"
               class="icon material-symbols-outlined"
             >repeat_on</span>
             <span
-              v-if="state.queue.repeatMode === RepeatMode.One"
+              v-if="state?.queue.repeatMode === RepeatMode.One"
               class="icon material-symbols-outlined"
             >repeat_one_on</span>
           </button>
@@ -290,21 +294,8 @@ window.addEventListener("resize", reconcileMarquee);
   align-items: center;
 }
 
-.thumbnail-container {
-  padding: 16px;
+.pusher {
   flex-grow: 1;
-  height: 0;
-  -webkit-app-region: drag;
-}
-
-.thumbnail {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -999;
 }
 
 .video-data {
@@ -323,6 +314,7 @@ window.addEventListener("resize", reconcileMarquee);
   mask-image: linear-gradient(to top, black 0%, black 25%, transparent 100%);
   z-index: -888;
   background-color: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 .video-controls {
