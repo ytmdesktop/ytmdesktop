@@ -3,4 +3,14 @@ allowBuilds:
   electron-winstaller: true
   fastify-socket.io: false
 
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - '@xosms/xosms-darwin-arm64@0.7.0-rc.2'
+  - '@xosms/xosms-darwin-x64@0.7.0-rc.2'
+  - '@xosms/xosms-linux-arm64-gnu@0.7.0-rc.2'
+  - '@xosms/xosms-linux-x64-gnu@0.7.0-rc.2'
+  - '@xosms/xosms-win32-arm64-msvc@0.7.0-rc.2'
+  - '@xosms/xosms-win32-x64-msvc@0.7.0-rc.2'
+  - xosms@0.7.0-rc.2
+
 nodeLinker: hoisted

@@ -60,6 +60,6 @@
     "multicast-dns": "^7.2.5",
     "socket.io": "^4.8.4",
     "vue": "^3.5.43",
-    "xosms": "^0.7.0-rc.1"
+    "xosms": "^0.7.0-rc.2"
   }
 }

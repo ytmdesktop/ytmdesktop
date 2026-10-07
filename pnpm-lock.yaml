@@ -212,8 +212,8 @@ importers:
         specifier: ^3.5.43
         version: 3.5.43(typescript@6.0.3)
       xosms:
-        specifier: ^0.7.0-rc.1
-        version: 0.7.0-rc.1
+        specifier: ^0.7.0-rc.2
+        version: 0.7.0-rc.2
     devDependencies:
       '@electron-forge/cli':
         specifier: ^8.0.1
@@ -943,40 +943,40 @@ packages:
     resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
     engines: {node: '>=14.6'}
 
-  '@xosms/xosms-darwin-arm64@0.7.0-rc.1':
-    resolution: {integrity: sha512-bcI2E+C+C86CsJCvsiK3VN5JGIK7/vVRIXivMkadb2kOgIHvaXp74la8p+5+3qIHtTBK9dwAEdGOjTmHTK2llQ==}
+  '@xosms/xosms-darwin-arm64@0.7.0-rc.2':
+    resolution: {integrity: sha512-Zd1nG0O13OMzMlUOaX4McaqRptF/d9Q7RWvdKI+XdMgDv7NkQIXjbTLK3Qo4FdCEuKo/UzonbxFTGmpo7eOWLg==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [arm64]
     os: [darwin]
 
-  '@xosms/xosms-darwin-x64@0.7.0-rc.1':
-    resolution: {integrity: sha512-KveDDUts+9xuEzYiFQnG6NQ3Et++wjEmQ16EGmrhReIoxTRFqZA92+ODn3ujuc1sqYo54kf75ueFn7lEOaH8GQ==}
+  '@xosms/xosms-darwin-x64@0.7.0-rc.2':
+    resolution: {integrity: sha512-Y0Ok0gC8xKnIK3tOvI0gp1/ac0dIGvfQlgVwZPYoWCa1cZfqiy5iJgOSagjtiYiZV6mnZhNqanJ82bR3oowzJQ==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [x64]
     os: [darwin]
 
-  '@xosms/xosms-linux-arm64-gnu@0.7.0-rc.1':
-    resolution: {integrity: sha512-mLYA4DJcQbCzR2zSK/uH2e3TB+GYSZBh4ZUYIH6tI90QBZLdAY7HHycKeKyyFbyj+rNat3pz+s6gBQGSIqGXhw==}
+  '@xosms/xosms-linux-arm64-gnu@0.7.0-rc.2':
+    resolution: {integrity: sha512-JP+4cQrdjzJb/JQC8gnc3RA2mJXGIcAlVS3R9WggE2FBgIqYO4TLd6bRdzYusWFvZbfHcVLl3BNqmEcW/16QKw==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@xosms/xosms-linux-x64-gnu@0.7.0-rc.1':
-    resolution: {integrity: sha512-zkFsczWPd5LIooIuDN7kL9um4b211NQi7FWVMSLTURK0FxURNrRn2moEqHEHpFiCGNqu36cBT7wiBasHH+FsiA==}
+  '@xosms/xosms-linux-x64-gnu@0.7.0-rc.2':
+    resolution: {integrity: sha512-QEyN94AguO5yzIHx4z6QC2noFRis0F3Y9JCsLzyh8wtU3bDPrDBzmlpuPgnPwBAjAV9YCsy89wDCq4MFrHS7nQ==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@xosms/xosms-win32-arm64-msvc@0.7.0-rc.1':
-    resolution: {integrity: sha512-fxlsMTWK0imYp6N0cLgcJtnnymMeNeuiRHAsQUig+WsrwJ8mPPWhFx8eAHXArA5bwGF1mqOUJPlpgWvLY2DGRw==}
+  '@xosms/xosms-win32-arm64-msvc@0.7.0-rc.2':
+    resolution: {integrity: sha512-ELEUwhu4/CypdJoHvjzjlxCUpku4IlafQMXqlqTyH+5l5OQccu1YxynxiIciztlc4vPK16vRBp1DXbTe/NIxWA==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [arm64]
     os: [win32]
 
-  '@xosms/xosms-win32-x64-msvc@0.7.0-rc.1':
-    resolution: {integrity: sha512-Hx0yEcwMZ9Um2HlffaJ55t/yTo0P2fZIoobz9/qOyiQQ6OuU5ClK32QizqqxhBBSzINoJZahGh+4atGvc1G7Vg==}
+  '@xosms/xosms-win32-x64-msvc@0.7.0-rc.2':
+    resolution: {integrity: sha512-wIapVlpVcg9svyNZvlLqOJOzmbToWd3a02m/RaGKpxztiiJbAO89PA+HDX2w5lA/vp0dVltqgAhQHqG8SP4q7A==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
     cpu: [x64]
     os: [win32]
@@ -2107,8 +2107,8 @@ packages:
     resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}
     engines: {node: '>=8.0'}
 
-  xosms@0.7.0-rc.1:
-    resolution: {integrity: sha512-Zs7BdFO3epCKW05WUDXnArJUku0KO8HQ2aAA+QxN7btVkq5jAn7UgygUo/rPk5wQ8skpEr3Q5ga1MF9NCx/5RQ==}
+  xosms@0.7.0-rc.2:
+    resolution: {integrity: sha512-btTSvoIwy93Sj2Kbwt70gbZYYWS6mRHgwr8bdU5GXgMYzHwqBjzqyEoHL7woyrKc/bnxo/qkT7zZd0aNkGE6tw==}
     engines: {node: '>= 10.17.0 < 11 || >= 12.11.0 < 12 || >= 13.0.0'}
 
   y18n@5.0.8:
@@ -2816,22 +2816,22 @@ snapshots:
 
   '@xmldom/xmldom@0.9.12': {}
 
-  '@xosms/xosms-darwin-arm64@0.7.0-rc.1':
+  '@xosms/xosms-darwin-arm64@0.7.0-rc.2':
     optional: true
 
-  '@xosms/xosms-darwin-x64@0.7.0-rc.1':
+  '@xosms/xosms-darwin-x64@0.7.0-rc.2':
     optional: true
 
-  '@xosms/xosms-linux-arm64-gnu@0.7.0-rc.1':
+  '@xosms/xosms-linux-arm64-gnu@0.7.0-rc.2':
     optional: true
 
-  '@xosms/xosms-linux-x64-gnu@0.7.0-rc.1':
+  '@xosms/xosms-linux-x64-gnu@0.7.0-rc.2':
     optional: true
 
-  '@xosms/xosms-win32-arm64-msvc@0.7.0-rc.1':
+  '@xosms/xosms-win32-arm64-msvc@0.7.0-rc.2':
     optional: true
 
-  '@xosms/xosms-win32-x64-msvc@0.7.0-rc.1':
+  '@xosms/xosms-win32-x64-msvc@0.7.0-rc.2':
     optional: true
 
   abbrev@4.0.0: {}
@@ -3952,14 +3952,14 @@ snapshots:
 
   xmlbuilder@15.1.1: {}
 
-  xosms@0.7.0-rc.1:
+  xosms@0.7.0-rc.2:
     optionalDependencies:
-      '@xosms/xosms-darwin-arm64': 0.7.0-rc.1
-      '@xosms/xosms-darwin-x64': 0.7.0-rc.1
-      '@xosms/xosms-linux-arm64-gnu': 0.7.0-rc.1
-      '@xosms/xosms-linux-x64-gnu': 0.7.0-rc.1
-      '@xosms/xosms-win32-arm64-msvc': 0.7.0-rc.1
-      '@xosms/xosms-win32-x64-msvc': 0.7.0-rc.1
+      '@xosms/xosms-darwin-arm64': 0.7.0-rc.2
+      '@xosms/xosms-darwin-x64': 0.7.0-rc.2
+      '@xosms/xosms-linux-arm64-gnu': 0.7.0-rc.2
+      '@xosms/xosms-linux-x64-gnu': 0.7.0-rc.2
+      '@xosms/xosms-win32-arm64-msvc': 0.7.0-rc.2
+      '@xosms/xosms-win32-x64-msvc': 0.7.0-rc.2
 
   y18n@5.0.8:
     optional: true

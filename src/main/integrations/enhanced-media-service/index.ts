@@ -138,7 +138,7 @@ export default class EnhancedMediaService extends Integration {
 
       if (state.videoDetails.id !== this.lastVideoDetailsId) {
         this.lastVideoDetailsId = state.videoDetails.id;
-        this.mediaPlayer.trackId = Buffer.from(state.videoDetails.id).toBase64({ alphabet: "base64url", omitPadding: true });
+        this.mediaPlayer.trackId = state.videoDetails.id;
       }
 
       if (state.trackState !== this.lastTrackState) {
