@@ -23,7 +23,7 @@ export async function hideChromecastButton() {
         ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
       }
     } catch (err) {
-      console.log("[ytmd-err(hideChromecastButton)]", err);
+      console.error("[ytmd-err(hideChromecastButton)]", err);
     }
   });
 }

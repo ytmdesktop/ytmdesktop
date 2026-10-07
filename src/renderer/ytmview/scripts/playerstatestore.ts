@@ -19,8 +19,33 @@ function getLikeStatus() {
     }
     return status;
   } catch (err) {
-    console.log("[ytmd-err(getLikeStatus)]", err);
+    console.error("[ytmd-err(getLikeStatus)]", err);
     return null;
+  }
+}
+
+async function remapThumbnailsToDataUrl(thumbnails: any[]) {
+  for (const thumbnail of thumbnails) {
+    if (thumbnail.url) {
+      try {
+        const response = await fetch(thumbnail.url, {
+          credentials: "omit",
+          referrerPolicy: "no-referrer"
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          thumbnail.url = dataUrl;
+        }
+      } catch(err) {
+        console.error("[ytmd-err(sendVideoData)] Could not update thumbnail url to data url", err);
+      }
+    }
   }
 }
 
@@ -30,7 +55,7 @@ export default function init() {
   //const playerBar = ytmhook.ytmPlayerController;
   const playerApi = ytmhook.ytmPlayerController.playerApi;
 
-  function sendStoreState() {
+  async function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     const state = ytmStore.getState();
 
@@ -42,13 +67,33 @@ export default function init() {
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
     const muted = state.player.muted;
+    
+    // This feature which can remap queue item thumbnails into data url is extremely intensive both memory and for companion api responses
+    // 
+    // We opt for a tradeoff below of just remapping the currently playing videos thumbnails to data url
+    /*
+    const queue = structuredClone(state.queue);
+    // Check if offline then convert the thumbnail url by requesting it
+    const networkStatusManager = window["yt"]?.networkStatusManager?.instance?.sharedNetworkStatusManager;
+    if (networkStatusManager && !networkStatusManager.isNetworkAvailable()) {
+      for (const item of queue.items) {
+        let playlistPanelVideoRenderer;
+        if (item.playlistPanelVideoRenderer) {
+          playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
+        } else if (item.playlistPanelVideoWrapperRenderer) {
+          playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer
+        }
+        await remapThumbnailsToDataUrl(playlistPanelVideoRenderer.thumbnail?.thumbnails ?? []);
+      }
+    }
+    */
 
     playerStateApi.postMessage("updateFromStore", state.queue, likeStatus, volume, muted, adPlaying);
   }
 
-  function sendVideoData() {
+  async function sendVideoData() {
     const state = ytmStore.getState();
-    const videoDetails = playerApi.getPlayerResponse().videoDetails;
+    const videoDetails = structuredClone(playerApi.getPlayerResponse().videoDetails);
     const playlistId = playerApi.getPlaylistId();
     let album: any | null = null;
     let hasFullMetadata = false;
@@ -63,7 +108,7 @@ export default function init() {
 
       // Fill out video details with better information
       videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
-      videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
+      videoDetails.thumbnail = structuredClone(currentItem.thumbnail); // Can contain more thumbnails than player response
 
       // Maybe obtain the album information from a text run
       for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
@@ -85,6 +130,15 @@ export default function init() {
     const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
 
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+
+    // Check if offline then convert the thumbnail url to data url if possible
+    //
+    // This provides a quality of life where at least when something is currently playing and we're offline the media service
+    // or anything that may present the currently playing media thumbnail has something tangible to work with
+    const networkStatusManager = window["yt"]?.networkStatusManager?.instance?.sharedNetworkStatusManager;
+    if (networkStatusManager && !networkStatusManager.isNetworkAvailable()) {
+      await remapThumbnailsToDataUrl(videoDetails.thumbnail?.thumbnails ?? []);
+    }
 
     playerStateApi.postMessage("updateVideoDetails", videoDetails, playlistId, album, likeStatus, hasFullMetadata);
   }
@@ -113,7 +167,7 @@ export default function init() {
     try {
       playerStateApi.postMessage("updateVideoState", state);
     } catch (err) {
-      console.log("[ytmd-err(playerApi.onStateChange)]", err);
+      console.error("[ytmd-err(playerApi.onStateChange)]", err);
     }
   });
   playerApi.addEventListener("onVideoDataChange", event => {
@@ -122,14 +176,14 @@ export default function init() {
         sendVideoData();
       }
     } catch (err) {
-      console.log("[ytmd-err(playerApi.onVideoDataChange)]", err);
+      console.error("[ytmd-err(playerApi.onVideoDataChange)]", err);
     }
   });
   ytmStore.subscribe(() => {
     try {
       sendStoreState();
     } catch (err) {
-      console.log("[ytmd-err(stateStore.subscribe)]", err);
+      console.error("[ytmd-err(stateStore.subscribe)]", err);
     }
   });
   window.addEventListener("yt-action", (e: any) => {

@@ -507,7 +507,7 @@ export default function init() {
             }
             resolve([playlists]);
           } catch (err) {
-            console.log("[ytmd-err(getPlaylists)]", err);
+            console.error("[ytmd-err(getPlaylists)]", err);
             resolve([[]]);
           }
         },

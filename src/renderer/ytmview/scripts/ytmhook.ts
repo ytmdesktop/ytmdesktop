@@ -46,6 +46,7 @@ export class YTMHook {
             });
           }
         }
+
         return mapSet.call(this, key, value);
       }
     });
