@@ -4,6 +4,7 @@ import { StoreSchema } from "~shared/store/schema";
 import { DependencyConstructor, ValueAtPath } from "~shared/types";
 import Service, { EventEmitterService } from "../service";
 import ConfigStore from "../configstore";
+import { ServiceHost } from "../servicehost";
 
 type IntegrationCreator<T> = new (...args: unknown[]) => T;
 type IntegrationManagerEventMap = {
@@ -20,10 +21,22 @@ function getProperty<T, Path extends string>(obj: T, path: Path): ValueAtPath<T,
 }
 
 export default class IntegrationManager extends EventEmitterService<IntegrationManagerEventMap> {
+  static readonly ENABLE = Symbol("IntegrationManager.ENABLE");
+  static readonly DISABLE = Symbol("IntegrationManager.DISABLE");
+  static readonly SETUP = Symbol("IntegrationManager.SETUP");
+
   public static override readonly dependencies: DependencyConstructor<Service>[] = [ConfigStore/*, FlagManager*/];
 
   private integrations: Integration[] = [];
   private enabledIntegrations: Integration[] = [];
+
+  #host!: ServiceHost;
+
+  // Specialty service which is allowed to obtain the ServiceHost directly
+  public override [ServiceHost.INJECT](host: ServiceHost) {
+    super[ServiceHost.INJECT](host);
+    this.#host = host;
+  }
 
   public override onPreInitialized() {}
 
@@ -50,8 +63,8 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
    */
   public createIntegrations(integrations: IntegrationCreator<Integration>[]) {
     for (const integration of integrations) {
-      const constructedIntegration = new integration();
-      constructedIntegration.__setServiceHost(this.__getServiceHost());
+      const constructedIntegration = new integration()
+      constructedIntegration[ServiceHost.INJECT](this.#host);
       this.integrations.push(constructedIntegration);
     }
   }
@@ -77,7 +90,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
 
   private runIntegrationSetups() {
     for (const integration of this.integrations) {
-      integration.onSetup();
+      integration[IntegrationManager.SETUP]();
     }
   }
 
@@ -86,6 +99,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
     // const flagManager = this.getDependency(FlagManager);
 
     for (const integration of this.integrations) {
+      // @ts-expect-error TODO: Fix configStore.get() here with correct type
       let shouldBeEnabled = newState ? getProperty(newState, integration.storeEnableProperty) : configStore.get(integration.storeEnableProperty);
       let disabledByFlag = false;
       // for (const flag of integration.disableFlags) {
@@ -100,7 +114,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
           if (!this.enabledIntegrations.includes(integration)) {
             log.info(`Enabling integration: ${integration.name}`);
 
-            integration.enable();
+            integration[IntegrationManager.ENABLE]();
 
             this.enabledIntegrations.push(integration);
             log.info(`Enabled integration: ${integration.name}`);
@@ -111,7 +125,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
           if (this.enabledIntegrations.includes(integration)) {
             log.info(`Disabling integration: ${integration.name}` + (disabledByFlag ? ` (flag disabled)` : ``));
 
-            await integration.disable();
+            await integration[IntegrationManager.DISABLE]();
 
             const index = this.enabledIntegrations.indexOf(integration, 0);
             if (index > -1) this.enabledIntegrations.splice(index, 1);
@@ -125,8 +139,8 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
 
               if (newProperty != oldProperty) {
                 log.info(`Restarting enabled integration: ${integration.name} (dependent properties changed)`);
-                await integration.disable();
-                integration.enable();
+                await integration[IntegrationManager.DISABLE]();
+                integration[IntegrationManager.ENABLE]();
                 log.info(`Restarted enabled integration: ${integration.name} (dependent properties changed)`);
               }
             }

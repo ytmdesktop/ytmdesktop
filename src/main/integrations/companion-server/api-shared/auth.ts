@@ -7,7 +7,7 @@ import ConfigStore from "../../../services/configstore";
 const temporaryCodeMap: { [code: string]: { appId: string; appVersion: string; appName: string } } = {};
 
 async function getUnusedCode() {
-  return new Promise<string>(resolve => {
+  return new Promise<string | null>(resolve => {
     let code;
     const generateStart = Date.now();
     // Because of this setInterval it does take 250ms before it executes which delays everything by 250ms
@@ -57,7 +57,7 @@ export function getIsTemporaryAuthCodeValidAndRemove(appId: string, code: string
 export function createAuthToken(configStore: ConfigStore, appId: string, appVersion: string, appName: string) {
   let authTokens: AuthToken[] = [];
   try {
-    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens"), "hex")));
+    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex")));
   } catch {
     /* authTokens will just be an empty array */
   }
@@ -85,21 +85,21 @@ export function createAuthToken(configStore: ConfigStore, appId: string, appVers
   return token;
 }
 
-export function isAuthValid(configStore: ConfigStore, authToken: string): [boolean, string] {
+export function isAuthValid(configStore: ConfigStore, authToken: string): [boolean, string | null] {
   if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
   let authTokens: AuthToken[] = [];
   try {
-    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens"), "hex"));
+    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"));
     authTokens = JSON.parse(decryptedAuthTokens);
   } catch {
     /* authTokens will just be an empty array */
   }
 
   let validSession = false;
-  let id = null;
+  let id: string | null = null;
   for (const authSession of authTokens) {
     if (authSession.token == authTokenHash) {
       id = authSession.id;
@@ -127,7 +127,7 @@ export function isAuthValidMiddleware(configStore: ConfigStore, request: Fastify
 
   const [validSession, tokenId] = isAuthValid(configStore, authToken);
 
-  if (validSession) {
+  if (validSession && !!tokenId) {
     request.authId = tokenId;
     next();
   } else {

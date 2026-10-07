@@ -9,7 +9,7 @@ class ProtectedAPIManager {
   }
 
   public createOrGetAPI(name: string): ProtectedAPI {
-    if (this.apis.has(name)) return this.apis.get(name);
+    if (this.apis.has(name)) return this.apis.get(name)!;
 
     const apiChannel = new MessageChannel();
 
@@ -86,7 +86,7 @@ class ProtectedAPI extends EventTarget {
 
   private async dispatchHandleEvent(event: Event) {
     if (this.invokeHandlers.has(event.type)) {
-      return await this.invokeHandlers.get(event.type)(event);
+      return await this.invokeHandlers.get(event.type)!(event);
     }
   }
 }

@@ -1,10 +1,10 @@
 export class YTMHook {
   private _ytmStateStore;
   private _ytmPlayerController;
-  public get ytmStateStore(): unknown {
+  public get ytmStateStore(): any {
     return this._ytmStateStore;
   }
-  public get ytmPlayerController(): unknown {
+  public get ytmPlayerController(): any {
     return this._ytmPlayerController;
   }
 

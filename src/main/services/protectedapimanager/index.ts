@@ -46,7 +46,7 @@ export default class ProtectedAPIManager extends Service {
   }
 
   public createOrGetAPI(name: string): ProtectedAPI {
-    if (this.apis.has(name)) return this.apis.get(name);
+    if (this.apis.has(name)) return this.apis.get(name)!;
 
     const protectedApi = new ProtectedAPI(name);
     this.apis.set(name, protectedApi);

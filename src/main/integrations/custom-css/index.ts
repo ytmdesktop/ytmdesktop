@@ -73,7 +73,7 @@ export default class CustomCSS extends Integration {
       const content: string = fs.readFileSync(cssPath, "utf8");
 
       await ytmViewManager.ready();
-      this.customCSSKey = await ytmViewManager.getView().webContents.insertCSS(content);
+      this.customCSSKey = await ytmViewManager.getView()?.webContents.insertCSS(content) ?? null;
       this.injected = true;
 
       this.watchCSSFile(cssPath);
@@ -81,12 +81,12 @@ export default class CustomCSS extends Integration {
   }
 
   private async removeCSS() {
-    if (this.customCSSKey === null && !this.injected) return;
+    if (this.customCSSKey === null || !this.injected) return;
 
     const ytmViewManager = this.getService(YTMViewManager);
 
     await ytmViewManager.ready();
-    await ytmViewManager.getView().webContents.removeInsertedCSS(this.customCSSKey);
+    await ytmViewManager.getView()?.webContents.removeInsertedCSS(this.customCSSKey);
 
     this.customCSSKey = null;
     this.injected = false;
@@ -99,7 +99,7 @@ export default class CustomCSS extends Integration {
       this.currentWatcher = null;
     }
 
-    if (newFile === null) return;
+    if (!newFile) return;
 
     // Watch for changes to the custom CSS file
     // and update the CSS when it changes
@@ -112,7 +112,7 @@ export default class CustomCSS extends Integration {
 
           configStore.set("appearance.customCSSPath", null);
           this.removeCSS();
-          this.currentWatcher.close();
+          this.currentWatcher?.close();
         }
       }
     });

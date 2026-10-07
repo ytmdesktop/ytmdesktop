@@ -121,7 +121,7 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
     if (!this.initialized) throw new Error("AutoUpdater is not initialized!");
     if (!this.autoUpdaterEnabled) return false;
 
-    let waitPromise = null;
+    let waitPromise: Promise<boolean> | null = null;
     if (wait) {
       waitPromise = new Promise<boolean>(resolve => {
         this.once("not-available", () => resolve(false));

@@ -59,7 +59,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     AppWindowManager
   ];
 
-  private ytmView: AppView;
+  private ytmView?: AppView;
   private hooksReady = false;
   private hookError: Error | null = null;
   private setupCompletionFlags = 0;
@@ -91,14 +91,12 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   public override onPostInitialized() {
     const configStore = this.getDependency(ConfigStore);
     configStore.onDidChange("appearance", newState => {
-      if (this.ytmView) {
-        this.ytmView.webContents.setZoomFactor(newState.zoom / 100);
-      }
+      if (newState) this.ytmView?.webContents.setZoomFactor(newState.zoom / 100);
     });
 
     //#region Permission handlers
     session.fromPartition("persist:ytmview").setPermissionCheckHandler((webContents, permission) => {
-      if (webContents == this.ytmView.webContents) {
+      if (webContents == this.ytmView?.webContents) {
         if (permission === "fullscreen") {
           return true;
         }
@@ -107,7 +105,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       return false;
     });
     session.fromPartition("persist:ytmview").setPermissionRequestHandler((webContents, permission, callback) => {
-      if (webContents == this.ytmView.webContents) {
+      if (webContents == this.ytmView?.webContents) {
         if (permission === "fullscreen") {
           return callback(true);
         }
@@ -173,8 +171,8 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     });
 
     this.ytmView.on("ready", () => {
-      this.ytmView.webContents.setZoomFactor(configStore.get("appearance.zoom") / 100);
-      const url = new URL(this.ytmView.webContents.getURL());
+      this.ytmView!.webContents.setZoomFactor(configStore.get("appearance.zoom") / 100);
+      const url = new URL(this.ytmView!.webContents.getURL());
       if (url.hostname === "music.youtube.com") {
         this.setStatus(YTMViewStatus.Hooking);
       } else {
@@ -193,7 +191,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     });
 
     this.ytmView.on("webcontents-enter-html-full-screen", () => {
-      this.ytmView.setAutoResize({
+      this.ytmView!.setAutoResize({
         offsetHeight: {
           anchor: "Top",
           pixels: 0
@@ -201,7 +199,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       });
     });
     this.ytmView.on("webcontents-leave-html-full-screen", () => {
-      this.ytmView.setAutoResize({
+      this.ytmView!.setAutoResize({
         offsetHeight: {
           anchor: "Bottom",
           pixels: 36
@@ -209,7 +207,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       });
     });
     this.ytmView.on("webcontents-did-navigate", () => {
-      const url = this.ytmView.webContents.getURL();
+      const url = this.ytmView!.webContents.getURL();
       const urlObj = new URL(url);
       if (urlObj.hostname === "music.youtube.com") {
         stateManager.updateState({
@@ -218,7 +216,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       }
     });
     this.ytmView.on("webcontents-did-navigate-in-page", () => {
-      const url = this.ytmView.webContents.getURL();
+      const url = this.ytmView!.webContents.getURL();
       const urlObj = new URL(url);
       if (urlObj.hostname === "music.youtube.com") {
         stateManager.updateState({
@@ -233,7 +231,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
         for (const suggestion of params.dictionarySuggestions) {
           menu.push({
             label: suggestion,
-            click: () => this.ytmView.webContents.replaceMisspelling(suggestion)
+            click: () => this.ytmView!.webContents.replaceMisspelling(suggestion)
           });
         }
       }
@@ -331,7 +329,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
           label: "Inspect",
           type: "normal",
           click: () => {
-            this.ytmView.webContents.inspectElement(params.x, params.y);
+            this.ytmView!.webContents.inspectElement(params.x, params.y);
           }
         });
       }
@@ -365,7 +363,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
         (url.hostname === "youtube.com" && url.pathname === "/musicpremium")
       ) {
         // This users region requires a premium subscription to use YTM
-        this.ytmView.webContents.loadURL(
+        this.ytmView!.webContents.loadURL(
           "https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F"
         );
       }
@@ -382,7 +380,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       this.emit("title-updated", title);
     });
     this.ytmView.on("webcontents-will-prevent-unload", event => {
-      const choice = dialog.showMessageBoxSync(this.ytmView.getParentWindow()._getElectronWindow(), {
+      const choice = dialog.showMessageBoxSync(this.ytmView!.getParentWindow()._getElectronWindow(), {
         type: "question",
         buttons: ["Leave", "Cancel"],
         title: "Leave site?",
@@ -416,7 +414,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   }
 
   public async ready(): Promise<void> {
-    await this.ytmView.ready();
+    await this.ytmView?.ready();
     if (!this.hooksReady)
       await new Promise<void>(resolve => {
         const interval = setInterval(async () => {
@@ -454,7 +452,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   }
 
   private setWindowOpenHandler() {
-    this.ytmView.webContents.setWindowOpenHandler(details => {
+    this.ytmView?.webContents.setWindowOpenHandler(details => {
       openExternalFromYtmView(details.url);
 
       return {

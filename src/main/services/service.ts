@@ -14,7 +14,7 @@ export default abstract class Service {
   public abstract onPostInitialized(): void;
   public abstract onTerminated(): void;
 
-  private host: ServiceHost;
+  #host!: ServiceHost;
 
   /**
    * Gets a service dependency from the host for this service
@@ -22,36 +22,24 @@ export default abstract class Service {
    * @param service The dependency service to get
    * @returns
    */
-  public getDependency<T extends Service>(service?: Constructor<T>): T {
+  public getDependency<T extends Service>(service: Constructor<T>): T {
     const dependencies = (this.constructor as DependencyConstructor<Service>).dependencies;
     if (!dependencies.includes(service as DependencyConstructor<T>))
       throw new Error(`Attempt to get dependency service '${service.name}' but '${this.constructor.name}' does not depend on it`);
 
-    return this.host.getService<T>(service);
+    return this.#host.getService<T>(service);
   }
 
   /**
-   * INTERNAL TO SERVICEHOST -- DO NOT USE
-   *
    * This function sets the ServiceHost which this service is a part of
+   * 
+   * @internal ServiceHost calls this to inject itself
    *
    * @param host
    * @returns
    */
-  public __setServiceHost(host: ServiceHost): NoOverride {
-    this.host = host;
-    return null;
-  }
-
-  /**
-   * INTERNAL -- DO NOT USE
-   *
-   * This function gets the ServiceHost this service is a part of
-   *
-   * @returns The service host
-   */
-  protected __getServiceHost() {
-    return this.host;
+  public [ServiceHost.INJECT](host: ServiceHost) {
+    this.#host = host;
   }
 }
 

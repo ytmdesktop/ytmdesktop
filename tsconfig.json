@@ -6,7 +6,8 @@
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false, // TODO: Probably shouldn't allow this but it requires a lot of work to type everything
+    "noImplicitThis": false, // YTMView scripts that utilize YTM apis may end up using implicit any for this - TODO: Scope this to just scripts folder? 
     "sourceMap": true,
     "resolveJsonModule": true,
     "paths": {

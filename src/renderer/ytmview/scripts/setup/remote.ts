@@ -5,7 +5,7 @@ import { getYTMTextRun } from "../utils";
 export default function init() {
   const remoteApi = protectedapimanager.createOrGetAPI("RemoteControl");
 
-  remoteApi.addEventListener("execute", event => {
+  remoteApi.addEventListener("execute", (event: any) => {
     const args = event.detail.args;
     const command = args.shift();
 
@@ -57,31 +57,48 @@ export default function init() {
 
         let defaultLikeStatus = "INDIFFERENT";
         if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
-          const buttonData = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
+          const buttonData =
+            state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
           defaultLikeStatus = buttonData.likeButtonRenderer.likeStatus;
 
-          for (const endpoint of buttonData.likeButtonRenderer.serviceEndpoints) {
+          for (const endpoint of buttonData.likeButtonRenderer
+            .serviceEndpoints) {
             if (endpoint.likeEndpoint.status === "LIKE") {
               serviceEndpoint = endpoint;
             } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
               toggledServiceEndpoint = endpoint;
             }
           }
-        } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+        } else if (
+          state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar
+        ) {
           // New player bar
-          const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
-          const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
-          defaultLikeStatus = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+          const actionBar =
+            state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+          const viewModel =
+            actionBar.videoActionBarViewModel.buttons[0].buttonViewModel
+              .segmentedLikeDislikeButtonViewModel;
+          defaultLikeStatus =
+            viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity
+              .likeStatus;
 
-          const toggleButtonViewModel = viewModel.likeButtonViewModel.likeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
-          serviceEndpoint = toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap.innertubeCommand;
-          toggledServiceEndpoint = toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap.innertubeCommand;
+          const toggleButtonViewModel =
+            viewModel.likeButtonViewModel.likeButtonViewModel
+              .toggleButtonViewModel.toggleButtonViewModel;
+          serviceEndpoint =
+            toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap
+              .innertubeCommand;
+          toggledServiceEndpoint =
+            toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap
+              .innertubeCommand;
         }
 
         const storeLikeStatus = state.likeStatus.videos[videoId];
-        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
+        const likeStatus = storeLikeStatus
+          ? state.likeStatus.videos[videoId]
+          : defaultLikeStatus;
 
-        let serviceEvent = null;
+        let serviceEvent: any | null = null;
 
         const ytmusicAppElement = document.querySelector("ytmusic-app");
         if (likeStatus === "LIKE") {
@@ -93,8 +110,8 @@ export default function init() {
               actionName: "yt-service-request",
               args: [ytmusicAppElement, toggledServiceEndpoint],
               optionalAction: false,
-              returnValue: []
-            }
+              returnValue: [],
+            },
           };
         } else {
           serviceEvent = {
@@ -105,12 +122,15 @@ export default function init() {
               actionName: "yt-service-request",
               args: [ytmusicAppElement, serviceEndpoint],
               optionalAction: false,
-              returnValue: []
-            }
+              returnValue: [],
+            },
           };
         }
 
-        if (serviceEvent) ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceEvent));
+        if (serviceEvent)
+          ytmusicAppElement?.dispatchEvent(
+            new CustomEvent("yt-action", serviceEvent),
+          );
 
         break;
       }
@@ -124,31 +144,48 @@ export default function init() {
 
         let defaultLikeStatus = "INDIFFERENT";
         if (state.playerPage.playerOverlay.playerOverlayRenderer.actions) {
-          const buttonData = state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
+          const buttonData =
+            state.playerPage.playerOverlay.playerOverlayRenderer.actions[0];
           defaultLikeStatus = buttonData.likeButtonRenderer.likeStatus;
 
-          for (const endpoint of buttonData.likeButtonRenderer.serviceEndpoints) {
+          for (const endpoint of buttonData.likeButtonRenderer
+            .serviceEndpoints) {
             if (endpoint.likeEndpoint.status === "DISLIKE") {
               serviceEndpoint = endpoint;
             } else if (endpoint.likeEndpoint.status === "INDIFFERENT") {
               toggledServiceEndpoint = endpoint;
             }
           }
-        } else if (state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar) {
+        } else if (
+          state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar
+        ) {
           // New player bar
-          const actionBar = state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
-          const viewModel = actionBar.videoActionBarViewModel.buttons[0].buttonViewModel.segmentedLikeDislikeButtonViewModel;
-          defaultLikeStatus = viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity.likeStatus;
+          const actionBar =
+            state.playerPage.playerOverlay.playerOverlayRenderer.videoActionBar;
+          const viewModel =
+            actionBar.videoActionBarViewModel.buttons[0].buttonViewModel
+              .segmentedLikeDislikeButtonViewModel;
+          defaultLikeStatus =
+            viewModel.likeButtonViewModel.likeButtonViewModel.likeStatusEntity
+              .likeStatus;
 
-          const toggleButtonViewModel = viewModel.dislikeButtonViewModel.dislikeButtonViewModel.toggleButtonViewModel.toggleButtonViewModel;
-          serviceEndpoint = toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap.innertubeCommand;
-          toggledServiceEndpoint = toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap.innertubeCommand;
+          const toggleButtonViewModel =
+            viewModel.dislikeButtonViewModel.dislikeButtonViewModel
+              .toggleButtonViewModel.toggleButtonViewModel;
+          serviceEndpoint =
+            toggleButtonViewModel.defaultButtonViewModel.buttonViewModel.onTap
+              .innertubeCommand;
+          toggledServiceEndpoint =
+            toggleButtonViewModel.toggledButtonViewModel.buttonViewModel.onTap
+              .innertubeCommand;
         }
 
         const storeLikeStatus = state.likeStatus.videos[videoId];
-        const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
+        const likeStatus = storeLikeStatus
+          ? state.likeStatus.videos[videoId]
+          : defaultLikeStatus;
 
-        let serviceEvent = null;
+        let serviceEvent: any | null = null;
 
         const ytmusicAppElement = document.querySelector("ytmusic-app");
         if (likeStatus === "DISLIKE") {
@@ -160,8 +197,8 @@ export default function init() {
               actionName: "yt-service-request",
               args: [ytmusicAppElement, toggledServiceEndpoint],
               optionalAction: false,
-              returnValue: []
-            }
+              returnValue: [],
+            },
           };
         } else {
           serviceEvent = {
@@ -172,12 +209,15 @@ export default function init() {
               actionName: "yt-service-request",
               args: [ytmusicAppElement, serviceEndpoint],
               optionalAction: false,
-              returnValue: []
-            }
+              returnValue: [],
+            },
           };
         }
 
-        if (serviceEvent) ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceEvent));
+        if (serviceEvent)
+          ytmusicAppElement?.dispatchEvent(
+            new CustomEvent("yt-action", serviceEvent),
+          );
 
         break;
       }
@@ -301,29 +341,34 @@ export default function init() {
           useAutoMix = true;
         }
 
-        let song = null;
+        let song: any | null = null;
         if (!useAutoMix) {
           song = queue.items[index];
         } else {
           song = queue.automixItems[index];
         }
 
-        let playlistPanelVideoRenderer;
-        if (song.playlistPanelVideoRenderer) {
-          playlistPanelVideoRenderer = song.playlistPanelVideoRenderer;
-        } else if (song.playlistPanelVideoWrapperRenderer) {
-          playlistPanelVideoRenderer = song.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
-        }
+        if (song) {
+          let playlistPanelVideoRenderer;
+          if (song.playlistPanelVideoRenderer) {
+            playlistPanelVideoRenderer = song.playlistPanelVideoRenderer;
+          } else if (song.playlistPanelVideoWrapperRenderer) {
+            playlistPanelVideoRenderer =
+              song.playlistPanelVideoWrapperRenderer.primaryRenderer
+                .playlistPanelVideoRenderer;
+          }
 
-        document.dispatchEvent(
-          new CustomEvent("yt-navigate", {
-            detail: {
-              endpoint: {
-                watchEndpoint: playlistPanelVideoRenderer.navigationEndpoint.watchEndpoint
-              }
-            }
-          })
-        );
+          document.dispatchEvent(
+            new CustomEvent("yt-navigate", {
+              detail: {
+                endpoint: {
+                  watchEndpoint:
+                    playlistPanelVideoRenderer.navigationEndpoint.watchEndpoint,
+                },
+              },
+            }),
+          );
+        }
 
         break;
       }
@@ -333,9 +378,9 @@ export default function init() {
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
             detail: {
-              endpoint
-            }
-          })
+              endpoint,
+            },
+          }),
         );
 
         break;
@@ -347,7 +392,7 @@ export default function init() {
         const index = args[0].index;
 
         const ytmusicAppElement = document.querySelector("ytmusic-app");
-        const returnValue = [];
+        const returnValue: any[] = [];
         const serviceRequestEvent = {
           bubbles: true,
           cancelable: false,
@@ -360,19 +405,21 @@ export default function init() {
                 queueAddEndpoint: {
                   queueTarget: {
                     videoId: videoId,
-                    playlistId: playlistId
-                  }
-                }
-              }
+                    playlistId: playlistId,
+                  },
+                },
+              },
             ],
             optionalAction: false,
-            returnValue
-          }
+            returnValue,
+          },
         };
-        ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+        ytmusicAppElement?.dispatchEvent(
+          new CustomEvent("yt-action", serviceRequestEvent),
+        );
         returnValue[0].ajaxPromise.then(
-          response => {
-            const items = response.data.queueDatas.map(data => data.content);
+          (response) => {
+            const items = response.data.queueDatas.map((data) => data.content);
             ytmStore.dispatch({
               type: "ADD_ITEMS",
               payload: {
@@ -380,11 +427,11 @@ export default function init() {
                 index,
                 items,
                 shuffleEnabled: ytmStore.getState().queue.shuffleEnabled,
-                shouldAssignIds: true
-              }
+                shouldAssignIds: true,
+              },
             });
           },
-          () => {}
+          () => {},
         );
 
         break;
@@ -395,7 +442,7 @@ export default function init() {
 
         ytmStore.dispatch({
           type: "REMOVE_ITEM",
-          payload: index
+          payload: index,
         });
         break;
       }
@@ -408,8 +455,8 @@ export default function init() {
           type: "MOVE_ITEM",
           payload: {
             fromIndex,
-            toIndex
-          }
+            toIndex,
+          },
         });
         break;
       }
@@ -421,7 +468,7 @@ export default function init() {
 
     return new Promise((resolve, reject) => {
       const ytmusicAppElement = document.querySelector("ytmusic-app");
-      const returnValue = [];
+      const returnValue: any[] = [];
       const serviceRequestEvent = {
         bubbles: true,
         cancelable: false,
@@ -432,26 +479,29 @@ export default function init() {
             ytmusicAppElement,
             {
               addToPlaylistEndpoint: {
-                videoId: playerApi.getPlayerResponse().videoDetails.videoId
-              }
-            }
+                videoId: playerApi.getPlayerResponse().videoDetails.videoId,
+              },
+            },
           ],
           optionalAction: false,
-          returnValue
-        }
+          returnValue,
+        },
       };
-      ytmusicAppElement.dispatchEvent(new CustomEvent("yt-action", serviceRequestEvent));
+      ytmusicAppElement?.dispatchEvent(
+        new CustomEvent("yt-action", serviceRequestEvent),
+      );
       returnValue[0].ajaxPromise.then(
-        response => {
+        (response) => {
           try {
-            const rawPlaylists = response.data.contents[0].addToPlaylistRenderer.playlists;
-            const playlists = [];
+            const rawPlaylists =
+              response.data.contents[0].addToPlaylistRenderer.playlists;
+            const playlists: any[] = [];
             if (rawPlaylists) {
               for (const rawPlaylist of rawPlaylists) {
                 const playlist = rawPlaylist.playlistAddToOptionRenderer;
                 playlists.push({
                   id: playlist.playlistId,
-                  title: getYTMTextRun(playlist.title.runs)
+                  title: getYTMTextRun(playlist.title.runs),
                 });
               }
             }
@@ -463,7 +513,7 @@ export default function init() {
         },
         () => {
           reject();
-        }
+        },
       );
     });
   });

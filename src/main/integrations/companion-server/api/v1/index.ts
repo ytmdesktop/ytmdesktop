@@ -428,7 +428,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           promiseResolve(authorized);
         };
 
-        const closeListener = (event: Electron.IpcMainEvent) => {
+        const closeListener = (event: Electron.IpcMainEvent | null) => {
           if (event && event.sender !== authorizationWindow.webContents) return;
 
           clearInterval(promiseInterval);

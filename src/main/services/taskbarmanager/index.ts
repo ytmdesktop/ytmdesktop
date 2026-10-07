@@ -47,7 +47,7 @@ export default class TaskbarManager extends Service {
       const hasVideo = !!playerState.videoDetails;
       const isPlaying = playerState.trackState === VideoState.Playing;
 
-      const taskbarFlags = [];
+      const taskbarFlags: string[] = [];
       if (!hasVideo) {
         taskbarFlags.push("disabled");
       }

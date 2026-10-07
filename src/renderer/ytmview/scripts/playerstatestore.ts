@@ -50,7 +50,7 @@ export default function init() {
     const state = ytmStore.getState();
     const videoDetails = playerApi.getPlayerResponse().videoDetails;
     const playlistId = playerApi.getPlaylistId();
-    let album = null;
+    let album: any | null = null;
     let hasFullMetadata = false;
 
     const selectedItemIndex = state.queue.items.findIndex(item => {
@@ -132,7 +132,7 @@ export default function init() {
       console.log("[ytmd-err(stateStore.subscribe)]", err);
     }
   });
-  window.addEventListener("yt-action", e => {
+  window.addEventListener("yt-action", (e: any) => {
     if (e.detail.actionName === "yt-service-request") {
       if (e.detail.args[1].createPlaylistServiceEndpoint) {
         const title = e.detail.args[2].create_playlist_title;

@@ -3,6 +3,7 @@ import { Constructor, Paths } from "~shared/types";
 import { ServiceHost } from "../services/servicehost";
 import YTMViewManager from "../services/ytmviewmanager";
 import Service from "../services/service";
+import IntegrationManager from "../services/integrationmanager";
 
 // Enforces TypeScript to not allow overriding a method (MUST NOT BE EXPORTED)
 declare const _never: unique symbol;
@@ -26,64 +27,81 @@ export default abstract class Integration {
    */
   public readonly disableFlags: string[] = [];
 
-  private _isEnabled = false;
+  #isEnabled = false;
   public get isEnabled() {
-    return this._isEnabled;
+    return this.#isEnabled;
   }
 
-  private host: ServiceHost;
+  #host!: ServiceHost;
 
   constructor() {}
 
   /**
-   * Enables the integration
+   * Setup the integration
+   * 
+   * @internal IntegrationManager calls this to setup the integration
    */
-  public enable(): NoOverride {
-    this._isEnabled = true;
+  public [IntegrationManager.SETUP]() {
+    this.onSetup();
+  }
+
+  /**
+   * Enables the integration
+   * 
+   * @internal IntegrationManager calls this to enable the integration
+   */
+  public [IntegrationManager.ENABLE]() {
+    this.#isEnabled = true;
     this.onEnabled();
-    return null;
   }
 
   /**
    * Disables the integration
+   * 
+   * @internal IntegrationManager calls this to disable the integration
    */
-  public async disable(): Promise<NoOverride> {
-    this._isEnabled = false;
+  public async [IntegrationManager.DISABLE](): Promise<void> {
+    this.#isEnabled = false;
     await this.onDisabled();
-    return null;
-  }
-
-  public __setServiceHost(host: ServiceHost): NoOverride {
-    this.host = host;
-    return null;
-  }
-
-  protected getService<T extends Service>(service?: Constructor<T>): T {
-    return this.host.getService<T>(service);
-  }
-
-  protected executeYTMScript(script: string): NoOverride {
-    const ytmViewManager = this.host.getService(YTMViewManager);
-    ytmViewManager.getView().webContents.send("ytmView:executeScript", script);
-    return null;
   }
 
   /**
-   * This function is run before the app has emitted ready
-   *
-   * The integration is not enabled at this point
+   * @internal IntegrationManager calls this inject the ServiceHost
+   * 
+   * @param host 
+   * @returns 
    */
-  public abstract onSetup(): void;
+  public [ServiceHost.INJECT](host: ServiceHost) {
+    this.#host = host;
+    return null;
+  }
+
+  protected getService<T extends Service>(service: Constructor<T>): T {
+    return this.#host.getService<T>(service);
+  }
+
+  protected executeYTMScript(script: string) {
+    const ytmViewManager = this.#host.getService(YTMViewManager);
+    ytmViewManager.getView()?.webContents.send("ytmView:executeScript", script);
+  }
+
   /**
-   * The integration ias been enabled
-   *
-   * This is always run after the app has emitted ready
+   * The integration has been setup
+   * 
+   * @remarks This is run before the app has emitted ready
+   * @remarks The integration is not enabled yet
    */
-  public abstract onEnabled(): void;
+  protected abstract onSetup(): void;
   /**
-   * The integration ias been enabled
+   * The integration has been enabled
    *
-   * This is always run after the app has emitted ready
+   * @remarks This is always run after the app has emitted ready
    */
-  public abstract onDisabled(): void;
+  protected abstract onEnabled(): void;
+  /**
+   * The integration has been enabled
+   *
+   * @remarks This is always run after the app has emitted ready
+   */
+  protected abstract onDisabled(): void;
 }

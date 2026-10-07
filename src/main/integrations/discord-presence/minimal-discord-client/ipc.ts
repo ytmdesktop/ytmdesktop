@@ -10,7 +10,7 @@ export enum OPCode {
 }
 
 export default class IPCClient extends EventEmitter {
-  private socket: Socket;
+  private socket!: Socket;
 
   constructor() {
     super();

@@ -10,7 +10,7 @@ import os from "node:os";
 function getHighestResThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 0;
   let currentHeight = 0;
-  let url = null;
+  let url: string | null = null;
   for (const thumbnail of thumbnails) {
     if (thumbnail.width > currentWidth && thumbnail.height > currentHeight) {
       currentWidth = thumbnail.width;

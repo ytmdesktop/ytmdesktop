@@ -8,7 +8,7 @@ import {
   IpcMainInvokeEvent,
   Rectangle,
   Size,
-  WillResizeDetails
+  WillResizeDetails,
 } from "electron";
 import assert from "node:assert";
 import log from "electron-log";
@@ -18,8 +18,8 @@ import EventEmitter from "node:events";
 
 export type AppWindowType = "Base" | "Browser";
 export type AppWindowEventMap = {
-  "recreated": [];
-  "electronwindow-will-resize": [Event, Rectangle, WillResizeDetails];
+  recreated: [];
+  "electronwindow-will-resize": [Electron.Event, Rectangle, WillResizeDetails];
   "electronwindow-resize": [];
   "electronwindow-move": [];
   "electronwindow-maximize": [];
@@ -89,22 +89,26 @@ export type AppWindowOptions<T extends AppWindowType> = {
   file?: string;
 };
 
-export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEventMap> {
+export class AppWindow<
+  T extends AppWindowType,
+> extends EventEmitter<AppWindowEventMap> {
   private readonly windowType: T;
   private parentManager: AppWindowManager;
-  private electronWindow: BaseWindow;
+  private electronWindow?: BaseWindow;
   private options: AppWindowOptions<T>;
-  private activeViews: { [viewName: string]: { view: AppView; index: number } } = {};
+  private activeViews: {
+    [viewName: string]: { view: AppView; index: number | undefined };
+  } = {};
 
   private destroyed = false;
   private requestedClosure = false;
   private initialCreation = true;
   private lastState: {
     maximized: boolean;
-    bounds: Rectangle;
+    bounds: Rectangle | undefined;
   } = {
     maximized: false,
-    bounds: undefined
+    bounds: undefined,
   };
   private initialViewsReady = 0;
   private localViewReady = false;
@@ -113,20 +117,29 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
 
   private thumbarButtons: Electron.ThumbarButton[] = [];
   private progressBar: number = -1;
-  private progressBarOptions: Electron.ProgressBarOptions = null;
+  private progressBarOptions: Electron.ProgressBarOptions | null = null;
 
   public readonly name: string;
   public get webContents() {
-    if (this.windowType !== "Browser") throw new Error("This AppWindow does not contain a webContents");
+    if (this.windowType !== "Browser")
+      throw new Error("This AppWindow does not contain a webContents");
 
-    if (this.electronWindow) return (this.electronWindow as BrowserWindow).webContents;
+    if (this.electronWindow)
+      return (this.electronWindow as BrowserWindow).webContents;
     else return null;
   }
 
-  public constructor(windowType: T, parentManager: AppWindowManager, windowOptions: AppWindowOptions<T>) {
+  public constructor(
+    windowType: T,
+    parentManager: AppWindowManager,
+    windowOptions: AppWindowOptions<T>,
+  ) {
     super();
 
-    if (windowOptions.url && windowOptions.file) throw new Error("Only one of 'url' or 'file' can be provided when creating an AppWindow");
+    if (windowOptions.url && windowOptions.file)
+      throw new Error(
+        "Only one of 'url' or 'file' can be provided when creating an AppWindow",
+      );
 
     this.windowType = windowType;
     this.options = windowOptions;
@@ -143,7 +156,7 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
   public closeWindow() {
     assert(this.destroyed === false, new Error("This AppWindow is destroyed"));
 
-    this.electronWindow.close();
+    this.electronWindow?.close();
   }
 
   /**
@@ -154,7 +167,7 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
   public destroyWindow() {
     this.requestedClosure = true;
 
-    if (!this.electronWindow.isDestroyed()) this.electronWindow.destroy();
+    if (!this.electronWindow?.isDestroyed()) this.electronWindow?.destroy();
 
     this.destroyed = true;
   }
@@ -163,13 +176,16 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
    * Creates the window
    */
   public createWindow() {
-    if (this.electronWindow) throw new Error(`Tried to create backing electron window for AppWindow '${this.name}' but it already exists`);
+    if (this.electronWindow)
+      throw new Error(
+        `Tried to create backing electron window for AppWindow '${this.name}' but it already exists`,
+      );
     this.createElectronWindow();
   }
 
   private recreateWindowInternal() {
     if (!this.requestedClosure && !this.destroyed) {
-      if (!this.electronWindow.isDestroyed()) this.electronWindow.destroy();
+      if (!this.electronWindow?.isDestroyed()) this.electronWindow?.destroy();
     }
   }
 
@@ -184,19 +200,22 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
   }
 
   public attachView(view: AppView, index?: number) {
-    if (this.activeViews[view.name]) throw new Error(`View with the name '${view.name}' already exists on Window '${this.name}'`);
+    if (this.activeViews[view.name])
+      throw new Error(
+        `View with the name '${view.name}' already exists on Window '${this.name}'`,
+      );
 
     view._attachToWindow(this, index);
     this.activeViews[view.name] = {
       view,
-      index
+      index,
     };
   }
 
   public detachView(view: AppView) {
     if (this.activeViews[view.name].view != view) {
       log.warn(
-        `Attempted to detach AppView '${this.name}' from ${this.name} but the provided view does not match the current view with the same name attached`
+        `Attempted to detach AppView '${this.name}' from ${this.name} but the provided view does not match the current view with the same name attached`,
       );
       return;
     }
@@ -212,7 +231,7 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
    */
   public async ready(): Promise<void> {
     if (!this.windowReady)
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const interval = setInterval(() => {
           if (this.windowReady) {
             clearInterval(interval);
@@ -223,54 +242,92 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is OK to have as any
-  public ipcOn(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void) {
-    assert(this.windowType === "Browser", new Error("Attempted to attach an ipc event but the current window isn't of type 'Browser'"));
+  public ipcOn(
+    channel: string,
+    listener: (event: IpcMainEvent, ...args: any[]) => void,
+  ) {
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to attach an ipc event but the current window isn't of type 'Browser'",
+      ),
+    );
 
     this.ipcEventProxy.on(channel, listener);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is OK to have as any
-  public ipcOff(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void) {
-    assert(this.windowType === "Browser", new Error("Attempted to detach an ipc event but the current window isn't of type 'Browser'"));
+  public ipcOff(
+    channel: string,
+    listener: (event: IpcMainEvent, ...args: any[]) => void,
+  ) {
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to detach an ipc event but the current window isn't of type 'Browser'",
+      ),
+    );
 
     this.ipcEventProxy.off(channel, listener);
   }
 
   public ipcBroadcast(channel: string, ...args: unknown[]) {
-    if (this.windowType === "Browser") (this.electronWindow as BrowserWindow).webContents.send(channel, ...args);
+    if (this.windowType === "Browser")
+      (this.electronWindow as BrowserWindow).webContents.send(channel, ...args);
 
     for (const appView of Object.values(this.activeViews)) {
       appView.view.webContents?.send(channel, ...args);
     }
   }
 
-  public ipcHandle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: unknown[]) => Promise<unknown> | unknown) {
-    assert(this.windowType === "Browser", new Error("Attempted to detach an ipc event but the current window isn't of type 'Browser'"));
+  public ipcHandle(
+    channel: string,
+    listener: (
+      event: IpcMainInvokeEvent,
+      ...args: unknown[]
+    ) => Promise<unknown> | unknown,
+  ) {
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to detach an ipc event but the current window isn't of type 'Browser'",
+      ),
+    );
 
-    (this.electronWindow as BrowserWindow).webContents.ipc.handle(channel, listener);
+    (this.electronWindow as BrowserWindow).webContents.ipc.handle(
+      channel,
+      listener,
+    );
   }
 
   public ipcRemoveHandler(channel: string) {
-    assert(this.windowType === "Browser", new Error("Attempted to detach an ipc event but the current window isn't of type 'Browser'"));
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to detach an ipc event but the current window isn't of type 'Browser'",
+      ),
+    );
 
-    (this.electronWindow as BrowserWindow).webContents.ipc.removeHandler(channel);
+    (this.electronWindow as BrowserWindow).webContents.ipc.removeHandler(
+      channel,
+    );
   }
 
   public showAndFocus() {
-    if (this.electronWindow.isMinimized()) this.electronWindow.restore();
-    this.electronWindow.show();
-    this.electronWindow.focus();
+    if (this.electronWindow?.isMinimized()) this.electronWindow.restore();
+    this.electronWindow?.show();
+    this.electronWindow?.focus();
   }
 
   public hide() {
-    this.electronWindow.hide();
+    this.electronWindow?.hide();
   }
 
   public show() {
-    this.electronWindow.show();
+    this.electronWindow?.show();
   }
 
   public isVisible() {
-    return this.electronWindow.isVisible();
+    return this.electronWindow?.isVisible();
   }
 
   public forceWindowClosure() {
@@ -281,49 +338,69 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
     if (process.platform !== "win32") return;
 
     this.thumbarButtons = buttons;
-    this.electronWindow.setThumbarButtons(buttons);
+    this.electronWindow?.setThumbarButtons(buttons);
   }
 
-  public setProgressBar(progress: number, options?: Electron.ProgressBarOptions) {
+  public setProgressBar(
+    progress: number,
+    options?: Electron.ProgressBarOptions,
+  ) {
     this.progressBar = progress;
-    this.progressBarOptions = options;
-    this.electronWindow.setProgressBar(progress, options);
+    this.progressBarOptions = options ?? null;
+    this.electronWindow?.setProgressBar(progress, options);
   }
 
   public setTitle(title: string) {
-    this.electronWindow.setTitle(title);
+    this.electronWindow?.setTitle(title);
   }
 
   public setAspectRatio(aspectRatio: number, extraSize?: Size) {
-    this.electronWindow.setAspectRatio(aspectRatio, extraSize);
+    this.electronWindow?.setAspectRatio(aspectRatio, extraSize);
   }
 
   public getWindowType() {
     return this.windowType;
   }
 
-  public setWindowOpenHandler(handler: (details: Electron.HandlerDetails) => Electron.WindowOpenHandlerResponse) {
-    assert(this.windowType === "Browser", new Error("Attempted to setWindowOpenHandler but the current window isn't of type 'Browser'"));
+  public setWindowOpenHandler(
+    handler: (
+      details: Electron.HandlerDetails,
+    ) => Electron.WindowOpenHandlerResponse,
+  ) {
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to setWindowOpenHandler but the current window isn't of type 'Browser'",
+      ),
+    );
 
-    (this.electronWindow as BrowserWindow).webContents.setWindowOpenHandler(handler);
+    (this.electronWindow as BrowserWindow).webContents.setWindowOpenHandler(
+      handler,
+    );
   }
 
   private createElectronWindow() {
     // Silently ignore this call as the AppWindow is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring createElectronWindow because this AppWindow is destroyed");
+      log.verbose(
+        "Silently ignoring createElectronWindow because this AppWindow is destroyed",
+      );
       return;
     }
     log.debug(`AppWindow '${this.name}' created`);
 
     switch (this.windowType) {
       case "Base": {
-        this.electronWindow = new BaseWindow(this.options.electronOptions as BaseWindowConstructorOptions);
+        this.electronWindow = new BaseWindow(
+          this.options.electronOptions as BaseWindowConstructorOptions,
+        );
         break;
       }
 
       case "Browser": {
-        this.electronWindow = new BrowserWindow(this.options.electronOptions as BrowserWindowConstructorOptions);
+        this.electronWindow = new BrowserWindow(
+          this.options.electronOptions as BrowserWindowConstructorOptions,
+        );
         break;
       }
 
@@ -333,17 +410,22 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
     }
     this.attachElectronWindowEvents();
 
-    if (this.initialCreation && (this.options.windowState?.maximized ?? false)) this.electronWindow.maximize();
+    if (this.initialCreation && (this.options.windowState?.maximized ?? false))
+      this.electronWindow.maximize();
     else if (this.lastState.maximized) this.electronWindow.maximize();
 
     if (this.initialCreation) {
-      for (const view of this.options.views ?? []) {
+      const views = this.options.views ?? [];
+      for (const view of views) {
         this.attachView(view);
         if (this.options.waitForViews) {
           view._getElectronView().webContents.once("dom-ready", () => {
             this.initialViewsReady++;
-            if (this.initialViewsReady >= this.options.views.length) {
-              if (this.electronWindow instanceof BrowserWindow && this.localViewReady) {
+            if (this.initialViewsReady >= views.length) {
+              if (
+                this.electronWindow instanceof BrowserWindow &&
+                this.localViewReady
+              ) {
                 this.electronWindow.show();
                 this.windowReady = true;
               }
@@ -357,7 +439,7 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
           this.electronWindow.on("ready-to-show", () => {
             this.localViewReady = true;
             if (this.initialViewsReady >= (this.options.views?.length ?? 0)) {
-              this.electronWindow.show();
+              this.electronWindow?.show();
               this.windowReady = true;
             }
           });
@@ -371,11 +453,17 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
       this.windowReady = true;
     }
 
-    if (this.thumbarButtons) this.electronWindow.setThumbarButtons(this.thumbarButtons);
-    if (this.progressBar) this.electronWindow.setProgressBar(this.progressBar, this.progressBarOptions);
+    if (this.thumbarButtons)
+      this.electronWindow.setThumbarButtons(this.thumbarButtons);
+    if (this.progressBar)
+      this.electronWindow.setProgressBar(
+        this.progressBar,
+        this.progressBarOptions ?? undefined,
+      );
 
     if (this.windowType === "Browser") {
-      if (!app.isPackaged) (this.electronWindow as BrowserWindow).webContents.openDevTools();
+      if (!app.isPackaged)
+        (this.electronWindow as BrowserWindow).webContents.openDevTools();
 
       const browserWindow = this.electronWindow as BrowserWindow;
       if (this.options.url) browserWindow.loadURL(this.options.url);
@@ -386,30 +474,40 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
   }
 
   private sendWindowControlsStateIpc() {
-    assert(this.windowType === "Browser", new Error("Attempted to send window controls state but the current window isn't of type 'Browser'"));
+    assert(
+      this.windowType === "Browser",
+      new Error(
+        "Attempted to send window controls state but the current window isn't of type 'Browser'",
+      ),
+    );
 
-    (this.electronWindow as BrowserWindow).webContents.send("windowControls:stateChanged", {
-      minimized: this.electronWindow.isMinimized(),
-      maximized: this.electronWindow.isMaximized(),
-      fullscreen: this.electronWindow.isFullScreen(),
-      alwaysOnTop: this.electronWindow.isAlwaysOnTop()
-    });
+    (this.electronWindow as BrowserWindow).webContents.send(
+      "windowControls:stateChanged",
+      {
+        minimized: this.electronWindow?.isMinimized(),
+        maximized: this.electronWindow?.isMaximized(),
+        fullscreen: this.electronWindow?.isFullScreen(),
+        alwaysOnTop: this.electronWindow?.isAlwaysOnTop(),
+      },
+    );
   }
 
   private attachElectronWindowEvents() {
     // Silently ignore this call as the AppWindow is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring attachElectronWindowEvents because this AppWindow is destroyed");
+      log.verbose(
+        "Silently ignoring attachElectronWindowEvents because this AppWindow is destroyed",
+      );
       return;
     }
 
-    this.electronWindow.on("close", event => {
+    this.electronWindow?.on("close", (event) => {
       if (!this.requestedClosure) this.emit("electronwindow-close", event);
       // Even if the event was prevented if a closure was requested already we will be honouring that
       if (!event.defaultPrevented) {
         this.requestedClosure = true;
-        this.lastState.bounds = this.electronWindow.getBounds();
-        this.lastState.maximized = this.electronWindow.isMaximized();
+        this.lastState.bounds = this.electronWindow?.getBounds();
+        this.lastState.maximized = !!this.electronWindow?.isMaximized();
 
         for (const view of Object.values(this.activeViews)) {
           this.detachView(view.view);
@@ -417,12 +515,14 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
       }
     });
 
-    this.electronWindow.on("closed", () => {
+    this.electronWindow?.on("closed", () => {
       log.debug(`AppWindow '${this.name}' closed`);
       this.windowReady = false;
 
       if (!this.requestedClosure && this.options.autoRecreate) {
-        log.debug(`Recreating AppWindow '${this.name}' because of an unexpected closure`);
+        log.debug(
+          `Recreating AppWindow '${this.name}' because of an unexpected closure`,
+        );
         this.createElectronWindow();
         log.debug(`Recreated AppWindow '${this.name}'`);
         this.emit("recreated");
@@ -432,19 +532,19 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
     });
 
     //#region Proxy rest of events
-    this.electronWindow.on("will-resize", (event, newBounds, details) => {
+    this.electronWindow?.on("will-resize", (event, newBounds, details) => {
       this.emit("electronwindow-will-resize", event, newBounds, details);
     });
-    this.electronWindow.on("resize", () => {
+    this.electronWindow?.on("resize", () => {
       this.emit("electronwindow-resize");
     });
-    this.electronWindow.on("move", () => {
+    this.electronWindow?.on("move", () => {
       this.emit("electronwindow-move");
     });
-    this.electronWindow.on("maximize", () => {
+    this.electronWindow?.on("maximize", () => {
       this.emit("electronwindow-maximize");
     });
-    this.electronWindow.on("unmaximize", () => {
+    this.electronWindow?.on("unmaximize", () => {
       this.emit("electronwindow-unmaximize");
     });
     //#endregion
@@ -452,35 +552,50 @@ export class AppWindow<T extends AppWindowType> extends EventEmitter<AppWindowEv
     if (this.windowType === "Browser") {
       const browserWindow = this.electronWindow as BrowserWindow;
       browserWindow.webContents.ipc.on("windowControls:minimize", () => {
-        this.electronWindow.minimize();
+        this.electronWindow?.minimize();
       });
       browserWindow.webContents.ipc.on("windowControls:maximize", () => {
-        this.electronWindow.maximize();
+        this.electronWindow?.maximize();
       });
       browserWindow.webContents.ipc.on("windowControls:restore", () => {
-        this.electronWindow.restore();
+        this.electronWindow?.restore();
       });
       browserWindow.webContents.ipc.on("windowControls:close", () => {
         this.closeWindow();
       });
-      browserWindow.webContents.ipc.on("windowControls:setAlwaysOnTop", (event, alwaysOnTop: boolean) => {
-        this.electronWindow.setAlwaysOnTop(alwaysOnTop, alwaysOnTop ? "pop-up-menu" : "normal");
-      });
+      browserWindow.webContents.ipc.on(
+        "windowControls:setAlwaysOnTop",
+        (event, alwaysOnTop: boolean) => {
+          this.electronWindow?.setAlwaysOnTop(
+            alwaysOnTop,
+            alwaysOnTop ? "pop-up-menu" : "normal",
+          );
+        },
+      );
       browserWindow.webContents.ipc.on("windowControls:requestState", () => {
         this.sendWindowControlsStateIpc();
       });
       browserWindow.on("minimize", this.sendWindowControlsStateIpc.bind(this));
       browserWindow.on("maximize", this.sendWindowControlsStateIpc.bind(this));
-      browserWindow.on("unmaximize", this.sendWindowControlsStateIpc.bind(this));
+      browserWindow.on(
+        "unmaximize",
+        this.sendWindowControlsStateIpc.bind(this),
+      );
       browserWindow.on("restore", this.sendWindowControlsStateIpc.bind(this));
-      browserWindow.on("always-on-top-changed", this.sendWindowControlsStateIpc.bind(this));
+      browserWindow.on(
+        "always-on-top-changed",
+        this.sendWindowControlsStateIpc.bind(this),
+      );
       browserWindow.webContents.on("render-process-gone", () => {
         log.debug(`AppWindow '${this.name}' webContents render process gone`);
         this.recreateWindowInternal();
       });
-      browserWindow.webContents.on("ipc-message", (event, channel, ...args: unknown[]) => {
-        this.ipcEventProxy.emit(channel, event, ...args);
-      });
+      browserWindow.webContents.on(
+        "ipc-message",
+        (event, channel, ...args: unknown[]) => {
+          this.ipcEventProxy.emit(channel, event, ...args);
+        },
+      );
     }
   }
 }

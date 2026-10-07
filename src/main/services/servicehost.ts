@@ -11,6 +11,8 @@ export enum ServiceHostLifecycle {
 }
 
 export class ServiceHost {
+  static readonly INJECT = Symbol("ServiceHost.INJECT");
+
   private services = new Map<string, Service>();
   private lifecycle = ServiceHostLifecycle.NotInitialized;
 
@@ -22,12 +24,12 @@ export class ServiceHost {
     const services = collection.getDependencyOrderedServices();
     for (const service of services) {
       const constructedService = new service();
-      constructedService.__setServiceHost(this);
+      constructedService[ServiceHost.INJECT](this);
       this.services.set(service.name, constructedService);
     }
   }
 
-  public getService<T>(service?: Constructor<T>): T {
+  public getService<T>(service: Constructor<T>): T {
     return this.services.get(service.name) as T;
   }
 

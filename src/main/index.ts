@@ -603,7 +603,8 @@ app.on("ready", async () => {
 
   // Initially create the YTM view and attach it
   ytmViewManager.createView();
-  mainWindow.attachView(ytmViewManager.getView(), 0);
+  const ytmView = ytmViewManager.getView();
+  if (ytmView) mainWindow.attachView(ytmView, 0);
 
   // This hides the main view if it was recreated and the YTMView is in a ready state
   await mainView.on("recreated", async () => {

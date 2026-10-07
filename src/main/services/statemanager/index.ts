@@ -12,8 +12,8 @@ function shallowEqual<T extends Record<string, unknown>>(obj1: T, obj2: T): bool
 export default class StateManager extends Service {
   public static override readonly dependencies: DependencyConstructor<Service>[] = [ConfigStore, WatchDog];
 
-  private currentState: StoreSchema["state"];
-  private diskWriteTimer: NodeJS.Timeout = null;
+  private currentState: StoreSchema["state"] | null = null;
+  private diskWriteTimer: NodeJS.Timeout | null = null;
   private diskStale = false;
   private stateUpdates = 0;
   private panicked = false;
@@ -50,19 +50,21 @@ export default class StateManager extends Service {
     if (this.panicked) return;
     if (!this._initialized) return;
 
-    const newState = { ...this.currentState, ...partialState };
-    if (!shallowEqual(this.currentState, newState)) {
-      this.currentState = newState;
-      this.diskStale = true;
-      this.stateUpdates++;
-      if (this.diskWriteTimer) clearTimeout(this.diskWriteTimer);
-      // If a significant amount of changes to the state happen then we just force write it immediately
-      if (this.stateUpdates >= 512) {
-        this.write();
-      } else {
-        this.diskWriteTimer = setTimeout(() => {
+    if (this.currentState) {
+      const newState = { ...this.currentState, ...partialState };
+      if (!shallowEqual(this.currentState, newState)) {
+        this.currentState = newState;
+        this.diskStale = true;
+        this.stateUpdates++;
+        if (this.diskWriteTimer) clearTimeout(this.diskWriteTimer);
+        // If a significant amount of changes to the state happen then we just force write it immediately
+        if (this.stateUpdates >= 512) {
           this.write();
-        }, 30 * 1000);
+        } else {
+          this.diskWriteTimer = setTimeout(() => {
+            this.write();
+          }, 30 * 1000);
+        }
       }
     }
   }
