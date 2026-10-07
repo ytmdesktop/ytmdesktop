@@ -93,11 +93,9 @@ export default class ConfigStore extends Service {
       },
       migrations: {
         ">=2.0.0": store => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          // @ts-expect-error Removed property which will error in TypeScript
           store.delete("integrations.companionServerAuthWindowEnabled");
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          // @ts-expect-error Removed property which will error in TypeScript
           store.delete("state.companionServerAuthWindowEnableTime");
           if (!store.has("appearance.zoom")) {
             store.set("appearance.zoom", 100);
