@@ -244,7 +244,7 @@ app.on("ready", async () => {
   mainView.ipcOn("ytmView:reload", () => {
     const ytmView = ytmViewManager.getView();
     if (ytmView) {
-      ytmView.webContents.reload();
+      ytmView.webContents?.reload();
     }
   });
 
@@ -448,7 +448,7 @@ app.on("ready", async () => {
 
   mainWindow.ipcOn("ytmView:navigateDefault", () => {
     const ytmView = ytmViewManager.getView();
-    if (ytmView) ytmView.webContents.loadURL("https://music.youtube.com/");
+    if (ytmView) ytmView.webContents?.loadURL("https://music.youtube.com/");
   });
   //#endregion
 
@@ -557,7 +557,7 @@ app.on("ready", async () => {
 
   // Attach events for the ytmviewmanager
   ytmViewManager.on("status-changed", async () => {
-    mainView.webContents.send("ytmView:statusChanged", ytmViewManager.status);
+    mainView.webContents?.send("ytmView:statusChanged", ytmViewManager.status);
     if (ytmViewManager.status === YTMViewStatus.Ready) {
       await mainView.hide(true);
       if (ytmViewManager.hasError()) {
@@ -598,7 +598,7 @@ app.on("ready", async () => {
     await mainView.hide(true);
   });
   ytmViewManager.on("load-errored", () => {
-    mainView.webContents.send("ytmView:loadError", ytmViewManager.loadError);
+    mainView.webContents?.send("ytmView:loadError", ytmViewManager.loadError);
   });
 
   // Initially create the YTM view and attach it

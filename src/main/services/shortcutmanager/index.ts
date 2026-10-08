@@ -44,61 +44,61 @@ export default class ShortcutManager extends Service {
 
     const memoryStore = this.getDependency(MemoryStore<MemoryStoreSchema>);
 
-    if (shortcuts.playPause) {
+    if (shortcuts?.playPause) {
       this.tryRegisterShortcut(shortcuts.playPause, "playPause", "shortcutsPlayPauseRegisterFailed");
     } else {
       memoryStore.set("shortcutsPlayPauseRegisterFailed", false);
     }
 
-    if (shortcuts.next) {
+    if (shortcuts?.next) {
       this.tryRegisterShortcut(shortcuts.next, "next", "shortcutsNextRegisterFailed");
     } else {
       memoryStore.set("shortcutsNextRegisterFailed", false);
     }
 
-    if (shortcuts.previous) {
+    if (shortcuts?.previous) {
       this.tryRegisterShortcut(shortcuts.previous, "previous", "shortcutsPreviousRegisterFailed");
     } else {
       memoryStore.set("shortcutsPreviousRegisterFailed", false);
     }
 
-    if (shortcuts.thumbsUp) {
+    if (shortcuts?.thumbsUp) {
       this.tryRegisterShortcut(shortcuts.thumbsUp, "toggleLike", "shortcutsThumbsUpRegisterFailed");
     } else {
       memoryStore.set("shortcutsThumbsUpRegisterFailed", false);
     }
 
-    if (shortcuts.thumbsDown) {
+    if (shortcuts?.thumbsDown) {
       this.tryRegisterShortcut(shortcuts.thumbsDown, "toggleDislike", "shortcutsThumbsDownRegisterFailed");
     } else {
       memoryStore.set("shortcutsThumbsDownRegisterFailed", false);
     }
 
-    if (shortcuts.volumeUp) {
+    if (shortcuts?.volumeUp) {
       this.tryRegisterShortcut(shortcuts.volumeUp, "volumeUp", "shortcutsVolumeUpRegisterFailed");
     } else {
       memoryStore.set("shortcutsVolumeUpRegisterFailed", false);
     }
 
-    if (shortcuts.volumeDown) {
+    if (shortcuts?.volumeDown) {
       this.tryRegisterShortcut(shortcuts.volumeDown, "volumeDown", "shortcutsVolumeDownRegisterFailed");
     } else {
       memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
     }
 
-    if (shortcuts.volumeMute) {
+    if (shortcuts?.volumeMute) {
       this.tryRegisterShortcut(shortcuts.volumeMute, "toggleMute", "shortcutsVolumeMuteRegisterFailed");
     } else {
       memoryStore.set("shortcutsVolumeMuteRegisterFailed", false);
     }
 
-    if (shortcuts.toggleShuffle) {
+    if (shortcuts?.toggleShuffle) {
       this.tryRegisterShortcut(shortcuts.toggleShuffle, "shuffle", "shortcutsToggleShuffleRegisterFailed");
     } else {
       memoryStore.set("shortcutsToggleShuffleRegisterFailed", false);
     }
 
-    if (shortcuts.toggleRepeat) {
+    if (shortcuts?.toggleRepeat) {
       this.tryRegisterShortcut(shortcuts.toggleRepeat, "cycleRepeatMode", "shortcutsToggleRepeatRegisterFailed");
     } else {
       memoryStore.set("shortcutsToggleRepeatRegisterFailed", false);

@@ -34,8 +34,8 @@ export type Thumbnail = {
 };
 
 export type VideoDetails = {
-  album: string;
-  albumId: string;
+  album: string | null;
+  albumId: string | null;
   author: string;
   channelId: string;
   durationSeconds: number;
@@ -54,25 +54,25 @@ export type PlayerQueueItem = {
   duration: string;
   selected: boolean;
   videoId: string;
-  counterparts: PlayerQueueItem[];
+  counterparts: PlayerQueueItem[] | null;
 };
 
 export type PlayerQueue = {
-  automixItems: PlayerQueueItem[];
+  automixItems: (PlayerQueueItem | null)[];
   autoplay: boolean;
   isGenerating: boolean;
   isInfinite: boolean;
-  items: PlayerQueueItem[];
+  items: (PlayerQueueItem | null)[];
   repeatMode: RepeatMode;
   selectedItemIndex: number;
   shuffleEnabled: boolean;
 };
 
 export type PlayerState = {
-  videoDetails: VideoDetails;
-  playlistId: string;
+  videoDetails: VideoDetails | null;
+  playlistId: string | null;
   trackState: VideoState;
-  queue: PlayerQueue;
+  queue: PlayerQueue | null;
   videoProgress: number;
   volume: number;
   muted: boolean;

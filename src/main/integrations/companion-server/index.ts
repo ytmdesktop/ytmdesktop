@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify, { FastifyError, FastifyInstance } from "fastify";
 import FastifyIO from "fastify-socket.io/dist/index";
 import CompanionServerAPIv1, { transformPlayerState as transformPlayerStatev1 } from "./api/v1";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
@@ -43,15 +43,15 @@ export default class CompanionServer extends Integration {
 
   private listenIp = "0.0.0.0";
   private listenPort = 9863;
-  private fastifyServer: FastifyInstance;
-  private storeListener: () => void | null = null;
+  private fastifyServer?: FastifyInstance;
+  private storeListener: (() => void) | null = null;
   private authWindowTimeout: NodeJS.Timeout | null = null;
 
-  private ipcServer: net.Server;
+  private ipcServer?: net.Server;
   private ipcServerClients: CompanionServerIpcClient[] = [];
-  private stateStoreListener: (state: PlayerState) => void | null = null;
+  private stateStoreListener: ((state: PlayerState) => void) | null = null;
 
-  private mdns: mDNS;
+  private mdns?: mDNS.MulticastDNS;
 
   private createServer() {
     const configStore = this.getService(ConfigStore);
@@ -73,7 +73,7 @@ export default class CompanionServer extends Integration {
         return this.getService<T>(service);
       }
     });
-    this.fastifyServer.setErrorHandler((error, request, reply) => {
+    this.fastifyServer.setErrorHandler((error: FastifyError, _request, reply) => {
       if (!isDefinedAPIError(error)) {
         if (!error.statusCode || error.statusCode >= 500) {
           log.error(error);
@@ -92,7 +92,7 @@ export default class CompanionServer extends Integration {
 
     // Disconnect connections to the default namespace
     this.fastifyServer.ready().then(() => {
-      this.fastifyServer.io.on("connection", socket => socket.disconnect());
+      this.fastifyServer?.io.on("connection", socket => socket.disconnect());
     });
   }
 
@@ -121,7 +121,7 @@ export default class CompanionServer extends Integration {
         heartbeated = false;
       }, 30 * 1000);
 
-      socket.on("data", data => {
+      socket.on("data", (data: Buffer<ArrayBuffer>) => {
         try {
           const op: IpcOpcode = data.readInt32LE(0);
           if (op === IpcOpcode.SELECT_VERSION) {
@@ -200,28 +200,32 @@ export default class CompanionServer extends Integration {
     this.mdns = mDNS();
 
     const hostname = os.hostname();
-    const aRecords = [];
+    const aRecords: mDNS.ResponsePacket["answers"] = [];
 
     const interfaces = os.networkInterfaces();
     for (const deviceName in interfaces) {
       const iface = interfaces[deviceName];
 
-      for (const alias of iface) {
-        if (alias.family === "IPv4" && !alias.internal) {
-          aRecords.push({
-            name: `${hostname}._ytmdesktop._tcp.local`,
-            type: "A",
-            ttl: 60,
-            data: alias.address
-          });
+      if (iface) {
+        for (const alias of iface) {
+          if (alias.family === "IPv4" && !alias.internal) {
+            aRecords.push({
+              name: `${hostname}._ytmdesktop._tcp.local`,
+              type: "A",
+              ttl: 60,
+              data: alias.address
+            });
+          }
         }
+      } else {
+        console.warn(`Could not create mDNS record for ${deviceName} (no iface)`);
       }
     }
 
     this.mdns.on("query", query => {
       for (const question of query.questions) {
         if (question.name === "_services._dns-sd._udp.local") {
-          this.mdns.respond({
+          this.mdns?.respond({
             answers: [
               {
                 name: `_services._dns-sd._udp.local`,
@@ -234,7 +238,7 @@ export default class CompanionServer extends Integration {
         }
 
         if (question.name === "_ytmdesktop._tcp.local") {
-          this.mdns.respond({
+          this.mdns?.respond({
             answers: [
               {
                 name: `_ytmdesktop._tcp.local`,
@@ -247,7 +251,7 @@ export default class CompanionServer extends Integration {
         }
 
         if (question.name === `${hostname}._ytmdesktop._tcp.local`) {
-          const compiledAnswers = [];
+          const compiledAnswers: mDNS.ResponsePacket["answers"] = [];
           if (question.type === "SRV") {
             compiledAnswers.push({
               name: `${hostname}._ytmdesktop._tcp.local`,
@@ -275,7 +279,7 @@ export default class CompanionServer extends Integration {
             compiledAnswers.push(...aRecords);
           }
 
-          this.mdns.respond({
+          this.mdns?.respond({
             answers: compiledAnswers
           });
         }
@@ -302,15 +306,17 @@ export default class CompanionServer extends Integration {
 
     if (!this.fastifyServer || (this.fastifyServer && !this.fastifyServer.server.listening)) {
       this.createServer();
-      await this.fastifyServer.listen({
+      await this.fastifyServer?.listen({
         host: this.listenIp,
         port: this.listenPort
       });
       this.storeListener = configStore.onDidChange("integrations", async newState => {
+        if (!newState) return;
+
         const validTokenIds: string[] = newState.companionServerAuthTokens
           ? JSON.parse(safeStorage.decryptString(Buffer.from(newState.companionServerAuthTokens, "hex"))).map((authToken: AuthToken) => authToken.id)
           : [];
-        if (this.fastifyServer.server.listening) {
+        if (this.fastifyServer?.server.listening) {
           const namespaces = this.fastifyServer.io._nsps.keys();
           let sockets: RemoteSocket<DefaultEventsMap, { tokenId: string }>[] = [];
 

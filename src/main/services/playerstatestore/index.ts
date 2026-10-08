@@ -5,6 +5,7 @@ import { DependencyConstructor } from "~shared/types";
 import ProtectedAPIManager, { ProtectedAPI } from "../protectedapimanager";
 import AppWindowManager from "../windowmanager";
 import StateManager from "../statemanager";
+import assert from "node:assert";
 
 enum YTMVideoState {
   Unstarted = -1,
@@ -123,7 +124,7 @@ function transformPlaylistPanelVideoRenderer(
   };
 }
 
-function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem {
+function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem | null {
   let playlistPanelVideoRenderer;
   let counterpart;
   if (item.playlistPanelVideoRenderer) {
@@ -224,7 +225,7 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
   private adPlaying: boolean = false;
   private hasFullMetadata: boolean = false;
 
-  private stateApi: ProtectedAPI;
+  private stateApi?: ProtectedAPI;
 
   public override onPreInitialized(): void {}
   public override onInitialized(): void {
@@ -342,13 +343,13 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
           repeatMode: transformRepeatMode(queueState.repeatMode),
           // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
           selectedItemIndex: queueItems.findIndex(item => {
-            return item.selected;
+            return item?.selected;
           }),
           shuffleEnabled: queueState.shuffleEnabled
         }
       : null;
     if (this.videoDetails) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
+      this.videoDetails.likeStatus = transformLikeStatus(likeStatus ?? "INDIFFERENT");
     }
     this.adPlaying = adPlaying === true;
     this.muted = muted === true;
@@ -365,7 +366,7 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
       windowManager.getWindow("Miniplayer").ipcBroadcast("playerStateStore:stateChanged", state);
     }
 
-    if (state.hasFullMetadata) {
+    if (state.hasFullMetadata && state.videoDetails) {
       if (windowManager.hasWindow("Main"))
         windowManager.getWindow("Main").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop`);
       if (windowManager.hasWindow("Miniplayer"))

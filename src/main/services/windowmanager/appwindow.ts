@@ -419,7 +419,7 @@ export class AppWindow<
       for (const view of views) {
         this.attachView(view);
         if (this.options.waitForViews) {
-          view._getElectronView().webContents.once("dom-ready", () => {
+          view._getElectronView()!.webContents.once("dom-ready", () => {
             this.initialViewsReady++;
             if (this.initialViewsReady >= views.length) {
               if (

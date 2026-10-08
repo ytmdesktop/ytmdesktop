@@ -10,18 +10,21 @@ import log from "electron-log";
 import Integration from "../integration";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import { PlayerState, VideoDetails, VideoState } from "~shared/playerstatestore/types";
+import assert from "node:assert";
 
 export default class LastFM extends Integration {
   public name = "LastFM";
   public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.lastFMEnabled";
   public override disableFlags = ["disable_last_fm"];
 
-  private possibleVideoIds: string[] | null;
-  private lastfmDetails: StoreSchema["lastfm"] = null;
-  private scrobbleTimer: NodeJS.Timeout | null = null;
-  private playerStateFunction: (state: PlayerState) => void;
+  private possibleVideoIds: string[] | null = null;
+  private lastfmDetails: StoreSchema["lastfm"] | null = null;
+  private scrobbleTimer: NodeJS.Timeout | string | number | undefined = undefined;
+  private playerStateFunction: ((state: PlayerState) => void) | null = null;
 
   private async createToken(): Promise<string> {
+    assert(this.lastfmDetails, new Error("LastFM information not available from config store integration may not have been enabled"));
+
     const data: LastfmRequestBody = {
       method: "auth.gettoken",
       format: "json",
@@ -37,6 +40,8 @@ export default class LastFM extends Integration {
   }
 
   private async authenticateUser() {
+    assert(this.lastfmDetails, new Error("LastFM information not available from config store integration may not have been enabled"));
+
     this.lastfmDetails.token = await this.createToken();
     this.saveSettings();
 
@@ -46,11 +51,17 @@ export default class LastFM extends Integration {
   }
 
   private async getSession() {
+    assert(this.lastfmDetails, new Error("LastFM information not available from config store integration may not have been enabled"));
+
+    if (!!this.lastfmDetails.token) {
+      await this.authenticateUser();
+    }
+
     const params: LastfmRequestBody = {
       method: "auth.getSession",
       format: "json",
       api_key: this.lastfmDetails.api_key,
-      token: this.lastfmDetails.token
+      token: this.lastfmDetails.token!
     };
 
     const api_sig = this.createApiSig(params, this.lastfmDetails.secret);
@@ -85,8 +96,11 @@ export default class LastFM extends Integration {
       }
 
       // Store all the IDs of videos for this song.
-      this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map(item => item.videoId) || [];
-      this.possibleVideoIds.push(state.queue.items[state.queue.selectedItemIndex]?.videoId);
+      if (state.queue) {
+        this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map(item => item.videoId) || [];
+        const possibleVideoId = state.queue.items[state.queue.selectedItemIndex]?.videoId;
+        if (possibleVideoId) this.possibleVideoIds.push(possibleVideoId);
+      }
 
       if (!this.lastfmDetails || !this.lastfmDetails.sessionKey) {
         this.getSession();
@@ -115,7 +129,7 @@ export default class LastFM extends Integration {
       );
       const scrobbleTime = new Date().getTime();
       this.scrobbleTimer = setTimeout(() => {
-        this.scrobbleSong(state.videoDetails, scrobbleTime);
+        if (state.videoDetails) this.scrobbleSong(state.videoDetails, scrobbleTime);
       }, scrobbleTimeRequired * 1000);
     }
   }
@@ -138,13 +152,16 @@ export default class LastFM extends Integration {
   }
 
   private async sendToLastFM(videoDetails: VideoDetails, params: Partial<LastfmRequestBody>): Promise<void> {
+    assert(this.lastfmDetails, new Error("LastFM information not available from config store integration may not have been enabled"));
+    assert(this.lastfmDetails.sessionKey, new Error("LastFM session key not available from config store authentication may not have occurred"));
+
     const data: Partial<LastfmRequestBody> = {
       // Add specific data to the request
       ...params,
 
       artist: videoDetails.author,
       track: videoDetails.title,
-      album: videoDetails.album,
+      album: videoDetails.album ?? undefined,
       duration: videoDetails.durationSeconds,
       // albumArtist, trackNumber, chosenByUser
 
@@ -163,7 +180,7 @@ export default class LastFM extends Integration {
       // Check Errors against https://www.last.fm/api/show/track.scrobble#errors
       switch (error.code) {
         case 9: // Invalid session key
-          this.lastfmDetails.sessionKey = null;
+          if (this.lastfmDetails) this.lastfmDetails.sessionKey = null;
           this.authenticateUser();
           break;
 
@@ -199,7 +216,7 @@ export default class LastFM extends Integration {
 
   public onDisabled(): void {
     const playerStateStore = this.getService(PlayerStateStore);
-    playerStateStore.off("state-changed", this.playerStateFunction);
+    if (this.playerStateFunction) playerStateStore.off("state-changed", this.playerStateFunction);
   }
 
   /**
@@ -209,7 +226,7 @@ export default class LastFM extends Integration {
    * @returns URL encoded query string to be used in the request
    */
   private createQueryString(params: LastfmRequestBody, api_sig: string) {
-    const data = [];
+    const data: string[] = [];
     params.api_sig = api_sig;
 
     for (const key in params) {
@@ -245,7 +262,7 @@ export default class LastFM extends Integration {
    */
   private createApiSig(params: Partial<LastfmRequestBody>, secret: string) {
     const keys = Object.keys(params).sort();
-    const data = [];
+    const data: string[] = [];
 
     for (const key of keys) {
       // Ignore format and callback parameters
@@ -294,11 +311,13 @@ export default class LastFM extends Integration {
   private async saveSettings(): Promise<void> {
     const configStore = this.getService(ConfigStore);
     try {
-      if (this.lastfmDetails.sessionKey) {
-        configStore.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
-      }
-      if (this.lastfmDetails.token) {
-        configStore.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+      if (this.lastfmDetails) {
+        if (this.lastfmDetails.sessionKey) {
+          configStore.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
+        }
+        if (this.lastfmDetails.token) {
+          configStore.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+        }
       }
     } catch {
       // Do nothing, the values are not valid and can be ignored

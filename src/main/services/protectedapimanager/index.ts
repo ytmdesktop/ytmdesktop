@@ -6,7 +6,7 @@ import log from "electron-log";
 import { randomUUID } from "node:crypto";
 
 export default class ProtectedAPIManager extends Service {
-  private mainPort: MessagePortMain;
+  private mainPort: MessagePortMain | null = null;
   private apis = new Map<string, ProtectedAPI>();
 
   public override onPreInitialized(): void {}
@@ -58,7 +58,7 @@ export default class ProtectedAPIManager extends Service {
 }
 
 export class ProtectedAPI extends EventEmitter {
-  private port: MessagePortMain;
+  private port: MessagePortMain | null = null;
   private waitingInvokes = new Map<string, (...args: unknown[]) => void>();
 
   public readonly name;
@@ -68,7 +68,7 @@ export class ProtectedAPI extends EventEmitter {
     this.name = name;
   }
 
-  public setPort(port: MessagePortMain) {
+  public setPort(port: MessagePortMain | null) {
     this.port = port;
     if (!this.port) return;
 
@@ -81,7 +81,7 @@ export class ProtectedAPI extends EventEmitter {
         if (this.waitingInvokes.has(event.data.id)) {
           const callback = this.waitingInvokes.get(event.data.id);
           this.waitingInvokes.delete(event.data.id);
-          callback(...event.data.args);
+          if (callback) callback(...event.data.args);
         }
       }
     });
@@ -100,7 +100,7 @@ export class ProtectedAPI extends EventEmitter {
    * @param args RPC arguments
    */
   public postMessage(name: string, ...args: unknown[]) {
-    this.port.postMessage({
+    this.port?.postMessage({
       op: ProtectedAPIOpCode.Message,
       name,
       args
@@ -119,7 +119,7 @@ export class ProtectedAPI extends EventEmitter {
         resolve(args);
       });
 
-      this.port.postMessage({
+      this.port?.postMessage({
         op: ProtectedAPIOpCode.Invoke,
         id: invokeId,
         name,

@@ -1,7 +1,16 @@
-import { Notification, NotificationConstructorOptions, nativeImage } from "electron";
+import {
+  Notification,
+  NotificationConstructorOptions,
+  nativeImage,
+} from "electron";
 import https from "https";
 import Integration from "../integration";
-import { PlayerState, Thumbnail, VideoDetails, VideoState } from "~shared/playerstatestore/types";
+import {
+  PlayerState,
+  Thumbnail,
+  VideoDetails,
+  VideoState,
+} from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../services/playerstatestore";
 
 // Visualiser - https://apps.microsoft.com/store/detail/notifications-visualizer/9NBLGGH5XSL1?hl=en-gb&gl=gb&rtc=1
@@ -10,10 +19,15 @@ import PlayerStateStore from "../../services/playerstatestore";
 function getLowestResThumbnail(thumbnails: Thumbnail[]) {
   let currentWidth = 1024;
   let currentHeight = 1024;
-  let url = null;
+  let url: string | null = null;
   for (const thumbnail of thumbnails) {
     // If the thumbnail is smaller than the current one, but bigger than 100x100
-    if (thumbnail.width < currentWidth && thumbnail.height < currentHeight && thumbnail.width > 100 && thumbnail.height > 100) {
+    if (
+      thumbnail.width < currentWidth &&
+      thumbnail.height < currentHeight &&
+      thumbnail.width > 100 &&
+      thumbnail.height > 100
+    ) {
       currentWidth = thumbnail.width;
       currentHeight = thumbnail.height;
       url = thumbnail.url;
@@ -22,16 +36,21 @@ function getLowestResThumbnail(thumbnails: Thumbnail[]) {
   return url;
 }
 
-function displayNotification(videoDetails: VideoDetails, imageData: string) {
+function displayNotification(
+  videoDetails: VideoDetails,
+  imageData: string | null,
+) {
   const notificationData: NotificationConstructorOptions = {
     title: videoDetails.title,
     body: videoDetails.author,
     silent: true,
-    urgency: "low" // Linux only
+    urgency: "low", // Linux only
   };
 
   if (imageData !== null) {
-    const notificationImage = nativeImage.createFromDataURL("data:image/jpeg;base64," + imageData);
+    const notificationImage = nativeImage.createFromDataURL(
+      "data:image/jpeg;base64," + imageData,
+    );
 
     notificationData.icon = notificationImage;
   }
@@ -49,17 +68,17 @@ function displayNotification(videoDetails: VideoDetails, imageData: string) {
  * @returns Promise<string>
  */
 function getUrlContents(url: string) {
-  return new Promise((resolve, reject) => {
-    const request = https.get(url, res => {
+  return new Promise<string>((resolve, reject) => {
+    const request = https.get(url, (res) => {
       const data: Array<Buffer> = [];
-      res.on("data", chunk => {
+      res.on("data", (chunk) => {
         data.push(chunk);
       });
 
       res.on("end", () => {
         resolve(Buffer.concat(data).toString("base64"));
       });
-      res.on("error", err => {
+      res.on("error", (err) => {
         reject(err);
       });
     });
@@ -72,11 +91,12 @@ function getUrlContents(url: string) {
 
 export default class NowPlayingNotifications extends Integration {
   public name = "NowPlayingNotifications";
-  public storeEnableProperty: Integration["storeEnableProperty"] = "general.showNotificationOnSongChange";
+  public storeEnableProperty: Integration["storeEnableProperty"] =
+    "general.showNotificationOnSongChange";
   public override disableFlags = ["disable_now_playing_notifications"];
 
-  private lastDetails: VideoDetails = null;
-  private playerStateFunction: (state: PlayerState) => void;
+  private lastDetails: VideoDetails | null = null;
+  private playerStateFunction: ((state: PlayerState) => void) | null = null;
 
   private async updateVideoDetails(state: PlayerState): Promise<void> {
     if (!this.isEnabled) {
@@ -90,14 +110,23 @@ export default class NowPlayingNotifications extends Integration {
 
       this.lastDetails = state.videoDetails;
 
-      if (state.videoDetails.thumbnails && state.videoDetails.thumbnails.length > 0) {
-        getUrlContents(getLowestResThumbnail(state.videoDetails.thumbnails))
-          .then(function (data: string) {
+      if (
+        state.videoDetails.thumbnails &&
+        state.videoDetails.thumbnails.length > 0
+      ) {
+        const thumbnailUrl = getLowestResThumbnail(
+          state.videoDetails.thumbnails,
+        );
+        if (thumbnailUrl) {
+          try {
+            let data = await getUrlContents(thumbnailUrl);
             displayNotification(state.videoDetails, data);
-          })
-          .catch(function () {
+          } catch(err) {
             displayNotification(state.videoDetails, null);
-          });
+          }
+        } else {
+          displayNotification(state.videoDetails, null);
+        }
       } else {
         displayNotification(state.videoDetails, null);
       }
@@ -107,7 +136,8 @@ export default class NowPlayingNotifications extends Integration {
   public onSetup() {}
 
   public onEnabled() {
-    this.playerStateFunction = (state: PlayerState) => this.updateVideoDetails(state);
+    this.playerStateFunction = (state: PlayerState) =>
+      this.updateVideoDetails(state);
 
     const playerStateStore = this.getService(PlayerStateStore);
     playerStateStore.on("state-changed", this.playerStateFunction);
@@ -115,6 +145,6 @@ export default class NowPlayingNotifications extends Integration {
 
   public onDisabled(): void {
     const playerStateStore = this.getService(PlayerStateStore);
-    playerStateStore.off("state-changed", this.playerStateFunction);
+    if (this.playerStateFunction) playerStateStore.off("state-changed", this.playerStateFunction);
   }
 }

@@ -82,7 +82,7 @@ export default abstract class Integration {
 
   protected executeYTMScript(script: string) {
     const ytmViewManager = this.#host.getService(YTMViewManager);
-    ytmViewManager.getView()?.webContents.send("ytmView:executeScript", script);
+    ytmViewManager.getView()?.webContents?.send("ytmView:executeScript", script);
   }
 
   /**

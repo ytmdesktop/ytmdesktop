@@ -91,7 +91,7 @@ export default class ProtocolManager extends Service {
 
   private async handleYTMDAppProtocol(req: Request) {
     const { host, pathname } = new URL(req.url);
-    let rootPath = undefined;
+    let rootPath: string | undefined = undefined;
     switch (host) {
       case "updater": {
         rootPath = path.resolve(process.resourcesPath, `app.asar/.vite/renderer/windows/updater`);
@@ -125,6 +125,13 @@ export default class ProtocolManager extends Service {
     }
 
     log.debug(`${req.method} ytmd-app://${host}${pathname}`);
+
+    if (!rootPath) {
+      log.debug(`Root path not found, dropping request`);
+      return new Response(null, {
+        status: 404
+      })
+    }
 
     let desiredPath = pathname;
     if (pathname === "/") desiredPath = "/index.html";

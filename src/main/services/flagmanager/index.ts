@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import Service, { EventEmitterService } from "../service";
 import { app, ipcMain } from "electron";
+// @ts-expect-error Explicitly ignored for now to clear TS error per the above comment
 import { Context, Unleash } from "unleash-client";
 import AppWindowManager from "../windowmanager";
 import { DependencyConstructor } from "~shared/types";

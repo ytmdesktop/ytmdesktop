@@ -55,16 +55,16 @@ export default class DiscordPresence extends Integration {
   public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.discordPresenceEnabled";
   public override disableFlags = ["disable_discord_presence"];
 
-  private discordClient: DiscordClient = null;
+  private discordClient: DiscordClient | null = null;
   private ready = false;
-  private activityDebounceTimeout: NodeJS.Timeout | null = null;
-  private pauseTimeout: string | number | NodeJS.Timeout = null;
-  private connectionRetryTimeout: string | number | NodeJS.Timeout = null;
-  private stateCallback: (event: PlayerState) => void = null;
+  private activityDebounceTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private pauseTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private connectionRetryTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private stateCallback: ((event: PlayerState) => void) | null = null;
 
-  private videoState: VideoState | null = null;
-  private videoDetails: Partial<VideoDetails> | null = null;
-  private progress: number | null = null;
+  private videoState: VideoState = VideoState.Unknown;
+  private videoDetails: VideoDetails | null = null;
+  private progress: number = 0;
 
   private connectionRetries: number = 0;
 
@@ -72,12 +72,12 @@ export default class DiscordPresence extends Integration {
     if (this.activityDebounceTimeout) return;
     this.activityDebounceTimeout = setTimeout(() => {
       if (!this.videoDetails) {
-        this.discordClient.clearActivity();
+        this.discordClient?.clearActivity();
         return;
       }
       const { title, author, album, id, thumbnails, durationSeconds, channelId, albumId } = this.videoDetails;
       const thumbnail = getHighestResThumbnail(thumbnails);
-      this.discordClient.setActivity({
+      this.discordClient?.setActivity({
         type: DiscordActivityType.Listening,
         status_display_type: 1,
         details: stringLimit(title, 128, 2),
@@ -91,7 +91,7 @@ export default class DiscordPresence extends Integration {
         assets: {
           large_image: (thumbnail?.length ?? 0) <= 256 ? thumbnail : "ytmd-logo",
           large_text: album ? stringLimit(album, 128, 2) : undefined,
-          large_url: `https://music.youtube.com/browse/${albumId}`,
+          large_url: albumId ? `https://music.youtube.com/browse/${albumId}` : undefined,
           small_image: getSmallImageKey(this.videoState),
           small_text: getSmallImageText(this.videoState)
         },
@@ -103,7 +103,7 @@ export default class DiscordPresence extends Integration {
           }
         ]
       });
-      this.activityDebounceTimeout = null;
+      this.activityDebounceTimeout = undefined;
     }, 1000);
   }
 
@@ -112,7 +112,7 @@ export default class DiscordPresence extends Integration {
 
     const { videoDetails, videoProgress, trackState, hasFullMetadata } = state;
     if (!videoDetails) {
-      this.discordClient.clearActivity();
+      this.discordClient?.clearActivity();
       return;
     }
     const oldState = this.videoState ?? null;
@@ -129,12 +129,12 @@ export default class DiscordPresence extends Integration {
     }
 
     clearTimeout(this.pauseTimeout);
-    this.pauseTimeout = null;
+    this.pauseTimeout = undefined;
     if (state.trackState == VideoState.Playing) return;
     this.pauseTimeout = setTimeout(() => {
       if (!this.discordClient && !this.ready) return;
-      this.discordClient.clearActivity();
-      this.pauseTimeout = null;
+      this.discordClient?.clearActivity();
+      this.pauseTimeout = undefined;
     }, 30 * 1000);
   }
 
@@ -190,7 +190,7 @@ export default class DiscordPresence extends Integration {
     clearTimeout(this.activityDebounceTimeout);
     clearTimeout(this.pauseTimeout);
     clearTimeout(this.connectionRetryTimeout);
-    this.activityDebounceTimeout = this.pauseTimeout = this.connectionRetryTimeout = null;
+    this.activityDebounceTimeout = this.pauseTimeout = this.connectionRetryTimeout = undefined;
 
     if (this.stateCallback) {
       const playerStateStore = this.getService(PlayerStateStore);

@@ -70,7 +70,8 @@ export default class EnhancedMediaService extends Integration {
     this.mediaPlayer.setPositionChangedCallback(position => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
       const playerStateStore = this.getService(PlayerStateStore);
-      if (position >= 0 && position <= playerStateStore.getState().videoDetails.durationSeconds) remoteControlApi.postMessage("execute", "seekTo", position);
+      const videoDetails = playerStateStore.getState().videoDetails;
+      if (videoDetails && (position >= 0 && position <= videoDetails.durationSeconds)) remoteControlApi.postMessage("execute", "seekTo", position);
     });
     this.mediaPlayer.setPositionSeekedCallback(seek => {
       const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
@@ -79,7 +80,8 @@ export default class EnhancedMediaService extends Integration {
       if (newProgress <= 0) newProgress = 0;
 
       // Behavior aligns with MPRIS documentation
-      if (newProgress > playerStateStore.getState().videoDetails.durationSeconds) {
+      const videoDetails = playerStateStore.getState().videoDetails;
+      if (videoDetails && (newProgress > videoDetails.durationSeconds)) {
         remoteControlApi.postMessage("execute", "next");
       } else {
         remoteControlApi.postMessage("execute", "seekTo", newProgress);
@@ -187,14 +189,14 @@ export default class EnhancedMediaService extends Integration {
         needUpdate = true;
       }
 
-      if (state.queue.shuffleEnabled !== this.lastShuffleEnabled) {
+      if (state.queue && (state.queue.shuffleEnabled !== this.lastShuffleEnabled)) {
         this.lastShuffleEnabled = state.queue.shuffleEnabled;
         this.mediaPlayer.shuffle = state.queue.shuffleEnabled;
 
         needUpdate = true;
       }
 
-      if (state.queue.repeatMode !== this.lastRepeatMode) {
+      if (state.queue && (state.queue.repeatMode !== this.lastRepeatMode)) {
         this.lastRepeatMode = state.queue.repeatMode;
         switch (state.queue.repeatMode) {
           case RepeatMode.None:

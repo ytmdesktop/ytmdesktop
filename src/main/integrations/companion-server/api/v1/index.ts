@@ -154,7 +154,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       case "seekTo": {
         const position = commandRequest.data;
-        if (isNaN(position) || position < 0 || position > playerStateStore.getState().videoDetails.durationSeconds) {
+        const videoDetails = playerStateStore.getState().videoDetails;
+        if (videoDetails && (isNaN(position) || position < 0 || position > videoDetails.durationSeconds)) {
           throw new InvalidPositionError(position);
         }
         remoteControlApi.postMessage("execute", "seekTo", position);
@@ -217,7 +218,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         const index = commandRequest.data;
         const state = playerStateStore.getState();
 
-        if (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1) {
+        if (state.queue && (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1)) {
           throw new InvalidQueueIndexError(index);
         }
 
@@ -246,7 +247,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
         const index = commandRequest.data.index;
         const state = playerStateStore.getState();
-        if (isNaN(index) || index > state.queue.items.length) {
+        if (state.queue && (isNaN(index) || index > state.queue.items.length)) {
           throw new InvalidQueueIndexError(index);
         }
 
@@ -262,7 +263,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         const index = commandRequest.data;
         const state = playerStateStore.getState();
 
-        if (isNaN(index) || index > state.queue.items.length - 1) {
+        if (state.queue && (isNaN(index) || index > state.queue.items.length - 1)) {
           throw new InvalidQueueIndexError(index);
         }
 
@@ -275,11 +276,11 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         const toIndex = commandRequest.data.toIndex;
         const state = playerStateStore.getState();
 
-        if (isNaN(fromIndex) || fromIndex > state.queue.items.length - 1) {
+        if (state.queue && (isNaN(fromIndex) || fromIndex > state.queue.items.length - 1)) {
           throw new InvalidQueueIndexError(fromIndex);
         }
 
-        if (isNaN(toIndex) || toIndex > state.queue.items.length - 1) {
+        if (state.queue && (isNaN(toIndex) || toIndex > state.queue.items.length - 1)) {
           throw new InvalidQueueIndexError(toIndex);
         }
 

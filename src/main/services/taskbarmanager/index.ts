@@ -93,7 +93,7 @@ export default class TaskbarManager extends Service {
         progressInTaskbar = state.progressInTaskbar;
       }
 
-      if (progressInTaskbar) {
+      if (progressInTaskbar && playerState.videoDetails) {
         mainWindow.setProgressBar(hasVideo ? playerState.videoProgress / playerState.videoDetails.durationSeconds : -1, {
           mode: isPlaying ? "normal" : "paused"
         });

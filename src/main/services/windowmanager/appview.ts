@@ -97,8 +97,8 @@ export type AppViewOptions = {
 };
 
 export class AppView extends EventEmitter<AppViewEventMap> {
-  private parentWindow: AppWindow<AppWindowType>;
-  private electronView: WebContentsView;
+  private parentWindow?: AppWindow<AppWindowType> | null;
+  private electronView?: WebContentsView | null;
   private options: AppViewOptions;
 
   private destroyed = false;
@@ -132,15 +132,15 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     if (this.parentWindow && this.parentWindow !== appWindow) this.parentWindow.detachView(this);
 
     this.parentWindow = appWindow;
-    this.parentWindow._getElectronWindow().contentView.addChildView(this.electronView, index);
-    this.lastViewIndex = index;
+    if (this.electronView) this.parentWindow._getElectronWindow().contentView.addChildView(this.electronView, index);
+    this.lastViewIndex = index ?? -1;
 
     // Execute a parent window resize so the bounds are adjusted on attach
     this.parentWindowResize();
 
     this.attachParentElectronWindowEvents();
 
-    if (!app.isPackaged) this.electronView.webContents.openDevTools();
+    if (!app.isPackaged) this.electronView?.webContents.openDevTools();
 
     log.debug(`AppView '${this.name}' attached to parent ${this.parentWindow.name} with index '${index ?? "end"}'`);
   }
@@ -154,12 +154,12 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     }
 
     this.detachParentElectronWindowEvents();
-    this.parentWindow._getElectronWindow().contentView.removeChildView(this.electronView);
+    if (this.electronView) this.parentWindow._getElectronWindow().contentView.removeChildView(this.electronView);
     log.debug(`AppView '${this.name}' detached from parent ${this.parentWindow.name}`);
     this.parentWindow = null;
   }
 
-  public _getElectronView(): WebContentsView {
+  public _getElectronView(): WebContentsView | null | undefined {
     assert(this.destroyed === false, new Error("This AppView is destroyed"));
 
     return this.electronView;
@@ -202,15 +202,15 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   public async hide(waitForWebContents?: boolean) {
     if (waitForWebContents) {
       await new Promise<void>(resolve => {
-        this.electronView.webContents.ipc.once("appView:hide", () => {
+        this.electronView?.webContents.ipc.once("appView:hide", () => {
           resolve();
         });
-        this.electronView.webContents.send("appView:hide");
+        this.electronView?.webContents.send("appView:hide");
       });
     }
 
     log.debug(`AppView '${this.name}' hidden`);
-    this.electronView.setVisible(false);
+    this.electronView?.setVisible(false);
   }
 
   /**
@@ -219,10 +219,10 @@ export class AppView extends EventEmitter<AppViewEventMap> {
    * @param notifyWebContents Whether to notify the web contents of the view being shown
    */
   public show(notifyWebContents?: boolean) {
-    if (notifyWebContents) this.electronView.webContents.send("appView:show");
+    if (notifyWebContents) this.electronView?.webContents.send("appView:show");
 
     log.debug(`AppView '${this.name}' shown`);
-    this.electronView.setVisible(true);
+    this.electronView?.setVisible(true);
   }
 
   /**
@@ -269,7 +269,7 @@ export class AppView extends EventEmitter<AppViewEventMap> {
       return;
     }
 
-    this.electronView.webContents.on("render-process-gone", () => {
+    this.electronView?.webContents.on("render-process-gone", () => {
       log.debug(`AppView '${this.name}' webContents render process gone`);
       this.viewReady = false;
       if (this.options.autoRecreate) {
@@ -277,60 +277,60 @@ export class AppView extends EventEmitter<AppViewEventMap> {
         this.emit("recreated");
       } else {
         this.destroyed = true;
-        this._detachFromWindow(this.parentWindow);
+        if (this.parentWindow) this._detachFromWindow(this.parentWindow);
       }
     });
-    this.electronView.webContents.on("dom-ready", () => {
+    this.electronView?.webContents.on("dom-ready", () => {
       log.debug(`AppView '${this.name}' webContents dom ready`);
       this.viewReady = true;
       this.emit("ready");
     });
-    this.electronView.webContents.on("ipc-message", (event, channel, ...args: unknown[]) => {
+    this.electronView?.webContents.on("ipc-message", (event, channel, ...args: unknown[]) => {
       this.ipcEventProxy.emit(channel, event, ...args);
     });
 
     //#region Proxy rest of events
-    this.electronView.webContents.on("enter-html-full-screen", () => {
+    this.electronView?.webContents.on("enter-html-full-screen", () => {
       this.emit("webcontents-enter-html-full-screen");
     });
-    this.electronView.webContents.on("leave-html-full-screen", () => {
+    this.electronView?.webContents.on("leave-html-full-screen", () => {
       this.emit("webcontents-leave-html-full-screen");
     });
-    this.electronView.webContents.on("did-navigate", () => {
+    this.electronView?.webContents.on("did-navigate", () => {
       this.emit("webcontents-did-navigate");
     });
-    this.electronView.webContents.on("did-navigate-in-page", () => {
+    this.electronView?.webContents.on("did-navigate-in-page", () => {
       this.emit("webcontents-did-navigate-in-page");
     });
-    this.electronView.webContents.on("context-menu", (event, params) => {
+    this.electronView?.webContents.on("context-menu", (event, params) => {
       this.emit("webcontents-context-menu", event, params);
     });
-    this.electronView.webContents.on("will-navigate", event => {
+    this.electronView?.webContents.on("will-navigate", event => {
       this.emit("webcontents-will-navigate", event);
     });
-    this.electronView.webContents.on("will-redirect", event => {
+    this.electronView?.webContents.on("will-redirect", event => {
       this.emit("webcontents-will-redirect", event);
     });
-    this.electronView.webContents.on("unresponsive", () => {
+    this.electronView?.webContents.on("unresponsive", () => {
       this.emit("webcontents-unresponsive");
     });
-    this.electronView.webContents.on("responsive", () => {
+    this.electronView?.webContents.on("responsive", () => {
       this.emit("webcontents-responsive");
     });
-    this.electronView.webContents.on("page-title-updated", (event, title, explicitSet) => {
+    this.electronView?.webContents.on("page-title-updated", (event, title, explicitSet) => {
       this.emit("webcontents-page-title-updated", event, title, explicitSet);
     });
-    this.electronView.webContents.on("will-prevent-unload", event => {
+    this.electronView?.webContents.on("will-prevent-unload", event => {
       this.emit("webcontents-will-prevent-unload", event);
     });
-    this.electronView.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL, isMainFrame, frameProcessId, frameRoutingID) => {
+    this.electronView?.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL, isMainFrame, frameProcessId, frameRoutingID) => {
       this.emit("webcontents-did-fail-load", event, errorCode, errorDescription, validatedURL, isMainFrame, frameProcessId, frameRoutingID);
     });
     //#endregion
   }
 
   private parentWindowResize() {
-    if (this.options.viewState.autoResize) {
+    if (this.options.viewState.autoResize && this.electronView && this.parentWindow) {
       const newBounds = this.electronView.getBounds();
       const parentBounds = this.parentWindow._getElectronWindow().getContentBounds();
       if (this.options.viewState.autoResize.width) {
