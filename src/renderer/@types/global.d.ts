@@ -21,6 +21,10 @@ declare global {
       restartApplication(): void;
       restartApplicationForUpdate(): void;
       getTrueFilePath(file: File): string;
+      processVersions: {
+        electron: string;
+        chrome: string;
+      }
 
       // Companion Authorization specific
       sendResult(authorized: boolean);

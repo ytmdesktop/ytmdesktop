@@ -49,5 +49,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   handleUpdateDownloaded: (callback: () => void) => ipcRenderer.on("autoUpdater:updateDownloaded", () => callback()),
   isAppUpdateAvailable: async (): Promise<boolean> => await ipcRenderer.invoke("autoUpdater:isUpdateAvailable"),
   isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("autoUpdater:isUpdateDownloaded"),
-  getTrueFilePath: (file: File) => webUtils.getPathForFile(file)
+  getTrueFilePath: (file: File) => webUtils.getPathForFile(file),
+
+  processVersions: { electron: process.versions.electron, chrome: process.versions.chrome }
 });

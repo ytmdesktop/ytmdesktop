@@ -13,6 +13,8 @@ const ytmdVersion = await window.ytmd.getAppVersion();
 const ytmdCommitHash = YTMD_GIT_COMMIT_HASH?.substring(0, 7);
 const ytmdBranch = YTMD_GIT_BRANCH;
 
+const processVersions = window.ytmd.processVersions;
+
 const isDarwin = window.ytmd.isDarwin;
 const isLinux = window.ytmd.isLinux;
 
@@ -814,9 +816,12 @@ window.ytmd.handleUpdateDownloaded(() => {
             </p>
           </template>
           <span class="version-info">
-            <p class="version">Version: {{ ytmdVersion }}</p>
-            <p class="branch">Branch: {{ ytmdBranch ?? "None" }}</p>
-            <p class="commit">Commit: {{ ytmdCommitHash ?? "None" }}</p>
+            <p>Version: {{ ytmdVersion }}</p>
+            <p>Branch: {{ ytmdBranch ?? "None" }}</p>
+            <p>Commit: {{ ytmdCommitHash ?? "None" }}</p>
+            <div class="divider"></div>
+            <p>Electron: {{ processVersions.electron }}</p>
+            <p>Chrome: {{ processVersions.chrome }}</p>
           </span>
           <div class="links">
             <a
@@ -947,11 +952,15 @@ window.ytmd.handleUpdateDownloaded(() => {
   margin: 0;
 }
 
-.version-info .version,
-.version-info .branch,
-.version-info .commit {
+.version-info p {
   margin: 4px 0;
   color: #bbbbbb;
+}
+
+.version-info .divider {
+  background-color: #414141;
+  height: 1px;
+  margin: 8px 0;
 }
 
 .made-by {
