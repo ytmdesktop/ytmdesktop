@@ -27,5 +27,11 @@ contextBridge.exposeInMainWorld("ytmd", {
   },
   executeCommandInYTMView: (command: string, ...args: unknown[]) => {
     ipcRenderer.send("remoteControl:execute", command, ...args);
+  },
+
+  isWayland: () => {
+    // Vite overwrites "process.env" calls
+    const runtimeProcess = process;
+    return runtimeProcess.platform === "linux" && (!!runtimeProcess.env.WAYLAND_DISPLAY || runtimeProcess.env.XDG_SESSION_TYPE === "wayland")
   }
 });

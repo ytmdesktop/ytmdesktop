@@ -67,6 +67,7 @@ declare global {
         handleStateChanged(callback: (state: PlayerState) => void);
       };
       executeCommandInYTMView(command: string, ...args: unknown[]);
+      isWayland(): boolean;
     };
   }
 

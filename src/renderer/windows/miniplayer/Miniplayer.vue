@@ -147,14 +147,6 @@ window.addEventListener("resize", reconcileMarquee);
     v-if="state?.videoDetails != null"
     class="container"
   >
-    <!--<div class="thumbnail-container">
-      <img
-        class="thumbnail"
-        :src="thumbnailUrl"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-      >
-    </div>-->
     <div class="pusher"></div>
     <div class="video-data">
       <div class="backdrop" />

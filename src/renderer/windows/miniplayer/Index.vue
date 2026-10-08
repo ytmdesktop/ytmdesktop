@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import Miniplayer from "./Miniplayer.vue";
 
+const isWayland = ref(window.ytmd.isWayland());
 const alwaysOnTop = ref(true);
 
 window.ytmd.handleWindowEvents(windowState => {
@@ -23,8 +24,9 @@ function pinUnpinMiniplayer() {
     <div class="button-container">
       <button
         class="pin"
-        title="Pin/Unpin Miniplayer"
+        :title="!isWayland ? `Pin/Unpin Miniplayer` : `Use your native window manager to pin the miniplayer`"
         @click="pinUnpinMiniplayer"
+        :disabled="isWayland"
       >
         <span
           v-if="alwaysOnTop"
