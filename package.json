@@ -40,11 +40,11 @@
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/multicast-dns": "^7.2.4",
     "@vitejs/plugin-vue": "^6.0.9",
-    "electron": "44.5.1",
+    "electron": "44.7.0",
     "oxfmt": "^0.41.0",
-    "oxlint": "^1.86.0",
+    "oxlint": "^1.87.0",
     "typescript": "^6.0.3",
-    "vite": "^8.3.2"
+    "vite": "^8.3.3"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.0",
@@ -57,7 +57,7 @@
     "fastify": "^5.12.5",
     "fastify-socket.io": "^5.1.0",
     "markdown-it": "^15.0.2",
-    "material-symbols": "^0.47.5",
+    "material-symbols": "^0.47.6",
     "multicast-dns": "^7.2.5",
     "socket.io": "^4.8.4",
     "vue": "^3.5.43",
