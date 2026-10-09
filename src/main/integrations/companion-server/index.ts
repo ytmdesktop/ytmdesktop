@@ -143,6 +143,20 @@ export default class CompanionServer extends Integration {
 
             log.info(`ipc: client selected api version ${selectedVersion}`);
             ipcClient.version = selectedVersion;
+            
+            // Send initial state after version selection
+            const playerStateStore = this.getService(PlayerStateStore);
+            const state = playerStateStore.getState();
+            
+            const eventNameBuffer = Buffer.from("state-update");
+            const stateBuffer = Buffer.from(JSON.stringify(TRANSFORM_PLAYER_STATE_FOR_VERSION[ipcClient.version](state)));
+            const buffer = Buffer.alloc(12 + eventNameBuffer.byteLength + stateBuffer.byteLength);
+            buffer.writeInt32LE(IpcOpcode.EVENT, 0);
+            buffer.writeInt32LE(eventNameBuffer.byteLength, 4);
+            buffer.writeInt32LE(stateBuffer.byteLength, 8);
+            eventNameBuffer.copy(buffer, 12);
+            stateBuffer.copy(buffer, 12 + eventNameBuffer.length);
+            ipcClient.socket.write(buffer);
           }
 
           if (op === IpcOpcode.PING) {
