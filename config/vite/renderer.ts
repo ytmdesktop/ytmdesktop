@@ -42,6 +42,10 @@ export default defineConfig({
           root,
           "src/renderer/windows/miniplayer/index.html",
         ),
+        changelog_window: path.resolve(
+          root,
+          "src/renderer/windows/changelog/index.html",
+        ),
       },
       output: {
         codeSplitting: {
