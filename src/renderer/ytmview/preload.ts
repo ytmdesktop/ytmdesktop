@@ -23,7 +23,7 @@ const store = new Store<StoreSchema>();
 
 let protectedApiBound = false;
 window.addEventListener("message", async event => {
-  if (event.data === "protected-api-port" && !protectedApiBound) {
+  if (event.data === "ytmd-protected-api-port" && !protectedApiBound) {
     ipcRenderer.postMessage("protectedApi:bindPort", null, [...event.ports]);
     protectedApiBound = true;
   }

@@ -5,7 +5,7 @@ class ProtectedAPIManager {
   private apis = new Map<string, ProtectedAPI>();
 
   public init() {
-    window.postMessage("protected-api-port", "*", [this.channel.port2]);
+    window.postMessage("ytmd-protected-api-port", "/", [this.channel.port2]);
   }
 
   public createOrGetAPI(name: string): ProtectedAPI {

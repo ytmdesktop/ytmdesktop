@@ -77,7 +77,7 @@ window.addEventListener("load", async () => {
         op: "ytmd-errored",
         error
       },
-      "*"
+      "/"
     );
   } finally {
     window.postMessage(
@@ -85,7 +85,7 @@ window.addEventListener("load", async () => {
         op: "ytmd-ready",
         completions: setupCompletions
       },
-      "*"
+      "/"
     );
   }
 });
