@@ -204,6 +204,13 @@ if (!gotTheLock) {
 
 // Protocol handler
 function handleProtocol(url: string) {
+  // Robustness guard: `second-instance` hands over the raw last argv entry,
+  // which may be a random CLI flag (e.g. --enable-sandbox) instead of a
+  // ytmd:// URL. Only real protocol URLs pass here.
+  if (!url || !url.startsWith("ytmd://")) {
+    log.info("Ignoring non-protocol argument:", url);
+    return;
+  }
   log.info("Handling protocol url", url);
   const urlPaths = url.split("://")[1];
   if (urlPaths) {

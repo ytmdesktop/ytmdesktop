@@ -289,27 +289,11 @@ window.addEventListener("load", async () => {
     // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
     if (!state.lastUrl.startsWith("https://music.youtube.com/watch")) {
       if (state.lastVideoId) {
-        // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
-        let heightTransitionCount = 0;
-        const transitionEnd = async (e: TransitionEvent) => {
-          if (e.target === window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0]) {
-            if (e.propertyName === "height") {
-              (
-                await webFrame.executeJavaScript(`
-                  (function() {
-                    document.querySelector("ytmusic-popup-container").refitPopups_();
-                  })
-                `)
-              )();
-              heightTransitionCount++;
-              if (heightTransitionCount >= 2) {
-                window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0].removeEventListener("transitionend", transitionEnd);
-              }
-            }
-          }
-        };
-        window.__YTMD_HOOK__.ytmPlayerBar.playerBars[0].addEventListener("transitionend", transitionEnd);
-
+        // NOTE: The old "height transition check" hack (issue #1159) ran in
+        // the preload's isolated world where window.__YTMD_HOOK__ doesn't
+        // exist, throwing "Cannot read properties of undefined (reading
+        // 'ytmPlayerBar')" on every restore. It has been removed; the popup
+        // refit it performed was cosmetic.
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
             detail: {
