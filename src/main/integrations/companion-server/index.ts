@@ -199,10 +199,17 @@ export default class CompanionServer extends Integration {
   private createMdnsServer() {
     this.mdns = mDNS();
 
-    const hostname = os.hostname();
-    const aRecords: mDNS.ResponsePacket["answers"] = [];
+    const hostname = os.hostname().split(".")[0];
+    const serviceType = "_ytmdesktop._tcp";
+    const domain = "local";
 
+    const domainedServiceType = `${serviceType}.${domain}`;
+    const instanceName = `${hostname}.${domainedServiceType}`;
+    const domainedHostname = `${hostname}.${domain}`;
+
+    const aRecords: mDNS.ResponsePacket["answers"] = [];
     const interfaces = os.networkInterfaces();
+
     for (const deviceName in interfaces) {
       const iface = interfaces[deviceName];
 
@@ -210,7 +217,7 @@ export default class CompanionServer extends Integration {
         for (const alias of iface) {
           if (alias.family === "IPv4" && !alias.internal) {
             aRecords.push({
-              name: `${hostname}._ytmdesktop._tcp.local`,
+              name: domainedHostname,
               type: "A",
               ttl: 60,
               data: alias.address
@@ -218,75 +225,114 @@ export default class CompanionServer extends Integration {
           }
         }
       } else {
-        console.warn(`Could not create mDNS record for ${deviceName} (no iface)`);
+        log.warn(`mdns: could not create mDNS record for ${deviceName} (no iface)`);
       }
     }
 
     this.mdns.on("query", query => {
       for (const question of query.questions) {
-        if (question.name === "_services._dns-sd._udp.local") {
-          this.mdns?.respond({
-            answers: [
-              {
-                name: `_services._dns-sd._udp.local`,
-                type: "PTR",
-                ttl: 3960,
-                data: `_ytmdesktop._tcp.local`
-              }
-            ]
+        const name = question.name.toLowerCase();
+        const type = question.type;
+
+        if (name === "_services._dns-sd._udp.local") {
+          log.debug("mdns: received _services.dns-sd._udp query");
+
+          this.mdns?. respond({
+            answers: [{
+              name: "_services._dns-sd._udp.local",
+              type: "PTR",
+              ttl: 3960,
+              data: domainedServiceType
+            }]
           });
+          continue;
         }
 
-        if (question.name === "_ytmdesktop._tcp.local") {
+        if (name === domainedServiceType && type === "PTR") {
+          log.debug(`mdns: received ${domainedServiceType} query`);
+
           this.mdns?.respond({
-            answers: [
+            answers: [{
+              name: domainedServiceType,
+              type: "PTR",
+              ttl: 60,
+              data: instanceName
+            }],
+            additionals: [
               {
-                name: `_ytmdesktop._tcp.local`,
-                type: "PTR",
+                name: instanceName,
+                type: "SRV",
                 ttl: 60,
-                data: `${hostname}._ytmdesktop._tcp.local`
-              }
+                data: {
+                  port: 9863,
+                  weight: 0,
+                  priority: 0,
+                  target: domainedHostname
+                }
+              },
+              {
+                name: instanceName,
+                type: "TXT",
+                ttl: 60,
+                data: []
+              },
+              ...aRecords
             ]
           });
+          continue;
         }
 
-        if (question.name === `${hostname}._ytmdesktop._tcp.local`) {
-          const compiledAnswers: mDNS.ResponsePacket["answers"] = [];
-          if (question.type === "SRV") {
-            compiledAnswers.push({
-              name: `${hostname}._ytmdesktop._tcp.local`,
+        if (name === instanceName) {
+          log.debug(`mdns: received instance ${instanceName} query (${type})`);
+
+          const answers: mDNS.ResponsePacket["answers"] = [];
+          const additionals: mDNS.ResponsePacket["additionals"] = [];
+
+          if (type === "SRV") {
+            answers.push({
+              name: instanceName,
               type: "SRV",
+              ttl: 120,
               data: {
                 port: 9863,
                 weight: 0,
                 priority: 0,
-                target: `${hostname}._ytmdesktop._tcp.local`
+                target: domainedHostname
               }
             });
-            compiledAnswers.push(...aRecords);
           }
 
-          if (question.type === "TXT") {
-            compiledAnswers.push({
-              name: `${hostname}._ytmdesktop._tcp.local`,
+          if (type === "TXT") {
+            answers.push({
+              name: instanceName,
               type: "TXT",
-              ttl: 60,
-              data: ""
+              ttl: 120,
+              data: []
             });
           }
 
-          if (question.type === "A") {
-            compiledAnswers.push(...aRecords);
-          }
+          additionals.push(...aRecords);
 
-          this.mdns?.respond({
-            answers: compiledAnswers
-          });
+          if (answers.length > 0) {
+            this.mdns?.respond({ answers, additionals });
+          }
+          continue;
+        }
+
+        if (name === domainedHostname && (type === "A" || type === "AAAA")) {
+          log.debug("mdns: received hostname address query");
+
+          if (aRecords.length > 0) {
+            this.mdns?.respond({
+              answers: aRecords
+            });
+          }
+          continue;
         }
       }
     });
 
-    log.info("mdns: created mdns server");
+    log.info(`mdns: created mdns server advertising companion server with instance name ${instanceName}`); 
   }
 
   public onSetup() {}
