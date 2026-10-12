@@ -35,6 +35,7 @@ const playback: StoreSchema["playback"] = await store.get("playback");
 const integrations: StoreSchema["integrations"] = await store.get("integrations");
 const shortcuts: StoreSchema["shortcuts"] = await store.get("shortcuts");
 const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
+const listenBrainzStore: StoreSchema["listenbrainz"] = await store.get("listenbrainz");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
@@ -61,6 +62,10 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const listenBrainzEnabled = ref<boolean>(integrations.listenBrainzEnabled);
+const listenBrainzAuthenticated = ref<boolean>(!!listenBrainzStore.userToken);
+const listenBrainzTokenInput = ref<string>("");
+const listenBrainzScrobblePercent = ref<number>(listenBrainzStore.scrobblePercent);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -101,6 +106,10 @@ store.onDidAnyChange(async newState => {
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
+
+  listenBrainzEnabled.value = newState.integrations.listenBrainzEnabled;
+  listenBrainzAuthenticated.value = !!newState.listenbrainz.userToken;
+  listenBrainzScrobblePercent.value = newState.listenbrainz.scrobblePercent;
 
   shortcutPlayPause.value = newState.shortcuts.playPause;
   shortcutNext.value = newState.shortcuts.next;
@@ -170,6 +179,8 @@ async function settingsChanged() {
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
+  store.set("integrations.listenBrainzEnabled", listenBrainzEnabled.value);
+  store.set("listenbrainz.scrobblePercent", listenBrainzScrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
   store.set("shortcuts.next", shortcutNext.value);
@@ -240,6 +251,22 @@ async function logoutLastFM() {
   store.set("lastfm.sessionKey", null);
   lastFMEnabled.value = false;
   lastFMSessionKey.value = null;
+  await settingsChanged();
+}
+
+async function saveListenBrainzToken() {
+  if (!listenBrainzTokenInput.value.trim()) return;
+  const encrypted = await safeStorage.encryptString(listenBrainzTokenInput.value.trim());
+  store.set("listenbrainz.userToken", encrypted);
+  listenBrainzTokenInput.value = "";
+  listenBrainzAuthenticated.value = true;
+  await settingsChanged();
+}
+
+async function logoutListenBrainz() {
+  store.set("listenbrainz.userToken", null);
+  listenBrainzEnabled.value = false;
+  listenBrainzAuthenticated.value = false;
   await settingsChanged();
 }
 
@@ -428,6 +455,46 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-if="lastFMEnabled"
             v-model="scrobblePercent"
+            class="settings indented"
+            type="range"
+            name="Scrobble percent"
+            description="Determines when a song is scrobbled"
+            min="50"
+            max="95"
+            step="5"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-model="listenBrainzEnabled"
+            type="checkbox"
+            name="ListenBrainz scrobbling"
+            :disabled="!safeStorageAvailable"
+            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            @change="settingsChanged"
+          />
+          <div v-if="listenBrainzEnabled" class="setting indented">
+            <div class="name-with-description">
+              <p class="description">
+                User is Authenticated:
+                <span v-if="listenBrainzAuthenticated" style="color: #4caf50">Yes</span>
+                <span v-else style="color: #ff1100">No</span>
+              </p>
+            </div>
+            <button v-if="listenBrainzAuthenticated" @click="logoutListenBrainz">Logout</button>
+          </div>
+          <div v-if="listenBrainzEnabled && !listenBrainzAuthenticated" class="setting indented">
+            <div class="name-with-description">
+              <p class="name">User token</p>
+              <p class="description">Get your token from listenbrainz.org/settings/</p>
+            </div>
+            <div class="listenbrainz-token-input">
+              <input v-model="listenBrainzTokenInput" type="text" placeholder="Paste your token here" />
+              <button @click="saveListenBrainzToken">Save</button>
+            </div>
+          </div>
+          <YTMDSetting
+            v-if="listenBrainzEnabled"
+            v-model="listenBrainzScrobblePercent"
             class="settings indented"
             type="range"
             name="Scrobble percent"
@@ -866,5 +933,28 @@ button {
 .shortcuts-tab .shortcut-title .register-error {
   margin-left: 4px;
   color: #f44336;
+}
+
+.listenbrainz-token-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.listenbrainz-token-input input[type="text"] {
+  padding: 8px;
+  width: 180px;
+  background-color: #212121;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.listenbrainz-token-input input[type="text"]:focus {
+  outline: 1px solid #f44336;
+}
+
+.listenbrainz-token-input input[type="text"]::placeholder {
+  color: #969696;
 }
 </style>

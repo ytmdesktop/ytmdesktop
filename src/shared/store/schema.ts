@@ -35,6 +35,7 @@ export type StoreSchema = {
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
     lastFMEnabled: boolean;
+    listenBrainzEnabled: boolean;
   };
   shortcuts: {
     playPause: string;
@@ -57,6 +58,10 @@ export type StoreSchema = {
     secret: string;
     token: string | null;
     sessionKey: string | null;
+    scrobblePercent: number;
+  };
+  listenbrainz: {
+    userToken: string | null;
     scrobblePercent: number;
   };
   developer: {
