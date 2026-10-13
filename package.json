@@ -66,6 +66,7 @@
     "fastify-socket.io": "^5.1.0",
     "material-symbols": "^0.12.0",
     "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "vue": "^3.5.28"
   },
   "lint-staged": {
