@@ -1872,6 +1872,41 @@ app.on("ready", async () => {
 
   log.info("Created tray icon");
 
+  // macOS Dock right-click menu with playback controls
+  if (isDarwin) {
+    const dockMenu = Menu.buildFromTemplate([
+      {
+        label: "Play/Pause",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "playPause");
+        }
+      },
+      {
+        label: "Next",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "next");
+        }
+      },
+      {
+        label: "Previous",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "previous");
+        }
+      },
+      {
+        label: "Stop",
+        type: "normal",
+        click: () => {
+          ytmView.webContents.send("remoteControl:execute", "stop");
+        }
+      }
+    ]);
+    app.dock.setMenu(dockMenu);
+  }
+
   createMainWindow();
   log.info("Created main window");
 
