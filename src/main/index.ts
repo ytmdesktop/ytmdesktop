@@ -27,9 +27,11 @@ import electronSquirrelStartup from "electron-squirrel-startup";
 import MemoryStore from "./memory-store";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
 import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import { getPresetThemeById } from "../shared/preset-themes";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
+import PresetThemes from "./integrations/preset-themes";
 import DiscordPresence from "./integrations/discord-presence";
 import LastFM from "./integrations/last-fm";
 import NowPlayingNotifications from "./integrations/notifications";
@@ -163,6 +165,7 @@ Menu.setApplicationMenu(builtMenu);
 
 const companionServer = new CompanionServer();
 const customCss = new CustomCSS();
+const presetThemes = new PresetThemes();
 const discordPresence = new DiscordPresence();
 const lastFMScrobbler = new LastFM();
 const nowPlayingNotifications = new NowPlayingNotifications();
@@ -351,6 +354,7 @@ const store = new Conf<StoreSchema>({
     },
     appearance: {
       alwaysShowVolumeSlider: false,
+      presetTheme: null,
       customCSSEnabled: false,
       customCSSPath: null,
       zoom: 100,
@@ -422,6 +426,11 @@ const store = new Conf<StoreSchema>({
       if (!store.has("appearance.trayIconStyle")) {
         store.set("appearance.trayIconStyle", 0);
       }
+    },
+    ">=2.0.12": store => {
+      if (!store.has("appearance.presetTheme")) {
+        store.set("appearance.presetTheme", null);
+      }
     }
   }
 });
@@ -457,7 +466,22 @@ store.onDidAnyChange(async (newState, oldState) => {
     }
   }
 
-  // Appearance
+  // Appearance - Preset Themes
+  if (newState.appearance.presetTheme !== null) {
+    presetThemes.provide(store, ytmView);
+  }
+  if (newState.appearance.presetTheme !== null && oldState.appearance.presetTheme === null) {
+    presetThemes.enable();
+    log.info("Integration enabled: Preset Themes");
+  } else if (newState.appearance.presetTheme === null && oldState.appearance.presetTheme !== null) {
+    presetThemes.disable();
+    log.info("Integration disabled: Preset Themes");
+  }
+  if (newState.appearance.presetTheme !== oldState.appearance.presetTheme) {
+    updateTitleBarOverlay(newState.appearance.presetTheme);
+  }
+
+  // Appearance - Custom CSS
   if (newState.appearance.customCSSEnabled) {
     customCss.provide(store, ytmView);
   }
@@ -695,6 +719,33 @@ function getTrayIconPath() {
 
 function setTrayIcon() {
   tray.setImage(getTrayIconPath());
+}
+
+function updateTitleBarOverlay(themeId: string | null) {
+  const theme = themeId ? getPresetThemeById(themeId) : null;
+  const bgColor = theme ? theme.palette.background : "#000000";
+  const textColor = theme ? theme.palette.textSecondary : "#BBBBBB";
+
+  if (mainWindow) {
+    mainWindow.setBackgroundColor(bgColor);
+    if (!isDarwin) {
+      try {
+        mainWindow.setTitleBarOverlay({ color: bgColor, symbolColor: textColor, height: 36 });
+      } catch {
+        /* not supported */
+      }
+    }
+  }
+  if (settingsWindow) {
+    settingsWindow.setBackgroundColor(bgColor);
+    if (!isDarwin) {
+      try {
+        settingsWindow.setTitleBarOverlay({ color: bgColor, symbolColor: textColor, height: 36 });
+      } catch {
+        /* not supported */
+      }
+    }
+  }
 }
 
 // Shortcut registration
@@ -1031,6 +1082,7 @@ const createYTMView = (): void => {
     }
   });
   companionServer.provide(store, memoryStore, ytmView);
+  presetThemes.provide(store, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
 
@@ -1590,7 +1642,8 @@ app.on("ready", async () => {
 
       // TODO: this is just a hack fix for ratio volume to run the enable script
       ratioVolume.ytmViewLoaded();
-      // TODO: this is just a hack fix for custom css to update CSS when the view loads
+      // TODO: this is just a hack fix for preset themes/custom css to update CSS when the view loads
+      presetThemes.updateTheme();
       customCss.updateCSS();
     }
   });
@@ -1744,6 +1797,22 @@ app.on("ready", async () => {
     if (event.sender !== settingsWindow.webContents) return;
 
     return app.getVersion();
+  });
+
+  ipcMain.handle("app:saveCustomCSSTemplate", async event => {
+    if (event.sender !== settingsWindow.webContents) return null;
+
+    const templatePath = path.join(assetFolder, "custom-css-template.css");
+    const result = await dialog.showSaveDialog(settingsWindow, {
+      title: "Save CSS Template",
+      defaultPath: "custom-css-template.css",
+      filters: [{ name: "CSS Files", extensions: ["css"] }]
+    });
+
+    if (result.canceled || !result.filePath) return null;
+
+    await fs.copyFile(templatePath, result.filePath);
+    return result.filePath;
   });
 
   ipcMain.on("app:checkForUpdates", event => {
@@ -1916,6 +1985,14 @@ app.on("ready", async () => {
   if (store.get("general").showNotificationOnSongChange) {
     nowPlayingNotifications.enable();
     log.info("Integration enabled: Now playing notifications");
+  }
+
+  // PresetThemes (inject before custom CSS so custom CSS can override)
+  if (store.get("appearance").presetTheme !== null) {
+    presetThemes.provide(store, ytmView);
+    presetThemes.enable();
+    updateTitleBarOverlay(store.get("appearance").presetTheme);
+    log.info("Integration enabled: Preset Themes");
   }
 
   // CustomCSS

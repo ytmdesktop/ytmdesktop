@@ -20,6 +20,7 @@ declare global {
       restartApplication(): void;
       restartApplicationForUpdate(): void;
       getTrueFilePath(file: File): string;
+      saveCustomCSSTemplate(): Promise<string | null>;
 
       // Companion Authorization specific
       sendResult(authorized: boolean);

@@ -1,0 +1,283 @@
+/*
+ * YouTube Music Desktop - Custom CSS Template
+ * =============================================
+ *
+ * This template documents the main CSS selectors you can use to customize
+ * YouTube Music's appearance. Uncomment and modify any section below.
+ *
+ * TIPS:
+ * - Use !important to override YouTube Music's built-in styles
+ * - Custom CSS layers ON TOP of any preset theme you've selected
+ * - Changes are applied in real-time when you save this file
+ * - If YouTube Music updates and breaks your styles, you may need to
+ *   inspect the page (Ctrl+Shift+I / Cmd+Option+I with DevTools enabled)
+ *   to find updated selectors
+ *
+ * GETTING STARTED:
+ * 1. Save this file somewhere on your computer
+ * 2. Go to Settings > Appearance
+ * 3. Enable "Custom CSS" and select this file
+ * 4. Edit and save this file - changes apply instantly
+ */
+
+
+/* ===========================================
+ * CSS CUSTOM PROPERTIES (recommended approach)
+ * ===========================================
+ * Override these on ytmusic-app to change colors globally.
+ * This is the safest method as YouTube Music reads these variables.
+ */
+
+/*
+ytmusic-app {
+  --ytmusic-general-background-a: #1a1a2e !important;
+  --ytmusic-general-background-b: #16213e !important;
+  --ytmusic-general-background-c: #0f3460 !important;
+  --ytmusic-brand-background-solid: #1a1a2e !important;
+  --ytmusic-text-primary: #e0e0e0 !important;
+  --ytmusic-text-secondary: #a0a0a0 !important;
+  --ytmusic-color-white1: #e0e0e0 !important;
+  --ytmusic-color-white2: #a0a0a0 !important;
+  --ytmusic-color-white3: #a0a0a0 !important;
+  --ytmusic-color-white4: #a0a0a0 !important;
+  --ytmusic-selected-indicator-color: #e94560 !important;
+}
+*/
+
+
+/* ===========================================
+ * MAIN LAYOUT
+ * ===========================================
+ */
+
+/* Page background (behind all content) */
+/*
+html, body {
+  background-color: #1a1a2e !important;
+}
+*/
+
+/* Main content panel */
+/*
+#layout,
+#main-panel,
+ytmusic-browse-response,
+ytmusic-search-page {
+  background-color: #1a1a2e !important;
+}
+*/
+
+
+/* ===========================================
+ * PLAYER BAR (bottom bar with playback controls)
+ * ===========================================
+ */
+
+/* Player bar background */
+/*
+ytmusic-player-bar,
+#player-bar-background {
+  background: #16213e !important;
+}
+*/
+
+/* Song title in player bar */
+/*
+ytmusic-player-bar .title yt-formatted-string {
+  color: #ffffff !important;
+}
+*/
+
+/* Artist/album text in player bar */
+/*
+ytmusic-player-bar .byline yt-formatted-string {
+  color: #a0a0a0 !important;
+}
+*/
+
+/* Playback control buttons (play, next, prev, etc.) */
+/*
+ytmusic-player-bar tp-yt-paper-icon-button {
+  color: #e0e0e0 !important;
+}
+*/
+
+/* Time display (e.g., "1:23 / 4:56") */
+/*
+ytmusic-player-bar .time-info {
+  color: #a0a0a0 !important;
+}
+*/
+
+
+/* ===========================================
+ * NAVIGATION & HEADER
+ * ===========================================
+ */
+
+/* Top navigation bar */
+/*
+#nav-bar-background,
+ytmusic-pivot-bar-renderer {
+  background: #1a1a2e !important;
+}
+*/
+
+/* Header area */
+/*
+ytmusic-header-renderer,
+#header-bar {
+  background: #1a1a2e !important;
+}
+*/
+
+/* Side navigation drawer */
+/*
+tp-yt-app-drawer#guide-wrapper {
+  background: #16213e !important;
+}
+*/
+
+/* Navigation tabs (Home, Explore, Library, etc.) */
+/*
+tp-yt-paper-tab {
+  color: #a0a0a0 !important;
+}
+
+tp-yt-paper-tab[aria-selected="true"] {
+  color: #ffffff !important;
+}
+*/
+
+
+/* ===========================================
+ * SEARCH
+ * ===========================================
+ */
+
+/* Search box container */
+/*
+ytmusic-search-box[is-bauhaus-sidenav-enabled] .search-container {
+  background: #16213e !important;
+  border-color: #0f3460 !important;
+}
+*/
+
+/* Search input text */
+/*
+ytmusic-search-box input.style-scope {
+  color: #e0e0e0 !important;
+}
+*/
+
+
+/* ===========================================
+ * CONTENT ITEMS (songs, albums, playlists)
+ * ===========================================
+ */
+
+/* Song list items */
+/*
+ytmusic-responsive-list-item-renderer {
+  color: #e0e0e0 !important;
+}
+*/
+
+/* Hover state on list items */
+/*
+ytmusic-responsive-list-item-renderer:hover {
+  background: #0f3460 !important;
+}
+*/
+
+/* Card/shelf backgrounds (e.g., "Quick picks", carousels) */
+/*
+ytmusic-card-shelf-renderer,
+ytmusic-immersive-carousel-renderer {
+  background: #16213e !important;
+}
+*/
+
+/* Filter chips (genre/mood filters) */
+/*
+ytmusic-chip-cloud-chip-renderer {
+  background: #0f3460 !important;
+  color: #e0e0e0 !important;
+}
+*/
+
+/* Active/selected chip */
+/*
+ytmusic-chip-cloud-chip-renderer[chip-style="STYLE_PRIMARY"] {
+  background: #e94560 !important;
+  color: #ffffff !important;
+}
+*/
+
+
+/* ===========================================
+ * MENUS & DIALOGS
+ * ===========================================
+ */
+
+/* Context menus and popup dialogs */
+/*
+tp-yt-paper-dialog,
+tp-yt-paper-listbox {
+  background: #16213e !important;
+  color: #e0e0e0 !important;
+}
+*/
+
+/* Menu items */
+/*
+tp-yt-paper-item {
+  color: #e0e0e0 !important;
+}
+*/
+
+
+/* ===========================================
+ * SCROLLBAR
+ * ===========================================
+ */
+
+/*
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #1a1a2e !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #0f3460 !important;
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #e94560 !important;
+}
+*/
+
+
+/* ===========================================
+ * QUEUE / NOW PLAYING PAGE
+ * ===========================================
+ */
+
+/* Full player page background */
+/*
+ytmusic-player-page,
+#player-page {
+  background: #1a1a2e !important;
+}
+*/
+
+
+/* ===========================================
+ * YOUR CUSTOM STYLES
+ * ===========================================
+ * Add your own custom styles below!
+ */
