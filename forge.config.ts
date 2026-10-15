@@ -18,7 +18,8 @@ const macSigningOptions = {
   identity: "-",
   identityValidation: false,
   continueOnError: false,
-  optionsForFile: () => ({ timestamp: "none" })
+  // Ad-hoc identities have no Team ID for hardened runtime's library validation.
+  optionsForFile: () => ({ timestamp: "none", hardenedRuntime: false })
 };
 
 const config: ForgeConfig = {

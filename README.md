@@ -76,7 +76,7 @@ This will start downloading and installing, and may require a few prompts here a
 
 Mac packages are ad-hoc signed after the app metadata, helper names, resources, and Electron fuses have been finalized. Packaging also verifies the completed bundle and fails if its signature is invalid. Cookie encryption remains enabled: an invalid signature can prevent macOS Keychain access and cause Google sign-in to be lost after restarting the app.
 
-Ad-hoc signing does not identify the publisher or notarize the app, so macOS may still require approval to open it. Developer ID signing and notarization are needed for trusted distribution and consistent Keychain identity across releases. A new build may require permission to access the app's own **YouTube Music Desktop App Safe Storage** Keychain item.
+Ad-hoc signing does not identify the publisher or notarize the app, so macOS may still require approval to open it. These builds retain the existing non-hardened runtime mode because an ad-hoc identity has no Team ID for validating Electron's framework libraries. Developer ID signing and notarization are needed for trusted distribution and consistent Keychain identity across releases. A new build may require permission to access the app's own **YouTube Music Desktop App Safe Storage** Keychain item.
 
 To check login persistence, run the packaged app from Applications, sign in, quit with **Command-Q**, and reopen the same build. Do not clear the app's data or disable cookie encryption when testing this behavior.
 
