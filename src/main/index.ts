@@ -23,6 +23,145 @@ import log from "electron-log";
 import path from "path";
 import fs from "fs/promises";
 import electronSquirrelStartup from "electron-squirrel-startup";
+import * as chromeExtensionFetch from "chrome-extension-fetch";
+import unzipCrx from "@tomjs/unzip-crx";
+
+/** Chrome Web Store extension IDs are 32 lowercase letters a–p. */
+function isChromeExtensionId(input: string): boolean {
+  const s = input.trim();
+  return /^[a-p]{32}$/.test(s);
+}
+
+function getExtensionIdFromStoreUrl(storeUrl: string): string | null {
+  try {
+    const u = new URL(storeUrl.trim());
+    const segments = u.pathname.split("/").filter(Boolean);
+    return segments.length > 0 ? segments[segments.length - 1] : null;
+  } catch {
+    return null;
+  }
+}
+
+function isChromeStoreUrl(storeUrl: string): boolean {
+  const s = storeUrl.trim().toLowerCase();
+  return s.includes("chrome.google.com") || s.includes("chromewebstore.google.com");
+}
+
+function resolveExtensionId(input: string): string | null {
+  const s = input.trim();
+  if (isChromeExtensionId(s)) return s;
+  if (isChromeStoreUrl(s)) return getExtensionIdFromStoreUrl(s);
+  return null;
+}
+
+interface ExtensionManifestInfo {
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  iconDataUrl: string | null;
+  extensionId: string | null;
+  webStoreUrl: string | null;
+  /** Path to options page from manifest (options_ui.page or options_page), or null. */
+  optionsPage: string | null;
+}
+
+const MSG_PATTERN = /^__MSG_([a-zA-Z0-9@_]+)__$/;
+
+async function loadExtensionMessages(extPath: string): Promise<Record<string, string>> {
+  const localesPath = path.join(extPath, "_locales");
+  const out: Record<string, string> = {};
+  try {
+    const locales = await fs.readdir(localesPath);
+    const preferred = ["en", "en_US", "en_GB"];
+    const locale = preferred.find(l => locales.includes(l)) ?? locales[0];
+    const msgPath = path.join(localesPath, locale, "messages.json");
+    const raw = await fs.readFile(msgPath, "utf-8");
+    const json = JSON.parse(raw) as Record<string, { message?: string }>;
+    for (const [key, val] of Object.entries(json)) {
+      if (val?.message) out[key.toLowerCase()] = val.message;
+    }
+  } catch {
+    /* no _locales or invalid */
+  }
+  return out;
+}
+
+function resolveMessage(value: string, messages: Record<string, string>): string {
+  const trimmed = value.trim();
+  const m = trimmed.match(MSG_PATTERN);
+  if (!m) return value;
+  const key = m[1].toLowerCase();
+  return messages[key] ?? value;
+}
+
+async function getExtensionManifestData(extPath: string): Promise<ExtensionManifestInfo | null> {
+  try {
+    const manifestPath = path.join(extPath, "manifest.json");
+    const raw = await fs.readFile(manifestPath, "utf-8");
+    const manifest = JSON.parse(raw) as Record<string, unknown>;
+    const messages = await loadExtensionMessages(extPath);
+
+    let name = (manifest.name as string) ?? (manifest.short_name as string) ?? path.basename(extPath);
+    if (MSG_PATTERN.test(String(name).trim())) name = resolveMessage(name, messages);
+
+    let shortName = manifest.short_name as string | undefined;
+    if (shortName && MSG_PATTERN.test(String(shortName).trim())) shortName = resolveMessage(shortName, messages);
+    if (!name && shortName) name = shortName;
+    if (!name) name = path.basename(extPath);
+
+    const version = (manifest.version as string) ?? "";
+    let description = (manifest.description as string) ?? "";
+    if (description && MSG_PATTERN.test(description.trim())) description = resolveMessage(description, messages);
+
+    let author = "";
+    if (typeof manifest.author === "string") {
+      author = MSG_PATTERN.test(manifest.author.trim()) ? resolveMessage(manifest.author, messages) : manifest.author;
+    } else if (manifest.developer && typeof (manifest.developer as { name?: string }).name === "string") {
+      author = (manifest.developer as { name: string }).name;
+    }
+
+    const basename = path.basename(extPath);
+    const extensionId = isChromeExtensionId(basename) ? basename : null;
+    const webStoreUrl = extensionId != null ? `https://chrome.google.com/webstore/detail/${extensionId}` : null;
+
+    const optionsUi = manifest.options_ui as { page?: string } | undefined;
+    const optionsPageManifest = manifest.options_page as string | undefined;
+    const optionsPage =
+      (optionsUi?.page ?? optionsPageManifest) != null && String(optionsUi?.page ?? optionsPageManifest).trim() !== ""
+        ? String(optionsUi?.page ?? optionsPageManifest).trim()
+        : null;
+
+    let iconDataUrl: string | null = null;
+    const icons = manifest.icons as Record<string, string> | undefined;
+    if (icons && typeof icons === "object") {
+      const iconPath = icons["128"] ?? icons["48"] ?? icons["64"] ?? icons["32"] ?? icons["16"];
+      if (iconPath) {
+        try {
+          const absPath = path.join(extPath, iconPath);
+          const buf = await fs.readFile(absPath);
+          const mime = iconPath.endsWith(".png") ? "image/png" : iconPath.endsWith(".svg") ? "image/svg+xml" : "image/png";
+          iconDataUrl = `data:${mime};base64,${buf.toString("base64")}`;
+        } catch {
+          /* ignore icon read errors */
+        }
+      }
+    }
+
+    return {
+      name: String(name),
+      version: String(version),
+      description: String(description),
+      author: String(author),
+      iconDataUrl,
+      extensionId,
+      webStoreUrl,
+      optionsPage
+    };
+  } catch {
+    return null;
+  }
+}
 
 import MemoryStore from "./memory-store";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
@@ -175,6 +314,14 @@ let settingsWindow: BrowserWindow = null;
 let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
+
+/** Extension path → loaded extension ID (only for extensions loaded in the YTM session). */
+const extensionPathToExtensionId: Record<string, string> = {};
+
+/** Dedicated window for extension options (same session as YTM). Delayed destroy on close so extension can persist storage. */
+let extensionOptionsWindow: BrowserWindow | null = null;
+let extensionOptionsCloseTimeout: NodeJS.Timeout | null = null;
+let extensionOptionsForceDestroy = false;
 
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
@@ -396,6 +543,10 @@ const store = new Conf<StoreSchema>({
     },
     developer: {
       enableDevTools: false
+    },
+    extensions: {
+      extensionPaths: [],
+      disabledPaths: []
     }
   },
   beforeEachMigration: (store, context) => {
@@ -421,6 +572,14 @@ const store = new Conf<StoreSchema>({
     ">=2.0.7": store => {
       if (!store.has("appearance.trayIconStyle")) {
         store.set("appearance.trayIconStyle", 0);
+      }
+    },
+    ">=2.0.12": store => {
+      if (!store.has("extensions.extensionPaths")) {
+        store.set("extensions.extensionPaths", []);
+      }
+      if (!store.has("extensions.disabledPaths")) {
+        store.set("extensions.disabledPaths", []);
       }
     }
   }
@@ -1767,6 +1926,237 @@ app.on("ready", async () => {
     return appUpdateDownloaded;
   });
 
+  ipcMain.handle("app:selectExtensionFolder", async event => {
+    if (event.sender !== settingsWindow.webContents) return;
+
+    const result = await dialog.showOpenDialog(settingsWindow ?? mainWindow, {
+      properties: ["openDirectory"],
+      title: "Select unpacked extension folder"
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+    return null;
+  });
+
+  ipcMain.handle("app:installExtensionFromStoreUrl", async (event, urlOrId: string): Promise<string> => {
+    const toMessage = (err: unknown): string => (err instanceof Error ? err.message : err != null ? String(err) : "Unknown error");
+
+    let tempDir: string | null = null;
+
+    try {
+      try {
+        if (event.sender !== settingsWindow.webContents) {
+          return JSON.stringify({ path: null, error: "Unauthorized" });
+        }
+        if (typeof urlOrId !== "string" || !urlOrId.trim()) {
+          return JSON.stringify({ path: null, error: "Invalid URL or ID" });
+        }
+
+        const extensionId = resolveExtensionId(urlOrId);
+        if (!extensionId) {
+          return JSON.stringify({
+            path: null,
+            error: "Enter a Chrome Web Store URL or a 32-character extension ID (e.g. cmedhionkhpnakcndndgjdbohmhepckk)"
+          });
+        }
+
+        const extensionsDir = path.join(app.getPath("userData"), "extensions");
+        await fs.mkdir(extensionsDir, { recursive: true }).catch(() => {});
+
+        const outputDir = path.join(extensionsDir, extensionId);
+        tempDir = path.join(app.getPath("userData"), "temp", extensionId);
+
+        await fs.mkdir(tempDir, { recursive: true });
+        const storeUrl = `https://chrome.google.com/webstore/detail/e/${extensionId}`;
+        const { crxPath } = await chromeExtensionFetch.fetchExtensionZip(storeUrl, { outputDir: tempDir });
+        await unzipCrx(crxPath, outputDir);
+        log.info("Installed extension from store URL:", outputDir);
+        return JSON.stringify({ path: String(outputDir), error: null });
+      } catch (err) {
+        log.warn("Extension install from URL error:", err);
+        errorResult = toMessage(err);
+        return JSON.stringify({ path: null, error: errorResult });
+      } finally {
+        if (tempDir) await fs.rm(tempDir, { recursive: true }).catch(() => {});
+      }
+    } catch (outerErr) {
+      log.warn("Extension install from URL (outer):", outerErr);
+      return JSON.stringify({ path: null, error: toMessage(outerErr) });
+    }
+  });
+
+  ipcMain.handle("app:installExtensionFromCrxFile", async event => {
+    const toMessage = (err: unknown): string => (err instanceof Error ? err.message : err != null ? String(err) : "Unknown error");
+
+    try {
+      if (event.sender !== settingsWindow.webContents) return JSON.stringify({ path: null, error: "Unauthorized" });
+
+      const result = await dialog.showOpenDialog(settingsWindow ?? mainWindow, {
+        properties: ["openFile"],
+        title: "Select .crx extension file",
+        filters: [{ name: "Chrome extension", extensions: ["crx"] }]
+      });
+      if (result.canceled || result.filePaths.length === 0) return JSON.stringify({ path: null, error: null });
+
+      const crxPath = result.filePaths[0];
+      const extensionsDir = path.join(app.getPath("userData"), "extensions");
+      await fs.mkdir(extensionsDir, { recursive: true }).catch(() => {});
+
+      const baseName = path.basename(crxPath, path.extname(crxPath)) || path.basename(crxPath);
+      const outputDir = path.join(extensionsDir, baseName);
+
+      try {
+        await unzipCrx(crxPath, outputDir);
+        log.info("Installed extension from .crx:", outputDir);
+        return JSON.stringify({ path: String(outputDir), error: null });
+      } catch (err) {
+        log.warn("Extension install from .crx error:", err);
+        return JSON.stringify({ path: null, error: toMessage(err) });
+      }
+    } catch (outerErr) {
+      log.warn("Extension install from .crx (outer):", outerErr);
+      return JSON.stringify({ path: null, error: toMessage(outerErr) });
+    }
+  });
+
+  ipcMain.handle("app:getExtensionManifest", async (event, extPath: string) => {
+    if (event.sender !== settingsWindow.webContents) return JSON.stringify(null);
+    if (typeof extPath !== "string" || !extPath.trim()) return JSON.stringify(null);
+    const data = await getExtensionManifestData(extPath.trim());
+    return JSON.stringify(data);
+  });
+
+  ipcMain.handle("app:setExtensionDisabled", async (event, extPath: string, disabled: boolean) => {
+    if (event.sender !== settingsWindow.webContents) return;
+    if (typeof extPath !== "string" || !extPath.trim()) return;
+    const paths: string[] = store.get("extensions.extensionPaths") ?? [];
+    const current: string[] = store.get("extensions.disabledPaths") ?? [];
+    const path = extPath.trim();
+    if (!paths.includes(path)) return;
+    let next: string[];
+    if (disabled) next = current.includes(path) ? current : [...current, path];
+    else next = current.filter(p => p !== path);
+    store.set("extensions.disabledPaths", next);
+  });
+
+  ipcMain.handle("app:openExternalUrl", (event, url: string) => {
+    if (event.sender !== settingsWindow.webContents) return;
+    if (typeof url === "string" && url.startsWith("http")) shell.openExternal(url);
+  });
+
+  function openExtensionOptionsInDedicatedWindow(extPath: string): void {
+    const pathKey = extPath.trim();
+    const extensionId = extensionPathToExtensionId[pathKey];
+    if (!extensionId) return;
+    getExtensionManifestData(pathKey).then(manifestData => {
+      const optionsPage = manifestData?.optionsPage;
+      if (!optionsPage) return;
+      const optionsUrl = `chrome-extension://${extensionId}/${optionsPage.replace(/^\//, "")}`;
+      const ytmSession = session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev");
+      if (extensionOptionsWindow && !extensionOptionsWindow.isDestroyed()) {
+        if (extensionOptionsCloseTimeout) {
+          clearTimeout(extensionOptionsCloseTimeout);
+          extensionOptionsCloseTimeout = null;
+        }
+        extensionOptionsWindow.loadURL(optionsUrl);
+        extensionOptionsWindow.show();
+        extensionOptionsWindow.focus();
+        return;
+      }
+      if (extensionOptionsCloseTimeout) {
+        clearTimeout(extensionOptionsCloseTimeout);
+        extensionOptionsCloseTimeout = null;
+      }
+      extensionOptionsForceDestroy = false;
+      extensionOptionsWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        show: false,
+        webPreferences: {
+          session: ytmSession,
+          // Always allow DevTools for the options window so users can debug extension settings.
+          devTools: true
+        }
+      });
+      extensionOptionsWindow.setTitle(manifestData?.name ? `${manifestData.name} – Options` : "Extension options");
+      extensionOptionsWindow.on("close", event => {
+        if (extensionOptionsForceDestroy) {
+          extensionOptionsWindow = null;
+          return;
+        }
+        event.preventDefault();
+        extensionOptionsWindow?.hide();
+        if (extensionOptionsCloseTimeout) clearTimeout(extensionOptionsCloseTimeout);
+        extensionOptionsCloseTimeout = setTimeout(() => {
+          extensionOptionsCloseTimeout = null;
+          if (extensionOptionsWindow && !extensionOptionsWindow.isDestroyed()) {
+            extensionOptionsWindow.destroy();
+            extensionOptionsWindow = null;
+          }
+        }, 2500);
+      });
+      extensionOptionsWindow.loadURL(optionsUrl).then(() => {
+        extensionOptionsWindow?.show();
+        extensionOptionsWindow?.focus();
+        if (extensionOptionsWindow && !extensionOptionsWindow.isDestroyed()) {
+          extensionOptionsWindow.webContents.openDevTools({ mode: "detach" });
+        }
+      });
+    });
+  }
+
+  ipcMain.handle("app:openExtensionOptions", async (event, extPath: string) => {
+    const fromSettings = event.sender === settingsWindow?.webContents;
+    const fromMain = mainWindow && event.sender === mainWindow.webContents;
+    if (!fromSettings && !fromMain) return;
+    if (typeof extPath !== "string" || !extPath.trim()) return;
+    openExtensionOptionsInDedicatedWindow(extPath);
+  });
+
+  ipcMain.handle("app:getExtensionsWithOptions", async event => {
+    const fromMain = mainWindow && event.sender === mainWindow.webContents;
+    const fromSettings = settingsWindow && event.sender === settingsWindow.webContents;
+    if (!fromMain && !fromSettings) return [];
+    const extensionPaths: string[] = store.get("extensions.extensionPaths") ?? [];
+    const disabledPaths: string[] = store.get("extensions.disabledPaths") ?? [];
+    const disabledSet = new Set(disabledPaths);
+    const result: { path: string; name: string; iconDataUrl: string | null }[] = [];
+    for (const extPath of extensionPaths) {
+      if (disabledSet.has(extPath) || !extensionPathToExtensionId[extPath]) continue;
+      const manifest = await getExtensionManifestData(extPath);
+      if (!manifest?.optionsPage) continue;
+      result.push({ path: extPath, name: manifest.name, iconDataUrl: manifest.iconDataUrl });
+    }
+    return result;
+  });
+
+  ipcMain.handle("app:showExtensionOptionsMenu", async (event, clientX: number, clientY: number) => {
+    if (mainWindow == null || event.sender !== mainWindow.webContents) return;
+    const extensionPaths: string[] = store.get("extensions.extensionPaths") ?? [];
+    const disabledPaths: string[] = store.get("extensions.disabledPaths") ?? [];
+    const disabledSet = new Set(disabledPaths);
+    const items: { path: string; name: string }[] = [];
+    for (const extPath of extensionPaths) {
+      if (disabledSet.has(extPath) || !extensionPathToExtensionId[extPath]) continue;
+      const manifest = await getExtensionManifestData(extPath);
+      if (!manifest?.optionsPage) continue;
+      items.push({ path: extPath, name: manifest.name });
+    }
+    const template: MenuItemConstructorOptions[] =
+      items.length === 0
+        ? [{ label: "No extensions with options", enabled: false }]
+        : items.map(({ path: extPath, name }) => ({
+            label: name.length > 50 ? name.slice(0, 47) + "…" : name,
+            click: () => openExtensionOptionsInDedicatedWindow(extPath)
+          }));
+    const menu = Menu.buildFromTemplate(template);
+    const bounds = mainWindow.getBounds();
+    const screenX = Math.round(bounds.x + (typeof clientX === "number" ? clientX : 0));
+    const screenY = Math.round(bounds.y + (typeof clientY === "number" ? clientY : 0));
+    menu.popup({ window: mainWindow, x: screenX, y: screenY });
+  });
+
   ipcMain.on("app:restartApplicationForUpdate", event => {
     if (mainWindow && event.sender !== mainWindow.webContents && settingsWindow && event.sender !== settingsWindow.webContents) return;
 
@@ -1896,6 +2286,22 @@ app.on("ready", async () => {
     return map;
   }, {});
 
+  // Load Chrome extensions (e.g. adblockers) into the YTM session before creating the view
+  const extensionPaths: string[] = store.get("extensions.extensionPaths") ?? [];
+  const disabledPaths: string[] = store.get("extensions.disabledPaths") ?? [];
+  const disabledSet = new Set(disabledPaths);
+  const ytmSession = session.fromPartition(app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev");
+  for (const extPath of extensionPaths) {
+    if (disabledSet.has(extPath)) continue;
+    try {
+      const ext = await ytmSession.loadExtension(extPath);
+      extensionPathToExtensionId[extPath] = ext.id;
+      log.info(`Loaded extension: ${ext.name} (${ext.id}) from ${extPath}`);
+    } catch (err) {
+      log.warn(`Failed to load extension from ${extPath}:`, err);
+    }
+  }
+
   // Create the YouTube Music view
   createYTMView();
   log.info("Created YTM view");
@@ -1960,6 +2366,15 @@ app.on("before-quit", () => {
   log.info("Application quitting\n\n");
   applicationQuitting = true;
   saveState();
+  extensionOptionsForceDestroy = true;
+  if (extensionOptionsCloseTimeout) {
+    clearTimeout(extensionOptionsCloseTimeout);
+    extensionOptionsCloseTimeout = null;
+  }
+  if (extensionOptionsWindow && !extensionOptionsWindow.isDestroyed()) {
+    extensionOptionsWindow.destroy();
+    extensionOptionsWindow = null;
+  }
 });
 
 app.on("open-url", (_, url) => {

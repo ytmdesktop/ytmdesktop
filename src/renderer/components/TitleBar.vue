@@ -53,6 +53,13 @@ function restartApplicationForUpdate() {
 const ytmViewUnresponsive = ref<boolean>(false);
 const appUpdateDownloaded = ref<boolean>(false);
 
+function showExtensionOptionsMenu(event: MouseEvent) {
+  if (typeof window.ytmd.showExtensionOptionsMenu !== "function") return;
+  const target = event.currentTarget as HTMLElement;
+  const rect = target.getBoundingClientRect();
+  window.ytmd.showExtensionOptionsMenu(rect.left, rect.bottom);
+}
+
 if (props.isMainWindow) {
   const memoryStore = window.ytmd.memoryStore;
 
@@ -94,24 +101,27 @@ if (props.isMainWindow) {
       </div>
       <div class="app-buttons">
         <slot name="app-buttons"></slot>
-        <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
+        <button v-if="isMainWindow" type="button" class="app-button" tabindex="2" title="Extensions" @click="showExtensionOptionsMenu">
+          <span class="material-symbols-outlined">extension</span>
+        </button>
+        <button v-if="hasHomeButton" class="app-button" tabindex="3" @click="navigateToDefault">
           <span class="material-symbols-outlined">home</span>
         </button>
-        <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
+        <button v-if="hasSettingsButton" class="app-button" tabindex="4" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
       <div v-if="!wcoVisible" class="windows-action-buttons">
-        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="4" @click="minimizeWindow">
+        <button v-if="hasMinimizeButton" class="action-button window-minimize" tabindex="5" @click="minimizeWindow">
           <span class="material-symbols-outlined">remove</span>
         </button>
-        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="5" @click="maximizeWindow">
+        <button v-if="hasMaximizeButton && !windowMaximized" class="action-button window-maximize" tabindex="6" @click="maximizeWindow">
           <span class="material-symbols-outlined">square</span>
         </button>
-        <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="6" @click="restoreWindow">
+        <button v-if="hasMinimizeButton && windowMaximized" class="action-button window-restore" tabindex="7" @click="restoreWindow">
           <span class="material-symbols-outlined">filter_none</span>
         </button>
-        <button class="action-button window-close" tabindex="7" @click="closeWindow">
+        <button class="action-button window-close" tabindex="8" @click="closeWindow">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>

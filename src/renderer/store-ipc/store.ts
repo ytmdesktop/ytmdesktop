@@ -6,7 +6,13 @@ if (process.type !== "renderer") {
 
 export default class Store<TSchema> {
   public set(key: string, value?: unknown) {
-    return ipcRenderer.send("settings:set", key, value);
+    let payload: unknown = value;
+    try {
+      if (value !== undefined) payload = JSON.parse(JSON.stringify(value));
+    } catch {
+      /* leave payload as-is if not JSON-serializable */
+    }
+    return ipcRenderer.send("settings:set", key, payload);
   }
 
   public async get(key: keyof TSchema) {
