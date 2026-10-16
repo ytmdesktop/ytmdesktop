@@ -135,7 +135,8 @@ function createNavigationMenuArrows() {
   if (!pivotBar) {
     // New YTM UI
     const searchBar = document.querySelector("ytmusic-search-box");
-    const navBar = searchBar.parentNode;
+    const navBar = searchBar?.parentNode;
+    if (!navBar) return;
     navBar.insertBefore(historyForwardElement, searchBar);
     navBar.insertBefore(historyBackElement, historyForwardElement);
   } else {
@@ -175,8 +176,56 @@ async function hookPlayerApiEvents() {
 }
 
 function overrideHistoryButtonDisplay() {
-  // @ts-expect-error Style is reported as readonly but this still works
-  document.querySelector<HTMLElement>("#history-link .history-button").style = "display: inline-block !important;";
+  document.querySelector<HTMLElement>("#history-link .history-button")?.style.setProperty("display", "inline-block", "important");
+}
+
+let pageUnloaded = false;
+const pendingPlayerDelays = new Set<() => void>();
+window.addEventListener("pagehide", () => {
+  pageUnloaded = true;
+  for (const cancel of pendingPlayerDelays) cancel();
+});
+
+function playerDelay(milliseconds: number): Promise<void> {
+  return new Promise(resolve => {
+    const finish = () => {
+      clearTimeout(timer);
+      pendingPlayerDelays.delete(finish);
+      resolve();
+    };
+    const timer = setTimeout(finish, milliseconds);
+    pendingPlayerDelays.add(finish);
+    if (pageUnloaded) finish();
+  });
+}
+
+async function waitForPlayer(checkScript: string): Promise<boolean> {
+  const fastPollingDeadline = Date.now() + 10_000;
+  let reportedDelay = false;
+  while (!pageUnloaded) {
+    try {
+      const check = await webFrame.executeJavaScript(checkScript);
+      if (check()) return true;
+    } catch {
+      // Navigation and lazy player creation can transiently invalidate a check.
+    }
+    const backingOff = Date.now() >= fastPollingDeadline;
+    if (backingOff && !reportedDelay) {
+      console.warn("[YTMD] Desktop controls are still initializing; the YouTube Music website remains available.");
+      reportedDelay = true;
+    }
+    await playerDelay(backingOff ? 2_000 : 250);
+  }
+  return false;
+}
+
+async function optionalSetup(name: string, setup: () => void | Promise<void>) {
+  try {
+    await setup();
+  } catch {
+    // Keep remote page data and authentication details out of diagnostic logs.
+    console.warn(`[YTMD] ${name} is unavailable in this YouTube Music layout.`);
+  }
 }
 
 function getYTMTextRun(runs: { text: string }[]) {
@@ -201,6 +250,10 @@ function getYTMTextRun(runs: { text: string }[]) {
               window.__YTMD_HOOK__.ytmPlayerBar = this
             }
 
+            if (this.hostElement && this.hostElement.nodeName === "YTMUSIC-PLAYER") {
+              window.__YTMD_HOOK__.ytmPlayer = this
+            }
+
             if (this.store && !!this.store.getState && !!this.store.dispatch && !!this.store.subscribe) {
               window.__YTMD_HOOK__.ytmStore = this.store
             }
@@ -216,9 +269,9 @@ function getYTMTextRun(runs: { text: string }[]) {
     })
   `)
   )();
-})();
+})().catch(() => console.warn("[YTMD] The player hook could not be installed; the website remains available."));
 
-window.addEventListener("load", async () => {
+async function initializeYTMView() {
   if (window.location.hostname !== "music.youtube.com") {
     if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
@@ -226,59 +279,59 @@ window.addEventListener("load", async () => {
     return;
   }
 
-  await new Promise<void>(resolve => {
-    const interval = setInterval(async () => {
-      const hooked = (
-        await webFrame.executeJavaScript(`
+  // Showing the website must not depend on optional desktop integrations.
+  // In particular, signed-in accounts can receive a player layout we do not know yet.
+  ipcRenderer.send("ytmView:loaded");
+
+  const hooked = await waitForPlayer(`
         (function() {
-          if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi)) {
-            return true;
+          const hook = window.__YTMD_HOOK__;
+          if (!hook) return false;
+
+          const legacyElement = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+          const legacyPlayer = legacyElement?.polymerController ?? legacyElement;
+          if (legacyPlayer?.playerApi) hook.ytmPlayerBar = legacyPlayer;
+
+          if (!hook.ytmPlayerBar?.playerApi && document.querySelector("ytmusic-miniplayer, ytmusic-miniplayer-bar, ytmusic-player-controls")) {
+            const playerElement = document.querySelector("ytmusic-player");
+            const player = hook.ytmPlayer ?? playerElement?.polymerController ?? playerElement;
+            if (player?.playerApi) hook.ytmPlayerBar = player;
           }
-          
-          return false;
+
+          const playerStore = hook.ytmPlayerBar?.store;
+          if (!hook.ytmStore && playerStore?.getState && playerStore?.dispatch && playerStore?.subscribe) {
+            hook.ytmStore = playerStore;
+          }
+          return !!(hook.ytmStore && hook.ytmPlayerBar?.playerApi);
         })
-      `)
-      )();
+      `);
 
-      if (hooked) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 250);
-  });
+  if (!hooked) {
+    return;
+  }
 
-  let materialSymbolsLoaded = false;
-
-  const materialSymbols = createMaterialSymbolsLink();
-  materialSymbols.onload = () => {
-    materialSymbolsLoaded = true;
-  };
-  document.head.appendChild(materialSymbols);
-
-  await new Promise<void>(resolve => {
-    const interval = setInterval(async () => {
-      const playerApiReady: boolean = (
-        await webFrame.executeJavaScript(`
+  const playerApiReady = await waitForPlayer(`
           (function() {
-            return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.isReady();
+            return !!window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.isReady();
           })
-        `)
-      )();
+        `);
+  if (!playerApiReady) {
+    return;
+  }
 
-      if (materialSymbolsLoaded && playerApiReady) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 250);
+  // Fonts and cosmetic DOM changes must not keep the page or playback hidden.
+  await optionalSetup("Player styles", () => {
+    document.head.appendChild(createMaterialSymbolsLink());
+    createStyleSheet();
   });
-
-  createStyleSheet();
-  createNavigationMenuArrows();
-  createKeyboardNavigation();
-  await createAdditionalPlayerBarControls();
-  await hideChromecastButton();
-  await hookPlayerApiEvents();
-  overrideHistoryButtonDisplay();
+  await optionalSetup("Navigation arrows", createNavigationMenuArrows);
+  await optionalSetup("Keyboard navigation", createKeyboardNavigation);
+  if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
+    await optionalSetup("Additional player controls", createAdditionalPlayerBarControls);
+  }
+  await optionalSetup("Cast button integration", hideChromecastButton);
+  await optionalSetup("Playback metadata", hookPlayerApiEvents);
+  await optionalSetup("History button", overrideHistoryButtonDisplay);
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
 
@@ -286,8 +339,16 @@ window.addEventListener("load", async () => {
   const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
 
   if (continueWhereYouLeftOff) {
+    const hasSelectedVideo = (
+      await webFrame.executeJavaScript(`
+        (function() {
+          return !!window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse()?.videoDetails?.videoId;
+        })
+      `)
+    )();
     // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
-    if (!state.lastUrl.startsWith("https://music.youtube.com/watch")) {
+    // Also preserve playback the user starts while desktop controls are initializing.
+    if (!state.lastUrl.startsWith("https://music.youtube.com/watch") && !hasSelectedVideo) {
       if (state.lastVideoId) {
         // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
         let heightTransitionCount = 0;
@@ -308,7 +369,7 @@ window.addEventListener("load", async () => {
             }
           }
         };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+        document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.addEventListener("transitionend", transitionEnd);
 
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
@@ -323,23 +384,12 @@ window.addEventListener("load", async () => {
           })
         );
       }
-    } else {
-      (
-        await webFrame.executeJavaScript(`
-          (function() {
-            let playerResponse = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse();
-            if (playerResponse) {
-              window.ytmd.sendVideoData(playerResponse.videoDetails, window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlaylistId());
-            }
-          })
-        `)
-      )();
     }
   }
 
   const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
   if (alwaysShowVolumeSlider) {
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
   }
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
@@ -348,7 +398,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerState() === 1 ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
             })
           `)
         )();
@@ -521,7 +571,8 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").queue.shuffle();
+              const queue = document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.queue ?? document.querySelector("ytmusic-player-queue")?.polymerController?.queue;
+              queue?.shuffle();
             })
           `)
         )();
@@ -606,12 +657,12 @@ window.addEventListener("load", async () => {
   store.onDidAnyChange(newState => {
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider && !volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.add("ytmd-persist-volume-slider");
       }
     } else {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider?.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
     }
@@ -640,5 +691,11 @@ window.addEventListener("load", async () => {
     }
   });
 
-  ipcRenderer.send("ytmView:loaded");
-});
+  ipcRenderer.send("ytmView:integrationsReady");
+}
+
+window.addEventListener("load", () =>
+  initializeYTMView().catch(() => {
+    console.warn("[YTMD] Desktop integration setup failed; the YouTube Music website remains available.");
+  })
+);

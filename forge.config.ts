@@ -1,4 +1,7 @@
 import type { ForgeConfig } from "@electron-forge/shared-types";
+import { execFile } from "node:child_process";
+import path from "node:path";
+import { promisify } from "node:util";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
@@ -7,14 +10,17 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
-// There is probably a better way to do this, such as fetching it directly from forge
-let makerArch = null;
-for (let i = 0; i < process.argv.length; i++) {
-  const arg = process.argv[i];
-  if (arg === "--arch") {
-    makerArch = process.argv[i + 1];
-  }
-}
+const execFileAsync = promisify(execFile);
+
+// The fuse plugin runs before Packager updates Info.plist and renames helpers.
+// Sign the finished bundle so those changes do not invalidate its signature.
+const macSigningOptions = {
+  identity: "-",
+  identityValidation: false,
+  continueOnError: false,
+  // Ad-hoc identities have no Team ID for hardened runtime's library validation.
+  optionsForFile: () => ({ timestamp: "none", hardenedRuntime: false })
+};
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -40,9 +46,19 @@ const config: ForgeConfig = {
       }
     ],
     appCategoryType: "public.app-category.music",
-    asar: true
+    asar: true,
+    osxSign: macSigningOptions
   },
   rebuildConfig: {},
+  hooks: {
+    postPackage: async (_forgeConfig, { platform, outputPaths }) => {
+      if (platform !== "darwin") return;
+
+      for (const outputPath of outputPaths) {
+        await execFileAsync("/usr/bin/codesign", ["--verify", "--deep", "--strict", "--verbose=2", path.join(outputPath, "YouTube Music Desktop App.app")]);
+      }
+    }
+  },
   makers: [
     new MakerSquirrel({
       iconUrl: `https://raw.githubusercontent.com/${process.env.YTMD_UPDATE_FEED_OWNER ?? "ytmdesktop"}/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico`
@@ -115,7 +131,6 @@ const config: ForgeConfig = {
     }),
     new FusesPlugin({
       version: FuseVersion.V1,
-      resetAdHocDarwinSignature: process.platform === "darwin" && makerArch == "arm64",
       [FuseV1Options.RunAsNode]: false,
       [FuseV1Options.EnableCookieEncryption]: true,
       [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,

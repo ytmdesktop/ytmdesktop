@@ -1017,6 +1017,8 @@ function isPreventedNavOrRedirect(url: URL): boolean {
 }
 
 const createYTMView = (): void => {
+  memoryStore.set("ytmViewLoadingError", false);
+  memoryStore.set("ytmViewUnresponsive", false);
   memoryStore.set("ytmViewLoadTimedout", false);
   memoryStore.set("ytmViewLoading", true);
   memoryStore.set("ytmViewLoadingStatus", "Initializing...");
@@ -1030,6 +1032,12 @@ const createYTMView = (): void => {
       autoplayPolicy: store.get("playback.continueWhereYouLeftOffPaused") ? "document-user-activation-required" : "no-user-gesture-required"
     }
   });
+  // Use the real viewport before YouTube chooses its initial responsive player.
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    const bounds = mainWindow.getContentBounds();
+    const titleBarHeight = mainWindow.isFullScreen() ? 0 : 36;
+    ytmView.setBounds({ x: 0, y: titleBarHeight, width: bounds.width, height: bounds.height - titleBarHeight });
+  }
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
@@ -1576,21 +1584,24 @@ app.on("ready", async () => {
       memoryStore.set("ytmViewLoading", false);
       clearTimeout(ytmViewLoadTimeout);
       mainWindow.addBrowserView(ytmView);
+      const titleBarHeight = mainWindow.isFullScreen() ? 0 : 36;
       ytmView.setBounds({
         x: 0,
-        y: 36,
+        y: titleBarHeight,
         width: mainWindow.getContentBounds().width,
-        height: mainWindow.getContentBounds().height - 36
+        height: mainWindow.getContentBounds().height - titleBarHeight
       });
       if (process.env.NODE_ENV === "development") {
         ytmView.webContents.openDevTools({
           mode: "detach"
         });
       }
+    }
+  });
 
-      // TODO: this is just a hack fix for ratio volume to run the enable script
+  ipcMain.on("ytmView:integrationsReady", event => {
+    if (ytmView && event.sender === ytmView.webContents) {
       ratioVolume.ytmViewLoaded();
-      // TODO: this is just a hack fix for custom css to update CSS when the view loads
       customCss.updateCSS();
     }
   });
