@@ -1,4 +1,4 @@
-(function() {
+(function () {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
   const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
 
@@ -7,10 +7,10 @@
     let state = ytmStore.getState();
 
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-    const storeLikeStatus = state.likeStatus.videos[videoId];
-    
+    const storeLikeStatus = state.likeStatus?.videos?.[videoId];
+
     const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoId] : defaultLikeStatus;
     const volume = state.player.volume;
     const adPlaying = state.player.adPlaying;
@@ -25,48 +25,64 @@
   playerApi.addEventListener("onStateChange", state => {
     window.ytmd.sendVideoState(state);
   });
-  playerApi.addEventListener("onVideoDataChange", event => {
-    if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      let videoDetails = playerApi.getPlayerResponse().videoDetails;
-      let playlistId = playerApi.getPlaylistId();
-      let album = null;
-      let hasFullMetadata = false;
+  function sendVideoData() {
+    const responseDetails = playerApi.getPlayerResponse()?.videoDetails;
+    if (!responseDetails) return;
+    let videoDetails = { ...responseDetails };
+    let playlistId = playerApi.getPlaylistId();
+    let album = null;
+    let hasFullMetadata = false;
 
-      // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
-      let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
-      if (currentItem !== null && currentItem !== undefined) {
-        hasFullMetadata = true;
+    // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
+    let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar")?.currentItem;
+    if (currentItem !== null && currentItem !== undefined) {
+      hasFullMetadata = true;
 
-        // Fill out video details with better information
-        videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
-        videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
+      // Fill out video details with better information
+      if (currentItem.title?.runs) videoDetails.title = currentItem.title.runs.map(v => v.text).join(""); // Can contain featuring text which isn't in player response
+      if (currentItem.thumbnail) videoDetails.thumbnail = currentItem.thumbnail; // Can contain more thumbnails than player response
 
-        for (let i = 0; i < currentItem.longBylineText.runs.length; i++) {
-          const item = currentItem.longBylineText.runs[i];
-          if (item.navigationEndpoint) {
-            if (item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType === "MUSIC_PAGE_TYPE_ALBUM") {
-              album = {
-                id: item.navigationEndpoint.browseEndpoint.browseId,
-                text: item.text
-              }
-            }
+      const byline = currentItem.longBylineText?.runs ?? [];
+      for (let i = 0; i < byline.length; i++) {
+        const item = byline[i];
+        if (item.navigationEndpoint) {
+          if (
+            item.navigationEndpoint.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType ===
+            "MUSIC_PAGE_TYPE_ALBUM"
+          ) {
+            album = {
+              id: item.navigationEndpoint.browseEndpoint.browseId,
+              text: item.text
+            };
           }
         }
       }
+    }
 
-      let state = ytmStore.getState();
-      const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-      const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
-      const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
-      
-      const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+    let state = ytmStore.getState();
+    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
+    const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
+    const storeLikeStatus = state.likeStatus?.videos?.[videoDetails.videoId];
 
-      window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+    const likeStatus = storeLikeStatus ? state.likeStatus.videos[videoDetails.videoId] : defaultLikeStatus;
+
+    window.ytmd.sendVideoData(videoDetails, playlistId, album, likeStatus, hasFullMetadata);
+  }
+
+  playerApi.addEventListener("onVideoDataChange", event => {
+    if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
+      sendVideoData();
     }
   });
   ytmStore.subscribe(() => {
     sendStoreState();
   });
+  // The website can play before the optional desktop integration attaches.
+  // Snapshot current state so native controls do not wait for the next track.
+  sendStoreState();
+  if (typeof playerApi.getPlayerState === "function") window.ytmd.sendVideoState(playerApi.getPlayerState());
+  if (typeof playerApi.getCurrentTime === "function") window.ytmd.sendVideoProgress(playerApi.getCurrentTime());
+  sendVideoData();
   window.addEventListener("yt-action", e => {
     if (e.detail.actionName === "yt-service-request") {
       if (e.detail.args[1].createPlaylistServiceEndpoint) {
@@ -85,4 +101,4 @@
       window.ytmd.sendDeletePlaylistObservation(playlistId);
     }
   });
-})
+});

@@ -1,9 +1,10 @@
-(function() {
+(function () {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
   const videoId = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId;
-  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-  
+  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
+  if (!likeButtonData) return;
+
   let dislikeServiceEndpoint = null;
   let indifferentServiceEndpoint = null;
 
@@ -30,10 +31,7 @@
       composed: true,
       detail: {
         actionName: "yt-service-request",
-        args: [
-          document.querySelector("ytmusic-like-button-renderer"),
-          indifferentServiceEndpoint
-        ],
+        args: [document.querySelector("ytmusic-like-button-renderer"), indifferentServiceEndpoint],
         optionalAction: false,
         returnValue: []
       }
@@ -45,10 +43,7 @@
       composed: true,
       detail: {
         actionName: "yt-service-request",
-        args: [
-          document.querySelector("ytmusic-like-button-renderer"),
-          dislikeServiceEndpoint
-        ],
+        args: [document.querySelector("ytmusic-like-button-renderer"), dislikeServiceEndpoint],
         optionalAction: false,
         returnValue: []
       }
@@ -56,4 +51,4 @@
   }
 
   if (serviceEvent) document.querySelector("ytmusic-like-button-renderer").dispatchEvent(new CustomEvent("yt-action", serviceEvent));
-})
+});
