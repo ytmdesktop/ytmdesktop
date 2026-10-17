@@ -28,6 +28,7 @@ declare global {
 
       // Main window specific
       switchFocus(context: "main" | "ytm"): void;
+      toggleLyrics?(): void;
 
       // YTM view specific
       ytmViewNavigateDefault(): void;

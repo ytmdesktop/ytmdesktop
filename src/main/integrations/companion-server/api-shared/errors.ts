@@ -32,7 +32,9 @@ export const AuthorizationTooManyError = createError<[]>("AUTHORIZATION_TOO_MANY
 export const YouTubeMusicUnavailableError = createError<[]>("YOUTUBE_MUSIC_UNVAILABLE", "YouTube Music is currently unvailable", 503);
 export const YouTubeMusicTimeOutError = createError<[]>("YOUTUBE_MUSIC_TIME_OUT", "Response from YouTube Music took too long", 504);
 
-export function isDefinedAPIError(error: FastifyError): boolean {
-  if (errorCodes.includes(error.code)) return true;
+export function isDefinedAPIError(error: unknown): boolean {
+  if (error && typeof error === "object" && "code" in error && typeof (error as FastifyError).code === "string") {
+    return errorCodes.includes((error as FastifyError).code);
+  }
   return false;
 }

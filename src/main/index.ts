@@ -328,6 +328,7 @@ function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<
   if (newState.shortcuts.thumbsUp !== oldState.shortcuts.thumbsUp) return true;
   if (newState.shortcuts.volumeDown !== oldState.shortcuts.volumeDown) return true;
   if (newState.shortcuts.volumeUp !== oldState.shortcuts.volumeUp) return true;
+  if (newState.shortcuts.toggleLyrics !== oldState.shortcuts.toggleLyrics) return true;
 
   return false;
 }
@@ -361,7 +362,13 @@ const store = new Conf<StoreSchema>({
       continueWhereYouLeftOffPaused: true,
       enableSpeakerFill: false,
       progressInTaskbar: false,
-      ratioVolume: false
+      ratioVolume: false,
+      liveLyricsEnabled: true,
+      liveLyricsDefaultMode: "line",
+      liveLyricsLanguage: "default",
+      liveLyricsFontSize: 32,
+      liveLyricsGradientBg: true,
+      liveLyricsInstrumentalBreaks: true
     },
     integrations: {
       companionServerEnabled: false,
@@ -377,7 +384,8 @@ const store = new Conf<StoreSchema>({
       thumbsUp: "",
       thumbsDown: "",
       volumeUp: "",
-      volumeDown: ""
+      volumeDown: "",
+      toggleLyrics: ""
     },
     state: {
       lastUrl: "https://music.youtube.com/",
@@ -863,6 +871,29 @@ function registerShortcuts() {
     }
   } else {
     memoryStore.set("shortcutsVolumeDownRegisterFailed", false);
+  }
+
+  if (shortcuts.toggleLyrics) {
+    let registered = false;
+    try {
+      registered = globalShortcut.register(shortcuts.toggleLyrics, () => {
+        if (ytmView) {
+          ytmView.webContents.send("remoteControl:execute", "toggleLyrics");
+        }
+      });
+    } catch {
+      /* empty */
+    }
+
+    if (!registered) {
+      log.info("Failed to register shortcut: toggleLyrics");
+      memoryStore.set("shortcutsToggleLyricsRegisterFailed", true);
+    } else {
+      log.info("Registered shortcut: toggleLyrics");
+      memoryStore.set("shortcutsToggleLyricsRegisterFailed", false);
+    }
+  } else {
+    memoryStore.set("shortcutsToggleLyricsRegisterFailed", false);
   }
 
   log.info("Registered shortcuts");
@@ -1520,6 +1551,14 @@ app.on("ready", async () => {
     if (event.sender !== mainWindow.webContents) return;
 
     sendMainWindowStateIpc();
+  });
+
+  ipcMain.on("mainWindow:toggleLyrics", event => {
+    if (mainWindow !== null && ytmView !== null) {
+      if (event.sender !== mainWindow.webContents) return;
+
+      ytmView.webContents.send("remoteControl:execute", "toggleLyrics");
+    }
   });
 
   // Handle settings window ipc

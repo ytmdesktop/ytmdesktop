@@ -32,6 +32,7 @@ const closeWindow = window.ytmd.closeWindow;
 
 const openSettingsWindow = window.ytmd.openSettingsWindow;
 const navigateToDefault = window.ytmd.ytmViewNavigateDefault;
+const toggleLyrics = window.ytmd.toggleLyrics;
 
 const wcoVisible = ref(window.navigator.windowControlsOverlay.visible);
 const windowMaximized = ref(false);
@@ -94,10 +95,13 @@ if (props.isMainWindow) {
       </div>
       <div class="app-buttons">
         <slot name="app-buttons"></slot>
-        <button v-if="hasHomeButton" class="app-button" tabindex="2" @click="navigateToDefault">
+        <button v-if="isMainWindow" class="app-button" tabindex="2" title="Live Lyrics (L)" @click="toggleLyrics">
+          <span class="material-symbols-outlined">mic</span>
+        </button>
+        <button v-if="hasHomeButton" class="app-button" tabindex="3" @click="navigateToDefault">
           <span class="material-symbols-outlined">home</span>
         </button>
-        <button v-if="hasSettingsButton" class="app-button" tabindex="3" @click="openSettingsWindow">
+        <button v-if="hasSettingsButton" class="app-button" tabindex="4" @click="openSettingsWindow">
           <span class="material-symbols-outlined">settings</span>
         </button>
       </div>
