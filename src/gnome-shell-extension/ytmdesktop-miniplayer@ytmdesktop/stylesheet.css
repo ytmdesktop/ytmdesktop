@@ -1,0 +1,455 @@
+.ytmd-menu .popup-menu-content {
+  padding: 0;
+}
+
+#panel .panel-button.ytmd-tray-button {
+  -natural-hpadding: 12px;
+  -minimum-hpadding: 6px;
+}
+
+#panel .panel-button.ytmd-tray-button .ytmd-tray-icon {
+  icon-size: 16px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+}
+
+.ytmd-search-wrap {
+  padding: 14px 14px 8px 14px;
+  spacing: 10px;
+}
+
+.ytmd-popup {
+  padding: 6px 14px 14px 14px;
+  spacing: 12px;
+}
+
+.ytmd-size-small .ytmd-search-wrap,
+.ytmd-size-small .ytmd-popup { width: 280px; }
+.ytmd-size-medium .ytmd-search-wrap,
+.ytmd-size-medium .ytmd-popup { width: 400px; }
+.ytmd-size-large .ytmd-search-wrap,
+.ytmd-size-large .ytmd-popup { width: 520px; }
+
+.ytmd-size-small .ytmd-results-scroll { max-height: 0; }
+.ytmd-size-medium .ytmd-results-scroll { max-height: 180px; }
+.ytmd-size-large .ytmd-results-scroll { max-height: 280px; }
+
+.ytmd-size-small .ytmd-title { font-size: 13px; }
+.ytmd-size-small .ytmd-art-wrap,
+.ytmd-size-small .ytmd-art-overlay,
+.ytmd-size-small .ytmd-art {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  border-radius: 6px;
+}
+.ytmd-size-medium .ytmd-art-wrap,
+.ytmd-size-medium .ytmd-art-overlay,
+.ytmd-size-medium .ytmd-art {
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  max-width: 96px;
+  max-height: 96px;
+  border-radius: 8px;
+}
+.ytmd-size-large .ytmd-title { font-size: 18px; }
+.ytmd-size-large .ytmd-art-wrap,
+.ytmd-size-large .ytmd-art-overlay,
+.ytmd-size-large .ytmd-art {
+  width: 128px;
+  height: 128px;
+  min-width: 128px;
+  min-height: 128px;
+  max-width: 128px;
+  max-height: 128px;
+  border-radius: 10px;
+}
+
+.ytmd-search-entry {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-results-box {
+  spacing: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-results-header {
+  spacing: 8px;
+  padding: 0 2px;
+}
+
+.ytmd-results-label {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  font-weight: 600;
+  padding-top: 4px;
+}
+
+.ytmd-order-toggle {
+  spacing: 2px;
+  padding: 2px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+}
+
+.ytmd-order-button {
+  padding: 2px 6px;
+  color: rgba(255, 255, 255, 0.62);
+  background-color: transparent;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ytmd-order-button:hover,
+.ytmd-order-button:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-order-button-selected,
+.ytmd-order-button-selected:hover,
+.ytmd-order-button-selected:focus {
+  color: #151515;
+  background-color: #ffffff;
+}
+
+.ytmd-results-scroll {
+  max-height: 240px;
+}
+
+.ytmd-results {
+  padding-right: 16px;
+  spacing: 2px;
+}
+
+.ytmd-results-status {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  padding: 6px 2px;
+}
+
+.ytmd-result-row {
+  spacing: 10px;
+  padding: 6px 2px;
+  border-radius: 10px;
+}
+
+.ytmd-result-art-wrap,
+.ytmd-result-art-overlay,
+.ytmd-result-art {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 8px;
+}
+
+.ytmd-result-art {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ytmd-result-art-wrap {
+  padding: 0;
+  border-width: 0;
+  background-color: transparent;
+}
+
+.ytmd-result-details-button {
+  padding: 2px 6px;
+  border-width: 0;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+.ytmd-result-details-button:hover,
+.ytmd-result-details-button:focus {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.ytmd-artist-header {
+  spacing: 8px;
+  padding: 2px;
+}
+
+.ytmd-artist-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ytmd-section-divider {
+  spacing: 6px;
+  padding: 6px 2px 1px;
+}
+
+.ytmd-section-divider-label {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.ytmd-section-divider-line {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.ytmd-artist-status {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  padding: 4px 2px;
+}
+
+.ytmd-artist-actions {
+  spacing: 6px;
+  padding: 4px 2px;
+}
+
+.ytmd-artist-action {
+  padding: 3px 8px;
+  color: rgba(255, 255, 255, 0.72);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ytmd-artist-action:hover,
+.ytmd-artist-action:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.ytmd-result-art-wrap:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.ytmd-result-art-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.ytmd-result-details {
+  spacing: 2px;
+}
+
+.ytmd-result-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ytmd-result-artist {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+
+.ytmd-player-row {
+  spacing: 16px;
+}
+
+.ytmd-art-wrap,
+.ytmd-art-overlay,
+.ytmd-art {
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  max-width: 96px;
+  max-height: 96px;
+  border-radius: 8px;
+  background-color: #111111;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.ytmd-art-wrap {
+  padding: 0;
+  border-width: 0;
+}
+
+.ytmd-art-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.ytmd-mini-progress-track {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+}
+
+.ytmd-mini-progress-fill {
+  height: 3px;
+  background-color: #ffffff;
+  border-radius: 99px;
+}
+
+.ytmd-volume-row {
+  spacing: 10px;
+  padding: 2px 0 6px 0;
+}
+
+.ytmd-volume-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.ytmd-volume-slider {
+  height: 16px;
+  -barlevel-height: 4px;
+  -barlevel-background-color: rgba(255, 255, 255, 0.18);
+  -barlevel-active-background-color: #e95420;
+  -barlevel-overdrive-color: #e95420;
+  -barlevel-border-width: 0;
+  color: #ffffff;
+}
+
+.ytmd-like-on {
+  color: #ff5544;
+}
+
+.ytmd-dislike-on {
+  color: #8ab4f8;
+}
+
+.ytmd-details {
+  spacing: 6px;
+}
+
+.ytmd-marquee-clip {
+  min-width: 0;
+}
+
+.ytmd-skip-ad-button {
+  background-color: rgba(255, 0, 51, 0.18);
+  border-radius: 999px;
+}
+
+.ytmd-title-row {
+  spacing: 6px;
+}
+
+.ytmd-ad-badge {
+  background-color: #ff0033;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.ytmd-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ytmd-artist {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+}
+
+.ytmd-slider {
+  height: 14px;
+}
+
+.ytmd-times {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+}
+
+.ytmd-controls {
+  spacing: 10px;
+}
+
+.ytmd-size-small .ytmd-player-row { spacing: 10px; }
+.ytmd-size-small .ytmd-controls { spacing: 6px; }
+.ytmd-size-small .ytmd-icon-button {
+  width: 34px;
+  height: 34px;
+}
+
+.ytmd-icon-button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: transparent;
+  border-radius: 99px;
+}
+
+.ytmd-icon-button:hover,
+.ytmd-icon-button:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.ytmd-play-button {
+  width: 44px;
+  height: 44px;
+  color: #151515;
+  background-color: #ffffff;
+}
+
+.ytmd-play-button:hover,
+.ytmd-play-button:focus {
+  color: #151515;
+  background-color: #f2f2f2;
+}
+
+.ytmd-open-button {
+  padding: 8px 12px;
+  color: #151515;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+
+.ytmd-open-button:hover,
+.ytmd-open-button:focus {
+  color: #151515;
+  background-color: #f2f2f2;
+}
+
+.ytmd-footer {
+  padding-top: 8px;
+  spacing: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ytmd-quit-button:hover,
+.ytmd-quit-button:focus {
+  color: #ffffff;
+  background-color: #c42b2b;
+}
+
+.ytmd-action-tooltip {
+  background-color: #202020;
+  color: #f1f1f1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  max-width: 360px;
+}
+
+.ytmd-recovery-overlay {
+    background-color: rgba(55, 55, 55, 0.88);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.ytmd-recovery-message {
+    color: #eeeeee;
+    text-align: center;
+    max-width: 230px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}

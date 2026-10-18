@@ -1,85 +1,6 @@
 import { EventEmitter } from "events";
-
-export enum VideoState {
-  Unknown = -1,
-  Paused = 0,
-  Playing = 1,
-  Buffering = 2
-}
-
-export enum RepeatMode {
-  Unknown = -1,
-  None = 0,
-  All = 1,
-  One = 2
-}
-
-export enum LikeStatus {
-  Unknown = -1,
-  Dislike = 0,
-  Indifferent = 1,
-  Like = 2
-}
-
-export enum VideoType {
-  Unknown = -1,
-  MusicAudio = 0,
-  MusicVideo = 1,
-  MusicUploaded = 2,
-  PodcastEpisode = 3
-}
-
-export type Thumbnail = {
-  height: number;
-  url: string;
-  width: number;
-};
-
-export type VideoDetails = {
-  album: string;
-  albumId: string;
-  author: string;
-  channelId: string;
-  durationSeconds: number;
-  thumbnails: Thumbnail[];
-  title: string;
-  id: string;
-  likeStatus: LikeStatus;
-  videoType: VideoType;
-  isLive: boolean;
-};
-
-export type PlayerQueueItem = {
-  thumbnails: Thumbnail[];
-  title: string;
-  author: string;
-  duration: string;
-  selected: boolean;
-  videoId: string;
-  counterparts: PlayerQueueItem[];
-};
-
-export type PlayerQueue = {
-  automixItems: PlayerQueueItem[];
-  autoplay: boolean;
-  isGenerating: boolean;
-  isInfinite: boolean;
-  items: PlayerQueueItem[];
-  repeatMode: RepeatMode;
-  selectedItemIndex: number;
-};
-
-export type PlayerState = {
-  videoDetails: VideoDetails;
-  playlistId: string;
-  trackState: VideoState;
-  queue: PlayerQueue;
-  videoProgress: number;
-  volume: number;
-  muted: boolean;
-  adPlaying: boolean;
-  hasFullMetadata: boolean;
-};
+export * from "../../shared/player-state";
+import { AdDetails, LikeStatus, PlayerQueue, PlayerQueueItem, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "../../shared/player-state";
 
 enum YTMVideoState {
   Unstarted = -1,
@@ -94,6 +15,17 @@ type YTMThumbnail = {
   height: number;
   url: string;
   width: number;
+};
+
+type YTMAdDetails = {
+  title: string | null;
+  advertiser: string | null;
+  badge: string | null;
+  durationSeconds: number;
+  progressSeconds: number;
+  isPlaying: boolean;
+  canSkip: boolean;
+  skipHint: string | null;
 };
 
 type YTMTextRun = {
@@ -234,8 +166,15 @@ function transformRepeatMode(repeatMode: YTMRepeatMode) {
   }
 }
 
-function transformLikeStatus(likeStatus: YTMLikeStatus) {
-  switch (likeStatus) {
+function concreteLikeStatus(likeStatus: string | null | undefined): YTMLikeStatus | null {
+  if (typeof likeStatus !== "string") return null;
+  const status = likeStatus.toUpperCase();
+  if (status === "LIKE" || status === "DISLIKE" || status === "INDIFFERENT") return status;
+  return null;
+}
+
+function transformLikeStatus(likeStatus: YTMLikeStatus | string | null | undefined) {
+  switch (concreteLikeStatus(likeStatus)) {
     case "DISLIKE": {
       return LikeStatus.Dislike;
     }
@@ -288,6 +227,7 @@ class PlayerStateStore {
   private volume: number = 0;
   private muted: boolean = false;
   private adPlaying: boolean = false;
+  private adDetails: AdDetails | null = null;
   private hasFullMetadata: boolean = false;
   private eventEmitter = new EventEmitter();
 
@@ -307,6 +247,7 @@ class PlayerStateStore {
       volume: this.volume,
       muted: this.muted,
       adPlaying: this.adPlaying,
+      adDetails: this.adDetails,
       hasFullMetadata: this.hasFullMetadata
     };
   }
@@ -317,6 +258,25 @@ class PlayerStateStore {
 
   public getPlaylistId() {
     return this.playlistId;
+  }
+
+  // Ads are observed straight off the real player element; nothing in the YTM playerApi or its
+  // store reports them reliably.
+  public updateAdState(adDetails: YTMAdDetails | null) {
+    this.adPlaying = !!adDetails;
+    this.adDetails = adDetails
+      ? {
+          title: adDetails.title ?? null,
+          advertiser: adDetails.advertiser ?? null,
+          badge: adDetails.badge ?? null,
+          durationSeconds: adDetails.durationSeconds ?? 0,
+          progressSeconds: adDetails.progressSeconds ?? 0,
+          isPlaying: adDetails.isPlaying === true,
+          canSkip: adDetails.canSkip === true,
+          skipHint: adDetails.skipHint ?? null
+        }
+      : null;
+    this.eventEmitter.emit("stateChanged", this.getState());
   }
 
   public updateVideoProgress(progress: number) {
@@ -378,8 +338,7 @@ class PlayerStateStore {
     queueState: YTMPlayerQueue | null,
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
-    muted: boolean | null,
-    adPlaying: boolean | null
+    muted: boolean | null
   ) {
     const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
     const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
@@ -399,10 +358,10 @@ class PlayerStateStore {
           })
         }
       : null;
-    if (this.videoDetails) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus);
+    const nextLikeStatus = concreteLikeStatus(likeStatus);
+    if (this.videoDetails && nextLikeStatus) {
+      this.videoDetails.likeStatus = transformLikeStatus(nextLikeStatus);
     }
-    this.adPlaying = adPlaying === true;
     this.muted = muted === true;
     if (typeof volume === "number" && volume >= 0) this.volume = volume;
 

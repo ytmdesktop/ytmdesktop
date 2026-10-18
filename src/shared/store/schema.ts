@@ -25,6 +25,7 @@ export type StoreSchema = {
   playback: {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
+    linuxMiniPlayerAutoplay: boolean;
     enableSpeakerFill: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
@@ -81,6 +82,7 @@ export type MemoryStoreSchema = {
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
   ytmViewUnresponsive: boolean;
+  linuxMiniPlayerActive: boolean;
   appUpdateAvailable: boolean;
   appUpdateDownloaded: boolean;
 };
