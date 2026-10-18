@@ -50,12 +50,11 @@ export default class CompanionServer implements IIntegration {
         return this.memoryStore;
       }
     });
-    this.fastifyServer.setErrorHandler((error, request, reply) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.fastifyServer.setErrorHandler((error: any, request, reply) => {
       if (!isDefinedAPIError(error)) {
         if (!error.statusCode || error.statusCode >= 500) {
-          log.error(error);
-          reply.send(new Error("An internal server error occurred"));
-          return;
+          log.error("Companion server internal error", error);
         }
       }
 

@@ -22,11 +22,13 @@ import Conf from "conf";
 import log from "electron-log";
 import path from "path";
 import fs from "fs/promises";
+// @ts-expect-error No type definitions available for electron-squirrel-startup
 import electronSquirrelStartup from "electron-squirrel-startup";
 
 import MemoryStore from "./memory-store";
 import playerStateStore, { PlayerState, VideoState } from "./player-state-store";
-import { MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import { LyricsFontSize, MemoryStoreSchema, StoreSchema, TrayIconStyle } from "../shared/store/schema";
+import LyricsFeature from "./features/lyrics";
 
 import CompanionServer from "./integrations/companion-server";
 import CustomCSS from "./integrations/custom-css";
@@ -167,6 +169,7 @@ const discordPresence = new DiscordPresence();
 const lastFMScrobbler = new LastFM();
 const nowPlayingNotifications = new NowPlayingNotifications();
 const ratioVolume = new VolumeRatio();
+const lyricsFeature = new LyricsFeature();
 
 const ytmViewIntegrationScripts: { [name: string]: { [name: string]: string } } = {};
 
@@ -361,7 +364,12 @@ const store = new Conf<StoreSchema>({
       continueWhereYouLeftOffPaused: true,
       enableSpeakerFill: false,
       progressInTaskbar: false,
-      ratioVolume: false
+      ratioVolume: false,
+      lyricsEnabled: false,
+      lyricsPreferSynced: true,
+      lyricsFontSize: LyricsFontSize.Medium,
+      lyricsFontSizePx: 26,
+      lyricsDebug: false
     },
     integrations: {
       companionServerEnabled: false,
@@ -422,9 +430,43 @@ const store = new Conf<StoreSchema>({
       if (!store.has("appearance.trayIconStyle")) {
         store.set("appearance.trayIconStyle", 0);
       }
+    },
+    ">=2.0.11": store => {
+      if (!store.has("playback.lyricsEnabled")) {
+        store.set("playback.lyricsEnabled", false);
+      }
+      if (!store.has("playback.lyricsPreferSynced")) {
+        store.set("playback.lyricsPreferSynced", true);
+      }
+      if (!store.has("playback.lyricsFontSize")) {
+        store.set("playback.lyricsFontSize", LyricsFontSize.Medium);
+      }
+      if (!store.has("playback.lyricsFontSizePx")) {
+        store.set("playback.lyricsFontSizePx", 26);
+      }
+      if (!store.has("playback.lyricsDebug")) {
+        store.set("playback.lyricsDebug", false);
+      }
     }
   }
 });
+
+if (!store.has("playback.lyricsEnabled")) {
+  store.set("playback.lyricsEnabled", false);
+}
+if (!store.has("playback.lyricsPreferSynced")) {
+  store.set("playback.lyricsPreferSynced", true);
+}
+if (!store.has("playback.lyricsFontSize")) {
+  store.set("playback.lyricsFontSize", LyricsFontSize.Medium);
+}
+if (!store.has("playback.lyricsFontSizePx")) {
+  store.set("playback.lyricsFontSizePx", 26);
+}
+if (!store.has("playback.lyricsDebug")) {
+  store.set("playback.lyricsDebug", false);
+}
+
 store.onDidAnyChange(async (newState, oldState) => {
   if (settingsWindow !== null) {
     settingsWindow.webContents.send("settings:stateChanged", newState, oldState);
@@ -480,6 +522,14 @@ store.onDidAnyChange(async (newState, oldState) => {
   } else if (!newState.playback.ratioVolume && oldState.playback.ratioVolume) {
     ratioVolume.disable();
     log.info("Integration disabled: Ratio volume");
+  }
+
+  if (newState.playback.lyricsEnabled && !oldState.playback.lyricsEnabled) {
+    lyricsFeature.enable();
+    log.info("Feature enabled: Synced lyrics");
+  } else if (!newState.playback.lyricsEnabled && oldState.playback.lyricsEnabled) {
+    lyricsFeature.disable();
+    log.info("Feature disabled: Synced lyrics");
   }
 
   // Integrations
@@ -1033,6 +1083,7 @@ const createYTMView = (): void => {
   companionServer.provide(store, memoryStore, ytmView);
   customCss.provide(store, ytmView);
   ratioVolume.provide(ytmView);
+  lyricsFeature.provide(store, ytmView, app.getPath("userData"));
 
   // Attach events to ytm view
   ytmView.webContents.on("will-navigate", event => {
@@ -1592,6 +1643,7 @@ app.on("ready", async () => {
       ratioVolume.ytmViewLoaded();
       // TODO: this is just a hack fix for custom css to update CSS when the view loads
       customCss.updateCSS();
+      lyricsFeature.ytmViewLoaded();
     }
   });
 
@@ -1635,6 +1687,20 @@ app.on("ready", async () => {
     if (event.sender !== ytmView.webContents) return;
 
     playerStateStore.updateFromStore(queue, likeStatus, volume, muted, adPlaying);
+  });
+
+  ipcMain.on("ytmView:lyricsSeekTo", (event, positionSeconds) => {
+    if (event.sender !== ytmView.webContents) return;
+
+    const parsedPosition = Number(positionSeconds);
+    if (Number.isNaN(parsedPosition) || parsedPosition < 0) {
+      return;
+    }
+
+    const durationSeconds = playerStateStore.getState().videoDetails?.durationSeconds;
+    const safePosition = typeof durationSeconds === "number" ? Math.min(parsedPosition, durationSeconds) : parsedPosition;
+
+    ytmView.webContents.send("remoteControl:execute", "seekTo", safePosition);
   });
 
   ipcMain.on("ytmView:switchFocus", (event, context) => {
@@ -1697,6 +1763,11 @@ app.on("ready", async () => {
   ipcMain.on("settings:set", (event, key: string, value?: unknown) => {
     if (settingsWindow && event.sender !== settingsWindow.webContents) return;
 
+    if (value === undefined) {
+      log.warn(`Ignored settings:set for '${key}' with undefined value`);
+      return;
+    }
+
     store.set(key, value);
   });
 
@@ -1718,6 +1789,17 @@ app.on("ready", async () => {
     if (event.sender !== settingsWindow.webContents) return;
 
     store.reset(key);
+  });
+
+  ipcMain.handle("settings:lyricsCacheStats", async event => {
+    if (event.sender !== settingsWindow.webContents) return;
+    return lyricsFeature.getCacheStats();
+  });
+
+  ipcMain.handle("settings:lyricsCacheClear", async event => {
+    if (event.sender !== settingsWindow.webContents) return;
+    await lyricsFeature.clearCache();
+    return lyricsFeature.getCacheStats();
   });
 
   // Handle safeStorage ipc
@@ -1930,6 +2012,13 @@ app.on("ready", async () => {
     ratioVolume.provide(ytmView);
     ratioVolume.enable();
     log.info("Integration enabled: Ratio volume");
+  }
+
+  // SyncedLyrics
+  if (store.get("playback").lyricsEnabled) {
+    lyricsFeature.provide(store, ytmView, app.getPath("userData"));
+    lyricsFeature.enable();
+    log.info("Feature enabled: Synced lyrics");
   }
 
   // CompanionServer
