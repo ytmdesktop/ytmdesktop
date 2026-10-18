@@ -45,14 +45,17 @@ jobs:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
           NODE_ENV: production
-        run: pnpm make --arch ${{ matrix.arch }}
+        run: pnpm make --arch ${{ matrix.os.arch }}
 
       - name: Generate artifact attestation
         uses: actions/attest@v4
         with:
           subject-path: out/make/**/*
 
-      - name: Release From Make (${{ matrix.arch }})
+      - name: Release From Make (${{ matrix.os.arch }})
         run: pnpm release:frommake
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
+          NODE_ENV: production
