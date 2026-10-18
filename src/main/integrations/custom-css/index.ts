@@ -57,9 +57,9 @@ export default class CustomCSS extends Integration {
     this.removeCSS();
   }
 
-  public updateCSS(): void {
-    this.removeCSS();
-    this.injectCSS();
+  public async updateCSS() {
+    await this.removeCSS();
+    await this.injectCSS();
   }
 
   private async injectCSS() {
