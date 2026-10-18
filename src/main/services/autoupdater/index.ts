@@ -6,8 +6,8 @@ import MemoryStore from "../memorystore";
 import { MemoryStoreSchema } from "~shared/store/schema";
 
 declare const YTMD_DISABLE_UPDATES: boolean;
-declare const YTMD_UPDATE_FEED_OWNER: string;
-declare const YTMD_UPDATE_FEED_REPOSITORY: string;
+declare const YTMD_UPDATE_FEED_OWNER: string | null | undefined;
+declare const YTMD_UPDATE_FEED_REPOSITORY: string | null | undefined;
 
 export interface AutoUpdaterEvents {
   "checking": [];
@@ -25,23 +25,26 @@ export enum AutoUpdaterState {
   Error
 }
 
-const UPDATE_FEED_URL_NO_PLATFORM = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}`;
-const UPDATE_FEED_URL_NO_VERSION = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/${process.platform}-${process.arch}`;
 export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> {
   public static override readonly dependencies: DependencyConstructor<Service>[] = [MemoryStore<MemoryStoreSchema>];
 
   private autoUpdaterEnabled = false;
-  private updateFeedUrl = `${UPDATE_FEED_URL_NO_VERSION}/${app.getVersion()}`;
   private state = AutoUpdaterState.NotAvailable;
+  private invalidUpdateFeed = false;
+
+  private updateFeedUrlNoPlatform?: string;
+  private updateFeedUrlNoVersion?: string;
+  private updateFeedUrl?: string;
 
   private _initialized = false;
   public get initialized() {
     return this._initialized;
   }
 
-  private shouldDisableUpdates() {
+  public isDisabled() {
     // macOS can't have auto updates without a code signature
     // linux is not supported on the update server https://github.com/ytmdesktop/ytmdesktop/issues/1247 (hanging issue resolved)
+    if (this.invalidUpdateFeed) return true;
     if (!app.isPackaged) return true;
     if (YTMD_DISABLE_UPDATES) return true;
     if (process.platform !== "win32") return true;
@@ -55,6 +58,17 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
     if (this._initialized) throw new Error("AutoUpdater is already initialized!");
     this._initialized = true;
 
+    if (
+      (typeof YTMD_UPDATE_FEED_OWNER === "undefined" || !YTMD_UPDATE_FEED_OWNER?.trim()) ||
+      (typeof YTMD_UPDATE_FEED_REPOSITORY === "undefined" || !YTMD_UPDATE_FEED_REPOSITORY?.trim())
+    ) {
+      this.invalidUpdateFeed = true;
+    } else {
+      this.updateFeedUrlNoPlatform = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}`;
+      this.updateFeedUrlNoVersion = `${this.updateFeedUrlNoPlatform}/${process.platform}-${process.arch}`;
+      this.updateFeedUrl = `${this.updateFeedUrlNoVersion}/${app.getVersion()}`;
+    }
+
     ipcMain.handle("autoUpdater:isUpdateAvailable", () => {
       return this.state == AutoUpdaterState.Available;
     });
@@ -62,7 +76,7 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
       return this.state == AutoUpdaterState.Downloaded;
     });
 
-    if (this.shouldDisableUpdates()) {
+    if (this.isDisabled()) {
       const memoryStore = this.getDependency(MemoryStore<MemoryStoreSchema>);
       memoryStore.set("autoUpdaterDisabled", true);
       return;
@@ -70,9 +84,11 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
     this.autoUpdaterEnabled = true;
     log.debug(`AutoUpdater enabled with at feed ${this.updateFeedUrl}`);
 
-    autoUpdater.setFeedURL({
-      url: this.updateFeedUrl
-    });
+    if (!!this.updateFeedUrl) {
+      autoUpdater.setFeedURL({
+        url: this.updateFeedUrl
+      });
+    }
 
     autoUpdater.on("checking-for-update", () => {
       log.debug("AutoUpdater checking for updates...");
@@ -119,6 +135,7 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
    */
   public async checkForUpdates(wait: boolean): Promise<boolean> {
     if (!this.initialized) throw new Error("AutoUpdater is not initialized!");
+    if (this.invalidUpdateFeed) throw new Error("Update feed is marked invalid");
     if (!this.autoUpdaterEnabled) return false;
 
     let waitPromise: Promise<boolean> | null = null;
@@ -136,15 +153,18 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
   }
 
   public quitAndInstall() {
+    if (this.invalidUpdateFeed) throw new Error("Update feed is marked invalid");
     autoUpdater.quitAndInstall();
   }
 
   public getFeedUrlNoPlatform() {
-    return UPDATE_FEED_URL_NO_PLATFORM;
+    if (this.invalidUpdateFeed) throw new Error("Update feed is marked invalid");
+    return this.updateFeedUrlNoPlatform!;
   }
 
   public getFeedUrlNoVersion() {
-    return UPDATE_FEED_URL_NO_VERSION;
+    if (this.invalidUpdateFeed) throw new Error("Update feed is marked invalid");
+    return this.updateFeedUrlNoVersion!;
   }
 
   private reconcileMemoryStoreState() {

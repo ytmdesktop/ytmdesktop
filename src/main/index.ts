@@ -154,7 +154,7 @@ app.on("ready", async () => {
   autoUpdater.once("not-available", autoUpdaterCallbacks.notAvailable);
   autoUpdater.once("downloaded", autoUpdaterCallbacks.downloaded);
   autoUpdater.once("error", autoUpdaterCallbacks.error);
-  if (await autoUpdater.checkForUpdates(true)) {
+  if (!autoUpdater.isDisabled() && await autoUpdater.checkForUpdates(true)) {
     autoUpdater.quitAndInstall();
     return;
   } else {
