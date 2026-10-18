@@ -1,13 +1,14 @@
 (function() {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
-  const playerApi = window.__YTMD_HOOK__.ytmPlayerBar.playerApi;
+  const playerApi = window.__YTMD_HOOK__.ytmAppLayout.playerApi;
 
   function sendStoreState() {
     // We don't want to see everything in the store as there can be some sensitive data so we only send what's necessary to operate
     let state = ytmStore.getState();
 
     const videoId = playerApi.getPlayerResponse()?.videoDetails?.videoId;
-    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+    // The new miniplayer has no like button so this falls back to UNKNOWN
+    const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
     const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
     const storeLikeStatus = state.likeStatus.videos[videoId];
     
@@ -33,7 +34,7 @@
       let hasFullMetadata = false;
 
       // If playing from online sources this usually is filled out with the first dataupdated which is followed after dataloaded. While offline this is always filled
-      let currentItem = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").currentItem;
+      let currentItem = window.__YTMD_HOOK__.ytmPlayerPage?.currentItem;
       if (currentItem !== null && currentItem !== undefined) {
         hasFullMetadata = true;
 
@@ -55,7 +56,7 @@
       }
 
       let state = ytmStore.getState();
-      const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
+      const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
       const defaultLikeStatus = likeButtonData?.likeStatus ?? "UNKNOWN";
       const storeLikeStatus = state.likeStatus.videos[videoDetails.videoId];
       

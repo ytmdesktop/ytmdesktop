@@ -1,9 +1,11 @@
 (function() {
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
-  const videoId = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId;
-  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector("ytmusic-like-button-renderer").data;
-  
+  const videoId = window.__YTMD_HOOK__.ytmAppLayout.playerApi.getPlayerResponse().videoDetails.videoId;
+  // The new miniplayer has no like button to toggle through
+  const likeButtonData = document.querySelector("ytmusic-app-layout>ytmusic-player-bar ytmusic-like-button-renderer")?.data;
+  if (!likeButtonData?.serviceEndpoints) return;
+
   let dislikeServiceEndpoint = null;
   let indifferentServiceEndpoint = null;
 
