@@ -191,13 +191,9 @@ export default class ConfigStore extends Service {
   }
 
   // TODO: This should probably be moved somewhere else as this isn't the job of the config store
-  private reconcileConfig(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema> | undefined) {
-    if (oldState) {
-      if (newState.general.startOnBoot != oldState.general.startOnBoot) {
-        app.setLoginItemSettings({
-          openAtLogin: newState.general.startOnBoot
-        });
-      }
-    }
+  private reconcileConfig(newState: Readonly<StoreSchema>, _oldState?: Readonly<StoreSchema> | undefined) {
+    app.setLoginItemSettings({
+      openAtLogin: newState.general.startOnBoot
+    });
   }
 }
