@@ -653,16 +653,14 @@ app.on("ready", async () => {
         const feedUrl = autoUpdater.getFeedUrlNoPlatform();
         // Not all platforms are supported so we just use win32 to grab the notes
         const res = await fetch(`${feedUrl}/win32/${configStore.get("metadata.appVersion")}`);
-        if (res.ok) {
-          if (res.status != 204) {
-            const json = await res.json();
-            return json
-          } else {
-            return {
-              name: app.getVersion(),
-              notes: "# Failed to retrieve changelog"
-            }
-          }
+        if (res.ok && res.status != 204) {
+          const json = await res.json();
+          return json
+        }
+
+        return {
+          name: app.getVersion(),
+          notes: "# Failed to retrieve changelog"
         }
       } catch(err) {
         log.warn("Failed to retrieve changelog", err);
