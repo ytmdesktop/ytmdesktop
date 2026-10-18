@@ -17,6 +17,7 @@ import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw"
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
+import { installFloatingMiniplayer } from "./floating-miniplayer";
 
 const store = new Store<StoreSchema>();
 
@@ -224,6 +225,12 @@ window.addEventListener("load", async () => {
       ipcRenderer.send("ytmView:loaded");
     }
     return;
+  }
+
+  try {
+    installFloatingMiniplayer();
+  } catch (error) {
+    console.error("Failed to install floating miniplayer", error);
   }
 
   await new Promise<void>(resolve => {
