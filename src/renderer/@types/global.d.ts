@@ -1,6 +1,6 @@
 import { WindowsEventArguments } from "~shared/types";
 import Store from "../store-ipc/store";
-import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
+import { StoreSchema, MemoryStoreSchema, InstalledExtension } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
 
 declare global {
@@ -15,6 +15,22 @@ declare global {
       safeStorage: {
         decryptString(value: string): string;
         encryptString(value: string): Buffer;
+      };
+      extensions: {
+        getItems(): Promise<InstalledExtension[]>;
+        installFromUrlOrId(urlOrId: string): Promise<InstalledExtension>;
+        installFromFolder(): Promise<InstalledExtension | null>;
+        installFromArchive(): Promise<InstalledExtension | null>;
+        toggle(id: string, enabled: boolean): Promise<void>;
+        remove(id: string): Promise<void>;
+        openFolder(id: string): Promise<void>;
+        reloadView(): Promise<void>;
+      };
+      downloader: {
+        getDownloadPath(): Promise<string>;
+        openFolder(): Promise<void>;
+        selectFolder(): Promise<string | null>;
+        downloadCurrentTrack(): void;
       };
       openSettingsWindow(): void;
       restartApplication(): void;

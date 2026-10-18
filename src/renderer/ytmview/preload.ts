@@ -17,6 +17,7 @@ import hookPlayerApiEventsScript from "./scripts/hookplayerapievents.script?raw"
 import getPlaylistsScript from "./scripts/getplaylists.script?raw";
 import toggleLikeScript from "./scripts/togglelike.script?raw";
 import toggleDislikeScript from "./scripts/toggledislike.script?raw";
+import skipSilenceScript from "./scripts/skipsilence.script?raw";
 
 const store = new Store<StoreSchema>();
 
@@ -28,7 +29,16 @@ contextBridge.exposeInMainWorld("ytmd", {
   sendStoreUpdate: (queueState: unknown, likeStatus: string, volume: number, muted: boolean, adPlaying: boolean) =>
     ipcRenderer.send("ytmView:storeStateChanged", queueState, likeStatus, volume, muted, adPlaying),
   sendCreatePlaylistObservation: (playlist: unknown) => ipcRenderer.send("ytmView:createPlaylistObserved", playlist),
-  sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId)
+  sendDeletePlaylistObservation: (playlistId: string) => ipcRenderer.send("ytmView:deletePlaylistObserved", playlistId),
+  downloadCurrentTrack: (trackInfo?: unknown) => ipcRenderer.send("ytmView:downloadTrack", trackInfo)
+});
+
+window.addEventListener("ytmd:downloadCurrentTrack", ((event: CustomEvent) => {
+  ipcRenderer.send("ytmView:downloadTrack", event.detail);
+}) as EventListener);
+
+ipcRenderer.on("downloader:status", (event, data) => {
+  window.dispatchEvent(new CustomEvent("ytmd:downloadStatus", { detail: data }));
 });
 
 function createStyleSheet() {
@@ -81,6 +91,31 @@ function createStyleSheet() {
 
       .ytmd-player-bar-control.sleep-timer-button.active {
         color: #FFFFFF;
+      }
+
+      .ytmd-player-bar-control.download-button {
+        margin-left: 4px;
+        color: rgba(255, 255, 255, 0.7);
+        transition: color 0.2s ease, transform 0.2s ease;
+      }
+
+      .ytmd-player-bar-control.download-button:hover {
+        color: #FFFFFF;
+        transform: scale(1.1);
+      }
+
+      .ytmd-player-bar-control.download-button.downloading {
+        color: #3ea6ff;
+        animation: ytmd-spin 1s linear infinite;
+      }
+
+      @keyframes ytmd-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .ytmd-player-bar-control.download-button.completed {
+        color: #2ba640;
       }
     `)
   );
@@ -174,6 +209,20 @@ async function hookPlayerApiEvents() {
   (await webFrame.executeJavaScript(hookPlayerApiEventsScript))();
 }
 
+async function hookSkipSilence() {
+  try {
+    const isEnabled = (await store.get("playback")).skipSilence ?? true;
+    await webFrame.executeJavaScript(skipSilenceScript);
+    await webFrame.executeJavaScript(`
+      (function() {
+        window.dispatchEvent(new CustomEvent("ytmd:skipsilence:toggle", { detail: { enabled: ${isEnabled} } }));
+      })();
+    `);
+  } catch (err) {
+    console.error("[YTMD] Failed to initialize SkipSilence:", err);
+  }
+}
+
 function overrideHistoryButtonDisplay() {
   // @ts-expect-error Style is reported as readonly but this still works
   document.querySelector<HTMLElement>("#history-link .history-button").style = "display: inline-block !important;";
@@ -218,7 +267,109 @@ function getYTMTextRun(runs: { text: string }[]) {
   )();
 })();
 
-window.addEventListener("load", async () => {
+function setupAdBlockerAndSkipper() {
+  const injectStyle = () => {
+    if (document.getElementById("ytmd-adblock-styles")) return;
+    const adStyle = document.createElement("style");
+    adStyle.id = "ytmd-adblock-styles";
+    adStyle.textContent = `
+      .video-ads,
+      .ytp-ad-module,
+      .ytp-ad-player-overlay,
+      .ytp-ad-player-overlay-layout,
+      .ytp-ad-overlay-container,
+      .ytp-ad-image-overlay,
+      .ytp-ad-text-overlay,
+      ytmusic-mealbar-promo-renderer,
+      ytmusic-upsell-dialog-renderer,
+      #mealbar,
+      .mealbar-promo-renderer,
+      ytmusic-popup-container ytmusic-mealbar-promo-renderer {
+        display: none !important;
+      }
+    `;
+    (document.head || document.documentElement)?.appendChild(adStyle);
+  };
+
+  injectStyle();
+
+  const skipAds = () => {
+    try {
+      injectStyle();
+
+      // Dismiss promo popups ("Try Music Premium", etc.)
+      const promo = document.querySelector<HTMLElement>("ytmusic-mealbar-promo-renderer");
+      if (promo) {
+        const dismissBtn = promo.querySelector<HTMLElement>("#dismiss-button button, yt-button-renderer#dismiss-button");
+        if (dismissBtn) {
+          dismissBtn.click();
+        } else {
+          promo.remove();
+        }
+      }
+
+      // Auto-confirm "Are you still listening?"
+      const youThere = document.querySelector<HTMLElement>("ytmusic-you-there-renderer");
+      if (youThere) {
+        const confirmBtn = youThere.querySelector<HTMLElement>("button, yt-button-renderer");
+        if (confirmBtn) {
+          confirmBtn.click();
+        }
+      }
+
+      // Check if video is playing an ad
+      const player = document.querySelector<HTMLElement>("#movie_player, .html5-video-player");
+      const isAdShowing = player?.classList.contains("ad-showing") || player?.classList.contains("ad-interrupting");
+      const video = document.querySelector<HTMLVideoElement>("video");
+
+      if (isAdShowing) {
+        if (video) {
+          video.muted = true;
+          video.playbackRate = 16.0;
+          if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
+            video.currentTime = video.duration;
+          }
+        }
+
+        const skipButtons = document.querySelectorAll<HTMLElement>(
+          ".ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-skip-button-slot button, button[class*='skip-button']"
+        );
+        skipButtons.forEach(btn => btn.click());
+
+        const closeOverlayButtons = document.querySelectorAll<HTMLElement>(".ytp-ad-overlay-close-button, .ytp-ad-overlay-close-container");
+        closeOverlayButtons.forEach(btn => btn.click());
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
+  setInterval(skipAds, 200);
+
+  const observer = new MutationObserver(() => {
+    skipAds();
+  });
+
+  const attachObserver = () => {
+    const target = document.querySelector("#movie_player") || document.body;
+    if (target) {
+      observer.observe(target, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attachObserver);
+  } else {
+    attachObserver();
+  }
+}
+
+const initializeYTMView = async () => {
   if (window.location.hostname !== "music.youtube.com") {
     if (window.location.hostname === "consent.youtube.com" || window.location.hostname === "accounts.google.com") {
       ipcRenderer.send("ytmView:loaded");
@@ -226,59 +377,106 @@ window.addEventListener("load", async () => {
     return;
   }
 
-  await new Promise<void>(resolve => {
-    const interval = setInterval(async () => {
-      const hooked = (
-        await webFrame.executeJavaScript(`
-        (function() {
-          if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi)) {
-            return true;
-          }
-          
-          return false;
-        })
-      `)
-      )();
+  setupAdBlockerAndSkipper();
 
-      if (hooked) {
+  try {
+    const materialSymbols = createMaterialSymbolsLink();
+    document.head.appendChild(materialSymbols);
+  } catch {
+    // Ignore error
+  }
+
+  await new Promise<void>(resolve => {
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      let hooked = false;
+      try {
+        hooked = await webFrame.executeJavaScript(`
+            (function() {
+              return !!(window.__YTMD_HOOK__ && window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi);
+            })()
+          `);
+      } catch {
+        // Ignore error
+      }
+
+      if (hooked || attempts > 20) {
         clearInterval(interval);
         resolve();
       }
     }, 250);
   });
 
-  let materialSymbolsLoaded = false;
-
-  const materialSymbols = createMaterialSymbolsLink();
-  materialSymbols.onload = () => {
-    materialSymbolsLoaded = true;
-  };
-  document.head.appendChild(materialSymbols);
-
   await new Promise<void>(resolve => {
+    let attempts = 0;
     const interval = setInterval(async () => {
-      const playerApiReady: boolean = (
-        await webFrame.executeJavaScript(`
-          (function() {
-            return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.isReady();
-          })
-        `)
-      )();
+      attempts++;
+      let playerApiReady = false;
+      try {
+        playerApiReady = await webFrame.executeJavaScript(`
+            (function() {
+              try {
+                return window.__YTMD_HOOK__?.ytmPlayerBar?.playerApi?.isReady() ?? true;
+              } catch (e) {
+                return true;
+              }
+            })()
+          `);
+      } catch {
+        // Ignore error
+      }
 
-      if (materialSymbolsLoaded && playerApiReady) {
+      if (playerApiReady || attempts > 20) {
         clearInterval(interval);
         resolve();
       }
     }, 250);
   });
 
-  createStyleSheet();
-  createNavigationMenuArrows();
-  createKeyboardNavigation();
-  await createAdditionalPlayerBarControls();
-  await hideChromecastButton();
-  await hookPlayerApiEvents();
-  overrideHistoryButtonDisplay();
+  // Signal loaded to dismiss splash screen immediately
+  ipcRenderer.send("ytmView:loaded");
+
+  try {
+    createStyleSheet();
+  } catch (e) {
+    console.error("[YTMD] createStyleSheet error:", e);
+  }
+  try {
+    createNavigationMenuArrows();
+  } catch (e) {
+    console.error("[YTMD] createNavigationMenuArrows error:", e);
+  }
+  try {
+    createKeyboardNavigation();
+  } catch (e) {
+    console.error("[YTMD] createKeyboardNavigation error:", e);
+  }
+  try {
+    await createAdditionalPlayerBarControls();
+  } catch (e) {
+    console.error("[YTMD] createAdditionalPlayerBarControls error:", e);
+  }
+  try {
+    await hideChromecastButton();
+  } catch (e) {
+    console.error("[YTMD] hideChromecastButton error:", e);
+  }
+  try {
+    await hookPlayerApiEvents();
+  } catch (e) {
+    console.error("[YTMD] hookPlayerApiEvents error:", e);
+  }
+  try {
+    await hookSkipSilence();
+  } catch (e) {
+    console.error("[YTMD] hookSkipSilence error:", e);
+  }
+  try {
+    overrideHistoryButtonDisplay();
+  } catch (e) {
+    console.error("[YTMD] overrideHistoryButtonDisplay error:", e);
+  }
 
   const integrationScripts: { [integrationName: string]: { [scriptName: string]: string } } = await ipcRenderer.invoke("ytmView:getIntegrationScripts");
 
@@ -603,7 +801,15 @@ window.addEventListener("load", async () => {
     ipcRenderer.send(`ytmView:getPlaylists:response:${requestId}`, playlists);
   });
 
-  store.onDidAnyChange(newState => {
+  store.onDidAnyChange(async (newState, oldState) => {
+    if (newState.playback?.skipSilence !== oldState?.playback?.skipSilence) {
+      await webFrame.executeJavaScript(`
+        (function() {
+          window.dispatchEvent(new CustomEvent("ytmd:skipsilence:toggle", { detail: { enabled: ${newState.playback.skipSilence} } }));
+        })()
+      `);
+    }
+
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
       if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
@@ -639,6 +845,10 @@ window.addEventListener("load", async () => {
       }
     }
   });
+};
 
-  ipcRenderer.send("ytmView:loaded");
-});
+if (document.readyState === "complete") {
+  initializeYTMView();
+} else {
+  window.addEventListener("load", initializeYTMView);
+}

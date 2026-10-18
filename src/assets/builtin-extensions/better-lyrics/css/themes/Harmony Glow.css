@@ -1,0 +1,89 @@
+.blyrics-container {
+  font-family: "Roboto Mono", monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.blyrics-container > div > span {
+  display: inline-block;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Fix for translated and romanized text */
+.blyrics-container > div > span.blyrics--translated,
+.blyrics-container > div > span.blyrics--romanized {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.8rem;
+
+}
+
+.blyrics-container > div > span.blyrics--romanized {
+  font-size: 1.5rem;
+  font-style: italic;
+}
+
+.blyrics-container > div.blyrics--active > span:not(:empty):not(.blyrics--translated):not(.blyrics--romanized) {
+  opacity: 1;
+  animation: jump-and-color 2s ease-in-out;
+}
+
+@keyframes jump-and-color {
+  0% {
+    transform: translateY(0);
+    color: #8e44ad;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: translateY(-20px);
+    color: #e75480;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+  }
+  100% {
+    transform: translateY(0);
+    color: #e79c3c;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+  }
+}
+
+@media (max-width: 615px) {
+  .blyrics-container {
+    font-size: 2rem;
+  }
+
+  .blyrics-container > div > span.blyrics--translated {
+    font-size: 1.5rem;
+  }
+
+  .blyrics-container > div > span.blyrics--romanized {
+    font-size: 1.3rem;
+  }
+}
+
+.blyrics-container:has(.blyrics--active) > div:not(.blyrics--active):not(.blyrics--active ~ div) {
+  opacity: 0.33;
+  filter: blur(2.5px);
+}
+
+.blyrics-container > div.blyrics--active {
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.blyrics-container > div.blyrics--active ~ div {
+  opacity: 0.66;
+  filter: blur(0px);
+}
+
+.blyrics-container > div {
+  transition: filter calc(var(--blyrics-duration) / 2),
+    opacity calc(var(--blyrics-duration) / 2), transform 0.166s;
+}

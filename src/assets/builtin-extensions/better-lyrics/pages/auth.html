@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en-US"><head>
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="dark light">
+    <title>__MSG_auth_pageTitle__</title>
+		<link href="https://api.fontshare.com/v2/css?f[]=satoshi@1&amp;display=swap" rel="stylesheet">
+    
+    <style>body:not(.i18n-ready){opacity:0}</style>
+  <link rel="stylesheet" href="/pages/auth.css"></head>
+  <body class="auth-page">
+    <main class="auth-card">
+      <header class="auth-card__header">
+        <span class="auth-card__logos" id="auth-logos">
+          <img class="auth-card__logo" id="auth-logo" alt="Better Lyrics" width="24" height="24">
+          <span class="auth-card__pulse" id="auth-pulse" hidden="">
+            <span class="auth-card__pulse-dot"></span>
+            <span class="auth-card__pulse-dot"></span>
+            <span class="auth-card__pulse-dot"></span>
+          </span>
+          <img class="auth-card__logo" id="auth-partner-logo" alt="" width="24" height="24" hidden="">
+        </span>
+        <h1 class="auth-card__title" id="auth-title"></h1>
+      </header>
+
+      <section class="auth-card__body">
+        <p class="auth-card__subtitle" id="auth-subtitle"></p>
+        <p class="auth-card__explainer" id="auth-explainer"></p>
+      </section>
+
+      <section class="auth-card__remember">
+        <label class="auth-remember">
+          <span class="auth-remember__toggle">
+            <input type="checkbox" id="auth-remember">
+            <span class="auth-remember__checkmark"></span>
+          </span>
+          <span id="auth-remember-label"></span>
+        </label>
+      </section>
+
+      <p class="auth-card__error" id="auth-error" role="status"></p>
+    </main>
+
+    <footer class="auth-page__footer">
+      <button type="button" id="auth-cancel" class="auth-button auth-button--secondary"></button>
+      <button type="button" id="auth-approve" class="auth-button auth-button--primary"></button>
+    </footer>
+
+    
+  
+
+<script src="/pages/auth.js" type="module" defer=""></script></body></html>

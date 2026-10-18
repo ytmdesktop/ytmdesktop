@@ -1,0 +1,82 @@
+/* ThemeSong Compat */
+#songDivContainer {
+  display: none !important;
+}
+#thumbnail > img {
+  object-fit: contain !important;
+}
+
+@supports (selector(:root:has(#ThemeSong-MainContainer))) {
+  :root:has(#ThemeSong-MainContainer) {
+    --blyrics-text-color: var(--ts-primary-text-color);
+    --blyrics-footer-text-color: var(--ts-secondary-text-color);
+    --blyrics-footer-link-color: var(--ts-secondary-text-color);
+    --blyrics-footer-bg-color: var(--ts-pill-color);
+    --blyrics-footer-border-color: var(--ts-pill-color);
+
+    #player-page {
+      top: 0 !important;
+      padding-block: 64px;
+    }
+
+    ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+      > [slot="player-page"] {
+      padding-block: 64px;
+    }
+
+    ytmusic-app-layout[player-fullscreened][blyrics-dfs] #player-page {
+      height: calc(100% - 128px);
+    }
+
+    ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) #player-bar-background.ytmusic-app-layout {
+      display: block;
+      backdrop-filter: none !important;
+      background: transparent !important;
+    }
+
+    ytmusic-app-layout[player-fullscreened][blyrics-dfs] #player {
+      margin-bottom: 0px !important;
+      bottom: 0;
+    }
+
+    #player[player-ui-state="MINIPLAYER"] {
+      margin-bottom: 64px !important;
+    }
+
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] #guide-wrapper {
+      background-color: var(--ts-navbar-color) !important;
+    }
+
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background {
+      background-color: var(--ts-navbar-color) !important;
+    }
+
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar,
+    ytmusic-app #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+      background-color: var(--ts-navbar-color) !important;
+    }
+
+    [style*="--blyrics-background-img"] {
+      --blyrics-background-img: unset !important;
+    }
+
+    ytmusic-player[player-ui-state=FULLSCREEN] {
+      margin: 0 auto !important;
+    }
+
+    #song-image{
+      height: 100% !important;
+      padding-top: 100% !important;
+    }
+
+    ytmusic-player[player-ui-state=FULLSCREEN] #song-image #img {
+      height: 100% !important;
+      width: 100% !important;
+    }
+    ytmusic-player[player-ui-state="FULLSCREEN"] {
+      border-radius: var(--ts-songimg-border-radius) !important;
+    }
+  }
+}

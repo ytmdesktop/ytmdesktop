@@ -1,0 +1,111 @@
+/* Instrumental break styles */
+.blyrics--instrumental-icon {
+	height: var(--blyrics-font-size);
+	width: calc(var(--blyrics-font-size) + var(--blyrics-font-size) / 3);
+	overflow: visible;
+	margin-left: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics-rtl.blyrics--instrumental .blyrics--instrumental-icon {
+	margin-left: 0;
+	margin-right: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics--instrumental[data-agent="v2"] .blyrics--instrumental-icon,
+.blyrics--instrumental[data-agent="v3"] .blyrics--instrumental-icon {
+	margin-left: 0px;
+	margin-right: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics--instrumental[data-agent="v1000"] .blyrics--instrumental-icon {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.blyrics--instrumental-bg {
+	fill: var(--blyrics-lyric-inactive-color);
+}
+
+.blyrics--instrumental-fill {
+	fill: var(--blyrics-lyric-active-color);
+	transition: opacity var(--blyrics-lyric-highlight-fade-out-duration, 0.5s) ease;
+	opacity: 0;
+}
+
+.blyrics--instrumental.blyrics--animating .blyrics--instrumental-fill {
+	transition: none;
+	opacity: 1;
+}
+
+.blyrics--instrumental:not(.blyrics--pre-animating) .blyrics--wave-clip {
+	transition-property: transform;
+	transition-duration: 1000000s;
+	transition-delay: 0s;
+	transform: translateY(0%);
+}
+
+.blyrics--instrumental.blyrics--pre-animating:not(.blyrics--animating) .blyrics--wave-clip {
+	animation: none;
+	transform: translateY(78%);
+}
+
+.blyrics--instrumental.blyrics--animating .blyrics--wave-clip {
+	transition-property: transform;
+	transition-duration: calc(var(--blyrics-duration, 1ms) * 1);
+	transition-timing-function: linear;
+	transition-delay: var(--blyrics-anim-delay);
+	transform: translateY(-4%);
+}
+
+.blyrics--paused .blyrics--wave-clip {
+	transition-duration: 100000000s !important;
+	transform: translateY(100%) !important;
+}
+
+
+/* Setup the Wavy Path Transition */
+.blyrics--wave-path {
+	/* Set the transform origin to the bottom of the wave shape (y=4) */
+	transform-box: fill-box;
+	transform-origin: bottom;
+
+	/* Wiggle animation (indefinite) */
+	animation: blyrics-wave 1.25s ease-in-out infinite;
+	animation-play-state: paused;
+
+	/* Prepare the flatten transition */
+	transform: scaleY(1.2);
+}
+
+/* Trigger the Flattening */
+.blyrics--instrumental.blyrics--animating:not(.blyrics--paused) .blyrics--wave-path {
+	animation-play-state: running;
+
+	/* Flatten the wave to 0 height */
+	transform: scaleY(0);
+
+	transition-property: transform;
+	transition-duration: calc(var(--blyrics-duration, 1ms) * 1);
+	transition-timing-function: ease-in;
+	transition-delay: var(--blyrics-anim-delay);
+}
+
+/* If paused, we freeze the flattening where it is */
+.blyrics--instrumental.blyrics--animating.blyrics--paused .blyrics--wave-path {
+	transform: scaleY(0.0001); /* slightly different to force recalculation */
+	transition-duration: 10000000000s;
+	transition-property: transform;
+	transition-timing-function: ease-out;
+	transition-delay: 0s;
+}
+
+/* Update Keyframes for the "Split" shape */
+/* These paths must close at 'L 30 4 L -4 4' to match the static rect overlap */
+@keyframes blyrics-wave {
+	0%, 100% {
+		d: path("M -4 3 Q 1 2 5 3 Q 10 4 14 3 Q 18 2 22 3 Q 26 4 30 3 L 30 4 L -4 4 Z");
+	}
+	50% {
+		d: path("M -4 3 Q 1 4 5 3 Q 10 2 14 3 Q 18 4 22 3 Q 26 2 30 3 L 30 4 L -4 4 Z");
+	}
+}

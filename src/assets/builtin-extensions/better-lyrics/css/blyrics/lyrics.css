@@ -1,0 +1,292 @@
+/* Main container styles */
+.blyrics-container {
+	font-family: var(--blyrics-font-family);
+	font-size: var(--blyrics-font-size);
+	font-weight: var(--blyrics-font-weight);
+	isolation: isolate;
+	line-height: var(--blyrics-line-height);
+	position: relative !important;
+	z-index: 1;
+  will-change: transform;
+  transition: transform var(--blyrics-lyric-scroll-duration)
+		var(--blyrics-lyric-scroll-timing-function) 0s;
+	padding-top: 2rem;
+	padding-bottom: calc(var(--blyrics-padding-bottom));
+}
+
+.blyrics-container > div {
+	cursor: pointer;
+	padding-bottom: var(--blyrics-padding) !important;
+	transform-origin: left center;
+	word-break: break-word;
+}
+
+.blyrics-container > div,
+.blyrics-container > div:first-child {
+	padding-top: var(--blyrics-padding) !important;
+}
+
+.blyrics--active {
+	cursor: default;
+}
+
+:not(.blyrics-background-lyric) {
+	order: 0;
+}
+
+.blyrics-background-lyric {
+	order: 2;
+}
+
+.blyrics--line > span > span.blyrics-background-lyric {
+	font-size: 0.75em;
+	font-weight: 500;
+}
+
+.blyrics--line {
+	transform: scale(var(--blyrics-scale));
+	transition-property: transform;
+	transition-duration: var(--blyrics-scale-transition-duration);
+	transition-timing-function: ease;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: start;
+	align-content: flex-start;
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+	margin-right: -0.25em;
+	box-sizing: border-box;
+  will-change: transform;
+}
+
+.blyrics--line.blyrics--animating {
+	transform: scale(var(--blyrics-active-scale));
+	transition-delay: var(--blyrics-anim-delay);
+}
+
+.blyrics--line > span {
+	color: var(--blyrics-lyric-inactive-color);
+	display: inline-block;
+	white-space: pre-wrap;
+}
+
+.blyrics--has-trailing-space{
+	margin-right: 0.25em;
+}
+
+.blyrics--word {
+	white-space: pre;
+	display: inline-block;
+	transform: translateY(0px);
+}
+
+
+[blyrics-alt-hover] .blyrics--word:hover {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.blyrics--break {
+	flex-basis: 100%;
+	height: 0;
+}
+
+.blyrics--word.blyrics--animating {
+	animation: blyrics-wobble var(--blyrics-wobble-duration) forwards ease;
+  will-change: transform;
+	animation-delay: var(--blyrics-anim-delay);
+	animation-play-state: running;
+}
+
+.blyrics--word.blyrics--animating.blyrics--paused {
+	animation-play-state: paused;
+}
+
+@property --lyric-transition-amount-start {
+	syntax: "<number>";
+	inherits: false;
+	initial-value: 0;
+}
+
+@property --lyric-transition-amount-end {
+	syntax: "<number>";
+	inherits: false;
+	initial-value: 0;
+}
+
+.blyrics--word::after {
+	position: absolute;
+	content: attr(data-content);
+	top: -2rem;
+	left: -2rem;
+	white-space: pre-wrap;
+	padding: 2rem;
+	pointer-events: none;
+	/*color: var(--blyrics-lyric-active-color);*/
+	color: transparent;
+	box-sizing: content-box;
+	width: 100%;
+	background-image: linear-gradient(
+		90deg,
+		var(--blyrics-lyric-active-color)
+			calc(
+				100% * var(--lyric-transition-amount-start) - 4rem *
+					var(--lyric-transition-amount-start) + 2rem
+			),
+		#00000000
+			calc(
+				100% * var(--lyric-transition-amount-end) - 4rem *
+					var(--lyric-transition-amount-end) + 2rem + 1px
+			)
+	);
+	opacity: 0;
+	--lyric-transition-amount-start: -0.2;
+	--lyric-transition-amount-end: -0.1;
+  will-change: background-image;
+	transition:
+		--lyric-transition-amount-start 1s linear 1000s,
+		--lyric-transition-amount-end 1s linear 1000s,
+		opacity 0.5s ease;
+	background-clip: text;
+}
+
+.blyrics--word.blyrics--pre-animating:not(.blyrics--animating)::after {
+	/*The transition is purposely very long for the background position when we deselect a lyric, so here we need to reset the background position
+    to zero so that the lyric is in a valid state for the karaoke transition to play*/
+	transition: none;
+	--lyric-transition-amount-start: -0.2;
+	--lyric-transition-amount-end: -0.1;
+	opacity: 0;
+}
+
+.blyrics--word.blyrics--pre-animating:not(.blyrics--animating):not(
+		.blyrics-zero-dur-animate
+	)::after {
+	opacity: 1;
+}
+
+.blyrics--word.blyrics--animating::after {
+	opacity: 1;
+	animation: blyrics-glow max(calc(var(--blyrics-duration) * 1.2), 1.2s)
+		forwards ease;
+  will-change: filter;
+	animation-delay: var(--blyrics-anim-delay);
+	animation-play-state: running;
+
+	--lyric-transition-amount-start: 1.4;
+	--lyric-transition-amount-end: 1.5;
+	transition-property:
+		--lyric-transition-amount-start, --lyric-transition-amount-end, opacity;
+	transition-duration:
+		calc(var(--blyrics-duration) * 1.6), calc(var(--blyrics-duration) * 1.6),
+		var(--blyrics-lyric-highlight-fade-in-duration);
+	transition-timing-function: linear, linear, ease;
+	transition-delay:
+		var(--blyrics-swipe-delay), var(--blyrics-swipe-delay),
+		var(--blyrics-anim-delay);
+}
+
+.blyrics--word.blyrics--animating.blyrics--paused::after {
+	transition-duration: 100000000s, 100000000s, 100000000s;
+	/* Set new values to update the transition */
+	--lyric-transition-amount-start: 10;
+	--lyric-transition-amount-end: 10;
+	opacity: 0.5;
+	animation-play-state: paused;
+}
+
+.blyrics--translated,
+.blyrics--romanized {
+	display: block;
+	font-size: var(--blyrics-translated-font-size);
+	font-weight: var(--blyrics-translated-font-weight);
+	font-family: var(--blyrics-translated-font-family);
+	color: var(--blyrics-translated-color);
+	white-space: normal;
+	line-height: 1.1;
+	margin-top: 8px;
+}
+
+.blyrics--romanized > span {
+	color: var(--blyrics-lyric-inactive-color);
+	display: inline-block;
+	white-space: pre-wrap;
+}
+
+/* Romanization */
+.blyrics--romanized {
+	/* font-style: italic; */
+	width: fit-content;
+	padding-block: 1rem;
+	font-size: calc(var(--blyrics-translated-font-size) / 1.25);
+	background: rgba(255, 255, 255, 0.05);
+	padding: 0.375rem 0.75rem;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 1rem;
+}
+
+.blyrics-rtl {
+	direction: rtl;
+}
+
+.blyrics-rtl.blyrics--word::after {
+	background-image: linear-gradient(
+		270deg,
+		var(--blyrics-lyric-active-color)
+			calc(
+				100% * var(--lyric-transition-amount-start) - 4rem *
+					var(--lyric-transition-amount-start) + 2rem
+			),
+		#00000000
+			calc(
+				100% * var(--lyric-transition-amount-end) - 4rem *
+					var(--lyric-transition-amount-end) + 2rem + 1px
+			)
+	);
+}
+
+/* Secondary and tertiary vocals */
+.blyrics--line[data-agent="v2"],
+.blyrics--line[data-agent="v3"] {
+  justify-content: flex-end;
+  text-align: right;
+  transform-origin: right center !important;
+}
+
+/* All vocals together */
+.blyrics--line[data-agent="v1000"] {
+	justify-content: center;
+	text-align: center;
+	transform-origin: center center !important;
+}
+
+#blyrics-wrapper {
+	margin-top: 0;
+}
+
+/* Animations */
+@keyframes blyrics-wobble {
+	0% {
+		transform: scaleX(1);
+	}
+	12.5% {
+		transform: translateX(0.05em) scaleX(1.025);
+		animation-timing-function: ease-in-out;
+	}
+	75% {
+		transform: translateX(0) scaleX(1);
+	}
+	100% {
+		transform: scaleX(1);
+		animation-timing-function: ease-out;
+	}
+}
+
+@keyframes blyrics-glow {
+	0% {
+		filter: drop-shadow(0 0 0.8rem var(--blyrics-glow-color));
+	}
+	to {
+		filter: drop-shadow(0 0 0rem var(--blyrics-glow-color));
+	}
+}
