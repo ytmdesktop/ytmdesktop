@@ -8,6 +8,10 @@
 
   const ytmStore = window.__YTMD_HOOK__.ytmStore;
 
+  // The new miniplayer (ytmusic-miniplayer) is not Polymer based and has no DOM for these controls to attach to yet
+  const playerBar = document.querySelector("ytmusic-app-layout>ytmusic-player-bar");
+  if (!playerBar) return;
+
   let ytmdControlButtons = {};
 
   let currentVideoId = "";
@@ -69,10 +73,7 @@
     iconName: "yt-sys-icons:library_add",
     data: libraryButtonData
   };
-  document
-    .querySelector("ytmusic-app-layout>ytmusic-player-bar")
-    .querySelector("ytmusic-like-button-renderer")
-    .insertAdjacentElement("afterend", libraryButton);
+  playerBar.querySelector("ytmusic-like-button-renderer").insertAdjacentElement("afterend", libraryButton);
 
   let playlistButton = document.createElement("yt-button-shape");
   playlistButton.classList.add("ytmd-player-bar-control");
@@ -155,13 +156,13 @@
   };
   libraryButton.insertAdjacentElement("afterend", playlistButton);
 
-  window.__YTMD_HOOK__.ytmPlayerBar.playerApi.addEventListener("onVideoDataChange", event => {
+  window.__YTMD_HOOK__.ytmAppLayout.playerApi.addEventListener("onVideoDataChange", event => {
     if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-      currentVideoId = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse().videoDetails.videoId;
+      currentVideoId = window.__YTMD_HOOK__.ytmAppLayout.playerApi.getPlayerResponse().videoDetails.videoId;
     }
   });
 
-  let rightControls = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").querySelector(".right-controls-buttons");
+  let rightControls = playerBar.querySelector(".right-controls-buttons");
   let sleepTimerButton = document.createElement("yt-icon-button");
 
   let sleepTimerIcon = document.createElement("yt-icon");
@@ -406,8 +407,8 @@
               sleepTimerButton.classList.remove("active");
               sleepTimerButton.setAttribute("title", "Sleep timer off");
 
-              if (document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing) {
-                window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
+              if (ytmStore.getState().player.isPlaying) {
+                window.__YTMD_HOOK__.ytmAppLayout.playerApi.pauseVideo();
 
                 document.body.dispatchEvent(
                   new CustomEvent("yt-action", {
@@ -496,7 +497,7 @@
     let state = ytmStore.getState();
 
     // Update library button for current data
-    const currentMenu = document.querySelector("ytmusic-app-layout>ytmusic-player-bar").getMenuRenderer();
+    const currentMenu = window.__YTMD_HOOK__.ytmPlayerPage?.getMenuRenderer();
     if (currentMenu) {
       if (playlistButton.classList.contains("hidden")) {
         playlistButton.classList.remove("hidden");

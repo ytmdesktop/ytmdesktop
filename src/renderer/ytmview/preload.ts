@@ -197,8 +197,17 @@ function getYTMTextRun(runs: { text: string }[]) {
       let fakeBaseClass = function() {
         try {
           if (window.__YTMD_HOOK__) {
-            if (this.hostElement && this.hostElement.nodeName === "YTMUSIC-PLAYER-BAR") {
-              window.__YTMD_HOOK__.ytmPlayerBar = this
+            if (this.hostElement) {
+              // YTM is rolling out a new miniplayer (music_web_enable_wiz_miniplayer) which replaces ytmusic-player-bar with a non-Polymer ytmusic-miniplayer.
+              // ytmusic-app-layout exists in both layouts and resolves the same playerApi so it is used as the stable entry point to the player.
+              if (this.hostElement.nodeName === "YTMUSIC-APP-LAYOUT") {
+                window.__YTMD_HOOK__.ytmAppLayout = this
+              }
+
+              // The player page exposes the current queue item and its menu regardless of which player bar is in use
+              if (this.hostElement.nodeName === "YTMUSIC-PLAYER-PAGE") {
+                window.__YTMD_HOOK__.ytmPlayerPage = this
+              }
             }
 
             if (this.store && !!this.store.getState && !!this.store.dispatch && !!this.store.subscribe) {
@@ -231,7 +240,7 @@ window.addEventListener("load", async () => {
       const hooked = (
         await webFrame.executeJavaScript(`
         (function() {
-          if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmPlayerBar && window.__YTMD_HOOK__.ytmPlayerBar.playerApi)) {
+          if (window.__YTMD_HOOK__ && (window.__YTMD_HOOK__.ytmStore && window.__YTMD_HOOK__.ytmAppLayout && window.__YTMD_HOOK__.ytmAppLayout.playerApi)) {
             return true;
           }
           
@@ -260,7 +269,7 @@ window.addEventListener("load", async () => {
       const playerApiReady: boolean = (
         await webFrame.executeJavaScript(`
           (function() {
-            return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.isReady();
+            return window.__YTMD_HOOK__.ytmAppLayout.playerApi.isReady();
           })
         `)
       )();
@@ -291,8 +300,10 @@ window.addEventListener("load", async () => {
       if (state.lastVideoId) {
         // This height transition check is a hack to fix the `Start playback` hint from not being in the correct position https://github.com/ytmdesktop/ytmdesktop/issues/1159
         let heightTransitionCount = 0;
+        // The player bar slot holds either ytmusic-player-bar (legacy) or ytmusic-miniplayer (new)
+        const playerBar = document.querySelector("ytmusic-app-layout>[slot='player-bar']");
         const transitionEnd = async (e: TransitionEvent) => {
-          if (e.target === document.querySelector("ytmusic-app-layout>ytmusic-player-bar")) {
+          if (e.target === playerBar) {
             if (e.propertyName === "height") {
               (
                 await webFrame.executeJavaScript(`
@@ -303,12 +314,12 @@ window.addEventListener("load", async () => {
               )();
               heightTransitionCount++;
               if (heightTransitionCount >= 2) {
-                document.querySelector("ytmusic-app-layout>ytmusic-player-bar").removeEventListener("transitionend", transitionEnd);
+                playerBar?.removeEventListener("transitionend", transitionEnd);
               }
             }
           }
         };
-        document.querySelector("ytmusic-app-layout>ytmusic-player-bar").addEventListener("transitionend", transitionEnd);
+        playerBar?.addEventListener("transitionend", transitionEnd);
 
         document.dispatchEvent(
           new CustomEvent("yt-navigate", {
@@ -327,9 +338,9 @@ window.addEventListener("load", async () => {
       (
         await webFrame.executeJavaScript(`
           (function() {
-            let playerResponse = window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlayerResponse();
+            let playerResponse = window.__YTMD_HOOK__.ytmAppLayout.playerApi.getPlayerResponse();
             if (playerResponse) {
-              window.ytmd.sendVideoData(playerResponse.videoDetails, window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getPlaylistId());
+              window.ytmd.sendVideoData(playerResponse.videoDetails, window.__YTMD_HOOK__.ytmAppLayout.playerApi.getPlaylistId());
             }
           })
         `)
@@ -339,7 +350,8 @@ window.addEventListener("load", async () => {
 
   const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
   if (alwaysShowVolumeSlider) {
-    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider").classList.add("ytmd-persist-volume-slider");
+    // The new miniplayer has no persistent volume slider to show
+    document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
   }
 
   ipcRenderer.on("remoteControl:execute", async (_event, command, value) => {
@@ -348,7 +360,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").playing ? window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              window.__YTMD_HOOK__.ytmStore.getState().player.isPlaying ? window.__YTMD_HOOK__.ytmAppLayout.playerApi.pauseVideo() : window.__YTMD_HOOK__.ytmAppLayout.playerApi.playVideo();
             })
           `)
         )();
@@ -359,7 +371,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.playVideo();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.playVideo();
             })
           `)
         )();
@@ -370,7 +382,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.pauseVideo();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.pauseVideo();
             })
           `)
         )();
@@ -381,7 +393,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.nextVideo();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.nextVideo();
             })
           `)
         )();
@@ -392,7 +404,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.previousVideo();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.previousVideo();
             })
           `)
         )();
@@ -413,7 +425,7 @@ window.addEventListener("load", async () => {
         const currentVolumeUp: number = (
           await webFrame.executeJavaScript(`
             (function() {
-              return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getVolume();
+              return window.__YTMD_HOOK__.ytmAppLayout.playerApi.getVolume();
             })
           `)
         )();
@@ -425,7 +437,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(newVolumeUp) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(newVolumeUp);
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.setVolume(newVolumeUp);
               window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: newVolumeUp });
             })
           `)
@@ -437,7 +449,7 @@ window.addEventListener("load", async () => {
         const currentVolumeDown: number = (
           await webFrame.executeJavaScript(`
             (function() {
-              return window.__YTMD_HOOK__.ytmPlayerBar.playerApi.getVolume();
+              return window.__YTMD_HOOK__.ytmAppLayout.playerApi.getVolume();
             })
           `)
         )();
@@ -449,7 +461,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(newVolumeDown) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(newVolumeDown);
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.setVolume(newVolumeDown);
               window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: newVolumeDown });
             })
           `)
@@ -467,7 +479,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(valueInt) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.setVolume(valueInt);
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.setVolume(valueInt);
               window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_VOLUME', payload: valueInt });
             })
           `)
@@ -479,7 +491,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.mute();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.mute();
               window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_MUTED', payload: true });
             })
           `)
@@ -490,7 +502,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.unMute();
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.unMute();
               window.__YTMD_HOOK__.ytmStore.dispatch({ type: 'SET_MUTED', payload: false });
             })
           `)
@@ -511,7 +523,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function(value) {
-              window.__YTMD_HOOK__.ytmPlayerBar.playerApi.seekTo(value);
+              window.__YTMD_HOOK__.ytmAppLayout.playerApi.seekTo(value);
             })
           `)
         )(value);
@@ -521,7 +533,7 @@ window.addEventListener("load", async () => {
         (
           await webFrame.executeJavaScript(`
             (function() {
-              document.querySelector("ytmusic-app-layout>ytmusic-player-bar").queue.shuffle();
+              document.querySelector("ytmusic-player-queue").queue.shuffle();
             })
           `)
         )();
@@ -606,12 +618,12 @@ window.addEventListener("load", async () => {
   store.onDidAnyChange(newState => {
     if (newState.appearance.alwaysShowVolumeSlider) {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (!volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider && !volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.add("ytmd-persist-volume-slider");
       }
     } else {
       const volumeSlider = document.querySelector("#volume-slider");
-      if (volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+      if (volumeSlider && volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
         volumeSlider.classList.remove("ytmd-persist-volume-slider");
       }
     }
