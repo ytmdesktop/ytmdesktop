@@ -39,28 +39,28 @@
     "@electron/fuses": "^2.1.3",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/multicast-dns": "^7.2.4",
-    "@vitejs/plugin-vue": "^6.0.9",
+    "@vitejs/plugin-vue": "^6.0.10",
     "electron": "44.7.0",
     "oxfmt": "^0.41.0",
-    "oxlint": "^1.87.0",
+    "oxlint": "^1.88.0",
     "typescript": "^6.0.3",
-    "vite": "^8.3.3"
+    "vite": "^8.3.4"
   },
   "dependencies": {
-    "@fastify/cors": "^11.3.0",
-    "@fastify/rate-limit": "^11.2.0",
-    "@fastify/type-provider-typebox": "^6.1.0",
+    "@fastify/cors": "^11.3.1",
+    "@fastify/rate-limit": "^11.2.1",
+    "@fastify/type-provider-typebox": "^6.3.0",
     "@sinclair/typebox": "^0.34.52",
     "conf": "^15.1.0",
     "electron-log": "^5.4.4",
     "electron-squirrel-startup": "^1.0.1",
-    "fastify": "^5.12.5",
+    "fastify": "^5.12.7",
     "fastify-socket.io": "^5.1.0",
-    "markdown-it": "^15.0.2",
+    "markdown-it": "^15.0.3",
     "material-symbols": "^0.47.6",
     "multicast-dns": "^7.2.5",
     "socket.io": "^4.8.4",
-    "vue": "^3.5.43",
+    "vue": "^3.5.44",
     "xosms": "^0.7.0-rc.2"
   }
 }
