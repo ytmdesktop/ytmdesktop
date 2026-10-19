@@ -30,6 +30,7 @@ import {
   YouTubeMusicUnavailableError
 } from "../../api-shared/errors";
 import path from "node:path";
+import { ServerResponse } from "node:http";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
@@ -95,6 +96,73 @@ type Playlist = {
 const authorizationWindows: BrowserWindow[] = [];
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options) => {
+  type RealtimeEventName = "state-update" | "playlist-created" | "playlist-deleted";
+
+  type SseClient = {
+    id: string;
+    response: ServerResponse;
+    heartbeatInterval: NodeJS.Timeout;
+  };
+
+  const sseClients = new Map<string, SseClient>();
+
+  const writeSseEvent = (response: ServerResponse, eventName: RealtimeEventName, payload: unknown) => {
+    if (response.writableEnded) {
+      return;
+    }
+    let data: string;
+    try {
+      const json = JSON.stringify(payload);
+      data = json ?? "null";
+    } catch {
+      data = JSON.stringify({
+        error: "UNSERIALIZABLE_PAYLOAD"
+      });
+    }
+    response.write(`event: ${eventName}\n`);
+    response.write(`data: ${data}\n\n`);
+  };
+
+  const emitRealtimeEvent = (eventName: RealtimeEventName, payload: unknown) => {
+    fastify.io.of("/api/v1/realtime").emit(eventName, payload);
+
+    const staleClients: string[] = [];
+    for (const client of sseClients.values()) {
+      if (client.response.writableEnded) {
+        staleClients.push(client.id);
+        continue;
+      }
+      writeSseEvent(client.response, eventName, payload);
+    }
+
+    for (const clientId of staleClients) {
+      removeSseClient(clientId);
+    }
+  };
+
+  const removeSseClient = (clientId: string) => {
+    const client = sseClients.get(clientId);
+    if (!client) {
+      return;
+    }
+
+    clearInterval(client.heartbeatInterval);
+    if (!client.response.writableEnded) {
+      client.response.end();
+    }
+    sseClients.delete(clientId);
+  };
+
+  const closeAllSseClients = () => {
+    for (const client of sseClients.values()) {
+      clearInterval(client.heartbeatInterval);
+      if (!client.response.writableEnded) {
+        client.response.end();
+      }
+    }
+    sseClients.clear();
+  };
+
   const sendCommand = (commandRequest: APIV1CommandRequestBodyType) => {
     const ytmView = options.getYtmView();
     if (ytmView) {
@@ -513,6 +581,55 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
+  fastify.get(
+    "/realtime/sse",
+    {
+      preHandler: (request, response, next) => {
+        return isAuthValidMiddleware(options.getStore(), request, response, next);
+      }
+    },
+    (request, reply) => {
+      const headers = {
+        ...reply.getHeaders(),
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no"
+      };
+
+      reply.raw.writeHead(200, headers as any);
+      reply.hijack();
+
+      const clientId = crypto.randomUUID();
+      reply.raw.setTimeout(0);
+
+      const heartbeatInterval = setInterval(() => {
+        if (reply.raw.writableEnded) {
+          removeSseClient(clientId);
+          return;
+        }
+        reply.raw.write(": ping\n\n");
+      }, 1000 * 15);
+
+      sseClients.set(clientId, {
+        id: clientId,
+        response: reply.raw,
+        heartbeatInterval
+      });
+
+      writeSseEvent(reply.raw, "state-update", transformPlayerState(playerStateStore.getState()));
+
+      const cleanup = () => {
+        removeSseClient(clientId);
+      };
+
+      request.raw.on("close", cleanup);
+      request.raw.on("aborted", cleanup);
+      reply.raw.on("close", cleanup);
+      reply.raw.on("error", cleanup);
+    }
+  );
+
   fastify.ready().then(() => {
     fastify.io.of("/api/v1/realtime").use((socket, next) => {
       const token = socket.handshake.auth.token;
@@ -532,7 +649,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     });*/
 
     const stateStoreListener = (state: PlayerState) => {
-      fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
+      emitRealtimeEvent("state-update", transformPlayerState(state));
     };
     playerStateStore.addEventListener(stateStoreListener);
 
@@ -540,7 +657,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       const ytmView = options.getYtmView();
       if (event.sender !== ytmView.webContents) return;
 
-      fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
+      emitRealtimeEvent("playlist-created", playlist);
     };
     ipcMain.on("ytmView:createPlaylistObserved", createPlaylistObservedListener);
 
@@ -548,13 +665,14 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       const ytmView = options.getYtmView();
       if (event.sender !== ytmView.webContents) return;
 
-      fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
+      emitRealtimeEvent("playlist-deleted", playlistId);
     };
     ipcMain.on("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
 
     fastify.addHook("onClose", () => {
       // This should normally close on its own but we'll make sure it's closed out
       fastify.io.close();
+      closeAllSseClients();
       playerStateStore.removeEventListener(stateStoreListener);
       ipcMain.off("ytmView:createPlaylistObserved", createPlaylistObservedListener);
       ipcMain.off("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
