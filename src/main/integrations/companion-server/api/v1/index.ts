@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
-import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../api-shared/auth";
+import { createAuthTokenAsync, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValidAsync, isAuthValidMiddlewareAsync } from "../../api-shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
 import {
@@ -467,7 +467,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
 
         if (authorized) {
-          const token = createAuthToken(options.getService(ConfigStore), authData.appId, authData.appVersion, authData.appName);
+          const token = await createAuthTokenAsync(options.getService(ConfigStore), authData.appId, authData.appVersion, authData.appName);
 
           response.send({
             token
@@ -500,8 +500,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           }
         }
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     async (request, response) => {
@@ -529,8 +529,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           }
         }
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     (request, response) => {
@@ -555,8 +555,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       schema: {
         body: APIV1CommandRequestBody
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getService(ConfigStore), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     (request, response) => {
@@ -567,9 +567,9 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
   const playerStateStore = options.getService(PlayerStateStore);
 
-  fastify.io.of("/api/v1/realtime").use((socket, next) => {
+  fastify.io.of("/api/v1/realtime").use(async (socket, next) => {
     const token = socket.handshake.auth.token;
-    const [validSession, tokenId] = isAuthValid(options.getService(ConfigStore), token);
+    const [validSession, tokenId] = await isAuthValidAsync(options.getService(ConfigStore), token);
     if (validSession) {
       socket.data.tokenId = tokenId;
       next();

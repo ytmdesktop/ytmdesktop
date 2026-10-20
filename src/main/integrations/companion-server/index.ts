@@ -373,9 +373,11 @@ export default class CompanionServer extends Integration {
       this.storeListener = configStore.onDidChange("integrations", async newState => {
         if (!newState) return;
 
-        const validTokenIds: string[] = newState.companionServerAuthTokens
-          ? JSON.parse(safeStorage.decryptString(Buffer.from(newState.companionServerAuthTokens, "hex"))).map((authToken: AuthToken) => authToken.id)
-          : [];
+        let validTokenIds: string[] = [];
+        if (newState.companionServerAuthTokens) {
+          const companionAuthTokens = await safeStorage.decryptStringAsync(Buffer.from(newState.companionServerAuthTokens, "hex")); 
+          validTokenIds = JSON.parse(companionAuthTokens.result).map((authToken: AuthToken) => authToken.id); 
+        }
         if (this.fastifyServer?.server.listening) {
           const namespaces = this.fastifyServer.io._nsps.keys();
           let sockets: RemoteSocket<DefaultEventsMap, { tokenId: string }>[] = [];

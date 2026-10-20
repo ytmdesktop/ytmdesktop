@@ -179,26 +179,28 @@ app.on("ready", async () => {
   v1ConfigMigration(serviceHost.getService(ConfigStore));
 
   //#region safeStorage setup and checks
-  if (!safeStorage.isEncryptionAvailable()) {
+  if (!await safeStorage.isAsyncEncryptionAvailable()) {
     memoryStore.set("safeStorageAvailable", false);
   } else {
     memoryStore.set("safeStorageAvailable", true);
   }
 
-  ipcMain.handle("safeStorage:decryptString", (event, value: string) => {
+  ipcMain.handle("safeStorage:decryptString", async (event, value: string) => {
     if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
 
     if (value) {
-      return safeStorage.decryptString(Buffer.from(value, "hex"));
+      const decrypt = await safeStorage.decryptStringAsync(Buffer.from(value, "hex"));
+      return decrypt.result
     } else {
       return null;
     }
   });
 
-  ipcMain.handle("safeStorage:encryptString", (event, value: string) => {
+  ipcMain.handle("safeStorage:encryptString", async (event, value: string) => {
     if (!memoryStore.get("safeStorageAvailable")) throw new Error("safeStorage is unavailable");
 
-    return safeStorage.encryptString(value).toString("hex");
+    const encrypt = await safeStorage.encryptStringAsync(value);
+    return encrypt.toString("hex");
   });
   //#endregion
 

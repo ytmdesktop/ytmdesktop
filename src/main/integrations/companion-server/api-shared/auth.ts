@@ -54,10 +54,11 @@ export function getIsTemporaryAuthCodeValidAndRemove(appId: string, code: string
   return false;
 }
 
-export function createAuthToken(configStore: ConfigStore, appId: string, appVersion: string, appName: string) {
+export async function createAuthTokenAsync(configStore: ConfigStore, appId: string, appVersion: string, appName: string) {
   let authTokens: AuthToken[] = [];
   try {
-    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex")));
+    const decryptedAuthTokens = await safeStorage.decryptStringAsync(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"))
+    authTokens = JSON.parse(decryptedAuthTokens.result);
   } catch {
     /* authTokens will just be an empty array */
   }
@@ -80,20 +81,21 @@ export function createAuthToken(configStore: ConfigStore, appId: string, appVers
     }
   });
 
-  configStore.set("integrations.companionServerAuthTokens", safeStorage.encryptString(JSON.stringify(authTokens)).toString("hex"));
+  const encryptedAuthTokens = await safeStorage.encryptStringAsync(JSON.stringify(authTokens));
+  configStore.set("integrations.companionServerAuthTokens", encryptedAuthTokens.toString("hex"));
 
   return token;
 }
 
-export function isAuthValid(configStore: ConfigStore, authToken: string): [boolean, string | null] {
+export async function isAuthValidAsync(configStore: ConfigStore, authToken: string): [boolean, string | null] {
   if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
   let authTokens: AuthToken[] = [];
   try {
-    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"));
-    authTokens = JSON.parse(decryptedAuthTokens);
+    const decryptedAuthTokens = await safeStorage.decryptStringAsync(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"));
+    authTokens = JSON.parse(decryptedAuthTokens.result);
   } catch {
     /* authTokens will just be an empty array */
   }
@@ -115,7 +117,7 @@ export function isAuthValid(configStore: ConfigStore, authToken: string): [boole
   return [false, null];
 }
 
-export function isAuthValidMiddleware(configStore: ConfigStore, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
+export async function isAuthValidMiddlewareAsync(configStore: ConfigStore, request: FastifyRequest, response: FastifyReply) {
   const authToken = request.headers.authorization;
   if (!authToken) {
     response.code(401);
@@ -125,15 +127,15 @@ export function isAuthValidMiddleware(configStore: ConfigStore, request: Fastify
     return;
   }
 
-  const [validSession, tokenId] = isAuthValid(configStore, authToken);
+  const [validSession, tokenId] = await isAuthValidAsync(configStore, authToken);
 
   if (validSession && !!tokenId) {
     request.authId = tokenId;
-    next();
   } else {
     response.code(401);
     response.send({
       error: "UNAUTHORIZED"
     });
+    throw new Error("Unauthorized");
   }
 }

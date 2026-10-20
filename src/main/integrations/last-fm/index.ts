@@ -194,7 +194,7 @@ export default class LastFM extends Integration {
 
   public onSetup() {}
 
-  public onEnabled(): void {
+  public async onEnabled() {
     const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
 
     if (!memoryStore.get("safeStorageAvailable")) {
@@ -202,7 +202,7 @@ export default class LastFM extends Integration {
       return;
     }
 
-    this.lastfmDetails = this.getSettings();
+    this.lastfmDetails = await this.getSettings();
 
     if (!this.lastfmDetails || !this.lastfmDetails.sessionKey) {
       this.getSession();
@@ -282,14 +282,14 @@ export default class LastFM extends Integration {
     return md5(data.join(""));
   }
 
-  private getSettings(): StoreSchema["lastfm"] {
+  private async getSettings(): Promise<StoreSchema["lastfm"]> {
     const configStore = this.getService(ConfigStore);
     const decryptedValues = configStore.get("lastfm");
 
     // Grab the session key and token from the store and decrypt them
     if (decryptedValues.sessionKey) {
       try {
-        decryptedValues.sessionKey = safeStorage.decryptString(Buffer.from(decryptedValues.sessionKey, "hex"));
+        decryptedValues.sessionKey = (await safeStorage.decryptStringAsync(Buffer.from(decryptedValues.sessionKey, "hex"))).result;
       } catch (e) {
         decryptedValues.sessionKey = null;
         log.error(e);
@@ -298,7 +298,7 @@ export default class LastFM extends Integration {
 
     if (decryptedValues.token) {
       try {
-        decryptedValues.token = safeStorage.decryptString(Buffer.from(decryptedValues.token, "hex"));
+        decryptedValues.token = (await safeStorage.decryptStringAsync(Buffer.from(decryptedValues.token, "hex"))).result;
       } catch (e) {
         decryptedValues.token = null;
         log.error(e);
@@ -313,10 +313,10 @@ export default class LastFM extends Integration {
     try {
       if (this.lastfmDetails) {
         if (this.lastfmDetails.sessionKey) {
-          configStore.set("lastfm.sessionKey", safeStorage.encryptString(this.lastfmDetails.sessionKey).toString("hex"));
+          configStore.set("lastfm.sessionKey", (await safeStorage.encryptStringAsync(this.lastfmDetails.sessionKey)).toString("hex"));
         }
         if (this.lastfmDetails.token) {
-          configStore.set("lastfm.token", safeStorage.encryptString(this.lastfmDetails.token).toString("hex"));
+          configStore.set("lastfm.token", (await safeStorage.encryptStringAsync(this.lastfmDetails.token)).toString("hex"));
         }
       }
     } catch {
