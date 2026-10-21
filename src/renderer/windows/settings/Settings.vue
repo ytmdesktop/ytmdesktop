@@ -61,6 +61,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
+const sponsorBlockEnabled = ref<boolean>(integrations.sponsorBlockEnabled);
 
 const shortcutPlayPause = ref<string>(shortcuts.playPause);
 const shortcutNext = ref<string>(shortcuts.next);
@@ -99,6 +100,7 @@ store.onDidAnyChange(async newState => {
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
+  sponsorBlockEnabled.value = newState.integrations.sponsorBlockEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
 
@@ -169,6 +171,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
+  store.set("integrations.sponsorBlockEnabled", sponsorBlockEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
 
   store.set("shortcuts.playPause", shortcutPlayPause.value);
@@ -435,6 +438,13 @@ window.ytmd.handleUpdateDownloaded(() => {
             min="50"
             max="95"
             step="5"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-model="sponsorBlockEnabled"
+            type="checkbox"
+            name="SponsorBlock"
+            description="Skip non-music sections (intros, outros, silence) using community-submitted data from SponsorBlock"
             @change="settingsChanged"
           />
         </div>
