@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { Language, StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
+import { getTranslations, languageNames } from "~shared/i18n";
 import logo from "~assets/icons/ytmd.png";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
@@ -38,6 +39,7 @@ const lastFM: StoreSchema["lastfm"] = await store.get("lastfm");
 
 const disableHardwareAcceleration = ref<boolean>(general.disableHardwareAcceleration);
 const hideToTrayOnClose = ref<boolean>(general.hideToTrayOnClose);
+const language = ref<Language>(general.language);
 const showNotificationOnSongChange = ref<boolean>(general.showNotificationOnSongChange);
 const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
@@ -73,9 +75,12 @@ const shortcutVolumeDown = ref<string>(shortcuts.volumeDown);
 const lastFMSessionKey = ref<string>(lastFM.sessionKey);
 const scrobblePercent = ref<number>(lastFM.scrobblePercent);
 
+const text = computed(() => getTranslations(language.value).settings);
+
 store.onDidAnyChange(async newState => {
   disableHardwareAcceleration.value = newState.general.disableHardwareAcceleration;
   hideToTrayOnClose.value = newState.general.hideToTrayOnClose;
+  language.value = newState.general.language;
   showNotificationOnSongChange.value = newState.general.showNotificationOnSongChange;
   startOnBoot.value = newState.general.startOnBoot;
   startMinimized.value = newState.general.startMinimized;
@@ -149,6 +154,7 @@ async function memorySettingsChanged() {
 
 async function settingsChanged() {
   store.set("general.hideToTrayOnClose", hideToTrayOnClose.value);
+  store.set("general.language", language.value);
   store.set("general.showNotificationOnSongChange", showNotificationOnSongChange.value);
   store.set("general.startOnBoot", startOnBoot.value);
   store.set("general.startMinimized", startMinimized.value);
@@ -271,23 +277,28 @@ window.ytmd.handleUpdateDownloaded(() => {
   <div class="settings-container">
     <div class="content-container">
       <ul class="sidebar">
-        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
-        <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
-        <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
-        <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
-        <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
+        <li :class="{ active: currentTab === 1 }" @click="changeTab(1)">
+          <span class="material-symbols-outlined">settings_applications</span>{{ text.tabs.general }}
+        </li>
+        <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>{{ text.tabs.appearance }}</li>
+        <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>{{ text.tabs.playback }}</li>
+        <li :class="{ active: currentTab === 4 }" @click="changeTab(4)">
+          <span class="material-symbols-outlined">wifi_tethering</span>{{ text.tabs.integrations }}
+        </li>
+        <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>{{ text.tabs.shortcuts }}</li>
         <span class="push"></span>
-        <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>About</li>
+        <li :class="{ active: currentTab === 99 }" @click="changeTab(99)"><span class="material-symbols-outlined">info</span>{{ text.tabs.about }}</li>
       </ul>
       <div class="content">
         <div v-if="requiresRestart" class="restart-banner">
-          <p class="message"><span class="material-symbols-outlined">autorenew</span> Restart app to apply changes</p>
-          <button class="restart-button" @click="restartApplication">Restart</button>
+          <p class="message"><span class="material-symbols-outlined">autorenew</span> {{ text.restart.message }}</p>
+          <button class="restart-button" @click="restartApplication">{{ text.restart.button }}</button>
         </div>
         <div v-if="currentTab === 1" class="general-tab">
-          <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" name="Hide to tray on close" @change="settingsChanged" />
-          <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" name="Show notification on song change" @change="settingsChanged" />
-          <YTMDSetting v-model="startOnBoot" type="checkbox" name="Start on boot" @change="settingsChanged" />
+          <YTMDSetting v-model="language" :options-map="languageNames" type="select" :name="text.general.language" @change="settingsChanged" />
+          <YTMDSetting v-if="!isDarwin" v-model="hideToTrayOnClose" type="checkbox" :name="text.general.hideToTrayOnClose" @change="settingsChanged" />
+          <YTMDSetting v-model="showNotificationOnSongChange" type="checkbox" :name="text.general.showNotificationOnSongChange" @change="settingsChanged" />
+          <YTMDSetting v-model="startOnBoot" type="checkbox" :name="text.general.startOnBoot" @change="settingsChanged" />
           <!--<div class="setting">
             <p>Start minimized</p>
             <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
@@ -296,57 +307,67 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="disableHardwareAcceleration"
             type="checkbox"
             restart-required
-            name="Disable hardware acceleration"
+            :name="text.general.disableHardwareAcceleration"
             @change="settingChangedRequiresRestart"
           />
         </div>
 
         <div v-if="currentTab === 2" class="appearance-tab">
-          <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" name="Always show volume slider" @change="settingsChanged" />
-          <YTMDSetting v-model="customCSSEnabled" type="checkbox" name="Custom CSS" @change="settingsChanged" />
+          <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" :name="text.appearance.alwaysShowVolumeSlider" @change="settingsChanged" />
+          <YTMDSetting v-model="customCSSEnabled" type="checkbox" :name="text.appearance.customCSS" @change="settingsChanged" />
           <YTMDSetting
             v-if="customCSSEnabled"
             v-model="customCSSPath"
             type="file"
             indented
             bind-setting="appearance.customCSSPath"
-            name="Custom CSS file path"
+            :name="text.appearance.customCSSFilePath"
             @file-change="settingChangedFile"
             @clear="removeCustomCSSPath"
           />
-          <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" name="Zoom" @change="settingsChanged" />
+          <YTMDSetting v-model="zoom" type="range" max="300" min="30" step="10" :name="text.appearance.zoom" @change="settingsChanged" />
           <YTMDSetting
             v-if="isLinux"
             v-model="trayIconStyle"
-            :options-map="{ [TrayIconStyle.Auto]: 'Auto', [TrayIconStyle.White]: 'White', [TrayIconStyle.Black]: 'Black' }"
+            :options-map="{
+              [TrayIconStyle.Auto]: text.appearance.trayIconStyleOptions.auto,
+              [TrayIconStyle.White]: text.appearance.trayIconStyleOptions.white,
+              [TrayIconStyle.Black]: text.appearance.trayIconStyleOptions.black
+            }"
             type="select"
-            name="Tray icon style"
+            :name="text.appearance.trayIconStyle"
             @change="settingsChanged"
           />
         </div>
 
         <div v-if="currentTab === 3" class="playback-tab">
-          <YTMDSetting v-model="continueWhereYouLeftOff" name="Continue where you left off" type="checkbox" @change="settingsChanged" />
+          <YTMDSetting v-model="continueWhereYouLeftOff" :name="text.playback.continueWhereYouLeftOff" type="checkbox" @change="settingsChanged" />
           <YTMDSetting
             v-if="continueWhereYouLeftOff"
             v-model="continueWhereYouLeftOffPaused"
             type="checkbox"
             indented
-            name="Pause on application launch"
+            :name="text.playback.pauseOnApplicationLaunch"
             @change="settingsChanged"
           />
-          <YTMDSetting v-model="progressInTaskbar" type="checkbox" name="Show track progress on taskbar" @change="settingsChanged" />
-          <YTMDSetting v-model="enableSpeakerFill" type="checkbox" restart-required name="Enable speaker fill" @change="settingChangedRequiresRestart" />
-          <YTMDSetting v-model="ratioVolume" type="checkbox" name="Ratio volume" @change="settingsChanged" />
+          <YTMDSetting v-model="progressInTaskbar" type="checkbox" :name="text.playback.showTrackProgressOnTaskbar" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="enableSpeakerFill"
+            type="checkbox"
+            restart-required
+            :name="text.playback.enableSpeakerFill"
+            @change="settingChangedRequiresRestart"
+          />
+          <YTMDSetting v-model="ratioVolume" type="checkbox" :name="text.playback.ratioVolume" @change="settingsChanged" />
         </div>
 
         <div v-if="currentTab === 4" class="integrations-tab">
           <YTMDSetting
             v-model="companionServerEnabled"
             type="checkbox"
-            name="Companion server"
+            :name="text.integrations.companionServer"
             :disabled="!safeStorageAvailable"
-            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            :disabled-message="text.integrations.companionServerDisabled"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -354,8 +375,8 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="companionServerCORSWildcardEnabled"
             type="checkbox"
             indented
-            name="Allow browser communication"
-            description="This setting could be dangerous as it allows any website you visit to communicate with the companion server"
+            :name="text.integrations.allowBrowserCommunication"
+            :description="text.integrations.allowBrowserCommunicationDescription"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -363,8 +384,8 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="companionServerAuthWindowEnabled"
             type="checkbox"
             indented
-            name="Enable companion authorization"
-            description="Automatically disables after the first successful authorization or 5 minutes has passed"
+            :name="text.integrations.enableCompanionAuthorization"
+            :description="text.integrations.enableCompanionAuthorizationDescription"
             @change="memorySettingsChanged"
           />
           <YTMDSetting
@@ -372,15 +393,15 @@ window.ytmd.handleUpdateDownloaded(() => {
             type="custom"
             flex-column
             indented
-            name="Authorized companions"
-            description="This is a list of companions that currently have access to the companion server"
+            :name="text.integrations.authorizedCompanions"
+            :description="text.integrations.authorizedCompanionsDescription"
             @change="settingsChanged"
           >
             <table class="authorized-companions-table">
               <thead>
                 <tr>
-                  <th class="companion">Companion</th>
-                  <th class="version">Version</th>
+                  <th class="companion">{{ text.integrations.companion }}</th>
+                  <th class="version">{{ text.integrations.version }}</th>
                   <th class="controls"></th>
                 </tr>
               </thead>
@@ -399,39 +420,39 @@ window.ytmd.handleUpdateDownloaded(() => {
               </tbody>
             </table>
             <div v-if="companionServerAuthTokens.length === 0" class="no-authorized-companions">
-              <td>No authorized companions</td>
+              <td>{{ text.integrations.noAuthorizedCompanions }}</td>
             </div>
           </YTMDSetting>
-          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" name="Discord rich presence" @change="settingsChanged" />
+          <YTMDSetting v-model="discordPresenceEnabled" type="checkbox" :name="text.integrations.discordRichPresence" @change="settingsChanged" />
           <div v-if="discordPresenceEnabled && discordPresenceConnectionFailed" class="setting indented">
-            <p class="discord-failure">Discord connection could not be established after 30 attempts</p>
-            <button @click="restartDiscordPresence">Retry</button>
+            <p class="discord-failure">{{ text.integrations.discordConnectionFailed }}</p>
+            <button @click="restartDiscordPresence">{{ text.integrations.retry }}</button>
           </div>
           <YTMDSetting
             v-model="lastFMEnabled"
             type="checkbox"
-            name="Last.fm scrobbling"
+            :name="text.integrations.lastFmScrobbling"
             :disabled="!safeStorageAvailable"
-            disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
+            :disabled-message="text.integrations.lastFmDisabled"
             @change="settingsChanged"
           />
           <div v-if="lastFMEnabled" class="setting indented">
             <div class="name-with-description">
               <p class="description">
-                User is Authenticated:
-                <span v-if="lastFMSessionKey" style="color: #4caf50">Yes</span>
-                <span v-else style="color: #ff1100">No</span>
+                {{ text.integrations.userIsAuthenticated }}
+                <span v-if="lastFMSessionKey" style="color: #4caf50">{{ text.integrations.yes }}</span>
+                <span v-else style="color: #ff1100">{{ text.integrations.no }}</span>
               </p>
             </div>
-            <button v-if="lastFMSessionKey" @click="logoutLastFM">Logout</button>
+            <button v-if="lastFMSessionKey" @click="logoutLastFM">{{ text.integrations.logout }}</button>
           </div>
           <YTMDSetting
             v-if="lastFMEnabled"
             v-model="scrobblePercent"
             class="settings indented"
             type="range"
-            name="Scrobble percent"
-            description="Determines when a song is scrobbled"
+            :name="text.integrations.scrobblePercent"
+            :description="text.integrations.scrobblePercentDescription"
             min="50"
             max="95"
             step="5"
@@ -442,10 +463,8 @@ window.ytmd.handleUpdateDownloaded(() => {
         <div v-if="currentTab === 5" class="shortcuts-tab">
           <div class="setting">
             <p class="shortcut-title">
-              Play/Pause<span
-                v-if="shortcutsPlayPauseRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+              {{ text.shortcuts.playPause
+              }}<span v-if="shortcutsPlayPauseRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError"
                 >error</span
               >
             </p>
@@ -453,43 +472,29 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Next<span
-                v-if="shortcutsNextRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
-                >error</span
-              >
+              {{ text.shortcuts.next
+              }}<span v-if="shortcutsNextRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError">error</span>
             </p>
             <KeybindInput v-model="shortcutNext" @change="settingsChanged" />
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Previous<span
-                v-if="shortcutsPreviousRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
-                >error</span
-              >
+              {{ text.shortcuts.previous
+              }}<span v-if="shortcutsPreviousRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError">error</span>
             </p>
             <KeybindInput v-model="shortcutPrevious" @change="settingsChanged" />
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Thumbs Up<span
-                v-if="shortcutsThumbsUpRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
-                >error</span
-              >
+              {{ text.shortcuts.thumbsUp
+              }}<span v-if="shortcutsThumbsUpRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError">error</span>
             </p>
             <KeybindInput v-model="shortcutThumbsUp" @change="settingsChanged" />
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Thumbs Down<span
-                v-if="shortcutsThumbsDownRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+              {{ text.shortcuts.thumbsDown
+              }}<span v-if="shortcutsThumbsDownRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError"
                 >error</span
               >
             </p>
@@ -497,21 +502,15 @@ window.ytmd.handleUpdateDownloaded(() => {
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Increase Volume<span
-                v-if="shortcutsVolumeUpRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
-                >error</span
-              >
+              {{ text.shortcuts.increaseVolume
+              }}<span v-if="shortcutsVolumeUpRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError">error</span>
             </p>
             <KeybindInput v-model="shortcutVolumeUp" @change="settingsChanged" />
           </div>
           <div class="setting">
             <p class="shortcut-title">
-              Decrease Volume<span
-                v-if="shortcutsVolumeDownRegisterFailed"
-                class="material-symbols-outlined register-error"
-                title="Failed to register keybind. Does another application have this keybind?"
+              {{ text.shortcuts.decreaseVolume
+              }}<span v-if="shortcutsVolumeDownRegisterFailed" class="material-symbols-outlined register-error" :title="text.shortcuts.registerError"
                 >error</span
               >
             </p>
@@ -522,7 +521,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         <div v-if="currentTab === 99" class="about-tab">
           <img class="icon" :src="logo" />
           <h2 class="app-name">YouTube Music Desktop App</h2>
-          <p class="made-by">Made by YTMDesktop Team</p>
+          <p class="made-by">{{ text.about.madeBy }}</p>
           <template v-if="!autoUpdaterDisabled">
             <button
               v-if="!updateDownloaded"
@@ -530,31 +529,31 @@ window.ytmd.handleUpdateDownloaded(() => {
               class="update-check-button"
               @click="checkForUpdates"
             >
-              <span class="material-symbols-outlined">update</span>Check for updates
+              <span class="material-symbols-outlined">update</span>{{ text.about.checkForUpdates }}
             </button>
             <button v-if="updateDownloaded" class="update-button" @click="restartApplicationForUpdate">
-              <span class="material-symbols-outlined">upgrade</span>Restart to update
+              <span class="material-symbols-outlined">upgrade</span>{{ text.about.restartToUpdate }}
             </button>
             <p v-if="checkingForUpdate && !updateAvailable && !updateDownloaded" class="updating">
-              <span class="material-symbols-outlined">progress_activity</span>Checking for updates...
+              <span class="material-symbols-outlined">progress_activity</span>{{ text.about.checkingForUpdates }}
             </p>
             <p v-if="updateAvailable && !updateDownloaded" class="updating">
-              <span class="material-symbols-outlined">progress_activity</span>Downloading update...
+              <span class="material-symbols-outlined">progress_activity</span>{{ text.about.downloadingUpdate }}
             </p>
-            <p v-if="updateNotAvailable" class="no-update">Update not available</p>
+            <p v-if="updateNotAvailable" class="no-update">{{ text.about.updateNotAvailable }}</p>
           </template>
           <template v-if="autoUpdaterDisabled">
-            <button disabled class="update-check-button"><span class="material-symbols-outlined">update</span>Check for updates</button>
-            <p class="no-auto-updater">Auto updater disabled</p>
+            <button disabled class="update-check-button"><span class="material-symbols-outlined">update</span>{{ text.about.checkForUpdates }}</button>
+            <p class="no-auto-updater">{{ text.about.autoUpdaterDisabled }}</p>
           </template>
           <span class="version-info">
-            <p class="version">Version: {{ ytmdVersion }}</p>
-            <p class="branch">Branch: {{ ytmdBranch }}</p>
-            <p class="commit">Commit: {{ ytmdCommitHash }}</p>
+            <p class="version">{{ text.about.version }}: {{ ytmdVersion }}</p>
+            <p class="branch">{{ text.about.branch }}: {{ ytmdBranch }}</p>
+            <p class="commit">{{ text.about.commit }}: {{ ytmdCommitHash }}</p>
           </span>
           <div class="links">
             <a href="https://github.com/ytmdesktop/ytmdesktop" target="_blank">GitHub</a>
-            <a href="https://ytmdesktop.github.io/" target="_blank">Website</a>
+            <a href="https://ytmdesktop.github.io/" target="_blank">{{ text.about.website }}</a>
           </div>
         </div>
       </div>

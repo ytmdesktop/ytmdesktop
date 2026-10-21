@@ -4,6 +4,8 @@ export enum TrayIconStyle {
   Black = 2
 }
 
+export type Language = "en-US" | "pt-BR";
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -11,6 +13,7 @@ export type StoreSchema = {
   general: {
     disableHardwareAcceleration: boolean;
     hideToTrayOnClose: boolean;
+    language: Language;
     showNotificationOnSongChange: boolean;
     startOnBoot: boolean;
     startMinimized: boolean;
