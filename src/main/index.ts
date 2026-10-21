@@ -176,6 +176,12 @@ let ytmView: BrowserView = null;
 let tray: Tray = null;
 let trayContextMenu = null;
 
+enum CloseAction {
+  MinimizeToTray,
+  Quit,
+  Cancel
+}
+
 // These variables tend to be changed often so we store it in memory and write on close (less disk usage)
 let lastUrl = "";
 let lastVideoId = "";
@@ -318,6 +324,27 @@ function getIconPath(icon: string) {
 }
 function getControlsIconPath(icon: string) {
   return getIconPath(`${process.env.NODE_ENV === "development" ? "controls/" : ""}${icon}`);
+}
+
+function getMainWindowCloseAction() {
+  if (store.get("general").hideToTrayOnClose || isDarwin) {
+    return CloseAction.MinimizeToTray;
+  }
+
+  const choice = dialog.showMessageBoxSync(mainWindow, {
+    type: "question",
+    buttons: ["Minimize to tray", "Quit", "Cancel"],
+    title: "Close YouTube Music Desktop?",
+    message: "Do you want to keep YouTube Music Desktop running in the tray?",
+    detail: "Minimizing to tray keeps playback and integrations running in the background.",
+    defaultId: 0,
+    cancelId: 2,
+    noLink: true
+  });
+
+  if (choice === 0) return CloseAction.MinimizeToTray;
+  if (choice === 1) return CloseAction.Quit;
+  return CloseAction.Cancel;
 }
 
 function anyShortcutChanged(newState: Readonly<StoreSchema>, oldState: Readonly<StoreSchema>) {
@@ -1286,9 +1313,19 @@ const createMainWindow = (): void => {
   mainWindow.on("minimize", sendMainWindowStateIpc);
   mainWindow.on("restore", sendMainWindowStateIpc);
   mainWindow.on("close", event => {
-    if (!applicationQuitting && (store.get("general").hideToTrayOnClose || isDarwin)) {
-      event.preventDefault();
-      mainWindow.hide();
+    if (!applicationQuitting) {
+      const closeAction = getMainWindowCloseAction();
+
+      if (closeAction !== CloseAction.Quit) {
+        event.preventDefault();
+      }
+
+      if (closeAction === CloseAction.MinimizeToTray) {
+        mainWindow.hide();
+      } else if (closeAction === CloseAction.Quit) {
+        event.preventDefault();
+        app.quit();
+      }
     }
 
     store.set("state.windowBounds", mainWindow.getNormalBounds());
@@ -1508,9 +1545,11 @@ app.on("ready", async () => {
     if (mainWindow !== null) {
       if (event.sender !== mainWindow.webContents) return;
 
-      if (store.get("general").hideToTrayOnClose || isDarwin) {
+      const closeAction = getMainWindowCloseAction();
+
+      if (closeAction === CloseAction.MinimizeToTray) {
         mainWindow.hide();
-      } else {
+      } else if (closeAction === CloseAction.Quit) {
         app.quit();
       }
     }
