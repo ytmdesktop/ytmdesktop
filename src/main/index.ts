@@ -351,6 +351,7 @@ const store = new Conf<StoreSchema>({
     },
     appearance: {
       alwaysShowVolumeSlider: false,
+      centeredPlayerControls: false,
       customCSSEnabled: false,
       customCSSPath: null,
       zoom: 100,
@@ -421,6 +422,11 @@ const store = new Conf<StoreSchema>({
     ">=2.0.7": store => {
       if (!store.has("appearance.trayIconStyle")) {
         store.set("appearance.trayIconStyle", 0);
+      }
+    },
+    ">=2.0.11": store => {
+      if (!store.has("appearance.centeredPlayerControls")) {
+        store.set("appearance.centeredPlayerControls", false);
       }
     }
   }
