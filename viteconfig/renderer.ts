@@ -31,7 +31,8 @@ export default defineConfig({
       input: {
         main_window: "src/renderer/windows/main/index.html",
         settings_window: "src/renderer/windows/settings/index.html",
-        authorize_companion_window: "src/renderer/windows/authorize-companion/index.html"
+        authorize_companion_window: "src/renderer/windows/authorize-companion/index.html",
+        miniplayer_window: "src/renderer/windows/miniplayer/index.html"
       },
       output: {
         manualChunks: {
