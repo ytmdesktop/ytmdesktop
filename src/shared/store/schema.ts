@@ -1,7 +1,8 @@
 export enum TrayIconStyle {
   Auto = 0,
   White = 1,
-  Black = 2
+  Black = 2,
+  Red = 3
 }
 
 export type StoreSchema = {
