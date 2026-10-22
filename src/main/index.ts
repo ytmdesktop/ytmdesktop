@@ -347,7 +347,8 @@ const store = new Conf<StoreSchema>({
       hideToTrayOnClose: false,
       showNotificationOnSongChange: false,
       startOnBoot: false,
-      startMinimized: false
+      startMinimized: false,
+      proxyServer: ""
     },
     appearance: {
       alwaysShowVolumeSlider: false,
@@ -558,6 +559,10 @@ if (store.get("general").disableHardwareAcceleration) {
 
 if (store.get("playback").enableSpeakerFill) {
   app.commandLine.appendSwitch("try-supported-channel-layouts");
+}
+
+if (store.get("general").proxyServer) {
+  app.commandLine.appendSwitch("proxy-server", store.get("general").proxyServer);
 }
 
 function saveState() {
