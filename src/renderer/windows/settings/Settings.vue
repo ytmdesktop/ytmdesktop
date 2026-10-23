@@ -138,6 +138,8 @@ const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("com
 
 const autoUpdaterDisabled = ref<boolean>(await memoryStore.get("autoUpdaterDisabled"));
 
+const lastFMAuthenticationStep = ref<number>(await memoryStore.get("lastFMAuthenticationStep"));
+
 memoryStore.onStateChanged(newState => {
   discordPresenceConnectionFailed.value = newState.discordPresenceConnectionFailed;
 
@@ -157,6 +159,8 @@ memoryStore.onStateChanged(newState => {
   safeStorageAvailable.value = newState.safeStorageAvailable;
 
   autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
+
+  lastFMAuthenticationStep.value = newState.lastFMAuthenticationStep;
 });
 
 async function memorySettingsChanged() {
@@ -261,6 +265,10 @@ async function logoutLastFM() {
   lastFMEnabled.value = false;
   lastFMSessionKey.value = null;
   await settingsChanged();
+}
+
+function stepLastFMAuth() {
+  window.ytmd.lastFMStepAuthenticate();
 }
 
 window.ytmd.handleCheckingForUpdate(() => {
@@ -589,6 +597,28 @@ window.ytmd.handleUpdateDownloaded(() => {
               @click="logoutLastFM"
             >
               Logout
+            </button>
+          </div>
+          <div
+            v-if="lastFMEnabled && lastFMAuthenticationStep === 0"
+            class="setting indented"
+          >
+            <p>
+              Continue setup in your browser then come back here when you're done
+            </p>
+            <button @click="stepLastFMAuth">
+              Authorize Last.fm in browser
+            </button>
+          </div>
+          <div
+            v-if="lastFMEnabled && lastFMAuthenticationStep === 1"
+            class="setting indented"
+          >
+            <p>
+              After you're done in the browser click "Finish Last.fm authentication"
+            </p>
+            <button @click="stepLastFMAuth">
+              Finish Last.fm authentication
             </button>
           </div>
           <YTMDSetting

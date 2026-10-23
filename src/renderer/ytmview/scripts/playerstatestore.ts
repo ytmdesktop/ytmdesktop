@@ -170,8 +170,14 @@ export default function init() {
   });
   playerApi.addEventListener("onVideoDataChange", event => {
     try {
-      if (event.playertype === 1 && (event.type === "dataloaded" || event.type === "dataupdated")) {
-        sendVideoData();
+      if (event.playertype === 1) {
+        if (event.type === "newdata") {
+          playerStateApi.postMessage("playerSignal", "NEW_PLAYBACK");
+        }
+
+        if (event.type === "dataloaded" || event.type === "dataupdated") {
+          sendVideoData();
+        }
       }
     } catch (err) {
       console.error("[ytmd-err(playerApi.onVideoDataChange)]", err);

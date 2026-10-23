@@ -79,3 +79,7 @@ export type PlayerState = {
   adPlaying: boolean;
   hasFullMetadata: boolean;
 };
+
+export enum PlayerSignal {
+  NewPlayback = 0
+}

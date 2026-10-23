@@ -51,5 +51,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   isAppUpdateDownloaded: async (): Promise<boolean> => await ipcRenderer.invoke("autoUpdater:isUpdateDownloaded"),
   getTrueFilePath: (file: File) => webUtils.getPathForFile(file),
 
+  lastFMStepAuthenticate: () => ipcRenderer.send("lastfm:authenticate"),
+
   processVersions: { electron: process.versions.electron, chrome: process.versions.chrome }
 });

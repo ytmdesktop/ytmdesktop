@@ -1,4 +1,4 @@
-import { LikeStatus, PlayerQueue, PlayerQueueItem, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "~shared/playerstatestore/types";
+import { LikeStatus, PlayerQueue, PlayerQueueItem, PlayerSignal, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "~shared/playerstatestore/types";
 import Service, { EventEmitterService } from "../service";
 import log from "electron-log";
 import { DependencyConstructor } from "~shared/types";
@@ -210,6 +210,7 @@ export type PlayerStateStoreEventMap = {
   "state-changed": [PlayerState];
   "playlist-created": [{ title: string; id: string }];
   "playlist-deleted": [string];
+  "player-signal": [PlayerSignal];
 };
 
 export default class PlayerStateStore extends EventEmitterService<PlayerStateStoreEventMap> {
@@ -234,6 +235,8 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
     this.stateApi.on("updateVideoState", this.updateVideoState.bind(this));
     this.stateApi.on("updateVideoDetails", this.updateVideoDetails.bind(this));
     this.stateApi.on("updateFromStore", this.updateFromStore.bind(this));
+    
+    this.stateApi.on("playerSignal", this.emitPlayerSignal.bind(this));
 
     this.stateApi.on("playlistCreated", playlist => this.emit("playlist-created", playlist));
     this.stateApi.on("playlistDeleted", playlistId => this.emit("playlist-deleted", playlistId));
@@ -356,6 +359,12 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
     if (typeof volume === "number" && volume >= 0) this.volume = volume;
 
     this.stateChanged();
+  }
+
+  public emitPlayerSignal(signal: "NEW_PLAYBACK") {
+    if (signal === "NEW_PLAYBACK") {
+      this.emit("player-signal", PlayerSignal.NewPlayback)
+    }
   }
 
   private stateChanged() {

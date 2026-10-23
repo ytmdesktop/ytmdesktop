@@ -72,6 +72,7 @@ export type StoreSchema = {
 
 export type MemoryStoreSchema = {
   discordPresenceConnectionFailed: boolean;
+
   shortcutsPlayPauseRegisterFailed: boolean;
   shortcutsNextRegisterFailed: boolean;
   shortcutsPreviousRegisterFailed: boolean;
@@ -82,18 +83,26 @@ export type MemoryStoreSchema = {
   shortcutsVolumeMuteRegisterFailed: boolean;
   shortcutsToggleShuffleRegisterFailed: boolean;
   shortcutsToggleRepeatRegisterFailed: boolean;
+
   companionServerAuthWindowEnabled: boolean;
+
   safeStorageAvailable: boolean;
+
   autoUpdaterDisabled: boolean;
   autoUpdaterChecking: boolean;
   autoUpdaterNotAvailable: boolean;
   autoUpdaterAvailable: boolean;
   autoUpdaterDownloaded: boolean;
   autoUpdaterErrored: boolean;
+
   ytmViewLoadTimedout: boolean;
   ytmViewLoading: boolean;
   ytmViewLoadingError: boolean;
   ytmViewLoadingStatus: string;
   ytmViewUnresponsive: boolean;
+
   appLoadingStatus: string;
+
+  lastFMAuthenticationStep: number;
+  lastFMToken: string;
 };
