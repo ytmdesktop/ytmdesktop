@@ -28,11 +28,9 @@ async function remapThumbnailsToDataUrl(thumbnails: any[]) {
   for (const thumbnail of thumbnails) {
     if (thumbnail.url) {
       try {
-        const response = await fetch(thumbnail.url, {
-          credentials: "omit",
-          referrerPolicy: "no-referrer"
-        });
-        if (response.ok) {
+        // YTM utilizes CacheStorage and more specifically for thumbnails it's from `caches.open("yt-player-local-img:${yt.config_.DATASYNC_ID}")`
+        const response = await caches.match(thumbnail.url);
+        if (response && response.ok) {
           const blob = await response.blob();
           const dataUrl = await new Promise((resolve, reject) => {
             const reader = new FileReader();
