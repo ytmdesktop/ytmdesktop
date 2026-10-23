@@ -40,11 +40,11 @@
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/multicast-dns": "^7.2.4",
     "@vitejs/plugin-vue": "^6.0.10",
-    "electron": "44.7.0",
+    "electron": "45.0.0",
     "oxfmt": "^0.41.0",
-    "oxlint": "^1.88.0",
+    "oxlint": "^1.89.0",
     "typescript": "^6.0.3",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.1",
