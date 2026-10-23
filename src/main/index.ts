@@ -1312,7 +1312,16 @@ const createMainWindow = (): void => {
   });
 
   mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
+    const generalSettings = store.get("general");
+    if (generalSettings.startMinimized) {
+      // Stay in the tray if the user hides to tray, otherwise minimize to the taskbar
+      if (!(generalSettings.hideToTrayOnClose || isDarwin)) {
+        mainWindow.showInactive();
+        mainWindow.minimize();
+      }
+    } else {
+      mainWindow.show();
+    }
     // Open the DevTools.
     if (process.env.NODE_ENV === "development") {
       mainWindow.webContents.openDevTools({
