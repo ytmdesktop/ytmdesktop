@@ -20,11 +20,16 @@ export default class LastFM extends Integration {
 
   private possibleVideoIds: string[] | null = null;
   private lastFMDetails: StoreSchema["lastfm"] | null = null;
-  private scrobbleTimer: NodeJS.Timeout | string | number | undefined = undefined;
   private playerStateFunction: ((state: PlayerState) => void) | null = null;
   private playerSignalFunction: ((signal: PlayerSignal) => void) | null = null;
 
   private lastFMClient?: LastFMClient;
+
+  private scrobbleTimeRequired = -1;
+  private accumulatedPlaybackTime = 0;
+  private hasScrobbled = false;
+  private playbackStartTimestamp = 0;
+  private lastPlaybackAccumulationTime = 0;
 
   public onSetup() {}
 
@@ -126,83 +131,101 @@ export default class LastFM extends Integration {
     }
   }
 
+  private async maybeUpdateScrobble(state: PlayerState): Promise<void> {
+    if (!state.videoDetails) return;
+
+    // Check if the video has changed
+    const videoIsPrepped = this.possibleVideoIds && this.possibleVideoIds.indexOf(state.videoDetails.id) !== -1;
+    const queueExists = state.queue && state.queue.items && state.queue.items.length > 0;
+
+    if (videoIsPrepped && queueExists) {
+      return;
+    }
+
+    const hasFullMetadata = state.hasFullMetadata;
+    if (!hasFullMetadata) {
+      return;
+    }
+
+    // Store all the IDs of videos for this song.
+    if (state.queue) {
+      this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map(item => item.videoId) || [];
+      const possibleVideoId = state.queue.items[state.queue.selectedItemIndex]?.videoId;
+      if (possibleVideoId) this.possibleVideoIds.push(possibleVideoId);
+    }
+
+    // Track must be longer than 30 seconds
+    // https://www.last.fm/api/scrobbling "When is a scrobble a scrobble?"
+    if (state.videoDetails.durationSeconds < 30) {
+      return;
+    }
+
+    try {
+      await this.lastFMClient?.updateNowPlaying({
+        artist: state.videoDetails.author,
+        track: state.videoDetails.title,
+        album: state.videoDetails.album ?? undefined,
+        duration: state.videoDetails.durationSeconds
+      });
+    } catch(err) {
+      log.error("lastfm: failed to update now playing", err);
+    }
+
+    const configStore = this.getService(ConfigStore);
+
+    this.lastFMDetails!.scrobblePercent = configStore.get("lastfm.scrobblePercent");
+    const scrobblePercentDecimal = Math.max(50, Math.min(100, this.lastFMDetails!.scrobblePercent)) / 100;
+    this.scrobbleTimeRequired = Math.min(
+      // Scrobble the track if it has been played to the percent picked by the user
+      Math.round(state.videoDetails.durationSeconds * scrobblePercentDecimal),
+      // OR if it has been played for more than 4 minutes, scrobble maximum time: https://www.last.fm/api/scrobbling
+      240
+    );
+    log.debug("lastfm: reset accumulated playback time");
+    this.accumulatedPlaybackTime = 0;
+    this.hasScrobbled = false;
+    this.playbackStartTimestamp = new Date().getTime();
+  }
+
   private async updatePlayerState(state: PlayerState): Promise<void> {
     if (!this.isEnabled || !this.lastFMDetails?.sessionKey) {
       return;
     }
 
-    if (state.videoDetails && state.trackState === VideoState.Playing) {
-      // Check if the video has changed
-      const videoIsPrepped = this.possibleVideoIds && this.possibleVideoIds.indexOf(state.videoDetails.id) !== -1;
-      const queueExists = state.queue && state.queue.items && state.queue.items.length > 0;
+    if (state.videoDetails) {
+      this.maybeUpdateScrobble(state);
+    }
 
-      if (videoIsPrepped && queueExists) {
-        return;
-      }
+    // Media is actively playing accumulate playback time for scrobble
+    if (state.trackState === VideoState.Playing) {
+      if (!this.hasScrobbled && this.scrobbleTimeRequired >= 0) {
+        const now = new Date().getTime();
+        if (now - this.lastPlaybackAccumulationTime >= 1000) {
+          this.accumulatedPlaybackTime++;
+          this.lastPlaybackAccumulationTime = now;
+        }
 
-      const hasFullMetadata = state.hasFullMetadata;
-      if (!hasFullMetadata) {
-        return;
-      }
-
-      // Store all the IDs of videos for this song.
-      if (state.queue) {
-        this.possibleVideoIds = state.queue.items[state.queue.selectedItemIndex]?.counterparts?.map(item => item.videoId) || [];
-        const possibleVideoId = state.queue.items[state.queue.selectedItemIndex]?.videoId;
-        if (possibleVideoId) this.possibleVideoIds.push(possibleVideoId);
-      }
-
-      // Track must be longer than 30 seconds
-      // https://www.last.fm/api/scrobbling "When is a scrobble a scrobble?"
-      if (state.videoDetails.durationSeconds < 30) {
-        return;
-      }
-
-      try {
-        await this.lastFMClient?.updateNowPlaying({
-          artist: state.videoDetails.author,
-          track: state.videoDetails.title,
-          album: state.videoDetails.album ?? undefined,
-          duration: state.videoDetails.durationSeconds
-        });
-      } catch(err) {
-        log.error("lastfm: failed to update now playing", err);
-      }
-
-      const configStore = this.getService(ConfigStore);
-
-      this.lastFMDetails.scrobblePercent = configStore.get("lastfm.scrobblePercent");
-      const scrobblePercentDecimal = this.lastFMDetails.scrobblePercent / 100;
-      const scrobbleTimeRequired = Math.min(
-        // Scrobble the track if it has been played to the percent picked by the user
-        Math.round(state.videoDetails.durationSeconds * scrobblePercentDecimal),
-        // OR if it has been played for more than 4 minutes, scrobble maximum time: https://www.last.fm/api/scrobbling
-        240
-      );
-      const scrobbleTime = new Date().getTime();
-      clearTimeout(this.scrobbleTimer);
-      this.scrobbleTimer = setTimeout(async () => {
-        try {
+        if (this.accumulatedPlaybackTime >= this.scrobbleTimeRequired) {
+          this.hasScrobbled = true;
           if (state.videoDetails) {
             await this.lastFMClient?.scrobble({
               artist: state.videoDetails.author,
               track: state.videoDetails.title,
-              timestamp: Math.floor(scrobbleTime / 1000),
+              timestamp: Math.floor(this.playbackStartTimestamp / 1000),
               album: state.videoDetails.album ?? undefined,
               duration: state.videoDetails.durationSeconds
             });
           }
-        } catch(err) {
-          log.error("lastfm: failed to scrobble", err);
         }
-      }, scrobbleTimeRequired * 1000);
+      }
     }
   }
 
   private updateFromPlayerSignal(signal: PlayerSignal) {
     // NewPlayback signal is considered a fresh playback e.g. a new video or a looped video
+    // 
+    // TODO: Fix how this works? It resets the scrobble time if the user swaps between song/video which may not really be a new video/looped track in this context
     if (signal === PlayerSignal.NewPlayback) {
-      clearTimeout(this.scrobbleTimer);
       this.possibleVideoIds = [];
     }
   }
