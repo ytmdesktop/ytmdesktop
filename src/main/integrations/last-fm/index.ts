@@ -26,7 +26,7 @@ export default class LastFM extends Integration {
 
   private currentVideoId: string | null = null
   private scrobbleTimeRequired = -1;
-  private accumulatedPlaybackTime = 0;
+  private accumulatedPlaybackTime = -1;
   private hasScrobbled = false;
   private playbackStartTimestamp = 0;
   private lastPlaybackAccumulationTime = 0;
