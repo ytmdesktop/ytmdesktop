@@ -396,6 +396,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="alwaysShowVolumeSlider"
             type="checkbox"
             name="Always show volume slider"
+            description="This feature only works on the old player bar and may not work for you"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -440,6 +441,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-model="continueWhereYouLeftOff"
             name="Continue where you left off"
+            description="If you're signed in this feature can be turned off"
             type="checkbox"
             @change="settingsChanged"
           />
