@@ -66,10 +66,15 @@ if (!gotTheLock) {
     // If the service host isn't initialized the app is still starting up
     if (!serviceHost.initialized) return;
 
+    log.debug("Second instance");
+
     const windowManager = serviceHost.getService(AppWindowManager);
-    if (windowManager.hasWindow("Main")) {
-      const mainWindow = windowManager.getWindow("Main");
-      mainWindow.showAndFocus();
+    if (windowManager.hasWindow("Miniplayer")) {
+      log.debug("Closing miniplayer");
+      // Main window will automatically show upon closure of the miniplayer
+      windowManager.getWindow("Miniplayer").closeWindow();
+    } else if (windowManager.hasWindow("Main")) {
+      windowManager.getWindow("Main").showAndFocus();
     }
 
     if (serviceHost.initialized) serviceHost.getService(ProtocolManager).handleYTMDProtocol(commandLine[commandLine.length - 1]);
@@ -499,6 +504,8 @@ app.on("ready", async () => {
       click: () => {
         if (windowManager.hasWindow("Miniplayer")) {
           windowManager.getWindow("Miniplayer").closeWindow();
+          // Closing the miniplayer automatically shows and focuses the mainWindow so we don't need to continue
+          return;
         }
 
         if (mainWindow.isVisible()) {
