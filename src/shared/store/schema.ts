@@ -59,9 +59,6 @@ export type StoreSchema = {
     miniplayerWindowBounds: Electron.Rectangle | null;
   };
   lastfm: {
-    api_key: string;
-    secret: string;
-    token: string | null;
     sessionKey: string | null;
     scrobblePercent: number;
   };

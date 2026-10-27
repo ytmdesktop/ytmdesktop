@@ -77,10 +77,6 @@ export default class ConfigStore extends Service {
           miniplayerWindowBounds: null
         },
         lastfm: {
-          // Last FM Keys belong to @Alipoodle
-          api_key: "2a69bcf769a7a28a8bf2f6a5100accad",
-          secret: "46eea23770a459a49eb4d26cbf46b41c",
-          token: null,
           sessionKey: null,
           scrobblePercent: 50
         },
@@ -134,6 +130,24 @@ export default class ConfigStore extends Service {
 
           if (!store.has("metadata.appVersion")) {
             store.set("metadata.appVersion", "2.0.10");
+          }
+
+          // @ts-expect-error Removed store key
+          if (store.has("lastfm.api_key")) {
+            // @ts-expect-error Removed store key
+            store.delete("lastfm.api_key");
+          }
+
+          // @ts-expect-error Removed store key
+          if (store.has("lastfm.secret")) {
+            // @ts-expect-error Removed store key
+            store.delete("lastfm.secret");
+          }
+
+          // @ts-expect-error Removed store key
+          if (store.has("lastfm.token")) {
+            // @ts-expect-error Removed store key
+            store.delete("lastfm.token");
           }
         }
       }
