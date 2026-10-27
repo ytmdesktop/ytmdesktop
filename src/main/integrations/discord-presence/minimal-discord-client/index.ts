@@ -21,9 +21,12 @@ function getIPCPath(id: number): string {
   const dirtyPrefix = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
   const prefix = dirtyPrefix.replace(/\/$/, "");
   const discordSnapDir = "snap.discord";
+  const discordFlatpakDir = "app/com.discordapp.Discord";
 
   if (directoryExists(`${prefix}/${discordSnapDir}`)) {
     return `${prefix}/${discordSnapDir}/discord-ipc-${id}`;
+  } else if (directoryExists(`${prefix}/${discordFlatpakDir}`)) {
+    return `${prefix}/${discordFlatpakDir}/discord-ipc-${id}`;
   } else {
     return `${prefix}/discord-ipc-${id}`;
   }
@@ -61,14 +64,14 @@ export default class DiscordClient extends EventEmitter {
               ipcReject();
             });
             this.ipcClient.once("error", error => {
-              log.error("dipc: socket error connecting to discord", error);
+              log.debug("dipc: socket error connecting to discord", error);
             });
             this.ipcClient.once("connect", () => {
               log.debug("dipc: connected to discord at", ipcPath);
               this.ipcClient.removeAllListeners();
               ipcResolve();
             });
-            this.ipcClient.connect(getIPCPath(id));
+            this.ipcClient.connect(ipcPath);
           });
 
           this.connected = true;
@@ -81,6 +84,9 @@ export default class DiscordClient extends EventEmitter {
           );
           this.emit("connect");
 
+          this.ipcClient.on("error", error => {
+            log.debug("dipc: socket error after connection", error);
+          });
           this.ipcClient.on("close", () => {
             this.connected = false;
             this.emit("close");
