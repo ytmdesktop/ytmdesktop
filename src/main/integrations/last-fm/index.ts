@@ -197,13 +197,17 @@ export default class LastFM extends Integration {
 
         if (this.accumulatedPlaybackTime >= this.scrobbleTimeRequired) {
           this.hasScrobbled = true;
-          await this.lastFMClient?.scrobble({
-            artist: state.videoDetails.author,
-            track: state.videoDetails.title,
-            timestamp: Math.floor(this.playbackStartTimestamp / 1000),
-            album: state.videoDetails.album ?? undefined,
-            duration: state.videoDetails.durationSeconds
-          });
+          try {
+            await this.lastFMClient?.scrobble({
+              artist: state.videoDetails.author,
+              track: state.videoDetails.title,
+              timestamp: Math.floor(this.playbackStartTimestamp / 1000),
+              album: state.videoDetails.album ?? undefined,
+              duration: state.videoDetails.durationSeconds
+            });
+          } catch(err) {
+            log.error("lastfm: failed to scrobble", err);
+          }
         }
       }
     }
