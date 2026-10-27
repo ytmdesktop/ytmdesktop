@@ -5,6 +5,7 @@ import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
+import Themes from "./Themes.vue";
 
 declare const YTMD_GIT_COMMIT_HASH: string;
 declare const YTMD_GIT_BRANCH: string;
@@ -273,6 +274,7 @@ window.ytmd.handleUpdateDownloaded(() => {
       <ul class="sidebar">
         <li :class="{ active: currentTab === 1 }" @click="changeTab(1)"><span class="material-symbols-outlined">settings_applications</span>General</li>
         <li :class="{ active: currentTab === 2 }" @click="changeTab(2)"><span class="material-symbols-outlined">brush</span>Appearance</li>
+        <li :class="{ active: currentTab === 6 }" @click="changeTab(6)"><span class="material-symbols-outlined">palette</span>Themes</li>
         <li :class="{ active: currentTab === 3 }" @click="changeTab(3)"><span class="material-symbols-outlined">music_note</span>Playback</li>
         <li :class="{ active: currentTab === 4 }" @click="changeTab(4)"><span class="material-symbols-outlined">wifi_tethering</span>Integrations</li>
         <li :class="{ active: currentTab === 5 }" @click="changeTab(5)"><span class="material-symbols-outlined">keyboard</span>Shortcuts</li>
@@ -301,9 +303,16 @@ window.ytmd.handleUpdateDownloaded(() => {
           />
         </div>
 
+        <Themes v-if="currentTab === 6" />
         <div v-if="currentTab === 2" class="appearance-tab">
           <YTMDSetting v-model="alwaysShowVolumeSlider" type="checkbox" name="Always show volume slider" @change="settingsChanged" />
-          <YTMDSetting v-model="customCSSEnabled" type="checkbox" name="Custom CSS" @change="settingsChanged" />
+          <YTMDSetting
+            v-model="customCSSEnabled"
+            type="checkbox"
+            name="Linked CSS overrides"
+            description="Optional file layer above your theme. Manage presets and imported copies in Themes. Self-contained CSS only; external resources are rejected."
+            @change="settingsChanged"
+          />
           <YTMDSetting
             v-if="customCSSEnabled"
             v-model="customCSSPath"

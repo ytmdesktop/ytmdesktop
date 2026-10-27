@@ -6,11 +6,22 @@ import Store from "../../store-ipc/store";
 import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import { WindowsEventArguments } from "~shared/types";
 import MemoryStore from "../../store-ipc/memory-store";
+import { Selection } from "~shared/themes/model";
 
 const store = new Store<StoreSchema>();
 const memoryStore = new MemoryStore<MemoryStoreSchema>();
 
 contextBridge.exposeInMainWorld("ytmd", {
+  themes: {
+    get: () => ipcRenderer.invoke("themes:action", "get"),
+    preview: (value: Selection) => ipcRenderer.invoke("themes:action", "preview", value),
+    apply: (value: Selection) => ipcRenderer.invoke("themes:action", "apply", value),
+    cancel: () => ipcRenderer.invoke("themes:action", "cancel"),
+    importCSS: () => ipcRenderer.invoke("themes:action", "import"),
+    rename: (id: string, name: string) => ipcRenderer.invoke("themes:action", "rename", id, name),
+    remove: (id: string) => ipcRenderer.invoke("themes:action", "remove", id),
+    exportCSS: (value: Selection) => ipcRenderer.invoke("themes:action", "export", value)
+  },
   isDarwin: process.platform === "darwin",
   isLinux: process.platform === "linux",
   isWindows: process.platform === "win32",

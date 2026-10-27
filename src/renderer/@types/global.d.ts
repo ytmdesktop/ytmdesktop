@@ -2,10 +2,12 @@ import { WindowsEventArguments } from "~shared/types";
 import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
+import { ThemeAPI } from "~shared/themes/model";
 
 declare global {
   interface Window {
     ytmd: {
+      themes: ThemeAPI;
       // Settings specific
       isDarwin: boolean;
       isLinux: boolean;
