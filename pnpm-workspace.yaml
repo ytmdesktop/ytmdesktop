@@ -1,0 +1,10 @@
+allowBuilds:
+  electron: true
+  electron-winstaller: true
+  fastify-socket.io: false
+
+minimumReleaseAgeStrict: true
+
+nodeLinker: hoisted
+patchedDependencies:
+  electron-installer-redhat: patches/electron-installer-redhat.patch

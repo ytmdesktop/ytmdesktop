@@ -6,47 +6,58 @@ on:
     tags:
       - "v*"
 
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
 jobs:
   build:
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        arch: [ 'x64', 'arm64' ]
-        exclude:
-          # Mitigation for Electron Forge naming conflict. See #1183.
-          - os: 'windows-latest'
-            arch: 'arm64'
-        
+        os:
+          [
+            { name: "linux", image: "ubuntu-24.04", arch: "x64" },
+            { name: "linux", image: "ubuntu-24.04-arm", arch: "arm64" },
+            { name: "windows", image: "windows-2025", arch: "x64" },
+            # Naming conflict can't publish windows arm. See #1183.
+            # { name: "windows", image: "windows-11-arm", arch: "arm64" },
+            { name: "macos", image: "macos-26-intel", arch: "x64" },
+            { name: "macos", image: "macos-26", arch: "arm64" },
+          ]
+
       fail-fast: true # Explicitly failing fast because this is a publish. We want to bail the entire release if something went wrong with another build
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os.image }}
 
     steps:
       - name: Github checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Corepack Enable Yarn
-        run: corepack enable yarn
-
-      - name: Setup Node (v20)
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/setup@v3
         with:
-          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
-          cache: 'yarn'
-          node-version: "20.9.0"
+          runtime: node@lts
+          cache: true
 
-      - name: Install dependencies
-        run: yarn --immutable
-
-      - name: Publish Dry (${{ matrix.arch }})
+      - name: Make (${{ matrix.os.arch }})
         env:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
-        run: yarn publish:dry --arch ${{ matrix.arch }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_API_SECRET: ${{ secrets.LASTFM_API_SECRET }}
+          NODE_ENV: production
+        run: pnpm make --arch ${{ matrix.os.arch }}
 
-      - name: Publish From Dry (${{ matrix.arch }})
-        run: yarn publish:fromdry
+      - name: Generate artifact attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: out/make/**/*
+
+      - name: Release From Make (${{ matrix.os.arch }})
+        run: pnpm release:frommake
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
+          NODE_ENV: production

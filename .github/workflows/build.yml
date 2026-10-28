@@ -9,47 +9,47 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [
-            { name: 'linux',   image: 'ubuntu-latest' },
-            { name: 'windows', image: 'windows-latest' },
-            { name: 'macos',   image: 'macos-latest' }
+        os:
+          [
+            { name: "linux", image: "ubuntu-24.04", arch: "x64" },
+            { name: "linux", image: "ubuntu-24.04-arm", arch: "arm64" },
+            { name: "windows", image: "windows-2025", arch: "x64" },
+            { name: "windows", image: "windows-11-arm", arch: "arm64" },
+            { name: "macos", image: "macos-26-intel", arch: "x64" },
+            { name: "macos", image: "macos-26", arch: "arm64" },
           ]
-        arch: [ 'x64', 'arm64' ]
       fail-fast: false
-          
 
     runs-on: ${{ matrix.os.image }}
 
     steps:
       - name: Github checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Corepack Enable Yarn
-        run: corepack enable yarn
-
-      - name: Setup Node (v20)
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/setup@v3
         with:
-          # https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
-          cache: 'yarn'
-          node-version: "20.9.0"
+          runtime: node@lts
+          cache: true
 
-      - name: Install dependencies
-        run: yarn --immutable
+      - name: Install libdbus
+        if: matrix.os.name == 'linux'
+        run: sudo apt-get install libdbus-1-dev pkg-config -y
 
-      - name: Build (${{ matrix.arch }})
-        # if: matrix.os.image == 'macos-latest'
+      - name: Make (${{ matrix.os.arch }})
         env:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
           YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
-        run: yarn make --arch ${{ matrix.arch }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_API_SECRET: ${{ secrets.LASTFM_API_SECRET }}
+        run: pnpm make --arch ${{ matrix.os.arch }}
 
-      - name: Upload artifacts (${{ matrix.arch }})
-        uses: actions/upload-artifact@v4
+      - name: Upload artifacts (${{ matrix.os.arch }})
+        uses: actions/upload-artifact@v7
         with:
-          name: dist-${{ matrix.os.name }}-${{ matrix.arch }}
+          name: dist-${{ matrix.os.name }}-${{ matrix.os.arch }}
           path: |
-            out/make/squirrel.windows/${{ matrix.arch }}/*.exe
-            out/make/deb/${{ matrix.arch }}/*.deb
-            out/make/rpm/${{ matrix.arch }}/*.rpm
-            out/make/zip/darwin/${{ matrix.arch }}/*.zip
+            out/make/squirrel.windows/${{ matrix.os.arch }}/*.exe
+            out/make/deb/${{ matrix.os.arch }}/*.deb
+            out/make/rpm/${{ matrix.os.arch }}/*.rpm
+            out/make/zip/darwin/${{ matrix.os.arch }}/*.zip
