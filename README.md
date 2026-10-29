@@ -53,17 +53,13 @@ cd ytmdesktop
 ```
 ##### And:
 ```sh
-# If you do not have Yarn Installed / New to Node as a whole you can enable Yarn with:
-corepack enable
+pnpm install
 
-# Install dependencies
-yarn install
-# Run the app
-yarn start
+pnpm start
 ```
 
 # Building the Project
-To build for your platform you need to run `yarn make`, however please see the information below regarding the required additionally Software, Tools and Packages which are needed to successfully package into a nice installer file.
+To build for your platform you need to run `pnpm make`, however please see the information below regarding the required additionally Software, Tools and Packages which are needed to successfully package into a nice installer file.
 
 ## Windows
 To download the full suite of Tools/Software needed to build the app it is recommended to install the suite of build tools that electron provide which includes Visual Studio, Python and other tools.
