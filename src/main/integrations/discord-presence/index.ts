@@ -1,10 +1,11 @@
-import playerStateStore, { PlayerState, Thumbnail, VideoDetails, VideoState } from "../../player-state-store";
-import IIntegration from "../integration";
-import MemoryStore from "../../memory-store";
-import { MemoryStoreSchema } from "~shared/store/schema";
+import PlayerStateStore from "../../services/playerstatestore";
 import DiscordClient from "./minimal-discord-client";
 import log from "electron-log";
 import { DiscordActivityStatusDisplayType, DiscordActivityType } from "./minimal-discord-client/types";
+import Integration from "../integration";
+import MemoryStore from "../../services/memorystore";
+import { MemoryStoreSchema } from "~shared/store/schema";
+import { PlayerState, Thumbnail, VideoDetails, VideoState } from "~shared/playerstatestore/types";
 
 const DISCORD_CLIENT_ID = "1143202598460076053";
 const INITIAL_RETRY_DELAY_MS = 5 * 1000;
@@ -53,30 +54,31 @@ function stringLimit(str: string, limit: number, minimum: number) {
   return str;
 }
 
-export default class DiscordPresence implements IIntegration {
-  private memoryStore: MemoryStore<MemoryStoreSchema> | null = null;
+export default class DiscordPresence extends Integration {
+  public name = "DiscordPresence";
+  public storeEnableProperty: Integration["storeEnableProperty"] = "integrations.discordPresenceEnabled";
+  public override disableFlags = ["disable_discord_presence"];
 
   private discordClient: DiscordClient | null = null;
-  private enabled = false;
   private ready = false;
-  private activityDebounceTimeout: NodeJS.Timeout | null = null;
-  private pauseTimeout: NodeJS.Timeout | null = null;
-  private connectionRetryTimeout: NodeJS.Timeout | null = null;
-  private connectionFailedTimeout: NodeJS.Timeout | null = null;
+  private activityDebounceTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private pauseTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private connectionRetryTimeout: NodeJS.Timeout | string | number | undefined = undefined;
+  private connectionFailedTimeout: NodeJS.Timeout | string | number | undefined = undefined;
   private stateCallback: ((event: PlayerState) => void) | null = null;
 
-  private videoState: VideoState | null = null;
-  private videoDetails: Partial<VideoDetails> | null = null;
-  private progress: number | null = null;
+  private videoState: VideoState = VideoState.Unknown;
+  private videoDetails: VideoDetails | null = null;
+  private progress: number = 0;
 
   private connectionRetries: number = 0;
 
-  private UpdateActivity() {
+  private updateActivity() {
     if (this.activityDebounceTimeout) return;
     this.activityDebounceTimeout = setTimeout(() => {
       if (!this.videoDetails || !this.discordClient) {
         this.discordClient?.clearActivity();
-        this.activityDebounceTimeout = null;
+        this.activityDebounceTimeout = undefined;
         return;
       }
       const { title, author, album, id, thumbnails, durationSeconds, channelId, albumId } = this.videoDetails;
@@ -112,7 +114,7 @@ export default class DiscordPresence implements IIntegration {
             ]
           : undefined
       });
-      this.activityDebounceTimeout = null;
+      this.activityDebounceTimeout = undefined;
     }, 1000);
   }
 
@@ -121,9 +123,9 @@ export default class DiscordPresence implements IIntegration {
 
     const { videoDetails, videoProgress, trackState, hasFullMetadata } = state;
     if (!videoDetails) {
-      this.videoState = null;
+      this.videoState = VideoState.Unknown;
       this.videoDetails = null;
-      this.progress = null;
+      this.progress = 0;
       this.discordClient?.clearActivity();
       return;
     }
@@ -141,37 +143,34 @@ export default class DiscordPresence implements IIntegration {
         Math.abs(this.progress - oldProgress) > 1 ||
         oldProgress > this.progress)
     ) {
-      this.UpdateActivity();
+      this.updateActivity();
     }
 
     if (this.pauseTimeout) {
       clearTimeout(this.pauseTimeout);
-      this.pauseTimeout = null;
+      this.pauseTimeout = undefined;
     }
     if (state.trackState === VideoState.Playing) return;
     this.pauseTimeout = setTimeout(() => {
       if (!this.discordClient || !this.ready) {
-        this.pauseTimeout = null;
+        this.pauseTimeout = undefined;
         return;
       }
       this.discordClient.clearActivity();
-      this.pauseTimeout = null;
+      this.pauseTimeout = undefined;
     }, 30 * 1000);
   }
 
-  public provide(memoryStore: MemoryStore<MemoryStoreSchema>): void {
-    this.memoryStore = memoryStore;
-  }
-
   private retryDiscordConnection() {
-    if (!this.enabled) return;
+    if (!this.isEnabled) return;
 
     if (!this.connectionFailedTimeout && !this.ready) {
       this.connectionFailedTimeout = setTimeout(() => {
-        if (!this.ready && this.enabled) {
-          this.memoryStore?.set("discordPresenceConnectionFailed", true);
+        if (!this.ready && this.isEnabled) {
+          const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+          memoryStore.set("discordPresenceConnectionFailed", true);
         }
-        this.connectionFailedTimeout = null;
+        this.connectionFailedTimeout = undefined;
       }, CONNECTION_FAILED_TIMEOUT_MS);
     }
 
@@ -188,16 +187,18 @@ export default class DiscordPresence implements IIntegration {
     }, retryDelay);
   }
 
-  public enable(): void {
-    this.enabled = true;
-    this.memoryStore?.set("discordPresenceConnectionFailed", false);
+  public onSetup() {}
+
+  public onEnabled(): void {
+    const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+    memoryStore.set("discordPresenceConnectionFailed", false);
 
     if (!this.connectionFailedTimeout && !this.ready) {
       this.connectionFailedTimeout = setTimeout(() => {
-        if (!this.ready && this.enabled) {
-          this.memoryStore?.set("discordPresenceConnectionFailed", true);
+        if (!this.ready && this.isEnabled) {
+          memoryStore.set("discordPresenceConnectionFailed", true);
         }
-        this.connectionFailedTimeout = null;
+        this.connectionFailedTimeout = undefined;
       }, CONNECTION_FAILED_TIMEOUT_MS);
     }
 
@@ -209,17 +210,19 @@ export default class DiscordPresence implements IIntegration {
       this.connectionRetries = 0;
       if (this.connectionFailedTimeout) {
         clearTimeout(this.connectionFailedTimeout);
-        this.connectionFailedTimeout = null;
+        this.connectionFailedTimeout = undefined;
       }
-      this.memoryStore?.set("discordPresenceConnectionFailed", false);
+      const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+      memoryStore.set("discordPresenceConnectionFailed", false);
+      const playerStateStore = this.getService(PlayerStateStore);
       this.playerStateChanged(playerStateStore.getState());
     });
     this.discordClient.on("close", () => {
       log.info("Discord connection closed");
       this.ready = false;
-      this.videoState = null;
+      this.videoState = VideoState.Unknown;
       this.videoDetails = null;
-      this.progress = null;
+      this.progress = 0;
       this.retryDiscordConnection();
     });
     this.discordClient.connect().catch(() => this.retryDiscordConnection());
@@ -227,45 +230,43 @@ export default class DiscordPresence implements IIntegration {
       this.playerStateChanged(event);
     };
 
-    playerStateStore.addEventListener(this.stateCallback);
+    const playerStateStore = this.getService(PlayerStateStore);
+    playerStateStore.on("state-changed", this.stateCallback);
   }
 
-  public disable(): void {
-    this.enabled = false;
+  public onDisabled(): void {
     this.connectionRetries = 0;
-    this.memoryStore?.set("discordPresenceConnectionFailed", false);
+    const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
+    memoryStore.set("discordPresenceConnectionFailed", false);
 
     if (this.activityDebounceTimeout) {
       clearTimeout(this.activityDebounceTimeout);
-      this.activityDebounceTimeout = null;
+      this.activityDebounceTimeout = undefined;
     }
     if (this.pauseTimeout) {
       clearTimeout(this.pauseTimeout);
-      this.pauseTimeout = null;
+      this.pauseTimeout = undefined;
     }
     if (this.connectionRetryTimeout) {
       clearTimeout(this.connectionRetryTimeout);
-      this.connectionRetryTimeout = null;
+      this.connectionRetryTimeout = undefined;
     }
     if (this.connectionFailedTimeout) {
       clearTimeout(this.connectionFailedTimeout);
-      this.connectionFailedTimeout = null;
+      this.connectionFailedTimeout = undefined;
     }
 
     if (this.stateCallback) {
-      playerStateStore.removeEventListener(this.stateCallback);
+      const playerStateStore = this.getService(PlayerStateStore);
+      playerStateStore.off("state-changed", this.stateCallback);
     }
 
     if (!this.discordClient) return;
     this.ready = false;
-    this.videoState = null;
+    this.videoState = VideoState.Unknown;
     this.videoDetails = null;
-    this.progress = null;
+    this.progress = 0;
     this.discordClient.destroy();
     this.discordClient = null;
-  }
-
-  public getYTMScripts(): { name: string; script: string }[] {
-    return [];
   }
 }

@@ -59,22 +59,53 @@ function select(optionKey: string) {
 <template>
   <div :class="{ 'ytmd-setting': true, 'indented': props.indented, 'flex-column': props.flexColumn }">
     <p v-if="!disabled && !hasDescription">
-      {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
-      <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+      {{ name }} <span
+        v-if="restartRequired"
+        class="reload-required material-symbols-outlined"
+      >autorenew</span>
+      <span
+        v-if="beta"
+        class="beta-tag"
+        title="This is a beta feature and may not work correctly yet."
+      >BETA</span>
     </p>
-    <div v-else-if="!disabled && hasDescription" class="name-description">
+    <div
+      v-else-if="!disabled && hasDescription"
+      class="name-description"
+    >
       <p class="name">
-        {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
-        <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+        {{ name }} <span
+          v-if="restartRequired"
+          class="reload-required material-symbols-outlined"
+        >autorenew</span>
+        <span
+          v-if="beta"
+          class="beta-tag"
+          title="This is a beta feature and may not work correctly yet."
+        >BETA</span>
       </p>
-      <p class="description">{{ description }}</p>
+      <p class="description">
+        {{ description }}
+      </p>
     </div>
-    <div v-if="disabled" class="disabled-name-message">
+    <div
+      v-if="disabled"
+      class="disabled-name-message"
+    >
       <p class="name">
-        <span class="disabled-tag">DISABLED</span> {{ name }} <span v-if="restartRequired" class="reload-required material-symbols-outlined">autorenew</span>
-        <span v-if="beta" class="beta-tag" title="This is a beta feature and may not work correctly yet.">BETA</span>
+        <span class="disabled-tag">DISABLED</span> {{ name }} <span
+          v-if="restartRequired"
+          class="reload-required material-symbols-outlined"
+        >autorenew</span>
+        <span
+          v-if="beta"
+          class="beta-tag"
+          title="This is a beta feature and may not work correctly yet."
+        >BETA</span>
       </p>
-      <p class="message">{{ disabledMessage }}</p>
+      <p class="message">
+        {{ disabledMessage }}
+      </p>
     </div>
 
     <input
@@ -83,31 +114,91 @@ function select(optionKey: string) {
       :disabled="disabled"
       :type="props.type"
       @change="$emit('change', $event)"
-    />
-    <div v-if="type == 'range'" class="range-selector">
+    >
+    <div
+      v-if="type == 'range'"
+      class="range-selector"
+    >
       <span class="range-value">{{ value }}</span>
-      <input v-model="value" :disabled="disabled" :type="props.type" :max="props.max" :min="props.min" :step="props.step" @change="$emit('change', $event)" />
+      <input
+        v-model="value"
+        :disabled="disabled"
+        :type="props.type"
+        :max="props.max"
+        :min="props.min"
+        :step="props.step"
+        @change="$emit('change', $event)"
+      >
     </div>
-    <div v-if="type == 'file'" class="file-picker">
-      <input ref="fileInput" :disabled="disabled" type="file" accept=".css" :data-setting="bindSetting" @change="$emit('file-change', $event)" />
+    <div
+      v-if="type == 'file'"
+      class="file-picker"
+    >
+      <input
+        ref="fileInput"
+        :disabled="disabled"
+        type="file"
+        accept=".css"
+        :data-setting="bindSetting"
+        @change="$emit('file-change', $event)"
+      >
       <div class="file-input-button">
-        <button class="choose" @click="fileInput.click()"><span class="material-symbols-outlined">file_open</span></button>
-        <input :disabled="disabled" type="text" readonly class="path" placeholder="No file chosen" :value="value" />
-        <button v-if="value" class="remove" @click="$emit('clear')"><span class="material-symbols-outlined">delete</span></button>
+        <button
+          class="choose"
+          @click="fileInput.click()"
+        >
+          <span class="material-symbols-outlined">file_open</span>
+        </button>
+        <input
+          :disabled="disabled"
+          type="text"
+          readonly
+          class="path"
+          placeholder="No file chosen"
+          :value="value"
+        >
+        <button
+          v-if="value"
+          class="remove"
+          @click="$emit('clear')"
+        >
+          <span class="material-symbols-outlined">delete</span>
+        </button>
       </div>
     </div>
-    <div v-if="type == 'select'" :class="{ select: true, open: selectOpen }">
-      <div class="selected" @click="selectOpen = !selectOpen">
-        <p class="text">{{ selectedOption }}</p>
-        <span v-if="!selectOpen" class="material-symbols-outlined">arrow_drop_down</span>
-        <span v-if="selectOpen" class="material-symbols-outlined">arrow_drop_up</span>
+    <div
+      v-if="type == 'select'"
+      :class="{ select: true, open: selectOpen }"
+    >
+      <div
+        class="selected"
+        @click="selectOpen = !selectOpen"
+      >
+        <p class="text">
+          {{ selectedOption }}
+        </p>
+        <span
+          v-if="!selectOpen"
+          class="material-symbols-outlined"
+        >arrow_drop_down</span>
+        <span
+          v-if="selectOpen"
+          class="material-symbols-outlined"
+        >arrow_drop_up</span>
       </div>
       <div class="options">
-        <div v-for="(optionValue, optionKey) of props.optionsMap" :key="optionKey" class="option" @click="select(optionKey)">{{ optionValue }}</div>
+        <div
+          v-for="(optionValue, optionKey) of props.optionsMap"
+          :key="optionKey"
+          class="option"
+          @click="select(optionKey)"
+        >
+          {{ optionValue }}
+        </div>
       </div>
     </div>
 
-    <slot></slot>
+    <slot />
   </div>
 </template>
 

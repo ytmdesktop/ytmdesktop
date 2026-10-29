@@ -1,14 +1,13 @@
 import crypto from "crypto";
 import { safeStorage } from "electron";
-import Conf from "conf";
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
-import { StoreSchema } from "../../../../shared/store/schema";
 import { AuthToken } from "../../../../shared/integrations/companion-server/types";
+import ConfigStore from "../../../services/configstore";
 
 const temporaryCodeMap: { [code: string]: { appId: string; appVersion: string; appName: string } } = {};
 
 async function getUnusedCode() {
-  return new Promise<string>(resolve => {
+  return new Promise<string | null>(resolve => {
     let code;
     const generateStart = Date.now();
     // Because of this setInterval it does take 250ms before it executes which delays everything by 250ms
@@ -55,10 +54,11 @@ export function getIsTemporaryAuthCodeValidAndRemove(appId: string, code: string
   return false;
 }
 
-export function createAuthToken(store: Conf<StoreSchema>, appId: string, appVersion: string, appName: string) {
+export async function createAuthTokenAsync(configStore: ConfigStore, appId: string, appVersion: string, appName: string) {
   let authTokens: AuthToken[] = [];
   try {
-    authTokens = JSON.parse(safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex")));
+    const decryptedAuthTokens = await safeStorage.decryptStringAsync(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"))
+    authTokens = JSON.parse(decryptedAuthTokens.result);
   } catch {
     /* authTokens will just be an empty array */
   }
@@ -81,26 +81,27 @@ export function createAuthToken(store: Conf<StoreSchema>, appId: string, appVers
     }
   });
 
-  store.set("integrations.companionServerAuthTokens", safeStorage.encryptString(JSON.stringify(authTokens)).toString("hex"));
+  const encryptedAuthTokens = await safeStorage.encryptStringAsync(JSON.stringify(authTokens));
+  configStore.set("integrations.companionServerAuthTokens", encryptedAuthTokens.toString("hex"));
 
   return token;
 }
 
-export function isAuthValid(store: Conf<StoreSchema>, authToken: string): [boolean, string] {
+export async function isAuthValidAsync(configStore: ConfigStore, authToken: string): [boolean, string | null] {
   if (!authToken) return [false, null];
 
   const authTokenHash = crypto.createHash("sha256").update(authToken).digest("hex");
 
   let authTokens: AuthToken[] = [];
   try {
-    const decryptedAuthTokens = safeStorage.decryptString(Buffer.from(store.get("integrations").companionServerAuthTokens, "hex"));
-    authTokens = JSON.parse(decryptedAuthTokens);
+    const decryptedAuthTokens = await safeStorage.decryptStringAsync(Buffer.from(configStore.get("integrations.companionServerAuthTokens") ?? "", "hex"));
+    authTokens = JSON.parse(decryptedAuthTokens.result);
   } catch {
     /* authTokens will just be an empty array */
   }
 
   let validSession = false;
-  let id = null;
+  let id: string | null = null;
   for (const authSession of authTokens) {
     if (authSession.token == authTokenHash) {
       id = authSession.id;
@@ -116,7 +117,7 @@ export function isAuthValid(store: Conf<StoreSchema>, authToken: string): [boole
   return [false, null];
 }
 
-export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: FastifyRequest, response: FastifyReply, next: HookHandlerDoneFunction) {
+export async function isAuthValidMiddlewareAsync(configStore: ConfigStore, request: FastifyRequest, response: FastifyReply) {
   const authToken = request.headers.authorization;
   if (!authToken) {
     response.code(401);
@@ -126,15 +127,15 @@ export function isAuthValidMiddleware(store: Conf<StoreSchema>, request: Fastify
     return;
   }
 
-  const [validSession, tokenId] = isAuthValid(store, authToken);
+  const [validSession, tokenId] = await isAuthValidAsync(configStore, authToken);
 
-  if (validSession) {
+  if (validSession && !!tokenId) {
     request.authId = tokenId;
-    next();
   } else {
     response.code(401);
     response.send({
       error: "UNAUTHORIZED"
     });
+    throw new Error("Unauthorized");
   }
 }

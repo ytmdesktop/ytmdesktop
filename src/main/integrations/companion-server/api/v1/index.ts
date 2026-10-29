@@ -1,9 +1,6 @@
-import { BrowserView, BrowserWindow, ipcMain } from "electron";
-import Conf from "conf";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
-import { StoreSchema } from "~shared/store/schema";
-import playerStateStore, { PlayerState, RepeatMode } from "../../../../player-state-store";
-import { createAuthToken, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValid, isAuthValidMiddleware } from "../../api-shared/auth";
+import { createAuthTokenAsync, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValidAsync, isAuthValidMiddlewareAsync } from "../../api-shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
 import crypto from "crypto";
 import {
@@ -27,13 +24,21 @@ import {
   InvalidVolumeError,
   UnauthenticatedError,
   YouTubeMusicTimeOutError,
-  YouTubeMusicUnavailableError
+  InvalidQueueAddRequestError
 } from "../../api-shared/errors";
 import path from "node:path";
+import Service from "../../../../services/service";
+import { Constructor } from "~shared/types";
+import MemoryStore from "../../../../services/memorystore";
+import { MemoryStoreSchema } from "~shared/store/schema";
+import ConfigStore from "../../../../services/configstore";
+import { PlayerState, RepeatMode } from "~shared/playerstatestore/types";
+import PlayerStateStore from "../../../../services/playerstatestore";
+import ProtectedAPIManager from "../../../../services/protectedapimanager";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
-const transformPlayerState = (state: PlayerState) => {
+export const transformPlayerState = (state: PlayerState) => {
   return {
     player: {
       trackState: state.trackState,
@@ -49,7 +54,8 @@ const transformPlayerState = (state: PlayerState) => {
             isGenerating: state.queue.isGenerating,
             isInfinite: state.queue.isInfinite,
             repeatMode: state.queue.repeatMode,
-            selectedItemIndex: state.queue.selectedItemIndex
+            selectedItemIndex: state.queue.selectedItemIndex,
+            shuffleEnabled: state.queue.shuffleEnabled
           }
         : null
     },
@@ -83,8 +89,7 @@ const transformPlayerState = (state: PlayerState) => {
 };
 
 interface CompanionServerAPIv1Options extends FastifyPluginOptions {
-  getStore: () => Conf<StoreSchema>;
-  getYtmView: () => BrowserView;
+  getService: <T extends Service>(service: Constructor<T>) => T;
 }
 
 type Playlist = {
@@ -96,137 +101,194 @@ const authorizationWindows: BrowserWindow[] = [];
 
 const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> = async (fastify, options) => {
   const sendCommand = (commandRequest: APIV1CommandRequestBodyType) => {
-    const ytmView = options.getYtmView();
-    if (ytmView) {
-      switch (commandRequest.command) {
-        case "playPause": {
-          ytmView.webContents.send("remoteControl:execute", "playPause");
-          break;
+    const playerStateStore = options.getService(PlayerStateStore);
+    const protectedApiManager = options.getService(ProtectedAPIManager);
+    const remoteControlApi = protectedApiManager.createOrGetAPI("RemoteControl");
+
+    switch (commandRequest.command) {
+      case "playPause": {
+        remoteControlApi.postMessage("execute", "playPause");
+        break;
+      }
+
+      case "play": {
+        remoteControlApi.postMessage("execute", "play");
+        break;
+      }
+
+      case "pause": {
+        remoteControlApi.postMessage("execute", "pause");
+        break;
+      }
+
+      case "volumeUp": {
+        remoteControlApi.postMessage("execute", "volumeUp");
+        break;
+      }
+
+      case "volumeDown": {
+        remoteControlApi.postMessage("execute", "volumeDown");
+        break;
+      }
+
+      case "setVolume": {
+        const volume = commandRequest.data;
+        // Check if Volume is a number and between 0 and 100
+        if (isNaN(volume) || volume < 0 || volume > 100) {
+          throw new InvalidVolumeError(volume);
         }
 
-        case "play": {
-          ytmView.webContents.send("remoteControl:execute", "play");
-          break;
-        }
+        remoteControlApi.postMessage("execute", "setVolume", volume);
+        break;
+      }
 
-        case "pause": {
-          ytmView.webContents.send("remoteControl:execute", "pause");
-          break;
-        }
+      case "mute": {
+        remoteControlApi.postMessage("execute", "mute");
+        break;
+      }
 
-        case "volumeUp": {
-          ytmView.webContents.send("remoteControl:execute", "volumeUp");
-          break;
-        }
+      case "unmute": {
+        remoteControlApi.postMessage("execute", "unmute");
+        break;
+      }
 
-        case "volumeDown": {
-          ytmView.webContents.send("remoteControl:execute", "volumeDown");
-          break;
+      case "seekTo": {
+        const position = commandRequest.data;
+        const videoDetails = playerStateStore.getState().videoDetails;
+        if (videoDetails && (isNaN(position) || position < 0 || position > videoDetails.durationSeconds)) {
+          throw new InvalidPositionError(position);
         }
+        remoteControlApi.postMessage("execute", "seekTo", position);
+        break;
+      }
 
-        case "setVolume": {
-          const volume = commandRequest.data;
-          // Check if Volume is a number and between 0 and 100
-          if (isNaN(volume) || volume < 0 || volume > 100) {
-            throw new InvalidVolumeError(volume);
+      case "changeVideo": {
+        const videoId = commandRequest.data.videoId;
+        const playlistId = commandRequest.data.playlistId;
+        if (videoId == null && playlistId == null) {
+          throw new InvalidChangeVideoRequestError();
+        }
+        remoteControlApi.postMessage("execute", "navigate", {
+          watchEndpoint: {
+            videoId: videoId,
+            playlistId: playlistId
           }
+        });
+        break;
+      }
 
-          ytmView.webContents.send("remoteControl:execute", "setVolume", volume);
-          break;
-        }
+      case "next": {
+        remoteControlApi.postMessage("execute", "next");
+        break;
+      }
 
-        case "mute": {
-          ytmView.webContents.send("remoteControl:execute", "mute");
-          break;
-        }
+      case "previous": {
+        remoteControlApi.postMessage("execute", "previous");
+        break;
+      }
 
-        case "unmute": {
-          ytmView.webContents.send("remoteControl:execute", "unmute");
-          break;
-        }
-
-        case "seekTo": {
-          const position = commandRequest.data;
-          if (isNaN(position) || position < 0 || position > playerStateStore.getState().videoDetails.durationSeconds) {
-            throw new InvalidPositionError(position);
+      case "repeatMode": {
+        const repeatMode = commandRequest.data;
+        switch (repeatMode) {
+          case RepeatMode.None: {
+            remoteControlApi.postMessage("execute", "repeatMode", "NONE");
+            break;
           }
-          ytmView.webContents.send("remoteControl:execute", "seekTo", position);
-          break;
-        }
-
-        case "changeVideo": {
-          const videoId = commandRequest.data.videoId;
-          const playlistId = commandRequest.data.playlistId;
-          if (videoId == null && playlistId == null) {
-            throw new InvalidChangeVideoRequestError();
+          case RepeatMode.All: {
+            remoteControlApi.postMessage("execute", "repeatMode", "ALL");
+            break;
           }
-          ytmView.webContents.send("remoteControl:execute", "navigate", {
-            watchEndpoint: {
-              videoId: videoId,
-              playlistId: playlistId
-            }
-          });
-          break;
-        }
-
-        case "next": {
-          ytmView.webContents.send("remoteControl:execute", "next");
-          break;
-        }
-
-        case "previous": {
-          ytmView.webContents.send("remoteControl:execute", "previous");
-          break;
-        }
-
-        case "repeatMode": {
-          const repeatMode = commandRequest.data;
-          switch (repeatMode) {
-            case RepeatMode.None: {
-              ytmView.webContents.send("remoteControl:execute", "repeatMode", "NONE");
-              break;
-            }
-            case RepeatMode.All: {
-              ytmView.webContents.send("remoteControl:execute", "repeatMode", "ALL");
-              break;
-            }
-            case RepeatMode.One: {
-              ytmView.webContents.send("remoteControl:execute", "repeatMode", "ONE");
-              break;
-            }
-            default: {
-              throw new InvalidRepeatModeError(repeatMode);
-            }
+          case RepeatMode.One: {
+            remoteControlApi.postMessage("execute", "repeatMode", "ONE");
+            break;
           }
-          break;
-        }
-
-        case "shuffle": {
-          ytmView.webContents.send("remoteControl:execute", "shuffle");
-          break;
-        }
-
-        case "playQueueIndex": {
-          const index = commandRequest.data;
-          const state = playerStateStore.getState();
-
-          if (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1) {
-            throw new InvalidQueueIndexError(index);
+          default: {
+            throw new InvalidRepeatModeError(repeatMode);
           }
+        }
+        break;
+      }
 
-          ytmView.webContents.send("remoteControl:execute", "playQueueIndex", index);
-          break;
+      case "shuffle": {
+        remoteControlApi.postMessage("execute", "shuffle");
+        break;
+      }
+
+      case "playQueueIndex": {
+        const index = commandRequest.data;
+        const state = playerStateStore.getState();
+
+        if (state.queue && (isNaN(index) || index > state.queue.items.length + state.queue.automixItems.length - 1)) {
+          throw new InvalidQueueIndexError(index);
         }
 
-        case "toggleLike": {
-          ytmView.webContents.send("remoteControl:execute", "toggleLike");
-          break;
+        remoteControlApi.postMessage("execute", "playQueueIndex", index);
+        break;
+      }
+
+      case "toggleLike": {
+        remoteControlApi.postMessage("execute", "toggleLike");
+        break;
+      }
+
+      case "toggleDislike": {
+        remoteControlApi.postMessage("execute", "toggleDislike");
+        break;
+      }
+
+      case "queueAdd": {
+        const videoId = commandRequest.data.videoId;
+        const playlistId = commandRequest.data.playlistId;
+        if (videoId == null && playlistId == null) {
+          throw new InvalidQueueAddRequestError();
+        } else if (videoId != null && playlistId != null) {
+          throw new InvalidQueueAddRequestError();
         }
 
-        case "toggleDislike": {
-          ytmView.webContents.send("remoteControl:execute", "toggleDislike");
-          break;
+        const index = commandRequest.data.index;
+        const state = playerStateStore.getState();
+        if (state.queue && (isNaN(index) || index > state.queue.items.length)) {
+          throw new InvalidQueueIndexError(index);
         }
+
+        remoteControlApi.postMessage("execute", "queueAdd", {
+          videoId: videoId,
+          playlistId: playlistId,
+          index
+        });
+        break;
+      }
+
+      case "queueRemove": {
+        const index = commandRequest.data;
+        const state = playerStateStore.getState();
+
+        if (state.queue && (isNaN(index) || index > state.queue.items.length - 1)) {
+          throw new InvalidQueueIndexError(index);
+        }
+
+        remoteControlApi.postMessage("execute", "queueRemove", index);
+        break;
+      }
+
+      case "queueMove": {
+        const fromIndex = commandRequest.data.fromIndex;
+        const toIndex = commandRequest.data.toIndex;
+        const state = playerStateStore.getState();
+
+        if (state.queue && (isNaN(fromIndex) || fromIndex > state.queue.items.length - 1)) {
+          throw new InvalidQueueIndexError(fromIndex);
+        }
+
+        if (state.queue && (isNaN(toIndex) || toIndex > state.queue.items.length - 1)) {
+          throw new InvalidQueueIndexError(toIndex);
+        }
+
+        remoteControlApi.postMessage("execute", "queueMove", {
+          fromIndex,
+          toIndex
+        });
+        break;
       }
     }
   };
@@ -251,7 +313,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
+      const memoryStore = options.getService(MemoryStore<MemoryStoreSchema>);
+      const companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
 
       // API Users: The user has companion server authorization disabled, show a feedback error accordingly
       if (!companionServerAuthWindowEnabled) {
@@ -283,7 +346,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       }
     },
     async (request, response) => {
-      const companionServerAuthWindowEnabled = options.getMemoryStore().get("companionServerAuthWindowEnabled") ?? false;
+      const memoryStore = options.getService(MemoryStore<MemoryStoreSchema>);
+      const companionServerAuthWindowEnabled = memoryStore.get("companionServerAuthWindowEnabled") ?? false;
 
       // There's too many authorization windows open and we have to reject this request for now (this is unlikely to occur but this prevents malicious use of spamming auth windows)
       // API Users: Show a friendly feedback that too many applications are trying to authorize at the same time
@@ -323,12 +387,13 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(__dirname, `../renderer/windows/authorize-companion/preload.js`),
+          preload: path.join(__dirname, `../renderer/windows/authorize-companion/preload.cjs`),
           additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });
-      if (ALL_WINDOWS_VITE_DEV_SERVER_URL) authorizationWindow.loadURL(ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html");
-      else authorizationWindow.loadFile(path.join(__dirname, `../renderer/windows/authorize-companion/index.html`));
+      authorizationWindow.loadURL(
+        app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html"
+      );
       authorizationWindow.show();
       authorizationWindow.flashFrame(true);
 
@@ -339,7 +404,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       });
 
       authorizationWindow.webContents.on("will-navigate", event => {
-        if (process.env.NODE_ENV === "development") if (event.url.startsWith("http://localhost")) return;
+        if (!app.isPackaged) if (event.url.startsWith("http://localhost")) return;
 
         event.preventDefault();
       });
@@ -348,7 +413,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       try {
         // Open the DevTools.
-        if (process.env.NODE_ENV === "development") {
+        if (!app.isPackaged) {
           authorizationWindow.webContents.openDevTools({
             mode: "detach"
           });
@@ -364,7 +429,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           promiseResolve(authorized);
         };
 
-        const closeListener = (event: Electron.IpcMainEvent) => {
+        const closeListener = (event: Electron.IpcMainEvent | null) => {
           if (event && event.sender !== authorizationWindow.webContents) return;
 
           clearInterval(promiseInterval);
@@ -402,12 +467,12 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         ipcMain.removeListener(`companionWindow:close:${requestId}`, closeListener);
 
         if (authorized) {
-          const token = createAuthToken(options.getStore(), authData.appId, authData.appVersion, authData.appName);
+          const token = await createAuthTokenAsync(options.getService(ConfigStore), authData.appId, authData.appVersion, authData.appName);
 
           response.send({
             token
           });
-          options.getMemoryStore().set("companionServerAuthWindowEnabled", false);
+          memoryStore.set("companionServerAuthWindowEnabled", false);
         } else {
           throw new AuthorizationDeniedError();
         }
@@ -435,31 +500,17 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           }
         }
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     async (request, response) => {
-      const ytmView = options.getYtmView();
-      if (ytmView) {
-        const requestId = crypto.randomUUID();
-
-        const playlistsResponseListener = (event: Electron.IpcMainEvent, playlists: Playlist[]) => {
-          if (event.sender !== ytmView.webContents) return;
-          response.send(playlists);
-        };
-        ipcMain.once(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-
-        ytmView.webContents.send(`ytmView:getPlaylists`, requestId);
-
-        await new Promise((_resolve, reject) =>
-          setTimeout(() => {
-            ipcMain.removeListener(`ytmView:getPlaylists:response:${requestId}`, playlistsResponseListener);
-            reject(new YouTubeMusicTimeOutError());
-          }, 1000 * 30)
-        );
-      } else {
-        throw new YouTubeMusicUnavailableError();
+      const remoteControlApi = options.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+      try {
+        const getPlaylistsRes = await remoteControlApi.invokeMessage("getPlaylists");
+        response.send(getPlaylistsRes[0]);
+      } catch {
+        throw new YouTubeMusicTimeOutError();
       }
     }
   );
@@ -478,11 +529,12 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
           }
         }
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     (request, response) => {
+      const playerStateStore = options.getService(PlayerStateStore);
       response.send(transformPlayerState(playerStateStore.getState()));
     }
   );
@@ -503,8 +555,8 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       schema: {
         body: APIV1CommandRequestBody
       },
-      preHandler: (request, response, next) => {
-        return isAuthValidMiddleware(options.getStore(), request, response, next);
+      preHandler: async (request, response) => {
+        return await isAuthValidMiddlewareAsync(options.getService(ConfigStore), request, response);
       }
     },
     (request, response) => {
@@ -513,53 +565,50 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
     }
   );
 
-  fastify.ready().then(() => {
-    fastify.io.of("/api/v1/realtime").use((socket, next) => {
-      const token = socket.handshake.auth.token;
-      const [validSession, tokenId] = isAuthValid(options.getStore(), token);
-      if (validSession) {
-        socket.data.tokenId = tokenId;
-        next();
-      } else {
-        next(new UnauthenticatedError());
-      }
+  const playerStateStore = options.getService(PlayerStateStore);
+
+  fastify.io.of("/api/v1/realtime").use(async (socket, next) => {
+    const token = socket.handshake.auth.token;
+    const [validSession, tokenId] = await isAuthValidAsync(options.getService(ConfigStore), token);
+    if (validSession) {
+      socket.data.tokenId = tokenId;
+      next();
+    } else {
+      next(new UnauthenticatedError());
+    }
+  });
+  // Will look into enabling sending commands/requests over the websocket at a later point in time
+  /*fastify.io.of("/api/v1/realtime").on("connection", socket => {
+    socket.on("command", (command: RemoteCommand) => {
+      sendCommand(command);
     });
-    // Will look into enabling sending commands/requests over the websocket at a later point in time
-    /*fastify.io.of("/api/v1/realtime").on("connection", socket => {
-      socket.on("command", (command: RemoteCommand) => {
-        sendCommand(command);
-      });
-    });*/
+  });*/
 
-    const stateStoreListener = (state: PlayerState) => {
-      fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
-    };
-    playerStateStore.addEventListener(stateStoreListener);
+  const stateStoreListener = (state: PlayerState) => {
+    fastify.io.of("/api/v1/realtime").emit("state-update", transformPlayerState(state));
+  };
+  playerStateStore.on("state-changed", stateStoreListener);
 
-    const createPlaylistObservedListener = (event: Electron.IpcMainEvent, playlist: Playlist) => {
-      const ytmView = options.getYtmView();
-      if (event.sender !== ytmView.webContents) return;
+  const createPlaylistObservedListener = (playlist: Playlist) => {
+    fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
+  };
+  playerStateStore.on("playlist-created", createPlaylistObservedListener);
 
-      fastify.io.of("/api/v1/realtime").emit("playlist-created", playlist);
-    };
-    ipcMain.on("ytmView:createPlaylistObserved", createPlaylistObservedListener);
+  const deletePlaylistObservedListener = (playlistId: string) => {
+    fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
+  };
+  playerStateStore.on("playlist-deleted", deletePlaylistObservedListener);
 
-    const deletePlaylistObservedListener = (event: Electron.IpcMainEvent, playlistId: string) => {
-      const ytmView = options.getYtmView();
-      if (event.sender !== ytmView.webContents) return;
-
-      fastify.io.of("/api/v1/realtime").emit("playlist-deleted", playlistId);
-    };
-    ipcMain.on("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
-
-    fastify.addHook("onClose", () => {
-      // This should normally close on its own but we'll make sure it's closed out
-      fastify.io.close();
-      playerStateStore.removeEventListener(stateStoreListener);
-      ipcMain.off("ytmView:createPlaylistObserved", createPlaylistObservedListener);
-      ipcMain.off("ytmView:deletePlaylistObserved", deletePlaylistObservedListener);
-    });
+  fastify.addHook("onClose", () => {
+    // This should normally close on its own but we'll make sure it's closed out
+    fastify.io.close();
+    playerStateStore.off("state-changed", stateStoreListener);
+    playerStateStore.off("playlist-created", createPlaylistObservedListener);
+    playerStateStore.off("playlist-deleted", deletePlaylistObservedListener);
   });
 };
+
+//// @ts-expect-error This is for ESM purposes so that Fastify isn't trying to use CJS require.cache to get the name
+//CompanionServerAPIv1[Symbol.for("fastify.display-name")] = "CompanionServerAPIv1";
 
 export default CompanionServerAPIv1;
