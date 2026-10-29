@@ -29,7 +29,10 @@ source. `model.ts` defines palettes and validates persisted selections;
 `css.ts` derives secondary colors from eight tokens and generates CSS.
 `CustomCSS` owns injection, managed imports and authenticated settings IPC.
 `CSSLayers` serializes replacement and removes previous insertion keys.
-An empty initial BrowserView defers injection until its load event, avoiding
+The v2.1 Integration lifecycle obtains ConfigStore, YTMViewManager and the
+Settings window through the service host. View recreation and status events
+rebind the current WebContents; disabling cleans up listeners and file watches.
+An empty initial AppView defers injection until its load event, avoiding
 an unresolved Electron insertion holding the settings action queue.
 No CSS is executed as JavaScript and the settings renderer has no Node access.
 
@@ -37,9 +40,9 @@ No CSS is executed as JavaScript and the settings renderer has no Node access.
 
 ```sh
 node --test scripts/tests/*.test.cjs
-yarn lint
-yarn vue-tsc --noEmit --pretty false
-yarn package
+pnpm lint
+pnpm typecheck
+pnpm package
 ```
 
 Tests cover all palettes, validation, migration, separate saved custom state,
@@ -52,6 +55,6 @@ apply every palette; edit/apply/cancel; reload and restart; import two files,
 rename/remove/export; check artwork, menus, search, scrolling and mini-player
 on live YouTube Music. Upstream DOM changes may require selector updates.
 
-Local validation status and remaining limitations are recorded in the task
-report and project memory. Preserve existing startup/crash patches when
-reviewing this feature; they predate Theme Studio.
+This feature targets YTMD 2.1.0 (Electron 45, pnpm 12.8.1). The previous
+miniplayer/startup patches and their tests have been removed: upstream v2.1
+owns player initialization and recovery. Theme tests focus on CSS management.

@@ -1,38 +1,50 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, ref } from "vue";
-import { colorKeys, contrast, defaultSelection, effects, presets, Selection, ThemeResult, ThemeSnapshot, validateSelection } from "~shared/themes/model";
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
+import {
+  colorKeys,
+  contrast,
+  defaultSelection,
+  effects,
+  presets,
+  Selection,
+  ThemeResult,
+  ThemeSnapshot,
+  validateSelection,
+} from '~shared/themes/model';
 
 const api = window.ytmd.themes;
 const snapshot = ref<ThemeSnapshot | null>(null);
 const draft = ref<Selection>(defaultSelection());
 const editing = ref(false);
 const busy = ref(false);
-const message = ref("");
+const message = ref('');
 const names = ref<Record<string, string>>({});
 let timer: ReturnType<typeof setTimeout>;
 let alive = true;
 let sequence = 0;
 const labels = {
-  accent: "Accent",
-  highlight: "Highlight",
-  background: "Background",
-  surface: "Surface",
-  surfaceRaised: "Raised surface",
-  text: "Primary text",
-  textMuted: "Secondary text",
-  border: "Border"
+  accent: 'Accent',
+  highlight: 'Highlight',
+  background: 'Background',
+  surface: 'Surface',
+  surfaceRaised: 'Raised surface',
+  text: 'Primary text',
+  textMuted: 'Secondary text',
+  border: 'Border',
 };
 const active = computed(() => {
   const s = snapshot.value?.selection;
-  if (!s) return "Loading…";
-  if (s.mode === "preset") return presets.find(p => p.id === s.presetId)?.name;
-  if (s.mode === "imported") return snapshot.value?.imports.find(x => x.id === s.importId)?.name;
-  return s.mode === "custom" ? "My custom theme" : "Original";
+  if (!s) return 'Loading…';
+  if (s.mode === 'preset')
+    return presets.find((p) => p.id === s.presetId)?.name;
+  if (s.mode === 'imported')
+    return snapshot.value?.imports.find((x) => x.id === s.importId)?.name;
+  return s.mode === 'custom' ? 'My custom theme' : 'Original';
 });
 const invalid = computed(() => {
   try {
     validateSelection(draft.value);
-    return "";
+    return '';
   } catch (e) {
     return (e as Error).message;
   }
@@ -40,22 +52,29 @@ const invalid = computed(() => {
 const lowContrast = computed(
   () =>
     !invalid.value &&
-    (contrast(draft.value.tokens.text, draft.value.tokens.background) < 4.5 || contrast(draft.value.tokens.textMuted, draft.value.tokens.surface) < 4.5)
+    (contrast(draft.value.tokens.text, draft.value.tokens.background) < 4.5 ||
+      contrast(draft.value.tokens.textMuted, draft.value.tokens.surface) < 4.5),
 );
 function accept(result: ThemeResult, syncDraft = false) {
   if (!alive) return;
   if (result.state) {
     snapshot.value = result.state;
-    names.value = Object.fromEntries(result.state.imports.map(x => [x.id, x.name]));
+    names.value = Object.fromEntries(
+      result.state.imports.map((x) => [x.id, x.name]),
+    );
     if (syncDraft) {
       draft.value = structuredClone(result.state.selection);
-      if (draft.value.mode === "preset") {
-        draft.value.tokens = { ...presets.find(p => p.id === draft.value.presetId).tokens };
+      if (draft.value.mode === 'preset') {
+        draft.value.tokens = {
+          ...presets.find((p) => p.id === draft.value.presetId).tokens,
+        };
         draft.value.effects = { ...effects };
       }
     }
   }
-  message.value = result.ok ? (result.state?.error ?? "") : (result.error ?? "Theme operation failed");
+  message.value = result.ok
+    ? (result.state?.error ?? '')
+    : (result.error ?? 'Theme operation failed');
 }
 async function run(action: () => Promise<ThemeResult>, syncDraft = true) {
   clearTimeout(timer);
@@ -85,24 +104,31 @@ function preview() {
   }, 180);
 }
 async function selectPreset(id: string) {
-  const selection = { ...defaultSelection(), mode: "preset" as const, presetId: id, overrides: snapshot.value?.selection.overrides ?? true };
+  const selection = {
+    ...defaultSelection(),
+    mode: 'preset' as const,
+    presetId: id,
+    overrides: snapshot.value?.selection.overrides ?? true,
+  };
   await run(() => api.apply(selection));
   editing.value = false;
 }
 function copyPreset(id: string) {
   draft.value = {
     ...defaultSelection(),
-    mode: "custom",
+    mode: 'custom',
     presetId: id,
-    tokens: { ...presets.find(p => p.id === id).tokens },
-    overrides: snapshot.value?.selection.overrides ?? true
+    tokens: { ...presets.find((p) => p.id === id).tokens },
+    overrides: snapshot.value?.selection.overrides ?? true,
   };
   preview();
 }
 function resetDraft() {
-  draft.value.tokens = { ...presets.find(p => p.id === draft.value.presetId).tokens };
+  draft.value.tokens = {
+    ...presets.find((p) => p.id === draft.value.presetId).tokens,
+  };
   draft.value.effects = { ...effects };
-  draft.value.mode = "custom";
+  draft.value.mode = 'custom';
   preview();
 }
 async function cancel() {
@@ -118,7 +144,14 @@ async function original() {
   editing.value = false;
 }
 async function activateImport(id: string) {
-  await run(() => api.apply({ ...defaultSelection(), mode: "imported", importId: id, overrides: false }));
+  await run(() =>
+    api.apply({
+      ...defaultSelection(),
+      mode: 'imported',
+      importId: id,
+      overrides: false,
+    }),
+  );
   editing.value = false;
 }
 function editSaved() {
@@ -149,7 +182,9 @@ onBeforeUnmount(() => {
       ><button :disabled="busy" @click="original">Restore original</button>
     </div>
     <p class="hint">
-      Theme layer → optional linked CSS overrides. Original restores the official appearance and disables the override layer without deleting your file.
+      Theme layer → optional linked CSS overrides. Original restores the
+      official appearance and disables the override layer without deleting your
+      file.
     </p>
     <p v-if="message" class="notice" role="alert">{{ message }}</p>
     <div class="gallery">
@@ -157,35 +192,86 @@ onBeforeUnmount(() => {
         v-for="preset in presets"
         :key="preset.id"
         class="card"
-        :class="{ selected: snapshot?.selection.mode === 'preset' && snapshot.selection.presetId === preset.id }"
+        :class="{
+          selected:
+            snapshot?.selection.mode === 'preset' &&
+            snapshot.selection.presetId === preset.id,
+        }"
       >
         <div
           class="swatch"
-          :style="{ background: `radial-gradient(ellipse at top right, ${preset.tokens.accent}, ${preset.tokens.background} 80%)`, color: preset.tokens.text }"
+          :style="{
+            background: `radial-gradient(ellipse at top right, ${preset.tokens.accent}, ${preset.tokens.background} 80%)`,
+            color: preset.tokens.text,
+          }"
           aria-hidden="true"
         >
-          <span class="mini-line" :style="{ background: preset.tokens.highlight }"></span
-          ><span class="mini-disc" :style="{ background: preset.tokens.surfaceRaised, borderColor: preset.tokens.highlight }">♪</span
+          <span
+            class="mini-line"
+            :style="{ background: preset.tokens.highlight }"
+          ></span
+          ><span
+            class="mini-disc"
+            :style="{
+              background: preset.tokens.surfaceRaised,
+              borderColor: preset.tokens.highlight,
+            }"
+            >♪</span
           ><span class="mini-line"></span>
         </div>
-        <h2>{{ preset.name }} <span v-if="snapshot?.selection.mode === 'preset' && snapshot.selection.presetId === preset.id" class="badge">Active</span></h2>
+        <h2>
+          {{ preset.name }}
+          <span
+            v-if="
+              snapshot?.selection.mode === 'preset' &&
+              snapshot.selection.presetId === preset.id
+            "
+            class="badge"
+            >Active</span
+          >
+        </h2>
         <div class="actions">
-          <button :disabled="busy" @click="selectPreset(preset.id)">Apply</button><button :disabled="busy" @click="copyPreset(preset.id)">Edit a copy</button>
+          <button :disabled="busy" @click="selectPreset(preset.id)">
+            Apply</button
+          ><button :disabled="busy" @click="copyPreset(preset.id)">
+            Edit a copy
+          </button>
         </div>
       </article>
     </div>
     <section class="editor" aria-label="Custom theme editor">
-      <button :disabled="busy || !snapshot" @click="editSaved">Load my saved custom theme</button>
-      <h2>My custom theme <span v-if="editing" class="badge">Unsaved preview</span></h2>
-      <p class="hint">Edit a copy of a palette, or adjust these colors. Cancel, leaving this tab or closing settings restores your saved theme.</p>
+      <button :disabled="busy || !snapshot" @click="editSaved">
+        Load my saved custom theme
+      </button>
+      <h2>
+        My custom theme
+        <span v-if="editing" class="badge">Unsaved preview</span>
+      </h2>
+      <p class="hint">
+        Edit a copy of a palette, or adjust these colors. Cancel, leaving this
+        tab or closing settings restores your saved theme.
+      </p>
       <div
         class="editor-preview"
-        :style="{ background: draft.tokens.background, color: draft.tokens.text, borderColor: draft.tokens.border, borderRadius: draft.effects.radius + 'px' }"
+        :style="{
+          background: draft.tokens.background,
+          color: draft.tokens.text,
+          borderColor: draft.tokens.border,
+          borderRadius: draft.effects.radius + 'px',
+        }"
       >
-        <span class="preview-art" :style="{ background: `linear-gradient(135deg, ${draft.tokens.accent}, ${draft.tokens.highlight})` }">♪</span>
+        <span
+          class="preview-art"
+          :style="{
+            background: `linear-gradient(135deg, ${draft.tokens.accent}, ${draft.tokens.highlight})`,
+          }"
+          >♪</span
+        >
         <div>
           <strong>Your next favorite</strong>
-          <p :style="{ color: draft.tokens.textMuted }">A palette that follows your music</p>
+          <p :style="{ color: draft.tokens.textMuted }">
+            A palette that follows your music
+          </p>
         </div>
       </div>
       <div class="colors">
@@ -266,20 +352,40 @@ onBeforeUnmount(() => {
         Respect reduced motion</label
       >
       <label class="check"
-        ><input v-model="draft.overrides" type="checkbox" :disabled="busy" @change="preview" /> Include linked CSS overrides (configured in Appearance)</label
+        ><input
+          v-model="draft.overrides"
+          type="checkbox"
+          :disabled="busy"
+          @change="preview"
+        />
+        Include linked CSS overrides (configured in Appearance)</label
       >
       <p class="hint">
-        Linked file: {{ snapshot?.legacyEnabled ? "enabled in Appearance" : "disabled in Appearance" }}. An imported primary theme replaces the preset, not the
-        settings interface.
+        Linked file:
+        {{
+          snapshot?.legacyEnabled
+            ? 'enabled in Appearance'
+            : 'disabled in Appearance'
+        }}. An imported primary theme replaces the preset, not the settings
+        interface.
       </p>
       <p v-if="invalid" class="notice" role="alert">{{ invalid }}</p>
-      <p v-else-if="lowContrast" class="notice" role="status">Low text contrast: aim for at least 4.5:1 against the background and surface.</p>
+      <p v-else-if="lowContrast" class="notice" role="status">
+        Low text contrast: aim for at least 4.5:1 against the background and
+        surface.
+      </p>
       <div class="actions">
-        <button :disabled="busy || !!invalid || !editing" @click="apply">Apply changes</button
-        ><button :disabled="busy || !editing" @click="cancel">Cancel</button><button :disabled="busy" @click="resetDraft">Restore preset</button
+        <button :disabled="busy || !!invalid || !editing" @click="apply">
+          Apply changes</button
+        ><button :disabled="busy || !editing" @click="cancel">Cancel</button
+        ><button :disabled="busy" @click="resetDraft">Restore preset</button
         ><button
-          :disabled="busy || !!invalid || !['custom', 'preset'].includes(draft.mode)"
-          @click="run(() => api.exportCSS(JSON.parse(JSON.stringify(draft))), false)"
+          :disabled="
+            busy || !!invalid || !['custom', 'preset'].includes(draft.mode)
+          "
+          @click="
+            run(() => api.exportCSS(JSON.parse(JSON.stringify(draft))), false)
+          "
         >
           Export CSS
         </button>
@@ -288,21 +394,53 @@ onBeforeUnmount(() => {
     <section class="library" aria-label="Imported CSS library">
       <div class="status">
         <h2>Imported CSS</h2>
-        <button :disabled="busy" @click="run(() => api.importCSS(), false)">Import CSS…</button>
+        <button :disabled="busy" @click="run(() => api.importCSS(), false)">
+          Import CSS…
+        </button>
       </div>
       <p class="hint">
-        UTF-8 .css, up to 1 MiB. A managed copy is stored; your original is never deleted. For privacy, @import, url() and image-set() references are rejected,
-        including local, remote and data resources. Self-contained CSS can style the player freely.
+        UTF-8 .css, up to 1 MiB. A managed copy is stored; your original is
+        never deleted. For privacy, @import, url() and image-set() references
+        are rejected, including local, remote and data resources. Self-contained
+        CSS can style the player freely.
       </p>
-      <p v-if="!snapshot?.imports.length" class="empty">Bring your own CSS to make it yours.</p>
-      <div v-for="entry in snapshot?.imports ?? []" :key="entry.id" class="import-row">
-        <input v-model="names[entry.id]" :aria-label="'Name for ' + entry.name" maxlength="80" :disabled="busy" />
-        <span v-if="snapshot?.selection.mode === 'imported' && snapshot.selection.importId === entry.id" class="badge">Active</span>
-        <button :disabled="busy" @click="run(() => api.rename(entry.id, names[entry.id]), false)">Rename</button
-        ><button :disabled="busy" @click="activateImport(entry.id)">Apply</button
-        ><button :disabled="busy" @click="run(() => api.remove(entry.id))">Remove</button>
+      <p v-if="!snapshot?.imports.length" class="empty">
+        Bring your own CSS to make it yours.
+      </p>
+      <div
+        v-for="entry in snapshot?.imports ?? []"
+        :key="entry.id"
+        class="import-row"
+      >
+        <input
+          v-model="names[entry.id]"
+          :aria-label="'Name for ' + entry.name"
+          maxlength="80"
+          :disabled="busy"
+        />
+        <span
+          v-if="
+            snapshot?.selection.mode === 'imported' &&
+            snapshot.selection.importId === entry.id
+          "
+          class="badge"
+          >Active</span
+        >
+        <button
+          :disabled="busy"
+          @click="run(() => api.rename(entry.id, names[entry.id]), false)"
+        >
+          Rename</button
+        ><button :disabled="busy" @click="activateImport(entry.id)">
+          Apply</button
+        ><button :disabled="busy" @click="run(() => api.remove(entry.id))">
+          Remove
+        </button>
       </div>
-      <p class="hint">Restore original deactivates imported themes. Remove only removes the library entry; its managed copy remains recoverable on disk.</p>
+      <p class="hint">
+        Restore original deactivates imported themes. Remove only removes the
+        library entry; its managed copy remains recoverable on disk.
+      </p>
     </section>
   </section>
 </template>
@@ -459,7 +597,7 @@ input:focus-visible {
   display: flex;
   gap: 6px;
 }
-input[type="text"],
+input[type='text'],
 .import-row input {
   min-width: 0;
   width: 100%;
@@ -470,7 +608,7 @@ input[type="text"],
   padding: 8px;
   border-radius: 6px;
 }
-input[type="color"] {
+input[type='color'] {
   width: 36px;
   height: 33px;
   padding: 2px;

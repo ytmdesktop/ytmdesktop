@@ -1,8 +1,9 @@
-import { WindowsEventArguments } from "~shared/types";
+import type { ThemeAPI } from "~shared/themes/model";
+import { WindowsEventArguments, YTMViewStatus } from "~shared/types";
 import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
-import { ThemeAPI } from "~shared/themes/model";
+import { PlayerState } from "~shared/playerstatestore/types";
 
 declare global {
   interface Window {
@@ -22,6 +23,10 @@ declare global {
       restartApplication(): void;
       restartApplicationForUpdate(): void;
       getTrueFilePath(file: File): string;
+      processVersions: {
+        electron: string;
+        chrome: string;
+      }
 
       // Companion Authorization specific
       sendResult(authorized: boolean);
@@ -34,24 +39,41 @@ declare global {
       // YTM view specific
       ytmViewNavigateDefault(): void;
       ytmViewRecreate(): void;
+      ytmViewStatusChanged(callback: (status: YTMViewStatus) => void): void;
+      ytmViewLoadError(callback: (loadError: { code: number; description: string }) => void): void;
+      ytmViewReload(): void;
+
+      // View specific
+      appViewHiding(callback: () => void): void;
+      appViewShowing(callback: () => void): void;
+      appViewHide(): void;
 
       // Window control
       minimizeWindow(): void;
       maximizeWindow(): void;
       restoreWindow(): void;
       closeWindow(): void;
-      handleWindowEvents(callback: (event: Electron.IpcRendererEvent, args: WindowsEventArguments) => void);
+      setAlwaysOnTopWindow(alwaysOnTop: boolean): void;
+      handleWindowEvents(callback: (args: WindowsEventArguments) => void);
       requestWindowState(): void;
 
       // App specific
       getAppVersion(): Promise<string>;
       checkForUpdates(): void;
-      handleCheckingForUpdate(callback: (event: Electron.IpcRendererEvent) => void);
-      handleUpdateAvailable(callback: (event: Electron.IpcRendererEvent) => void);
-      handleUpdateNotAvailable(callback: (event: Electron.IpcRendererEvent) => void);
-      handleUpdateDownloaded(callback: (event: Electron.IpcRendererEvent) => void);
+      handleCheckingForUpdate(callback: () => void);
+      handleUpdateAvailable(callback: () => void);
+      handleUpdateNotAvailable(callback: () => void);
+      handleUpdateDownloaded(callback: () => void);
       isAppUpdateAvailable(): Promise<boolean>;
       isAppUpdateDownloaded(): Promise<boolean>;
+
+      // Miniplayer specific
+      playerStore: {
+        getState(): PlayerState | null;
+        handleStateChanged(callback: (state: PlayerState) => void);
+      };
+      executeCommandInYTMView(command: string, ...args: unknown[]);
+      isWayland(): boolean;
     };
   }
 
