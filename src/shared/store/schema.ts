@@ -1,3 +1,4 @@
+import type { ThemeState } from "../themes/model";
 export enum TrayIconStyle {
   Auto = 0,
   White = 1,
@@ -17,6 +18,7 @@ export type StoreSchema = {
     startMinimized: boolean;
   };
   appearance: {
+    theme?: ThemeState;
     alwaysShowVolumeSlider: boolean;
     customCSSEnabled: boolean;
     customCSSPath: string | null;

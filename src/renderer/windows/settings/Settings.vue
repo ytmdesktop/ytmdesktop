@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Themes from "./Themes.vue";
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
@@ -329,6 +330,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         >
           <span class="material-symbols-outlined">keyboard</span>Shortcuts
         </li>
+        <li :class="{ active: currentTab === 6 }" @click="changeTab(6)"><span class="material-symbols-outlined">palette</span>Themes</li>
         <span class="push" />
         <li
           :class="{ active: currentTab === 99 }"
@@ -338,6 +340,7 @@ window.ytmd.handleUpdateDownloaded(() => {
         </li>
       </ul>
       <div class="content">
+        <Themes v-if="currentTab === 6" />
         <div
           v-if="requiresRestart"
           class="restart-banner"
@@ -402,7 +405,7 @@ window.ytmd.handleUpdateDownloaded(() => {
           <YTMDSetting
             v-model="customCSSEnabled"
             type="checkbox"
-            name="Custom CSS"
+            name="Linked CSS overrides"
             @change="settingsChanged"
           />
           <YTMDSetting
