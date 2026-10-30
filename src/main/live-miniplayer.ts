@@ -77,9 +77,26 @@ const MOUNT_LIVE_VIDEO = `(() => {
     return window.__ytmdLiveMiniplayer;
   }
 
+  function pin(video) {
+    video.style.setProperty("position", "relative", "important");
+    video.style.setProperty("top", "0", "important");
+    video.style.setProperty("left", "0", "important");
+    video.style.setProperty("right", "auto", "important");
+    video.style.setProperty("bottom", "auto", "important");
+    video.style.setProperty("transform", "none", "important");
+    video.style.setProperty("margin", "0", "important");
+    video.style.setProperty("width", "100%", "important");
+    video.style.setProperty("height", "100%", "important");
+    video.style.setProperty("max-width", "none", "important");
+    video.style.setProperty("max-height", "none", "important");
+    video.style.setProperty("object-fit", "contain", "important");
+    video.style.setProperty("background", "black", "important");
+  }
+
   function adopt(video, state) {
     if (state.adopted.some((item) => item.video === video)) {
       if (video.isConnected && video.parentElement !== state.host) state.host.appendChild(video);
+      pin(video);
       return;
     }
     const parent = video.parentNode;
@@ -92,12 +109,7 @@ const MOUNT_LIVE_VIDEO = `(() => {
     const wasPlaying = !video.paused && !video.ended;
     parent.insertBefore(placeholder, video);
     state.host.appendChild(video);
-    video.style.setProperty("width", "100%", "important");
-    video.style.setProperty("height", "100%", "important");
-    video.style.setProperty("max-width", "none", "important");
-    video.style.setProperty("max-height", "none", "important");
-    video.style.setProperty("object-fit", "contain", "important");
-    video.style.setProperty("background", "black", "important");
+    pin(video);
     state.adopted.push({ video, placeholder, prevStyle, parent, wasPlaying, adoptedAt: Date.now() });
     if (wasPlaying) video.play().catch(() => {});
   }
