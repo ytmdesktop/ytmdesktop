@@ -62,6 +62,7 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 );
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
+const discordPresenceShowPlayOnYTMDButton = ref<boolean>(integrations.discordPresenceShowPlayOnYTMDButton ?? true);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 const enhancedMediaServiceEnabled = ref<boolean>(integrations.enhancedMediaServiceEnabled);
 
@@ -104,6 +105,7 @@ store.onDidAnyChange(async newState => {
     : [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
+  discordPresenceShowPlayOnYTMDButton.value = newState.integrations.discordPresenceShowPlayOnYTMDButton ?? true;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
@@ -188,6 +190,7 @@ async function settingsChanged() {
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
+  store.set("integrations.discordPresenceShowPlayOnYTMDButton", discordPresenceShowPlayOnYTMDButton.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
   store.set("integrations.enhancedMediaServiceEnabled", enhancedMediaServiceEnabled.value);
@@ -556,6 +559,15 @@ window.ytmd.handleUpdateDownloaded(() => {
             v-model="discordPresenceEnabled"
             type="checkbox"
             name="Discord rich presence"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="discordPresenceEnabled"
+            v-model="discordPresenceShowPlayOnYTMDButton"
+            type="checkbox"
+            indented
+            name='Show "Play on YTMDesktop" button'
+            description="Allows others to play the current song in YTMDesktop"
             @change="settingsChanged"
           />
           <div
