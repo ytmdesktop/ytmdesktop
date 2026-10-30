@@ -4,6 +4,7 @@ import log from "electron-log";
 import { DiscordActivityStatusDisplayType, DiscordActivityType } from "./minimal-discord-client/types";
 import Integration from "../integration";
 import MemoryStore from "../../services/memorystore";
+import ConfigStore from "../../services/configstore";
 import { MemoryStoreSchema } from "~shared/store/schema";
 import { PlayerState, Thumbnail, VideoDetails, VideoState } from "~shared/playerstatestore/types";
 
@@ -66,13 +67,14 @@ export default class DiscordPresence extends Integration {
   private connectionRetryTimeout: NodeJS.Timeout | string | number | undefined = undefined;
   private connectionFailedTimeout: NodeJS.Timeout | string | number | undefined = undefined;
   private stateCallback: ((event: PlayerState) => void) | null = null;
+  private storeListener: ReturnType<ConfigStore["onDidChange"]> | null = null;
 
   private videoState: VideoState = VideoState.Unknown;
   private videoDetails: VideoDetails | null = null;
   private progress: number = 0;
 
   private connectionRetries: number = 0;
-
+  
   private updateActivity() {
     if (this.activityDebounceTimeout) return;
     this.activityDebounceTimeout = setTimeout(() => {
@@ -105,14 +107,15 @@ export default class DiscordPresence extends Integration {
           small_text: getSmallImageText(this.videoState)
         },
         instance: false,
-        buttons: id
-          ? [
-              {
-                label: "Play on YTMDesktop",
-                url: `ytmd://play/${id}`
-              }
-            ]
-          : undefined
+        buttons:
+          id && this.getService(ConfigStore).get("integrations.discordPresenceShowPlayOnYTMDButton", true)
+            ? [
+                {
+                  label: "Play on YTMDesktop",
+                  url: `ytmd://play/${id}`
+                }
+              ]
+            : undefined
       });
       this.activityDebounceTimeout = undefined;
     }, 1000);
@@ -232,9 +235,25 @@ export default class DiscordPresence extends Integration {
 
     const playerStateStore = this.getService(PlayerStateStore);
     playerStateStore.on("state-changed", this.stateCallback);
+
+    const configStore = this.getService(ConfigStore);
+    this.storeListener = configStore.onDidChange("integrations", (newState, oldState) => {
+      if (!this.ready || !this.videoDetails) return;
+      if (newState?.discordPresenceShowPlayOnYTMDButton !== oldState?.discordPresenceShowPlayOnYTMDButton) {
+        if (this.activityDebounceTimeout) {
+          clearTimeout(this.activityDebounceTimeout);
+          this.activityDebounceTimeout = undefined;
+        }
+        this.updateActivity();
+      }
+    });
   }
 
   public onDisabled(): void {
+    if (this.storeListener) {
+      this.storeListener();
+      this.storeListener = null;
+    }
     this.connectionRetries = 0;
     const memoryStore = this.getService(MemoryStore<MemoryStoreSchema>);
     memoryStore.set("discordPresenceConnectionFailed", false);
