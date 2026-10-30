@@ -422,7 +422,7 @@ export default class CompanionServer extends Integration {
     }
   }
 
-  private memoryStoryListenerCallback(newState: MemoryStoreSchema, oldState: MemoryStoreSchema) {
+  private memoryStoryListenerCallback = (newState: MemoryStoreSchema, oldState: MemoryStoreSchema) => {
     if (newState.companionServerAuthWindowEnabled && !oldState.companionServerAuthWindowEnabled) {
       this.authWindowTimeout = setTimeout(
         () => {
