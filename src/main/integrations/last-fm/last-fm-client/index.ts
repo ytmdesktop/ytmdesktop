@@ -153,7 +153,8 @@ export default class LastFMClient {
         const transientFailure = (response.status >= 500 && response.status <= 599) || [LastFMErrorCode.OperationFailed, LastFMErrorCode.ServiceOffline, LastFMErrorCode.ServiceTemporarilyUnvailable].includes(data.error);
         
         if (rateLimited || transientFailure) {
-          await sleep(this.getRetryDelay(response, attempt))
+          await sleep(this.getRetryDelay(response, attempt));
+          continue;
         }
 
         const error = new Error(data.message || "LastFM returned an error");
