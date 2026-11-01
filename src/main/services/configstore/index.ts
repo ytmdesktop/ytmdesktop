@@ -181,6 +181,7 @@ export default class ConfigStore extends Service {
     });
 
     ipcMain.on("configStore:set", (_event, key, value) => {
+      if (typeof key !== "string" || key === "appearance" || key.startsWith("appearance.theme")) return;
       return this.set(key, value);
     });
 

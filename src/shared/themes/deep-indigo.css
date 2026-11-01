@@ -1,0 +1,1153 @@
+/*
+ * YTMD — Deep Indigo Glass
+ * Base color: #192586
+ * Designed for YouTube Music Desktop / YTMD
+ *
+ * Palette:
+ *   Accent        #192586
+ *   Accent light  #4657d6
+ *   Accent glow   #6f7cff
+ *   Deep base     #050713
+ *   Surface       #0b0f25
+ *   Text          #f4f6ff
+ */
+
+/* =========================================================
+   01. DESIGN TOKENS
+   ========================================================= */
+
+html:not(.style-scope),
+:root {
+    --sb-accent: #192586 !important;
+    --sb-accent-2: #2637ad !important;
+    --sb-accent-3: #4657d6 !important;
+    --sb-accent-soft: #6f7cff !important;
+
+    --sb-bg-0: #03040b !important;
+    --sb-bg-1: #050713 !important;
+    --sb-bg-2: #080b1d !important;
+    --sb-bg-3: #0b0f25 !important;
+    --sb-surface: rgba(12, 17, 43, 0.72) !important;
+    --sb-surface-strong: rgba(11, 15, 37, 0.92) !important;
+    --sb-surface-hover: rgba(25, 37, 134, 0.24) !important;
+
+    --sb-text: #f4f6ff !important;
+    --sb-text-2: #c5cbea !important;
+    --sb-text-3: #8e97c3 !important;
+    --sb-border: rgba(113, 126, 255, 0.16) !important;
+    --sb-border-strong: rgba(113, 126, 255, 0.28) !important;
+
+    --sb-shadow: 0 18px 60px rgba(0, 0, 0, 0.36) !important;
+    --sb-shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.24) !important;
+    --sb-glow: 0 0 24px rgba(70, 87, 214, 0.30) !important;
+    --sb-glow-strong: 0 0 34px rgba(70, 87, 214, 0.48) !important;
+
+    /* YouTube Music / YTMD variables */
+    --ytmusic-color-black1: var(--sb-bg-3) !important;
+    --ytmusic-color-black2: var(--sb-bg-2) !important;
+    --ytmusic-color-black3: var(--sb-bg-1) !important;
+    --ytmusic-color-black4: var(--sb-bg-0) !important;
+    --ytmusic-color-blackpure: var(--sb-bg-0) !important;
+
+    --ytmusic-color-white1: var(--sb-text) !important;
+    --ytmusic-color-grey1: var(--sb-text-2) !important;
+    --ytmusic-color-grey2: var(--sb-text-3) !important;
+    --ytmusic-color-grey3: #737ca8 !important;
+    --ytmusic-color-grey4: #5e678f !important;
+    --ytmusic-color-grey5: #444d78 !important;
+
+    --ytmusic-color-white1-alpha10: rgba(244, 246, 255, 0.10) !important;
+    --ytmusic-color-white1-alpha15: rgba(244, 246, 255, 0.15) !important;
+    --ytmusic-color-white1-alpha20: rgba(244, 246, 255, 0.20) !important;
+    --ytmusic-color-white1-alpha30: rgba(244, 246, 255, 0.30) !important;
+    --ytmusic-color-white1-alpha50: rgba(244, 246, 255, 0.50) !important;
+    --ytmusic-color-white1-alpha70: rgba(244, 246, 255, 0.70) !important;
+
+    --ytmusic-static-brand-red: var(--sb-accent-3) !important;
+    --yt-spec-themed-blue: var(--sb-accent-soft) !important;
+    --yt-spec-brand-link-text: var(--sb-accent-soft) !important;
+    --ytmusic-setting-item-toggle-active: var(--sb-accent-3) !important;
+    --ytmusic-dialog-background-color: var(--sb-surface-strong) !important;
+    --ytmusic-overlay-background-brand: rgba(25, 37, 134, 0.50) !important;
+    --ytmusic-focus-active: var(--sb-accent-soft) !important;
+    --ytmusic-detail-header: transparent !important;
+}
+
+/* =========================================================
+   02. GLOBAL BACKGROUND / AMBIENT LIGHT
+   ========================================================= */
+
+html,
+body,
+ytmusic-app {
+    background: var(--sb-bg-0) !important;
+    color: var(--sb-text) !important;
+}
+
+body {
+    position: relative !important;
+    overflow-x: hidden !important;
+}
+
+/* Layered indigo ambient glow */
+body::before {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: -2 !important;
+    pointer-events: none !important;
+    background:
+        radial-gradient(circle at 15% 10%,
+            rgba(25, 37, 134, 0.42) 0%,
+            rgba(25, 37, 134, 0.13) 26%,
+            transparent 52%),
+        radial-gradient(circle at 85% 18%,
+            rgba(70, 87, 214, 0.20) 0%,
+            transparent 38%),
+        radial-gradient(circle at 50% 100%,
+            rgba(25, 37, 134, 0.20) 0%,
+            transparent 44%),
+        linear-gradient(145deg,
+            #03040b 0%,
+            #06091a 42%,
+            #050713 70%,
+            #02030a 100%) !important;
+}
+
+/* Very subtle texture without external images */
+body::after {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+    opacity: 0.18 !important;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px) !important;
+    background-size: 46px 46px !important;
+    mask-image: linear-gradient(to bottom, black, transparent 85%) !important;
+}
+
+/* Neutralize YouTube's own page gradients so ours remains coherent */
+div.background-gradient.style-scope.ytmusic-browse-response,
+.background-gradient.ytmusic-browse-response {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+
+/* =========================================================
+   02.5 APP LAYOUT / MAIN CONTENT BACKGROUND — SAFE VERSION
+   ========================================================= */
+
+/*
+ * IMPORTANT:
+ * Do NOT target generic descendant IDs such as:
+ *
+ *   ytmusic-app-layout #content
+ *   ytmusic-app #content
+ *
+ * YouTube Music reuses #content inside cards, thumbnails and other
+ * components. Styling those descendants can cover album artwork.
+ *
+ * Only the real application-level containers are touched here.
+ */
+ytmusic-app-layout,
+#content.ytmusic-app-layout,
+#main-panel.ytmusic-app-layout {
+    background:
+        radial-gradient(
+            1100px 700px at 82% 2%,
+            rgba(70, 87, 214, 0.18) 0%,
+            rgba(25, 37, 134, 0.08) 37%,
+            transparent 72%
+        ),
+        radial-gradient(
+            900px 720px at 17% 13%,
+            rgba(25, 37, 134, 0.23) 0%,
+            rgba(25, 37, 134, 0.09) 40%,
+            transparent 75%
+        ),
+        linear-gradient(
+            145deg,
+            #060817 0%,
+            #070a1b 42%,
+            #050716 72%,
+            #03050f 100%
+        ) !important;
+
+    background-color: #050713 !important;
+    background-attachment: fixed !important;
+}
+
+/* Pages and shelves stay transparent so the single app-level canvas remains visible continuously. */
+ytmusic-browse-response,
+ytmusic-search-page,
+ytmusic-tab-renderer,
+ytmusic-section-list-renderer,
+ytmusic-music-shelf-renderer,
+ytmusic-carousel-shelf-renderer,
+ytmusic-card-shelf-renderer,
+ytmusic-shelf-renderer {
+    background-color: transparent !important;
+}
+
+/* Search containers: transparent only where selectors are specific to search components. */
+ytmusic-search-page > ytmusic-section-list-renderer,
+ytmusic-search-page ytmusic-music-shelf-renderer,
+ytmusic-search-page ytmusic-shelf-renderer,
+ytmusic-search-page ytmusic-carousel-shelf-renderer,
+ytmusic-search-page ytmusic-card-shelf-renderer {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Preserve artwork and media surfaces explicitly. */
+yt-img-shadow,
+yt-img-shadow #img,
+yt-img-shadow img,
+ytmusic-two-row-item-renderer yt-img-shadow,
+ytmusic-responsive-list-item-renderer yt-img-shadow,
+ytmusic-player-bar yt-img-shadow,
+ytmusic-player-page yt-img-shadow {
+    background-color: transparent !important;
+}
+
+yt-img-shadow img,
+img.yt-img-shadow,
+ytmusic-two-row-item-renderer img,
+ytmusic-responsive-list-item-renderer img,
+ytmusic-player-bar img,
+ytmusic-player-page img {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Do not create a second per-page gradient. */
+ytmusic-search-page {
+    background: transparent !important;
+}
+
+/* =========================================================
+   03. TOP NAVIGATION
+   ========================================================= */
+
+ytmusic-nav-bar {
+    background: rgba(5, 7, 19, 0.72) !important;
+    border-bottom: 1px solid var(--sb-border) !important;
+    box-shadow: 0 8px 34px rgba(0, 0, 0, 0.22) !important;
+    backdrop-filter: blur(20px) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
+}
+
+ytmusic-pivot-bar-item-renderer {
+    color: var(--sb-text-3) !important;
+    border-radius: 999px !important;
+    padding: 8px 15px !important;
+    transition:
+        color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease !important;
+}
+
+ytmusic-pivot-bar-item-renderer:hover {
+    color: var(--sb-text) !important;
+    background: rgba(70, 87, 214, 0.10) !important;
+}
+
+ytmusic-pivot-bar-item-renderer.iron-selected {
+    color: #ffffff !important;
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.75),
+            rgba(70, 87, 214, 0.32)) !important;
+    border: 1px solid rgba(111, 124, 255, 0.20) !important;
+    box-shadow:
+        0 5px 18px rgba(25, 37, 134, 0.22),
+        inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+
+ytmusic-search-box {
+    color: var(--sb-text-2) !important;
+}
+
+/* Search input */
+ytmusic-search-box input,
+input.ytmusic-search-box {
+    color: var(--sb-text) !important;
+    caret-color: var(--sb-accent-soft) !important;
+}
+
+/* =========================================================
+   04. MAIN CONTENT / HEADERS
+   ========================================================= */
+
+ytmusic-browse-response,
+ytmusic-section-list-renderer,
+ytmusic-tab-renderer,
+ytmusic-library-page,
+ytmusic-home-page,
+ytmusic-search-page {
+    background: transparent !important;
+}
+
+ytmusic-detail-header-renderer,
+ytmusic-data-bound-header-renderer,
+ytmusic-immersive-header-renderer {
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.26),
+            rgba(8, 11, 29, 0.15) 50%,
+            rgba(3, 4, 11, 0.00)) !important;
+}
+
+.title.ytmusic-detail-header-renderer,
+.title.ytmusic-carousel-shelf-basic-header-renderer,
+.title.ytmusic-immersive-header-renderer,
+.title.ytmusic-header-renderer {
+    color: var(--sb-text) !important;
+    text-shadow: 0 4px 22px rgba(0, 0, 0, 0.26) !important;
+}
+
+.description.ytmusic-immersive-header-renderer,
+yt-formatted-string.strapline,
+.subtitle,
+.byline {
+    color: var(--sb-text-3) !important;
+}
+
+/* =========================================================
+   05. CARDS / ALBUMS / PLAYLISTS
+   ========================================================= */
+
+ytmusic-two-row-item-renderer,
+ytmusic-responsive-list-item-renderer,
+ytmusic-list-item-renderer,
+ytmusic-grid-renderer > *,
+ytmusic-carousel-shelf-renderer ytmusic-two-row-item-renderer {
+    border-radius: 16px !important;
+}
+
+/* Card-like tiles */
+ytmusic-two-row-item-renderer {
+    transition:
+        transform 220ms cubic-bezier(.2,.8,.2,1),
+        filter 220ms ease !important;
+}
+
+ytmusic-two-row-item-renderer:hover {
+    transform: translateY(-4px) !important;
+    filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.30)) !important;
+}
+
+/* Album/playlist artwork */
+ytmusic-two-row-item-renderer yt-img-shadow,
+ytmusic-responsive-list-item-renderer yt-img-shadow,
+ytmusic-player-bar .thumbnail-image-wrapper,
+ytmusic-player-page yt-img-shadow {
+    overflow: hidden !important;
+    border-radius: 14px !important;
+    box-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.32),
+        0 0 0 1px rgba(111, 124, 255, 0.08) !important;
+}
+
+ytmusic-two-row-item-renderer img,
+ytmusic-responsive-list-item-renderer img {
+    transition:
+        transform 300ms cubic-bezier(.2,.8,.2,1),
+        filter 300ms ease !important;
+}
+
+ytmusic-two-row-item-renderer:hover img {
+    transform: scale(1.035) !important;
+    filter: saturate(1.08) brightness(1.04) !important;
+}
+
+/* Overlay play button */
+.content-wrapper.ytmusic-play-button-renderer,
+ytmusic-play-button-renderer:hover .content-wrapper.ytmusic-play-button-renderer,
+ytmusic-play-button-renderer:focus .content-wrapper.ytmusic-play-button-renderer {
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.96),
+            rgba(70, 87, 214, 0.90)) !important;
+    --ytmusic-play-button-icon-color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+    box-shadow: var(--sb-glow-strong) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+
+/* =========================================================
+   05.5 ARTWORK VISIBILITY SAFETY
+   ========================================================= */
+
+ytmusic-two-row-item-renderer .image-wrapper,
+ytmusic-two-row-item-renderer .thumbnail-overlay,
+ytmusic-two-row-item-renderer #thumbnail,
+ytmusic-responsive-list-item-renderer #thumbnail,
+ytmusic-player-queue-item #thumbnail {
+    background-color: transparent !important;
+}
+
+ytmusic-two-row-item-renderer yt-img-shadow,
+ytmusic-responsive-list-item-renderer yt-img-shadow {
+    position: relative !important;
+}
+
+ytmusic-two-row-item-renderer yt-img-shadow img,
+ytmusic-responsive-list-item-renderer yt-img-shadow img {
+    position: relative !important;
+    z-index: 1 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none;
+}
+
+ytmusic-two-row-item-renderer:hover yt-img-shadow img {
+    transform: scale(1.035) !important;
+    filter: saturate(1.08) brightness(1.04) !important;
+}
+
+/* =========================================================
+   06. SONG LISTS
+   ========================================================= */
+
+ytmusic-responsive-list-item-renderer {
+    position: relative !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease !important;
+}
+
+ytmusic-responsive-list-item-renderer:hover {
+    background:
+        linear-gradient(90deg,
+            rgba(25, 37, 134, 0.24),
+            rgba(70, 87, 214, 0.07)) !important;
+    border-color: rgba(111, 124, 255, 0.12) !important;
+    transform: translateX(3px) !important;
+    box-shadow: inset 3px 0 0 rgba(70, 87, 214, 0.72) !important;
+}
+
+ytmusic-responsive-list-item-renderer[is-playing] {
+    background:
+        linear-gradient(90deg,
+            rgba(25, 37, 134, 0.34),
+            rgba(70, 87, 214, 0.10)) !important;
+    border-color: rgba(111, 124, 255, 0.18) !important;
+    box-shadow:
+        inset 3px 0 0 var(--sb-accent-soft),
+        0 6px 24px rgba(25, 37, 134, 0.10) !important;
+}
+
+ytmusic-responsive-list-item-renderer[is-playing] .title,
+ytmusic-player-queue-item[selected] .song-title {
+    color: #ffffff !important;
+}
+
+/* Explicit badge */
+yt-icon.ytmusic-inline-badge-renderer {
+    color: var(--sb-accent-soft) !important;
+}
+
+
+/* =========================================================
+   06.5 SEARCH RESULTS — REMOVE DEFAULT BLACK PANELS
+   ========================================================= */
+
+/*
+ * YouTube Music injects opaque black backgrounds into a few result
+ * containers after a search. Keep the whole result area integrated
+ * with the Deep Indigo page instead.
+ */
+ytmusic-search-page,
+ytmusic-search-page ytmusic-section-list-renderer,
+ytmusic-search-page ytmusic-shelf-renderer,
+ytmusic-search-page ytmusic-card-shelf-renderer,
+ytmusic-search-page ytmusic-carousel-shelf-renderer,
+ytmusic-search-page ytmusic-music-shelf-renderer,
+ytmusic-search-page #contents,
+ytmusic-search-page #content,
+ytmusic-search-page .content-container,
+ytmusic-search-page .shelf-content,
+ytmusic-search-page .contents {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Song-result rows themselves */
+ytmusic-search-page ytmusic-responsive-list-item-renderer,
+ytmusic-search-page ytmusic-list-item-renderer {
+    background-color: transparent !important;
+}
+
+/* Preserve our indigo hover instead of falling back to YouTube black. */
+ytmusic-search-page ytmusic-responsive-list-item-renderer:hover {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(25, 37, 134, 0.24),
+            rgba(70, 87, 214, 0.07)
+        ) !important;
+}
+
+/*
+ * Some current YTM builds wrap search shelves in generic Polymer
+ * containers. This targets them only inside the search page.
+ */
+ytmusic-search-page tp-yt-paper-listbox,
+ytmusic-search-page .ytmusic-shelf-renderer,
+ytmusic-search-page .ytmusic-section-list-renderer {
+    background-color: transparent !important;
+}
+
+/* =========================================================
+   07. BUTTONS / CHIPS
+   ========================================================= */
+
+yt-button-renderer[is-paper-button],
+ytmusic-toggle-button-renderer,
+ytmusic-chip-cloud-chip-renderer {
+    border-radius: 999px !important;
+}
+
+/* IMPORTANT:
+   The renderer host can be as tall as the whole chip shelf.
+   Keep the host visually neutral and style ONLY the clickable <a>.
+   Otherwise YouTube Music turns every category into a giant oval. */
+ytmusic-chip-cloud-chip-renderer {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+}
+
+/* Actual category pill */
+a.ytmusic-chip-cloud-chip-renderer,
+.yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    width: auto !important;
+    min-width: max-content !important;
+
+    padding: 0 14px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(111, 124, 255, 0.16) !important;
+
+    color: var(--sb-text-2) !important;
+    background:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(25, 37, 134, 0.10)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        0 4px 14px rgba(0, 0, 0, 0.10) !important;
+
+    backdrop-filter: blur(10px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(125%) !important;
+
+    transition:
+        color 180ms ease,
+        background 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease !important;
+}
+
+/* Keep labels on one line */
+.text.ytmusic-chip-cloud-chip-renderer,
+yt-formatted-string.ytmusic-chip-cloud-chip-renderer {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1 !important;
+}
+
+/* Hover */
+a.ytmusic-chip-cloud-chip-renderer:hover,
+.yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer:hover {
+    color: #ffffff !important;
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.48),
+            rgba(70, 87, 214, 0.18)) !important;
+    border-color: rgba(111, 124, 255, 0.32) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 6px 18px rgba(25, 37, 134, 0.20),
+        0 0 14px rgba(70, 87, 214, 0.10) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Selected category */
+ytmusic-chip-cloud-chip-renderer[selected] a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[is-selected] a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer.iron-selected a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[selected] .yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[is-selected] .yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer.iron-selected .yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer {
+    color: #ffffff !important;
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.96),
+            rgba(70, 87, 214, 0.86)) !important;
+    border-color: rgba(132, 143, 255, 0.46) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.10),
+        0 7px 22px rgba(25, 37, 134, 0.30),
+        0 0 18px rgba(70, 87, 214, 0.18) !important;
+}
+
+/* Carousel arrows */
+.previous-items-button.ytmusic-carousel,
+.next-items-button.ytmusic-carousel {
+    background: rgba(11, 15, 37, 0.80) !important;
+    color: var(--sb-text) !important;
+    border: 1px solid var(--sb-border) !important;
+    box-shadow: var(--sb-shadow-soft) !important;
+    backdrop-filter: blur(14px) !important;
+}
+
+/* =========================================================
+   08. PLAYER BAR
+   ========================================================= */
+
+ytmusic-player-bar {
+    background:
+        linear-gradient(90deg,
+            rgba(6, 9, 26, 0.94) 0%,
+            rgba(11, 15, 37, 0.96) 42%,
+            rgba(10, 14, 34, 0.96) 100%) !important;
+    border-top: 1px solid rgba(111, 124, 255, 0.16) !important;
+    box-shadow:
+        0 -16px 50px rgba(0, 0, 0, 0.34),
+        0 -1px 20px rgba(25, 37, 134, 0.10) !important;
+    backdrop-filter: blur(26px) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(135%) !important;
+}
+
+/* Player artwork */
+ytmusic-player-bar .thumbnail-image-wrapper {
+    border-radius: 10px !important;
+}
+
+/* Main play/pause circle/icon */
+#play-pause-button,
+paper-icon-button#play-pause-button,
+tp-yt-paper-icon-button#play-pause-button {
+    color: #ffffff !important;
+    --iron-icon-fill-color: #ffffff !important;
+    border-radius: 50% !important;
+    filter: drop-shadow(0 0 10px rgba(70, 87, 214, 0.30)) !important;
+}
+
+/* Generic player icons */
+.left-controls.ytmusic-player-bar paper-icon-button,
+.right-controls-buttons.ytmusic-player-bar paper-icon-button,
+.toggle-player-page-button.ytmusic-player-bar,
+ytmusic-player-expanding-menu paper-icon-button,
+.menu.ytmusic-player-bar {
+    color: var(--sb-text-2) !important;
+    --iron-icon-fill-color: var(--sb-text-2) !important;
+    transition:
+        color 160ms ease,
+        filter 160ms ease,
+        transform 160ms ease !important;
+}
+
+.left-controls.ytmusic-player-bar paper-icon-button:hover,
+.right-controls-buttons.ytmusic-player-bar paper-icon-button:hover,
+.toggle-player-page-button.ytmusic-player-bar:hover,
+ytmusic-player-expanding-menu paper-icon-button:hover {
+    color: #ffffff !important;
+    --iron-icon-fill-color: #ffffff !important;
+    filter: drop-shadow(0 0 10px rgba(70, 87, 214, 0.55)) !important;
+    transform: scale(1.06) !important;
+}
+
+/* Progress slider */
+#progress-bar.ytmusic-player-bar {
+    --paper-slider-active-color: var(--sb-accent-3) !important;
+    --paper-slider-knob-color: var(--sb-accent-soft) !important;
+    --paper-slider-knob-start-color: var(--sb-accent-soft) !important;
+    --paper-slider-knob-start-border-color: var(--sb-accent-soft) !important;
+    --paper-slider-container-color: rgba(142, 151, 195, 0.24) !important;
+}
+
+/* Volume slider */
+paper-slider#volume-slider,
+.volume-slider.ytmusic-player-bar,
+.expand-volume-slider.ytmusic-player-bar {
+    --paper-slider-active-color: var(--sb-accent-3) !important;
+    --paper-slider-knob-color: var(--sb-accent-soft) !important;
+    --paper-slider-container-color: rgba(142, 151, 195, 0.26) !important;
+}
+
+/* =========================================================
+   09. FULL PLAYER PAGE
+   ========================================================= */
+
+ytmusic-player-page {
+    background:
+        radial-gradient(circle at 50% 20%,
+            rgba(25, 37, 134, 0.38),
+            rgba(8, 11, 29, 0.70) 38%,
+            rgba(3, 4, 11, 0.96) 82%) !important;
+}
+
+ytmusic-player-page #player {
+    filter: drop-shadow(0 28px 70px rgba(0,0,0,0.44)) !important;
+}
+
+/* Queue tabs */
+tp-yt-paper-tab.ytmusic-player-page {
+    color: var(--sb-text-3) !important;
+}
+
+tp-yt-paper-tab.iron-selected.ytmusic-player-page {
+    color: var(--sb-text) !important;
+}
+
+#selectionBar.tp-yt-paper-tabs {
+    border-bottom: 2px solid var(--sb-accent-soft) !important;
+    box-shadow: 0 0 16px rgba(70, 87, 214, 0.45) !important;
+}
+
+/* Queue entries */
+ytmusic-player-queue-item {
+    background: transparent !important;
+    border-radius: 12px !important;
+    transition:
+        background 160ms ease,
+        transform 160ms ease !important;
+}
+
+ytmusic-player-queue-item:hover {
+    background: rgba(25, 37, 134, 0.18) !important;
+    transform: translateX(3px) !important;
+}
+
+ytmusic-player-queue-item[selected] {
+    background:
+        linear-gradient(90deg,
+            rgba(25, 37, 134, 0.33),
+            rgba(70, 87, 214, 0.08)) !important;
+    box-shadow: inset 3px 0 0 var(--sb-accent-soft) !important;
+}
+
+yt-formatted-string.byline.ytmusic-player-queue-item,
+yt-formatted-string.duration.ytmusic-player-queue-item {
+    color: var(--sb-text-3) !important;
+}
+
+
+/* =========================================================
+   09.5 POPUP / OVERLAY STACKING FIX
+   ========================================================= */
+
+/*
+ * ytmusic-popup-container is a viewport-sized HOST, not the popup itself.
+ * Never give it a visible background, border, shadow or backdrop-filter.
+ * Doing so creates a full-screen glass layer that can sit above dialogs
+ * and steal mouse input.
+ */
+ytmusic-popup-container {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    /* Preserve YouTube Music's own positioning / event routing. */
+    filter: none !important;
+}
+
+/*
+ * Overlay/backdrop lifecycle fix.
+ *
+ * IMPORTANT: never force the backdrop visible all the time.
+ * YouTube Music itself toggles its "opened" state when a popup appears.
+ * Hidden backdrop = invisible + non-interactive.
+ */
+tp-yt-iron-overlay-backdrop,
+.iron-overlay-backdrop,
+#backdrop.tp-yt-iron-overlay-backdrop {
+    background: rgba(1, 2, 8, 0.58) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    transition:
+        opacity 160ms ease,
+        visibility 160ms ease !important;
+}
+
+/* Only activate the curtain while YouTube Music says it is open. */
+tp-yt-iron-overlay-backdrop.opened,
+tp-yt-iron-overlay-backdrop[opened],
+.iron-overlay-backdrop.opened,
+.iron-overlay-backdrop[opened],
+#backdrop.tp-yt-iron-overlay-backdrop.opened,
+#backdrop.tp-yt-iron-overlay-backdrop[opened] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+
+    backdrop-filter: blur(3px) !important;
+    -webkit-backdrop-filter: blur(3px) !important;
+}
+
+/*
+ * Explicitly keep the actual interactive popup surfaces above the backdrop.
+ */
+tp-yt-paper-dialog,
+ytmusic-dialog,
+ytmusic-menu-popup-renderer,
+ytmusic-multi-select-menu-renderer,
+tp-yt-paper-listbox,
+.dropdown-content {
+    pointer-events: auto !important;
+    isolation: isolate !important;
+}
+
+/*
+ * Playlist picker / add-to-playlist dialogs use nested scrollable areas.
+ * Avoid pseudo-elements or filters accidentally blocking their contents.
+ */
+ytmusic-add-to-playlist-renderer,
+ytmusic-playlist-add-to-option-renderer,
+ytmusic-playlist-add-to-option-renderer *,
+ytmusic-add-to-playlist-renderer * {
+    pointer-events: auto;
+}
+
+/* Preserve normal button/link interaction inside every popup. */
+tp-yt-paper-dialog a,
+tp-yt-paper-dialog button,
+tp-yt-paper-dialog tp-yt-paper-item,
+tp-yt-paper-dialog ytmusic-playlist-add-to-option-renderer,
+ytmusic-dialog a,
+ytmusic-dialog button,
+ytmusic-dialog tp-yt-paper-item,
+ytmusic-menu-popup-renderer a,
+ytmusic-menu-popup-renderer tp-yt-paper-item {
+    pointer-events: auto !important;
+}
+
+/* =========================================================
+   10. MENUS / DIALOGS / POPUPS
+   ========================================================= */
+
+tp-yt-paper-dialog,
+ytmusic-dialog,
+.dropdown-content,
+tp-yt-paper-listbox,
+ytmusic-menu-popup-renderer,
+ytmusic-multi-select-menu-renderer {
+    background: rgba(8, 11, 29, 0.92) !important;
+    color: var(--sb-text) !important;
+    border: 1px solid var(--sb-border-strong) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--sb-shadow) !important;
+    backdrop-filter: blur(26px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(140%) !important;
+}
+
+tp-yt-paper-item:hover,
+ytmusic-menu-navigation-item-renderer:hover,
+ytmusic-menu-service-item-renderer:hover,
+ytmusic-toggle-menu-service-item-renderer:hover {
+    background: rgba(25, 37, 134, 0.20) !important;
+}
+
+/* Settings selection */
+.category-menu-item.iron-selected.ytmusic-settings-page {
+    background:
+        linear-gradient(90deg,
+            rgba(25, 37, 134, 0.46),
+            rgba(70, 87, 214, 0.10)) !important;
+    color: var(--sb-text) !important;
+    border-radius: 10px !important;
+    box-shadow: inset 3px 0 0 var(--sb-accent-soft) !important;
+}
+
+/* =========================================================
+   11. LINKS / TEXT
+   ========================================================= */
+
+yt-formatted-string[has-link-only_]:not([force-default-style]) a.yt-simple-endpoint.yt-formatted-string,
+a.yt-simple-endpoint {
+    transition: color 150ms ease, text-shadow 150ms ease !important;
+}
+
+yt-formatted-string[has-link-only_]:not([force-default-style]) a.yt-simple-endpoint.yt-formatted-string:hover,
+a.yt-simple-endpoint:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 14px rgba(70, 87, 214, 0.36) !important;
+}
+
+/* New recommendations chip */
+a.ytmusic-content-update-chip {
+    color: #ffffff !important;
+    background:
+        linear-gradient(135deg,
+            rgba(25, 37, 134, 0.92),
+            rgba(70, 87, 214, 0.86)) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-radius: 999px !important;
+    box-shadow: var(--sb-glow) !important;
+}
+
+/* =========================================================
+   12. SCROLLBARS
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(70, 87, 214, 0.68),
+            rgba(25, 37, 134, 0.62)
+        ) !important;
+    border: 3px solid transparent !important;
+    background-clip: padding-box !important;
+    border-radius: 999px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(111, 124, 255, 0.86),
+            rgba(38, 55, 173, 0.80)
+        ) !important;
+    border: 2px solid transparent !important;
+    background-clip: padding-box !important;
+}
+
+/* =========================================================
+   13. FOCUS / SELECTION / ACCESSIBILITY
+   ========================================================= */
+
+::selection {
+    background: rgba(70, 87, 214, 0.46) !important;
+    color: #ffffff !important;
+}
+
+*:focus-visible {
+    outline: 2px solid rgba(111, 124, 255, 0.82) !important;
+    outline-offset: 2px !important;
+}
+
+/* =========================================================
+   14. YTMD DESKTOP-SPECIFIC ICONS
+   ========================================================= */
+
+i.material-icons {
+    color: var(--sb-text-3) !important;
+    transition: color 160ms ease, filter 160ms ease !important;
+}
+
+i.material-icons:hover {
+    color: #ffffff !important;
+    filter: drop-shadow(0 0 10px rgba(70, 87, 214, 0.46)) !important;
+}
+
+/* =========================================================
+   15. MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+
+/* =========================================================
+   V6.1 — ONLY FIX: BROWSE GRADIENT HORIZONTAL SEAM
+   ========================================================= */
+
+/*
+ * YouTube Music adds its own finite-height dynamic background to the
+ * browse page. When that element ends, the color abruptly changes and
+ * creates the visible horizontal cut between sections.
+ *
+ * Disable ONLY that native finite layer. The Deep Indigo background
+ * defined by this theme remains untouched and continues through the
+ * whole page.
+ */
+#browse-page > #background {
+    display: none !important;
+    background: none !important;
+    background-image: none !important;
+}
+
+/* Kill any secondary finite gradient layer without touching content. */
+#browse-page > .background-gradient,
+ytmusic-browse-response > .background-gradient,
+div.background-gradient.style-scope.ytmusic-browse-response,
+.background-gradient.ytmusic-browse-response {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/* Keep the browse canvas itself transparent so the continuous
+   app-level Deep Indigo gradient remains visible underneath. */
+#browse-page,
+ytmusic-browse-response {
+    background-color: transparent !important;
+}
+
+
+
+/* =========================================================
+   V6.2 — ONLY FIX: TOP GRADIENT CONTINUITY
+   ========================================================= */
+
+/*
+ * The top navigation bar had its own opaque background, which made the
+ * page gradient appear to start abruptly below it.
+ *
+ * Recreate the same Deep Indigo atmosphere in the top bar so the
+ * transition is visually continuous.
+ */
+ytmusic-nav-bar {
+    background:
+        radial-gradient(
+            900px 420px at 78% -80px,
+            rgba(70, 87, 214, 0.16) 0%,
+            rgba(25, 37, 134, 0.07) 42%,
+            transparent 74%
+        ),
+        radial-gradient(
+            720px 360px at 18% -50px,
+            rgba(25, 37, 134, 0.18) 0%,
+            rgba(25, 37, 134, 0.07) 44%,
+            transparent 78%
+        ),
+        linear-gradient(
+            90deg,
+            #060817 0%,
+            #070a1b 42%,
+            #050716 72%,
+            #03050f 100%
+        ) !important;
+
+    border-bottom-color: rgba(111, 124, 255, 0.10) !important;
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.16),
+        0 1px 0 rgba(111, 124, 255, 0.04) !important;
+
+    backdrop-filter: blur(18px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(125%) !important;
+}
+
+/*
+ * Some YTM builds add an internal nav background layer.
+ * Keep it transparent so it cannot cover the gradient above.
+ */
+ytmusic-nav-bar::before,
+ytmusic-nav-bar::after,
+#nav-bar-background,
+.nav-bar-background {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+
+
+/* =========================================================
+   V6.3 — SEAMLESS TOP BAR
+   ========================================================= */
+
+/*
+ * The previous fix recreated a similar gradient inside ytmusic-nav-bar,
+ * but because it was a separate gradient it still produced a visible seam.
+ *
+ * The top bar is now transparent so it visually belongs to the same
+ * continuous Deep Indigo canvas underneath.
+ */
+ytmusic-nav-bar {
+    background: rgba(5, 7, 19, 0.18) !important;
+    background-image: none !important;
+
+    border-bottom: 1px solid rgba(111, 124, 255, 0.055) !important;
+
+    box-shadow:
+        0 1px 0 rgba(255,255,255,0.012),
+        0 6px 18px rgba(0,0,0,0.06) !important;
+
+    backdrop-filter: blur(12px) saturate(115%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(115%) !important;
+}
+
+/* Remove any internal opaque layer that can recreate the seam. */
+ytmusic-nav-bar::before,
+ytmusic-nav-bar::after,
+#nav-bar-background,
+.nav-bar-background,
+ytmusic-nav-bar #background {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/*
+ * Make the immediate page edge below the bar transparent as well,
+ * so there is no 1px/2px strip caused by YTM's native header layers.
+ */
+ytmusic-app-layout > ytmusic-nav-bar + *,
+ytmusic-app-layout #content.ytmusic-app-layout {
+    border-top-color: transparent !important;
+}
+
+/*
+ * Keep the search box itself readable while the bar becomes transparent.
+ */
+ytmusic-search-box,
+ytmusic-search-box #input,
+ytmusic-search-box input {
+    background-color: rgba(18, 23, 46, 0.72) !important;
+}
+
