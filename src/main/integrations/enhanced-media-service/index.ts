@@ -1,6 +1,6 @@
 import { app } from "electron";
 import PlayerStateStore from "../../services/playerstatestore";
-import { MediaPlayer, MediaPlayerThumbnail } from "xosms";
+import type { MediaPlayer } from "xosms";
 import Integration from "../integration";
 import ConfigStore from "../../services/configstore";
 import { PlayerState, RepeatMode, Thumbnail, VideoState } from "~shared/playerstatestore/types";
@@ -27,7 +27,7 @@ export default class EnhancedMediaService extends Integration {
   public override disableFlags = ["disable_enhanced_media_service"];
 
   private stateCallback: ((event: PlayerState) => void) | null = null;
-  private mediaPlayer: MediaPlayer = new MediaPlayer("ytmdesktop", "YTMDesktop");
+  private mediaPlayer: MediaPlayer | null = null;
 
   private lastVideoDetailsTitle: string | null = null;
   private lastVideoDetailsAlbum: string | null = null;
@@ -43,85 +43,94 @@ export default class EnhancedMediaService extends Integration {
 
   constructor() {
     super();
+  }
 
-    this.mediaPlayer.setButtonPressedCallback(button => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      switch (button) {
-        case "playpause":
-          remoteControlApi.postMessage("execute", "playPause");
-          break;
-        case "play":
-          remoteControlApi.postMessage("execute", "play");
-          break;
-        case "pause":
-          remoteControlApi.postMessage("execute", "pause");
-          break;
-        case "stop":
-          remoteControlApi.postMessage("execute", "pause");
-          break;
-        case "next":
+  private async maybeCreateMediaPlayer() {
+    if (!this.mediaPlayer) {
+      const { MediaPlayer } = await import("xosms");
+      this.mediaPlayer = new MediaPlayer("ytmdesktop", "YTMDesktop");
+
+      this.mediaPlayer.setButtonPressedCallback(button => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        switch (button) {
+          case "playpause":
+            remoteControlApi.postMessage("execute", "playPause");
+            break;
+          case "play":
+            remoteControlApi.postMessage("execute", "play");
+            break;
+          case "pause":
+            remoteControlApi.postMessage("execute", "pause");
+            break;
+          case "stop":
+            remoteControlApi.postMessage("execute", "pause");
+            break;
+          case "next":
+            remoteControlApi.postMessage("execute", "next");
+            break;
+          case "previous":
+            remoteControlApi.postMessage("execute", "previous");
+            break;
+        }
+      });
+      this.mediaPlayer.setPositionChangedCallback(position => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        const playerStateStore = this.getService(PlayerStateStore);
+        const videoDetails = playerStateStore.getState().videoDetails;
+        if (videoDetails && (position >= 0 && position <= videoDetails.durationSeconds)) remoteControlApi.postMessage("execute", "seekTo", position);
+      });
+      this.mediaPlayer.setPositionSeekedCallback(seek => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        const playerStateStore = this.getService(PlayerStateStore);
+        let newProgress = playerStateStore.getState().videoProgress + seek;
+        if (newProgress <= 0) newProgress = 0;
+
+        // Behavior aligns with MPRIS documentation
+        const videoDetails = playerStateStore.getState().videoDetails;
+        if (videoDetails && (newProgress > videoDetails.durationSeconds)) {
           remoteControlApi.postMessage("execute", "next");
-          break;
-        case "previous":
-          remoteControlApi.postMessage("execute", "previous");
-          break;
-      }
-    });
-    this.mediaPlayer.setPositionChangedCallback(position => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      const playerStateStore = this.getService(PlayerStateStore);
-      const videoDetails = playerStateStore.getState().videoDetails;
-      if (videoDetails && (position >= 0 && position <= videoDetails.durationSeconds)) remoteControlApi.postMessage("execute", "seekTo", position);
-    });
-    this.mediaPlayer.setPositionSeekedCallback(seek => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      const playerStateStore = this.getService(PlayerStateStore);
-      let newProgress = playerStateStore.getState().videoProgress + seek;
-      if (newProgress <= 0) newProgress = 0;
+        } else {
+          remoteControlApi.postMessage("execute", "seekTo", newProgress);
+        }
+      });
+      this.mediaPlayer.setLoopChangedCallback(loop => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        switch (loop) {
+          case "none":
+            remoteControlApi.postMessage("execute", "repeatMode", "NONE");
+            break;
+          case "playlist":
+            remoteControlApi.postMessage("execute", "repeatMode", "ALL");
+            break;
+          case "track":
+            remoteControlApi.postMessage("execute", "repeatMode", "ONE");
+            break;
+        }
+      });
+      this.mediaPlayer.setShuffleChangedCallback(() => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        remoteControlApi.postMessage("execute", "shuffle");
+      });
+      this.mediaPlayer.setVolumeChangedCallback(volume => {
+        const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
+        let newVolume = volume;
+        if (os.platform() === "linux") {
+          newVolume = newVolume * 100;
+        }
+        remoteControlApi.postMessage("execute", "setVolume", newVolume);
+      });
 
-      // Behavior aligns with MPRIS documentation
-      const videoDetails = playerStateStore.getState().videoDetails;
-      if (videoDetails && (newProgress > videoDetails.durationSeconds)) {
-        remoteControlApi.postMessage("execute", "next");
-      } else {
-        remoteControlApi.postMessage("execute", "seekTo", newProgress);
-      }
-    });
-    this.mediaPlayer.setLoopChangedCallback(loop => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      switch (loop) {
-        case "none":
-          remoteControlApi.postMessage("execute", "repeatMode", "NONE");
-          break;
-        case "playlist":
-          remoteControlApi.postMessage("execute", "repeatMode", "ALL");
-          break;
-        case "track":
-          remoteControlApi.postMessage("execute", "repeatMode", "ONE");
-          break;
-      }
-    });
-    this.mediaPlayer.setShuffleChangedCallback(() => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      remoteControlApi.postMessage("execute", "shuffle");
-    });
-    this.mediaPlayer.setVolumeChangedCallback(volume => {
-      const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
-      let newVolume = volume;
-      if (os.platform() === "linux") {
-        newVolume = newVolume * 100;
-      }
-      remoteControlApi.postMessage("execute", "setVolume", newVolume);
-    });
-
-    this.mediaPlayer.nextButtonEnabled = true;
-    this.mediaPlayer.pauseButtonEnabled = true;
-    this.mediaPlayer.playButtonEnabled = true;
-    this.mediaPlayer.previousButtonEnabled = true;
-    this.mediaPlayer.seekEnabled = true;
+      this.mediaPlayer.nextButtonEnabled = true;
+      this.mediaPlayer.pauseButtonEnabled = true;
+      this.mediaPlayer.playButtonEnabled = true;
+      this.mediaPlayer.previousButtonEnabled = true;
+      this.mediaPlayer.seekEnabled = true;
+    }
   }
 
   private async playerStateChanged(state: PlayerState) {
+    if (!this.mediaPlayer) return;
+
     if (this.isEnabled && state.videoDetails && state.hasFullMetadata) {
       let needUpdate = false;
       if (state.videoDetails.title !== this.lastVideoDetailsTitle) {
@@ -158,6 +167,8 @@ export default class EnhancedMediaService extends Integration {
       const thumbnail = getHighestResThumbnail(state.videoDetails.thumbnails);
       if (thumbnail !== null && thumbnail !== this.lastThumbnail) {
         this.lastThumbnail = thumbnail;
+
+        const { MediaPlayerThumbnail } = await import("xosms");
         this.mediaPlayer.thumbnail = await MediaPlayerThumbnail.create("uri", thumbnail);
 
         needUpdate = true;
@@ -230,8 +241,10 @@ export default class EnhancedMediaService extends Integration {
     }
   }
 
-  public onEnabled(): void {
-    this.mediaPlayer.activate();
+  public async onEnabled(): Promise<void> {
+    this.maybeCreateMediaPlayer();
+
+    this.mediaPlayer?.activate();
     //this.mediaPlayer.mediaType = MediaPlayerMediaType.Music;
     this.stateCallback = event => {
       this.playerStateChanged(event);
@@ -242,7 +255,7 @@ export default class EnhancedMediaService extends Integration {
   }
 
   public onDisabled(): void {
-    this.mediaPlayer.deactivate();
+    this.mediaPlayer?.deactivate();
     if (this.stateCallback) {
       const playerStateStore = this.getService(PlayerStateStore);
       playerStateStore.off("state-changed", this.stateCallback);
