@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import markdownit from "markdown-it";
+import markdownit from 'markdown-it';
 const md = markdownit({
   linkify: true,
-  html: true
+  html: true,
 });
 
 const releaseMetadata = await window.ytmd.getReleaseMetadata();
@@ -19,10 +19,7 @@ const appVersion = await window.ytmd.getAppVersion();
     <h2 class="app-version">
       {{ releaseMetadata.name }}
     </h2>
-    <div
-      class="release-notes"
-      v-html="mdRender"
-    />
+    <div class="release-notes" v-html="mdRender" />
   </div>
 </template>
 
@@ -31,6 +28,8 @@ const appVersion = await window.ytmd.getAppVersion();
   height: 100%;
   background: #000000;
   padding: 16px;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .updated-header {
