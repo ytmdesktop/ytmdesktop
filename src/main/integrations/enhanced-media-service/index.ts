@@ -242,7 +242,7 @@ export default class EnhancedMediaService extends Integration {
   }
 
   public async onEnabled(): Promise<void> {
-    this.maybeCreateMediaPlayer();
+    await this.maybeCreateMediaPlayer();
 
     this.mediaPlayer?.activate();
     //this.mediaPlayer.mediaType = MediaPlayerMediaType.Music;
