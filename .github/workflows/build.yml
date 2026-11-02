@@ -36,6 +36,9 @@ jobs:
         if: matrix.os.name == 'linux'
         run: sudo apt-get install libdbus-1-dev pkg-config -y
 
+      - name: Test
+        run: pnpm test
+
       - name: Make (${{ matrix.os.arch }})
         env:
           YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
