@@ -21,6 +21,7 @@ import os from "node:os";
 import CompanionServerIpcClient from "./ipc-client";
 import { PlayerState } from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../services/playerstatestore";
+import fs from "node:fs";
 
 const API_VERSIONS = ["v1"];
 const TRANSFORM_PLAYER_STATE_FOR_VERSION: { [version: string]: (state: PlayerState) => unknown } = {
@@ -187,6 +188,16 @@ export default class CompanionServer extends Integration {
     });
 
     const pipePath = this.getIpcPath();
+    if (process.platform !== "win32") {
+      try {
+        fs.unlinkSync(pipePath);
+      } catch (err: any) {
+        if (err.code !== "ENOENT") {
+          throw err;
+        }
+      }
+    }
+
     this.ipcServer.listen(pipePath, () => {
       log.info(`ipc: listening on ${pipePath}`);
     });
