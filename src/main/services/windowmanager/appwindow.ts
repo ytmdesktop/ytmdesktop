@@ -338,7 +338,7 @@ export class AppWindow<
     if (process.platform !== "win32") return;
 
     this.thumbarButtons = buttons;
-    this.electronWindow?.setThumbarButtons(buttons);
+    this.applyTaskbarState();
   }
 
   public setProgressBar(
@@ -347,7 +347,29 @@ export class AppWindow<
   ) {
     this.progressBar = progress;
     this.progressBarOptions = options ?? null;
-    this.electronWindow?.setProgressBar(progress, options);
+    this.applyTaskbarState();
+  }
+
+  // ThumbBarAddButtons fails until the HWND has a taskbar button, and Electron
+  // latches that failure so later ThumbBarUpdateButtons calls never create the
+  // toolbar. Apply only while visible. Hide() drops the toolbar without
+  // restoring it, so the show handler applies this again.
+  private applyTaskbarState() {
+    const electronWindow = this.electronWindow;
+    if (
+      !electronWindow ||
+      electronWindow.isDestroyed() ||
+      !electronWindow.isVisible()
+    )
+      return;
+
+    if (process.platform === "win32" && this.thumbarButtons.length > 0)
+      electronWindow.setThumbarButtons(this.thumbarButtons);
+
+    electronWindow.setProgressBar(
+      this.progressBar,
+      this.progressBarOptions ?? undefined,
+    );
   }
 
   public setTitle(title: string) {
@@ -453,14 +475,6 @@ export class AppWindow<
       this.windowReady = true;
     }
 
-    if (this.thumbarButtons)
-      this.electronWindow.setThumbarButtons(this.thumbarButtons);
-    if (this.progressBar)
-      this.electronWindow.setProgressBar(
-        this.progressBar,
-        this.progressBarOptions ?? undefined,
-      );
-
     if (this.windowType === "Browser") {
       if (!app.isPackaged)
         (this.electronWindow as BrowserWindow).webContents.openDevTools();
@@ -469,6 +483,10 @@ export class AppWindow<
       if (this.options.url) browserWindow.loadURL(this.options.url);
       else if (this.options.file) browserWindow.loadFile(this.options.file);
     }
+
+    // A window constructed with `show: true` emits show during construction,
+    // before the show listener is attached. Hidden windows no-op here.
+    this.applyTaskbarState();
 
     this.initialCreation = false;
   }
@@ -500,6 +518,10 @@ export class AppWindow<
       );
       return;
     }
+
+    this.electronWindow?.on("show", () => {
+      this.applyTaskbarState();
+    });
 
     this.electronWindow?.on("close", (event) => {
       if (!this.requestedClosure) this.emit("electronwindow-close", event);
