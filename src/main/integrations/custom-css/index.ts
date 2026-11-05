@@ -73,7 +73,7 @@ export default class CustomCSS extends Integration {
       const content: string = fs.readFileSync(cssPath, "utf8");
 
       await ytmViewManager.ready();
-      this.customCSSKey = await ytmViewManager.getView()?.webContents?.insertCSS(content) ?? null;
+      this.customCSSKey = await ytmViewManager.getView()?.webContents?.insertCSS(content, { cssOrigin: "user" }) ?? null;
       this.injected = true;
 
       this.watchCSSFile(cssPath);
