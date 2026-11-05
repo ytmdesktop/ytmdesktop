@@ -638,6 +638,7 @@ export async function addTimedLyrics() {
   let currentTimedLyrics: { timedLyrics: any; source: any } | null = null;
   let autoScrolling = false;
   let autoScrollPaused = false;
+  let autoScrollRafId: number | null = null;
   let viewingLyricsTab = false;
   let ytmLyricTabContents: any[] | null = null;
 
@@ -686,19 +687,16 @@ export async function addTimedLyrics() {
   returnToLiveContainer.appendChild(returnToLive);
 
   const tabRenderer = document.querySelector("#player-page #tab-renderer");
-  tabRenderer?.addEventListener("scroll", () => {
-    if (!viewingLyricsTab) return;
-    if (autoScrolling) return;
-
-    disableAutoScroll();
-  });
-  tabRenderer?.addEventListener("scrollend", () => {
+  function onUserScroll() {
     if (!viewingLyricsTab) return;
     if (autoScrolling) {
+      //cancelAnimationFrame(autoScrollRafId);
       autoScrolling = false;
-      return;
     }
-  });
+    disableAutoScroll();
+  }
+  tabRenderer?.addEventListener("wheel", onUserScroll, { passive: true });
+  tabRenderer?.addEventListener("touchstart", onUserScroll, { passive: true });
 
   async function getTimedLyrics() {
     try {
@@ -802,8 +800,47 @@ export async function addTimedLyrics() {
     }
   }
 
+  function easeOutQuad(x: number): number {
+    return 1 - (1 - x) * (1 - x);
+  }
+
+  function smoothScrollToCenter(container, element, duration = 250, easing = easeOutQuad) {
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    const targetScrollTop =
+      container.scrollTop +
+      (elementRect.top - containerRect.top) -
+      (container.clientHeight / 2 - elementRect.height / 2);
+
+    const start = container.scrollTop;
+    const change = targetScrollTop - start;
+    const startTime = performance.now();
+
+    return new Promise<void>((resolve, reject) => {
+      let lastKnownRafId;
+      function animate(now) {
+        // If we're not auto scrolling (interruption) or the last known raf id is not the same (another scroll operation) we cancel this one
+        if (!autoScrolling || lastKnownRafId != autoScrollRafId) {
+          reject();
+          return;
+        }
+
+        const t = Math.min(1, (now - startTime) / duration);
+        container.scrollTop = start + change * easing(t);
+
+        if (t < 1) {
+          autoScrollRafId = lastKnownRafId = requestAnimationFrame(animate);
+        } else {
+          resolve();
+        }
+      }
+      autoScrollRafId = lastKnownRafId = requestAnimationFrame(animate);
+    });
+  }
+
   // This could definitely be optimized far better
-  function updateLyricLines(progress) {
+  async function updateLyricLines(progress) {
     const msProgress = progress * 1000;
     for (const lyric of timedLyricsContainer.children) {
       const lyricStart = parseInt(lyric.getAttribute("data-start-ms")!);
@@ -812,13 +849,12 @@ export async function addTimedLyrics() {
       if (msProgress >= lyricStart && msProgress < lyricEnd) {
         if (!lyric.classList.contains("active")) {
           lyric.classList.add("active");
-          if (!autoScrollPaused) {
+          if (!autoScrollPaused && viewingLyricsTab) {
             autoScrolling = true;
-            lyric.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "center",
-            });
+            try {
+              await smoothScrollToCenter(tabRenderer, lyric, 500);
+            } catch {}
+            autoScrolling = false;
           }
         }
       } else {
