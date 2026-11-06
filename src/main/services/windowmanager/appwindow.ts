@@ -338,7 +338,7 @@ export class AppWindow<
     if (process.platform !== "win32") return;
 
     this.thumbarButtons = buttons;
-    this.electronWindow?.setThumbarButtons(buttons);
+    if (this.electronWindow?.isVisible()) this.electronWindow?.setThumbarButtons(buttons);
   }
 
   public setProgressBar(
