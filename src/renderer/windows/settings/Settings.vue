@@ -159,6 +159,10 @@ memoryStore.onStateChanged(newState => {
   safeStorageAvailable.value = newState.safeStorageAvailable;
 
   autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
+  checkingForUpdate.value = newState.autoUpdaterChecking;
+  updateAvailable.value = newState.autoUpdaterAvailable;
+  updateNotAvailable.value = newState.autoUpdaterNotAvailable;
+  updateDownloaded.value = newState.autoUpdaterDownloaded;
 
   lastFMAuthenticationStep.value = newState.lastFMAuthenticationStep;
 });
@@ -270,29 +274,6 @@ async function logoutLastFM() {
 function stepLastFMAuth() {
   window.ytmd.lastFMStepAuthenticate();
 }
-
-window.ytmd.handleCheckingForUpdate(() => {
-  checkingForUpdate.value = true;
-});
-
-window.ytmd.handleUpdateAvailable(() => {
-  checkingForUpdate.value = false;
-  updateAvailable.value = true;
-  updateNotAvailable.value = false;
-});
-
-window.ytmd.handleUpdateNotAvailable(() => {
-  checkingForUpdate.value = false;
-  updateNotAvailable.value = true;
-  updateAvailable.value = false;
-});
-
-window.ytmd.handleUpdateDownloaded(() => {
-  checkingForUpdate.value = false;
-  updateNotAvailable.value = false;
-  updateAvailable.value = false;
-  updateDownloaded.value = true;
-});
 </script>
 
 <template>
