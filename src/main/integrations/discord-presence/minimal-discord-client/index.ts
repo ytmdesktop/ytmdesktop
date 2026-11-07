@@ -64,14 +64,14 @@ export default class DiscordClient extends EventEmitter {
               ipcReject();
             });
             this.ipcClient.once("error", error => {
-              log.error("dipc: socket error connecting to discord", error);
+              log.debug("dipc: socket error connecting to discord", error);
             });
             this.ipcClient.once("connect", () => {
               log.debug("dipc: connected to discord at", ipcPath);
               this.ipcClient.removeAllListeners();
               ipcResolve();
             });
-            this.ipcClient.connect(getIPCPath(id));
+            this.ipcClient.connect(ipcPath);
           });
 
           this.connected = true;
@@ -84,6 +84,9 @@ export default class DiscordClient extends EventEmitter {
           );
           this.emit("connect");
 
+          this.ipcClient.on("error", error => {
+            log.debug("dipc: socket error after connection", error);
+          });
           this.ipcClient.on("close", () => {
             this.connected = false;
             this.emit("close");

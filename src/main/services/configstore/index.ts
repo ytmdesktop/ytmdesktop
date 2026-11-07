@@ -53,6 +53,7 @@ export default class ConfigStore extends Service {
           companionServerAuthTokens: null,
           companionServerCORSWildcardEnabled: true,
           discordPresenceEnabled: false,
+          discordPresenceShowPlayOnYTMDButton: true,
           lastFMEnabled: false,
           enhancedMediaServiceEnabled: true
         },
@@ -124,6 +125,10 @@ export default class ConfigStore extends Service {
             store.set("integrations.enhancedMediaServiceEnabled", true);
           }
 
+          if (!store.has("integrations.discordPresenceShowPlayOnYTMDButton")) {
+            store.set("integrations.discordPresenceShowPlayOnYTMDButton", true);
+          }
+
           if (!store.has("state.miniplayerWindowBounds")) {
             store.set("state.miniplayerWindowBounds", null);
           }
@@ -181,7 +186,7 @@ export default class ConfigStore extends Service {
     });
 
     ipcMain.on("configStore:set", (_event, key, value) => {
-      return this.set(key, value);
+      return value === undefined ? this.conf.delete(key) : this.set(key, value);
     });
 
     log.info("ConfigStore initialized");
