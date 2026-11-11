@@ -4,6 +4,12 @@ export enum TrayIconStyle {
   Black = 2
 }
 
+export enum DiscordActivityStatusDisplayType {
+  Name = 0,
+  State = 1,
+  Details = 2
+}
+
 export type StoreSchema = {
   metadata: {
     version: 1;
@@ -35,6 +41,9 @@ export type StoreSchema = {
     companionServerAuthTokens: string | null; // array[object] | Encrypted for security
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
+    discordPresenceStatusDisplay: DiscordActivityStatusDisplayType;
+    discordPresenceShowPlayOnYTMDButton: boolean;
+    discordPresenceShowPlaybackStateIcon: boolean;
     lastFMEnabled: boolean;
     enhancedMediaServiceEnabled: boolean;
   };
