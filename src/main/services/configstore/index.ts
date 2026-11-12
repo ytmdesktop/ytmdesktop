@@ -1,8 +1,8 @@
 import Conf from "conf";
 import { app, ipcMain } from "electron";
 import log from "electron-log";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
-import { DependencyConstructor, Paths, ValueAtPath } from "~shared/types";
+import { DiscordActivityStatusDisplayType, StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { DependencyConstructor } from "~shared/types";
 import Service from "../service";
 import AppWindowManager from "../windowmanager";
 
@@ -53,6 +53,9 @@ export default class ConfigStore extends Service {
           companionServerAuthTokens: null,
           companionServerCORSWildcardEnabled: true,
           discordPresenceEnabled: false,
+          discordPresenceStatusDisplay: DiscordActivityStatusDisplayType.State,
+          discordPresenceShowPlayOnYTMDButton: true,
+          discordPresenceShowPlaybackStateIcon: true,
           lastFMEnabled: false,
           enhancedMediaServiceEnabled: true
         },
@@ -122,6 +125,18 @@ export default class ConfigStore extends Service {
 
           if (!store.has("integrations.enhancedMediaServiceEnabled")) {
             store.set("integrations.enhancedMediaServiceEnabled", true);
+          }
+
+          if (!store.has("integrations.discordPresenceStatusDisplay")) {
+            store.set("integrations.discordPresenceStatusDisplay", DiscordActivityStatusDisplayType.State);
+          }
+
+          if (!store.has("integrations.discordPresenceShowPlayOnYTMDButton")) {
+            store.set("integrations.discordPresenceShowPlayOnYTMDButton", true);
+          }
+
+          if (!store.has("integrations.discordPresenceShowPlaybackStateIcon")) {
+            store.set("integrations.discordPresenceShowPlaybackStateIcon", true);
           }
 
           if (!store.has("state.miniplayerWindowBounds")) {
