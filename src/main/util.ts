@@ -5,6 +5,13 @@ import ConfigStore from "./services/configstore";
 
 export const assetFolder = path.join(!app.isPackaged ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
 
+// Default colors of the main window's native window controls (minimize/maximize/close) on Windows and Linux
+export const mainWindowTitleBarOverlay = {
+  color: "#000000",
+  symbolColor: "#BBBBBB",
+  height: 36
+};
+
 export function getIconPath(icon: string) {
   return path.join(assetFolder, `${!app.isPackaged ? "icons/" : ""}${icon}`);
 }
