@@ -33,6 +33,11 @@ const config: ForgeConfig = {
       }
     ],
     appCategoryType: "public.app-category.music",
+    // macOS only lets an app browse for and connect to devices on the local network when these keys are present
+    extendInfo: {
+      NSLocalNetworkUsageDescription: "YouTube Music Desktop App uses the local network to find and control Cast devices.",
+      NSBonjourServices: ["_googlecast._tcp"]
+    },
     asar: true
   },
   rebuildConfig: {},
