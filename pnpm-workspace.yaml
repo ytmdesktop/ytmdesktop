@@ -4,6 +4,8 @@ allowBuilds:
   fastify-socket.io: false
 
 minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - electron-cast
 
 nodeLinker: hoisted
 patchedDependencies:
