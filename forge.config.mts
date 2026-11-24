@@ -112,6 +112,11 @@ const config: ForgeConfig = {
           target: "preload"
         },
         {
+          entry: "src/renderer/windows/cast-picker/preload.ts",
+          config: "config/vite/preload/cast_picker_window.ts",
+          target: "preload"
+        },
+        {
           entry: "src/renderer/ytmview/preload.ts",
           config: "config/vite/preload/ytmview.ts",
           target: "preload"

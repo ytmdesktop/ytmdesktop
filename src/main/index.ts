@@ -28,6 +28,7 @@ import { MemoryStoreSchema, TrayIconStyle } from "~shared/store/schema";
 import ProtocolManager from "./services/protocolmanager";
 import PlayerStateStore from "./services/playerstatestore";
 import ProtectedAPIManager from "./services/protectedapimanager";
+import CastManager from "./services/castmanager";
 import { VideoType } from "~shared/playerstatestore/types";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
@@ -49,6 +50,7 @@ serviceCollection.addServices([
   ProtectedAPIManager,
   PlayerStateStore,
   YTMViewManager,
+  CastManager,
   ShortcutManager,
   TaskbarManager,
   ProtocolManager,

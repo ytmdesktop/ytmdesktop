@@ -54,3 +54,15 @@ export enum ProtectedAPIOpCode {
   Invoke,
   InvokeResponse
 }
+
+export type CastPickerDeviceKind = "tv" | "speaker" | "group";
+export type CastPickerDevice = {
+  id: string;
+  name: string;
+  model: string;
+  kind: CastPickerDeviceKind;
+};
+export type CastPickerShowArguments = {
+  devices: CastPickerDevice[];
+  currentDeviceId?: string;
+};

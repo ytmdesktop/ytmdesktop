@@ -13,13 +13,17 @@ if (window.location.hostname !== "music.youtube.com") {
   throw new Error("[YTMDFastFail]: THIS IS NOT AN ERROR! Location not applicable bailing preload");
 }
 
-import { ipcRenderer, webFrame } from "electron";
+import { contextBridge, ipcRenderer, webFrame } from "electron";
+import { installCastBridge } from "electron-cast/preload";
 import Store from "../store-ipc/store";
 import { StoreSchema } from "~shared/store/schema";
 
 import scriptsRaw from "./scripts?raw";
 
 const store = new Store<StoreSchema>();
+
+// Gives YTM a working chrome.cast before its scripts run, so its own cast button casts through the main process.
+installCastBridge({ contextBridge, ipcRenderer });
 
 let protectedApiBound = false;
 window.addEventListener("message", async event => {

@@ -1,4 +1,4 @@
-import { WindowsEventArguments, YTMViewStatus } from "~shared/types";
+import { CastPickerShowArguments, WindowsEventArguments, YTMViewStatus } from "~shared/types";
 import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
@@ -72,6 +72,15 @@ declare global {
       };
       executeCommandInYTMView(command: string, ...args: unknown[]);
       isWayland(): boolean;
+
+      // Cast picker specific
+      castPicker: {
+        onShow(callback: (args: CastPickerShowArguments) => void): void;
+        choose(id: string): void;
+        stop(): void;
+        cancel(): void;
+        resize(height: number): void;
+      };
     };
   }
 
