@@ -75,7 +75,8 @@ export default class ConfigStore extends Service {
           lastVideoId: "",
           windowBounds: null,
           windowMaximized: false,
-          miniplayerWindowBounds: null
+          miniplayerWindowBounds: null,
+          castSession: null
         },
         lastfm: {
           sessionKey: null,
