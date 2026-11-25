@@ -119,7 +119,7 @@ describe("AutoUpdater & AppWindowManager", () => {
     au.onInitialized();
     expect(au.isDisabled()).toBe(false);
     expect(mockAutoUpdater.setFeedURL).toHaveBeenCalledWith({
-      url: expect.stringContaining("https://update.electronjs.org/ytmd/ytmdesktop/win32-"),
+      url: "https://github.com/ytmd/ytmdesktop/releases/latest/download",
     });
 
     autoUpdaterEmitter.emit("checking-for-update");

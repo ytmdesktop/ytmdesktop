@@ -64,9 +64,9 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
     ) {
       this.invalidUpdateFeed = true;
     } else {
-      this.updateFeedUrlNoPlatform = `https://update.electronjs.org/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}`;
-      this.updateFeedUrlNoVersion = `${this.updateFeedUrlNoPlatform}/${process.platform}-${process.arch}`;
-      this.updateFeedUrl = `${this.updateFeedUrlNoVersion}/${app.getVersion()}`;
+      this.updateFeedUrlNoPlatform = `https://github.com/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/releases`;
+      this.updateFeedUrlNoVersion = `${this.updateFeedUrlNoPlatform}/latest/download`;
+      this.updateFeedUrl = this.updateFeedUrlNoVersion;
     }
 
     ipcMain.handle("autoUpdater:isUpdateAvailable", () => {
@@ -128,6 +128,52 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
 
   public override onTerminated() {}
 
+  private async resolveLatestReleaseFeedUrl(): Promise<string | null> {
+    if (
+      process.env.VITEST ||
+      typeof YTMD_UPDATE_FEED_OWNER !== "string" ||
+      typeof YTMD_UPDATE_FEED_REPOSITORY !== "string" ||
+      typeof fetch !== "function"
+    ) {
+      return null;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/releases?per_page=10`,
+        {
+          headers: {
+            Accept: "application/vnd.github+json",
+            "User-Agent": "ytmdesktop-autoupdater",
+          },
+          signal: controller.signal,
+        },
+      );
+      if (!res.ok) return null;
+      const releases = (await res.json()) as Array<{
+        tag_name?: string;
+        draft?: boolean;
+        assets?: Array<{ name?: string }>;
+      }>;
+      if (!Array.isArray(releases)) return null;
+      const match = releases.find(
+        (r) =>
+          !r.draft &&
+          typeof r.tag_name === "string" &&
+          r.tag_name.length > 0 &&
+          Array.isArray(r.assets) &&
+          r.assets.some((a) => a.name === "RELEASES"),
+      );
+      if (!match?.tag_name) return null;
+      return `https://github.com/${YTMD_UPDATE_FEED_OWNER}/${YTMD_UPDATE_FEED_REPOSITORY}/releases/download/${match.tag_name}`;
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   /**
    *
    * @param wait Wait for update check to complete
@@ -145,6 +191,12 @@ export default class AutoUpdater extends EventEmitterService<AutoUpdaterEvents> 
         this.once("downloaded", () => resolve(true));
         this.once("error", () => resolve(false));
       });
+    }
+
+    const resolvedFeedUrl = await this.resolveLatestReleaseFeedUrl();
+    if (resolvedFeedUrl && resolvedFeedUrl !== this.updateFeedUrl) {
+      this.updateFeedUrl = resolvedFeedUrl;
+      autoUpdater.setFeedURL({ url: resolvedFeedUrl });
     }
 
     autoUpdater.checkForUpdates();
