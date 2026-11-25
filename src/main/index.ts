@@ -143,13 +143,19 @@ function pruneLogArtifacts(logFilePath: string | undefined, maxBytes: number) {
   }
 }
 
+const swallowBrokenPipe = (err: NodeJS.ErrnoException) => {
+  if (err?.code === "EPIPE") return;
+};
+process.stdout?.on?.("error", swallowBrokenPipe);
+process.stderr?.on?.("error", swallowBrokenPipe);
+
 const configuredFileLevel = process.env.YTMD_LOG_LEVEL as
   | log.LevelOption
   | undefined;
 log.transports.file.level = configuredFileLevel || "warn";
 log.transports.file.maxSize = MAX_LOG_FILE_BYTES;
 log.transports.console.level = app.isPackaged
-  ? "warn"
+  ? false
   : configuredFileLevel || "info";
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 pruneLogArtifacts(log.transports.file.getFile()?.path, MAX_LOG_FILE_BYTES);

@@ -774,6 +774,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
   public async createRoom(options: {
     displayName: string;
     initialQueue?: QueueTrack[];
+    initialPositionSec?: number;
     initialSettings?: RoomSettings;
     ownerPubKey?: string;
   }): Promise<ListenTogetherActionResult> {
@@ -900,7 +901,9 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
       const initialQueue =
         options.initialQueue ??
-        (this.persistentRoomEnabled ? this.loadPersistentQueue() : undefined);
+        (this.persistentRoomEnabled
+          ? this.loadPersistentQueue(roomId)
+          : undefined);
 
       this.roomState = createRoomState({
         roomId,
@@ -914,9 +917,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
       await this.connectHostRelays(lookupId, roomId);
       this.rebuildHostInviteUrl();
-      if (this.persistentRoomEnabled) {
-        this.recordRecentRoom();
-      }
+      this.recordRecentRoom();
 
       this.connectingStage = null;
       this.arbiter.setSessionState({
@@ -942,6 +943,17 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           actorId: hostKeypair.publicKeyB64,
           action: "play",
         });
+        if (
+          typeof options.initialPositionSec === "number" &&
+          options.initialPositionSec > 0
+        ) {
+          this.dispatchRoomEvent({
+            type: "HOST_TRANSPORT",
+            actorId: hostKeypair.publicKeyB64,
+            action: "seek",
+            seekPosSec: options.initialPositionSec,
+          });
+        }
       }
 
       this.emitStateChanged();
@@ -1684,17 +1696,28 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
     this.configStore.set("listenTogether.favoriteRooms", this.favoriteRooms);
   }
 
-  private loadPersistentQueue(): QueueTrack[] {
-    const raw = this.configStore.get("listenTogether.persistentQueue");
-    if (!Array.isArray(raw)) return [];
-    return raw.filter(
+  private loadPersistentQueue(roomId: string): QueueTrack[] {
+    const raw = this.configStore.get("listenTogether.persistentQueue") as
+      | Record<string, unknown>
+      | unknown[]
+      | undefined;
+    if (!raw || Array.isArray(raw) || typeof raw !== "object") return [];
+    const roomTracks = raw[roomId];
+    if (!Array.isArray(roomTracks)) return [];
+    return roomTracks.filter(
       (t): t is QueueTrack =>
-        Boolean(t && typeof t.entryId === "string" && typeof t.videoId === "string"),
+        Boolean(
+          t && typeof t.entryId === "string" && typeof t.videoId === "string",
+        ),
     );
   }
 
   private savePersistentQueue(): void {
-    if (!this.persistentRoomEnabled || this.sessionMode !== "host" || !this.roomState) {
+    if (
+      !this.persistentRoomEnabled ||
+      this.sessionMode !== "host" ||
+      !this.roomState
+    ) {
       return;
     }
     const snapshot = this.roomState.currentTrack
@@ -1703,15 +1726,18 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           ...materializeQueue(this.roomState.scheduler),
         ]
       : materializeQueue(this.roomState.scheduler);
-    this.configStore.set(
-      "listenTogether.persistentQueue",
-      snapshot.slice(0, 50),
-    );
+    const raw = this.configStore.get("listenTogether.persistentQueue");
+    const existing: Record<string, QueueTrack[]> =
+      raw && !Array.isArray(raw) && typeof raw === "object"
+        ? { ...(raw as Record<string, QueueTrack[]>) }
+        : {};
+    existing[this.roomState.roomId] = snapshot.slice(0, 50);
+    this.configStore.set("listenTogether.persistentQueue", existing);
   }
 
   private recordRecentRoom(): void {
     if (this.sessionMode === "host") {
-      if (!this.persistentRoomEnabled || !this.hostKeypair) return;
+      if (!this.hostKeypair) return;
       const hostPubKeyB64 = this.hostKeypair.publicKeyB64;
       const label =
         this.persistentRoomName.trim() || `${this.displayName || "My"}'s Room`;
@@ -2800,6 +2826,10 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         this.pendingMigrationResolve = null;
         resolve(url);
       };
+      const anchor = this.getCurrentAnchor();
+      const initialPositionSec = anchor
+        ? this.projectCurrentRoomPosSec(anchor)
+        : 0;
       this.sendEncryptedToPeer(targetPeerId, {
         type: "HOST_MIGRATION_PREPARE",
         targetPeerId,
@@ -2810,6 +2840,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         reason,
         settings: { ...this.roomState!.settings },
         queueSnapshot,
+        initialPositionSec,
         history: [...this.roomState!.history],
       });
     });
@@ -5002,6 +5033,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         void this.createRoom({
           displayName: this.displayName,
           initialQueue: msg.queueSnapshot,
+          initialPositionSec: msg.initialPositionSec,
           initialSettings: msg.settings,
           ownerPubKey: msg.ownerPubKey,
         }).then((res) => {

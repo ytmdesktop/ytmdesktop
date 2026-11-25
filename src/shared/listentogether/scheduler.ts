@@ -257,12 +257,14 @@ export function enqueueDjTrack(
 function selectFairRrNextDj(
   perDjQueues: Record<string, QueueTrack[]>,
   djNextRound: Record<string, number>,
+  headIndices?: Record<string, number>,
 ): { djId: string; round: number; head: QueueTrack } | null {
   let best: { djId: string; round: number; head: QueueTrack } | null = null;
 
   for (const [djId, queue] of Object.entries(perDjQueues)) {
-    if (queue.length === 0) continue;
-    const head = queue[0];
+    const headIdx = headIndices?.[djId] ?? 0;
+    if (headIdx >= queue.length) continue;
+    const head = queue[headIdx];
     const round = djNextRound[djId] ?? 0;
 
     if (
@@ -461,24 +463,17 @@ export function materializeQueue(state: SchedulerState): QueueTrack[] {
     return result;
   }
 
-  const simQueues: Record<string, QueueTrack[]> = {};
-  for (const [djId, queue] of Object.entries(state.perDjQueues)) {
-    if (queue.length > 0) {
-      simQueues[djId] = [...queue];
-    }
+  const simIndices: Record<string, number> = {};
+  for (const djId of Object.keys(state.perDjQueues)) {
+    simIndices[djId] = 0;
   }
   const simRounds: Record<string, number> = { ...state.djNextRound };
 
   while (true) {
-    const chosen = selectFairRrNextDj(simQueues, simRounds);
+    const chosen = selectFairRrNextDj(state.perDjQueues, simRounds, simIndices);
     if (!chosen) break;
     result.push(chosen.head);
-    const remaining = simQueues[chosen.djId].slice(1);
-    if (remaining.length === 0) {
-      delete simQueues[chosen.djId];
-    } else {
-      simQueues[chosen.djId] = remaining;
-    }
+    simIndices[chosen.djId] += 1;
     simRounds[chosen.djId] = chosen.round + 1;
   }
 
@@ -503,7 +498,9 @@ export function removeTrack(
   actorId: string,
   isAdmin: boolean,
   logger: ListenTogetherLogger = noopLogger,
+  options: { forgive?: boolean } = {},
 ): { ok: boolean; removed: QueueTrack | null; state: SchedulerState } {
+  const forgive = options.forgive !== false;
   const pinnedIdx = state.pinnedNext.findIndex((t) => t.entryId === entryId);
   if (pinnedIdx !== -1) {
     const target = state.pinnedNext[pinnedIdx];
@@ -519,6 +516,11 @@ export function removeTrack(
       ...state.pinnedNext.slice(0, pinnedIdx),
       ...state.pinnedNext.slice(pinnedIdx + 1),
     ];
+    let nextLastEnqueueAtByDj = state.lastEnqueueAtByDj;
+    if (forgive && actorId === target.addedBy && target.addedBy in nextLastEnqueueAtByDj) {
+      nextLastEnqueueAtByDj = { ...nextLastEnqueueAtByDj };
+      delete nextLastEnqueueAtByDj[target.addedBy];
+    }
     logger.debug?.("Removed pinned track from queue", {
       entryId,
       actorId,
@@ -531,6 +533,7 @@ export function removeTrack(
       state: {
         ...state,
         pinnedNext: nextPinned,
+        lastEnqueueAtByDj: nextLastEnqueueAtByDj,
       },
     };
   }
@@ -554,6 +557,23 @@ export function removeTrack(
       } else {
         nextPerDjQueues[djId] = remaining;
       }
+      let nextLastEnqueueAtByDj = state.lastEnqueueAtByDj;
+      let nextDjNextRound = state.djNextRound;
+      if (forgive) {
+        if ((actorId === djId || remaining.length === 0) && djId in nextLastEnqueueAtByDj) {
+          nextLastEnqueueAtByDj = { ...nextLastEnqueueAtByDj };
+          delete nextLastEnqueueAtByDj[djId];
+        }
+        if (
+          remaining.length === 0 &&
+          (nextDjNextRound[djId] ?? state.currentRound) > state.currentRound
+        ) {
+          nextDjNextRound = {
+            ...nextDjNextRound,
+            [djId]: state.currentRound,
+          };
+        }
+      }
       logger.debug?.("Removed DJ track from queue", {
         entryId,
         actorId,
@@ -566,6 +586,8 @@ export function removeTrack(
         state: {
           ...state,
           perDjQueues: nextPerDjQueues,
+          djNextRound: nextDjNextRound,
+          lastEnqueueAtByDj: nextLastEnqueueAtByDj,
           fifoOrder: state.fifoOrder.filter((id) => id !== entryId),
         },
       };
@@ -802,7 +824,9 @@ export function reorderTrack(
     }
 
     if (currentIndex >= pinnedLen && clampedTarget < pinnedLen) {
-      const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger);
+      const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger, {
+        forgive: false,
+      });
       if (!removed.ok || !removed.removed) return { ok: false, state };
       const pinnedCopy: QueueTrack = { ...removed.removed, pinned: true };
       const nextPinned = [...removed.state.pinnedNext];
@@ -868,7 +892,9 @@ export function reorderTrack(
   }
 
   if (currentIndex >= pinnedLen && clampedTarget <= pinnedLen) {
-    const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger);
+    const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger, {
+      forgive: false,
+    });
     if (!removed.ok || !removed.removed) return { ok: false, state };
     const pinnedCopy: QueueTrack = { ...removed.removed, pinned: true };
     const nextPinned = [...removed.state.pinnedNext];
@@ -914,7 +940,9 @@ export function reorderTrack(
   }
 
   if (clampedTarget < currentIndex) {
-    const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger);
+    const removed = removeTrack(state, entryId, movedTrack.addedBy, true, logger, {
+      forgive: false,
+    });
     if (!removed.ok || !removed.removed) return { ok: false, state };
     const pinnedCopy: QueueTrack = { ...removed.removed, pinned: true };
     const nextPinned = [...removed.state.pinnedNext, pinnedCopy];

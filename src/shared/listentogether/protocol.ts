@@ -364,6 +364,7 @@ export const AppMessageSchema = Type.Union([
     ]),
     settings: RoomSettingsSchema,
     queueSnapshot: Type.Array(QueueTrackSchema, { maxItems: 500 }),
+    initialPositionSec: Type.Optional(Type.Number({ minimum: 0 })),
     history: Type.Optional(Type.Array(QueueTrackSchema, { maxItems: 50 })),
   }),
   Type.Object({

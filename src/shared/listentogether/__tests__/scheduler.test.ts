@@ -803,4 +803,55 @@ describe("scheduler: host reorderTrack and jumpToQueuedTrack", () => {
 
     expect(jumpToQueuedTrack(state, "nope").track).toBeNull();
   });
+
+  it("removeTrack grants cooldown and deferred-round forgiveness without forgiving reorder pins", () => {
+    let state = createSchedulerState("fair-rr");
+    const r1 = enqueueDjTrack(state, "dj-a", makeTrack(1, { addedBy: "dj-a" }), "dj", "strict", 100);
+    if (!r1.ok) throw new Error("expected enqueue 1 ok");
+    state = r1.state;
+    const r2 = enqueueDjTrack(state, "dj-b", makeTrack(2, { addedBy: "dj-b" }), "dj", "strict", 200);
+    if (!r2.ok) throw new Error("expected enqueue 2 ok");
+    state = r2.state;
+
+    // Defer dj-a downward via cross-DJ reorder, then remove entry-1 -> forgives round & strict cooldown
+    state = reorderTrack(state, "entry-1", 1).state;
+    expect(state.djNextRound["dj-a"]).toBeGreaterThan(state.currentRound);
+
+    const removed = removeTrack(state, "entry-1", "dj-a", false);
+    expect(removed.ok).toBe(true);
+    state = removed.state;
+    expect(state.djNextRound["dj-a"]).toBe(state.currentRound);
+    expect(state.lastEnqueueAtByDj["dj-a"]).toBeUndefined();
+
+    const replacement = enqueueDjTrack(
+      state,
+      "dj-a",
+      makeTrack(3, { addedBy: "dj-a" }),
+      "dj",
+      "strict",
+      250,
+    );
+    expect(replacement.ok).toBe(true);
+  });
+
+  it("materializeQueue handles large 500-track fair-rr queues accurately", () => {
+    let state = createSchedulerState("fair-rr");
+    for (let i = 0; i < 500; i++) {
+      const djId = `dj-${i % 10}`;
+      const res = enqueueDjTrack(
+        state,
+        djId,
+        makeTrack(i, { addedBy: djId }),
+        "admin",
+        "off",
+        i,
+      );
+      if (!res.ok) throw new Error(`expected enqueue ${i} ok`);
+      state = res.state;
+    }
+    const materialized = materializeQueue(state);
+    expect(materialized).toHaveLength(500);
+    const firstRoundDjs = new Set(materialized.slice(0, 10).map((t) => t.addedBy));
+    expect(firstRoundDjs.size).toBe(10);
+  });
 });

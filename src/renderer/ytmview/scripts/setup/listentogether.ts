@@ -1155,12 +1155,14 @@ export default function setupListenTogether(
     doc.querySelectorAll?.(`[${LT_BTN_ATTR}]`)?.forEach((el) => {
       (el as { remove?: () => void }).remove?.();
     });
-    const styleEl = doc.querySelector?.(`#${LT_STYLE_ID}`) as
-      | { remove?: () => void }
-      | null;
-    styleEl?.remove?.();
-    (doc as { documentElement?: { removeAttribute?: (k: string) => void } })
-      .documentElement?.removeAttribute?.("data-ytmd-lt-mode");
+    if (!lockState.locked) {
+      const styleEl = doc.querySelector?.(`#${LT_STYLE_ID}`) as
+        | { remove?: () => void }
+        | null;
+      styleEl?.remove?.();
+      (doc as { documentElement?: { removeAttribute?: (k: string) => void } })
+        .documentElement?.removeAttribute?.("data-ytmd-lt-mode");
+    }
   }
 
   function syncPlayerBarQueueButton(): void {
@@ -1245,7 +1247,7 @@ export default function setupListenTogether(
   }
 
   function syncQueueButtons(): void {
-    if (!lockState.locked || !lockState.canAddSongs) {
+    if (!lockState.locked) {
       removeInjectedQueueButtons();
       return;
     }
@@ -1263,6 +1265,10 @@ export default function setupListenTogether(
       }
     };
     runSafely("styles", ensureQuickAddStyles);
+    if (!lockState.canAddSongs) {
+      removeInjectedQueueButtons();
+      return;
+    }
     runSafely("player-bar", syncPlayerBarQueueButton);
     runSafely("cards", () =>
       syncRendererButtons(
