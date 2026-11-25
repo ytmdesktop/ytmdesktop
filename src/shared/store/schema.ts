@@ -1,4 +1,7 @@
-import type { FavoriteRoomEntry } from "../listentogether/ipc";
+import type {
+  FavoriteRoomEntry,
+  FriendEntry,
+} from "../listentogether/ipc";
 import type { QueueTrack } from "../listentogether/protocol";
 
 export enum TrayIconStyle {
@@ -85,6 +88,7 @@ export type StoreSchema = {
     persistentQueue: QueueTrack[];
     favoriteRooms: FavoriteRoomEntry[];
     recentRooms: FavoriteRoomEntry[];
+    friends: FriendEntry[];
   };
 };
 

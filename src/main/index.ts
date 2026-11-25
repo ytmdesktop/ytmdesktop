@@ -31,6 +31,7 @@ import LastFM from "./integrations/last-fm";
 import NowPlayingNotifications from "./integrations/notifications";
 import VolumeRatio from "./integrations/volume-ratio";
 import EnhancedMediaService from "./integrations/enhanced-media-service";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import electronSquirrelStartup from "electron-squirrel-startup";
@@ -82,6 +83,37 @@ function resolveAppWindowUrl(route: string, devHtmlPath: string): string {
 // Squirrel shortcut creation/removal
 // This is part of application installation/uninstallation process close the app immediately
 if (electronSquirrelStartup) {
+  if (
+    process.platform === "win32" &&
+    (process.argv.includes("--squirrel-install") ||
+      process.argv.includes("--squirrel-updated"))
+  ) {
+    try {
+      const tailcatExe = path.join(process.resourcesPath ?? "", "tailcat.exe");
+      if (fs.existsSync(tailcatExe)) {
+        const escapedPath = tailcatExe.replace(/'/g, "''");
+        const innerScript = [
+          `Unblock-File -LiteralPath '${escapedPath}' -ErrorAction SilentlyContinue`,
+          `Remove-NetFirewallRule -DisplayName 'YTMD Tailcat (In)','YTMD Tailcat (Out)' -ErrorAction SilentlyContinue`,
+          `New-NetFirewallRule -DisplayName 'YTMD Tailcat (In)' -Direction Inbound -Program '${escapedPath}' -Action Allow -Profile Any -ErrorAction SilentlyContinue | Out-Null`,
+          `New-NetFirewallRule -DisplayName 'YTMD Tailcat (Out)' -Direction Outbound -Program '${escapedPath}' -Action Allow -Profile Any -ErrorAction SilentlyContinue | Out-Null`,
+        ].join("; ");
+        const encoded = Buffer.from(innerScript, "utf16le").toString("base64");
+        execFileSync(
+          "powershell.exe",
+          [
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            `Start-Process powershell.exe -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NoProfile','-NonInteractive','-EncodedCommand','${encoded}'`,
+          ],
+          { timeout: 30_000, windowsHide: true, stdio: "ignore" },
+        );
+      }
+    } catch {
+      // User cancelled UAC prompt or elevation unavailable; continue setup cleanly.
+    }
+  }
   app.exit();
 }
 

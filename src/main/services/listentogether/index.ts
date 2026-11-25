@@ -7,6 +7,8 @@ import { DriftController } from "~shared/listentogether/drift";
 import {
   LISTEN_TOGETHER_IPC,
   type FavoriteRoomEntry,
+  type FriendEntry,
+  type FriendRequestUI,
   type ListenTogetherActionResult,
   type ListenTogetherActiveRoomUIState,
   type ListenTogetherCommand,
@@ -24,6 +26,7 @@ import {
 import {
   computeSkipVotesRequired,
   decodeAppMessage,
+  DEFAULT_ROOM_SETTINGS,
   encodeInviteUrl,
   isAllowedSignalingUrl,
   normalizePasscode,
@@ -96,6 +99,7 @@ import {
   type DirectWsHostOptions,
 } from "./transport/direct-ws";
 import {
+  probeTailcatRoomStatus,
   RelayHostClient,
   RelayWsTransport,
   resolveTailcatBinary,
@@ -205,6 +209,12 @@ type ActiveGuestJoinParams =
       lookupId: string;
       passcodeAuthKey: Buffer;
       lanEndpoint?: string;
+    }
+  | {
+      kind: "friend";
+      friendPubKeyB64: string;
+      tcAddress: string;
+      tcPort: number;
     };
 
 const SENSITIVE_LOG_KEY_RE =
@@ -376,10 +386,14 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
   private panelOpen = false;
   private clientSlug = "";
   private displayName = "";
-  private persistentRoomEnabled = false;
+  private persistentRoomEnabled = true;
   private persistentRoomName = "";
   private favoriteRooms: FavoriteRoomEntry[] = [];
   private recentRooms: FavoriteRoomEntry[] = [];
+  private friends: FriendEntry[] = [];
+  private pendingFriendRequests: FriendRequestUI[] = [];
+  private sentFriendRequestPeerIds = new Set<string>();
+  private friendProbeInFlight = false;
   private signalingUrl: string | null = null;
   private trustedSignalingHosts: string[] = [];
   private lanDiscoveryEnabled = false;
@@ -655,6 +669,8 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       persistentRoomName: this.persistentRoomName,
       favoriteRooms: [...this.favoriteRooms].slice(0, 5),
       recentRooms: [...this.recentRooms].slice(0, 5),
+      friends: this.friends.map((f) => ({ ...f })),
+      pendingFriendRequests: this.pendingFriendRequests.map((r) => ({ ...r })),
       signalingUrl: this.signalingUrl,
       trustedSignalingHosts: [...this.trustedSignalingHosts],
       lanDiscoveryEnabled: this.lanDiscoveryEnabled,
@@ -905,11 +921,23 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           ? this.loadPersistentQueue(roomId)
           : undefined);
 
+      const resolvedRoomName =
+        options.initialSettings?.roomName?.trim() ||
+        this.persistentRoomName.trim() ||
+        undefined;
+      const initialSettings = resolvedRoomName
+        ? {
+            ...DEFAULT_ROOM_SETTINGS,
+            ...options.initialSettings,
+            roomName: resolvedRoomName.slice(0, 64),
+          }
+        : options.initialSettings;
+
       this.roomState = createRoomState({
         roomId,
         hostPeerId: hostKeypair.publicKeyB64,
         hostDisplayName: cleanName,
-        settings: options.initialSettings,
+        settings: initialSettings,
         initialQueue,
         nowMs: this.nowMs(),
         logger: this.logger,
@@ -1226,6 +1254,11 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
             "listenTogether.persistentRoomName",
             this.persistentRoomName,
           );
+          if (this.sessionMode === "host" && this.roomState) {
+            this.handleUpdateSettings({
+              roomName: this.persistentRoomName || undefined,
+            });
+          }
         }
         this.emitStateChanged();
         return { ok: true };
@@ -1318,6 +1351,27 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
       case "joinFavoriteRoom": {
         return this.joinFavoriteRoom(command.id);
+      }
+
+      case "sendFriendRequest": {
+        return this.sendFriendRequest(command.targetPeerId);
+      }
+
+      case "respondFriendRequest": {
+        return this.respondFriendRequest(command.requestId, command.accept);
+      }
+
+      case "removeFriend": {
+        return this.removeFriend(command.pubKeyB64);
+      }
+
+      case "joinFriend": {
+        return this.joinFriend(command.pubKeyB64);
+      }
+
+      case "refreshFriends": {
+        void this.refreshFriendsStatus();
+        return { ok: true };
       }
 
       case "setSignalingUrl": {
@@ -1578,10 +1632,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
     }
     this.displayName =
       typeof cfg?.displayName === "string" ? cfg.displayName : "";
-    const rawPersistent =
-      cfg?.persistentRoomEnabled ??
-      this.configStore.get("listenTogether.persistentRoomEnabled");
-    this.persistentRoomEnabled = Boolean(rawPersistent);
+    this.persistentRoomEnabled = true;
     const rawPersistentName =
       (cfg as { persistentRoomName?: unknown } | undefined)?.persistentRoomName ??
       this.configStore.get("listenTogether.persistentRoomName");
@@ -1612,6 +1663,21 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
               ),
           )
           .slice(0, 5)
+      : [];
+    const rawFriends =
+      (cfg as { friends?: unknown } | undefined)?.friends ??
+      this.configStore.get("listenTogether.friends");
+    this.friends = Array.isArray(rawFriends)
+      ? rawFriends
+          .filter(
+            (f): f is FriendEntry =>
+              Boolean(
+                f &&
+                  typeof f.pubKeyB64 === "string" &&
+                  typeof f.displayName === "string",
+              ),
+          )
+          .map((f) => ({ ...f, status: "unknown", roomName: null }))
       : [];
     this.signalingUrl =
       typeof cfg?.signalingUrl === "string" && cfg.signalingUrl.trim()
@@ -1768,7 +1834,9 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         : (this.guestRoomId ?? "");
     if (!hostPubKeyB64) return;
     const hostMember = this.guestMembers.find((m) => m.role === "admin");
-    const label = hostMember ? `${hostMember.displayName}'s Room` : "Recent Room";
+    const label =
+      this.guestSettings?.roomName?.trim() ||
+      (hostMember ? `${hostMember.displayName}'s Room` : "Recent Room");
     const entry: FavoriteRoomEntry = {
       id: hostPubKeyB64,
       label: label.slice(0, 64),
@@ -1824,6 +1892,10 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
     const hostMember = members.find((m) => m.role === "admin");
     const cleanLabel =
       (typeof label === "string" && label.trim()) ||
+      (this.sessionMode === "host"
+        ? this.roomState?.settings.roomName?.trim() ||
+          this.persistentRoomName.trim()
+        : this.guestSettings?.roomName?.trim()) ||
       (hostMember ? `${hostMember.displayName}'s Room` : "Saved Room");
     const existing = this.favoriteRooms.find((r) => r.id === hostPubKeyB64);
     if (existing) {
@@ -1895,6 +1967,282 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       });
     }
     return { ok: false, error: "No saved invite link or code for this room" };
+  }
+
+  private saveFriends(): void {
+    this.configStore.set(
+      "listenTogether.friends",
+      this.friends.map((f) => ({
+        pubKeyB64: f.pubKeyB64,
+        displayName: f.displayName,
+        tcAddress: f.tcAddress,
+        tcPort: f.tcPort,
+        addedAtMs: f.addedAtMs,
+      })),
+    );
+  }
+
+  private upsertFriend(entry: {
+    pubKeyB64: string;
+    displayName: string;
+    tcAddress?: string | null;
+    tcPort?: number | null;
+  }): void {
+    const existing = this.friends.find((f) => f.pubKeyB64 === entry.pubKeyB64);
+    const updated: FriendEntry = {
+      pubKeyB64: entry.pubKeyB64,
+      displayName: entry.displayName.trim().slice(0, 32) || "Friend",
+      tcAddress: entry.tcAddress ?? existing?.tcAddress ?? null,
+      tcPort: entry.tcPort ?? existing?.tcPort ?? null,
+      addedAtMs: existing?.addedAtMs ?? this.nowMs(),
+      status: existing?.status ?? "unknown",
+      roomName: existing?.roomName ?? null,
+    };
+    this.friends = [
+      updated,
+      ...this.friends.filter((f) => f.pubKeyB64 !== entry.pubKeyB64),
+    ];
+    this.saveFriends();
+  }
+
+  private sendFriendAppMessage(
+    targetPeerId: string,
+    msg:
+      | Extract<AppMessage, { type: "FRIEND_REQUEST" }>
+      | Extract<AppMessage, { type: "FRIEND_ACCEPT" }>
+      | Extract<AppMessage, { type: "FRIEND_REMOVE" }>,
+  ): void {
+    if (this.sessionMode === "host") {
+      this.sendEncryptedToPeer(targetPeerId, msg);
+    } else if (this.sessionMode === "guest") {
+      this.sendGuestAppMessage(msg);
+    }
+  }
+
+  private sendFriendRequest(targetPeerId: string): ListenTogetherActionResult {
+    if (this.sessionMode === "none") {
+      return { ok: false, error: "Must be in a room to add a friend" };
+    }
+    const selfPeerId = this.getSelfPeerId();
+    if (!targetPeerId || targetPeerId === selfPeerId) {
+      return { ok: false, error: "Invalid friend target" };
+    }
+    if (this.friends.some((f) => f.pubKeyB64 === targetPeerId)) {
+      return { ok: true };
+    }
+    this.sentFriendRequestPeerIds.add(targetPeerId);
+    this.sendFriendAppMessage(targetPeerId, {
+      type: "FRIEND_REQUEST",
+      targetPeerId,
+      fromPeerId: selfPeerId,
+      fromDisplayName: this.displayName || "Listener",
+      fromTcAddress:
+        this.sessionMode === "host" && this.roomTailcatAddress
+          ? this.roomTailcatAddress
+          : undefined,
+      fromTcPort:
+        this.sessionMode === "host" && this.roomTailcatRemotePort
+          ? this.roomTailcatRemotePort
+          : undefined,
+    });
+    this.emitStateChanged();
+    return { ok: true };
+  }
+
+  private respondFriendRequest(
+    requestId: string,
+    accept: boolean,
+  ): ListenTogetherActionResult {
+    const req = this.pendingFriendRequests.find((r) => r.id === requestId);
+    this.pendingFriendRequests = this.pendingFriendRequests.filter(
+      (r) => r.id !== requestId,
+    );
+    if (!req) {
+      this.emitStateChanged();
+      return { ok: false, error: "Friend request not found" };
+    }
+    if (accept) {
+      this.upsertFriend({
+        pubKeyB64: req.fromPubKeyB64,
+        displayName: req.fromDisplayName,
+        tcAddress: req.fromTcAddress,
+        tcPort: req.fromTcPort,
+      });
+      this.sentFriendRequestPeerIds.delete(req.fromPubKeyB64);
+      if (this.sessionMode !== "none") {
+        const selfPeerId = this.getSelfPeerId();
+        this.sendFriendAppMessage(req.fromPubKeyB64, {
+          type: "FRIEND_ACCEPT",
+          targetPeerId: req.fromPubKeyB64,
+          fromPeerId: selfPeerId,
+          fromDisplayName: this.displayName || "Listener",
+          fromTcAddress:
+            this.sessionMode === "host" && this.roomTailcatAddress
+              ? this.roomTailcatAddress
+              : undefined,
+          fromTcPort:
+            this.sessionMode === "host" && this.roomTailcatRemotePort
+              ? this.roomTailcatRemotePort
+              : undefined,
+        });
+      }
+    }
+    this.emitStateChanged();
+    return { ok: true };
+  }
+
+  private removeFriend(pubKeyB64: string): ListenTogetherActionResult {
+    const existed = this.friends.some((f) => f.pubKeyB64 === pubKeyB64);
+    this.friends = this.friends.filter((f) => f.pubKeyB64 !== pubKeyB64);
+    this.sentFriendRequestPeerIds.delete(pubKeyB64);
+    if (existed) {
+      this.saveFriends();
+      if (this.sessionMode !== "none") {
+        this.sendFriendAppMessage(pubKeyB64, {
+          type: "FRIEND_REMOVE",
+          targetPeerId: pubKeyB64,
+          fromPeerId: this.getSelfPeerId(),
+        });
+      }
+    }
+    this.emitStateChanged();
+    return { ok: true };
+  }
+
+  private handleIncomingFriendMessage(
+    msg:
+      | Extract<AppMessage, { type: "FRIEND_REQUEST" }>
+      | Extract<AppMessage, { type: "FRIEND_ACCEPT" }>
+      | Extract<AppMessage, { type: "FRIEND_REMOVE" }>,
+  ): void {
+    const selfPeerId = this.getSelfPeerId();
+    if (msg.targetPeerId !== selfPeerId || msg.fromPeerId === selfPeerId) {
+      return;
+    }
+    if (msg.type === "FRIEND_REQUEST") {
+      if (this.friends.some((f) => f.pubKeyB64 === msg.fromPeerId)) {
+        // Already friends — update Tailcat info & reply with accept
+        this.upsertFriend({
+          pubKeyB64: msg.fromPeerId,
+          displayName: msg.fromDisplayName,
+          tcAddress: msg.fromTcAddress ?? null,
+          tcPort: msg.fromTcPort ?? null,
+        });
+        this.sendFriendAppMessage(msg.fromPeerId, {
+          type: "FRIEND_ACCEPT",
+          targetPeerId: msg.fromPeerId,
+          fromPeerId: selfPeerId,
+          fromDisplayName: this.displayName || "Listener",
+          fromTcAddress:
+            this.sessionMode === "host" && this.roomTailcatAddress
+              ? this.roomTailcatAddress
+              : undefined,
+          fromTcPort:
+            this.sessionMode === "host" && this.roomTailcatRemotePort
+              ? this.roomTailcatRemotePort
+              : undefined,
+        });
+        this.emitStateChanged();
+        return;
+      }
+      this.pendingFriendRequests = [
+        {
+          id: msg.fromPeerId,
+          fromPubKeyB64: msg.fromPeerId,
+          fromDisplayName: msg.fromDisplayName,
+          fromTcAddress: msg.fromTcAddress ?? null,
+          fromTcPort: msg.fromTcPort ?? null,
+          receivedAtMs: this.nowMs(),
+        },
+        ...this.pendingFriendRequests.filter(
+          (r) => r.fromPubKeyB64 !== msg.fromPeerId,
+        ),
+      ];
+      this.emitStateChanged();
+      return;
+    }
+    if (msg.type === "FRIEND_ACCEPT") {
+      this.sentFriendRequestPeerIds.delete(msg.fromPeerId);
+      this.pendingFriendRequests = this.pendingFriendRequests.filter(
+        (r) => r.fromPubKeyB64 !== msg.fromPeerId,
+      );
+      this.upsertFriend({
+        pubKeyB64: msg.fromPeerId,
+        displayName: msg.fromDisplayName,
+        tcAddress: msg.fromTcAddress ?? null,
+        tcPort: msg.fromTcPort ?? null,
+      });
+      this.emitStateChanged();
+      return;
+    }
+    if (msg.type === "FRIEND_REMOVE") {
+      this.friends = this.friends.filter((f) => f.pubKeyB64 !== msg.fromPeerId);
+      this.sentFriendRequestPeerIds.delete(msg.fromPeerId);
+      this.pendingFriendRequests = this.pendingFriendRequests.filter(
+        (r) => r.fromPubKeyB64 !== msg.fromPeerId,
+      );
+      this.saveFriends();
+      this.emitStateChanged();
+    }
+  }
+
+  private async joinFriend(
+    pubKeyB64: string,
+  ): Promise<ListenTogetherActionResult> {
+    const friend = this.friends.find((f) => f.pubKeyB64 === pubKeyB64);
+    if (!friend) {
+      return { ok: false, error: "Friend not found" };
+    }
+    if (!friend.tcAddress || !friend.tcPort) {
+      return {
+        ok: false,
+        error: "No Tailcat address saved for this friend yet.",
+      };
+    }
+    return this.executeGuestJoin(
+      {
+        kind: "friend",
+        friendPubKeyB64: friend.pubKeyB64,
+        tcAddress: friend.tcAddress,
+        tcPort: friend.tcPort,
+      },
+      this.displayName || "Listener",
+    );
+  }
+
+  private async refreshFriendsStatus(): Promise<void> {
+    if (this.friendProbeInFlight || this.friends.length === 0) return;
+    if (!this.isTailcatAvailable()) return;
+    this.friendProbeInFlight = true;
+    this.friends = this.friends.map((f) =>
+      f.tcAddress && f.tcPort ? { ...f, status: "checking" } : { ...f, status: "offline" },
+    );
+    this.emitStateChanged();
+    try {
+      await Promise.all(
+        this.friends.map(async (friend) => {
+          if (!friend.tcAddress || !friend.tcPort) return;
+          const res = await probeTailcatRoomStatus({
+            tcAddress: friend.tcAddress,
+            remotePort: friend.tcPort,
+            derpMapUrl: this.tailcatDerpMapUrl,
+            timeoutMs: 4_500,
+          });
+          this.friends = this.friends.map((f) =>
+            f.pubKeyB64 === friend.pubKeyB64
+              ? {
+                  ...f,
+                  status: res.online ? "online" : "offline",
+                  roomName: res.online ? (res.roomName ?? null) : null,
+                }
+              : f,
+          );
+          this.emitStateChanged();
+        }),
+      );
+    } finally {
+      this.friendProbeInFlight = false;
+    }
   }
 
   private extractShortCodeFromInput(raw: string): string | null {
@@ -2181,6 +2529,12 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
   private emitStateChanged(): void {
     const snapshot = this.getUIState();
+    if (this.sessionMode === "host" && this.directWsHost && snapshot.room) {
+      this.directWsHost.setStatusMeta({
+        roomName: snapshot.room.roomName,
+        memberCount: snapshot.room.members.length,
+      });
+    }
     this.emit("state-changed", snapshot);
 
     const sentIds = new Set<number>();
@@ -3955,6 +4309,8 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       roomInviteToken: this.roomInviteToken ?? undefined,
       roomTokenEpoch: this.roomTokenEpoch,
       passcodeAuthKey: this.roomPasscodeAuthKey ?? undefined,
+      isTrustedFriend: (pubKey) =>
+        this.friends.some((f) => f.pubKeyB64 === pubKey),
       authGuard: this.authGuard ?? undefined,
       peerRateKey: conn.remoteLabel,
       logger: this.logger,
@@ -4413,6 +4769,21 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         });
         return;
       }
+
+      case "FRIEND_REQUEST":
+      case "FRIEND_ACCEPT":
+      case "FRIEND_REMOVE": {
+        const hostPeerId = this.hostKeypair?.publicKeyB64;
+        if (msg.targetPeerId === hostPeerId) {
+          this.handleIncomingFriendMessage({ ...msg, fromPeerId: peerId });
+        } else if (this.hostPeers.has(msg.targetPeerId)) {
+          this.sendEncryptedToPeer(msg.targetPeerId, {
+            ...msg,
+            fromPeerId: peerId,
+          });
+        }
+        return;
+      }
     }
   }
 
@@ -4516,7 +4887,8 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
     this.guestJoinAbort = controller;
 
     try {
-      const guestKeypair = this.guestKeypair ?? generateEd25519Keypair();
+      const guestKeypair =
+        this.guestKeypair ?? this.resolveRoomIdentity().hostKeypair;
       this.guestKeypair = guestKeypair;
 
       const result = await this.connectAndAuthenticateGuest(
@@ -4609,7 +4981,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           ? this.injectedDeps.createRelayTransport(relayOpts)
           : new RelayWsTransport(relayOpts);
       }
-    } else {
+    } else if (params.kind === "passcode") {
       const lanMatches = this.rawDiscoveredLanRooms
         .filter((r) => r.lookupId === params.lookupId)
         .map((r) => r.endpoint);
@@ -4634,6 +5006,26 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         throw new Error(
           "Room codes need same Wi-Fi, a friend's invite link, or a relay in Advanced.",
         );
+      }
+    }
+
+    if (params.kind === "friend") {
+      if (
+        this.injectedDeps.createTailcatTransport ||
+        this.isTailcatAvailable()
+      ) {
+        const tcOpts: TailcatWsTransportOptions = {
+          tcAddress: params.tcAddress,
+          remotePort: params.tcPort,
+          derpMapUrl: this.tailcatDerpMapUrl,
+          logger: this.logger,
+        };
+        tailcatTransport = this.injectedDeps.createTailcatTransport
+          ? this.injectedDeps.createTailcatTransport(tcOpts)
+          : new TailcatWsTransport(tcOpts);
+      }
+      if (!tailcatTransport) {
+        throw new Error("Tailcat is required to join friends.");
       }
     }
 
@@ -4681,7 +5073,9 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       const authSecret =
         params.kind === "url"
           ? Buffer.from(params.envelope.t, "base64url")
-          : params.passcodeAuthKey;
+          : params.kind === "friend"
+            ? Buffer.from(params.friendPubKeyB64, "utf8")
+            : params.passcodeAuthKey;
 
       const handshake = createGuestHandshake({
         guestKeypair,
@@ -4689,8 +5083,17 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         expectedLookupId:
           params.kind === "passcode" ? params.lookupId : undefined,
         expectedHostPubKeyB64:
-          params.kind === "url" ? params.envelope.k : undefined,
-        authMode: params.kind === "url" ? "token" : "passcode",
+          params.kind === "url"
+            ? params.envelope.k
+            : params.kind === "friend"
+              ? params.friendPubKeyB64
+              : undefined,
+        authMode:
+          params.kind === "url"
+            ? "token"
+            : params.kind === "friend"
+              ? "friend"
+              : "passcode",
         authSecret,
         tokenEpoch: params.kind === "url" ? params.envelope.te : undefined,
         logger: this.logger,
@@ -5003,6 +5406,13 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       case "ACTION_REJECTED": {
         this.applyActionRejectedFeedback(msg.reason, msg.retryAfterMs);
         this.emitStateChanged();
+        return;
+      }
+
+      case "FRIEND_REQUEST":
+      case "FRIEND_ACCEPT":
+      case "FRIEND_REMOVE": {
+        this.handleIncomingFriendMessage(msg);
         return;
       }
 
@@ -5928,6 +6338,9 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       remotePositionCapturedAtMs: capturedAtMs,
       localTrack: this.localTrack ? { ...this.localTrack } : null,
       localPlaylist: this.localPlaylist ? { ...this.localPlaylist } : null,
+      pendingFriendRequests: this.pendingFriendRequests.map((r) => ({ ...r })),
+      sentFriendRequestPeerIds: [...this.sentFriendRequestPeerIds],
+      friendPubKeys: this.friends.map((f) => f.pubKeyB64),
     };
 
     const clampRemotePos = (rawPos: number, durationSec: number): number =>
@@ -5945,6 +6358,10 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       return {
         ...sharedBase,
         roomId: this.roomState.roomId,
+        roomName:
+          this.roomState.settings.roomName?.trim() ||
+          this.persistentRoomName.trim() ||
+          `${this.displayName || "My"}'s Room`,
         passcode: this.roomPasscode,
         shortCode: this.roomShortCode,
         shortInviteUrl: this.roomShortInviteUrl,
@@ -5997,9 +6414,13 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           ? anchor.anchorPosSec + Math.max(0, (hostNowMs - anchor.anchorHostTimeMs) / 1000)
           : anchor.anchorPosSec
         : 0;
+      const hostMember = this.guestMembers.find((m) => m.role === "admin");
       return {
         ...sharedBase,
         roomId: this.guestRoomId,
+        roomName:
+          this.guestSettings.roomName?.trim() ||
+          (hostMember ? `${hostMember.displayName}'s Room` : "Listen Together"),
         passcode: null,
         shortCode: null,
         shortInviteUrl: null,

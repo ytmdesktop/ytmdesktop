@@ -1,7 +1,7 @@
 {
   "name": "youtube-music-desktop-app",
   "productName": "YouTube Music Desktop App",
-  "version": "2.1.0",
+  "version": "2.1.0-lt.4",
   "private": true,
   "description": "An unofficial cross platform desktop app for YouTube Music",
   "keywords": [],

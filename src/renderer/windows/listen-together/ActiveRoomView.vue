@@ -571,6 +571,14 @@ function handleDragEnd() {
           >
             {{ statusMeta.label }}
           </span>
+          <span
+            v-if="room.roomName"
+            class="lt-room-name"
+            data-testid="lt-room-name"
+            :title="room.roomName"
+          >
+            {{ room.roomName }}
+          </span>
           <span class="lt-role-badge">{{ roleLabel(room.role) }}</span>
         </div>
 
@@ -1420,6 +1428,44 @@ function handleDragEnd() {
 
       <div v-if="friendsOpen" class="lt-friends-list lt-scroll">
         <div
+          v-for="req in room.pendingFriendRequests"
+          :key="req.id"
+          class="lt-member-row lt-friend-req-banner"
+        >
+          <span class="lt-member-name">{{ req.fromDisplayName }}</span>
+          <div class="lt-member-actions">
+            <button
+              type="button"
+              class="lt-icon-btn lt-friend-accept-btn"
+              title="Accept friend"
+              @click="
+                dispatchCommand({
+                  type: 'respondFriendRequest',
+                  requestId: req.id,
+                  accept: true,
+                })
+              "
+            >
+              <span class="material-symbols-outlined">check</span>
+            </button>
+            <button
+              type="button"
+              class="lt-icon-btn"
+              title="Decline friend"
+              @click="
+                dispatchCommand({
+                  type: 'respondFriendRequest',
+                  requestId: req.id,
+                  accept: false,
+                })
+              "
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
+
+        <div
           v-for="member in room.members"
           :key="member.peerId"
           class="lt-member-row"
@@ -1460,10 +1506,45 @@ function handleDragEnd() {
             </span>
           </div>
 
-          <div
-            v-if="room.isHost && member.peerId !== room.selfPeerId"
-            class="lt-member-menu-wrap"
-          >
+          <div class="lt-member-actions">
+            <span
+              v-if="
+                member.peerId !== room.selfPeerId &&
+                room.friendPubKeys.includes(member.peerId)
+              "
+              class="material-symbols-outlined lt-friend-badge-icon"
+              title="Friend"
+            >
+              how_to_reg
+            </span>
+            <span
+              v-else-if="
+                member.peerId !== room.selfPeerId &&
+                room.sentFriendRequestPeerIds.includes(member.peerId)
+              "
+              class="lt-member-pending-chip"
+            >
+              Pending
+            </span>
+            <button
+              v-else-if="member.peerId !== room.selfPeerId"
+              type="button"
+              class="lt-icon-btn"
+              title="Add friend"
+              @click="
+                dispatchCommand({
+                  type: 'sendFriendRequest',
+                  targetPeerId: member.peerId,
+                })
+              "
+            >
+              <span class="material-symbols-outlined">person_add</span>
+            </button>
+
+            <div
+              v-if="room.isHost && member.peerId !== room.selfPeerId"
+              class="lt-member-menu-wrap"
+            >
             <button
               type="button"
               class="lt-icon-btn lt-member-menu-btn"
@@ -1514,6 +1595,7 @@ function handleDragEnd() {
                 Kick
               </button>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -1568,6 +1650,15 @@ function handleDragEnd() {
   font-size: 12px;
   font-weight: 600;
   color: #eeeeee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-room-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f1f1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2497,6 +2588,31 @@ function handleDragEnd() {
 
 .lt-member-row:hover {
   background-color: #111111;
+}
+
+.lt-member-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lt-friend-badge-icon {
+  font-size: 16px;
+  color: #81c784;
+  padding: 0 4px;
+}
+
+.lt-friend-accept-btn {
+  color: #81c784;
+}
+
+.lt-member-pending-chip {
+  font-size: 10px;
+  color: #ffb74d;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: rgba(255, 183, 77, 0.14);
 }
 
 .lt-member-tune-icon {

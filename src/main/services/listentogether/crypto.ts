@@ -51,7 +51,7 @@ export type PasscodeLookupResult = {
   passcodeAuthKey: Buffer;
 };
 
-export type AuthMode = "token" | "passcode";
+export type AuthMode = "token" | "passcode" | "friend";
 
 export type ClientHello = {
   type: "CLIENT_HELLO";
@@ -667,6 +667,7 @@ export type HostHandshakeOptions = {
   roomInviteToken?: Buffer;
   roomTokenEpoch?: number;
   passcodeAuthKey?: Buffer;
+  isTrustedFriend?: (clientIdentityPubB64: string) => boolean;
   authGuard?: HostAuthGuard;
   peerRateKey?: string;
   logger?: ListenTogetherLogger;
@@ -863,6 +864,19 @@ export function createHostHandshake(
           throw new HandshakeError("AUTH_FAILED", "Passcode auth unavailable");
         }
         authSecret = options.passcodeAuthKey;
+      } else if (auth.authMode === "friend") {
+        if (!options.isTrustedFriend?.(auth.clientIdentityPubB64)) {
+          guard?.recordFailure(rateKey, "friend");
+          logger.warn?.(
+            "Host handshake rejected CLIENT_AUTH: peer not in friends list",
+            {
+              roomId: options.roomId,
+              peerKey: auth.clientIdentityPubB64,
+            },
+          );
+          throw new HandshakeError("AUTH_FAILED", "Not in host friends list");
+        }
+        authSecret = Buffer.from(options.hostKeypair.publicKeyB64, "utf8");
       } else {
         logger.warn?.("Host handshake rejected CLIENT_AUTH: unsupported mode", {
           roomId: options.roomId,

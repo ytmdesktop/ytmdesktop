@@ -7,6 +7,7 @@ import {
 } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
+import http from "node:http";
 import net from "node:net";
 import path from "node:path";
 import WebSocket from "ws";
@@ -831,4 +832,147 @@ export class TailcatWsTransport implements ITransport {
       terminateChildImmediate(child);
     }
   }
+}
+
+export type ProbeTailcatRoomStatusResult = {
+  online: boolean;
+  roomName?: string | null;
+  memberCount?: number;
+};
+
+/**
+ * Probes a friend's Tailcat endpoint (`GET /lt-status`) to check if their room is open.
+ */
+export async function probeTailcatRoomStatus(options: {
+  tcAddress: string;
+  remotePort: number;
+  derpMapUrl?: string | null;
+  timeoutMs?: number;
+  binaryPath?: string;
+  spawnFn?: TailcatSpawnFn;
+}): Promise<ProbeTailcatRoomStatusResult> {
+  if (!TAILCAT_ADDR_STRICT_RE.test(options.tcAddress) || !isValidPort(options.remotePort)) {
+    return { online: false };
+  }
+  const bin = options.binaryPath ?? resolveTailcatBinary();
+  if (!bin) {
+    return { online: false };
+  }
+
+  let localPort: number;
+  try {
+    localPort = await defaultAllocateLocalPort();
+  } catch {
+    return { online: false };
+  }
+
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  if (options.derpMapUrl) {
+    env.TAILCAT_DERPMAP_URL = options.derpMapUrl;
+  }
+
+  const spawn = options.spawnFn ?? ((cmd, args, opts) => nodeSpawn(cmd, args, opts));
+  const child = spawn(
+    bin,
+    ["forward", "--key=new", options.tcAddress, `${localPort}:${options.remotePort}`],
+    {
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
+    },
+  );
+
+  const timeoutMs = options.timeoutMs ?? 4_500;
+  const deadline = Date.now() + timeoutMs;
+
+  return new Promise<ProbeTailcatRoomStatusResult>((resolve) => {
+    let settled = false;
+    let retryTimer: NodeJS.Timeout | null = null;
+    let timeoutTimer: NodeJS.Timeout | null = null;
+    let activeReq: http.ClientRequest | null = null;
+
+    const finish = (result: ProbeTailcatRoomStatusResult) => {
+      if (settled) return;
+      settled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      try {
+        activeReq?.destroy();
+      } catch {
+        // ignore
+      }
+      child.removeListener("error", onChildExit);
+      child.removeListener("exit", onChildExit);
+      terminateChildImmediate(child);
+      resolve(result);
+    };
+
+    const onChildExit = () => finish({ online: false });
+    child.once("error", onChildExit);
+    child.once("exit", onChildExit);
+
+    timeoutTimer = setTimeout(() => finish({ online: false }), timeoutMs);
+    timeoutTimer.unref?.();
+
+    const attempt = () => {
+      if (settled) return;
+      if (Date.now() >= deadline) {
+        finish({ online: false });
+        return;
+      }
+      const req = http.get(
+        `http://127.0.0.1:${localPort}/lt-status`,
+        { timeout: 1500 },
+        (res) => {
+          let raw = "";
+          res.setEncoding("utf8");
+          res.on("data", (chunk) => {
+            if (raw.length < 4096) raw += chunk;
+          });
+          res.on("end", () => {
+            if (res.statusCode !== 200) {
+              finish({ online: false });
+              return;
+            }
+            try {
+              const parsed = JSON.parse(raw) as {
+                ok?: boolean;
+                roomName?: unknown;
+                memberCount?: unknown;
+              };
+              finish({
+                online: Boolean(parsed?.ok),
+                roomName:
+                  typeof parsed?.roomName === "string" && parsed.roomName.trim()
+                    ? parsed.roomName.trim()
+                    : null,
+                memberCount:
+                  typeof parsed?.memberCount === "number"
+                    ? parsed.memberCount
+                    : undefined,
+              });
+            } catch {
+              finish({ online: false });
+            }
+          });
+        },
+      );
+      activeReq = req;
+      req.on("error", () => {
+        if (settled) return;
+        if (Date.now() + 80 < deadline) {
+          retryTimer = setTimeout(attempt, 80);
+          retryTimer.unref?.();
+        } else {
+          finish({ online: false });
+        }
+      });
+      req.on("timeout", () => {
+        req.destroy();
+      });
+    };
+
+    retryTimer = setTimeout(attempt, 40);
+    retryTimer.unref?.();
+  });
 }

@@ -45,6 +45,27 @@ export type ListenTogetherPendingInviteUI = {
   relayTrusted: boolean;
 };
 
+export type FriendStatus = "unknown" | "checking" | "online" | "offline";
+
+export type FriendEntry = {
+  pubKeyB64: string;
+  displayName: string;
+  tcAddress: string | null;
+  tcPort: number | null;
+  addedAtMs: number;
+  status?: FriendStatus;
+  roomName?: string | null;
+};
+
+export type FriendRequestUI = {
+  id: string;
+  fromPubKeyB64: string;
+  fromDisplayName: string;
+  fromTcAddress: string | null;
+  fromTcPort: number | null;
+  receivedAtMs: number;
+};
+
 export type FavoriteRoomEntry = {
   id: string;
   label: string;
@@ -61,6 +82,7 @@ export type FavoriteRoomEntry = {
 
 export type ListenTogetherActiveRoomUIState = {
   roomId: string;
+  roomName: string;
   passcode: string | null;
   shortCode: string | null;
   shortInviteUrl: string | null;
@@ -92,6 +114,9 @@ export type ListenTogetherActiveRoomUIState = {
   rateLimitReason: string | null;
   isLocalNetworkOnly: boolean;
   listeningMode: "room" | "local";
+  pendingFriendRequests: FriendRequestUI[];
+  sentFriendRequestPeerIds: string[];
+  friendPubKeys: string[];
   remotePositionSec: number;
   remotePositionCapturedAtMs: number;
   remotePositionAdvancing: boolean;
@@ -118,6 +143,8 @@ export type ListenTogetherUIState = {
   persistentRoomName: string;
   favoriteRooms: FavoriteRoomEntry[];
   recentRooms: FavoriteRoomEntry[];
+  friends: FriendEntry[];
+  pendingFriendRequests: FriendRequestUI[];
   signalingUrl: string | null;
   trustedSignalingHosts: string[];
   lanDiscoveryEnabled: boolean;
@@ -204,7 +231,12 @@ export type ListenTogetherCommand =
   | { type: "dismissNotice" }
   | { type: "hostNewRoomWithQueue" }
   | { type: "returnToLobby" }
-  | { type: "openLogFile" };
+  | { type: "openLogFile" }
+  | { type: "sendFriendRequest"; targetPeerId: string }
+  | { type: "respondFriendRequest"; requestId: string; accept: boolean }
+  | { type: "removeFriend"; pubKeyB64: string }
+  | { type: "joinFriend"; pubKeyB64: string }
+  | { type: "refreshFriends" };
 
 export type ListenTogetherActionResult =
   | { ok: true }

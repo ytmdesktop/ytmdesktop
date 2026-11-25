@@ -68,11 +68,6 @@ function onVoteSkipModeChange(event: Event) {
   void updateSetting({ voteSkipMode: value });
 }
 
-function onPersistentRoomChange(event: Event) {
-  const checked = (event.target as HTMLInputElement).checked;
-  void dispatchCommand({ type: "setPersistentRoom", enabled: checked });
-}
-
 async function handleResetInvite() {
   resetting.value = true;
   resetFeedback.value = null;
@@ -236,27 +231,6 @@ async function handleOpenLogFile() {
 
       <section class="lt-settings-section">
         <h3 class="lt-settings-section-title">Room &amp; Diagnostics</h3>
-
-        <div class="lt-setting-block">
-          <div class="lt-toggle-row">
-            <div class="lt-toggle-copy">
-              <span class="lt-setting-name">Persistent room</span>
-              <span class="lt-muted">
-                Keep the same room identity and Tailcat address across restarts.
-              </span>
-            </div>
-            <label class="lt-toggle">
-              <input
-                type="checkbox"
-                :checked="room.persistentRoomEnabled"
-                @change="onPersistentRoomChange"
-              />
-              <span class="lt-toggle-track">
-                <span class="lt-toggle-thumb" />
-              </span>
-            </label>
-          </div>
-        </div>
 
         <div class="lt-setting-block">
           <button

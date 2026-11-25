@@ -132,6 +132,7 @@ export const DefaultJoinRoleSchema = Type.Union([
 ]);
 
 export const RoomSettingsSchema = Type.Object({
+  roomName: Type.Optional(Type.String({ maxLength: 64 })),
   adSyncMode: AdSyncModeSchema,
   queueMode: QueueModeSchema,
   defaultJoinRole: DefaultJoinRoleSchema,
@@ -381,6 +382,27 @@ export const AppMessageSchema = Type.Union([
       Type.Literal("host-left"),
       Type.Literal("host-reclaimed"),
     ]),
+  }),
+  Type.Object({
+    type: Type.Literal("FRIEND_REQUEST"),
+    targetPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+    fromPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+    fromDisplayName: DisplayNameSchema,
+    fromTcAddress: Type.Optional(Type.String({ minLength: 1, maxLength: 512 })),
+    fromTcPort: Type.Optional(Type.Integer({ minimum: 1, maximum: 65535 })),
+  }),
+  Type.Object({
+    type: Type.Literal("FRIEND_ACCEPT"),
+    targetPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+    fromPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+    fromDisplayName: DisplayNameSchema,
+    fromTcAddress: Type.Optional(Type.String({ minLength: 1, maxLength: 512 })),
+    fromTcPort: Type.Optional(Type.Integer({ minimum: 1, maximum: 65535 })),
+  }),
+  Type.Object({
+    type: Type.Literal("FRIEND_REMOVE"),
+    targetPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+    fromPeerId: Type.String({ minLength: 1, maxLength: 128 }),
   }),
 ]);
 export type AppMessage = Static<typeof AppMessageSchema>;

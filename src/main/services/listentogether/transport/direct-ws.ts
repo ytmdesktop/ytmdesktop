@@ -349,6 +349,10 @@ export class DirectWsHost {
   private boundPort = 0;
   private currentLookupId = "";
   private currentLabel = "";
+  private statusMeta: { roomName: string; memberCount: number } = {
+    roomName: "",
+    memberCount: 0,
+  };
   private mdnsMetadataCache: {
     meta: {
       domainedHostname: string;
@@ -368,6 +372,15 @@ export class DirectWsHost {
     this.maxPayloadBytes = options.maxPayloadBytes ?? DEFAULT_MAX_PAYLOAD_BYTES;
   }
 
+  public setStatusMeta(meta: { roomName?: string; memberCount?: number }): void {
+    if (typeof meta.roomName === "string") {
+      this.statusMeta.roomName = meta.roomName.slice(0, 64);
+    }
+    if (typeof meta.memberCount === "number" && Number.isFinite(meta.memberCount)) {
+      this.statusMeta.memberCount = Math.max(0, Math.floor(meta.memberCount));
+    }
+  }
+
   public onConnection(
     handler: (conn: TransportConnection) => void,
   ): () => void {
@@ -385,7 +398,23 @@ export class DirectWsHost {
     this.currentLookupId = params.lookupId;
     this.currentLabel = params.label;
 
-    const server = http.createServer();
+    const server = http.createServer((req, res) => {
+      if (req.method === "GET" && req.url === "/lt-status") {
+        const body = JSON.stringify({
+          ok: true,
+          roomName: this.statusMeta.roomName,
+          memberCount: this.statusMeta.memberCount,
+        });
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        });
+        res.end(body);
+        return;
+      }
+      res.writeHead(426, { "Content-Type": "text/plain" });
+      res.end("Upgrade Required");
+    });
     const wss = new WebSocketServer({
       server,
       maxPayload: this.maxPayloadBytes,

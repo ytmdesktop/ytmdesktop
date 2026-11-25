@@ -62,13 +62,14 @@ describe("ConfigStore defaults and >=2.2.0 migration", () => {
       trustedSignalingHosts: [],
       tailcatDerpMapUrl: null,
       lanDiscoveryEnabled: false,
-      persistentRoomEnabled: false,
+      persistentRoomEnabled: true,
       persistentRoomName: "",
       persistentHostKeypair: null,
       persistentRoomId: null,
       persistentQueue: [],
       favoriteRooms: [],
       recentRooms: [],
+      friends: [],
     });
     expect(store.get("listenTogether.displayName")).toBe("");
     expect(store.get("listenTogether.signalingUrl")).toBeNull();
@@ -146,13 +147,14 @@ describe("ConfigStore defaults and >=2.2.0 migration", () => {
       trustedSignalingHosts: [],
       tailcatDerpMapUrl: null,
       lanDiscoveryEnabled: false,
-      persistentRoomEnabled: false,
+      persistentRoomEnabled: true,
       persistentRoomName: "",
       persistentHostKeypair: null,
       persistentRoomId: null,
       persistentQueue: [],
       favoriteRooms: [],
       recentRooms: [],
+      friends: [],
     });
   });
 });

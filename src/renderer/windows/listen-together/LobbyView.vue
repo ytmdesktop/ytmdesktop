@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import type {
   ListenTogetherLanRoomUI,
   ListenTogetherUIState,
@@ -20,7 +20,6 @@ const props = defineProps<{
 const nameInput = ref(props.state.displayName);
 const nameError = ref<string | null>(null);
 const nameInputEl = ref<HTMLInputElement | null>(null);
-const persistentEnabled = ref(props.state.persistentRoomEnabled);
 const persistentRoomName = ref(props.state.persistentRoomName);
 
 const joinInput = ref("");
@@ -33,6 +32,12 @@ const derpInput = ref(props.state.tailcatDerpMapUrl ?? "");
 const derpFeedback = ref<{ text: string; isError: boolean } | null>(null);
 const logFeedback = ref<string | null>(null);
 const busyAction = ref<"create" | "join" | "derp" | null>(null);
+
+onMounted(() => {
+  if (props.state.friends.length > 0) {
+    void dispatchCommand({ type: "refreshFriends" });
+  }
+});
 
 watch(
   () => props.state.displayName,
@@ -90,7 +95,7 @@ async function handleCreateRoom() {
   try {
     await dispatchCommand({
       type: "setPersistentRoom",
-      enabled: persistentEnabled.value,
+      enabled: true,
       roomName: persistentRoomName.value,
     });
     const res = await dispatchCommand({
@@ -104,24 +109,6 @@ async function handleCreateRoom() {
     busyAction.value = null;
   }
 }
-
-const savedRooms = computed(() => {
-  const seen = new Set<string>();
-  const combined: Array<
-    (typeof props.state.favoriteRooms)[number] & { isFavorite: boolean }
-  > = [];
-  for (const fav of props.state.favoriteRooms) {
-    if (seen.has(fav.id)) continue;
-    seen.add(fav.id);
-    combined.push({ ...fav, isFavorite: true });
-  }
-  for (const rec of props.state.recentRooms) {
-    if (seen.has(rec.id)) continue;
-    seen.add(rec.id);
-    combined.push({ ...rec, isFavorite: false });
-  }
-  return combined.slice(0, 5);
-});
 
 function handleJoinInput(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -306,22 +293,7 @@ function handleDismissError() {
       </section>
 
       <section class="lt-card lt-create-card">
-        <label class="lt-persist-row">
-          <input
-            v-model="persistentEnabled"
-            type="checkbox"
-            @change="
-              dispatchCommand({
-                type: 'setPersistentRoom',
-                enabled: persistentEnabled,
-                roomName: persistentRoomName,
-              })
-            "
-          />
-          <span>Persistent room</span>
-        </label>
         <input
-          v-if="persistentEnabled"
           v-model="persistentRoomName"
           type="text"
           class="lt-input"
@@ -330,7 +302,7 @@ function handleDismissError() {
           @blur="
             dispatchCommand({
               type: 'setPersistentRoom',
-              enabled: persistentEnabled,
+              enabled: true,
               roomName: persistentRoomName,
             })
           "
@@ -346,65 +318,113 @@ function handleDismissError() {
       </section>
 
       <section
-        v-if="savedRooms.length > 0"
         class="lt-card lt-lan-card"
-        data-testid="lt-favorites-card"
+        data-testid="lt-friends-card"
       >
-        <div class="lt-section-heading">Recent &amp; Favorites</div>
-        <div class="lt-lan-list">
+        <div class="lt-friends-header-row">
+          <span class="lt-section-heading">Friends</span>
+          <button
+            v-if="state.friends.length > 0"
+            type="button"
+            class="lt-icon-btn"
+            title="Refresh friends"
+            @click="dispatchCommand({ type: 'refreshFriends' })"
+          >
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+        </div>
+
+        <div
+          v-for="req in state.pendingFriendRequests"
+          :key="req.id"
+          class="lt-lan-row lt-friend-req-row"
+        >
+          <span class="lt-lan-name">{{ req.fromDisplayName }}</span>
+          <div class="lt-fav-actions">
+            <button
+              type="button"
+              class="lt-icon-btn lt-accept-btn"
+              title="Accept friend"
+              @click="
+                dispatchCommand({
+                  type: 'respondFriendRequest',
+                  requestId: req.id,
+                  accept: true,
+                })
+              "
+            >
+              <span class="material-symbols-outlined">check</span>
+            </button>
+            <button
+              type="button"
+              class="lt-icon-btn"
+              title="Decline friend"
+              @click="
+                dispatchCommand({
+                  type: 'respondFriendRequest',
+                  requestId: req.id,
+                  accept: false,
+                })
+              "
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="state.friends.length > 0" class="lt-lan-list">
           <div
-            v-for="room in savedRooms"
-            :key="room.id"
+            v-for="friend in state.friends"
+            :key="friend.pubKeyB64"
             class="lt-lan-row"
           >
-            <div class="lt-saved-meta">
-              <span class="lt-lan-name">{{ room.label }}</span>
-              <span v-if="room.ownerName" class="lt-saved-owner">
-                {{ room.passcode === "__host__" ? `by ${room.ownerName} (You)` : `by ${room.ownerName}` }}
+            <span
+              class="lt-status-chip"
+              :class="{
+                'is-online': friend.status === 'online',
+                'is-checking': friend.status === 'checking',
+                'is-offline': friend.status !== 'online' && friend.status !== 'checking',
+              }"
+              :title="friend.roomName || undefined"
+            >
+              <span class="lt-status-dot" />
+              <span>
+                {{
+                  friend.status === "online"
+                    ? "Open"
+                    : friend.status === "checking"
+                      ? "…"
+                      : "Offline"
+                }}
               </span>
-            </div>
-            <div class="lt-fav-actions">
-              <button
-                v-if="room.isFavorite"
-                type="button"
-                class="lt-btn lt-btn-sm"
-                :class="{ 'lt-btn-primary': room.autoJoin }"
-                :title="
-                  room.autoJoin
-                    ? 'Auto-join enabled on open'
-                    : 'Enable auto-join on open'
-                "
-                @click="
-                  dispatchCommand({
-                    type: 'toggleFavoriteAutoJoin',
-                    id: room.id,
-                    autoJoin: !room.autoJoin,
-                  })
-                "
-              >
-                Auto
-              </button>
-              <button
-                type="button"
-                class="lt-btn lt-btn-sm"
-                :disabled="busyAction !== null"
-                @click="dispatchCommand({ type: 'joinFavoriteRoom', id: room.id })"
-              >
-                Join
-              </button>
-              <button
-                v-if="room.isFavorite"
-                type="button"
-                class="lt-icon-btn"
-                title="Remove favorite"
-                @click="
-                  dispatchCommand({ type: 'removeFavoriteRoom', id: room.id })
-                "
-              >
-                <span class="material-symbols-outlined">close</span>
-              </button>
-            </div>
+            </span>
+
+            <button
+              type="button"
+              class="lt-btn lt-btn-sm lt-friend-join-btn"
+              :class="{ 'lt-btn-primary': friend.status === 'online' }"
+              :disabled="busyAction !== null || !friend.tcAddress"
+              :title="friend.roomName ? `Join ${friend.roomName}` : `Join ${friend.displayName}`"
+              @click="dispatchCommand({ type: 'joinFriend', pubKeyB64: friend.pubKeyB64 })"
+            >
+              {{ friend.displayName }} : Join
+            </button>
+
+            <button
+              type="button"
+              class="lt-icon-btn"
+              title="Remove friend"
+              @click="dispatchCommand({ type: 'removeFriend', pubKeyB64: friend.pubKeyB64 })"
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
+        </div>
+        <div
+          v-else-if="state.pendingFriendRequests.length === 0"
+          class="lt-muted-empty"
+        >
+          No friends yet
         </div>
       </section>
 
@@ -624,6 +644,58 @@ function handleDismissError() {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+
+.lt-friends-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lt-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #1f1f1f;
+  color: #9e9e9e;
+  flex-shrink: 0;
+}
+
+.lt-status-chip.is-online {
+  background-color: rgba(76, 175, 80, 0.16);
+  color: #81c784;
+}
+
+.lt-status-chip.is-checking {
+  color: #ffb74d;
+}
+
+.lt-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.lt-friend-join-btn {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lt-accept-btn {
+  color: #81c784;
+}
+
+.lt-muted-empty {
+  font-size: 12px;
+  color: #777777;
 }
 
 .lt-saved-meta {

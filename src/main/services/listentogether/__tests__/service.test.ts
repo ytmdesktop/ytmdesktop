@@ -2100,4 +2100,135 @@ describe("ListenTogetherService", () => {
       "dQw4w9WgXcQ",
     );
   });
+
+  it("supports mutual friend handshake, Tailcat joinFriend without invite link, and removeFriend", async () => {
+    const fakeTcAddr = "tcFRIEND1234567890abcdef12345678";
+    const stableRemotePort = 44444;
+    let boundHostPort = 0;
+
+    const host = createServiceHarness("HostAlice", {
+      resolveTailcatBinaryFn: () => "/usr/local/bin/tailcat",
+      createTailcatHost: () => ({
+        start: async ({ localPort }) => {
+          boundHostPort = localPort;
+          return { tcAddress: fakeTcAddr, remotePort: stableRemotePort };
+        },
+        stop: async () => {},
+      }),
+    });
+
+    const guest = createServiceHarness("GuestBob", {
+      disableDirectHost: true,
+      resolveTailcatBinaryFn: () => "/usr/local/bin/tailcat",
+      createTailcatTransport: (opts) => ({
+        mode: "tailcat",
+        connect: async () => {
+          expect(opts.tcAddress).toBe(fakeTcAddr);
+          expect(opts.remotePort).toBe(stableRemotePort);
+          const ws = new WebSocket(`ws://127.0.0.1:${boundHostPort}/`);
+          await new Promise<void>((resolve, reject) => {
+            ws.once("open", () => resolve());
+            ws.once("error", reject);
+          });
+          const msgHandlers = new Set<(buf: Buffer) => void>();
+          const closeHandlers = new Set<(c: number, r: string) => void>();
+          const errHandlers = new Set<(e: Error) => void>();
+          ws.on("message", (d) => {
+            const buf = Buffer.isBuffer(d) ? d : Buffer.from(d as ArrayBuffer);
+            for (const h of msgHandlers) h(buf);
+          });
+          ws.on("close", (c, r) => {
+            for (const h of closeHandlers) h(c, r.toString("utf8"));
+          });
+          ws.on("error", (e) => {
+            for (const h of errHandlers) h(e);
+          });
+          return {
+            id: "tc-friend-conn",
+            mode: "tailcat",
+            remoteLabel: "tailcat:redacted",
+            get isOpen() {
+              return ws.readyState === WebSocket.OPEN;
+            },
+            send: (d) => ws.send(d),
+            close: (c, r) => ws.close(c, r),
+            onMessage: (h) => {
+              msgHandlers.add(h);
+              return () => msgHandlers.delete(h);
+            },
+            onClose: (h) => {
+              closeHandlers.add(h);
+              return () => closeHandlers.delete(h);
+            },
+            onError: (h) => {
+              errHandlers.add(h);
+              return () => errHandlers.delete(h);
+            },
+          };
+        },
+        close: () => {},
+      }) as never,
+    });
+
+    await host.service.createRoom({ displayName: "HostAlice" });
+    const inviteUrl = host.service.getUIState().room!.inviteUrl!;
+    await guest.service.joinByUrl(inviteUrl, { displayName: "GuestBob" });
+    await vi.waitFor(() => {
+      expect(host.service.getUIState().room?.members.length).toBe(2);
+    });
+
+    const hostPeerId = host.service.getUIState().room!.selfPeerId;
+    const guestPeerId = guest.service.getUIState().room!.selfPeerId;
+
+    // Guest requests Host as friend -> Host must accept for mutual friendship
+    await guest.service.handleCommand({
+      type: "sendFriendRequest",
+      targetPeerId: hostPeerId,
+    });
+    expect(guest.service.getUIState().friends).toHaveLength(0);
+
+    await vi.waitFor(() => {
+      expect(host.service.getUIState().pendingFriendRequests).toHaveLength(1);
+    });
+
+    const reqId = host.service.getUIState().pendingFriendRequests[0]!.id;
+    await host.service.handleCommand({
+      type: "respondFriendRequest",
+      requestId: reqId,
+      accept: true,
+    });
+
+    await vi.waitFor(() => {
+      expect(host.service.getUIState().friends).toHaveLength(1);
+      expect(guest.service.getUIState().friends).toHaveLength(1);
+    });
+    expect(guest.service.getUIState().friends[0]!.tcAddress).toBe(fakeTcAddr);
+    expect(guest.service.getUIState().friends[0]!.tcPort).toBe(
+      stableRemotePort,
+    );
+
+    // Leave & reopen room on a brand new local port/token/passcode; guest joins via joinFriend
+    await guest.service.handleCommand({ type: "leaveRoom" });
+    await host.service.handleCommand({ type: "leaveRoom" });
+    await host.service.createRoom({ displayName: "HostAlice" });
+
+    const joinFriendRes = await guest.service.handleCommand({
+      type: "joinFriend",
+      pubKeyB64: hostPeerId,
+    });
+    expect(joinFriendRes).toEqual({ ok: true });
+    await vi.waitFor(() => {
+      expect(guest.service.getUIState().view).toBe("active");
+    });
+
+    // Removing friend revokes friend auth
+    await host.service.handleCommand({
+      type: "removeFriend",
+      pubKeyB64: guestPeerId,
+    });
+    await vi.waitFor(() => {
+      expect(host.service.getUIState().friends).toHaveLength(0);
+      expect(guest.service.getUIState().friends).toHaveLength(0);
+    });
+  });
 });
