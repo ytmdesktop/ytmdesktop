@@ -1,3 +1,26 @@
+# Ibis Fork Ramblings and Why this Exists
+Heya, I had a desire to build out a robust, self-host capable listen together feature for YTM for a while now, and used YTMDesktop as a base for it. It uses [Tailcat](https://github.com/tailscale/tailcat) to act as the networking backend. If you haven't heard of Tailcat before, its Tailscale without the need for a Tailscale account and setup. It should just work out of the box. If you wanna throw up your own relays or IP it should support that too, but haven't tested it myself yet.
+
+It should be accessible via the lil person icon in the top right, and be self explanatory from there. Persistence is for saving connection info so friend's rooms are easily restarted without needing to reshare links everytime. No guarantee on storing queue, I am not hosting any infra for keeping true persistence.
+
+It does NOT (**I REPEAT DOES NOT**) stream any RTSP info over the internet. All it does is sync clients times. If someone in the room doesn't have YT Premium, the host has an option to wait for their ads, or skip ads and the person with ads will get fast forwarded when they finish.
+
+You also might notice the UI going green when in remote. That's because I built this around the idea that you can tune in and out of the remote mix whenever you want. When the UI is green, you are synced to the remote queue. You can add any playlist, album, or song using the (+) button you see around the UI. Clicking on a song normally will send you to local mode. You can tune back in whenever you want and it'll maintain sync. The remote queue keeps running in the background. 
+
+There are also fair queue options! 1 DJ can add 90 songs at once, and a second DJ will still be able to add their 1 song an hour and have it play next so you don't have to wait 3 hours for the backlog to go through.
+
+It supports autoplay using YTM's mix feature, although I wanna do another pass at improving it. Am still early in building this.
+
+I built this entirely on CachyOS,`7.3.5-2-cachyos`. I have a few testers on Windows, but I haven't finished as robust of a test pipeline yet to validate other configurations and platforms as I want yet. Feel free to spike an issue off with a log (you can find a quick button to logs in the advanced dropdown on the room join screen). 
+
+Now the elephant in the room, 
+## AI use 
+Yeah, I used AI to handle the implementation. That's why this is a fork and not a PR to upstream, as I couldn't find any AI policies there and I am uncomfortable sending anything in without knowing their policy. I am a professional developer and work most of my day knee deep in cranky old codebases for financial institutions. I, in general, believe that personal projects should be mostly AI free to encourage learning and skill development, but this is ultimately a project I wanted for me and my friends and given the lack of similar projects that worked how I wanted it to work for years, I wanted to get something to exist first and foremost. If this turns into a project that continues to capture my interest and some of my other projects finish up and I get some more free-time (precious that it be), I'll be willing to do a rewrite without AI assistance. **That being said**, I do not intend to let this project decay. I am an active user of this, and do project design for work (not saying I am perfect by any means). I have tried to keep my AI use focused on areas that I believe helps more than hurts, and believe in shipping working, reliable, and not overly engineered chaotic messes. I will continue to evolve and adapt my work here over the coming weeks and hopefully get to a point where I am not embarrassed to say I worked on this. Also note that the networking here is handled via Tailcat which is *not* an AI generated project as far as I know. I just hook into it to send timestamps and state information over the pipes. I would be uncomfortable shipping an entirely from scratch AI vibed network pipeline in today's spooky internet, no matter how trivial the data being sent is. 
+
+If you want to try it out, give it a spin and let me know what breaks or any features you think are missing! I already have shuffling, queue clearing, tagging genres / moods, and maybe some discord bot integration in my head. 
+
+
+## ORIGINAL README
 # YouTube Music Desktop App
 ### Now with a Fresh new Codebase 😉
 

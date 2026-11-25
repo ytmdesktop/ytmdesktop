@@ -145,3 +145,9 @@ vite.config.ts.timestamp-*
 
 # Electron-Forge
 out/
+test-results/
+
+docs/*
+!docs/listen-together/
+docs/listen-together/*
+!docs/listen-together/knowledge-base/
