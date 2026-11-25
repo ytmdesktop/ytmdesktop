@@ -23,6 +23,7 @@ import {
 import AppWindowManager from "../windowmanager";
 import type { AppWindow } from "../windowmanager/appwindow";
 import ConfigStore from "../configstore";
+import StateManager from "../statemanager";
 import { getIconPath } from "../../util";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
@@ -75,7 +76,7 @@ function toPickerDevice(device: CastDevice): CastPickerDevice {
  */
 export default class CastManager extends Service {
   public static override readonly dependencies: DependencyConstructor<Service>[] =
-    [AppWindowManager, ConfigStore];
+    [AppWindowManager, ConfigStore, StateManager];
 
   private _initialized = false;
   public get initialized() {
@@ -110,6 +111,8 @@ export default class CastManager extends Service {
       return;
     }
 
+    this.registerSessionHandlers();
+
     this.manager = createCastManager({
       ipcMain,
       allowOrigin: (origin) => origin === YTM_ORIGIN,
@@ -133,11 +136,52 @@ export default class CastManager extends Service {
     }
 
     ipcMain.removeAllListeners("castManager:isEnabled");
+    ipcMain.removeAllListeners("castManager:takeSavedSession");
+    ipcMain.removeAllListeners("castManager:sessionChanged");
     const manager = this.manager;
     this.manager = null;
     manager
       ?.dispose()
       .catch((err) => log.error("CastManager failed to dispose", err));
+  }
+
+  /**
+   * The YTM page reports the session Google's Cast SDK holds, and asks once per app start for the one a previous run
+   * left playing so it can rejoin it (chrome.cast.requestSessionById). Kept in StateManager's in-memory state because
+   * the copy on disk can lag it by 30 seconds.
+   */
+  private registerSessionHandlers() {
+    const stateManager = this.getDependency(StateManager);
+    let savedSessionTaken = false;
+
+    ipcMain.on("castManager:takeSavedSession", (event) => {
+      if (event.senderFrame?.origin !== YTM_ORIGIN || savedSessionTaken) {
+        event.returnValue = null;
+        return;
+      }
+      savedSessionTaken = true;
+      event.returnValue = stateManager.state?.castSession ?? null;
+    });
+
+    ipcMain.on("castManager:sessionChanged", (event, session: unknown) => {
+      if (event.senderFrame?.origin !== YTM_ORIGIN) return;
+
+      let castSession: { sessionId: string; appId: string; deviceName: string | null } | null = null;
+      if (session && typeof session === "object") {
+        const { sessionId, appId, deviceName } = session as Record<string, unknown>;
+        if (typeof sessionId !== "string" || !sessionId || typeof appId !== "string") return;
+        castSession = { sessionId, appId, deviceName: typeof deviceName === "string" ? deviceName : null };
+      }
+
+      const current = stateManager.state?.castSession ?? null;
+      if (
+        current?.sessionId === castSession?.sessionId &&
+        current?.appId === castSession?.appId &&
+        current?.deviceName === castSession?.deviceName
+      )
+        return;
+      stateManager.updateState({ castSession });
+    });
   }
 
   /** Shows the device picker at the cursor (the user just clicked YTM's cast button). */

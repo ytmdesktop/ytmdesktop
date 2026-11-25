@@ -5,6 +5,7 @@ import protectedapimanager from "./protectedapimanager";
 import { createMaterialSymbolsLink, createStyleSheet } from "./setup/styles";
 import { createNavigationMenuArrows } from "./setup/navigation";
 import initRemote from "./setup/remote";
+import { initCastSessionPersistence } from "./setup/cast";
 import { addTimedLyrics, createAdditionalPlayerBarControls, overrideHistoryButtonDisplay, refitHintsWhenPlayerBarSettles } from "./setup/extras";
 
 protectedapimanager.init();
@@ -70,6 +71,10 @@ window.addEventListener("load", async () => {
       addTimedLyrics();
 
       setupCompletions |= YTMViewSetupCompletionFlags.Extras;
+    }
+
+    {
+      initCastSessionPersistence();
     }
   } catch (error) {
     window.postMessage(

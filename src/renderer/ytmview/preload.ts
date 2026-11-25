@@ -118,6 +118,16 @@ window.addEventListener("message", async event => {
     });
   }
 
+  // Cast session persistence (see scripts/setup/cast.ts). Nothing is answered or kept while casting is disabled.
+  if (castingEnabled && event.source === window && event.data?.op) {
+    if (event.data.op === "ytmd-cast-request-saved-session") {
+      const session = ipcRenderer.sendSync("castManager:takeSavedSession");
+      if (session) window.postMessage({ op: "ytmd-cast-saved-session", session }, "/");
+    } else if (event.data.op === "ytmd-cast-session") {
+      ipcRenderer.send("castManager:sessionChanged", event.data.session);
+    }
+  }
+
   if (event.data.op && event.data.op === "ytmd-errored") {
     ipcRenderer.send("ytmView:errored", event.data.error);
   }
