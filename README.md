@@ -19,6 +19,7 @@ Yeah, I used AI to handle the implementation. That's why this is a fork and not 
 
 If you want to try it out, give it a spin and let me know what breaks or any features you think are missing! I already have shuffling, queue clearing, tagging genres / moods, and maybe some discord bot integration in my head. 
 
+Also if you despise the fact that I used AI, go ahead and rip and tear away! The project is GPL, and by rule I do not consider anything written AI to be written by me. AI was trained off of every dev who contributed to FOSS over my entire lifetime, so everything that comes out of it is everyone's work, not mine. 
 
 ## ORIGINAL README
 # YouTube Music Desktop App
