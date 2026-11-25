@@ -18,7 +18,21 @@ permissions:
   attestations: write
 
 jobs:
+  prepare-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Ensure GitHub Release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --generate-notes
+          fi
+
   build:
+    needs: prepare-release
     strategy:
       matrix:
         os:
@@ -78,12 +92,10 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
           TARGET_ARCH: ${{ matrix.os.arch }}
         run: |
-          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --generate-notes || true
-          fi
           shopt -s nullglob
           files=(
             out/make/squirrel.windows/${TARGET_ARCH}/*.exe
