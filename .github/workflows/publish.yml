@@ -100,7 +100,7 @@ jobs:
           files=(
             out/make/squirrel.windows/${TARGET_ARCH}/*.exe
             out/make/squirrel.windows/${TARGET_ARCH}/*.nupkg
-            out/make/squirrel.windows/${TARGET_ARCH}/RELEASES
+            out/make/squirrel.windows/${TARGET_ARCH}/RELEASES*
             out/make/deb/${TARGET_ARCH}/*.deb
             out/make/rpm/${TARGET_ARCH}/*.rpm
             out/make/zip/darwin/${TARGET_ARCH}/*.zip

@@ -2,9 +2,21 @@
 name: Application Build
 
 on:
-  - push
-  - pull_request
-  - workflow_dispatch
+  push:
+    branches:
+      - main
+      - master
+      - development
+  pull_request:
+    branches:
+      - main
+      - master
+      - development
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
