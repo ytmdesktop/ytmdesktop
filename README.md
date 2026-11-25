@@ -19,7 +19,9 @@ TODO: Write guides for v2. While these may still be helpful they are geared towa
 # Casting
 
 Use the cast button in the player bar to cast to Chromecasts, Google/Nest speakers and speaker groups on your
-network. Powered by [electron-cast](https://github.com/adammpkins/electron-cast).
+network. YTM's own cast button and Google's Cast SDK do the work, with
+[electron-cast](https://github.com/adammpkins/electron-cast) supplying the device discovery and connection Electron
+lacks.
 
 # ⬇️ Download at
 <a href="https://repology.org/project/ytmdesktop/versions">
