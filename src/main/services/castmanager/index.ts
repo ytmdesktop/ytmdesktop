@@ -67,8 +67,11 @@ function toPickerDevice(device: CastDevice): CastPickerDevice {
 }
 
 /**
- * Chromecast support: discovers Cast devices on the network and serves YTM's own cast button through electron-cast's
- * chrome.cast polyfill, which the ytmview preload installs.
+ * Chromecast support: discovers Cast devices on the network and serves YTM's own cast button. YTM's page runs Google's
+ * Cast SDK on the Presentation API, and electron-cast (installed by the ytmview preload) supplies its backend.
+ *
+ * Off when the user turns off playback.enableCasting: then there is no discovery, no IPC, and the preload hides the
+ * cast button. The setting is read once at startup.
  */
 export default class CastManager extends Service {
   public static override readonly dependencies: DependencyConstructor<Service>[] =
@@ -80,6 +83,7 @@ export default class CastManager extends Service {
   }
 
   private manager: ElectronCastManager | null = null;
+  private enabled = false;
 
   private pickerWindow: AppWindow<"Browser"> | null = null;
   private pickerLoaded: Promise<void> | null = null;
@@ -94,6 +98,17 @@ export default class CastManager extends Service {
     if (this._initialized)
       throw new Error("CastManager is already initialized!");
     this._initialized = true;
+
+    // Missing until the store migration has run, which means on
+    this.enabled =
+      this.getDependency(ConfigStore).get("playback.enableCasting") !== false;
+    ipcMain.on("castManager:isEnabled", (event) => {
+      event.returnValue = this.enabled;
+    });
+    if (!this.enabled) {
+      log.info("CastManager disabled in settings");
+      return;
+    }
 
     this.manager = createCastManager({
       ipcMain,
@@ -117,6 +132,7 @@ export default class CastManager extends Service {
       this.pickerWindow = null;
     }
 
+    ipcMain.removeAllListeners("castManager:isEnabled");
     const manager = this.manager;
     this.manager = null;
     manager

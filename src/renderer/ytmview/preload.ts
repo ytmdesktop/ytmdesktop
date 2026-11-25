@@ -22,9 +22,13 @@ import scriptsRaw from "./scripts?raw";
 
 const store = new Store<StoreSchema>();
 
+// Asked synchronously because the bridge has to be in place before YTM's scripts run. Main answers with what it is
+// serving, so the page and main always agree (the setting only applies after a restart).
+const castingEnabled = ipcRenderer.sendSync("castManager:isEnabled") !== false;
+
 // Gives the Presentation API a backend before YTM's scripts run, so Google's Cast SDK (loaded by YTM) finds devices
 // and its own cast button casts through the main process.
-installCastBridge({ contextBridge, ipcRenderer });
+if (castingEnabled) installCastBridge({ contextBridge, ipcRenderer });
 
 let protectedApiBound = false;
 window.addEventListener("message", async event => {
@@ -67,6 +71,27 @@ window.addEventListener("message", async event => {
         `)
         )();
       }
+    }
+
+    if (!castingEnabled) {
+      // Without the bridge nothing answers Google's Cast SDK, so hide YTM's cast button. YTM sets it available again
+      // from its own code, so keep overriding it.
+      (
+        await webFrame.executeJavaScript(`
+          (function() {
+            const ytmStore = window.__YTMD_HOOK__.ytmStateStore.store;
+            const hide = () => {
+              try {
+                if (ytmStore.getState().castStatus.castAvailable) ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+              } catch (err) {
+                console.error("[ytmd-err(hideCastButton)]", err);
+              }
+            };
+            hide();
+            ytmStore.subscribe(hide);
+          })
+        `)
+      )();
     }
 
     const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;

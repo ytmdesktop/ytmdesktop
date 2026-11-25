@@ -27,6 +27,7 @@ export type StoreSchema = {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
     enableSpeakerFill: boolean;
+    enableCasting: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
   };
