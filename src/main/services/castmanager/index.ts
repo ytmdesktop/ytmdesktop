@@ -147,8 +147,8 @@ export default class CastManager extends Service {
 
   /**
    * The YTM page reports the session Google's Cast SDK holds, and asks once per app start for the one a previous run
-   * left playing so it can rejoin it (chrome.cast.requestSessionById). Kept in StateManager's in-memory state because
-   * the copy on disk can lag it by 30 seconds.
+   * left playing so it can rejoin it (chrome.cast.requestSessionById). Kept in StateManager's state and written to disk
+   * at once, so it survives the app being killed.
    */
   private registerSessionHandlers() {
     const stateManager = this.getDependency(StateManager);
@@ -181,6 +181,8 @@ export default class CastManager extends Service {
       )
         return;
       stateManager.updateState({ castSession });
+      // Written now, not after StateManager's 30 quiet seconds: the session is what a restart after a crash needs
+      stateManager.forceWrite();
     });
   }
 
