@@ -2,3 +2,6 @@
 
 /src/assets/** binary
 /.github/images/** binary
+/resources/bin/tailcat binary
+/resources/bin/tailcat.exe binary
+*.exe binary

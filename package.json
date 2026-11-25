@@ -41,6 +41,7 @@
     "@electron-forge/publisher-github": "^8.0.1",
     "@electron/fuses": "^2.1.3",
     "@playwright/test": "^1.65.1",
+    "@reforged/maker-appimage": "^6.0.0",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/multicast-dns": "^7.2.4",
     "@types/ws": "^8.18.1",

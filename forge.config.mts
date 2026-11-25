@@ -3,6 +3,7 @@ import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
+import { MakerAppImage } from "@reforged/maker-appimage";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
@@ -57,6 +58,12 @@ const config: ForgeConfig = {
         categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
         section: "sound",
+        icon: "src/assets/icons/ytmd.png",
+      },
+    }),
+    new MakerAppImage({
+      options: {
+        categories: ["AudioVideo", "Audio"],
         icon: "src/assets/icons/ytmd.png",
       },
     }),

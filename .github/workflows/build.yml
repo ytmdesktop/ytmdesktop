@@ -50,9 +50,13 @@ jobs:
           runtime: node@lts
           cache: true
 
-      - name: Install libdbus
+      - name: Install Linux build dependencies
         if: matrix.os.name == 'linux'
-        run: sudo apt-get install libdbus-1-dev pkg-config -y
+        run: sudo apt-get install libdbus-1-dev pkg-config squashfs-tools -y
+
+      - name: Verify bundled tailcat checksum
+        if: (matrix.os.name == 'linux' || matrix.os.name == 'windows') && matrix.os.arch == 'x64'
+        run: node scripts/fetch-tailcat.mjs --verify --platform ${{ matrix.os.name == 'windows' && 'win32' || 'linux' }} --arch x64
 
       - name: Make (${{ matrix.os.arch }})
         env:
@@ -76,4 +80,5 @@ jobs:
             out/make/squirrel.windows/${{ matrix.os.arch }}/*.exe
             out/make/deb/${{ matrix.os.arch }}/*.deb
             out/make/rpm/${{ matrix.os.arch }}/*.rpm
+            out/make/AppImage/${{ matrix.os.arch }}/*.AppImage
             out/make/zip/darwin/${{ matrix.os.arch }}/*.zip

@@ -254,6 +254,9 @@ importers:
       '@playwright/test':
         specifier: ^1.65.1
         version: 1.65.1
+      '@reforged/maker-appimage':
+        specifier: ^6.0.0
+        version: 6.0.0(supports-color@7.2.0)
       '@types/electron-squirrel-startup':
         specifier: ^1.0.2
         version: 1.0.2
@@ -995,6 +998,13 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
+  '@reforged/maker-appimage@6.0.0':
+    resolution: {integrity: sha512-2fdlJWV1RUh0+2kuVzi+0T2DnOUO/MHes45+dQThoarl5pD7LntvMG7IFJGW2qnjXnKOf1eZM56JnOuo1mXZLg==}
+    engines: {node: '>=20.12.0'}
+
+  '@reforged/maker-types@2.2.0':
+    resolution: {integrity: sha512-14B5Tu6fG2AWgH+bdsfJaQkAi8Bc7YC8GmMuNEWCJupU9IhvKHrdte3GAncBYO10yqSbsQx7Pi9xpyveJ5vL+Q==}
+
   '@rolldown/binding-android-arm-eabi@1.2.15':
     resolution: {integrity: sha512-aLcgK9gIJ3YRvrrtfSBbRa27F5WrpiTaPulnFpsHPxpUHgFlSgnU4854MHwoRGEBhfRJDWCS2WQ7lIjskE9Olw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1242,6 +1252,9 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
+
+  '@spacingbat3/lss@1.2.0':
+    resolution: {integrity: sha512-aywhxHNb6l7COooF3m439eT/6QN8E/RSl5IVboSKthMHcp0GlZYMSoS7546rqDLmFRxTD8f1tu/NIS9vtDwYAg==}
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -3497,6 +3510,17 @@ snapshots:
     dependencies:
       playwright: 1.65.1
 
+  '@reforged/maker-appimage@6.0.0(supports-color@7.2.0)':
+    dependencies:
+      '@electron-forge/maker-base': 8.0.1(supports-color@7.2.0)
+      '@reforged/maker-types': 2.2.0
+      '@spacingbat3/lss': 1.2.0
+      semver: 7.8.5
+    transitivePeerDependencies:
+      - supports-color
+
+  '@reforged/maker-types@2.2.0': {}
+
   '@rolldown/binding-android-arm-eabi@1.2.15':
     optional: true
 
@@ -3625,6 +3649,8 @@ snapshots:
   '@sinclair/typebox@0.34.52': {}
 
   '@socket.io/component-emitter@3.1.2': {}
+
+  '@spacingbat3/lss@1.2.0': {}
 
   '@types/chai@5.2.3':
     dependencies:
