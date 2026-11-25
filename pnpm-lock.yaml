@@ -185,8 +185,8 @@ importers:
         specifier: ^15.1.0
         version: 15.1.0
       electron-cast:
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.4.0
+        version: 0.4.0(electron@45.2.2)
       electron-log:
         specifier: ^5.4.4
         version: 5.4.4
@@ -1199,9 +1199,14 @@ packages:
     resolution: {integrity: sha512-BTJ9aZYL3vCfZlZOBLy9v8TUqWGQ0pzFnygKwFZt5udj6viBoFIBviKPUoZLDCPn1FoXffv6McQFDenrm5Krfw==}
     engines: {node: '>=20'}
 
-  electron-cast@0.3.1:
-    resolution: {integrity: sha512-xKlMyw+h1o6sB3hz22WmWK94RaKOcwNAt7AW/VzlG7XwNKQdRZ6SHOSgnpBHUCizsABApbL2lgQ9zQEajNITlQ==}
+  electron-cast@0.4.0:
+    resolution: {integrity: sha512-n39Wh5P+NeVJEsEY/U9kS0tfQoI/urKsV2B3D0nUPsLvCssUj6pewKPtLKZMz0+gNIqZvWA/jrVri3Vm/4Sn/A==}
     engines: {node: '>=20'}
+    peerDependencies:
+      electron: '>=35'
+    peerDependenciesMeta:
+      electron:
+        optional: true
 
   electron-installer-common@0.10.4:
     resolution: {integrity: sha512-8gMNPXfAqUE5CfXg8RL0vXpLE9HAaPkgLXVoHE3BMUzogMWenf4LmwQ27BdCUrEhkjrKl+igs2IHJibclR3z3Q==}
@@ -3039,7 +3044,9 @@ snapshots:
     dependencies:
       type-fest: 5.10.0
 
-  electron-cast@0.3.1: {}
+  electron-cast@0.4.0(electron@45.2.2):
+    optionalDependencies:
+      electron: 45.2.2
 
   electron-installer-common@0.10.4:
     dependencies:
