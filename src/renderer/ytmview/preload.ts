@@ -22,7 +22,8 @@ import scriptsRaw from "./scripts?raw";
 
 const store = new Store<StoreSchema>();
 
-// Gives YTM a working chrome.cast before its scripts run, so its own cast button casts through the main process.
+// Gives the Presentation API a backend before YTM's scripts run, so Google's Cast SDK (loaded by YTM) finds devices
+// and its own cast button casts through the main process.
 installCastBridge({ contextBridge, ipcRenderer });
 
 let protectedApiBound = false;
