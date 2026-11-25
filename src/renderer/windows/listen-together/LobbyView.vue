@@ -32,6 +32,33 @@ const derpInput = ref(props.state.tailcatDerpMapUrl ?? "");
 const derpFeedback = ref<{ text: string; isError: boolean } | null>(null);
 const logFeedback = ref<string | null>(null);
 const busyAction = ref<"create" | "join" | "derp" | null>(null);
+const refreshingFriends = ref(false);
+
+async function handleRefreshFriends() {
+  if (refreshingFriends.value) return;
+  refreshingFriends.value = true;
+  try {
+    await Promise.all([
+      dispatchCommand({ type: "refreshFriends" }),
+      new Promise<void>((resolve) => setTimeout(resolve, 650)),
+    ]);
+  } finally {
+    refreshingFriends.value = false;
+  }
+}
+
+function formatDuration(sec?: number): string {
+  if (typeof sec !== "number" || !Number.isFinite(sec) || sec < 0) return "0:00";
+  const s = Math.floor(sec);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, "0")}`;
+}
+
+function friendProgressPct(pos?: number, dur?: number): number {
+  if (!dur || dur <= 0 || typeof pos !== "number") return 0;
+  return Math.max(0, Math.min(100, (pos / dur) * 100));
+}
 
 onMounted(() => {
   if (props.state.friends.length > 0) {
@@ -328,9 +355,19 @@ function handleDismissError() {
             type="button"
             class="lt-icon-btn"
             title="Refresh friends"
-            @click="dispatchCommand({ type: 'refreshFriends' })"
+            :disabled="refreshingFriends"
+            @click="handleRefreshFriends"
           >
-            <span class="material-symbols-outlined">refresh</span>
+            <span
+              class="material-symbols-outlined"
+              :class="{
+                'lt-spin':
+                  refreshingFriends ||
+                  state.friends.some((f) => f.status === 'checking'),
+              }"
+            >
+              refresh
+            </span>
           </button>
         </div>
 
@@ -376,48 +413,108 @@ function handleDismissError() {
           <div
             v-for="friend in state.friends"
             :key="friend.pubKeyB64"
-            class="lt-lan-row"
+            class="lt-friend-entry"
+            :class="{
+              'is-online': friend.status === 'online',
+              'is-offline': friend.status !== 'online',
+            }"
           >
-            <span
-              class="lt-status-chip"
-              :class="{
-                'is-online': friend.status === 'online',
-                'is-checking': friend.status === 'checking',
-                'is-offline': friend.status !== 'online' && friend.status !== 'checking',
-              }"
-              :title="friend.roomName || undefined"
-            >
-              <span class="lt-status-dot" />
-              <span>
-                {{
-                  friend.status === "online"
-                    ? "Open"
-                    : friend.status === "checking"
-                      ? "…"
-                      : "Offline"
-                }}
+            <div class="lt-friend-top-row">
+              <span
+                class="lt-status-chip"
+                :class="{
+                  'is-online': friend.status === 'online',
+                  'is-checking': friend.status === 'checking',
+                  'is-offline':
+                    friend.status !== 'online' && friend.status !== 'checking',
+                }"
+              >
+                <span class="lt-status-dot" />
+                <span>
+                  {{
+                    friend.status === "online"
+                      ? "Open"
+                      : friend.status === "checking"
+                        ? "…"
+                        : "Offline"
+                  }}
+                </span>
               </span>
-            </span>
 
-            <button
-              type="button"
-              class="lt-btn lt-btn-sm lt-friend-join-btn"
-              :class="{ 'lt-btn-primary': friend.status === 'online' }"
-              :disabled="busyAction !== null || !friend.tcAddress"
-              :title="friend.roomName ? `Join ${friend.roomName}` : `Join ${friend.displayName}`"
-              @click="dispatchCommand({ type: 'joinFriend', pubKeyB64: friend.pubKeyB64 })"
-            >
-              {{ friend.displayName }} : Join
-            </button>
+              <span class="lt-friend-name-chip">{{ friend.displayName }}</span>
 
-            <button
-              type="button"
-              class="lt-icon-btn"
-              title="Remove friend"
-              @click="dispatchCommand({ type: 'removeFriend', pubKeyB64: friend.pubKeyB64 })"
+              <span
+                v-if="friend.status === 'online' && friend.memberCount"
+                class="lt-friend-users-chip"
+                :title="`${friend.memberCount} in room`"
+              >
+                <span class="material-symbols-outlined lt-friend-users-icon">
+                  group
+                </span>
+                <span>{{ friend.memberCount }}</span>
+              </span>
+
+              <button
+                v-if="friend.status === 'online'"
+                type="button"
+                class="lt-btn lt-btn-sm lt-btn-primary lt-friend-join-pill"
+                :disabled="busyAction !== null"
+                @click="
+                  dispatchCommand({
+                    type: 'joinFriend',
+                    pubKeyB64: friend.pubKeyB64,
+                  })
+                "
+              >
+                Join
+              </button>
+
+              <button
+                type="button"
+                class="lt-icon-btn lt-friend-remove-btn"
+                title="Remove friend"
+                @click="
+                  dispatchCommand({
+                    type: 'removeFriend',
+                    pubKeyB64: friend.pubKeyB64,
+                  })
+                "
+              >
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div
+              v-if="
+                friend.status === 'online' &&
+                (friend.trackTitle || friend.roomName)
+              "
+              class="lt-friend-now-playing"
             >
-              <span class="material-symbols-outlined">close</span>
-            </button>
+              <div class="lt-friend-track-row">
+                <span class="lt-friend-track-title">
+                  {{ friend.trackTitle || friend.roomName }}
+                </span>
+                <span
+                  v-if="friend.durationSec && friend.durationSec > 0"
+                  class="lt-friend-track-time"
+                >
+                  {{ formatDuration(friend.positionSec) }} /
+                  {{ formatDuration(friend.durationSec) }}
+                </span>
+              </div>
+              <div
+                v-if="friend.durationSec && friend.durationSec > 0"
+                class="lt-friend-progress-bar"
+              >
+                <div
+                  class="lt-friend-progress-fill"
+                  :style="{
+                    width: `${friendProgressPct(friend.positionSec, friend.durationSec)}%`,
+                  }"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div
@@ -681,12 +778,123 @@ function handleDismissError() {
   background-color: currentColor;
 }
 
-.lt-friend-join-btn {
+.lt-friend-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  background-color: #161616;
+  border: 1px solid #242424;
+  transition: opacity 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.lt-friend-entry.is-offline {
+  opacity: 0.55;
+}
+
+.lt-friend-entry.is-online {
+  background-color: rgba(76, 175, 80, 0.06);
+  border-color: rgba(76, 175, 80, 0.35);
+}
+
+.lt-friend-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lt-friend-name-chip {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #eeeeee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lt-friend-users-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: #cccccc;
+  background-color: #242424;
+  flex-shrink: 0;
+}
+
+.lt-friend-users-icon {
+  font-size: 13px;
+}
+
+.lt-friend-join-pill {
+  flex-shrink: 0;
+  padding: 3px 10px;
+}
+
+.lt-friend-remove-btn {
+  flex-shrink: 0;
+}
+
+.lt-friend-now-playing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lt-friend-track-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: #bbbbbb;
+}
+
+.lt-friend-track-title {
   flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.lt-friend-track-time {
+  flex-shrink: 0;
+  color: #888888;
+  font-variant-numeric: tabular-nums;
+}
+
+.lt-friend-progress-bar {
+  height: 3px;
+  border-radius: 2px;
+  background-color: #2a2a2a;
+  overflow: hidden;
+}
+
+.lt-friend-progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 2px;
+  transition: width 0.2s linear;
+}
+
+.lt-spin {
+  animation: lt-spin-anim 0.75s linear infinite;
+}
+
+@keyframes lt-spin-anim {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .lt-accept-btn {

@@ -1088,87 +1088,9 @@ app.on("ready", async () => {
 
   integrationManager.runHook(IntegrationManagerHook.AppReady);
 
-  // Show a changelog popup window if one should be shown
+  // Record current app version without fetching upstream changelog
   if (configStore.get("metadata.appVersion") !== app.getVersion()) {
-    const mainWindowBounds = mainWindow._getElectronWindow().getBounds();
-    const changelogWindow = windowManager.createWindow("Browser", {
-      name: "Changelog",
-      autoRecreate: false,
-      waitForViews: true,
-      url: resolveAppWindowUrl("changelog", "/windows/changelog/index.html"),
-      electronOptions: {
-        width: 800,
-        height: 600,
-        x: Math.round(mainWindowBounds.x + (mainWindowBounds.width / 2 - 400)),
-        y: Math.round(mainWindowBounds.y + (mainWindowBounds.height / 2 - 300)),
-        minimizable: false,
-        maximizable: false,
-        frame: false,
-        show: false,
-        icon: getIconPath("ytmd.png"),
-        parent: mainWindow._getElectronWindow(),
-        modal: process.platform !== "darwin",
-        titleBarStyle: "hidden",
-        titleBarOverlay: {
-          color: "#000000",
-          symbolColor: "#BBBBBB",
-          height: 36,
-        },
-        webPreferences: {
-          sandbox: true,
-          contextIsolation: true,
-          preload: path.join(
-            __dirname,
-            `../preload/windows/changelog/preload.cjs`,
-          ),
-          devTools: !app.isPackaged
-            ? true
-            : configStore.get("developer.enableDevTools"),
-        },
-      },
-    });
-    changelogWindow.ipcHandle("changelog:getReleaseMetadata", async () => {
-      try {
-        const feedUrl = autoUpdater.getFeedUrlNoPlatform();
-        // Not all platforms are supported so we just use win32 to grab the notes
-        const res = await fetch(
-          `${feedUrl}/win32/${configStore.get("metadata.appVersion")}`,
-        );
-        if (res.ok && res.status != 204) {
-          const json = await res.json();
-          return json;
-        }
-
-        return {
-          name: app.getVersion(),
-          notes: "# Failed to retrieve changelog",
-        };
-      } catch (err) {
-        log.warn("Failed to retrieve changelog", err);
-        return {
-          name: app.getVersion(),
-          notes: "# Failed to retrieve changelog",
-        };
-      }
-    });
-    changelogWindow.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url);
-
-      return {
-        action: "deny",
-      };
-    });
-    changelogWindow.webContents?.on("will-navigate", (event) => {
-      event.preventDefault();
-      shell.openExternal(event.url);
-    });
-    changelogWindow.webContents?.on("will-redirect", (event) => {
-      event.preventDefault();
-      shell.openExternal(event.url);
-    });
-    changelogWindow.on("electronwindow-close", () => {
-      configStore.set("metadata.appVersion", app.getVersion());
-    });
+    configStore.set("metadata.appVersion", app.getVersion());
   }
 });
 

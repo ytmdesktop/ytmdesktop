@@ -2231,4 +2231,154 @@ describe("ListenTogetherService", () => {
       expect(guest.service.getUIState().friends).toHaveLength(0);
     });
   });
+
+  it("allows friend-of-a-friend referral and 3-person host migration without auto-reclaim", async () => {
+    const tcMap = new Map<string, number>();
+    const makeTcTransport = (opts: { tcAddress: string; remotePort: number }) =>
+      ({
+        mode: "tailcat",
+        connect: async () => {
+          const port = tcMap.get(opts.tcAddress) ?? opts.remotePort;
+          const ws = new WebSocket(`ws://127.0.0.1:${port}/`);
+          await new Promise<void>((resolve, reject) => {
+            ws.once("open", () => resolve());
+            ws.once("error", reject);
+          });
+          const msgHandlers = new Set<(buf: Buffer) => void>();
+          const closeHandlers = new Set<(c: number, r: string) => void>();
+          const errHandlers = new Set<(e: Error) => void>();
+          ws.on("message", (d) => {
+            const buf = Buffer.isBuffer(d) ? d : Buffer.from(d as ArrayBuffer);
+            for (const h of msgHandlers) h(buf);
+          });
+          ws.on("close", (c, r) => {
+            for (const h of closeHandlers) h(c, r.toString("utf8"));
+          });
+          ws.on("error", (e) => {
+            for (const h of errHandlers) h(e);
+          });
+          return {
+            id: `tc-${opts.tcAddress}`,
+            mode: "tailcat",
+            remoteLabel: "tailcat:redacted",
+            get isOpen() {
+              return ws.readyState === WebSocket.OPEN;
+            },
+            send: (d: Buffer) => ws.send(d),
+            close: (c?: number, r?: string) => ws.close(c, r),
+            onMessage: (h: (buf: Buffer) => void) => {
+              msgHandlers.add(h);
+              return () => msgHandlers.delete(h);
+            },
+            onClose: (h: (c: number, r: string) => void) => {
+              closeHandlers.add(h);
+              return () => closeHandlers.delete(h);
+            },
+            onError: (h: (e: Error) => void) => {
+              errHandlers.add(h);
+              return () => errHandlers.delete(h);
+            },
+          };
+        },
+        close: () => {},
+      }) as never;
+
+    const tcA = "tcALICE1234567890abcdef123456789";
+    const tcB = "tcBOB1234567890abcdef12345678901";
+    const tcC = "tcCHARLIE1234567890abcdef1234567";
+
+    const alice = createServiceHarness("Alice", {
+      resolveTailcatBinaryFn: () => "/usr/local/bin/tailcat",
+      createTailcatHost: () => ({
+        start: async ({ localPort }) => {
+          tcMap.set(tcA, localPort);
+          return { tcAddress: tcA, remotePort: localPort };
+        },
+        stop: async () => {},
+      }),
+      createTailcatTransport: makeTcTransport,
+    });
+    const bob = createServiceHarness("Bob", {
+      resolveTailcatBinaryFn: () => "/usr/local/bin/tailcat",
+      createTailcatHost: () => ({
+        start: async ({ localPort }) => {
+          tcMap.set(tcB, localPort);
+          return { tcAddress: tcB, remotePort: localPort };
+        },
+        stop: async () => {},
+      }),
+      createTailcatTransport: makeTcTransport,
+    });
+    const charlie = createServiceHarness("Charlie", {
+      resolveTailcatBinaryFn: () => "/usr/local/bin/tailcat",
+      createTailcatHost: () => ({
+        start: async ({ localPort }) => {
+          tcMap.set(tcC, localPort);
+          return { tcAddress: tcC, remotePort: localPort };
+        },
+        stop: async () => {},
+      }),
+      createTailcatTransport: makeTcTransport,
+    });
+
+    // Establish B <-> C friendship first (Alice does NOT know Charlie)
+    await bob.service.createRoom({ displayName: "Bob" });
+    await charlie.service.joinByUrl(bob.service.getUIState().room!.inviteUrl!, {
+      displayName: "Charlie",
+    });
+    await vi.waitFor(() => {
+      expect(bob.service.getUIState().room?.members).toHaveLength(2);
+    });
+    const bobPeerId = bob.service.getUIState().room!.selfPeerId;
+    await charlie.service.handleCommand({
+      type: "sendFriendRequest",
+      targetPeerId: bobPeerId,
+    });
+    await vi.waitFor(() => {
+      expect(bob.service.getUIState().pendingFriendRequests).toHaveLength(1);
+    });
+    await bob.service.handleCommand({
+      type: "respondFriendRequest",
+      requestId: bob.service.getUIState().pendingFriendRequests[0]!.id,
+      accept: true,
+    });
+    await vi.waitFor(() => {
+      expect(charlie.service.getUIState().friends).toHaveLength(1);
+    });
+    await charlie.service.handleCommand({ type: "leaveRoom" });
+    await bob.service.handleCommand({ type: "leaveRoom" });
+
+    // Alice hosts, Bob joins Alice, Charlie (Bob's friend, NOT Alice's) joins via Bob's referral
+    const prevBobPort = tcMap.get(tcB);
+    await alice.service.createRoom({ displayName: "Alice" });
+    await bob.service.joinByUrl(alice.service.getUIState().room!.inviteUrl!, {
+      displayName: "Bob",
+    });
+    await vi.waitFor(() => {
+      expect(alice.service.getUIState().room?.members).toHaveLength(2);
+      expect(tcMap.get(tcB)).toBeDefined();
+      expect(tcMap.get(tcB)).not.toBe(prevBobPort);
+    });
+
+    await charlie.service.handleCommand({
+      type: "joinFriend",
+      pubKeyB64: bobPeerId,
+    });
+    await vi.waitFor(() => {
+      expect(alice.service.getUIState().room?.members).toHaveLength(3);
+    });
+
+    // 3-person host migration: Alice promotes Bob -> Charlie follows HOST_MIGRATED -> Alice becomes guest (no auto-reclaim)
+    await alice.service.handleCommand({
+      type: "moderateMember",
+      targetPeerId: bobPeerId,
+      action: "promote-host",
+    });
+    await vi.waitFor(() => {
+      expect(bob.service.getUIState().room?.isHost).toBe(true);
+      expect(bob.service.getUIState().room?.members).toHaveLength(3);
+      expect(alice.service.getUIState().room?.isHost).toBe(false);
+      expect(charlie.service.getUIState().room?.isHost).toBe(false);
+    });
+  });
 });

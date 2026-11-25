@@ -244,12 +244,12 @@ describe("tailcat transport & sidecar", () => {
 
       expect(started).toEqual({
         tcAddress: "tcAbCdEfGhIjKlMnOpQrStUvWxYz0123",
-        remotePort: 45123,
+        remotePort: 47820,
       });
       expect(spawnCalls).toEqual([
         {
           cmd: "/mock/tailcat",
-          args: ["serve", "--key=new", "--log", "45123"],
+          args: ["serve", "--key=new", "--log", "47820:45123"],
           derp: "https://derp.example.com/map.json",
         },
       ]);

@@ -394,6 +394,12 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
   private pendingFriendRequests: FriendRequestUI[] = [];
   private sentFriendRequestPeerIds = new Set<string>();
   private friendProbeInFlight = false;
+  private guestRoomInviteUrl: string | null = null;
+  private guestReferralHost: DirectWsHost | null = null;
+  private guestReferralSidecar: Pick<TailcatHostSidecar, "start" | "stop"> | null =
+    null;
+  private guestReferralTcAddress: string | null = null;
+  private guestReferralTcPort: number | null = null;
   private signalingUrl: string | null = null;
   private trustedSignalingHosts: string[] = [];
   private lanDiscoveryEnabled = false;
@@ -1697,7 +1703,6 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
   }
 
   private getPersistentTailcatStateDir(): string | null {
-    if (!this.persistentRoomEnabled) return null;
     try {
       const userData = app?.getPath?.("userData");
       if (typeof userData === "string" && userData.trim()) {
@@ -2037,13 +2042,13 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       fromPeerId: selfPeerId,
       fromDisplayName: this.displayName || "Listener",
       fromTcAddress:
-        this.sessionMode === "host" && this.roomTailcatAddress
+        (this.sessionMode === "host"
           ? this.roomTailcatAddress
-          : undefined,
+          : this.guestReferralTcAddress) ?? undefined,
       fromTcPort:
-        this.sessionMode === "host" && this.roomTailcatRemotePort
+        (this.sessionMode === "host"
           ? this.roomTailcatRemotePort
-          : undefined,
+          : this.guestReferralTcPort) ?? undefined,
     });
     this.emitStateChanged();
     return { ok: true };
@@ -2077,13 +2082,13 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           fromPeerId: selfPeerId,
           fromDisplayName: this.displayName || "Listener",
           fromTcAddress:
-            this.sessionMode === "host" && this.roomTailcatAddress
+            (this.sessionMode === "host"
               ? this.roomTailcatAddress
-              : undefined,
+              : this.guestReferralTcAddress) ?? undefined,
           fromTcPort:
-            this.sessionMode === "host" && this.roomTailcatRemotePort
+            (this.sessionMode === "host"
               ? this.roomTailcatRemotePort
-              : undefined,
+              : this.guestReferralTcPort) ?? undefined,
         });
       }
     }
@@ -2134,13 +2139,13 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           fromPeerId: selfPeerId,
           fromDisplayName: this.displayName || "Listener",
           fromTcAddress:
-            this.sessionMode === "host" && this.roomTailcatAddress
+            (this.sessionMode === "host"
               ? this.roomTailcatAddress
-              : undefined,
+              : this.guestReferralTcAddress) ?? undefined,
           fromTcPort:
-            this.sessionMode === "host" && this.roomTailcatRemotePort
+            (this.sessionMode === "host"
               ? this.roomTailcatRemotePort
-              : undefined,
+              : this.guestReferralTcPort) ?? undefined,
         });
         this.emitStateChanged();
         return;
@@ -2212,37 +2217,210 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
   private async refreshFriendsStatus(): Promise<void> {
     if (this.friendProbeInFlight || this.friends.length === 0) return;
-    if (!this.isTailcatAvailable()) return;
     this.friendProbeInFlight = true;
+    const minWait = new Promise<void>((r) => setTimeout(r, 500));
+    const tailcatOk = this.isTailcatAvailable();
+    this.logger.info?.("Refreshing friends status", {
+      friendCount: this.friends.length,
+      tailcatAvailable: tailcatOk,
+    });
     this.friends = this.friends.map((f) =>
-      f.tcAddress && f.tcPort ? { ...f, status: "checking" } : { ...f, status: "offline" },
+      f.tcAddress && f.tcPort
+        ? { ...f, status: "checking" }
+        : { ...f, status: "offline" },
     );
     this.emitStateChanged();
     try {
-      await Promise.all(
-        this.friends.map(async (friend) => {
-          if (!friend.tcAddress || !friend.tcPort) return;
-          const res = await probeTailcatRoomStatus({
-            tcAddress: friend.tcAddress,
-            remotePort: friend.tcPort,
-            derpMapUrl: this.tailcatDerpMapUrl,
-            timeoutMs: 4_500,
-          });
-          this.friends = this.friends.map((f) =>
-            f.pubKeyB64 === friend.pubKeyB64
-              ? {
-                  ...f,
-                  status: res.online ? "online" : "offline",
-                  roomName: res.online ? (res.roomName ?? null) : null,
-                }
-              : f,
-          );
-          this.emitStateChanged();
-        }),
+      if (tailcatOk) {
+        await Promise.all(
+          this.friends.map(async (friend) => {
+            if (!friend.tcAddress || !friend.tcPort) {
+              this.logger.info?.("Friend missing Tailcat address/port", {
+                displayName: friend.displayName,
+                hasTcAddress: Boolean(friend.tcAddress),
+                tcPort: friend.tcPort,
+              });
+              return;
+            }
+            const res = await probeTailcatRoomStatus({
+              tcAddress: friend.tcAddress,
+              remotePort: friend.tcPort,
+              derpMapUrl: this.tailcatDerpMapUrl,
+              timeoutMs: 4_500,
+              logger: this.logger,
+            });
+            this.logger.info?.("Friend probe completed", {
+              displayName: friend.displayName,
+              online: res.online,
+              memberCount: res.memberCount ?? null,
+              hasTrack: Boolean(res.trackTitle),
+            });
+            this.friends = this.friends.map((f) =>
+              f.pubKeyB64 === friend.pubKeyB64
+                ? {
+                    ...f,
+                    status: res.online ? "online" : "offline",
+                    roomName: res.online ? (res.roomName ?? null) : null,
+                    memberCount: res.online ? res.memberCount : undefined,
+                    trackTitle: res.online ? (res.trackTitle ?? null) : null,
+                    positionSec: res.online ? res.positionSec : undefined,
+                    durationSec: res.online ? res.durationSec : undefined,
+                  }
+                : f,
+            );
+            this.emitStateChanged();
+          }),
+        );
+      }
+      await minWait;
+      this.friends = this.friends.map((f) =>
+        f.status === "checking" ? { ...f, status: "offline" } : f,
       );
+      this.emitStateChanged();
     } finally {
       this.friendProbeInFlight = false;
     }
+  }
+
+  private async startGuestReferralListener(inviteUrl: string): Promise<void> {
+    this.guestRoomInviteUrl = inviteUrl;
+    if (this.guestReferralHost) {
+      this.guestReferralHost.setStatusMeta({
+        roomName: this.guestSettings?.roomName ?? "",
+        memberCount: this.guestMembers.length,
+      });
+      return;
+    }
+    if (
+      this.friends.length === 0 ||
+      (!this.injectedDeps.createTailcatHost && !this.isTailcatAvailable())
+    ) {
+      return;
+    }
+    const referralHost = new DirectWsHost({
+      logger: this.logger,
+      ...this.injectedDeps.directHostOptions,
+    });
+    referralHost.setStatusMeta({
+      roomName: this.guestSettings?.roomName ?? "",
+      memberCount: this.guestMembers.length,
+    });
+    referralHost.onConnection((conn) => {
+      this.handleGuestReferralConnection(conn);
+    });
+    let directPort = 0;
+    try {
+      const started = await referralHost.start({
+        lookupId: `ref-${crypto.randomUUID().slice(0, 8)}`,
+        label: this.displayName || "Listener",
+        host: "127.0.0.1",
+        announceMdns: false,
+      });
+      directPort = started.port;
+    } catch {
+      await referralHost.stop().catch(() => {});
+      return;
+    }
+    if (this.sessionMode !== "guest") {
+      await referralHost.stop().catch(() => {});
+      return;
+    }
+    this.guestReferralHost = referralHost;
+    try {
+      const sidecarOpts: TailcatHostSidecarOptions = { logger: this.logger };
+      const sidecar = this.injectedDeps.createTailcatHost
+        ? this.injectedDeps.createTailcatHost(sidecarOpts)
+        : new TailcatHostSidecar(sidecarOpts);
+      const startedTc = await sidecar.start({
+        localPort: directPort,
+        derpMapUrl: this.tailcatDerpMapUrl,
+        stateDir: this.getPersistentTailcatStateDir(),
+        timeoutMs: 8_000,
+      });
+      if (this.sessionMode !== "guest") {
+        await sidecar.stop().catch(() => {});
+        return;
+      }
+      this.guestReferralSidecar = sidecar;
+      this.guestReferralTcAddress = startedTc.tcAddress;
+      this.guestReferralTcPort = startedTc.remotePort;
+    } catch {
+      await this.stopGuestReferralListener();
+    }
+  }
+
+  private async stopGuestReferralListener(): Promise<void> {
+    this.guestReferralTcAddress = null;
+    this.guestReferralTcPort = null;
+    if (this.guestReferralSidecar) {
+      const sidecar = this.guestReferralSidecar;
+      this.guestReferralSidecar = null;
+      await sidecar.stop().catch(() => {});
+    }
+    if (this.guestReferralHost) {
+      const host = this.guestReferralHost;
+      this.guestReferralHost = null;
+      await host.stop().catch(() => {});
+    }
+  }
+
+  private handleGuestReferralConnection(conn: TransportConnection): void {
+    if (this.sessionMode !== "guest" || !this.guestRoomInviteUrl) {
+      conn.close(1008, "Unavailable");
+      return;
+    }
+    const { hostKeypair } = this.resolveRoomIdentity();
+    const handshake = createHostHandshake({
+      roomId: this.guestRoomId ?? "referral",
+      lookupId: "referral",
+      epoch: 0,
+      roomSalt: crypto.randomBytes(16),
+      hostKeypair,
+      isTrustedFriend: (pubKey) =>
+        this.friends.some((f) => f.pubKeyB64 === pubKey),
+      logger: this.logger,
+    });
+    let stage: "await_hello" | "await_auth" | "done" = "await_hello";
+    const timer = setTimeout(() => {
+      if (stage !== "done") conn.close(1008, "Timeout");
+    }, HANDSHAKE_TIMEOUT_MS);
+    const unsub = conn.onMessage((buf) => {
+      if (buf.byteLength > MAX_HANDSHAKE_JSON_BYTES) {
+        conn.close(1009, "Frame too large");
+        return;
+      }
+      try {
+        const msg = JSON.parse(buf.toString("utf8")) as ClientHello | ClientAuth;
+        if (stage === "await_hello") {
+          const hello = handshake.receiveClientHello(msg as ClientHello);
+          stage = "await_auth";
+          conn.send(Buffer.from(JSON.stringify(hello), "utf8"));
+          return;
+        }
+        if (stage === "await_auth") {
+          const authRes = handshake.verifyClientAuth(msg as ClientAuth);
+          stage = "done";
+          clearTimeout(timer);
+          unsub();
+          conn.send(Buffer.from(JSON.stringify(authRes.serverAuth), "utf8"));
+          if (this.guestRoomInviteUrl) {
+            const payload = Buffer.from(
+              JSON.stringify({
+                type: "FRIEND_REFERRAL",
+                inviteUrl: this.guestRoomInviteUrl,
+              }),
+              "utf8",
+            );
+            conn.send(encryptFrame(authRes.session, payload, this.logger));
+          }
+          setTimeout(() => conn.close(1000, "Referred"), 50);
+        }
+      } catch {
+        clearTimeout(timer);
+        unsub();
+        conn.close(1008, "Auth failed");
+      }
+    });
   }
 
   private extractShortCodeFromInput(raw: string): string | null {
@@ -2529,11 +2707,19 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
 
   private emitStateChanged(): void {
     const snapshot = this.getUIState();
-    if (this.sessionMode === "host" && this.directWsHost && snapshot.room) {
-      this.directWsHost.setStatusMeta({
+    if (snapshot.room) {
+      const statusMeta = {
         roomName: snapshot.room.roomName,
         memberCount: snapshot.room.members.length,
-      });
+        trackTitle: snapshot.room.currentTrack?.title ?? "",
+        positionSec: snapshot.room.remotePositionSec,
+        durationSec: snapshot.room.currentTrack?.durationSec ?? 0,
+      };
+      if (this.sessionMode === "host" && this.directWsHost) {
+        this.directWsHost.setStatusMeta(statusMeta);
+      } else if (this.sessionMode === "guest" && this.guestReferralHost) {
+        this.guestReferralHost.setStatusMeta(statusMeta);
+      }
     }
     this.emit("state-changed", snapshot);
 
@@ -3174,7 +3360,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           this.pendingMigrationResolve = null;
           resolve(null);
         }
-      }, 6_000);
+      }, 15_000);
       this.pendingMigrationResolve = (url) => {
         clearTimeout(timer);
         this.pendingMigrationResolve = null;
@@ -3187,10 +3373,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       this.sendEncryptedToPeer(targetPeerId, {
         type: "HOST_MIGRATION_PREPARE",
         targetPeerId,
-        ownerPubKey:
-          reason === "promoted"
-            ? targetPeerId
-            : (this.roomOwnerPubKey ?? this.roomState!.hostPeerId),
+        ownerPubKey: targetPeerId,
         reason,
         settings: { ...this.roomState!.settings },
         queueSnapshot,
@@ -3831,6 +4014,7 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
             autoplayNext: effect.autoplayNext,
             history: effect.history,
             skipVotes: effect.skipVotes,
+            inviteUrl: this.roomInviteUrl ?? undefined,
           });
           break;
         }
@@ -4523,29 +4707,6 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       displayName: params.displayName,
       transport: params.conn.mode,
     });
-
-    if (
-      this.roomOwnerPubKey &&
-      this.hostKeypair &&
-      this.hostKeypair.publicKeyB64 !== this.roomOwnerPubKey &&
-      params.peerId === this.roomOwnerPubKey
-    ) {
-      this.logger.info?.("Original room owner rejoined; reclaiming host", {
-        ownerPubKey: this.roomOwnerPubKey,
-      });
-      setTimeout(() => {
-        if (
-          this.sessionMode === "host" &&
-          this.hostPeers.has(params.peerId)
-        ) {
-          void this.initiateHostMigration(
-            params.peerId,
-            "host-reclaimed",
-            true,
-          );
-        }
-      }, 200);
-    }
   }
 
   private handleHostEncryptedPeerFrame(peerId: string, frame: Buffer): void {
@@ -5339,6 +5500,9 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
         this.handleEpochChange("ROOM_SNAPSHOT", msg.epoch);
         void this.applyAnchorToLocalView(msg.anchor);
         this.recordRecentRoom();
+        if (msg.inviteUrl) {
+          void this.startGuestReferralListener(msg.inviteUrl);
+        }
         this.emitStateChanged();
         return;
       }
@@ -5475,7 +5639,31 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
           newHostPeerId: msg.newHostPeerId,
           reason: msg.reason,
         });
+        const parsedInvite = parseInviteUrl(msg.newInviteUrl, this.logger);
+        if (
+          parsedInvite?.tc &&
+          parsedInvite.tcp &&
+          this.friends.some((f) => f.pubKeyB64 === msg.newHostPeerId)
+        ) {
+          this.upsertFriend({
+            pubKeyB64: msg.newHostPeerId,
+            displayName:
+              this.friends.find((f) => f.pubKeyB64 === msg.newHostPeerId)
+                ?.displayName ?? "Friend",
+            tcAddress: parsedInvite.tc,
+            tcPort: parsedInvite.tcp,
+          });
+        }
         void this.joinByUrl(msg.newInviteUrl, {
+          displayName: this.displayName,
+          trustRelayHost: true,
+        });
+        return;
+      }
+
+      case "FRIEND_REFERRAL": {
+        this.logger.info?.("Following FRIEND_REFERRAL to host room");
+        void this.joinByUrl(msg.inviteUrl, {
           displayName: this.displayName,
           trustRelayHost: true,
         });
@@ -6096,6 +6284,8 @@ export default class ListenTogetherService extends EventEmitterService<ListenTog
       });
       this.clearGuestGraceTimers();
       this.cleanupGuestTransportOnly();
+      await this.stopGuestReferralListener();
+      this.guestRoomInviteUrl = null;
       this.guestClockSync = null;
       this.guestDriftController = null;
       this.guestEpoch = null;

@@ -26,6 +26,7 @@ import {
 const TAILCAT_ADDR_RE = /\btc[A-Za-z0-9_-]{16,}\b/;
 const TAILCAT_ADDR_STRICT_RE = /^tc[A-Za-z0-9_-]{14,510}$/;
 const DEFAULT_SIDECAR_START_TIMEOUT_MS = 15_000;
+const DEFAULT_TAILCAT_REMOTE_PORT = 47_820;
 const DEFAULT_FORWARD_TIMEOUT_MS = 10_000;
 const DEFAULT_STOP_KILL_GRACE_MS = 2_000;
 const FORWARD_CONNECT_RETRY_MS = 25;
@@ -220,6 +221,7 @@ export type TailcatHostSidecarOptions = {
 
 export type TailcatHostSidecarStartOptions = {
   localPort: number;
+  remotePort?: number;
   derpMapUrl?: string | null;
   stateDir?: string | null;
   timeoutMs?: number;
@@ -289,9 +291,15 @@ export class TailcatHostSidecar {
         );
       }
     }
-    const args = ["serve", keyArg, "--log", String(options.localPort)];
+    const remotePort = options.remotePort ?? DEFAULT_TAILCAT_REMOTE_PORT;
+    const portArg =
+      remotePort === options.localPort
+        ? String(options.localPort)
+        : `${remotePort}:${options.localPort}`;
+    const args = ["serve", keyArg, "--log", portArg];
     this.logger.debug?.("Starting TailcatHostSidecar", {
       localPort: options.localPort,
+      remotePort,
       hasDerpMapUrl: Boolean(options.derpMapUrl),
       timeoutMs,
     });
@@ -365,9 +373,9 @@ export class TailcatHostSidecar {
           });
 
           this.logger.info?.("TailcatHostSidecar ready", {
-            remotePort: options.localPort,
+            remotePort,
           });
-          resolve({ tcAddress, remotePort: options.localPort });
+          resolve({ tcAddress, remotePort });
         };
 
         const fail = (err: Error, killProcess: boolean) => {
@@ -838,6 +846,9 @@ export type ProbeTailcatRoomStatusResult = {
   online: boolean;
   roomName?: string | null;
   memberCount?: number;
+  trackTitle?: string | null;
+  positionSec?: number;
+  durationSec?: number;
 };
 
 /**
@@ -850,12 +861,18 @@ export async function probeTailcatRoomStatus(options: {
   timeoutMs?: number;
   binaryPath?: string;
   spawnFn?: TailcatSpawnFn;
+  logger?: ListenTogetherLogger;
 }): Promise<ProbeTailcatRoomStatusResult> {
   if (!TAILCAT_ADDR_STRICT_RE.test(options.tcAddress) || !isValidPort(options.remotePort)) {
+    options.logger?.debug?.("probeTailcatRoomStatus skipped: invalid address or port", {
+      hasTcAddress: Boolean(options.tcAddress),
+      remotePort: options.remotePort,
+    });
     return { online: false };
   }
   const bin = options.binaryPath ?? resolveTailcatBinary();
   if (!bin) {
+    options.logger?.warn?.("probeTailcatRoomStatus failed: tailcat binary not found");
     return { online: false };
   }
 
@@ -907,11 +924,28 @@ export async function probeTailcatRoomStatus(options: {
       resolve(result);
     };
 
-    const onChildExit = () => finish({ online: false });
-    child.once("error", onChildExit);
+    const onChildExit = (code?: number | null) => {
+      options.logger?.debug?.("probeTailcatRoomStatus child exited", {
+        remotePort: options.remotePort,
+        code: code ?? null,
+      });
+      finish({ online: false });
+    };
+    child.once("error", (err) => {
+      options.logger?.warn?.("probeTailcatRoomStatus spawn error", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+      finish({ online: false });
+    });
     child.once("exit", onChildExit);
 
-    timeoutTimer = setTimeout(() => finish({ online: false }), timeoutMs);
+    timeoutTimer = setTimeout(() => {
+      options.logger?.debug?.("probeTailcatRoomStatus timed out", {
+        remotePort: options.remotePort,
+        timeoutMs,
+      });
+      finish({ online: false });
+    }, timeoutMs);
     timeoutTimer.unref?.();
 
     const attempt = () => {
@@ -939,6 +973,9 @@ export async function probeTailcatRoomStatus(options: {
                 ok?: boolean;
                 roomName?: unknown;
                 memberCount?: unknown;
+                trackTitle?: unknown;
+                positionSec?: unknown;
+                durationSec?: unknown;
               };
               finish({
                 online: Boolean(parsed?.ok),
@@ -949,6 +986,19 @@ export async function probeTailcatRoomStatus(options: {
                 memberCount:
                   typeof parsed?.memberCount === "number"
                     ? parsed.memberCount
+                    : undefined,
+                trackTitle:
+                  typeof parsed?.trackTitle === "string" &&
+                  parsed.trackTitle.trim()
+                    ? parsed.trackTitle.trim()
+                    : null,
+                positionSec:
+                  typeof parsed?.positionSec === "number"
+                    ? parsed.positionSec
+                    : undefined,
+                durationSec:
+                  typeof parsed?.durationSec === "number"
+                    ? parsed.durationSec
                     : undefined,
               });
             } catch {

@@ -349,9 +349,18 @@ export class DirectWsHost {
   private boundPort = 0;
   private currentLookupId = "";
   private currentLabel = "";
-  private statusMeta: { roomName: string; memberCount: number } = {
+  private statusMeta: {
+    roomName: string;
+    memberCount: number;
+    trackTitle: string;
+    positionSec: number;
+    durationSec: number;
+  } = {
     roomName: "",
     memberCount: 0,
+    trackTitle: "",
+    positionSec: 0,
+    durationSec: 0,
   };
   private mdnsMetadataCache: {
     meta: {
@@ -372,12 +381,27 @@ export class DirectWsHost {
     this.maxPayloadBytes = options.maxPayloadBytes ?? DEFAULT_MAX_PAYLOAD_BYTES;
   }
 
-  public setStatusMeta(meta: { roomName?: string; memberCount?: number }): void {
+  public setStatusMeta(meta: {
+    roomName?: string;
+    memberCount?: number;
+    trackTitle?: string;
+    positionSec?: number;
+    durationSec?: number;
+  }): void {
     if (typeof meta.roomName === "string") {
       this.statusMeta.roomName = meta.roomName.slice(0, 64);
     }
     if (typeof meta.memberCount === "number" && Number.isFinite(meta.memberCount)) {
       this.statusMeta.memberCount = Math.max(0, Math.floor(meta.memberCount));
+    }
+    if (typeof meta.trackTitle === "string") {
+      this.statusMeta.trackTitle = meta.trackTitle.slice(0, 120);
+    }
+    if (typeof meta.positionSec === "number" && Number.isFinite(meta.positionSec)) {
+      this.statusMeta.positionSec = Math.max(0, Math.floor(meta.positionSec));
+    }
+    if (typeof meta.durationSec === "number" && Number.isFinite(meta.durationSec)) {
+      this.statusMeta.durationSec = Math.max(0, Math.floor(meta.durationSec));
     }
   }
 
@@ -404,6 +428,9 @@ export class DirectWsHost {
           ok: true,
           roomName: this.statusMeta.roomName,
           memberCount: this.statusMeta.memberCount,
+          trackTitle: this.statusMeta.trackTitle,
+          positionSec: this.statusMeta.positionSec,
+          durationSec: this.statusMeta.durationSec,
         });
         res.writeHead(200, {
           "Content-Type": "application/json",

@@ -55,6 +55,10 @@ export type FriendEntry = {
   addedAtMs: number;
   status?: FriendStatus;
   roomName?: string | null;
+  memberCount?: number;
+  trackTitle?: string | null;
+  positionSec?: number;
+  durationSec?: number;
 };
 
 export type FriendRequestUI = {

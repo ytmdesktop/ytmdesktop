@@ -216,6 +216,7 @@ export const AppMessageSchema = Type.Union([
         maxItems: 16,
       }),
     ),
+    inviteUrl: Type.Optional(Type.String({ minLength: 1, maxLength: 4096 })),
   }),
   Type.Object({
     type: Type.Literal("SYNC_ANCHOR"),
@@ -234,6 +235,7 @@ export const AppMessageSchema = Type.Union([
         maxItems: 16,
       }),
     ),
+    inviteUrl: Type.Optional(Type.String({ minLength: 1, maxLength: 4096 })),
   }),
   Type.Object({
     type: Type.Literal("MEMBERS_UPDATED"),
@@ -403,6 +405,10 @@ export const AppMessageSchema = Type.Union([
     type: Type.Literal("FRIEND_REMOVE"),
     targetPeerId: Type.String({ minLength: 1, maxLength: 128 }),
     fromPeerId: Type.String({ minLength: 1, maxLength: 128 }),
+  }),
+  Type.Object({
+    type: Type.Literal("FRIEND_REFERRAL"),
+    inviteUrl: Type.String({ minLength: 1, maxLength: 4096 }),
   }),
 ]);
 export type AppMessage = Static<typeof AppMessageSchema>;
