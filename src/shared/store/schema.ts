@@ -1,7 +1,10 @@
+import type { FavoriteRoomEntry } from "../listentogether/ipc";
+import type { QueueTrack } from "../listentogether/protocol";
+
 export enum TrayIconStyle {
   Auto = 0,
   White = 1,
-  Black = 2
+  Black = 2,
 }
 
 export type StoreSchema = {
@@ -65,6 +68,24 @@ export type StoreSchema = {
   developer: {
     enableDevTools: boolean;
   };
+  listenTogether: {
+    clientSlug: string;
+    displayName: string;
+    signalingUrl: string | null;
+    trustedSignalingHosts: string[];
+    tailcatDerpMapUrl: string | null;
+    lanDiscoveryEnabled: boolean;
+    persistentRoomEnabled: boolean;
+    persistentRoomName: string;
+    persistentHostKeypair: {
+      publicKeyB64: string;
+      privateKeyPem: string;
+    } | null;
+    persistentRoomId: string | null;
+    persistentQueue: QueueTrack[];
+    favoriteRooms: FavoriteRoomEntry[];
+    recentRooms: FavoriteRoomEntry[];
+  };
 };
 
 export type MemoryStoreSchema = {
@@ -102,4 +123,6 @@ export type MemoryStoreSchema = {
 
   lastFMAuthenticationStep: number;
   lastFMToken: string;
+
+  listenTogetherPendingColdStart: boolean;
 };

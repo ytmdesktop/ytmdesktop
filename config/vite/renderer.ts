@@ -46,6 +46,10 @@ export default defineConfig({
           root,
           "src/renderer/windows/changelog/index.html",
         ),
+        listen_together_window: path.resolve(
+          root,
+          "src/renderer/windows/listen-together/index.html",
+        ),
       },
       output: {
         codeSplitting: {
@@ -77,7 +81,9 @@ export default defineConfig({
     },
   },
   define: {
-    YTMD_GIT_COMMIT_HASH: gitCommitHash ? JSON.stringify(gitCommitHash) : undefined,
+    YTMD_GIT_COMMIT_HASH: gitCommitHash
+      ? JSON.stringify(gitCommitHash)
+      : undefined,
     YTMD_GIT_BRANCH: gitBranch ? JSON.stringify(gitBranch) : undefined,
   },
 });

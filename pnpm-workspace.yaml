@@ -1,6 +1,7 @@
 allowBuilds:
   electron: true
   electron-winstaller: true
+  esbuild: true
   fastify-socket.io: false
 
 minimumReleaseAgeStrict: true

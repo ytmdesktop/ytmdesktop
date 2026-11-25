@@ -2,21 +2,21 @@ export enum VideoState {
   Unknown = -1,
   Paused = 0,
   Playing = 1,
-  Buffering = 2
+  Buffering = 2,
 }
 
 export enum RepeatMode {
   Unknown = -1,
   None = 0,
   All = 1,
-  One = 2
+  One = 2,
 }
 
 export enum LikeStatus {
   Unknown = -1,
   Dislike = 0,
   Indifferent = 1,
-  Like = 2
+  Like = 2,
 }
 
 export enum VideoType {
@@ -24,7 +24,7 @@ export enum VideoType {
   MusicAudio = 0,
   MusicVideo = 1,
   MusicUploaded = 2,
-  PodcastEpisode = 3
+  PodcastEpisode = 3,
 }
 
 export type Thumbnail = {
@@ -74,6 +74,7 @@ export type PlayerState = {
   trackState: VideoState;
   queue: PlayerQueue | null;
   videoProgress: number;
+  progressCapturedAtMs: number;
   volume: number;
   muted: boolean;
   adPlaying: boolean;
@@ -81,5 +82,6 @@ export type PlayerState = {
 };
 
 export enum PlayerSignal {
-  NewPlayback = 0
+  NewPlayback = 0,
+  TrackEnded = 1,
 }

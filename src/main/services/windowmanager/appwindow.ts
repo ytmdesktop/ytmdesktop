@@ -167,8 +167,11 @@ export class AppWindow<
   public destroyWindow() {
     this.requestedClosure = true;
 
-    if (!this.electronWindow?.isDestroyed()) this.electronWindow?.destroy();
+    if (this.electronWindow && !this.electronWindow.isDestroyed()) {
+      this.electronWindow.destroy();
+    }
 
+    this.electronWindow = undefined;
     this.destroyed = true;
   }
 
@@ -313,21 +316,25 @@ export class AppWindow<
   }
 
   public showAndFocus() {
-    if (this.electronWindow?.isMinimized()) this.electronWindow.restore();
-    this.electronWindow?.show();
-    this.electronWindow?.focus();
+    if (!this.electronWindow || this.electronWindow.isDestroyed()) return;
+    if (this.electronWindow.isMinimized()) this.electronWindow.restore();
+    this.electronWindow.show();
+    this.electronWindow.focus();
   }
 
   public hide() {
-    this.electronWindow?.hide();
+    if (!this.electronWindow || this.electronWindow.isDestroyed()) return;
+    this.electronWindow.hide();
   }
 
   public show() {
-    this.electronWindow?.show();
+    if (!this.electronWindow || this.electronWindow.isDestroyed()) return;
+    this.electronWindow.show();
   }
 
   public isVisible() {
-    return this.electronWindow?.isVisible();
+    if (!this.electronWindow || this.electronWindow.isDestroyed()) return false;
+    return this.electronWindow.isVisible();
   }
 
   public forceWindowClosure() {
@@ -424,6 +431,7 @@ export class AppWindow<
             if (this.initialViewsReady >= views.length) {
               if (
                 this.electronWindow instanceof BrowserWindow &&
+                !this.electronWindow.isDestroyed() &&
                 this.localViewReady
               ) {
                 this.electronWindow.show();
@@ -438,8 +446,12 @@ export class AppWindow<
         if (this.electronWindow instanceof BrowserWindow) {
           this.electronWindow.on("ready-to-show", () => {
             this.localViewReady = true;
-            if (this.initialViewsReady >= (this.options.views?.length ?? 0)) {
-              this.electronWindow?.show();
+            if (
+              this.initialViewsReady >= (this.options.views?.length ?? 0) &&
+              this.electronWindow &&
+              !this.electronWindow.isDestroyed()
+            ) {
+              this.electronWindow.show();
               this.windowReady = true;
             }
           });
@@ -460,7 +472,7 @@ export class AppWindow<
       );
 
     if (this.windowType === "Browser") {
-      if (!app.isPackaged)
+      if (!app.isPackaged && process.env.YTMD_E2E_MODE !== "1")
         (this.electronWindow as BrowserWindow).webContents.openDevTools();
 
       const browserWindow = this.electronWindow as BrowserWindow;

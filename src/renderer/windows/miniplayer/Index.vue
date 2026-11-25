@@ -79,6 +79,11 @@ function pinUnpinMiniplayer() {
   -webkit-app-region: no-drag;
 }
 
+.topbar button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .topbar .icon {
   font-size: 20px;
 }

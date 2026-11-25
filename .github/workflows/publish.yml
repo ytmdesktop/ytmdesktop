@@ -5,6 +5,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (defaults to ref name)"
+        required: false
+        type: string
 
 permissions:
   id-token: write
@@ -26,7 +32,7 @@ jobs:
             { name: "macos", image: "macos-26", arch: "arm64" },
           ]
 
-      fail-fast: true # Explicitly failing fast because this is a publish. We want to bail the entire release if something went wrong with another build
+      fail-fast: true
 
     runs-on: ${{ matrix.os.image }}
 
@@ -40,10 +46,14 @@ jobs:
           runtime: node@lts
           cache: true
 
+      - name: Install libdbus
+        if: matrix.os.name == 'linux'
+        run: sudo apt-get install libdbus-1-dev pkg-config -y
+
       - name: Make (${{ matrix.os.arch }})
         env:
-          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
-          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
+          YTMD_UPDATE_FEED_OWNER: ${{ github.repository_owner }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ github.event.repository.name }}
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_API_SECRET: ${{ secrets.LASTFM_API_SECRET }}
           NODE_ENV: production
@@ -54,10 +64,35 @@ jobs:
         with:
           subject-path: out/make/**/*
 
-      - name: Release From Make (${{ matrix.os.arch }})
-        run: pnpm release:frommake
+      - name: Upload artifacts (${{ matrix.os.arch }})
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.os.name }}-${{ matrix.os.arch }}
+          path: |
+            out/make/squirrel.windows/${{ matrix.os.arch }}/*.exe
+            out/make/deb/${{ matrix.os.arch }}/*.deb
+            out/make/rpm/${{ matrix.os.arch }}/*.rpm
+            out/make/zip/darwin/${{ matrix.os.arch }}/*.zip
+
+      - name: Publish to fork GitHub Release
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
-          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
-          NODE_ENV: production
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          TARGET_ARCH: ${{ matrix.os.arch }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --generate-notes || true
+          fi
+          shopt -s nullglob
+          files=(
+            out/make/squirrel.windows/${TARGET_ARCH}/*.exe
+            out/make/squirrel.windows/${TARGET_ARCH}/*.nupkg
+            out/make/squirrel.windows/${TARGET_ARCH}/RELEASES
+            out/make/deb/${TARGET_ARCH}/*.deb
+            out/make/rpm/${TARGET_ARCH}/*.rpm
+            out/make/zip/darwin/${TARGET_ARCH}/*.zip
+          )
+          if [ ${#files[@]} -gt 0 ]; then
+            gh release upload "$RELEASE_TAG" "${files[@]}" --clobber
+          fi

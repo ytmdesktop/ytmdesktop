@@ -1,6 +1,35 @@
 import { app, clipboard, crashReporter, dialog } from "electron";
 import log, { LogMessage } from "electron-log";
+import { redactInviteUrl, redactLogUrl } from "~shared/listentogether/logger";
 import Service from "../service";
+
+const SENSITIVE_KEY_RE =
+  /passcode|roomcode|token|secret|password|privatekey|secretkey|keypair|authkey|lookupid|clientslug|authorization|cookie|sigurl|signalingurl|derpmapurl|inviteurl/i;
+
+function sanitizeValue(val: unknown, depth = 0): unknown {
+  if (depth > 4) return "[REDACTED]";
+  if (typeof val === "string" || val instanceof String) {
+    const str = val.toString();
+    const redacted = redactInviteUrl(redactLogUrl(str)).replaceAll(
+      /(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm,
+      "[REDACTED]",
+    );
+    return val instanceof String ? new String(redacted) : redacted;
+  }
+  if (Array.isArray(val)) {
+    return val.map((item) => sanitizeValue(item, depth + 1));
+  }
+  if (val && typeof val === "object" && !(val instanceof Error)) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
+      out[k] = SENSITIVE_KEY_RE.test(k)
+        ? "[REDACTED]"
+        : sanitizeValue(v, depth + 1);
+    }
+    return out;
+  }
+  return val;
+}
 
 export type WatchDogEvent = "crash";
 export type WatchDogEventCallback = () => void;
@@ -28,11 +57,10 @@ export default class WatchDog extends Service {
     for (let i = 0; i < message.data.length; i++) {
       const data = message.data[i];
 
-      if (data instanceof String) {
+      if (typeof data === "string" || data instanceof String) {
         if (data.includes("Third-party cookie will be blocked.")) return false;
-
-        message.data[i] = data.replaceAll(/(?<=((https|http):\/\/)?.{1,64}(\..{1,64})?\..{1,64}\/)([\S]+)/gm, "[REDACTED]");
       }
+      message.data[i] = sanitizeValue(data);
     }
 
     return message;
@@ -51,7 +79,12 @@ export default class WatchDog extends Service {
     log.eventLogger.format = "Electron event {eventSource}#{eventName} observed";
 
     log.hooks.push((message, transport) => {
-      if (transport !== log.transports.file) return message;
+      if (
+        transport !== log.transports.file &&
+        transport !== log.transports.console
+      ) {
+        return message;
+      }
 
       return this.sanitizeMessage(message);
     });
@@ -123,6 +156,6 @@ export default class WatchDog extends Service {
 
   public off(event: WatchDogEvent, callback: () => void) {
     const index = this.eventCallbacks[event].indexOf(callback, 0);
-    if (index > -1) this.eventCallbacks[event] = this.eventCallbacks[event].splice(index, 1);
+    if (index > -1) this.eventCallbacks[event].splice(index, 1);
   }
 }

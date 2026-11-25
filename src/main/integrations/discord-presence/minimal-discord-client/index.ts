@@ -25,11 +25,18 @@ function getIPCPath(id: number): string {
 
   if (directoryExists(`${prefix}/${discordSnapDir}`)) {
     return `${prefix}/${discordSnapDir}/discord-ipc-${id}`;
-  } else if (directoryExists(`${prefix}/${discordFlatpakDir}`)) {
-    return `${prefix}/app/${discordFlatpakDir}/discord-ipc-${id}`;
-  } else {
-    return `${prefix}/discord-ipc-${id}`;
   }
+  const flatpakDirs = [
+    `${prefix}/app/${discordFlatpakDir}`,
+    `${prefix}/app/com.discordapp.DiscordCanary`,
+    `${prefix}/app/dev.vencord.Vesktop`,
+  ];
+  for (const dir of flatpakDirs) {
+    if (existsSync(`${dir}/discord-ipc-${id}`) || directoryExists(dir)) {
+      return `${dir}/discord-ipc-${id}`;
+    }
+  }
+  return `${prefix}/discord-ipc-${id}`;
 }
 
 export default class DiscordClient extends EventEmitter {

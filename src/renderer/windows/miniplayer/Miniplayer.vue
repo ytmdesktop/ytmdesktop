@@ -1,10 +1,41 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, useTemplateRef } from "vue";
-import { PlayerState, RepeatMode, Thumbnail, VideoState } from "~shared/playerstatestore/types";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from "vue";
+import {
+  PlayerState,
+  RepeatMode,
+  Thumbnail,
+  VideoState,
+} from "~shared/playerstatestore/types";
+import type { ListenTogetherUIState } from "~shared/listentogether/ipc";
 import RangeInput from "../../components/RangeInput.vue";
 
 const state = ref<PlayerState | null>(null);
 state.value = await window.ytmd.playerStore.getState();
+
+const listenTogetherState = ref<ListenTogetherUIState | null>(null);
+try {
+  listenTogetherState.value = await window.ytmd.listenTogether.getState();
+} catch {
+  listenTogetherState.value = null;
+}
+
+const inRoom = computed(() => listenTogetherState.value?.room != null);
+const isRoomSynced = computed(
+  () =>
+    inRoom.value &&
+    listenTogetherState.value?.room?.listeningMode === "room",
+);
+const isHost = computed(() => listenTogetherState.value?.room?.isHost ?? false);
+const isGuestRestricted = computed(() => inRoom.value && !isHost.value);
+let unsubListenTogether: (() => void) | null = null;
 
 const volume = ref(state.value?.volume ?? 0);
 
@@ -18,8 +49,11 @@ const infoTitle = useTemplateRef("infoTitle");
 
 function getHighestResThumbnail(thumbnails: Thumbnail[]): string {
   return thumbnails.reduce(
-    (accumulator, current) => (current.height * current.width <= accumulator.height * accumulator.width ? accumulator : current),
-    thumbnails[0]
+    (accumulator, current) =>
+      current.height * current.width <= accumulator.height * accumulator.width
+        ? accumulator
+        : current,
+    thumbnails[0],
   ).url;
 }
 
@@ -29,7 +63,9 @@ async function stateChanged(newState) {
   state.value = newState;
 
   if (newState.videoDetails && newState.videoDetails.id != videoId.value) {
-    const thumbnailUrl = getHighestResThumbnail(newState.videoDetails?.thumbnails);
+    const thumbnailUrl = getHighestResThumbnail(
+      newState.videoDetails?.thumbnails,
+    );
     if (thumbnailUrl) {
       document.body.style.backgroundImage = `url("${thumbnailUrl}")`;
     } else {
@@ -62,17 +98,36 @@ function reconcileMarquee() {
 }
 
 onMounted(() => {
-  window.ytmd.playerStore.handleStateChanged(newState => {
+  window.ytmd.playerStore.handleStateChanged((newState) => {
     stateChanged(newState);
   });
+
+  unsubListenTogether = window.ytmd.listenTogether.onStateChanged(
+    (nextState) => {
+      listenTogetherState.value = nextState;
+    },
+  );
 
   window.ytmd.requestWindowState();
   stateChanged(state.value);
 });
 
+onUnmounted(() => {
+  unsubListenTogether?.();
+});
+
 const seekHandleVisible = ref(false);
 
+watch(isGuestRestricted, (restricted) => {
+  if (restricted) {
+    seekbarDragging = false;
+    seekHandleVisible.value = false;
+    document.body.style.userSelect = "";
+  }
+});
+
 function showSeekHandle() {
+  if (isGuestRestricted.value) return;
   seekHandleVisible.value = true;
 }
 
@@ -81,6 +136,7 @@ function hideSeekHandle() {
 }
 
 function startDrag(event) {
+  if (isGuestRestricted.value) return;
   seekbarDragging = true;
   seek(event);
 
@@ -94,6 +150,7 @@ function getOffsetX(event, rect) {
 }
 
 function seek(event) {
+  if (isGuestRestricted.value) return;
   const seekbarRect = seekbarContainer.value.getBoundingClientRect();
   const offsetX = getOffsetX(event, seekbarRect);
   const seekToValue = (offsetX * videoLength.value) / seekbarRect.width;
@@ -101,7 +158,7 @@ function seek(event) {
   window.ytmd.executeCommandInYTMView("seekTo", seekToValue);
 }
 
-document.addEventListener("mousemove", event => {
+document.addEventListener("mousemove", (event) => {
   if (!seekbarDragging) return;
   if (event.clientX > -1) {
     seek(event);
@@ -117,15 +174,18 @@ document.addEventListener("mouseup", () => {
 });
 
 function previousVideo() {
+  if (isGuestRestricted.value) return;
   window.ytmd.executeCommandInYTMView("previous");
 }
 function playPauseVideo() {
   window.ytmd.executeCommandInYTMView("playPause");
 }
 function nextVideo() {
+  if (isGuestRestricted.value) return;
   window.ytmd.executeCommandInYTMView("next");
 }
 function cycleRepeat() {
+  if (isGuestRestricted.value) return;
   window.ytmd.executeCommandInYTMView("cycleRepeatMode");
 }
 function volumeChanged() {
@@ -146,22 +206,21 @@ window.addEventListener("resize", reconcileMarquee);
   <div
     v-if="state?.videoDetails != null"
     class="container"
+    :class="{ 'is-room-synced': isRoomSynced }"
   >
     <div class="pusher"></div>
     <div class="video-data">
       <div class="backdrop" />
-      <div
-        ref="infoContainer"
-        class="video-info"
-      >
-        <span
-          ref="infoTitle"
-          class="title"
-        >{{ state?.videoDetails?.title }} • {{ state?.videoDetails?.author }}</span>
+      <div ref="infoContainer" class="video-info">
+        <span ref="infoTitle" class="title"
+          >{{ state?.videoDetails?.title }} •
+          {{ state?.videoDetails?.author }}</span
+        >
       </div>
       <div
         ref="seekbarContainer"
         class="seekbar-container"
+        :class="{ 'guest-disabled': isGuestRestricted }"
         @mouseenter="showSeekHandle"
         @mouseleave="hideSeekHandle"
         @mousedown="startDrag"
@@ -184,33 +243,38 @@ window.addEventListener("resize", reconcileMarquee);
         <div class="controls">
           <button
             class="previous"
+            :class="{ 'guest-disabled': isGuestRestricted }"
+            :disabled="isGuestRestricted"
             @click="previousVideo"
           >
             <span class="icon material-symbols-outlined">skip_previous</span>
           </button>
-          <button
-            class="play-pause"
-            @click="playPauseVideo"
-          >
+          <button class="play-pause" @click="playPauseVideo">
             <span
               v-if="state?.trackState == VideoState.Paused"
               class="icon material-symbols-outlined"
-            >play_arrow</span>
+              >play_arrow</span
+            >
             <span
               v-if="state?.trackState == VideoState.Playing"
               class="icon material-symbols-outlined"
-            >pause</span>
+              >pause</span
+            >
             <span
               v-if="state?.trackState == VideoState.Buffering"
               class="icon material-symbols-outlined"
-            >data_saver_off</span>
+              >data_saver_off</span
+            >
             <span
               v-if="state?.trackState == VideoState.Unknown"
               class="icon material-symbols-outlined"
-            >play_arrow</span>
+              >play_arrow</span
+            >
           </button>
           <button
             class="next"
+            :class="{ 'guest-disabled': isGuestRestricted }"
+            :disabled="isGuestRestricted"
             @click="nextVideo"
           >
             <span class="icon material-symbols-outlined">skip_next</span>
@@ -225,49 +289,52 @@ window.addEventListener("resize", reconcileMarquee);
               :max="100"
               @update:model-value="volumeChanged"
             />
-            <button
-              class="next"
-              @click="toggleMute"
-            >
+            <button class="next" @click="toggleMute">
               <span
                 v-if="volume <= 50 && !state?.muted"
                 class="icon material-symbols-outlined"
-              >volume_down</span>
+                >volume_down</span
+              >
               <span
                 v-if="volume > 50 && !state?.muted"
                 class="icon material-symbols-outlined"
-              >volume_up</span>
-              <span
-                v-if="state?.muted"
-                class="icon material-symbols-outlined"
-              >volume_off</span>
+                >volume_up</span
+              >
+              <span v-if="state?.muted" class="icon material-symbols-outlined"
+                >volume_off</span
+              >
             </button>
           </div>
           <button
             class="repeat"
+            :class="{ 'guest-disabled': isGuestRestricted }"
+            :disabled="isGuestRestricted"
             @click="cycleRepeat"
           >
             <span
-              v-if="state?.queue.repeatMode === RepeatMode.None || state?.queue.repeatMode === RepeatMode.Unknown"
+              v-if="
+                state?.queue.repeatMode === RepeatMode.None ||
+                state?.queue.repeatMode === RepeatMode.Unknown
+              "
               class="icon material-symbols-outlined"
-            >repeat</span>
+              >repeat</span
+            >
             <span
               v-if="state?.queue.repeatMode === RepeatMode.All"
               class="icon material-symbols-outlined"
-            >repeat_on</span>
+              >repeat_on</span
+            >
             <span
               v-if="state?.queue.repeatMode === RepeatMode.One"
               class="icon material-symbols-outlined"
-            >repeat_one_on</span>
+              >repeat_one_on</span
+            >
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div
-    v-else
-    class="container unavailable"
-  >
+  <div v-else class="container unavailable">
     <p>Video is still loading or no video loaded</p>
   </div>
 </template>
@@ -410,6 +477,30 @@ window.addEventListener("resize", reconcileMarquee);
   position: absolute;
   top: 50%;
   transform: translate(-8px, -50%);
+}
+
+.guest-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.container.is-room-synced .video-data .backdrop {
+  background-color: rgba(14, 52, 28, 0.58);
+  border-top: 1px solid rgba(76, 175, 80, 0.35);
+}
+
+.container.is-room-synced .seekbar .progress,
+.container.is-room-synced .seekbar .handle {
+  background-color: #4caf50;
+}
+
+.container.is-room-synced .controls button {
+  color: #81c784;
+}
+
+.container.is-room-synced .volume :deep(.range-fill),
+.container.is-room-synced .volume :deep(.range-handle) {
+  background-color: #4caf50;
 }
 
 @keyframes marquee {

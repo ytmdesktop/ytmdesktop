@@ -3,13 +3,31 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import ConfigStore from "./services/configstore";
 
-export const assetFolder = path.join(!app.isPackaged ? path.join(app.getAppPath(), "src/assets") : process.resourcesPath);
+export const assetFolder = path.join(
+  !app.isPackaged
+    ? path.join(typeof app.getAppPath === "function" ? app.getAppPath() : "", "src/assets")
+    : process.resourcesPath,
+);
 
 export function getIconPath(icon: string) {
   return path.join(assetFolder, `${!app.isPackaged ? "icons/" : ""}${icon}`);
 }
 export function getControlsIconPath(icon: string) {
   return getIconPath(`${!app.isPackaged ? "controls/" : ""}${icon}`);
+}
+
+export function appendDisableFeatureSwitch(feature: string): void {
+  const existingDisabled = app.commandLine
+    .getSwitchValue("disable-features")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!existingDisabled.includes(feature)) {
+    app.commandLine.appendSwitch(
+      "disable-features",
+      [...existingDisabled, feature].join(","),
+    );
+  }
 }
 
 export async function v1ConfigMigration(configStore: ConfigStore) {

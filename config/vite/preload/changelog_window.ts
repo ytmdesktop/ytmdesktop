@@ -1,8 +1,3 @@
-import { defineConfig } from "vite";
+import { createWindowPreloadConfig } from "./window_preload";
 
-// https://vitejs.dev/config
-export default defineConfig({
-  build: {
-    outDir: ".vite/preload/windows/changelog"
-  }
-});
+export default createWindowPreloadConfig("changelog");

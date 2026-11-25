@@ -1,4 +1,4 @@
-import { app } from "electron";
+import { appendDisableFeatureSwitch } from "../../util";
 import PlayerStateStore from "../../services/playerstatestore";
 import type { MediaPlayer } from "xosms";
 import Integration from "../integration";
@@ -47,8 +47,13 @@ export default class EnhancedMediaService extends Integration {
 
   private async maybeCreateMediaPlayer() {
     if (!this.mediaPlayer) {
-      const { MediaPlayer } = await import("xosms");
-      this.mediaPlayer = new MediaPlayer("ytmdesktop", "YTMDesktop");
+      try {
+        const { MediaPlayer } = await import("xosms");
+        this.mediaPlayer = new MediaPlayer("ytmdesktop", "YTMDesktop");
+      } catch {
+        // Ignore missing native xosms binding
+        return;
+      }
 
       this.mediaPlayer.setButtonPressedCallback(button => {
         const remoteControlApi = this.getService(ProtectedAPIManager).createOrGetAPI("RemoteControl");
@@ -237,7 +242,7 @@ export default class EnhancedMediaService extends Integration {
 
   public onSetup() {
     if (this.getService(ConfigStore).get("integrations.enhancedMediaServiceEnabled")) {
-      app.commandLine.appendSwitch("disable-features", "MediaSessionService");
+      appendDisableFeatureSwitch("MediaSessionService");
     }
   }
 

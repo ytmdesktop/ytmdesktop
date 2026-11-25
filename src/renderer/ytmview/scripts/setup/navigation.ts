@@ -1,22 +1,58 @@
+import { shouldBlockHistoryTraversal } from "./listentogether";
+
+function getAdjacentNavigationUrl(
+  direction: "back" | "forward",
+): string | null {
+  try {
+    const entries = navigation.entries?.();
+    const current = navigation.currentEntry;
+    if (!entries || !current) return null;
+    const delta = direction === "back" ? -1 : 1;
+    return entries[current.index + delta]?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function createNavigationMenuArrows() {
   // Go back in history
   const historyBackElement = document.createElement("span");
-  historyBackElement.classList.add("material-symbols-outlined", "ytmd-history-back", "disabled");
+  historyBackElement.classList.add(
+    "material-symbols-outlined",
+    "ytmd-history-back",
+    "disabled",
+  );
   historyBackElement.innerText = "west";
 
   historyBackElement.addEventListener("click", function () {
     if (!historyBackElement.classList.contains("disabled")) {
+      if (shouldBlockHistoryTraversal(getAdjacentNavigationUrl("back"))) {
+        console.warn(
+          "[ListenTogether][YTMView] Blocked history.back() traversal during active session",
+        );
+        return;
+      }
       history.back();
     }
   });
 
   // Go forward in history
   const historyForwardElement = document.createElement("span");
-  historyForwardElement.classList.add("material-symbols-outlined", "ytmd-history-forward", "disabled");
+  historyForwardElement.classList.add(
+    "material-symbols-outlined",
+    "ytmd-history-forward",
+    "disabled",
+  );
   historyForwardElement.innerText = "east";
 
   historyForwardElement.addEventListener("click", function () {
     if (!historyForwardElement.classList.contains("disabled")) {
+      if (shouldBlockHistoryTraversal(getAdjacentNavigationUrl("forward"))) {
+        console.warn(
+          "[ListenTogether][YTMView] Blocked history.forward() traversal during active session",
+        );
+        return;
+      }
       history.forward();
     }
   });
@@ -35,7 +71,17 @@ export function createNavigationMenuArrows() {
     }
   }
 
-  navigation.addEventListener("navigate", () => {
+  navigation.addEventListener("navigate", (event: any) => {
+    if (
+      event?.navigationType === "traverse" &&
+      shouldBlockHistoryTraversal(event?.destination?.url) &&
+      event?.cancelable
+    ) {
+      console.warn(
+        "[ListenTogether][YTMView] Blocked Navigation API traverse event during active session",
+      );
+      event.preventDefault();
+    }
     reconcileNavigationButtons();
   });
   navigation.addEventListener("currententrychange", () => {

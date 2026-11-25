@@ -1,11 +1,21 @@
-import { LikeStatus, PlayerQueue, PlayerQueueItem, PlayerSignal, PlayerState, RepeatMode, VideoDetails, VideoState, VideoType } from "~shared/playerstatestore/types";
-import Service, { EventEmitterService } from "../service";
+import {
+  LikeStatus,
+  PlayerQueue,
+  PlayerQueueItem,
+  PlayerSignal,
+  PlayerState,
+  RepeatMode,
+  VideoDetails,
+  VideoState,
+  VideoType,
+} from "~shared/playerstatestore/types";
+import Service, { EventEmitterService, type ServiceLogger } from "../service";
+import { ServiceHost } from "../servicehost";
 import log from "electron-log";
 import { DependencyConstructor } from "~shared/types";
 import ProtectedAPIManager, { ProtectedAPI } from "../protectedapimanager";
 import AppWindowManager from "../windowmanager";
 import StateManager from "../statemanager";
-import assert from "node:assert";
 
 enum YTMVideoState {
   Unstarted = -1,
@@ -13,7 +23,7 @@ enum YTMVideoState {
   Playing = 1,
   Paused = 2,
   Buffering = 3,
-  VideoCued = 5
+  VideoCued = 5,
 }
 
 type YTMThumbnail = {
@@ -99,28 +109,38 @@ function mapYTMThumbnails(thumbnail: YTMThumbnail) {
   return {
     url: thumbnail.url,
     width: thumbnail.width,
-    height: thumbnail.height
+    height: thumbnail.height,
   };
 }
 
 function mapCounterpart(counterpart: YTMPlayerQueueItemCounterpart) {
   // Explicit mapping to keep a consistent API
   // If YouTube Music changes how this is presented internally then it's easier to update without breaking the API
-  return transformPlaylistPanelVideoRenderer(counterpart.counterpartRenderer.playlistPanelVideoRenderer);
+  return transformPlaylistPanelVideoRenderer(
+    counterpart.counterpartRenderer.playlistPanelVideoRenderer,
+  );
 }
 
 function transformPlaylistPanelVideoRenderer(
   playlistPanelVideoRenderer: YTMPlayerQueueItemVideoRenderer,
-  counterpart?: YTMPlayerQueueItemCounterpart[]
+  counterpart?: YTMPlayerQueueItemCounterpart[],
 ): PlayerQueueItem {
   return {
-    thumbnails: playlistPanelVideoRenderer.thumbnail ? playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails) : [],
-    title: getYTMTextRun(playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }]),
-    author: getYTMTextRun(playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }]),
-    duration: getYTMTextRun(playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }]),
+    thumbnails: playlistPanelVideoRenderer.thumbnail
+      ? playlistPanelVideoRenderer.thumbnail.thumbnails.map(mapYTMThumbnails)
+      : [],
+    title: getYTMTextRun(
+      playlistPanelVideoRenderer.title?.runs ?? [{ text: "" }],
+    ),
+    author: getYTMTextRun(
+      playlistPanelVideoRenderer.shortBylineText?.runs ?? [{ text: "" }],
+    ),
+    duration: getYTMTextRun(
+      playlistPanelVideoRenderer.lengthText?.runs ?? [{ text: "" }],
+    ),
     selected: playlistPanelVideoRenderer.selected,
     videoId: playlistPanelVideoRenderer.videoId,
-    counterparts: counterpart ? counterpart.map(mapCounterpart) : null
+    counterparts: counterpart ? counterpart.map(mapCounterpart) : null,
   };
 }
 
@@ -130,14 +150,19 @@ function mapYTMQueueItems(item: YTMPlayerQueueItem): PlayerQueueItem | null {
   if (item.playlistPanelVideoRenderer) {
     playlistPanelVideoRenderer = item.playlistPanelVideoRenderer;
   } else if (item.playlistPanelVideoWrapperRenderer) {
-    playlistPanelVideoRenderer = item.playlistPanelVideoWrapperRenderer.primaryRenderer.playlistPanelVideoRenderer;
+    playlistPanelVideoRenderer =
+      item.playlistPanelVideoWrapperRenderer.primaryRenderer
+        .playlistPanelVideoRenderer;
     counterpart = item.playlistPanelVideoWrapperRenderer.counterpart;
   }
 
   // This probably shouldn't happen but in the off chance it does we need to return nothing
   if (!playlistPanelVideoRenderer) return null;
 
-  return transformPlaylistPanelVideoRenderer(playlistPanelVideoRenderer, counterpart);
+  return transformPlaylistPanelVideoRenderer(
+    playlistPanelVideoRenderer,
+    counterpart,
+  );
 }
 
 // This may seem redundant but we do this in case YTM changes its own data to accomodate and prevent severe breaking of things
@@ -211,12 +236,25 @@ export type PlayerStateStoreEventMap = {
   "playlist-created": [{ title: string; id: string }];
   "playlist-deleted": [string];
   "player-signal": [PlayerSignal];
+  "track-unavailable": [string | null, string | number];
 };
 
+export type PlayerStateStoreLogger = ServiceLogger;
+
+export interface PlayerStateStoreDeps {
+  windowManager?: Pick<AppWindowManager, "hasWindow" | "getWindow">;
+  stateManager?: Pick<StateManager, "updateState">;
+  protectedApiManager?: Pick<ProtectedAPIManager, "createOrGetAPI">;
+  logger?: ServiceLogger;
+  now?: () => number;
+}
+
 export default class PlayerStateStore extends EventEmitterService<PlayerStateStoreEventMap> {
-  public static override readonly dependencies: DependencyConstructor<Service>[] = [AppWindowManager, ProtectedAPIManager, StateManager];
+  public static override readonly dependencies: DependencyConstructor<Service>[] =
+    [AppWindowManager, ProtectedAPIManager, StateManager];
 
   private videoProgress = 0;
+  private progressCapturedAtMs = 0;
   private state: VideoState = -1;
   private videoDetails: VideoDetails | null = null;
   private playlistId: string | null = null;
@@ -227,21 +265,55 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
   private hasFullMetadata: boolean = false;
 
   private stateApi?: ProtectedAPI;
+  private deps?: PlayerStateStoreDeps;
+  private logger: ServiceLogger = log;
+  private now: () => number = () => performance.now();
+  private hostInjected = false;
+
+  public setDependencies(deps: PlayerStateStoreDeps): this {
+    this.deps = deps;
+    this.logger = deps.logger ?? log;
+    this.now = deps.now ?? (() => performance.now());
+    return this;
+  }
+
+  public override [ServiceHost.INJECT](host: ServiceHost) {
+    super[ServiceHost.INJECT](host);
+    this.hostInjected = true;
+  }
 
   public override onPreInitialized(): void {}
   public override onInitialized(): void {
-    this.stateApi = this.getDependency(ProtectedAPIManager).createOrGetAPI("PlayerState");
-    this.stateApi.on("updateVideoProgress", this.updateVideoProgress.bind(this));
+    const protectedApiManager =
+      this.deps?.protectedApiManager ??
+      (this.hostInjected ? this.getDependency(ProtectedAPIManager) : undefined);
+    if (!protectedApiManager) {
+      this.logger.warn(
+        "playerstatestore: initialized without ProtectedAPIManager dependency",
+      );
+      return;
+    }
+
+    this.stateApi = protectedApiManager.createOrGetAPI("PlayerState");
+    this.stateApi.on(
+      "updateVideoProgress",
+      this.updateVideoProgress.bind(this),
+    );
     this.stateApi.on("updateVideoState", this.updateVideoState.bind(this));
     this.stateApi.on("updateVideoDetails", this.updateVideoDetails.bind(this));
     this.stateApi.on("updateFromStore", this.updateFromStore.bind(this));
-    
+
     this.stateApi.on("playerSignal", this.emitPlayerSignal.bind(this));
+    this.stateApi.on("trackUnavailable", this.trackUnavailable.bind(this));
 
-    this.stateApi.on("playlistCreated", playlist => this.emit("playlist-created", playlist));
-    this.stateApi.on("playlistDeleted", playlistId => this.emit("playlist-deleted", playlistId));
+    this.stateApi.on("playlistCreated", (playlist) =>
+      this.emit("playlist-created", playlist),
+    );
+    this.stateApi.on("playlistDeleted", (playlistId) =>
+      this.emit("playlist-deleted", playlistId),
+    );
 
-    log.info("PlayerStateStore initialized");
+    this.logger.info("PlayerStateStore initialized");
   }
   public override onPostInitialized(): void {}
   public override onTerminated(): void {}
@@ -253,10 +325,11 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
       trackState: this.state,
       queue: this.queue,
       videoProgress: this.videoProgress,
+      progressCapturedAtMs: this.progressCapturedAtMs,
       volume: this.volume,
       muted: this.muted,
       adPlaying: this.adPlaying,
-      hasFullMetadata: this.hasFullMetadata
+      hasFullMetadata: this.hasFullMetadata,
     };
   }
 
@@ -270,6 +343,7 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
 
   public updateVideoProgress(progress: number) {
     this.videoProgress = progress;
+    this.progressCapturedAtMs = this.now();
     this.stateChanged();
   }
 
@@ -304,7 +378,7 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
     playlistId: string,
     album: { id: string; text: string } | null,
     likeStatus: YTMLikeStatus,
-    hasFullMetadata: boolean
+    hasFullMetadata: boolean,
   ) {
     this.videoDetails = {
       author: videoDetails.author,
@@ -313,11 +387,13 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
       album: album?.text ?? null,
       albumId: album?.id ?? null,
       likeStatus: transformLikeStatus(likeStatus),
-      thumbnails: videoDetails.thumbnail ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails) : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
+      thumbnails: videoDetails.thumbnail
+        ? videoDetails.thumbnail.thumbnails.map(mapYTMThumbnails)
+        : [], // There are cases where the thumbnails simply don't exist on the videoDetails but can be found via other means. Podcasts notably can do this
       durationSeconds: parseInt(videoDetails.lengthSeconds),
       id: videoDetails.videoId,
       videoType: transformVideoType(videoDetails.musicVideoType),
-      isLive: !!videoDetails.isLive
+      isLive: !!videoDetails.isLive,
     };
     this.playlistId = playlistId;
     this.hasFullMetadata = hasFullMetadata;
@@ -330,10 +406,14 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
     likeStatus: YTMLikeStatus | null,
     volume: number | null,
     muted: boolean | null,
-    adPlaying: boolean | null
+    adPlaying: boolean | null,
   ) {
-    const queueItems = queueState ? queueState.items?.map(mapYTMQueueItems) : [];
-    const automixItems = queueState ? queueState.automixItems?.map(mapYTMQueueItems) : [];
+    const queueItems = queueState
+      ? queueState.items?.map(mapYTMQueueItems)
+      : [];
+    const automixItems = queueState
+      ? queueState.automixItems?.map(mapYTMQueueItems)
+      : [];
     this.queue = queueState
       ? {
           // automixItems comes from an autoplay queue that isn't pushed yet to the main queue. A radio will never have automixItems (weird YTM distinction from autoplay vs radio)
@@ -345,14 +425,16 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
           items: queueItems,
           repeatMode: transformRepeatMode(queueState.repeatMode),
           // YTM has a native selectedItemIndex property but that isn't updated correctly so we calculate it ourselves
-          selectedItemIndex: queueItems.findIndex(item => {
+          selectedItemIndex: queueItems.findIndex((item) => {
             return item?.selected;
           }),
-          shuffleEnabled: queueState.shuffleEnabled
+          shuffleEnabled: queueState.shuffleEnabled,
         }
       : null;
     if (this.videoDetails) {
-      this.videoDetails.likeStatus = transformLikeStatus(likeStatus ?? "INDIFFERENT");
+      this.videoDetails.likeStatus = transformLikeStatus(
+        likeStatus ?? "INDIFFERENT",
+      );
     }
     this.adPlaying = adPlaying === true;
     this.muted = muted === true;
@@ -361,35 +443,79 @@ export default class PlayerStateStore extends EventEmitterService<PlayerStateSto
     this.stateChanged();
   }
 
-  public emitPlayerSignal(signal: "NEW_PLAYBACK") {
+  public emitPlayerSignal(
+    signal: "NEW_PLAYBACK" | "TRACK_ENDED",
+    videoId?: string,
+  ) {
     if (signal === "NEW_PLAYBACK") {
-      this.emit("player-signal", PlayerSignal.NewPlayback)
+      this.logger.debug(
+        `playerstatestore: player signal NewPlayback (videoId=${videoId ?? "unknown"})`,
+      );
+      this.emit("player-signal", PlayerSignal.NewPlayback);
+    } else if (signal === "TRACK_ENDED") {
+      this.logger.info(
+        `playerstatestore: player signal TrackEnded (videoId=${videoId ?? "unknown"})`,
+      );
+      this.emit("player-signal", PlayerSignal.TrackEnded);
+    } else {
+      this.logger.warn(
+        `playerstatestore: ignored unknown player signal '${String(signal)}'`,
+      );
     }
+  }
+
+  public trackUnavailable(videoId: string | null, reason: string | number) {
+    this.logger.warn(
+      `playerstatestore: track unavailable (videoId=${videoId ?? "unknown"}, reason=${String(reason)})`,
+    );
+    this.emit("track-unavailable", videoId, reason);
   }
 
   private stateChanged() {
     const state = this.getState();
 
-    const windowManager = this.getDependency(AppWindowManager);
-    if (windowManager.hasWindow("Miniplayer")) {
-      windowManager.getWindow("Miniplayer").ipcBroadcast("playerStateStore:stateChanged", state);
+    const windowManager =
+      this.deps?.windowManager ??
+      (this.hostInjected ? this.getDependency(AppWindowManager) : undefined);
+    if (windowManager) {
+      if (windowManager.hasWindow("Miniplayer")) {
+        windowManager
+          .getWindow("Miniplayer")
+          .ipcBroadcast("playerStateStore:stateChanged", state);
+      }
+
+      if (state.hasFullMetadata && state.videoDetails) {
+        if (windowManager.hasWindow("Main"))
+          windowManager
+            .getWindow("Main")
+            .setTitle(
+              `${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop`,
+            );
+        if (windowManager.hasWindow("Miniplayer"))
+          windowManager
+            .getWindow("Miniplayer")
+            .setTitle(
+              `${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop - Miniplayer`,
+            );
+      } else {
+        if (windowManager.hasWindow("Main"))
+          windowManager.getWindow("Main").setTitle(`YTMDesktop`);
+        if (windowManager.hasWindow("Miniplayer"))
+          windowManager
+            .getWindow("Miniplayer")
+            .setTitle("YTMDesktop - Miniplayer");
+      }
     }
 
-    if (state.hasFullMetadata && state.videoDetails) {
-      if (windowManager.hasWindow("Main"))
-        windowManager.getWindow("Main").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop`);
-      if (windowManager.hasWindow("Miniplayer"))
-        windowManager.getWindow("Miniplayer").setTitle(`${state.videoDetails.title} - ${state.videoDetails.author} | YTMDesktop - Miniplayer`);
-    } else {
-      if (windowManager.hasWindow("Main")) windowManager.getWindow("Main").setTitle(`YTMDesktop`);
-      if (windowManager.hasWindow("Miniplayer")) windowManager.getWindow("Miniplayer").setTitle("YTMDesktop - Miniplayer");
+    const stateManager =
+      this.deps?.stateManager ??
+      (this.hostInjected ? this.getDependency(StateManager) : undefined);
+    if (stateManager) {
+      stateManager.updateState({
+        lastVideoId: state.videoDetails?.id ?? "",
+        lastPlaylistId: state.playlistId ?? "",
+      });
     }
-
-    const stateManager = this.getDependency(StateManager);
-    stateManager.updateState({
-      lastVideoId: state.videoDetails?.id ?? "",
-      lastPlaylistId: state.playlistId ?? ""
-    });
 
     this.emit("state-changed", this.getState());
   }

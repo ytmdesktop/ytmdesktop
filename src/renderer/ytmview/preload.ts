@@ -10,7 +10,9 @@
 
 // Early bail if the page isn't YTM. This could be an account login or something else
 if (window.location.hostname !== "music.youtube.com") {
-  throw new Error("[YTMDFastFail]: THIS IS NOT AN ERROR! Location not applicable bailing preload");
+  throw new Error(
+    "[YTMDFastFail]: THIS IS NOT AN ERROR! Location not applicable bailing preload",
+  );
 }
 
 import { ipcRenderer, webFrame } from "electron";
@@ -22,20 +24,35 @@ import scriptsRaw from "./scripts?raw";
 const store = new Store<StoreSchema>();
 
 let protectedApiBound = false;
-window.addEventListener("message", async event => {
+window.addEventListener("message", async (event) => {
   if (event.data === "ytmd-protected-api-port" && !protectedApiBound) {
     ipcRenderer.postMessage("protectedApi:bindPort", null, [...event.ports]);
     protectedApiBound = true;
   }
 
-  if (event.data.op && event.data.op === "ytmd-ready") {
+  if (event.data?.op && event.data.op === "ytmd-ready") {
     ipcRenderer.send("ytmView:ready", event.data.completions);
+
+    const listenTogetherPendingColdStart = Boolean(
+      await ipcRenderer.invoke(
+        "memoryStore:get",
+        "listenTogetherPendingColdStart",
+      ),
+    );
 
     // TODO: Move all the below be part of the ProtectedAPI system within this block
     const state = await store.get("state");
-    const continueWhereYouLeftOff = (await store.get("playback")).continueWhereYouLeftOff;
+    const continueWhereYouLeftOff = (await store.get("playback"))
+      .continueWhereYouLeftOff;
 
-    if (continueWhereYouLeftOff) {
+    if (listenTogetherPendingColdStart) {
+      console.info(
+        "[YTMView Preload] listenTogetherPendingColdStart active; suppressing continueWhereYouLeftOff auto-resume",
+        { continueWhereYouLeftOff },
+      );
+    }
+
+    if (continueWhereYouLeftOff && !listenTogetherPendingColdStart) {
       // The last page the user was on is already a page where it will be playing a song from (no point telling YTM to play it again)
       if (!window.location.pathname.startsWith("/watch")) {
         if (state.lastVideoId) {
@@ -45,11 +62,11 @@ window.addEventListener("message", async event => {
                 endpoint: {
                   watchEndpoint: {
                     videoId: state.lastVideoId,
-                    playlistId: state.lastPlaylistId
-                  }
-                }
-              }
-            })
+                    playlistId: state.lastPlaylistId,
+                  },
+                },
+              },
+            }),
           );
         }
       } else {
@@ -64,20 +81,29 @@ window.addEventListener("message", async event => {
       }
     }
 
-    const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
+    const alwaysShowVolumeSlider = (await store.get("appearance"))
+      .alwaysShowVolumeSlider;
     if (alwaysShowVolumeSlider) {
-      document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
+      document
+        .querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")
+        ?.classList.add("ytmd-persist-volume-slider");
     }
 
-    store.onDidAnyChange(newState => {
+    store.onDidAnyChange((newState) => {
       if (newState.appearance.alwaysShowVolumeSlider) {
         const volumeSlider = document.querySelector("#volume-slider");
-        if (volumeSlider && !volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+        if (
+          volumeSlider &&
+          !volumeSlider.classList.contains("ytmd-persist-volume-slider")
+        ) {
           volumeSlider.classList.add("ytmd-persist-volume-slider");
         }
       } else {
         const volumeSlider = document.querySelector("#volume-slider");
-        if (volumeSlider && volumeSlider.classList.contains("ytmd-persist-volume-slider")) {
+        if (
+          volumeSlider &&
+          volumeSlider.classList.contains("ytmd-persist-volume-slider")
+        ) {
           volumeSlider.classList.remove("ytmd-persist-volume-slider");
         }
       }
@@ -88,7 +114,11 @@ window.addEventListener("message", async event => {
     });
   }
 
-  if (event.data.op && event.data.op === "ytmd-errored") {
+  if (event.data?.op === "ytmd-errored") {
+    console.error(
+      "[YTMView Preload] Page-world setup errored",
+      event.data.error,
+    );
     ipcRenderer.send("ytmView:errored", event.data.error);
   }
 });

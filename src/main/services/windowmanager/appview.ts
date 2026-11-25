@@ -1,4 +1,10 @@
-import { app, IpcMainEvent, Rectangle, WebContentsView, WebContentsViewConstructorOptions } from "electron";
+import {
+  app,
+  IpcMainEvent,
+  Rectangle,
+  WebContentsView,
+  WebContentsViewConstructorOptions,
+} from "electron";
 import { AppWindow, AppWindowType } from "./appwindow";
 import assert from "node:assert";
 import log from "electron-log";
@@ -6,8 +12,8 @@ import EventEmitter from "node:events";
 
 export type AppViewEventMap = {
   // AppView related events
-  "recreated": [];
-  "ready": [];
+  recreated: [];
+  ready: [];
 
   // WebContents proxied events
   "webcontents-enter-html-full-screen": [];
@@ -15,13 +21,25 @@ export type AppViewEventMap = {
   "webcontents-did-navigate": [];
   "webcontents-did-navigate-in-page": [];
   "webcontents-context-menu": [Electron.Event, Electron.ContextMenuParams];
-  "webcontents-will-navigate": [Electron.Event<Electron.WebContentsWillNavigateEventParams>];
-  "webcontents-will-redirect": [Electron.Event<Electron.WebContentsWillRedirectEventParams>];
+  "webcontents-will-navigate": [
+    Electron.Event<Electron.WebContentsWillNavigateEventParams>,
+  ];
+  "webcontents-will-redirect": [
+    Electron.Event<Electron.WebContentsWillRedirectEventParams>,
+  ];
   "webcontents-unresponsive": [];
   "webcontents-responsive": [];
   "webcontents-page-title-updated": [Electron.Event, string, boolean];
   "webcontents-will-prevent-unload": [Electron.Event];
-  "webcontents-did-fail-load": [Electron.Event, number, string, string, boolean, number, number];
+  "webcontents-did-fail-load": [
+    Electron.Event,
+    number,
+    string,
+    string,
+    boolean,
+    number,
+    number,
+  ];
 };
 
 export type AppViewOptions = {
@@ -46,6 +64,12 @@ export type AppViewOptions = {
    */
   autoCreate?: boolean;
   /**
+   * Whether to open DevTools automatically in development builds
+   *
+   * @default true
+   */
+  openDevTools?: boolean;
+  /**
    * The initial state the view should be in
    */
   viewState: {
@@ -62,6 +86,13 @@ export type AppViewOptions = {
        * Resize the height with the parent window
        */
       height?: boolean;
+      /**
+       * Pin the view to a fixed pixel width anchored to the left or right edge
+       */
+      fixedWidth?: {
+        pixels: number;
+        anchor: "Left" | "Right";
+      };
       /**
        * How much to offset width by when resizing
        *
@@ -96,6 +127,87 @@ export type AppViewOptions = {
   electronOptions: WebContentsViewConstructorOptions;
 };
 
+export type ComputedAppViewBounds = {
+  bounds: Rectangle;
+  fixedWidthClamped: boolean;
+  requestedFixedWidth?: number;
+  hiddenBounds: boolean;
+};
+
+/**
+ * Computes resized bounds for an AppView relative to its parent window content bounds.
+ */
+export function computeAppViewBounds(
+  currentBounds: Rectangle,
+  parentBounds: Rectangle,
+  autoResize: NonNullable<AppViewOptions["viewState"]["autoResize"]>,
+): ComputedAppViewBounds {
+  const newBounds: Rectangle = { ...currentBounds };
+  let fixedWidthClamped = false;
+  let requestedFixedWidth: number | undefined;
+
+  if (autoResize.width) {
+    newBounds.width = parentBounds.width;
+    newBounds.x = 0;
+  }
+
+  if (autoResize.height) {
+    newBounds.height = parentBounds.height;
+    newBounds.y = 0;
+  }
+
+  if (autoResize.fixedWidth) {
+    requestedFixedWidth = autoResize.fixedWidth.pixels;
+    const clampedWidth = Math.min(
+      Math.max(0, autoResize.fixedWidth.pixels),
+      Math.max(0, parentBounds.width),
+    );
+    fixedWidthClamped = clampedWidth !== autoResize.fixedWidth.pixels;
+    newBounds.width = clampedWidth;
+    newBounds.x =
+      autoResize.fixedWidth.anchor === "Right"
+        ? Math.max(0, parentBounds.width) - newBounds.width
+        : 0;
+  } else if (autoResize.offsetWidth) {
+    if (autoResize.offsetWidth.percent)
+      newBounds.width -=
+        (autoResize.offsetWidth.percent / 100) * newBounds.width;
+
+    if (autoResize.offsetWidth.pixels)
+      newBounds.width -= autoResize.offsetWidth.pixels;
+
+    newBounds.width = Math.max(0, newBounds.width);
+
+    if (autoResize.offsetWidth.anchor === "Right")
+      newBounds.x = Math.max(0, parentBounds.width) - newBounds.width;
+    else if (autoResize.offsetWidth.anchor === "Left") newBounds.x = 0;
+  }
+
+  if (autoResize.offsetHeight) {
+    if (autoResize.offsetHeight.percent)
+      newBounds.height -=
+        (autoResize.offsetHeight.percent / 100) * newBounds.height;
+
+    if (autoResize.offsetHeight.pixels)
+      newBounds.height -= autoResize.offsetHeight.pixels;
+
+    newBounds.height = Math.max(0, newBounds.height);
+
+    if (autoResize.offsetHeight.anchor === "Bottom")
+      newBounds.y = Math.max(0, parentBounds.height) - newBounds.height;
+    else if (autoResize.offsetHeight.anchor === "Top") newBounds.y = 0;
+  }
+
+  const hiddenBounds = newBounds.width <= 0 || newBounds.height <= 0;
+
+  return {
+    bounds: newBounds,
+    fixedWidthClamped,
+    requestedFixedWidth,
+    hiddenBounds,
+  };
+}
+
 export class AppView extends EventEmitter<AppViewEventMap> {
   private parentWindow?: AppWindow<AppWindowType> | null;
   private electronView?: WebContentsView | null;
@@ -117,7 +229,10 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   public constructor(viewOptions: AppViewOptions) {
     super();
 
-    if (viewOptions.url && viewOptions.file) throw new Error("Only one of 'url' or 'file' can be provided when creating an AppView");
+    if (viewOptions.url && viewOptions.file)
+      throw new Error(
+        "Only one of 'url' or 'file' can be provided when creating an AppView",
+      );
 
     this.options = viewOptions;
     this.name = viewOptions.name;
@@ -129,10 +244,14 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   public _attachToWindow(appWindow: AppWindow<AppWindowType>, index?: number) {
     assert(this.destroyed === false, new Error("This AppView is destroyed"));
 
-    if (this.parentWindow && this.parentWindow !== appWindow) this.parentWindow.detachView(this);
+    if (this.parentWindow && this.parentWindow !== appWindow)
+      this.parentWindow.detachView(this);
 
     this.parentWindow = appWindow;
-    if (this.electronView) this.parentWindow._getElectronWindow().contentView.addChildView(this.electronView, index);
+    if (this.electronView)
+      this.parentWindow
+        ._getElectronWindow()
+        .contentView.addChildView(this.electronView, index);
     this.lastViewIndex = index ?? -1;
 
     // Execute a parent window resize so the bounds are adjusted on attach
@@ -140,22 +259,37 @@ export class AppView extends EventEmitter<AppViewEventMap> {
 
     this.attachParentElectronWindowEvents();
 
-    if (!app.isPackaged) this.electronView?.webContents.openDevTools();
+    if (
+      !app.isPackaged &&
+      process.env.YTMD_E2E_MODE !== "1" &&
+      this.options.openDevTools !== false
+    ) {
+      this.electronView?.webContents.openDevTools();
+    }
 
-    log.debug(`AppView '${this.name}' attached to parent ${this.parentWindow.name} with index '${index ?? "end"}'`);
+    log.debug(
+      `AppView '${this.name}' attached to parent ${this.parentWindow.name} with index '${index ?? "end"}'`,
+    );
   }
 
   public _detachFromWindow(appWindow: AppWindow<AppWindowType>) {
     assert(this.destroyed === false, new Error("This AppView is destroyed"));
 
     if (this.parentWindow != appWindow) {
-      log.warn(`Attempted to detach AppView '${this.name}' from ${appWindow.name} but the window isn't the current parent window of this AppView`);
+      log.warn(
+        `Attempted to detach AppView '${this.name}' from ${appWindow.name} but the window isn't the current parent window of this AppView`,
+      );
       return;
     }
 
     this.detachParentElectronWindowEvents();
-    if (this.electronView) this.parentWindow._getElectronWindow().contentView.removeChildView(this.electronView);
-    log.debug(`AppView '${this.name}' detached from parent ${this.parentWindow.name}`);
+    if (this.electronView)
+      this.parentWindow
+        ._getElectronWindow()
+        .contentView.removeChildView(this.electronView);
+    log.debug(
+      `AppView '${this.name}' detached from parent ${this.parentWindow.name}`,
+    );
     this.parentWindow = null;
   }
 
@@ -171,7 +305,10 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   public create() {
     assert(this.destroyed === false, new Error("This AppView is destroyed"));
 
-    if (this.options.autoCreate) throw new Error("This function cannot be called while autoCreate is enabled");
+    if (this.options.autoCreate)
+      throw new Error(
+        "This function cannot be called while autoCreate is enabled",
+      );
     if (this.electronView) throw new Error("View already created");
 
     this.createElectronView();
@@ -184,7 +321,7 @@ export class AppView extends EventEmitter<AppViewEventMap> {
    */
   public async ready(): Promise<void> {
     if (!this.viewReady)
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const interval = setInterval(() => {
           if (this.viewReady) {
             clearInterval(interval);
@@ -201,7 +338,7 @@ export class AppView extends EventEmitter<AppViewEventMap> {
    */
   public async hide(waitForWebContents?: boolean) {
     if (waitForWebContents) {
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         this.electronView?.webContents.ipc.once("appView:hide", () => {
           resolve();
         });
@@ -233,16 +370,27 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is OK to have as any
-  public ipcOn(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void) {
+  public ipcOn(
+    channel: string,
+    listener: (event: IpcMainEvent, ...args: any[]) => void,
+  ) {
     this.ipcEventProxy.on(channel, listener);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is OK to have as any
-  public ipcOff(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void) {
+  public ipcOff(
+    channel: string,
+    listener: (event: IpcMainEvent, ...args: any[]) => void,
+  ) {
     this.ipcEventProxy.off(channel, listener);
   }
 
-  public setAutoResize(autoResize: Partial<AppViewOptions["viewState"]["autoResize"]>) {
-    const updatedAutoResize = { ...this.options.viewState.autoResize, ...autoResize };
+  public setAutoResize(
+    autoResize: Partial<AppViewOptions["viewState"]["autoResize"]>,
+  ) {
+    const updatedAutoResize = {
+      ...this.options.viewState.autoResize,
+      ...autoResize,
+    };
     this.options.viewState.autoResize = updatedAutoResize;
     this.parentWindowResize();
   }
@@ -250,22 +398,29 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   private createElectronView() {
     // Silently ignore this call as the AppView is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring createElectronView because this AppView is destroyed");
+      log.verbose(
+        "Silently ignoring createElectronView because this AppView is destroyed",
+      );
       return;
     }
     log.debug(`AppView '${this.name}' created`);
 
     this.electronView = new WebContentsView(this.options.electronOptions);
-    if (this.options.url) this.electronView.webContents.loadURL(this.options.url);
-    else if (this.options.file) this.electronView.webContents.loadFile(this.options.file);
+    if (this.options.url)
+      this.electronView.webContents.loadURL(this.options.url);
+    else if (this.options.file)
+      this.electronView.webContents.loadFile(this.options.file);
     this.attachElectronViewEvents();
-    if (this.parentWindow) this._attachToWindow(this.parentWindow, this.lastViewIndex);
+    if (this.parentWindow)
+      this._attachToWindow(this.parentWindow, this.lastViewIndex);
   }
 
   private attachElectronViewEvents() {
     // Silently ignore this call as the AppView is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring attachElectronViewEvents because this AppView is destroyed");
+      log.verbose(
+        "Silently ignoring attachElectronViewEvents because this AppView is destroyed",
+      );
       return;
     }
 
@@ -285,9 +440,12 @@ export class AppView extends EventEmitter<AppViewEventMap> {
       this.viewReady = true;
       this.emit("ready");
     });
-    this.electronView?.webContents.on("ipc-message", (event, channel, ...args: unknown[]) => {
-      this.ipcEventProxy.emit(channel, event, ...args);
-    });
+    this.electronView?.webContents.on(
+      "ipc-message",
+      (event, channel, ...args: unknown[]) => {
+        this.ipcEventProxy.emit(channel, event, ...args);
+      },
+    );
 
     //#region Proxy rest of events
     this.electronView?.webContents.on("enter-html-full-screen", () => {
@@ -305,10 +463,10 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     this.electronView?.webContents.on("context-menu", (event, params) => {
       this.emit("webcontents-context-menu", event, params);
     });
-    this.electronView?.webContents.on("will-navigate", event => {
+    this.electronView?.webContents.on("will-navigate", (event) => {
       this.emit("webcontents-will-navigate", event);
     });
-    this.electronView?.webContents.on("will-redirect", event => {
+    this.electronView?.webContents.on("will-redirect", (event) => {
       this.emit("webcontents-will-redirect", event);
     });
     this.electronView?.webContents.on("unresponsive", () => {
@@ -317,77 +475,121 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     this.electronView?.webContents.on("responsive", () => {
       this.emit("webcontents-responsive");
     });
-    this.electronView?.webContents.on("page-title-updated", (event, title, explicitSet) => {
-      this.emit("webcontents-page-title-updated", event, title, explicitSet);
-    });
-    this.electronView?.webContents.on("will-prevent-unload", event => {
+    this.electronView?.webContents.on(
+      "page-title-updated",
+      (event, title, explicitSet) => {
+        this.emit("webcontents-page-title-updated", event, title, explicitSet);
+      },
+    );
+    this.electronView?.webContents.on("will-prevent-unload", (event) => {
       this.emit("webcontents-will-prevent-unload", event);
     });
-    this.electronView?.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL, isMainFrame, frameProcessId, frameRoutingID) => {
-      this.emit("webcontents-did-fail-load", event, errorCode, errorDescription, validatedURL, isMainFrame, frameProcessId, frameRoutingID);
-    });
+    this.electronView?.webContents.on(
+      "did-fail-load",
+      (
+        event,
+        errorCode,
+        errorDescription,
+        validatedURL,
+        isMainFrame,
+        frameProcessId,
+        frameRoutingID,
+      ) => {
+        this.emit(
+          "webcontents-did-fail-load",
+          event,
+          errorCode,
+          errorDescription,
+          validatedURL,
+          isMainFrame,
+          frameProcessId,
+          frameRoutingID,
+        );
+      },
+    );
     //#endregion
   }
 
   private parentWindowResize() {
-    if (this.options.viewState.autoResize && this.electronView && this.parentWindow) {
-      const newBounds = this.electronView.getBounds();
-      const parentBounds = this.parentWindow._getElectronWindow().getContentBounds();
-      if (this.options.viewState.autoResize.width) {
-        newBounds.width = parentBounds.width;
+    if (
+      this.options.viewState.autoResize &&
+      this.electronView &&
+      this.parentWindow
+    ) {
+      const autoResize = this.options.viewState.autoResize;
+      const currentBounds = this.electronView.getBounds();
+      const parentBounds = this.parentWindow
+        ._getElectronWindow()
+        .getContentBounds();
+      const {
+        bounds: newBounds,
+        fixedWidthClamped,
+        requestedFixedWidth,
+        hiddenBounds,
+      } = computeAppViewBounds(currentBounds, parentBounds, autoResize);
+
+      if (fixedWidthClamped) {
+        log.debug(`AppView '${this.name}' fixedWidth clamped during resize`, {
+          view: this.name,
+          requestedWidth: requestedFixedWidth,
+          clampedWidth: newBounds.width,
+          parentWidth: parentBounds.width,
+          parentHeight: parentBounds.height,
+        });
       }
 
-      if (this.options.viewState.autoResize.height) {
-        newBounds.height = parentBounds.height;
-      }
-
-      if (this.options.viewState.autoResize.offsetWidth) {
-        if (this.options.viewState.autoResize.offsetWidth.percent)
-          newBounds.width -= (this.options.viewState.autoResize.offsetWidth.percent / 100) * newBounds.width;
-
-        if (this.options.viewState.autoResize.offsetWidth.pixels) newBounds.width -= this.options.viewState.autoResize.offsetWidth.pixels;
-
-        if (this.options.viewState.autoResize.offsetWidth.anchor === "Right") newBounds.x = parentBounds.width - newBounds.width;
-        else if (this.options.viewState.autoResize.offsetWidth.anchor === "Left") newBounds.x = 0;
-      }
-
-      if (this.options.viewState.autoResize.offsetHeight) {
-        if (this.options.viewState.autoResize.offsetHeight.percent)
-          newBounds.height -= (this.options.viewState.autoResize.offsetHeight.percent / 100) * newBounds.height;
-
-        if (this.options.viewState.autoResize.offsetHeight.pixels) newBounds.height -= this.options.viewState.autoResize.offsetHeight.pixels;
-
-        if (this.options.viewState.autoResize.offsetHeight.anchor === "Bottom") newBounds.y = parentBounds.height - newBounds.height;
-        else if (this.options.viewState.autoResize.offsetHeight.anchor === "Top") newBounds.y = 0;
+      if (hiddenBounds) {
+        log.debug(`AppView '${this.name}' resolved to hidden/empty bounds`, {
+          view: this.name,
+          bounds: newBounds,
+          parentBounds,
+        });
       }
 
       this.electronView.setBounds(newBounds);
+    } else if (this.options.viewState.autoResize) {
+      log.verbose(
+        `Skipping AppView '${this.name}' resize without attached electronView/parentWindow`,
+        {
+          view: this.name,
+          hasElectronView: Boolean(this.electronView),
+          hasParentWindow: Boolean(this.parentWindow),
+        },
+      );
     }
   }
 
   private attachParentElectronWindowEvents() {
     // Silently ignore this call as the AppView is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring attachParentElectronWindowEvents because this AppView is destroyed");
+      log.verbose(
+        "Silently ignoring attachParentElectronWindowEvents because this AppView is destroyed",
+      );
       return;
     }
 
     if (this.parentWindow) {
       this.attachedParentEvents["resize"] = this.parentWindowResize.bind(this);
 
-      this.parentWindow._getElectronWindow().on("resize", this.attachedParentEvents["resize"]);
+      this.parentWindow
+        ._getElectronWindow()
+        .on("resize", this.attachedParentEvents["resize"]);
     }
   }
 
   private detachParentElectronWindowEvents() {
     // Silently ignore this call as the AppView is destroyed
     if (this.destroyed) {
-      log.verbose("Silently ignoring detachParentElectronWindowEvents because this AppView is destroyed");
+      log.verbose(
+        "Silently ignoring detachParentElectronWindowEvents because this AppView is destroyed",
+      );
       return;
     }
 
     if (this.parentWindow) {
-      this.parentWindow._getElectronWindow().off("resize", this.attachedParentEvents["resize"]);
+      this.parentWindow
+        ._getElectronWindow()
+        .off("resize", this.attachedParentEvents["resize"]);
 
       delete this.attachedParentEvents["resize"];
     }

@@ -1,0 +1,24 @@
+{
+  "name": "ytmd-listen-relay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fastify/rate-limit": "^10.2.0",
+    "@sinclair/typebox": "^0.34.0",
+    "fastify": "^5.12.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.14",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -4,6 +4,12 @@ name: Application Build
 on:
   - push
   - pull_request
+  - workflow_dispatch
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
 
 jobs:
   build:
@@ -38,11 +44,17 @@ jobs:
 
       - name: Make (${{ matrix.os.arch }})
         env:
-          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER }}
-          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY }}
+          YTMD_UPDATE_FEED_OWNER: ${{ vars.YTMD_UPDATE_FEED_OWNER || github.repository_owner }}
+          YTMD_UPDATE_FEED_REPOSITORY: ${{ vars.YTMD_UPDATE_FEED_REPOSITORY || github.event.repository.name }}
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_API_SECRET: ${{ secrets.LASTFM_API_SECRET }}
         run: pnpm make --arch ${{ matrix.os.arch }}
+
+      - name: Generate artifact attestation
+        if: github.event_name != 'pull_request'
+        uses: actions/attest@v4
+        with:
+          subject-path: out/make/**/*
 
       - name: Upload artifacts (${{ matrix.os.arch }})
         uses: actions/upload-artifact@v7

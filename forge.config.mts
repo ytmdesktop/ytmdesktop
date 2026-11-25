@@ -1,11 +1,12 @@
-import type { ForgeConfig } from '@electron-forge/shared-types';
-import { MakerSquirrel } from '@electron-forge/maker-squirrel';
-import { MakerZIP } from '@electron-forge/maker-zip';
-import { MakerDeb } from '@electron-forge/maker-deb';
-import { MakerRpm } from '@electron-forge/maker-rpm';
-import { VitePlugin } from '@electron-forge/plugin-vite';
-import { FusesPlugin } from '@electron-forge/plugin-fuses';
-import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import type { ForgeConfig } from "@electron-forge/shared-types";
+import { MakerSquirrel } from "@electron-forge/maker-squirrel";
+import { MakerZIP } from "@electron-forge/maker-zip";
+import { MakerDeb } from "@electron-forge/maker-deb";
+import { MakerRpm } from "@electron-forge/maker-rpm";
+import { VitePlugin } from "@electron-forge/plugin-vite";
+import { FusesPlugin } from "@electron-forge/plugin-fuses";
+import { FuseV1Options, FuseVersion } from "@electron/fuses";
+import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -25,36 +26,39 @@ const config: ForgeConfig = {
       "src/assets/icons/controls/play-button.png",
       "src/assets/icons/controls/play-next-button.png",
       "src/assets/icons/controls/play-previous-button.png",
+
+      "LICENSE",
+      "resources/bin/LICENSE.tailcat.txt",
     ],
     protocols: [
       {
         name: "YTMDesktop",
-        schemes: ["ytmd"]
-      }
+        schemes: ["ytmd"],
+      },
     ],
     appCategoryType: "public.app-category.music",
-    asar: true
+    asar: true,
   },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      iconUrl: `https://raw.githubusercontent.com/ytmdesktop/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico`
+      iconUrl: `https://raw.githubusercontent.com/ytmdesktop/ytmdesktop/137c4e5c175c8c125cbcca9a5312611f80cd3bd9/src/assets/icons/ytmd.ico`,
     }),
-    new MakerZIP({}, ['darwin']),
+    new MakerZIP({}, ["darwin"]),
     new MakerRpm({
       options: {
         categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
-        icon: "src/assets/icons/ytmd.png"
-      }
+        icon: "src/assets/icons/ytmd.png",
+      },
     }),
     new MakerDeb({
       options: {
         categories: ["AudioVideo", "Audio"],
         mimeType: ["x-scheme-handler/ytmd"],
         section: "sound",
-        icon: "src/assets/icons/ytmd.png"
-      }
+        icon: "src/assets/icons/ytmd.png",
+      },
     }),
   ],
   publishers: [
@@ -63,10 +67,10 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: process.env.YTMD_UPDATE_FEED_OWNER,
-          name: process.env.YTMD_UPDATE_FEED_REPOSITORY
-        }
-      }
-    }
+          name: process.env.YTMD_UPDATE_FEED_REPOSITORY,
+        },
+      },
+    },
   ],
   plugins: [
     new VitePlugin({
@@ -79,43 +83,48 @@ const config: ForgeConfig = {
         {
           entry: "src/renderer/windows/main/preload.ts",
           config: "config/vite/preload/main_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/settings/preload.ts",
           config: "config/vite/preload/settings_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/authorize-companion/preload.ts",
           config: "config/vite/preload/authorize_companion_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/titlebar/preload.ts",
           config: "config/vite/preload/titlebar_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/updater/preload.ts",
           config: "config/vite/preload/updater_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/miniplayer/preload.ts",
           config: "config/vite/preload/miniplayer_window.ts",
-          target: "preload"
+          target: "preload",
         },
         {
           entry: "src/renderer/windows/changelog/preload.ts",
           config: "config/vite/preload/changelog_window.ts",
-          target: "preload"
+          target: "preload",
+        },
+        {
+          entry: "src/renderer/windows/listen-together/preload.ts",
+          config: "config/vite/preload/listen_together_window.ts",
+          target: "preload",
         },
         {
           entry: "src/renderer/ytmview/preload.ts",
           config: "config/vite/preload/ytmview.ts",
-          target: "preload"
-        }
+          target: "preload",
+        },
       ],
       renderer: [
         {
@@ -135,38 +144,67 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
       [FuseV1Options.GrantFileProtocolExtraPrivileges]: false,
       [FuseV1Options.WasmTrapHandlers]: true,
-      [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false
+      [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
     }),
   ],
   hooks: {
-    async packageAfterCopy(_config, buildPath, _electronVersion, platform, arch) {
+    async packageAfterCopy(
+      _config,
+      buildPath,
+      _electronVersion,
+      platform,
+      arch,
+    ) {
       const srcRoot = path.join(__dirname, "node_modules");
       const destRoot = path.join(buildPath, "node_modules");
-      
+
       const xosmsPlatformSuffix = (() => {
         switch (platform) {
           case "linux":
-            return "-gnu"
+            return "-gnu";
           case "win32":
-            return "-msvc"
+            return "-msvc";
           default:
-            return ""
+            return "";
         }
-      })()
-      const pkgs = ["xosms", `@xosms/xosms-${platform}-${arch}${xosmsPlatformSuffix}`];
+      })();
+      const pkgs = [
+        "xosms",
+        `@xosms/xosms-${platform}-${arch}${xosmsPlatformSuffix}`,
+      ];
 
       await Promise.all(
-        pkgs.map(async pkg => {
+        pkgs.map(async (pkg) => {
           const src = path.join(srcRoot, pkg);
           const dest = path.join(destRoot, pkg);
 
-          if ((await fs.stat(src)).isDirectory()) {
+          if (existsSync(src) && (await fs.stat(src)).isDirectory()) {
             await fs.cp(src, dest, { dereference: true, recursive: true });
           }
-        })
-      )
-    }
-  }
+        }),
+      );
+
+      // Copy target-platform tailcat binary directly into the app's resources directory
+      const targetTailcatName =
+        platform === "win32" ? "tailcat.exe" : "tailcat";
+      const targetTailcatSrc = path.join(
+        __dirname,
+        "resources",
+        "bin",
+        targetTailcatName,
+      );
+      if (existsSync(targetTailcatSrc)) {
+        const targetTailcatDest = path.join(
+          path.dirname(buildPath),
+          targetTailcatName,
+        );
+        await fs.copyFile(targetTailcatSrc, targetTailcatDest);
+        if (platform !== "win32") {
+          await fs.chmod(targetTailcatDest, 0o755);
+        }
+      }
+    },
+  },
 };
 
 export default config;

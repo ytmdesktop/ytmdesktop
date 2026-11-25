@@ -2,12 +2,13 @@ import Conf from "conf";
 import { app, ipcMain } from "electron";
 import log from "electron-log";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
-import { DependencyConstructor, Paths, ValueAtPath } from "~shared/types";
+import { DependencyConstructor } from "~shared/types";
 import Service from "../service";
 import AppWindowManager from "../windowmanager";
 
 export default class ConfigStore extends Service {
-  public static override readonly dependencies: DependencyConstructor<Service>[] = [AppWindowManager];
+  public static override readonly dependencies: DependencyConstructor<Service>[] =
+    [AppWindowManager];
 
   private conf!: Conf<StoreSchema>;
 
@@ -25,28 +26,28 @@ export default class ConfigStore extends Service {
       defaults: {
         metadata: {
           version: 1,
-          appVersion: app.getVersion()
+          appVersion: app.getVersion(),
         },
         general: {
           disableHardwareAcceleration: false,
           hideToTrayOnClose: false,
           showNotificationOnSongChange: false,
           startOnBoot: false,
-          startMinimized: false
+          startMinimized: false,
         },
         appearance: {
           alwaysShowVolumeSlider: false,
           customCSSEnabled: false,
           customCSSPath: null,
           zoom: 100,
-          trayIconStyle: TrayIconStyle.Auto
+          trayIconStyle: TrayIconStyle.Auto,
         },
         playback: {
           continueWhereYouLeftOff: true,
           continueWhereYouLeftOffPaused: true,
           enableSpeakerFill: false,
           progressInTaskbar: false,
-          ratioVolume: false
+          ratioVolume: false,
         },
         integrations: {
           companionServerEnabled: false,
@@ -54,7 +55,7 @@ export default class ConfigStore extends Service {
           companionServerCORSWildcardEnabled: true,
           discordPresenceEnabled: false,
           lastFMEnabled: false,
-          enhancedMediaServiceEnabled: true
+          enhancedMediaServiceEnabled: true,
         },
         shortcuts: {
           playPause: "",
@@ -66,7 +67,7 @@ export default class ConfigStore extends Service {
           volumeDown: "",
           volumeMute: "",
           toggleShuffle: "",
-          toggleRepeat: ""
+          toggleRepeat: "",
         },
         state: {
           lastUrl: "https://music.youtube.com/",
@@ -74,21 +75,38 @@ export default class ConfigStore extends Service {
           lastVideoId: "",
           windowBounds: null,
           windowMaximized: false,
-          miniplayerWindowBounds: null
+          miniplayerWindowBounds: null,
         },
         lastfm: {
           sessionKey: null,
-          scrobblePercent: 50
+          scrobblePercent: 50,
         },
         developer: {
-          enableDevTools: false
-        }
+          enableDevTools: false,
+        },
+        listenTogether: {
+          clientSlug: "",
+          displayName: "",
+          signalingUrl: null,
+          trustedSignalingHosts: [],
+          tailcatDerpMapUrl: null,
+          lanDiscoveryEnabled: false,
+          persistentRoomEnabled: false,
+          persistentRoomName: "",
+          persistentHostKeypair: null,
+          persistentRoomId: null,
+          persistentQueue: [],
+          favoriteRooms: [],
+          recentRooms: [],
+        },
       },
       beforeEachMigration: (store, context) => {
-        log.info(`Performing store migration from ${context.fromVersion} to ${context.toVersion}`);
+        log.info(
+          `Performing store migration from ${context.fromVersion} to ${context.toVersion}`,
+        );
       },
       migrations: {
-        ">=2.0.0": store => {
+        ">=2.0.0": (store) => {
           // @ts-expect-error Removed property which will error in TypeScript
           store.delete("integrations.companionServerAuthWindowEnabled");
           // @ts-expect-error Removed property which will error in TypeScript
@@ -97,17 +115,17 @@ export default class ConfigStore extends Service {
             store.set("appearance.zoom", 100);
           }
         },
-        ">=2.0.1": store => {
+        ">=2.0.1": (store) => {
           if (!store.has("lastfm.scrobblePercent")) {
             store.set("lastfm.scrobblePercent", 50);
           }
         },
-        ">=2.0.7": store => {
+        ">=2.0.7": (store) => {
           if (!store.has("appearance.trayIconStyle")) {
             store.set("appearance.trayIconStyle", 0);
           }
         },
-        ">=2.1.0": store => {
+        ">=2.1.0": (store) => {
           if (!store.has("shortcuts.volumeMute")) {
             store.set("shortcuts.volumeMute", "");
           }
@@ -149,8 +167,22 @@ export default class ConfigStore extends Service {
             // @ts-expect-error Removed store key
             store.delete("lastfm.token");
           }
-        }
-      }
+        },
+        ">=2.2.0": (store) => {
+          if (!store.has("listenTogether.displayName")) {
+            store.set("listenTogether.displayName", "");
+          }
+          if (!store.has("listenTogether.signalingUrl")) {
+            store.set("listenTogether.signalingUrl", null);
+          }
+          if (!store.has("listenTogether.trustedSignalingHosts")) {
+            store.set("listenTogether.trustedSignalingHosts", []);
+          }
+          if (!store.has("listenTogether.tailcatDerpMapUrl")) {
+            store.set("listenTogether.tailcatDerpMapUrl", null);
+          }
+        },
+      },
     });
 
     if (this.conf.get("general.disableHardwareAcceleration")) {
@@ -164,7 +196,8 @@ export default class ConfigStore extends Service {
   }
 
   public override onInitialized() {
-    if (this._initialized) throw new Error("ConfigStore is already initialized!");
+    if (this._initialized)
+      throw new Error("ConfigStore is already initialized!");
     this._initialized = true;
 
     const windowManager = this.getDependency(AppWindowManager);
@@ -205,9 +238,12 @@ export default class ConfigStore extends Service {
   }
 
   // TODO: This should probably be moved somewhere else as this isn't the job of the config store
-  private reconcileConfig(newState: Readonly<StoreSchema>, _oldState?: Readonly<StoreSchema> | undefined) {
+  private reconcileConfig(
+    newState: Readonly<StoreSchema>,
+    _oldState?: Readonly<StoreSchema> | undefined,
+  ) {
     app.setLoginItemSettings({
-      openAtLogin: newState.general.startOnBoot
+      openAtLogin: newState.general.startOnBoot,
     });
   }
 }

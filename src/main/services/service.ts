@@ -6,6 +6,13 @@ import EventEmitter from "node:events";
 declare const _never: unique symbol;
 type NoOverride = { [_never]: typeof _never };
 
+export interface ServiceLogger {
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+}
+
 export default abstract class Service {
   public static readonly dependencies: DependencyConstructor<Service>[] = [];
 

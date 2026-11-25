@@ -1,5 +1,9 @@
 import { app, dialog, Menu, session, shell } from "electron";
-import { DependencyConstructor, YTMViewSetupCompletionFlags, YTMViewStatus } from "~shared/types";
+import {
+  DependencyConstructor,
+  YTMViewSetupCompletionFlags,
+  YTMViewStatus,
+} from "~shared/types";
 import log from "electron-log";
 import path from "node:path";
 import Service, { EventEmitterService } from "../service";
@@ -8,13 +12,14 @@ import { AppView } from "../windowmanager/appview";
 import StateManager from "../statemanager";
 import MemoryStore from "../memorystore";
 import { MemoryStoreSchema } from "~shared/store/schema";
+import { redactLogUrl } from "~shared/listentogether/logger";
 import AppWindowManager from "../windowmanager";
 
 export type YTMViewManagerEventMap = {
   "status-changed": [];
   "view-recreated": [];
-  "unresponsive": [];
-  "responsive": [];
+  unresponsive: [];
+  responsive: [];
   "title-updated": [string];
   "load-errored": [];
 };
@@ -23,8 +28,11 @@ function urlIsGoogleAccountsDomain(url: URL): boolean {
   // https://www.google.com/supported_domains
   // prettier-ignore
   const supportedDomains = [".google.com",".google.ad",".google.ae",".google.com.af",".google.com.ag",".google.al",".google.am",".google.co.ao",".google.com.ar",".google.as",".google.at",".google.com.au",".google.az",".google.ba",".google.com.bd",".google.be",".google.bf",".google.bg",".google.com.bh",".google.bi",".google.bj",".google.com.bn",".google.com.bo",".google.com.br",".google.bs",".google.bt",".google.co.bw",".google.by",".google.com.bz",".google.ca",".google.cd",".google.cf",".google.cg",".google.ch",".google.ci",".google.co.ck",".google.cl",".google.cm",".google.cn",".google.com.co",".google.co.cr",".google.com.cu",".google.cv",".google.com.cy",".google.cz",".google.de",".google.dj",".google.dk",".google.dm",".google.com.do",".google.dz",".google.com.ec",".google.ee",".google.com.eg",".google.es",".google.com.et",".google.fi",".google.com.fj",".google.fm",".google.fr",".google.ga",".google.ge",".google.gg",".google.com.gh",".google.com.gi",".google.gl",".google.gm",".google.gr",".google.com.gt",".google.gy",".google.com.hk",".google.hn",".google.hr",".google.ht",".google.hu",".google.co.id",".google.ie",".google.co.il",".google.im",".google.co.in",".google.iq",".google.is",".google.it",".google.je",".google.com.jm",".google.jo",".google.co.jp",".google.co.ke",".google.com.kh",".google.ki",".google.kg",".google.co.kr",".google.com.kw",".google.kz",".google.la",".google.com.lb",".google.li",".google.lk",".google.co.ls",".google.lt",".google.lu",".google.lv",".google.com.ly",".google.co.ma",".google.md",".google.me",".google.mg",".google.mk",".google.ml",".google.com.mm",".google.mn",".google.com.mt",".google.mu",".google.mv",".google.mw",".google.com.mx",".google.com.my",".google.co.mz",".google.com.na",".google.com.ng",".google.com.ni",".google.ne",".google.nl",".google.no",".google.com.np",".google.nr",".google.nu",".google.co.nz",".google.com.om",".google.com.pa",".google.com.pe",".google.com.pg",".google.com.ph",".google.com.pk",".google.pl",".google.pn",".google.com.pr",".google.ps",".google.pt",".google.com.py",".google.com.qa",".google.ro",".google.ru",".google.rw",".google.com.sa",".google.com.sb",".google.sc",".google.se",".google.com.sg",".google.sh",".google.si",".google.sk",".google.com.sl",".google.sn",".google.so",".google.sm",".google.sr",".google.st",".google.com.sv",".google.td",".google.tg",".google.co.th",".google.com.tj",".google.tl",".google.tm",".google.tn",".google.to",".google.com.tr",".google.tt",".google.com.tw",".google.co.tz",".google.com.ua",".google.co.ug",".google.co.uk",".google.com.uy",".google.co.uz",".google.com.vc",".google.co.ve",".google.co.vi",".google.com.vn",".google.vu",".google.ws",".google.rs",".google.co.za",".google.co.zm",".google.co.zw",".google.cat"];
-  const domainSplits = [url.hostname.split("accounts")[1], url.hostname.split("myaccount")[1]];
-  if (domainSplits.some(d => supportedDomains.includes(d))) return true;
+  const domainSplits = [
+    url.hostname.split("accounts")[1],
+    url.hostname.split("myaccount")[1],
+  ];
+  if (domainSplits.some((d) => supportedDomains.includes(d))) return true;
   return false;
 }
 function isPreventedNavOrRedirect(url: URL): boolean {
@@ -34,7 +42,10 @@ function isPreventedNavOrRedirect(url: URL): boolean {
     url.hostname !== "music.youtube.com" &&
     !(
       (url.hostname === "www.youtube.com" || url.hostname === "youtube.com") &&
-      (url.pathname === "/signin" || url.pathname === "/premium" || url.pathname === "/musicpremium" || url.pathname === "/signin_prompt")
+      (url.pathname === "/signin" ||
+        url.pathname === "/premium" ||
+        url.pathname === "/musicpremium" ||
+        url.pathname === "/signin_prompt")
     ) &&
     !urlIsGoogleAccountsDomain(url)
   );
@@ -44,20 +55,28 @@ function openExternalFromYtmView(urlString: string) {
   const domainSplit = url.hostname.split(".");
   domainSplit.reverse();
   const domain = `${domainSplit[1]}.${domainSplit[0]}`;
-  if (domain === "google.com" || domain === "youtube.com" || domain === "googleusercontent.com" || domain === "ggpht.com") {
+  if (
+    domain === "google.com" ||
+    domain === "youtube.com" ||
+    domain === "googleusercontent.com" ||
+    domain === "ggpht.com"
+  ) {
     shell.openExternal(urlString);
   } else {
-    log.warn(`Attempted to open ${urlString} from YTMView but was denied`);
+    log.warn(
+      `Attempted to open ${redactLogUrl(urlString)} from YTMView but was denied`,
+    );
   }
 }
 
 export default class YTMViewManager extends EventEmitterService<YTMViewManagerEventMap> {
-  public static override readonly dependencies: DependencyConstructor<Service>[] = [
-    ConfigStore,
-    StateManager,
-    MemoryStore<MemoryStoreSchema>,
-    AppWindowManager
-  ];
+  public static override readonly dependencies: DependencyConstructor<Service>[] =
+    [
+      ConfigStore,
+      StateManager,
+      MemoryStore<MemoryStoreSchema>,
+      AppWindowManager,
+    ];
 
   private ytmView?: AppView;
   private hooksReady = false;
@@ -82,7 +101,8 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   public override onPreInitialized() {}
 
   public onInitialized() {
-    if (this._initialized) throw new Error("YTMViewManager is already initialized!");
+    if (this._initialized)
+      throw new Error("YTMViewManager is already initialized!");
     this._initialized = true;
 
     log.info("YTMViewManager initialized");
@@ -90,29 +110,34 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
 
   public override onPostInitialized() {
     const configStore = this.getDependency(ConfigStore);
-    configStore.onDidChange("appearance", newState => {
-      if (newState) this.ytmView?.webContents?.setZoomFactor(newState.zoom / 100);
+    configStore.onDidChange("appearance", (newState) => {
+      if (newState)
+        this.ytmView?.webContents?.setZoomFactor(newState.zoom / 100);
     });
 
     //#region Permission handlers
-    session.fromPartition("persist:ytmview").setPermissionCheckHandler((webContents, permission) => {
-      if (webContents == this.ytmView?.webContents) {
-        if (permission === "fullscreen") {
-          return true;
+    session
+      .fromPartition("persist:ytmview")
+      .setPermissionCheckHandler((webContents, permission) => {
+        if (webContents == this.ytmView?.webContents) {
+          if (permission === "fullscreen") {
+            return true;
+          }
         }
-      }
 
-      return false;
-    });
-    session.fromPartition("persist:ytmview").setPermissionRequestHandler((webContents, permission, callback) => {
-      if (webContents == this.ytmView?.webContents) {
-        if (permission === "fullscreen") {
-          return callback(true);
+        return false;
+      });
+    session
+      .fromPartition("persist:ytmview")
+      .setPermissionRequestHandler((webContents, permission, callback) => {
+        if (webContents == this.ytmView?.webContents) {
+          if (permission === "fullscreen") {
+            return callback(true);
+          }
         }
-      }
 
-      return callback(false);
-    });
+        return callback(false);
+      });
     //#endregion
   }
 
@@ -129,13 +154,25 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
 
     this.setStatus(YTMViewStatus.Loading);
 
+    const listenTogetherPendingColdStart = Boolean(
+      memoryStore.get("listenTogetherPendingColdStart"),
+    );
+
     let url = "https://music.youtube.com/";
-    const continueWhereYouLeftOff: boolean = configStore.get("playback.continueWhereYouLeftOff");
-    if (continueWhereYouLeftOff) {
-      const lastUrl: string = configStore.get("state.lastUrl");
-      if (lastUrl) {
-        if (lastUrl.startsWith("https://music.youtube.com/")) {
-          url = lastUrl;
+    if (listenTogetherPendingColdStart) {
+      log.info(
+        "[YTMViewManager] Cold-start Listen Together invite pending; suppressing continueWhereYouLeftOff URL restore and forcing no-user-gesture-required autoplayPolicy",
+      );
+    } else {
+      const continueWhereYouLeftOff: boolean = configStore.get(
+        "playback.continueWhereYouLeftOff",
+      );
+      if (continueWhereYouLeftOff) {
+        const lastUrl: string = configStore.get("state.lastUrl");
+        if (lastUrl) {
+          if (lastUrl.startsWith("https://music.youtube.com/")) {
+            url = lastUrl;
+          }
         }
       }
     }
@@ -151,33 +188,43 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
           height: true,
           offsetHeight: {
             anchor: "Bottom",
-            pixels: 36
-          }
-        }
+            pixels: 36,
+          },
+        },
       },
       electronOptions: {
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
           partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
-          preload: path.join(__dirname, `../preload/windows/ytmview/preload.cjs`),
-          devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools"),
-          autoplayPolicy:
-            configStore.get("playback.continueWhereYouLeftOff") && configStore.get("playback.continueWhereYouLeftOffPaused")
+          preload: path.join(
+            __dirname,
+            `../preload/windows/ytmview/preload.cjs`,
+          ),
+          devTools: !app.isPackaged
+            ? true
+            : configStore.get("developer.enableDevTools"),
+          autoplayPolicy: listenTogetherPendingColdStart
+            ? "no-user-gesture-required"
+            : configStore.get("playback.continueWhereYouLeftOff") &&
+                configStore.get("playback.continueWhereYouLeftOffPaused")
               ? "document-user-activation-required"
-              : "no-user-gesture-required"
-        }
-      }
+              : "no-user-gesture-required",
+        },
+      },
     });
 
     this.ytmView.on("ready", () => {
-      this.ytmView!.webContents!.setZoomFactor(configStore.get("appearance.zoom") / 100);
+      this.ytmView!.webContents!.setZoomFactor(
+        configStore.get("appearance.zoom") / 100,
+      );
       const url = new URL(this.ytmView!.webContents!.getURL());
       if (url.hostname === "music.youtube.com") {
         this.setStatus(YTMViewStatus.Hooking);
       } else {
         this.hooksReady = true;
-        this.setupCompletionFlags = YTMViewSetupCompletionFlags.LocationNotApplicable;
+        this.setupCompletionFlags =
+          YTMViewSetupCompletionFlags.LocationNotApplicable;
         this.setStatus(YTMViewStatus.Ready);
       }
     });
@@ -186,6 +233,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       this.hookError = null;
       this.setStatus(YTMViewStatus.Loading);
       this.setWindowOpenHandler();
+      log.info("[YTMViewManager] YTMView recreated; resetting hook readiness");
 
       this.emit("view-recreated");
     });
@@ -194,16 +242,16 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       this.ytmView!.setAutoResize({
         offsetHeight: {
           anchor: "Top",
-          pixels: 0
-        }
+          pixels: 0,
+        },
       });
     });
     this.ytmView.on("webcontents-leave-html-full-screen", () => {
       this.ytmView!.setAutoResize({
         offsetHeight: {
           anchor: "Bottom",
-          pixels: 36
-        }
+          pixels: 36,
+        },
       });
     });
     this.ytmView.on("webcontents-did-navigate", () => {
@@ -211,7 +259,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       const urlObj = new URL(url);
       if (urlObj.hostname === "music.youtube.com") {
         stateManager.updateState({
-          lastUrl: url
+          lastUrl: url,
         });
       }
     });
@@ -220,18 +268,20 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       const urlObj = new URL(url);
       if (urlObj.hostname === "music.youtube.com") {
         stateManager.updateState({
-          lastUrl: url
+          lastUrl: url,
         });
       }
     });
     this.ytmView.on("webcontents-context-menu", (_event, params) => {
-      const menu: (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] = [];
+      const menu: (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] =
+        [];
 
       if (params.spellcheckEnabled) {
         for (const suggestion of params.dictionarySuggestions) {
           menu.push({
             label: suggestion,
-            click: () => this.ytmView!.webContents!.replaceMisspelling(suggestion)
+            click: () =>
+              this.ytmView!.webContents!.replaceMisspelling(suggestion),
           });
         }
       }
@@ -239,90 +289,90 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
       if (params.linkURL) {
         if (menu.length > 0) {
           menu.push({
-            type: "separator"
+            type: "separator",
           });
         }
 
         menu.push({
           label: "Open Link in Browser",
           type: "normal",
-          click: () => openExternalFromYtmView(params.linkURL)
+          click: () => openExternalFromYtmView(params.linkURL),
         });
       }
 
       if (params.hasImageContents) {
         if (menu.length > 0) {
           menu.push({
-            type: "separator"
+            type: "separator",
           });
         }
 
         menu.push({
           label: "Open Image in Browser",
           type: "normal",
-          click: () => openExternalFromYtmView(params.srcURL)
+          click: () => openExternalFromYtmView(params.srcURL),
         });
       }
 
       if (params.isEditable) {
         if (menu.length > 0) {
           menu.push({
-            type: "separator"
+            type: "separator",
           });
         }
 
         menu.push({
           role: "undo",
           enabled: params.editFlags.canUndo,
-          accelerator: "CommandOrControl+Z"
+          accelerator: "CommandOrControl+Z",
         });
         menu.push({
           role: "redo",
           enabled: params.editFlags.canRedo,
-          accelerator: "CommandOrControl+Shift+Z"
+          accelerator: "CommandOrControl+Shift+Z",
         });
         menu.push({
-          type: "separator"
+          type: "separator",
         });
         menu.push({
           role: "cut",
           enabled: params.editFlags.canCut,
-          accelerator: "CommandOrControl+X"
+          accelerator: "CommandOrControl+X",
         });
         menu.push({
           role: "copy",
           enabled: params.editFlags.canCopy,
-          accelerator: "CommandOrControl+C"
+          accelerator: "CommandOrControl+C",
         });
         menu.push({
           role: "paste",
           enabled: params.editFlags.canPaste,
-          accelerator: "CommandOrControl+V"
+          accelerator: "CommandOrControl+V",
         });
         menu.push({
           role: "selectAll",
           enabled: params.editFlags.canSelectAll,
-          accelerator: "CommandOrControl+A"
+          accelerator: "CommandOrControl+A",
         });
       } else {
         if (params.selectionText) {
           menu.push({
             role: "copy",
             enabled: params.editFlags.canCopy,
-            accelerator: "CommandOrControl+C"
+            accelerator: "CommandOrControl+C",
           });
         }
         menu.push({
           role: "selectAll",
           enabled: params.editFlags.canSelectAll,
-          accelerator: "CommandOrControl+A"
+          accelerator: "CommandOrControl+A",
         });
       }
 
       if (configStore.get("developer.enableDevTools")) {
         if (menu.length > 0) {
           menu.push({
-            type: "separator"
+            type: "separator",
           });
         }
         menu.push({
@@ -330,41 +380,42 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
           type: "normal",
           click: () => {
             this.ytmView!.webContents!.inspectElement(params.x, params.y);
-          }
+          },
         });
       }
 
       Menu.buildFromTemplate(menu).popup({
         x: params.x,
         y: params.y,
-        sourceType: params.menuSourceType
+        sourceType: params.menuSourceType,
       });
     });
-    this.ytmView.on("webcontents-will-navigate", event => {
+    this.ytmView.on("webcontents-will-navigate", (event) => {
       const url = new URL(event.url);
       if (isPreventedNavOrRedirect(url)) {
         event.preventDefault();
-        log.info(`Blocking YTM View navigation to ${event.url}`);
+        log.info(`Blocking YTM View navigation to ${redactLogUrl(event.url)}`);
 
         openExternalFromYtmView(event.url);
       }
     });
-    this.ytmView.on("webcontents-will-redirect", event => {
+    this.ytmView.on("webcontents-will-redirect", (event) => {
       const url = new URL(event.url);
       if (isPreventedNavOrRedirect(url)) {
         event.preventDefault();
-        log.info(`Blocking YTM View redirect to ${event.url}`);
+        log.info(`Blocking YTM View redirect to ${redactLogUrl(event.url)}`);
       }
 
       if (
         (url.hostname === "www.youtube.com" && url.pathname === "/premium") ||
         (url.hostname === "youtube.com" && url.pathname === "/premium") ||
-        (url.hostname === "www.youtube.com" && url.pathname === "/musicpremium") ||
+        (url.hostname === "www.youtube.com" &&
+          url.pathname === "/musicpremium") ||
         (url.hostname === "youtube.com" && url.pathname === "/musicpremium")
       ) {
         // This users region requires a premium subscription to use YTM
         this.ytmView!.webContents!.loadURL(
-          "https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F"
+          "https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F",
         );
       }
     });
@@ -379,32 +430,51 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     this.ytmView.on("webcontents-page-title-updated", (event, title) => {
       this.emit("title-updated", title);
     });
-    this.ytmView.on("webcontents-will-prevent-unload", event => {
-      const choice = dialog.showMessageBoxSync(this.ytmView!.getParentWindow()!._getElectronWindow(), {
-        type: "question",
-        buttons: ["Leave", "Cancel"],
-        title: "Leave site?",
-        message: "Changes you made may not be saved.",
-        defaultId: 0,
-        cancelId: 1
-      });
+    this.ytmView.on("webcontents-will-prevent-unload", (event) => {
+      const choice = dialog.showMessageBoxSync(
+        this.ytmView!.getParentWindow()!._getElectronWindow(),
+        {
+          type: "question",
+          buttons: ["Leave", "Cancel"],
+          title: "Leave site?",
+          message: "Changes you made may not be saved.",
+          defaultId: 0,
+          cancelId: 1,
+        },
+      );
       if (choice === 0) {
         event.preventDefault();
       }
     });
-    this.ytmView.on("webcontents-did-fail-load", (event, errorCode, errorDescription) => {
-      this.setLoadError(errorCode, errorDescription);
-      this.setStatus(YTMViewStatus.LoadFailed);
-    });
+    this.ytmView.on(
+      "webcontents-did-fail-load",
+      (event, errorCode, errorDescription) => {
+        log.warn("[YTMViewManager] YTMView failed to load", {
+          errorCode,
+          errorDescription,
+        });
+        this.setLoadError(errorCode, errorDescription);
+        this.setStatus(YTMViewStatus.LoadFailed);
+      },
+    );
     this.setWindowOpenHandler();
 
     // YTM View IPC
-    this.ytmView.ipcOn("ytmView:ready", async (_event, setupCompletionFlags) => {
-      this.hooksReady = true;
-      this.setupCompletionFlags = setupCompletionFlags;
-      this.setStatus(YTMViewStatus.Ready);
-    });
+    this.ytmView.ipcOn(
+      "ytmView:ready",
+      async (_event, setupCompletionFlags) => {
+        this.hooksReady = true;
+        this.setupCompletionFlags = setupCompletionFlags;
+        log.info("[YTMViewManager] YTMView hooks ready", {
+          setupCompletionFlags,
+        });
+        this.setStatus(YTMViewStatus.Ready);
+      },
+    );
     this.ytmView.ipcOn("ytmView:errored", (_event, error) => {
+      log.error("[YTMViewManager] YTMView setup errored", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.hookError = error;
     });
   }
@@ -416,7 +486,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   public async ready(): Promise<void> {
     await this.ytmView?.ready();
     if (!this.hooksReady)
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const interval = setInterval(async () => {
           if (this.hooksReady) {
             clearInterval(interval);
@@ -446,17 +516,17 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
   private setLoadError(code: number, description: string) {
     this._loadError = {
       code,
-      description
+      description,
     };
     this.emit("load-errored");
   }
 
   private setWindowOpenHandler() {
-    this.ytmView?.webContents?.setWindowOpenHandler(details => {
+    this.ytmView?.webContents?.setWindowOpenHandler((details) => {
       openExternalFromYtmView(details.url);
 
       return {
-        action: "deny"
+        action: "deny",
       };
     });
   }

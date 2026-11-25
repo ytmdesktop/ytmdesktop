@@ -27,7 +27,9 @@ export default class IPCClient extends EventEmitter {
       this.emit("close", hadError);
     });
     this.socket.on("error", error => {
-      this.emit("error", error);
+      if (this.listenerCount("error") > 0) {
+        this.emit("error", error);
+      }
     });
     this.socket.on("data", (buffer: Buffer) => {
       try {
@@ -60,8 +62,17 @@ export default class IPCClient extends EventEmitter {
     buffer.writeInt32LE(length, 4);
     buffer.write(json, 8, length);
 
-    if (!this.socket.closed && this.socket.writable) {
-      this.socket.write(buffer);
+    if (
+      !this.socket.closed &&
+      !this.socket.destroyed &&
+      !this.socket.writableEnded &&
+      this.socket.writable
+    ) {
+      try {
+        this.socket.write(buffer);
+      } catch {
+        this.socket.destroy();
+      }
     } else {
       this.socket.end();
       this.createSocket();

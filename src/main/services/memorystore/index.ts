@@ -5,10 +5,15 @@ import Service from "../service";
 import AppWindowManager from "../windowmanager";
 import log from "electron-log";
 
-export default class MemoryStore<T extends Record<string, unknown>> extends Service {
-  public static override readonly dependencies: DependencyConstructor<Service>[] = [AppWindowManager];
+export default class MemoryStore<
+  T extends Record<string, unknown>,
+> extends Service {
+  public static override readonly dependencies: DependencyConstructor<Service>[] =
+    [AppWindowManager];
 
-  private state: Record<string, unknown> = {};
+  private state: Record<string, unknown> = {
+    listenTogetherPendingColdStart: false,
+  };
   private eventEmitter = new EventEmitter();
 
   public override onPreInitialized() {}

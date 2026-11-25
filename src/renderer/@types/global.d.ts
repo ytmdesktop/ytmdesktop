@@ -3,6 +3,11 @@ import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../store-ipc/memory-store";
 import { PlayerState } from "~shared/playerstatestore/types";
+import type {
+  ListenTogetherActionResult,
+  ListenTogetherCommand,
+  ListenTogetherUIState,
+} from "~shared/listentogether/ipc";
 
 declare global {
   interface Window {
@@ -24,7 +29,7 @@ declare global {
       processVersions: {
         electron: string;
         chrome: string;
-      }
+      };
 
       // Companion Authorization specific
       sendResult(authorized: boolean);
@@ -32,13 +37,16 @@ declare global {
       getCode(): string;
 
       // Main window specific
-      switchFocus(context: "main" | "ytm"): void;
+      switchFocus(context: "main" | "ytm" | "listenTogether"): void;
+      isMainWindow(): boolean;
 
       // YTM view specific
       ytmViewNavigateDefault(): void;
       ytmViewRecreate(): void;
       ytmViewStatusChanged(callback: (status: YTMViewStatus) => void): void;
-      ytmViewLoadError(callback: (loadError: { code: number; description: string }) => void): void;
+      ytmViewLoadError(
+        callback: (loadError: { code: number; description: string }) => void,
+      ): void;
       ytmViewReload(): void;
 
       // View specific
@@ -67,11 +75,24 @@ declare global {
 
       // Miniplayer specific
       playerStore: {
-        getState(): PlayerState | null;
+        getState(): Promise<PlayerState | null>;
         handleStateChanged(callback: (state: PlayerState) => void);
       };
       executeCommandInYTMView(command: string, ...args: unknown[]);
       isWayland(): boolean;
+
+      // Listen Together
+      listenTogether: {
+        getState(): Promise<ListenTogetherUIState>;
+        onStateChanged(
+          callback: (state: ListenTogetherUIState) => void,
+        ): () => void;
+        dispatch?(
+          command: ListenTogetherCommand,
+        ): Promise<ListenTogetherActionResult>;
+        togglePanel?(): void;
+        closePanel?(): void;
+      };
     };
   }
 
@@ -79,7 +100,10 @@ declare global {
   interface Navigator {
     windowControlsOverlay: {
       visible: boolean;
-      addEventListener(event: "geometrychange", listener: (event: { visible: boolean }) => void);
+      addEventListener(
+        event: "geometrychange",
+        listener: (event: { visible: boolean }) => void,
+      );
     };
   }
 }

@@ -1,11 +1,19 @@
 import { YTMViewSetupCompletionFlags } from "~shared/types";
-import initPlayerStateStore, { waitForYTMPlayerApiReady } from "./playerstatestore";
+import initPlayerStateStore, {
+  waitForYTMPlayerApiReady,
+} from "./playerstatestore";
 import ytmhook from "./ytmhook";
 import protectedapimanager from "./protectedapimanager";
 import { createMaterialSymbolsLink, createStyleSheet } from "./setup/styles";
 import { createNavigationMenuArrows } from "./setup/navigation";
 import initRemote from "./setup/remote";
-import { addTimedLyrics, createAdditionalPlayerBarControls, hideChromecastButton, overrideHistoryButtonDisplay } from "./setup/extras";
+import setupListenTogether from "./setup/listentogether";
+import {
+  addTimedLyrics,
+  createAdditionalPlayerBarControls,
+  hideChromecastButton,
+  overrideHistoryButtonDisplay,
+} from "./setup/extras";
 
 protectedapimanager.init();
 ytmhook.init();
@@ -17,7 +25,7 @@ window.addEventListener("load", async () => {
       await ytmhook.ready();
       window.__YTMD_HOOK__ = Object.freeze({
         ytmPlayerController: ytmhook.ytmPlayerController,
-        ytmStateStore: ytmhook.ytmStateStore
+        ytmStateStore: ytmhook.ytmStateStore,
       });
 
       setupCompletions |= YTMViewSetupCompletionFlags.Early;
@@ -32,7 +40,7 @@ window.addEventListener("load", async () => {
       };
       document.head.appendChild(materialSymbols);
 
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const interval = setInterval(async () => {
           if (materialSymbolsLoaded) {
             clearInterval(interval);
@@ -64,6 +72,10 @@ window.addEventListener("load", async () => {
     }
 
     {
+      setupListenTogether();
+    }
+
+    {
       overrideHistoryButtonDisplay();
       hideChromecastButton();
       createAdditionalPlayerBarControls(); // Sort of broken as of new YTM player bar (10/03/26)
@@ -75,17 +87,17 @@ window.addEventListener("load", async () => {
     window.postMessage(
       {
         op: "ytmd-errored",
-        error
+        error,
       },
-      "/"
+      "/",
     );
   } finally {
     window.postMessage(
       {
         op: "ytmd-ready",
-        completions: setupCompletions
+        completions: setupCompletions,
       },
-      "/"
+      "/",
     );
   }
 });
