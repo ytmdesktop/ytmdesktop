@@ -13,13 +13,22 @@ if (window.location.hostname !== "music.youtube.com") {
   throw new Error("[YTMDFastFail]: THIS IS NOT AN ERROR! Location not applicable bailing preload");
 }
 
-import { ipcRenderer, webFrame } from "electron";
+import { contextBridge, ipcRenderer, webFrame } from "electron";
+import { installCastBridge } from "electron-cast/preload";
 import Store from "../store-ipc/store";
 import { StoreSchema } from "~shared/store/schema";
 
 import scriptsRaw from "./scripts?raw";
 
 const store = new Store<StoreSchema>();
+
+// Asked synchronously because the bridge has to be in place before YTM's scripts run. Main answers with what it is
+// serving, so the page and main always agree (the setting only applies after a restart).
+const castingEnabled = ipcRenderer.sendSync("castManager:isEnabled") !== false;
+
+// Gives the Presentation API a backend before YTM's scripts run, so Google's Cast SDK (loaded by YTM) finds devices
+// and its own cast button casts through the main process.
+if (castingEnabled) installCastBridge({ contextBridge, ipcRenderer });
 
 let protectedApiBound = false;
 window.addEventListener("message", async event => {
@@ -64,6 +73,27 @@ window.addEventListener("message", async event => {
       }
     }
 
+    if (!castingEnabled) {
+      // Without the bridge nothing answers Google's Cast SDK, so hide YTM's cast button. YTM sets it available again
+      // from its own code, so keep overriding it.
+      (
+        await webFrame.executeJavaScript(`
+          (function() {
+            const ytmStore = window.__YTMD_HOOK__.ytmStateStore.store;
+            const hide = () => {
+              try {
+                if (ytmStore.getState().castStatus.castAvailable) ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+              } catch (err) {
+                console.error("[ytmd-err(hideCastButton)]", err);
+              }
+            };
+            hide();
+            ytmStore.subscribe(hide);
+          })
+        `)
+      )();
+    }
+
     const alwaysShowVolumeSlider = (await store.get("appearance")).alwaysShowVolumeSlider;
     if (alwaysShowVolumeSlider) {
       document.querySelector("ytmusic-app-layout>ytmusic-player-bar #volume-slider")?.classList.add("ytmd-persist-volume-slider");
@@ -86,6 +116,16 @@ window.addEventListener("message", async event => {
     ipcRenderer.on("ytmView:executeScript", async (_event, script) => {
       (await webFrame.executeJavaScript(script))();
     });
+  }
+
+  // Cast session persistence (see scripts/setup/cast.ts). Nothing is answered or kept while casting is disabled.
+  if (castingEnabled && event.source === window && event.data?.op) {
+    if (event.data.op === "ytmd-cast-request-saved-session") {
+      const session = ipcRenderer.sendSync("castManager:takeSavedSession");
+      if (session) window.postMessage({ op: "ytmd-cast-saved-session", session }, "/");
+    } else if (event.data.op === "ytmd-cast-session") {
+      ipcRenderer.send("castManager:sessionChanged", event.data.session);
+    }
   }
 
   if (event.data.op && event.data.op === "ytmd-errored") {

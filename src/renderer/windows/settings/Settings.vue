@@ -53,6 +53,8 @@ const trayIconStyle = ref<number>(appearance.trayIconStyle);
 const continueWhereYouLeftOff = ref<boolean>(playback.continueWhereYouLeftOff);
 const continueWhereYouLeftOffPaused = ref<boolean>(playback.continueWhereYouLeftOffPaused);
 const enableSpeakerFill = ref<boolean>(playback.enableSpeakerFill);
+// Missing until the store migration has run, which means on
+const enableCasting = ref<boolean>(playback.enableCasting !== false);
 const progressInTaskbar = ref<boolean>(playback.progressInTaskbar);
 const ratioVolume = ref<boolean>(playback.ratioVolume);
 
@@ -95,6 +97,7 @@ store.onDidAnyChange(async newState => {
   continueWhereYouLeftOff.value = newState.playback.continueWhereYouLeftOff;
   continueWhereYouLeftOffPaused.value = newState.playback.continueWhereYouLeftOffPaused;
   enableSpeakerFill.value = newState.playback.enableSpeakerFill;
+  enableCasting.value = newState.playback.enableCasting !== false;
   progressInTaskbar.value = newState.playback.progressInTaskbar;
   ratioVolume.value = newState.playback.ratioVolume;
 
@@ -187,6 +190,7 @@ async function settingsChanged() {
   store.set("playback.continueWhereYouLeftOffPaused", continueWhereYouLeftOffPaused.value);
   store.set("playback.progressInTaskbar", progressInTaskbar.value);
   store.set("playback.enableSpeakerFill", enableSpeakerFill.value);
+  store.set("playback.enableCasting", enableCasting.value);
   store.set("playback.ratioVolume", ratioVolume.value);
 
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
@@ -445,6 +449,14 @@ function stepLastFMAuth() {
             type="checkbox"
             restart-required
             name="Enable speaker fill"
+            @change="settingChangedRequiresRestart"
+          />
+          <YTMDSetting
+            v-model="enableCasting"
+            type="checkbox"
+            restart-required
+            name="Enable casting"
+            description="Cast to Chromecasts, Google/Nest speakers and speaker groups. When off, the app doesn't look for devices on your network"
             @change="settingChangedRequiresRestart"
           />
           <YTMDSetting

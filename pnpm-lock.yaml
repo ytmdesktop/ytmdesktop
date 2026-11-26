@@ -184,6 +184,9 @@ importers:
       conf:
         specifier: ^15.1.0
         version: 15.1.0
+      electron-cast:
+        specifier: 0.5.0
+        version: 0.5.0(electron@45.2.2)
       electron-log:
         specifier: ^5.4.4
         version: 5.4.4
@@ -1195,6 +1198,16 @@ packages:
   dot-prop@10.2.0:
     resolution: {integrity: sha512-BTJ9aZYL3vCfZlZOBLy9v8TUqWGQ0pzFnygKwFZt5udj6viBoFIBviKPUoZLDCPn1FoXffv6McQFDenrm5Krfw==}
     engines: {node: '>=20'}
+
+  electron-cast@0.5.0:
+    resolution: {integrity: sha512-vlm5pBwqpEuikHaaFriwzFKbI9WXiZ7sEJ3pVBTgDkvfO6/eUFNJOq5JlXPuAQ64xAH9I1RrW4x1NhuVAdhd1g==}
+    engines: {node: '>=20'}
+    hasBin: true
+    peerDependencies:
+      electron: '>=35'
+    peerDependenciesMeta:
+      electron:
+        optional: true
 
   electron-installer-common@0.10.4:
     resolution: {integrity: sha512-8gMNPXfAqUE5CfXg8RL0vXpLE9HAaPkgLXVoHE3BMUzogMWenf4LmwQ27BdCUrEhkjrKl+igs2IHJibclR3z3Q==}
@@ -3031,6 +3044,10 @@ snapshots:
   dot-prop@10.2.0:
     dependencies:
       type-fest: 5.10.0
+
+  electron-cast@0.5.0(electron@45.2.2):
+    optionalDependencies:
+      electron: 45.2.2
 
   electron-installer-common@0.10.4:
     dependencies:

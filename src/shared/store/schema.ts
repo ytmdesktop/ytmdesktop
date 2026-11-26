@@ -27,6 +27,7 @@ export type StoreSchema = {
     continueWhereYouLeftOff: boolean;
     continueWhereYouLeftOffPaused: boolean;
     enableSpeakerFill: boolean;
+    enableCasting: boolean;
     progressInTaskbar: boolean;
     ratioVolume: boolean;
   };
@@ -57,6 +58,7 @@ export type StoreSchema = {
     windowBounds: Electron.Rectangle | null;
     windowMaximized: boolean;
     miniplayerWindowBounds: Electron.Rectangle | null;
+    castSession: { sessionId: string; appId: string; deviceName: string | null } | null;
   };
   lastfm: {
     sessionKey: string | null;

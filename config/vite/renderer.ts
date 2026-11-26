@@ -46,6 +46,10 @@ export default defineConfig({
           root,
           "src/renderer/windows/changelog/index.html",
         ),
+        cast_picker_window: path.resolve(
+          root,
+          "src/renderer/windows/cast-picker/index.html",
+        ),
       },
       output: {
         codeSplitting: {

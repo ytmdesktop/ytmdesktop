@@ -45,6 +45,7 @@ export default class ConfigStore extends Service {
           continueWhereYouLeftOff: true,
           continueWhereYouLeftOffPaused: true,
           enableSpeakerFill: false,
+          enableCasting: true,
           progressInTaskbar: false,
           ratioVolume: false
         },
@@ -74,7 +75,8 @@ export default class ConfigStore extends Service {
           lastVideoId: "",
           windowBounds: null,
           windowMaximized: false,
-          miniplayerWindowBounds: null
+          miniplayerWindowBounds: null,
+          castSession: null
         },
         lastfm: {
           sessionKey: null,
@@ -148,6 +150,11 @@ export default class ConfigStore extends Service {
           if (store.has("lastfm.token")) {
             // @ts-expect-error Removed store key
             store.delete("lastfm.token");
+          }
+        },
+        ">=2.1.1": store => {
+          if (!store.has("playback.enableCasting")) {
+            store.set("playback.enableCasting", true);
           }
         }
       }

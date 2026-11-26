@@ -11,21 +11,21 @@ export function overrideHistoryButtonDisplay() {
     );
 }
 
-export async function hideChromecastButton() {
-  const ytmStore = ytmhook.ytmStateStore.store;
-
-  ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
-  // YTM has independent code which sets the cast available so we're subscribing to ensure it's overriden if they do later call it
-  ytmStore.subscribe(() => {
-    try {
-      const ytmStore = ytmhook.ytmStateStore.store;
-      if (ytmStore.getState().castStatus.castAvailable) {
-        ytmStore.dispatch({ type: "SET_CAST_AVAILABLE", payload: false });
+// YTM places its hint bubbles (the cast "Start playback" one, for example) above the play button, but it can do so
+// while the player bar is still sliding into view. The bubble then ends up on top of the buttons and stays there.
+export function refitHintsWhenPlayerBarSettles() {
+  document
+    .querySelector("ytmusic-player-bar")
+    ?.addEventListener("transitionend", () => {
+      for (const hint of document.querySelectorAll(
+        "ytmusic-popup-container yt-bubble-hint-renderer",
+      )) {
+        const dropdown = hint.closest<
+          HTMLElement & { opened: boolean; refit(): void }
+        >("tp-yt-iron-dropdown");
+        if (dropdown?.opened) dropdown.refit();
       }
-    } catch (err) {
-      console.error("[ytmd-err(hideChromecastButton)]", err);
-    }
-  });
+    });
 }
 
 export async function createAdditionalPlayerBarControls() {

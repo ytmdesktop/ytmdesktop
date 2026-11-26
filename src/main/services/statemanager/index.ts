@@ -46,6 +46,11 @@ export default class StateManager extends Service {
     this.forceWrite();
   }
 
+  /** The state as last updated; the copy on disk can be up to 30 seconds behind it. */
+  public get state(): Readonly<StoreSchema["state"]> | null {
+    return this.currentState;
+  }
+
   public updateState(partialState: Partial<StoreSchema["state"]>) {
     if (this.panicked) return;
     if (!this._initialized) return;

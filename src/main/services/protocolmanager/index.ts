@@ -127,6 +127,11 @@ export default class ProtocolManager extends Service {
         rootPath = path.resolve(process.resourcesPath, `app.asar/.vite/renderer/windows/changelog`);
         break;
       }
+
+      case "cast-picker": {
+        rootPath = path.resolve(process.resourcesPath, `app.asar/.vite/renderer/windows/cast-picker`);
+        break;
+      }
     }
 
     log.debug(`${req.method} ytmd-app://${host}${pathname}`);
