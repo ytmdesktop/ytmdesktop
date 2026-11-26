@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
-import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
+import { DiscordActivityStatusDisplayType, StoreSchema, TrayIconStyle } from "~shared/store/schema";
 import { AuthToken } from "~shared/integrations/companion-server/types";
 import logo from "~assets/icons/ytmd.png";
 
@@ -62,6 +62,9 @@ const companionServerAuthTokens = ref<AuthToken[]>(
 );
 const companionServerCORSWildcardEnabled = ref<boolean>(integrations.companionServerCORSWildcardEnabled);
 const discordPresenceEnabled = ref<boolean>(integrations.discordPresenceEnabled);
+const discordPresenceStatusDisplay = ref<number>(integrations.discordPresenceStatusDisplay ?? DiscordActivityStatusDisplayType.State);
+const discordPresenceShowPlayOnYTMDButton = ref<boolean>(integrations.discordPresenceShowPlayOnYTMDButton ?? true);
+const discordPresenceShowPlaybackStateIcon = ref<boolean>(integrations.discordPresenceShowPlaybackStateIcon ?? true);
 const lastFMEnabled = ref<boolean>(integrations.lastFMEnabled);
 const enhancedMediaServiceEnabled = ref<boolean>(integrations.enhancedMediaServiceEnabled);
 
@@ -104,6 +107,9 @@ store.onDidAnyChange(async newState => {
     : [];
   companionServerCORSWildcardEnabled.value = newState.integrations.companionServerCORSWildcardEnabled;
   discordPresenceEnabled.value = newState.integrations.discordPresenceEnabled;
+  discordPresenceStatusDisplay.value = newState.integrations.discordPresenceStatusDisplay ?? DiscordActivityStatusDisplayType.State;
+  discordPresenceShowPlayOnYTMDButton.value = newState.integrations.discordPresenceShowPlayOnYTMDButton ?? true;
+  discordPresenceShowPlaybackStateIcon.value = newState.integrations.discordPresenceShowPlaybackStateIcon ?? true;
   lastFMEnabled.value = newState.integrations.lastFMEnabled;
   lastFMSessionKey.value = newState.lastfm.sessionKey;
   scrobblePercent.value = newState.lastfm.scrobblePercent;
@@ -192,6 +198,9 @@ async function settingsChanged() {
   store.set("integrations.companionServerEnabled", companionServerEnabled.value);
   store.set("integrations.companionServerCORSWildcardEnabled", companionServerCORSWildcardEnabled.value);
   store.set("integrations.discordPresenceEnabled", discordPresenceEnabled.value);
+  store.set("integrations.discordPresenceStatusDisplay", discordPresenceStatusDisplay.value);
+  store.set("integrations.discordPresenceShowPlayOnYTMDButton", discordPresenceShowPlayOnYTMDButton.value);
+  store.set("integrations.discordPresenceShowPlaybackStateIcon", discordPresenceShowPlaybackStateIcon.value);
   store.set("integrations.lastFMEnabled", lastFMEnabled.value);
   store.set("lastfm.scrobblePercent", scrobblePercent.value);
   store.set("integrations.enhancedMediaServiceEnabled", enhancedMediaServiceEnabled.value);
@@ -537,6 +546,38 @@ function stepLastFMAuth() {
             v-model="discordPresenceEnabled"
             type="checkbox"
             name="Discord rich presence"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="discordPresenceEnabled"
+            v-model="discordPresenceStatusDisplay"
+            :options-map="{
+              [DiscordActivityStatusDisplayType.State]: 'Artist (Default)',
+              [DiscordActivityStatusDisplayType.Details]: 'Song title',
+              [DiscordActivityStatusDisplayType.Name]: 'App name'
+            }"
+            type="select"
+            indented
+            name="Activity banner display"
+            description="Choose whether the Discord activity banner displays the artist or song title"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="discordPresenceEnabled"
+            v-model="discordPresenceShowPlayOnYTMDButton"
+            type="checkbox"
+            indented
+            name='Show "Play on YTMDesktop" button'
+            description="Allows others to play the current song in YTMDesktop"
+            @change="settingsChanged"
+          />
+          <YTMDSetting
+            v-if="discordPresenceEnabled"
+            v-model="discordPresenceShowPlaybackStateIcon"
+            type="checkbox"
+            indented
+            name="Show playback state icon"
+            description="Shows playing or paused badge on the album art"
             @change="settingsChanged"
           />
           <div
