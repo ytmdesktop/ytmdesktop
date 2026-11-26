@@ -108,6 +108,7 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   private viewReady = false;
   private lastViewIndex = -1;
   private ipcEventProxy = new EventEmitter();
+  private boundsCalculator: ((parentBounds: Rectangle) => Rectangle) | null = null;
 
   public readonly name: string;
   public get webContents() {
@@ -247,6 +248,15 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     this.parentWindowResize();
   }
 
+  /**
+   * Replaces autoResize until cleared.
+   * Pass `apply` false when the view is about to move, so the new parent applies the layout.
+   */
+  public setBoundsCalculator(calculator: ((parentBounds: Rectangle) => Rectangle) | null, apply = true) {
+    this.boundsCalculator = calculator;
+    if (apply) this.parentWindowResize();
+  }
+
   private createElectronView() {
     // Silently ignore this call as the AppView is destroyed
     if (this.destroyed) {
@@ -330,6 +340,12 @@ export class AppView extends EventEmitter<AppViewEventMap> {
   }
 
   private parentWindowResize() {
+    if (this.boundsCalculator && this.electronView && this.parentWindow) {
+      const parentBounds = this.parentWindow._getElectronWindow().getContentBounds();
+      this.electronView.setBounds(this.boundsCalculator(parentBounds));
+      return;
+    }
+
     if (this.options.viewState.autoResize && this.electronView && this.parentWindow) {
       const newBounds = this.electronView.getBounds();
       const parentBounds = this.parentWindow._getElectronWindow().getContentBounds();

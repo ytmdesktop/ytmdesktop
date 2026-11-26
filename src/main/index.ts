@@ -29,6 +29,7 @@ import ProtocolManager from "./services/protocolmanager";
 import PlayerStateStore from "./services/playerstatestore";
 import ProtectedAPIManager from "./services/protectedapimanager";
 import { VideoType } from "~shared/playerstatestore/types";
+import { createLiveMiniplayerController } from "./live-miniplayer";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
@@ -376,6 +377,22 @@ app.on("ready", async () => {
     });
   });
 
+  const liveMiniplayer = createLiveMiniplayerController({
+    getYtmView: () => ytmViewManager.getView(),
+    isMiniplayerOpen: () => windowManager.hasWindow("Miniplayer"),
+    getMiniplayer: () => (windowManager.hasWindow("Miniplayer") ? windowManager.getWindow("Miniplayer") : undefined),
+    mainWindow,
+    playerStateStore,
+    rememberBoundsAndShowMain: () => {
+      if (windowManager.hasWindow("Miniplayer")) {
+        stateManager.updateState({
+          miniplayerWindowBounds: windowManager.getWindow("Miniplayer")._getElectronWindow().getBounds()
+        });
+      }
+      mainWindow.showAndFocus();
+    }
+  });
+
   mainWindow.ipcOn("window:openMiniplayer", () => {
     if (windowManager.hasWindow("Miniplayer")) {
       windowManager.getWindow("Miniplayer").showAndFocus();
@@ -433,11 +450,8 @@ app.on("ready", async () => {
       });
     });
 
-    miniplayerWindow.once("electronwindow-close", () => {
-      stateManager.updateState({
-        miniplayerWindowBounds: miniplayerWindow._getElectronWindow().getBounds()
-      });
-      mainWindow.showAndFocus();
+    miniplayerWindow.on("electronwindow-close", event => {
+      liveMiniplayer.onClose(event);
     });
 
     miniplayerWindow.ipcOn("remoteControl:execute", (event, command: string, ...args: unknown[]) => {
@@ -450,7 +464,9 @@ app.on("ready", async () => {
       return playerStateStore.getState();
     });
 
-    mainWindow.hide();
+    void liveMiniplayer.onOpened().finally(() => {
+      if (windowManager.hasWindow("Miniplayer")) mainWindow.hide();
+    });
   });
 
   mainWindow.ipcOn("ytmView:navigateDefault", () => {
