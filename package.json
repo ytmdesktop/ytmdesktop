@@ -18,6 +18,7 @@
     "make": "electron-forge make",
     "release:frommake": "electron-forge release --from-make",
     "release": "electron-forge release",
+    "test": "node --test",
     "lint": "oxlint && oxfmt --check",
     "lint:fix": "oxlint --fix && oxfmt --write",
     "typecheck": "tsc --noEmit"
