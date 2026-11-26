@@ -1,6 +1,6 @@
 import { app, clipboard, dialog, ipcMain, Menu, MenuItemConstructorOptions, nativeTheme, powerMonitor, safeStorage, screen, shell, Tray } from "electron";
 import log from "electron-log";
-import { getIconPath, v1ConfigMigration } from "./util";
+import { getIconPath, mainWindowTitleBarOverlay, v1ConfigMigration } from "./util";
 import { AppView } from "./services/windowmanager/appview";
 import { YTMViewSetupCompletionFlags, YTMViewSetupCompletionFlagsNames, YTMViewStatus } from "~shared/types";
 import CompanionServer from "./integrations/companion-server";
@@ -275,11 +275,7 @@ app.on("ready", async () => {
       show: false,
       icon: getIconPath("ytmd.png"),
       titleBarStyle: "hidden",
-      titleBarOverlay: {
-        color: "#000000",
-        symbolColor: "#BBBBBB",
-        height: 36
-      },
+      titleBarOverlay: { ...mainWindowTitleBarOverlay },
       webPreferences: {
         sandbox: true,
         contextIsolation: true,
