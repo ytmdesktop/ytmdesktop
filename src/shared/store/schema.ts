@@ -35,6 +35,7 @@ export type StoreSchema = {
     companionServerAuthTokens: string | null; // array[object] | Encrypted for security
     companionServerCORSWildcardEnabled: boolean;
     discordPresenceEnabled: boolean;
+    discordPresenceShowPlayOnYTMDButton: boolean;
     lastFMEnabled: boolean;
     enhancedMediaServiceEnabled: boolean;
   };
