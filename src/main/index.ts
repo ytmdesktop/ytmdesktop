@@ -28,7 +28,7 @@ import { MemoryStoreSchema, TrayIconStyle } from "~shared/store/schema";
 import ProtocolManager from "./services/protocolmanager";
 import PlayerStateStore from "./services/playerstatestore";
 import ProtectedAPIManager from "./services/protectedapimanager";
-import { VideoType } from "~shared/playerstatestore/types";
+import { PlayerState, VideoType } from "~shared/playerstatestore/types";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
@@ -488,6 +488,28 @@ app.on("ready", async () => {
     tray.setImage(getTrayIconPath());
   }
 
+  const trayTooltipIdle = "YTMDesktop";
+  let currentTrayTooltip = "";
+
+  function setTrayTooltip(state: PlayerState) {
+    if (!tray) return;
+
+    const title = state.videoDetails?.title?.trim();
+    const author = state.videoDetails?.author?.trim();
+    let tooltip = trayTooltipIdle;
+    if (title && author) tooltip = `${title} - ${author}`;
+    else if (title) tooltip = title;
+
+    // Windows rejects tray tooltips longer than 128 characters.
+    if (process.platform === "win32" && tooltip.length > 127) {
+      tooltip = `${tooltip.slice(0, 124)}...`;
+    }
+
+    if (tooltip === currentTrayTooltip) return;
+    currentTrayTooltip = tooltip;
+    tray.setToolTip(tooltip);
+  }
+
   tray = new Tray(getTrayIconPath());
   trayContextMenu = Menu.buildFromTemplate([
     {
@@ -550,7 +572,8 @@ app.on("ready", async () => {
       }
     }
   ]);
-  tray.setToolTip("YTMDesktop");
+  setTrayTooltip(playerStateStore.getState());
+  playerStateStore.on("state-changed", setTrayTooltip);
   tray.setContextMenu(trayContextMenu);
   tray.on("click", () => {
     mainWindow.showAndFocus();
