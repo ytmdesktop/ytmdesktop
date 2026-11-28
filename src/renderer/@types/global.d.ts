@@ -1,3 +1,4 @@
+import type { ThemeAPI } from "~shared/themes/model";
 import { WindowsEventArguments, YTMViewStatus } from "~shared/types";
 import Store from "../store-ipc/store";
 import { StoreSchema, MemoryStoreSchema } from "~shared/store/schema";
@@ -7,6 +8,7 @@ import { PlayerState } from "~shared/playerstatestore/types";
 declare global {
   interface Window {
     ytmd: {
+      themes: ThemeAPI;
       // Settings specific
       isDarwin: boolean;
       isLinux: boolean;
