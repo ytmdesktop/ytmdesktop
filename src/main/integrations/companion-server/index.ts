@@ -9,7 +9,11 @@ import cors from "@fastify/cors";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
 import Integration from "../integration";
-import { safeStorage } from "electron";
+import { app, BrowserWindow, ipcMain, safeStorage } from "electron";
+import path from "node:path";
+import { getIconPath } from "../../util";
+import AppWindowManager from "../../services/windowmanager";
+import { AppWindow } from "../../services/windowmanager/appwindow";
 import { MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../../services/memorystore";
 import ConfigStore from "../../services/configstore";
@@ -23,6 +27,8 @@ import { PlayerState } from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../services/playerstatestore";
 import fs from "node:fs";
 
+declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
+
 const API_VERSIONS = ["v1"];
 const TRANSFORM_PLAYER_STATE_FOR_VERSION: { [version: string]: (state: PlayerState) => unknown } = {
   v1: transformPlayerStatev1
@@ -34,6 +40,61 @@ enum IpcOpcode {
   EVENT = 2,
   PING = 3,
   PONG = 4
+}
+
+export function createAuthorizeCompanionWindow(opts: {
+  requestId: string;
+  appName: string;
+  code: string;
+  autoOpenDevTools: boolean;
+  devTools?: boolean;
+  parentWindow?: AppWindow<"Browser">;
+}): BrowserWindow {
+  const bounds = opts.parentWindow?._getElectronWindow().getBounds();
+  const win = new BrowserWindow({
+    width: 640,
+    height: 480,
+    x: bounds ? Math.round(bounds.x + (bounds.width - 640) / 2) : undefined,
+    y: bounds ? Math.round(bounds.y + (bounds.height - 480) / 2) : undefined,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    frame: false,
+    show: false,
+    icon: getIconPath("ytmd.png"),
+    parent: opts.parentWindow?.isVisible() ? opts.parentWindow._getElectronWindow() : undefined,
+    titleBarStyle: "hidden",
+    titleBarOverlay: { color: "#000000", symbolColor: "#BBBBBB", height: 36 },
+    webPreferences: {
+      sandbox: true,
+      contextIsolation: true,
+      preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
+      devTools: opts.devTools,
+      additionalArguments: [opts.requestId, opts.appName, opts.code]
+    }
+  });
+
+  win.loadURL(
+    app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html"
+  );
+  win.once("ready-to-show", () => {
+    win.show();
+    win.focus();
+    win.moveTop();
+  });
+
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  win.webContents.on("will-navigate", event => {
+    if (!app.isPackaged && event.url.startsWith("http://localhost")) return;
+
+    event.preventDefault();
+  });
+
+  if (!app.isPackaged && opts.autoOpenDevTools) {
+    win.webContents.openDevTools({ mode: "detach" });
+  }
+
+  return win;
 }
 
 export default class CompanionServer extends Integration {
@@ -449,5 +510,43 @@ export default class CompanionServer extends Integration {
         this.authWindowTimeout = null;
       }
     }
+  }
+
+  private static debugAuthWindow: BrowserWindow | null = null;
+
+  public static openDebugAuthorizeWindow(
+    windowManager: AppWindowManager,
+    parentWindow: AppWindow<"Browser">,
+    devTools: boolean
+  ) {
+    if (this.debugAuthWindow && !this.debugAuthWindow.isDestroyed()) {
+      this.debugAuthWindow.show();
+      this.debugAuthWindow.focus();
+      this.debugAuthWindow.moveTop();
+      return;
+    }
+
+    const requestId = "debug-request";
+    const authWindow = createAuthorizeCompanionWindow({
+      requestId,
+      appName: "Debug Companion App",
+      code: "1234",
+      devTools,
+      autoOpenDevTools: windowManager.autoOpenDevTools,
+      parentWindow
+    });
+    this.debugAuthWindow = authWindow;
+
+    const closeAuthWindow = () => {
+      if (!authWindow.isDestroyed()) authWindow.close();
+    };
+
+    ipcMain.once(`companionAuthorization:result:${requestId}`, closeAuthWindow);
+    ipcMain.once(`companionWindow:close:${requestId}`, closeAuthWindow);
+    authWindow.once("closed", () => {
+      this.debugAuthWindow = null;
+      ipcMain.removeListener(`companionAuthorization:result:${requestId}`, closeAuthWindow);
+      ipcMain.removeListener(`companionWindow:close:${requestId}`, closeAuthWindow);
+    });
   }
 }

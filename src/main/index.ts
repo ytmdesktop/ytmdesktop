@@ -29,6 +29,8 @@ import ProtocolManager from "./services/protocolmanager";
 import PlayerStateStore from "./services/playerstatestore";
 import ProtectedAPIManager from "./services/protectedapimanager";
 import { VideoType } from "~shared/playerstatestore/types";
+import LaunchArgsManager from "./services/launchargs";
+import { UpdaterDialogState } from "./services/launchargs/types";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
@@ -52,6 +54,7 @@ serviceCollection.addServices([
   ShortcutManager,
   TaskbarManager,
   ProtocolManager,
+  LaunchArgsManager,
   // This will always go last as it depends on every service since it's an optional system and integrations can perform work with any service
   IntegrationManager
 ]);
@@ -68,16 +71,15 @@ if (!gotTheLock) {
 
     log.debug("Second instance");
 
-    const windowManager = serviceHost.getService(AppWindowManager);
-    if (windowManager.hasWindow("Miniplayer")) {
-      log.debug("Closing miniplayer");
-      // Main window will automatically show upon closure of the miniplayer
-      windowManager.getWindow("Miniplayer").closeWindow();
-    } else if (windowManager.hasWindow("Main")) {
-      windowManager.getWindow("Main").showAndFocus();
+    const launchArgsManager = serviceHost.getService(LaunchArgsManager);
+    if (!launchArgsManager.handleSecondInstance(commandLine)) {
+      serviceHost.getService(AppWindowManager).focusMainOrCloseMiniplayer();
     }
 
-    if (serviceHost.initialized) serviceHost.getService(ProtocolManager).handleYTMDProtocol(commandLine[commandLine.length - 1]);
+    const lastArg = commandLine[commandLine.length - 1];
+    if (lastArg?.startsWith("ytmd://")) {
+      serviceHost.getService(ProtocolManager).handleYTMDProtocol(lastArg);
+    }
   });
 }
 
@@ -122,60 +124,75 @@ app.on("ready", async () => {
   const ytmViewManager = serviceHost.getService(YTMViewManager);
   const stateManager = serviceHost.getService(StateManager);
   const playerStateStore = serviceHost.getService(PlayerStateStore);
+  const launchArgsManager = serviceHost.getService(LaunchArgsManager);
+
+  const createUpdaterWindow = (parent?: Electron.BaseWindow) => {
+    if (windowManager.hasWindow("Updater")) {
+      const existing = windowManager.getWindow("Updater");
+      existing.showAndFocus();
+      return existing;
+    }
+
+    return windowManager.createWindow("Browser", {
+      name: "Updater",
+      autoRecreate: false,
+      waitForViews: true,
+      url: app.isPackaged ? "ytmd-app://updater" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/updater/index.html",
+      electronOptions: {
+        width: 256,
+        height: 320,
+        minWidth: 256,
+        minHeight: 320,
+        resizable: false,
+        frame: false,
+        show: false,
+        icon: getIconPath("ytmd.png"),
+        parent,
+        titleBarStyle: "hidden",
+        webPreferences: {
+          sandbox: true,
+          contextIsolation: true,
+          preload: path.join(__dirname, `../preload/windows/updater/preload.cjs`),
+          devTools: launchArgsManager.isDevToolsEnabled()
+        }
+      }
+    });
+  };
 
   //#region Updater Check
-  const updaterWindow = windowManager.createWindow("Browser", {
-    name: "Updater",
-    autoRecreate: false,
-    waitForViews: true,
-    url: app.isPackaged ? "ytmd-app://updater" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/updater/index.html",
-    electronOptions: {
-      width: 256,
-      height: 320,
-      minWidth: 256,
-      minHeight: 320,
-      resizable: false,
-      frame: false,
-      show: false,
-      icon: getIconPath("ytmd.png"),
-      titleBarStyle: "hidden",
-      webPreferences: {
-        sandbox: true,
-        contextIsolation: true,
-        preload: path.join(__dirname, `../preload/windows/updater/preload.cjs`),
-        devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
+  let updaterWindow: ReturnType<typeof createUpdaterWindow> | undefined;
+  if (!launchArgsManager.state.skipUpdateCheck) {
+    updaterWindow = createUpdaterWindow();
+    const autoUpdaterCallbacks = {
+      checking: () => updaterWindow?.webContents?.send("autoUpdater:checking"),
+      available: () => updaterWindow?.webContents?.send("autoUpdater:available"),
+      notAvailable: () => updaterWindow?.webContents?.send("autoUpdater:not-available"),
+      downloaded: () => updaterWindow?.webContents?.send("autoUpdater:downloaded"),
+      error: () => updaterWindow?.webContents?.send("autoUpdater:error")
+    };
+    autoUpdater.once("checking", autoUpdaterCallbacks.checking);
+    autoUpdater.once("available", autoUpdaterCallbacks.available);
+    autoUpdater.once("not-available", autoUpdaterCallbacks.notAvailable);
+    autoUpdater.once("downloaded", autoUpdaterCallbacks.downloaded);
+    autoUpdater.once("error", autoUpdaterCallbacks.error);
+    if (!autoUpdater.isDisabled() && await autoUpdater.checkForUpdates(true)) {
+      autoUpdater.quitAndInstall();
+      return;
+    } else {
+      // Better visual feedback for the updater window when in development mode
+      if (!app.isPackaged) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 1500);
+        });
       }
     }
-  });
-  const autoUpdaterCallbacks = {
-    checking: () => updaterWindow.webContents?.send("autoUpdater:checking"),
-    available: () => updaterWindow.webContents?.send("autoUpdater:available"),
-    notAvailable: () => updaterWindow.webContents?.send("autoUpdater:not-available"),
-    downloaded: () => updaterWindow.webContents?.send("autoUpdater:downloaded"),
-    error: () => updaterWindow.webContents?.send("autoUpdater:error")
-  };
-  autoUpdater.once("checking", autoUpdaterCallbacks.checking);
-  autoUpdater.once("available", autoUpdaterCallbacks.available);
-  autoUpdater.once("not-available", autoUpdaterCallbacks.notAvailable);
-  autoUpdater.once("downloaded", autoUpdaterCallbacks.downloaded);
-  autoUpdater.once("error", autoUpdaterCallbacks.error);
-  if (!autoUpdater.isDisabled() && await autoUpdater.checkForUpdates(true)) {
-    autoUpdater.quitAndInstall();
-    return;
-  } else {
-    // Better visual feedback for the updater window when in development mode
-    if (!app.isPackaged) {
-      await new Promise(resolve => {
-        setTimeout(resolve, 1500);
-      });
-    }
+    // Ensure the events are unbinded as we don't need them anymore
+    autoUpdater.off("checking", autoUpdaterCallbacks.checking);
+    autoUpdater.off("available", autoUpdaterCallbacks.available);
+    autoUpdater.off("not-available", autoUpdaterCallbacks.notAvailable);
+    autoUpdater.off("downloaded", autoUpdaterCallbacks.downloaded);
+    autoUpdater.off("error", autoUpdaterCallbacks.error);
   }
-  // Ensure the events are unbinded as we don't need them anymore
-  autoUpdater.off("checking", autoUpdaterCallbacks.checking);
-  autoUpdater.off("available", autoUpdaterCallbacks.available);
-  autoUpdater.off("not-available", autoUpdaterCallbacks.notAvailable);
-  autoUpdater.off("downloaded", autoUpdaterCallbacks.downloaded);
-  autoUpdater.off("error", autoUpdaterCallbacks.error);
   //#endregion
 
   // At this stage the next lifecycle is PostInitialized
@@ -244,7 +261,7 @@ app.on("ready", async () => {
         sandbox: true,
         contextIsolation: true,
         preload: path.join(__dirname, `../preload/windows/main/preload.cjs`),
-        devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
+        devTools: launchArgsManager.isDevToolsEnabled()
       }
     }
   });
@@ -259,6 +276,7 @@ app.on("ready", async () => {
     name: "Main",
     autoRecreate: false,
     waitForViews: true,
+    startHidden: launchArgsManager.state.startMinimized,
     windowState: {
       maximized: configStore.get("state.windowMaximized")
     },
@@ -284,7 +302,7 @@ app.on("ready", async () => {
         sandbox: true,
         contextIsolation: true,
         preload: path.join(__dirname, `../preload/windows/titlebar/preload.cjs`),
-        devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools"),
+        devTools: launchArgsManager.isDevToolsEnabled(),
         additionalArguments: ["is-main-window"]
       }
     }
@@ -326,46 +344,66 @@ app.on("ready", async () => {
     }
   });
 
-  mainWindow.ipcOn("window:openSettings", () => {
-    if (windowManager.hasWindow("Settings")) {
-      windowManager.getWindow("Settings").showAndFocus();
-      return;
+  const openCenteredWindow = (opts: {
+    name: string;
+    route: string;
+    preload: string;
+    width: number;
+    height: number;
+    resizable?: boolean;
+    modal?: boolean;
+    additionalArguments?: string[];
+  }) => {
+    if (windowManager.hasWindow(opts.name)) {
+      windowManager.getWindow(opts.name).showAndFocus();
+      return null;
     }
 
-    const mainWindowBounds = mainWindow._getElectronWindow().getBounds();
-    const settingsWindow = windowManager.createWindow("Browser", {
-      name: "Settings",
+    const bounds = mainWindow._getElectronWindow().getBounds();
+    const hasParent = mainWindow.isVisible();
+    const isModal = Boolean(opts.modal && hasParent);
+    return windowManager.createWindow("Browser", {
+      name: opts.name,
       autoRecreate: false,
       waitForViews: true,
-      url: app.isPackaged ? "ytmd-app://settings" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/settings/index.html",
+      url: app.isPackaged ? `ytmd-app://${opts.route}` : ALL_WINDOWS_VITE_DEV_SERVER_URL + `/windows/${opts.route}/index.html`,
       electronOptions: {
-        width: 800,
-        height: 600,
-        x: Math.round(mainWindowBounds.x + (mainWindowBounds.width / 2 - 400)),
-        y: Math.round(mainWindowBounds.y + (mainWindowBounds.height / 2 - 300)),
+        width: opts.width,
+        height: opts.height,
+        x: Math.round(bounds.x + (bounds.width - opts.width) / 2),
+        y: Math.round(bounds.y + (bounds.height - opts.height) / 2),
         minimizable: false,
         maximizable: false,
-        resizable: false,
+        resizable: opts.resizable ?? true,
         frame: false,
         show: false,
         icon: getIconPath("ytmd.png"),
-        parent: mainWindow._getElectronWindow(),
-        modal: process.platform !== "darwin",
+        parent: hasParent ? mainWindow._getElectronWindow() : undefined,
+        modal: isModal ? process.platform !== "darwin" : false,
         titleBarStyle: "hidden",
-        titleBarOverlay: {
-          color: "#000000",
-          symbolColor: "#BBBBBB",
-          height: 36
-        },
+        titleBarOverlay: { color: "#000000", symbolColor: "#BBBBBB", height: 36 },
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(__dirname, `../preload/windows/settings/preload.cjs`),
-          devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
+          preload: path.join(__dirname, `../preload/windows/${opts.preload}/preload.cjs`),
+          devTools: launchArgsManager.isDevToolsEnabled(),
+          additionalArguments: opts.additionalArguments
         }
       }
     });
-    settingsWindow.setWindowOpenHandler(details => {
+  };
+
+  const openSettingsWindow = () => {
+    const settingsWindow = openCenteredWindow({
+      name: "Settings",
+      route: "settings",
+      preload: "settings",
+      width: 800,
+      height: 600,
+      resizable: false,
+      modal: true
+    });
+    settingsWindow?.setWindowOpenHandler(details => {
       if (details.url === "https://github.com/ytmdesktop/ytmdesktop" || details.url === "https://ytmdesktop.github.io/") {
         shell.openExternal(details.url);
       }
@@ -374,9 +412,11 @@ app.on("ready", async () => {
         action: "deny"
       };
     });
-  });
+  };
 
-  mainWindow.ipcOn("window:openMiniplayer", () => {
+  mainWindow.ipcOn("window:openSettings", openSettingsWindow);
+
+  const openMiniplayerWindow = () => {
     if (windowManager.hasWindow("Miniplayer")) {
       windowManager.getWindow("Miniplayer").showAndFocus();
       return;
@@ -408,7 +448,7 @@ app.on("ready", async () => {
           sandbox: true,
           contextIsolation: true,
           preload: path.join(__dirname, `../preload/windows/miniplayer/preload.cjs`),
-          devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
+          devTools: launchArgsManager.isDevToolsEnabled()
         }
       }
     });
@@ -451,7 +491,9 @@ app.on("ready", async () => {
     });
 
     mainWindow.hide();
-  });
+  };
+
+  mainWindow.ipcOn("window:openMiniplayer", openMiniplayerWindow);
 
   mainWindow.ipcOn("ytmView:navigateDefault", () => {
     const ytmView = ytmViewManager.getView();
@@ -460,7 +502,7 @@ app.on("ready", async () => {
   //#endregion
 
   // Late updater window closure to prevent Electron from emitting window-all-closed before creating the main window
-  updaterWindow.destroyWindow();
+  updaterWindow?.destroyWindow();
 
   //#region Tray creation
   function trayIconFileName(style: TrayIconStyle) {
@@ -564,11 +606,23 @@ app.on("ready", async () => {
   // Wait for the main window to be ready
   await mainWindow.ready();
 
+  let resolveAppLoaded!: () => void;
+  const appLoadedPromise = new Promise<void>(resolve => {
+    resolveAppLoaded = resolve;
+  });
+  const appLoadedTimeout = setTimeout(resolveAppLoaded, 10000);
+  appLoadedTimeout.unref?.();
+  const finishAppLoad = () => {
+    clearTimeout(appLoadedTimeout);
+    resolveAppLoaded();
+  };
+
   // Attach events for the ytmviewmanager
   ytmViewManager.on("status-changed", async () => {
     mainView.webContents?.send("ytmView:statusChanged", ytmViewManager.status);
     if (ytmViewManager.status === YTMViewStatus.Ready) {
       await mainView.hide(true);
+      finishAppLoad();
       if (ytmViewManager.hasError()) {
         const hookError = ytmViewManager.getError();
         const setupFlags = ytmViewManager.getSetupFlags();
@@ -608,6 +662,7 @@ app.on("ready", async () => {
   });
   ytmViewManager.on("load-errored", () => {
     mainView.webContents?.send("ytmView:loadError", ytmViewManager.loadError);
+    finishAppLoad();
   });
 
   // Initially create the YTM view and attach it
@@ -623,40 +678,17 @@ app.on("ready", async () => {
 
   integrationManager.runHook(IntegrationManagerHook.AppReady);
 
-  // Show a changelog popup window if one should be shown
-  if (configStore.get("metadata.appVersion") !== app.getVersion()) {
-    const mainWindowBounds = mainWindow._getElectronWindow().getBounds();
-    const changelogWindow = windowManager.createWindow("Browser", {
+  const openChangelogWindow = () => {
+    const changelogWindow = openCenteredWindow({
       name: "Changelog",
-      autoRecreate: false,
-      waitForViews: true,
-      url: app.isPackaged ? "ytmd-app://changelog" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/changelog/index.html",
-      electronOptions: {
-        width: 800,
-        height: 600,
-        x: Math.round(mainWindowBounds.x + (mainWindowBounds.width / 2 - 400)),
-        y: Math.round(mainWindowBounds.y + (mainWindowBounds.height / 2 - 300)),
-        minimizable: false,
-        maximizable: false,
-        frame: false,
-        show: false,
-        icon: getIconPath("ytmd.png"),
-        parent: mainWindow._getElectronWindow(),
-        modal: process.platform !== "darwin",
-        titleBarStyle: "hidden",
-        titleBarOverlay: {
-          color: "#000000",
-          symbolColor: "#BBBBBB",
-          height: 36
-        },
-        webPreferences: {
-          sandbox: true,
-          contextIsolation: true,
-          preload: path.join(__dirname, `../preload/windows/changelog/preload.cjs`),
-          devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools")
-        }
-      }
+      route: "changelog",
+      preload: "changelog",
+      width: 800,
+      height: 600,
+      modal: true
     });
+    if (!changelogWindow) return;
+
     changelogWindow.ipcHandle("changelog:getReleaseMetadata", async () => {
       try {
         const feedUrl = autoUpdater.getFeedUrlNoPlatform();
@@ -664,19 +696,19 @@ app.on("ready", async () => {
         const res = await fetch(`${feedUrl}/win32/${configStore.get("metadata.appVersion")}`);
         if (res.ok && res.status != 204) {
           const json = await res.json();
-          return json
+          return json;
         }
 
         return {
           name: app.getVersion(),
           notes: "# Failed to retrieve changelog"
-        }
-      } catch(err) {
+        };
+      } catch (err) {
         log.warn("Failed to retrieve changelog", err);
         return {
           name: app.getVersion(),
           notes: "# Failed to retrieve changelog"
-        }
+        };
       }
     });
     changelogWindow.setWindowOpenHandler(details => {
@@ -697,7 +729,28 @@ app.on("ready", async () => {
     changelogWindow.on("electronwindow-close", () => {
       configStore.set("metadata.appVersion", app.getVersion());
     });
+  };
+
+  // Show a changelog popup window if one should be shown
+  if (configStore.get("metadata.appVersion") !== app.getVersion()) {
+    openChangelogWindow();
   }
+
+  const openUpdaterDialog = (state?: UpdaterDialogState) => {
+    const win = createUpdaterWindow(mainWindow.isVisible() ? mainWindow._getElectronWindow() : undefined);
+    win.ready().then(() => win.webContents?.send(`autoUpdater:${state ?? "checking"}`));
+  };
+
+  await appLoadedPromise;
+
+  launchArgsManager.runReady({
+    openUpdaterDialog,
+    openSettings: openSettingsWindow,
+    openChangelog: openChangelogWindow,
+    openMiniplayer: openMiniplayerWindow,
+    openAuthorizeCompanion: () =>
+      CompanionServer.openDebugAuthorizeWindow(windowManager, mainWindow, launchArgsManager.isDevToolsEnabled())
+  });
 });
 
 app.on("open-url", (_, url) => {

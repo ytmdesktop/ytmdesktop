@@ -1,5 +1,4 @@
 import {
-  app,
   BaseWindow,
   BaseWindowConstructorOptions,
   BrowserWindow,
@@ -64,6 +63,10 @@ export type AppWindowOptions<T extends AppWindowType> = {
    */
   waitForViews: boolean;
   /**
+   * Keeps the window hidden after initial creation/ready instead of showing it automatically
+   */
+  startHidden?: boolean;
+  /**
    * The initial state the window should be in that can't be specified by Electron window options
    */
   windowState?: {
@@ -113,6 +116,7 @@ export class AppWindow<
   private initialViewsReady = 0;
   private localViewReady = false;
   private windowReady = false;
+  private pendingMaximize = false;
   private ipcEventProxy = new EventEmitter();
 
   private thumbarButtons: Electron.ThumbarButton[] = [];
@@ -206,6 +210,10 @@ export class AppWindow<
       );
 
     view._attachToWindow(this, index);
+    if (this.parentManager.autoOpenDevTools) {
+      view.webContents?.openDevTools();
+    }
+
     this.activeViews[view.name] = {
       view,
       index,
@@ -314,8 +322,9 @@ export class AppWindow<
 
   public showAndFocus() {
     if (this.electronWindow?.isMinimized()) this.electronWindow.restore();
-    this.electronWindow?.show();
+    this.show();
     this.electronWindow?.focus();
+    this.electronWindow?.moveTop();
   }
 
   public hide() {
@@ -324,6 +333,15 @@ export class AppWindow<
 
   public show() {
     this.electronWindow?.show();
+    if (this.pendingMaximize) {
+      this.pendingMaximize = false;
+      this.electronWindow?.maximize();
+    }
+  }
+
+  private markWindowReady() {
+    if (!this.options.startHidden) this.showAndFocus();
+    this.windowReady = true;
   }
 
   public isVisible() {
@@ -410,47 +428,66 @@ export class AppWindow<
     }
     this.attachElectronWindowEvents();
 
-    if (this.initialCreation && (this.options.windowState?.maximized ?? false))
-      this.electronWindow.maximize();
-    else if (this.lastState.maximized) this.electronWindow.maximize();
+    const shouldMaximize =
+      (this.initialCreation && (this.options.windowState?.maximized ?? false)) ||
+      this.lastState.maximized;
+    if (shouldMaximize) {
+      if (this.options.startHidden) this.pendingMaximize = true;
+      else this.electronWindow.maximize();
+    }
 
     if (this.initialCreation) {
       const views = this.options.views ?? [];
+      let readyFallback: ReturnType<typeof setTimeout> | undefined;
+
+      const tryMarkReady = () => {
+        if (this.windowReady || !(this.electronWindow instanceof BrowserWindow)) return;
+        if (!this.localViewReady || this.initialViewsReady < views.length) return;
+
+        clearTimeout(readyFallback);
+        this.markWindowReady();
+      };
+
+      const scheduleFallback = () => {
+        if (this.windowReady || readyFallback) return;
+
+        readyFallback = setTimeout(() => {
+          if (this.destroyed || this.electronWindow?.isDestroyed()) return;
+
+          this.localViewReady = true;
+          this.initialViewsReady = views.length;
+          tryMarkReady();
+        }, 1500);
+        readyFallback.unref?.();
+      };
+
       for (const view of views) {
         this.attachView(view);
         if (this.options.waitForViews) {
           view._getElectronView()!.webContents.once("dom-ready", () => {
             this.initialViewsReady++;
-            if (this.initialViewsReady >= views.length) {
-              if (
-                this.electronWindow instanceof BrowserWindow &&
-                this.localViewReady
-              ) {
-                this.electronWindow.show();
-                this.windowReady = true;
-              }
-            }
+            tryMarkReady();
+            if (this.initialViewsReady >= views.length) scheduleFallback();
           });
         }
       }
 
-      if (this.options.waitForViews) {
-        if (this.electronWindow instanceof BrowserWindow) {
-          this.electronWindow.on("ready-to-show", () => {
-            this.localViewReady = true;
-            if (this.initialViewsReady >= (this.options.views?.length ?? 0)) {
-              this.electronWindow?.show();
-              this.windowReady = true;
-            }
-          });
-        }
+      if (this.options.waitForViews && this.electronWindow instanceof BrowserWindow) {
+        this.electronWindow.on("ready-to-show", () => {
+          this.localViewReady = true;
+          tryMarkReady();
+        });
+        this.electronWindow.webContents.once("did-finish-load", scheduleFallback);
+        this.electronWindow.once("closed", () => clearTimeout(readyFallback));
       }
     } else {
       for (const view of Object.values(this.activeViews)) {
         view.view._attachToWindow(this, view.index);
+        if (this.parentManager.autoOpenDevTools) {
+          view.view.webContents?.openDevTools();
+        }
       }
-      this.electronWindow.show();
-      this.windowReady = true;
+      this.markWindowReady();
     }
 
     if (this.progressBar)
@@ -460,7 +497,7 @@ export class AppWindow<
       );
 
     if (this.windowType === "Browser") {
-      if (!app.isPackaged)
+      if (this.parentManager.autoOpenDevTools)
         (this.electronWindow as BrowserWindow).webContents.openDevTools();
 
       const browserWindow = this.electronWindow as BrowserWindow;

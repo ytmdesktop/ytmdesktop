@@ -18,6 +18,7 @@ declare global {
         encryptString(value: string): Buffer;
       };
       openSettingsWindow(): void;
+      overrideSafeMode(storeProperty: string): void;
       restartApplication(): void;
       restartApplicationForUpdate(): void;
       getTrueFilePath(file: File): string;

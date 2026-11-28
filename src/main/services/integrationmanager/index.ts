@@ -1,9 +1,12 @@
 import Integration from "../../integrations/integration";
+import { ipcMain } from "electron";
 import log from "electron-log";
-import { StoreSchema } from "~shared/store/schema";
+import { MemoryStoreSchema, StoreSchema } from "~shared/store/schema";
 import { DependencyConstructor, ValueAtPath } from "~shared/types";
 import Service, { EventEmitterService } from "../service";
 import ConfigStore from "../configstore";
+import LaunchArgsManager from "../launchargs";
+import MemoryStore from "../memorystore";
 import { ServiceHost } from "../servicehost";
 
 type IntegrationCreator<T> = new (...args: unknown[]) => T;
@@ -25,10 +28,15 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
   static readonly DISABLE = Symbol("IntegrationManager.DISABLE");
   static readonly SETUP = Symbol("IntegrationManager.SETUP");
 
-  public static override readonly dependencies: DependencyConstructor<Service>[] = [ConfigStore/*, FlagManager*/];
+  public static override readonly dependencies: DependencyConstructor<Service>[] = [
+    ConfigStore,
+    LaunchArgsManager,
+    MemoryStore<MemoryStoreSchema> /*, FlagManager*/
+  ];
 
   private integrations: Integration[] = [];
   private enabledIntegrations: Integration[] = [];
+  private safeModeOverrides = new Set<string>();
 
   #host!: ServiceHost;
 
@@ -41,6 +49,16 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
   public override onPreInitialized() {}
 
   public onInitialized() {
+    const memoryStore = this.getDependency(MemoryStore<MemoryStoreSchema>);
+    ipcMain.on("integrations:overrideSafeMode", (_event, storeProperty: unknown) => {
+      if (typeof storeProperty !== "string") return;
+      if (!this.integrations.some(i => i.storeEnableProperty === storeProperty)) return;
+
+      this.safeModeOverrides.add(storeProperty);
+      memoryStore.set("safeModeOverrides", Array.from(this.safeModeOverrides).join(","));
+      this.reconcileIntegrationEnableState();
+    });
+
     log.info("IntegrationManager initialized");
   }
 
@@ -89,6 +107,8 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
   }
 
   private runIntegrationSetups() {
+    if (this.getDependency(LaunchArgsManager).state.safeModeEnabled) return;
+
     for (const integration of this.integrations) {
       integration[IntegrationManager.SETUP]();
     }
@@ -96,9 +116,13 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
 
   private async reconcileIntegrationEnableState(newState?: Readonly<StoreSchema>, oldState?: Readonly<StoreSchema>) {
     const configStore = this.getDependency(ConfigStore);
+    const safeMode = this.getDependency(LaunchArgsManager).state.safeModeEnabled;
     // const flagManager = this.getDependency(FlagManager);
 
     for (const integration of this.integrations) {
+      if (safeMode && !this.safeModeOverrides.has(integration.storeEnableProperty)) {
+        continue;
+      }
       // @ts-expect-error TODO: Fix configStore.get() here with correct type
       let shouldBeEnabled = newState ? getProperty(newState, integration.storeEnableProperty) : configStore.get(integration.storeEnableProperty);
       let disabledByFlag = false;

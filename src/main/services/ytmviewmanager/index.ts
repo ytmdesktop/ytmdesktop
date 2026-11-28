@@ -9,6 +9,7 @@ import StateManager from "../statemanager";
 import MemoryStore from "../memorystore";
 import { MemoryStoreSchema } from "~shared/store/schema";
 import AppWindowManager from "../windowmanager";
+import LaunchArgsManager from "../launchargs";
 
 export type YTMViewManagerEventMap = {
   "status-changed": [];
@@ -56,7 +57,8 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     ConfigStore,
     StateManager,
     MemoryStore<MemoryStoreSchema>,
-    AppWindowManager
+    AppWindowManager,
+    LaunchArgsManager
   ];
 
   private ytmView?: AppView;
@@ -126,6 +128,8 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
     const configStore = this.getDependency(ConfigStore);
     const stateManager = this.getDependency(StateManager);
     const memoryStore = this.getDependency(MemoryStore<MemoryStoreSchema>);
+    const launchArgsManager = this.getDependency(LaunchArgsManager);
+    const devToolsEnabled = launchArgsManager.isDevToolsEnabled();
 
     this.setStatus(YTMViewStatus.Loading);
 
@@ -161,7 +165,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
           contextIsolation: true,
           partition: app.isPackaged ? "persist:ytmview" : "persist:ytmview-dev",
           preload: path.join(__dirname, `../preload/windows/ytmview/preload.cjs`),
-          devTools: !app.isPackaged ? true : configStore.get("developer.enableDevTools"),
+          devTools: devToolsEnabled,
           autoplayPolicy:
             configStore.get("playback.continueWhereYouLeftOff") && configStore.get("playback.continueWhereYouLeftOffPaused")
               ? "document-user-activation-required"
@@ -319,7 +323,7 @@ export default class YTMViewManager extends EventEmitterService<YTMViewManagerEv
         });
       }
 
-      if (configStore.get("developer.enableDevTools")) {
+      if (devToolsEnabled) {
         if (menu.length > 0) {
           menu.push({
             type: "separator"
