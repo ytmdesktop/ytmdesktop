@@ -338,7 +338,7 @@ export class AppWindow<
     if (process.platform !== "win32") return;
 
     this.thumbarButtons = buttons;
-    this.electronWindow?.setThumbarButtons(buttons);
+    if (this.electronWindow?.isVisible()) this.electronWindow?.setThumbarButtons(buttons);
   }
 
   public setProgressBar(
@@ -453,8 +453,6 @@ export class AppWindow<
       this.windowReady = true;
     }
 
-    if (this.thumbarButtons)
-      this.electronWindow.setThumbarButtons(this.thumbarButtons);
     if (this.progressBar)
       this.electronWindow.setProgressBar(
         this.progressBar,
@@ -529,6 +527,12 @@ export class AppWindow<
       } else {
         this.parentManager.destroyWindow(this);
       }
+    });
+
+    this.electronWindow?.on("show", () => {
+      // Potential upstream bug with electron where a call to setThumbarButtons permanently fails if it's called before the window is shown and visible
+      // https://github.com/ytmdesktop/ytmdesktop/issues/1850
+      if (this.thumbarButtons) this.electronWindow?.setThumbarButtons(this.thumbarButtons);
     });
 
     //#region Proxy rest of events

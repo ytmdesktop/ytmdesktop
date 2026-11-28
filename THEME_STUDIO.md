@@ -1,6 +1,6 @@
 # Theme Studio
 
-Open Settings → Themes. Choose one of eight palettes or Restore original.
+Open Settings → Themes. Choose one of nine palettes or Restore original.
 Edit a copy opens eight semantic colors and controls for gradient intensity,
 blur, corner radius and reduced motion. Changes preview on the music page;
 Apply saves them, Cancel restores the saved selection. Closing settings also
@@ -13,9 +13,11 @@ a native save dialog.
 Import CSS accepts UTF-8 `.css` files up to 1 MiB. Imports are copied to
 `userData/themes/<SHA-256>.css`, deduplicated by content and listed with editable
 names. Removing a library entry preserves both the original and managed copy.
-Imports are independent themes. Linked CSS in Appearance remains an optional
-override, applied after the selected theme and watched for file changes.
-Restore original disables that override without deleting its path or file.
+Imports are independent themes managed only in Settings → Themes. The old
+Appearance CSS picker has been removed. Existing linked CSS remains compatible
+until another theme is applied; selecting, editing or restoring a theme disables
+that legacy layer without deleting its file. Import that file in Themes to keep it
+in the managed library.
 
 CSS must be self-contained: `@import`, `url()` (including data URLs),
 `image-set()` and legacy executable constructs are rejected. Missing files and
@@ -25,7 +27,9 @@ to legacy linked files; older CSS using resources must be adapted.
 ## Implementation
 
 `src/shared/themes/deep-indigo.css` preserves the supplied Deep Indigo v6.3
-source. `model.ts` defines palettes and validates persisted selections;
+source. `sakura-blush.css` preserves the supplied Sakura Blush Wallpaper v1
+source, offered as the ninth preset with editable copies and export.
+`model.ts` defines palettes and validates persisted selections;
 `css.ts` derives secondary colors from eight tokens and generates CSS.
 `CustomCSS` owns injection, managed imports and authenticated settings IPC.
 `CSSLayers` serializes replacement and removes previous insertion keys.
@@ -57,4 +61,5 @@ on live YouTube Music. Upstream DOM changes may require selector updates.
 
 This feature targets YTMD 2.1.0 (Electron 45, pnpm 12.8.1). The previous
 miniplayer/startup patches and their tests have been removed: upstream v2.1
-owns player initialization and recovery. Theme tests focus on CSS management.
+owns player initialization and recovery. Theme tests focus on CSS management. CSS is inserted with user origin,
+matching upstream precedence for custom styles.

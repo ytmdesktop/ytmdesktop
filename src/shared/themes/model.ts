@@ -1,12 +1,12 @@
 export const colorKeys = [
-  'accent',
-  'highlight',
-  'background',
-  'surface',
-  'surfaceRaised',
-  'text',
-  'textMuted',
-  'border',
+  "accent",
+  "highlight",
+  "background",
+  "surface",
+  "surfaceRaised",
+  "text",
+  "textMuted",
+  "border",
 ] as const;
 export type Tokens = Record<(typeof colorKeys)[number], string>;
 export type Effects = {
@@ -17,7 +17,7 @@ export type Effects = {
 };
 export type Design = { tokens: Tokens; effects: Effects };
 export type Selection = Design & {
-  mode: 'original' | 'preset' | 'custom' | 'imported';
+  mode: "original" | "preset" | "custom" | "imported";
   presetId: string;
   importId: string | null;
   overrides: boolean;
@@ -52,14 +52,24 @@ export type ThemeAPI = {
 };
 
 export const indigo: Tokens = {
-  accent: '#192586',
-  highlight: '#6f7cff',
-  background: '#050713',
-  surface: '#0b0f25',
-  surfaceRaised: '#12172e',
-  text: '#f4f6ff',
-  textMuted: '#c5cbea',
-  border: '#717eff',
+  accent: "#192586",
+  highlight: "#6f7cff",
+  background: "#050713",
+  surface: "#0b0f25",
+  surfaceRaised: "#12172e",
+  text: "#f4f6ff",
+  textMuted: "#c5cbea",
+  border: "#717eff",
+};
+export const sakura: Tokens = {
+  accent: "#f089b6",
+  highlight: "#fcb3d6",
+  background: "#1e101f",
+  surface: "#2d162c",
+  surfaceRaised: "#452744",
+  text: "#ffeaf6",
+  textMuted: "#f1c9de",
+  border: "#fcb3d6",
 };
 export const effects: Effects = {
   gradient: 100,
@@ -68,30 +78,33 @@ export const effects: Effects = {
   reducedMotion: true,
 };
 export const presets = [
-  ['deep-indigo', 'Deep Indigo', '#192586', '#6f7cff'],
-  ['youtube-red', 'YouTube Red', '#ff0033', '#ff829b'],
-  ['ocean-blue', 'Ocean Blue', '#1976d2', '#73caff'],
-  ['emerald', 'Emerald Green', '#159a6c', '#76e7bd'],
-  ['royal-purple', 'Royal Purple', '#7e57c2', '#c4a2ff'],
-  ['golden-amber', 'Golden Amber', '#d4a017', '#ffe19a'],
-  ['rose', 'Rose Pink', '#e94f93', '#ffb4d6'],
-  ['slate', 'Slate / Monochrome', '#718096', '#cbd5e0'],
+  ["deep-indigo", "Deep Indigo", "#192586", "#6f7cff"],
+  ["youtube-red", "YouTube Red", "#ff0033", "#ff829b"],
+  ["ocean-blue", "Ocean Blue", "#1976d2", "#73caff"],
+  ["emerald", "Emerald Green", "#159a6c", "#76e7bd"],
+  ["royal-purple", "Royal Purple", "#7e57c2", "#c4a2ff"],
+  ["golden-amber", "Golden Amber", "#d4a017", "#ffe19a"],
+  ["rose", "Rose Pink", "#e94f93", "#ffb4d6"],
+  ["sakura-blush", "Sakura Blush", "#f089b6", "#fcb3d6"],
+  ["slate", "Slate / Monochrome", "#718096", "#cbd5e0"],
 ].map(([id, name, accent, highlight]) => ({
   id,
   name,
   tokens:
-    id === 'deep-indigo'
-      ? { ...indigo }
-      : {
-          accent,
-          highlight,
-          background: mix(accent, '#000000', 0.94),
-          surface: mix(accent, '#000000', 0.86),
-          surfaceRaised: mix(accent, '#101018', 0.82),
-          text: '#f4f6ff',
-          textMuted: mix(highlight, '#ffffff', 0.55),
-          border: highlight,
-        },
+    id === "sakura-blush"
+      ? { ...sakura }
+      : id === "deep-indigo"
+        ? { ...indigo }
+        : {
+            accent,
+            highlight,
+            background: mix(accent, "#000000", 0.94),
+            surface: mix(accent, "#000000", 0.86),
+            surfaceRaised: mix(accent, "#101018", 0.82),
+            text: "#f4f6ff",
+            textMuted: mix(highlight, "#ffffff", 0.55),
+            border: highlight,
+          },
 }));
 
 export function rgb(hex: string): number[] {
@@ -99,20 +112,20 @@ export function rgb(hex: string): number[] {
 }
 export function mix(a: string, b: string, amount: number): string {
   return (
-    '#' +
+    "#" +
     rgb(a)
       .map((v, i) =>
         Math.round(v * (1 - amount) + rgb(b)[i] * amount)
           .toString(16)
-          .padStart(2, '0'),
+          .padStart(2, "0"),
       )
-      .join('')
+      .join("")
   );
 }
 export function defaultSelection(): Selection {
   return {
-    mode: 'original',
-    presetId: 'deep-indigo',
+    mode: "original",
+    presetId: "deep-indigo",
     importId: null,
     tokens: { ...indigo },
     effects: { ...effects },
@@ -120,28 +133,28 @@ export function defaultSelection(): Selection {
   };
 }
 export function validateSelection(value: unknown): Selection {
-  if (!value || typeof value !== 'object')
-    throw new Error('Invalid theme selection');
+  if (!value || typeof value !== "object")
+    throw new Error("Invalid theme selection");
   const s = value as Selection;
   if (
-    !['original', 'preset', 'custom', 'imported'].includes(s.mode) ||
+    !["original", "preset", "custom", "imported"].includes(s.mode) ||
     !presets.some((p) => p.id === s.presetId)
   )
-    throw new Error('Unknown theme');
+    throw new Error("Unknown theme");
   if (
     s.importId !== null &&
-    (typeof s.importId !== 'string' || !/^[a-f0-9]{64}$/.test(s.importId))
+    (typeof s.importId !== "string" || !/^[a-f0-9]{64}$/.test(s.importId))
   )
-    throw new Error('Invalid imported theme ID');
-  if (typeof s.overrides !== 'boolean' || !s.tokens || !s.effects)
-    throw new Error('Invalid theme options');
+    throw new Error("Invalid imported theme ID");
+  if (typeof s.overrides !== "boolean" || !s.tokens || !s.effects)
+    throw new Error("Invalid theme options");
   for (const k of colorKeys)
-    if (typeof s.tokens[k] !== 'string' || !/^#[0-9a-f]{6}$/i.test(s.tokens[k]))
+    if (typeof s.tokens[k] !== "string" || !/^#[0-9a-f]{6}$/i.test(s.tokens[k]))
       throw new Error(`${k}: use a six-digit HEX color`);
   for (const [key, max] of [
-    ['gradient', 150],
-    ['blur', 30],
-    ['radius', 32],
+    ["gradient", 150],
+    ["blur", 30],
+    ["radius", 32],
   ] as const) {
     if (
       !Number.isFinite(s.effects[key]) ||
@@ -150,8 +163,8 @@ export function validateSelection(value: unknown): Selection {
     )
       throw new Error(`Invalid ${key}`);
   }
-  if (typeof s.effects.reducedMotion !== 'boolean')
-    throw new Error('Invalid motion preference');
+  if (typeof s.effects.reducedMotion !== "boolean")
+    throw new Error("Invalid motion preference");
   return {
     mode: s.mode,
     presetId: s.presetId,
@@ -173,17 +186,17 @@ export function normalizeState(value: unknown): ThemeState {
   const fallback: ThemeState = {
     version: 1,
     selection: defaultSelection(),
-    custom: { ...defaultSelection(), mode: 'custom' },
+    custom: { ...defaultSelection(), mode: "custom" },
     imports: [],
   };
-  if (!value || typeof value !== 'object') return fallback;
+  if (!value || typeof value !== "object") return fallback;
   const state = value as ThemeState;
   const imports = Array.isArray(state.imports)
     ? state.imports.filter(
         (x) =>
           x &&
           /^[a-f0-9]{64}$/.test(x.id) &&
-          typeof x.name === 'string' &&
+          typeof x.name === "string" &&
           x.name.length > 0 &&
           x.name.length <= 80,
       )
@@ -191,18 +204,18 @@ export function normalizeState(value: unknown): ThemeState {
   try {
     const selection = validateSelection(state.selection);
     if (
-      selection.mode === 'imported' &&
+      selection.mode === "imported" &&
       !imports.some((x) => x.id === selection.importId)
     )
-      selection.mode = 'original';
+      selection.mode = "original";
     let custom = fallback.custom;
     try {
       custom = {
         ...validateSelection(
           state.custom ??
-            (selection.mode === 'custom' ? selection : fallback.custom),
+            (selection.mode === "custom" ? selection : fallback.custom),
         ),
-        mode: 'custom',
+        mode: "custom",
       };
     } catch {
       /* retain valid selection when saved editor data is invalid */

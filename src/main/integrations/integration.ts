@@ -50,9 +50,9 @@ export default abstract class Integration {
    * 
    * @internal IntegrationManager calls this to enable the integration
    */
-  public [IntegrationManager.ENABLE]() {
+  public async [IntegrationManager.ENABLE]() {
     this.#isEnabled = true;
-    this.onEnabled();
+    await this.onEnabled();
   }
 
   /**

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
 const props = defineProps({
   title: {
@@ -54,24 +54,18 @@ const ytmViewUnresponsive = ref<boolean>(false);
 const appUpdateDownloaded = ref<boolean>(false);
 
 if (props.isMainWindow) {
-  window.ytmd.memoryStore.onStateChanged(newState => {
-    ytmViewUnresponsive.value = newState.ytmViewUnresponsive ?? false;
-  });
-}
-
-/*if (props.isMainWindow) {
   const memoryStore = window.ytmd.memoryStore;
-
+  
   onBeforeMount(async () => {
     ytmViewUnresponsive.value = (await memoryStore.get("ytmViewUnresponsive")) ?? false;
-    appUpdateDownloaded.value = (await memoryStore.get("appUpdateDownloaded")) ?? false;
+    appUpdateDownloaded.value = (await memoryStore.get("autoUpdaterDownloaded")) ?? false;
   });
 
   memoryStore.onStateChanged(newState => {
-    ytmViewUnresponsive.value = newState.ytmViewUnresponsive;
-    appUpdateDownloaded.value = newState.appUpdateDownloaded;
+    ytmViewUnresponsive.value = newState.ytmViewUnresponsive ?? false;
+    appUpdateDownloaded.value = newState.autoUpdaterDownloaded ?? false;
   });
-}*/
+}
 </script>
 
 <template>

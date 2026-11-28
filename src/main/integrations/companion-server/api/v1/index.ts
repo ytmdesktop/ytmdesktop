@@ -387,7 +387,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
         webPreferences: {
           sandbox: true,
           contextIsolation: true,
-          preload: path.join(__dirname, `../renderer/windows/authorize-companion/preload.cjs`),
+          preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
           additionalArguments: [requestId, authData.appName, request.body.code]
         }
       });

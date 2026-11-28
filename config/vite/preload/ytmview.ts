@@ -40,7 +40,7 @@ export default defineConfig({
     }
   ],
   build: {
-    outDir: ".vite/renderer/windows/ytmview"
+    outDir: ".vite/preload/windows/ytmview"
   },
   resolve: {
     alias: {

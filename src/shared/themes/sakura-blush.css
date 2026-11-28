@@ -1,0 +1,683 @@
+/* ============================================================
+   YTMD — SAKURA BLUSH / WALLPAPER EDITION
+   Inspired by the user's pink-anime wallpaper.
+   Standalone CSS for YouTube Music Desktop -> Appearance -> Custom CSS
+   Based on the layout/compatibility principles of Deep Indigo v6.3.
+   No external assets, no @import, no images embedded.
+
+   Quick palette adjustments: edit the variables in section 01.
+   ============================================================ */
+
+/* 01 — COLOR SYSTEM */
+html:not(.style-scope),
+:root {
+    --sb-accent: #f089b6 !important;        /* soft pink */
+    --sb-accent-2: #df5993 !important;      /* cherry pink */
+    --sb-accent-3: #fcb3d6 !important;      /* hair highlight */
+    --sb-accent-soft: #ffd3e9 !important;   /* pale glow */
+    --sb-mauve: #aa688a !important;         /* shadows in wallpaper */
+
+    --sb-bg-0: #1e101f !important;          /* deepest plum */
+    --sb-bg-1: #2d162c !important;          /* plum */
+    --sb-bg-2: #38203a !important;          /* dark rose */
+    --sb-bg-3: #452744 !important;          /* mauve panel */
+
+    --sb-surface: rgba(70, 39, 68, 0.73) !important;
+    --sb-surface-strong: rgba(49, 25, 48, 0.96) !important;
+    --sb-surface-hover: rgba(240, 137, 182, 0.16) !important;
+    --sb-text: #ffeaf6 !important;
+    --sb-text-2: #f1c9de !important;
+    --sb-text-3: #ce9dbb !important;
+    --sb-border: rgba(252, 179, 214, 0.18) !important;
+    --sb-border-strong: rgba(252, 179, 214, 0.34) !important;
+
+    --sb-shadow: 0 20px 62px rgba(18, 5, 21, 0.48) !important;
+    --sb-shadow-soft: 0 8px 28px rgba(18, 5, 21, 0.30) !important;
+    --sb-glow: 0 0 24px rgba(240, 137, 182, 0.30) !important;
+    --sb-glow-strong: 0 0 32px rgba(240, 137, 182, 0.46) !important;
+
+    /* Native YouTube Music design tokens */
+    --ytmusic-color-black1: var(--sb-bg-3) !important;
+    --ytmusic-color-black2: var(--sb-bg-2) !important;
+    --ytmusic-color-black3: var(--sb-bg-1) !important;
+    --ytmusic-color-black4: var(--sb-bg-0) !important;
+    --ytmusic-color-blackpure: var(--sb-bg-0) !important;
+    --ytmusic-color-white1: var(--sb-text) !important;
+    --ytmusic-color-grey1: var(--sb-text-2) !important;
+    --ytmusic-color-grey2: var(--sb-text-3) !important;
+    --ytmusic-color-grey3: #b98dab !important;
+    --ytmusic-color-grey4: #9c6d8c !important;
+    --ytmusic-color-grey5: #75516d !important;
+
+    --ytmusic-color-white1-alpha10: rgba(255, 234, 246, 0.10) !important;
+    --ytmusic-color-white1-alpha15: rgba(255, 234, 246, 0.15) !important;
+    --ytmusic-color-white1-alpha20: rgba(255, 234, 246, 0.20) !important;
+    --ytmusic-color-white1-alpha30: rgba(255, 234, 246, 0.30) !important;
+    --ytmusic-color-white1-alpha50: rgba(255, 234, 246, 0.50) !important;
+    --ytmusic-color-white1-alpha70: rgba(255, 234, 246, 0.70) !important;
+
+    --ytmusic-static-brand-red: var(--sb-accent-2) !important;
+    --yt-spec-themed-blue: var(--sb-accent-3) !important;
+    --yt-spec-brand-link-text: var(--sb-accent-soft) !important;
+    --ytmusic-setting-item-toggle-active: var(--sb-accent-2) !important;
+    --ytmusic-dialog-background-color: var(--sb-surface-strong) !important;
+    --ytmusic-overlay-background-brand: rgba(223, 89, 147, 0.35) !important;
+    --ytmusic-focus-active: var(--sb-accent-soft) !important;
+    --ytmusic-detail-header: transparent !important;
+}
+
+/* 02 — CONTINUOUS ROSE / PLUM AMBIENT BACKGROUND */
+html,
+body,
+ytmusic-app {
+    background-color: var(--sb-bg-0) !important;
+    color: var(--sb-text) !important;
+}
+
+body {
+    overflow-x: hidden !important;
+}
+
+/* Apply the ambient gradient to the real app-level canvas only.
+   Avoid generic descendants such as `ytmusic-app #content`: YouTube
+   also uses #content inside cover-art tiles and thumbnails. */
+ytmusic-app-layout,
+#content.ytmusic-app-layout,
+#main-panel.ytmusic-app-layout {
+    background:
+        radial-gradient(1050px 720px at 83% 6%,
+            rgba(252, 179, 214, 0.22) 0%,
+            rgba(240, 137, 182, 0.14) 39%,
+            transparent 76%),
+        radial-gradient(960px 800px at 12% 12%,
+            rgba(170, 104, 138, 0.37) 0%,
+            rgba(170, 104, 138, 0.12) 43%,
+            transparent 76%),
+        radial-gradient(1000px 730px at 48% 94%,
+            rgba(223, 89, 147, 0.16) 0%,
+            transparent 68%),
+        linear-gradient(145deg,
+            #39223c 0%,
+            #301a35 28%,
+            #281429 64%,
+            #1e101f 100%) !important;
+    background-color: var(--sb-bg-1) !important;
+    background-attachment: fixed !important;
+}
+
+/* Never overlay cards or artwork with a full-screen pseudo-element. */
+.background-gradient.ytmusic-browse-response,
+div.background-gradient.style-scope.ytmusic-browse-response,
+#browse-page > .background-gradient,
+ytmusic-browse-response > .background-gradient {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/* Kill the native finite-height browse gradient, a known cause of
+   horizontal seams when scrolling or switching music sections. */
+#browse-page > #background {
+    display: none !important;
+    background: none !important;
+    background-image: none !important;
+}
+
+#browse-page,
+ytmusic-browse-response,
+ytmusic-search-page,
+ytmusic-tab-renderer,
+ytmusic-section-list-renderer,
+ytmusic-library-page,
+ytmusic-home-page,
+ytmusic-music-shelf-renderer,
+ytmusic-carousel-shelf-renderer,
+ytmusic-card-shelf-renderer,
+ytmusic-shelf-renderer {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Search: do not let opaque black sections interrupt the plum canvas. */
+ytmusic-search-page #contents,
+ytmusic-search-page #content,
+ytmusic-search-page .content-container,
+ytmusic-search-page .shelf-content,
+ytmusic-search-page .contents,
+ytmusic-search-page ytmusic-section-list-renderer,
+ytmusic-search-page ytmusic-shelf-renderer,
+ytmusic-search-page ytmusic-card-shelf-renderer,
+ytmusic-search-page ytmusic-carousel-shelf-renderer,
+ytmusic-search-page ytmusic-music-shelf-renderer {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* 03 — NAVIGATION / SEARCH */
+ytmusic-nav-bar {
+    background: rgba(45, 22, 44, 0.15) !important;
+    background-image: none !important;
+    border-bottom: 1px solid rgba(252, 179, 214, 0.08) !important;
+    box-shadow: 0 2px 16px rgba(14, 5, 16, 0.09) !important;
+    backdrop-filter: blur(12px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+}
+
+/* Opaque internal nav layers would recreate the top gradient seam. */
+ytmusic-nav-bar::before,
+ytmusic-nav-bar::after,
+ytmusic-nav-bar #background,
+#nav-bar-background,
+.nav-bar-background {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+ytmusic-app-layout > ytmusic-nav-bar + *,
+ytmusic-app-layout #content.ytmusic-app-layout {
+    border-top-color: transparent !important;
+}
+
+ytmusic-pivot-bar-item-renderer {
+    color: var(--sb-text-3) !important;
+    border-radius: 999px !important;
+    padding: 8px 15px !important;
+    transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease !important;
+}
+
+ytmusic-pivot-bar-item-renderer:hover {
+    color: var(--sb-text) !important;
+    background: rgba(240, 137, 182, 0.12) !important;
+}
+
+ytmusic-pivot-bar-item-renderer.iron-selected {
+    color: #fff4fb !important;
+    background: linear-gradient(135deg,
+        rgba(223, 89, 147, 0.73),
+        rgba(240, 137, 182, 0.28)) !important;
+    border: 1px solid rgba(252, 179, 214, 0.30) !important;
+    box-shadow: 0 5px 18px rgba(223, 89, 147, 0.22) !important;
+}
+
+ytmusic-search-box,
+ytmusic-search-box #input,
+ytmusic-search-box input {
+    background-color: rgba(73, 39, 68, 0.76) !important;
+    color: var(--sb-text) !important;
+    caret-color: var(--sb-accent-3) !important;
+    border-radius: 18px !important;
+}
+
+/* 04 — HEADINGS, COVERS, CARDS */
+ytmusic-detail-header-renderer,
+ytmusic-data-bound-header-renderer,
+ytmusic-immersive-header-renderer {
+    background: linear-gradient(135deg,
+        rgba(240, 137, 182, 0.20),
+        rgba(170, 104, 138, 0.10) 52%,
+        rgba(30, 16, 31, 0)) !important;
+}
+
+.title.ytmusic-detail-header-renderer,
+.title.ytmusic-carousel-shelf-basic-header-renderer,
+.title.ytmusic-immersive-header-renderer,
+.title.ytmusic-header-renderer {
+    color: var(--sb-text) !important;
+    text-shadow: 0 4px 22px rgba(22, 8, 21, 0.30) !important;
+}
+
+.description.ytmusic-immersive-header-renderer,
+yt-formatted-string.strapline,
+.subtitle,
+.byline {
+    color: var(--sb-text-3) !important;
+}
+
+ytmusic-two-row-item-renderer,
+ytmusic-responsive-list-item-renderer,
+ytmusic-list-item-renderer,
+ytmusic-grid-renderer > * {
+    border-radius: 16px !important;
+}
+
+ytmusic-two-row-item-renderer {
+    transition: transform 220ms cubic-bezier(.2, .8, .2, 1), filter 220ms ease !important;
+}
+
+ytmusic-two-row-item-renderer:hover {
+    transform: translateY(-4px) !important;
+    filter: drop-shadow(0 12px 26px rgba(28, 9, 27, 0.35)) !important;
+}
+
+/* Cover-art safety: never tint, hide or clip the actual image itself. */
+yt-img-shadow,
+yt-img-shadow #img,
+yt-img-shadow img,
+ytmusic-two-row-item-renderer .image-wrapper,
+ytmusic-two-row-item-renderer .thumbnail-overlay,
+ytmusic-two-row-item-renderer #thumbnail,
+ytmusic-responsive-list-item-renderer #thumbnail,
+ytmusic-player-queue-item #thumbnail {
+    background-color: transparent !important;
+}
+
+ytmusic-two-row-item-renderer yt-img-shadow,
+ytmusic-responsive-list-item-renderer yt-img-shadow,
+ytmusic-player-bar .thumbnail-image-wrapper,
+ytmusic-player-page yt-img-shadow {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 28px rgba(28, 9, 27, 0.40),
+                0 0 0 1px rgba(252, 179, 214, 0.13) !important;
+}
+
+yt-img-shadow img,
+img.yt-img-shadow,
+ytmusic-two-row-item-renderer img,
+ytmusic-responsive-list-item-renderer img,
+ytmusic-player-bar img,
+ytmusic-player-page img {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+ytmusic-two-row-item-renderer yt-img-shadow img,
+ytmusic-responsive-list-item-renderer yt-img-shadow img {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+ytmusic-two-row-item-renderer:hover yt-img-shadow img {
+    transform: scale(1.035) !important;
+    filter: saturate(1.05) brightness(1.04) !important;
+}
+
+/* 05 — SONG ROWS / SELECTED TRACKS */
+ytmusic-responsive-list-item-renderer {
+    position: relative !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    transition: background 160ms ease, border-color 160ms ease,
+                transform 160ms ease, box-shadow 160ms ease !important;
+}
+
+ytmusic-responsive-list-item-renderer:hover,
+ytmusic-search-page ytmusic-responsive-list-item-renderer:hover {
+    background: linear-gradient(90deg,
+        rgba(240, 137, 182, 0.20),
+        rgba(252, 179, 214, 0.06)) !important;
+    border-color: rgba(252, 179, 214, 0.15) !important;
+    box-shadow: inset 3px 0 0 rgba(240, 137, 182, 0.65) !important;
+    transform: translateX(3px) !important;
+}
+
+ytmusic-responsive-list-item-renderer[is-playing] {
+    background: linear-gradient(90deg,
+        rgba(223, 89, 147, 0.29),
+        rgba(240, 137, 182, 0.09)) !important;
+    border-color: rgba(252, 179, 214, 0.23) !important;
+    box-shadow: inset 3px 0 0 var(--sb-accent-3),
+                0 6px 24px rgba(223, 89, 147, 0.12) !important;
+}
+
+ytmusic-responsive-list-item-renderer[is-playing] .title,
+ytmusic-player-queue-item[selected] .song-title {
+    color: #fff4fb !important;
+}
+
+yt-icon.ytmusic-inline-badge-renderer {
+    color: var(--sb-accent-3) !important;
+}
+
+/* 06 — CATEGORY CHIPS / BUTTONS
+   Only style the clickable anchor; the host can occupy an entire shelf. */
+yt-button-renderer[is-paper-button],
+ytmusic-toggle-button-renderer {
+    border-radius: 999px !important;
+}
+
+ytmusic-chip-cloud-chip-renderer {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+}
+
+a.ytmusic-chip-cloud-chip-renderer,
+.yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    width: auto !important;
+    min-width: max-content !important;
+    padding: 0 14px !important;
+    box-sizing: border-box !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(252, 179, 214, 0.20) !important;
+    color: var(--sb-text-2) !important;
+    background: linear-gradient(135deg,
+        rgba(255, 234, 246, 0.07),
+        rgba(223, 89, 147, 0.12)) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04),
+                0 4px 14px rgba(14, 5, 16, 0.14) !important;
+    backdrop-filter: blur(10px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(125%) !important;
+    transition: color 180ms ease, background 180ms ease,
+                border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+.text.ytmusic-chip-cloud-chip-renderer,
+yt-formatted-string.ytmusic-chip-cloud-chip-renderer {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1 !important;
+}
+
+a.ytmusic-chip-cloud-chip-renderer:hover,
+.yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer:hover {
+    color: #fff4fb !important;
+    background: linear-gradient(135deg,
+        rgba(223, 89, 147, 0.46),
+        rgba(252, 179, 214, 0.18)) !important;
+    border-color: rgba(252, 179, 214, 0.40) !important;
+    box-shadow: 0 6px 18px rgba(223, 89, 147, 0.24) !important;
+}
+
+ytmusic-chip-cloud-chip-renderer[selected] a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[is-selected] a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer.iron-selected a.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[selected] .yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer,
+ytmusic-chip-cloud-chip-renderer[is-selected] .yt-simple-endpoint.style-scope.ytmusic-chip-cloud-chip-renderer {
+    color: #fff4fb !important;
+    background: linear-gradient(135deg,
+        rgba(223, 89, 147, 0.92),
+        rgba(240, 137, 182, 0.75)) !important;
+    border-color: rgba(255, 211, 233, 0.48) !important;
+    box-shadow: 0 7px 22px rgba(223, 89, 147, 0.30) !important;
+}
+
+.previous-items-button.ytmusic-carousel,
+.next-items-button.ytmusic-carousel {
+    background: rgba(56, 32, 58, 0.87) !important;
+    color: var(--sb-text) !important;
+    border: 1px solid var(--sb-border) !important;
+    box-shadow: var(--sb-shadow-soft) !important;
+    backdrop-filter: blur(14px) !important;
+}
+
+/* 07 — PLAYER BAR / PROGRESS / VOLUME */
+ytmusic-player-bar {
+    background: linear-gradient(90deg,
+        rgba(35, 16, 35, 0.96) 0%,
+        rgba(53, 28, 52, 0.96) 45%,
+        rgba(41, 21, 40, 0.96) 100%) !important;
+    border-top: 1px solid rgba(252, 179, 214, 0.21) !important;
+    box-shadow: 0 -16px 50px rgba(14, 5, 16, 0.38),
+                0 -1px 20px rgba(240, 137, 182, 0.10) !important;
+    backdrop-filter: blur(24px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(125%) !important;
+}
+
+ytmusic-player-bar .thumbnail-image-wrapper {
+    border-radius: 10px !important;
+}
+
+#play-pause-button,
+paper-icon-button#play-pause-button,
+tp-yt-paper-icon-button#play-pause-button {
+    color: #fff4fb !important;
+    --iron-icon-fill-color: #fff4fb !important;
+    border-radius: 50% !important;
+    filter: drop-shadow(0 0 10px rgba(240, 137, 182, 0.36)) !important;
+}
+
+.left-controls.ytmusic-player-bar paper-icon-button,
+.right-controls-buttons.ytmusic-player-bar paper-icon-button,
+.toggle-player-page-button.ytmusic-player-bar,
+ytmusic-player-expanding-menu paper-icon-button,
+.menu.ytmusic-player-bar {
+    color: var(--sb-text-2) !important;
+    --iron-icon-fill-color: var(--sb-text-2) !important;
+    transition: color 160ms ease, filter 160ms ease,
+                transform 160ms ease !important;
+}
+
+.left-controls.ytmusic-player-bar paper-icon-button:hover,
+.right-controls-buttons.ytmusic-player-bar paper-icon-button:hover,
+.toggle-player-page-button.ytmusic-player-bar:hover,
+ytmusic-player-expanding-menu paper-icon-button:hover {
+    color: #fff4fb !important;
+    --iron-icon-fill-color: #fff4fb !important;
+    filter: drop-shadow(0 0 10px rgba(240, 137, 182, 0.55)) !important;
+    transform: scale(1.06) !important;
+}
+
+#progress-bar.ytmusic-player-bar {
+    --paper-slider-active-color: var(--sb-accent-2) !important;
+    --paper-slider-knob-color: var(--sb-accent-3) !important;
+    --paper-slider-knob-start-color: var(--sb-accent-3) !important;
+    --paper-slider-knob-start-border-color: var(--sb-accent-3) !important;
+    --paper-slider-container-color: rgba(206, 157, 187, 0.24) !important;
+}
+
+paper-slider#volume-slider,
+.volume-slider.ytmusic-player-bar,
+.expand-volume-slider.ytmusic-player-bar {
+    --paper-slider-active-color: var(--sb-accent-2) !important;
+    --paper-slider-knob-color: var(--sb-accent-3) !important;
+    --paper-slider-container-color: rgba(206, 157, 187, 0.26) !important;
+}
+
+/* 08 — FULL PLAYER / QUEUE */
+ytmusic-player-page {
+    background: radial-gradient(circle at 50% 18%,
+        rgba(240, 137, 182, 0.28),
+        rgba(56, 32, 58, 0.75) 42%,
+        rgba(30, 16, 31, 0.97) 85%) !important;
+}
+
+ytmusic-player-page #player {
+    filter: drop-shadow(0 28px 70px rgba(16, 5, 17, 0.48)) !important;
+}
+
+tp-yt-paper-tab.ytmusic-player-page {
+    color: var(--sb-text-3) !important;
+}
+
+tp-yt-paper-tab.iron-selected.ytmusic-player-page {
+    color: var(--sb-text) !important;
+}
+
+#selectionBar.tp-yt-paper-tabs {
+    border-bottom: 2px solid var(--sb-accent-3) !important;
+    box-shadow: 0 0 16px rgba(240, 137, 182, 0.46) !important;
+}
+
+ytmusic-player-queue-item {
+    background: transparent !important;
+    border-radius: 12px !important;
+    transition: background 160ms ease, transform 160ms ease !important;
+}
+
+ytmusic-player-queue-item:hover {
+    background: rgba(240, 137, 182, 0.13) !important;
+    transform: translateX(3px) !important;
+}
+
+ytmusic-player-queue-item[selected] {
+    background: linear-gradient(90deg,
+        rgba(223, 89, 147, 0.28),
+        rgba(252, 179, 214, 0.08)) !important;
+    box-shadow: inset 3px 0 0 var(--sb-accent-3) !important;
+}
+
+yt-formatted-string.byline.ytmusic-player-queue-item,
+yt-formatted-string.duration.ytmusic-player-queue-item {
+    color: var(--sb-text-3) !important;
+}
+
+/* 09 — POPUPS / OVERLAYS
+   Never turn the viewport-sized popup container into a glass overlay.
+   YouTube Music owns backdrop visibility and pointer-event routing. */
+ytmusic-popup-container {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+}
+
+tp-yt-iron-overlay-backdrop,
+.iron-overlay-backdrop,
+#backdrop.tp-yt-iron-overlay-backdrop {
+    background: rgba(22, 7, 23, 0.57) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: opacity 160ms ease, visibility 160ms ease !important;
+}
+
+tp-yt-iron-overlay-backdrop.opened,
+tp-yt-iron-overlay-backdrop[opened],
+.iron-overlay-backdrop.opened,
+.iron-overlay-backdrop[opened],
+#backdrop.tp-yt-iron-overlay-backdrop.opened,
+#backdrop.tp-yt-iron-overlay-backdrop[opened] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    backdrop-filter: blur(3px) !important;
+    -webkit-backdrop-filter: blur(3px) !important;
+}
+
+/* Style actual panels, not full-screen hosts. */
+tp-yt-paper-dialog,
+ytmusic-dialog,
+.dropdown-content,
+tp-yt-paper-listbox,
+ytmusic-menu-popup-renderer,
+ytmusic-multi-select-menu-renderer {
+    background: rgba(53, 28, 52, 0.95) !important;
+    color: var(--sb-text) !important;
+    border: 1px solid var(--sb-border-strong) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--sb-shadow) !important;
+    backdrop-filter: blur(24px) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(135%) !important;
+}
+
+tp-yt-paper-item:hover,
+ytmusic-menu-navigation-item-renderer:hover,
+ytmusic-menu-service-item-renderer:hover,
+ytmusic-toggle-menu-service-item-renderer:hover {
+    background: rgba(240, 137, 182, 0.19) !important;
+}
+
+.category-menu-item.iron-selected.ytmusic-settings-page {
+    background: linear-gradient(90deg,
+        rgba(223, 89, 147, 0.36),
+        rgba(240, 137, 182, 0.08)) !important;
+    color: var(--sb-text) !important;
+    border-radius: 10px !important;
+    box-shadow: inset 3px 0 0 var(--sb-accent-3) !important;
+}
+
+/* Popup items remain clickable. Don't force z-indexes or add an overlay. */
+tp-yt-paper-dialog a,
+tp-yt-paper-dialog button,
+tp-yt-paper-dialog tp-yt-paper-item,
+ytmusic-dialog a,
+ytmusic-dialog button,
+ytmusic-menu-popup-renderer a,
+ytmusic-menu-popup-renderer tp-yt-paper-item {
+    pointer-events: auto !important;
+}
+
+/* 10 — LINKS, MISC, SCROLLBARS, FOCUS */
+yt-formatted-string[has-link-only_]:not([force-default-style]) a.yt-simple-endpoint.yt-formatted-string,
+a.yt-simple-endpoint {
+    transition: color 150ms ease, text-shadow 150ms ease !important;
+}
+
+yt-formatted-string[has-link-only_]:not([force-default-style]) a.yt-simple-endpoint.yt-formatted-string:hover,
+a.yt-simple-endpoint:hover {
+    color: #fff4fb !important;
+    text-shadow: 0 0 14px rgba(240, 137, 182, 0.37) !important;
+}
+
+a.ytmusic-content-update-chip {
+    color: #fff4fb !important;
+    background: linear-gradient(135deg,
+        rgba(223, 89, 147, 0.87),
+        rgba(240, 137, 182, 0.78)) !important;
+    border: 1px solid rgba(255, 234, 246, 0.18) !important;
+    border-radius: 999px !important;
+    box-shadow: var(--sb-glow) !important;
+}
+
+::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom,
+        rgba(240, 137, 182, 0.68),
+        rgba(170, 104, 138, 0.65)) !important;
+    border: 3px solid transparent !important;
+    background-clip: padding-box !important;
+    border-radius: 999px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom,
+        rgba(252, 179, 214, 0.87),
+        rgba(223, 89, 147, 0.80)) !important;
+    border: 2px solid transparent !important;
+    background-clip: padding-box !important;
+}
+
+::selection {
+    background: rgba(240, 137, 182, 0.45) !important;
+    color: #fff4fb !important;
+}
+
+*:focus-visible {
+    outline: 2px solid rgba(252, 179, 214, 0.84) !important;
+    outline-offset: 2px !important;
+}
+
+i.material-icons {
+    color: var(--sb-text-3) !important;
+    transition: color 160ms ease, filter 160ms ease !important;
+}
+
+i.material-icons:hover {
+    color: #fff4fb !important;
+    filter: drop-shadow(0 0 10px rgba(240, 137, 182, 0.40)) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

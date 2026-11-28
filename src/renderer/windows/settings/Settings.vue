@@ -46,8 +46,6 @@ const startOnBoot = ref<boolean>(general.startOnBoot);
 const startMinimized = ref<boolean>(general.startMinimized);
 
 const alwaysShowVolumeSlider = ref<boolean>(appearance.alwaysShowVolumeSlider);
-const customCSSEnabled = ref<boolean>(appearance.customCSSEnabled);
-const customCSSPath = ref<string>(appearance.customCSSPath);
 const zoom = ref<number>(appearance.zoom);
 const trayIconStyle = ref<number>(appearance.trayIconStyle);
 
@@ -88,8 +86,6 @@ store.onDidAnyChange(async newState => {
   startMinimized.value = newState.general.startMinimized;
 
   alwaysShowVolumeSlider.value = newState.appearance.alwaysShowVolumeSlider;
-  customCSSEnabled.value = newState.appearance.customCSSEnabled;
-  customCSSPath.value = newState.appearance.customCSSPath;
   zoom.value = newState.appearance.zoom;
   trayIconStyle.value = newState.appearance.trayIconStyle;
 
@@ -160,6 +156,10 @@ memoryStore.onStateChanged(newState => {
   safeStorageAvailable.value = newState.safeStorageAvailable;
 
   autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
+  checkingForUpdate.value = newState.autoUpdaterChecking;
+  updateAvailable.value = newState.autoUpdaterAvailable;
+  updateNotAvailable.value = newState.autoUpdaterNotAvailable;
+  updateDownloaded.value = newState.autoUpdaterDownloaded;
 
   lastFMAuthenticationStep.value = newState.lastFMAuthenticationStep;
 });
@@ -176,7 +176,6 @@ async function settingsChanged() {
   store.set("general.disableHardwareAcceleration", disableHardwareAcceleration.value);
 
   store.set("appearance.alwaysShowVolumeSlider", alwaysShowVolumeSlider.value);
-  store.set("appearance.customCSSEnabled", customCSSEnabled.value);
   store.set("appearance.zoom", zoom.value);
   store.set("appearance.trayIconStyle", trayIconStyle.value);
 
@@ -210,19 +209,6 @@ async function settingChangedRequiresRestart() {
   settingsChanged();
 }
 
-async function settingChangedFile(event: Event) {
-  const target = event.target as HTMLInputElement;
-
-  const setting = target.dataset.setting;
-  if (!setting) {
-    throw new Error("No setting specified in File Input");
-  }
-
-  store.set(setting, target.files.length > 0 ? window.ytmd.getTrueFilePath(target.files[0]) : null);
-
-  target.value = null;
-}
-
 async function restartDiscordPresence() {
   discordPresenceEnabled.value = false;
   await settingsChanged();
@@ -238,10 +224,6 @@ async function deleteCompanionAuthToken(appId: string) {
 
   if (safeStorageAvailable.value)
     store.set("integrations.companionServerAuthTokens", await safeStorage.encryptString(JSON.stringify(companionServerAuthTokens.value)));
-}
-
-function removeCustomCSSPath() {
-  store.set("appearance.customCSSPath", null);
 }
 
 function changeTab(newTab: number) {
@@ -271,29 +253,6 @@ async function logoutLastFM() {
 function stepLastFMAuth() {
   window.ytmd.lastFMStepAuthenticate();
 }
-
-window.ytmd.handleCheckingForUpdate(() => {
-  checkingForUpdate.value = true;
-});
-
-window.ytmd.handleUpdateAvailable(() => {
-  checkingForUpdate.value = false;
-  updateAvailable.value = true;
-  updateNotAvailable.value = false;
-});
-
-window.ytmd.handleUpdateNotAvailable(() => {
-  checkingForUpdate.value = false;
-  updateNotAvailable.value = true;
-  updateAvailable.value = false;
-});
-
-window.ytmd.handleUpdateDownloaded(() => {
-  checkingForUpdate.value = false;
-  updateNotAvailable.value = false;
-  updateAvailable.value = false;
-  updateDownloaded.value = true;
-});
 </script>
 
 <template>
@@ -402,22 +361,7 @@ window.ytmd.handleUpdateDownloaded(() => {
             description="This feature only works on the old player bar and may not work for you"
             @change="settingsChanged"
           />
-          <YTMDSetting
-            v-model="customCSSEnabled"
-            type="checkbox"
-            name="Linked CSS overrides"
-            @change="settingsChanged"
-          />
-          <YTMDSetting
-            v-if="customCSSEnabled"
-            v-model="customCSSPath"
-            type="file"
-            indented
-            bind-setting="appearance.customCSSPath"
-            name="Custom CSS file path"
-            @file-change="settingChangedFile"
-            @clear="removeCustomCSSPath"
-          />
+
           <YTMDSetting
             v-model="zoom"
             type="range"

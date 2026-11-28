@@ -1,6 +1,6 @@
 export interface CSSView {
   isDestroyed(): boolean;
-  insertCSS(css: string): Promise<string>;
+  insertCSS(css: string, options: { cssOrigin: "user" }): Promise<string>;
   removeInsertedCSS(key: string): Promise<void>;
 }
 export class CSSLayers {
@@ -26,7 +26,7 @@ export class CSSLayers {
       this.active = { view, keys: [] };
       for (const css of layers.filter(Boolean)) {
         if (revision !== this.revision || view.isDestroyed()) return;
-        const key = await view.insertCSS(css);
+        const key = await view.insertCSS(css, { cssOrigin: "user" });
         this.active.keys.push(key);
       }
     });

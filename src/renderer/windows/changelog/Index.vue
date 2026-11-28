@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import TitleBar from "../../components/TitleBar.vue";
-import Changelog from "./Changelog.vue";
+import TitleBar from '../../components/TitleBar.vue';
+import Changelog from './Changelog.vue';
 </script>
 
 <template>
-  <TitleBar
-    class="titlebar"
-    title="Changelog"
-    icon="news"
-  />
-  <Suspense>
-    <Changelog />
-  </Suspense>
+  <div class="container">
+    <TitleBar class="titlebar" title="Changelog" icon="news" />
+    <Suspense>
+      <Changelog class="changelog" />
+    </Suspense>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.changelog {
+  flex: 1;
+  min-height: 0;
+}
+</style>

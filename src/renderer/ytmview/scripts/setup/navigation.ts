@@ -45,10 +45,8 @@ export function createNavigationMenuArrows() {
   const pivotBar = document.querySelector("ytmusic-pivot-bar-renderer");
   if (!pivotBar) {
     // New YTM UI
-    const searchBar = document.querySelector("ytmusic-search-box");
-    const navBar = searchBar?.parentNode;
-    navBar?.insertBefore(historyForwardElement, searchBar);
-    navBar?.insertBefore(historyBackElement, historyForwardElement);
+    const leftContent = document.querySelector("ytmusic-nav-bar ytmusic-logo");
+    leftContent?.after(historyBackElement, historyForwardElement);
   } else {
     historyForwardElement.classList.add("pivotbar");
     historyBackElement.classList.add("pivotbar");

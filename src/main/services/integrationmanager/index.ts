@@ -114,7 +114,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
           if (!this.enabledIntegrations.includes(integration)) {
             log.info(`Enabling integration: ${integration.name}`);
 
-            integration[IntegrationManager.ENABLE]();
+            await integration[IntegrationManager.ENABLE]();
 
             this.enabledIntegrations.push(integration);
             log.info(`Enabled integration: ${integration.name}`);
@@ -140,7 +140,7 @@ export default class IntegrationManager extends EventEmitterService<IntegrationM
               if (newProperty != oldProperty) {
                 log.info(`Restarting enabled integration: ${integration.name} (dependent properties changed)`);
                 await integration[IntegrationManager.DISABLE]();
-                integration[IntegrationManager.ENABLE]();
+                await integration[IntegrationManager.ENABLE]();
                 log.info(`Restarted enabled integration: ${integration.name} (dependent properties changed)`);
               }
             }

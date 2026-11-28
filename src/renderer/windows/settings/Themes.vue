@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import {
   colorKeys,
   contrast,
@@ -10,41 +10,41 @@ import {
   ThemeResult,
   ThemeSnapshot,
   validateSelection,
-} from '~shared/themes/model';
+} from "~shared/themes/model";
 
 const api = window.ytmd.themes;
 const snapshot = ref<ThemeSnapshot | null>(null);
 const draft = ref<Selection>(defaultSelection());
 const editing = ref(false);
 const busy = ref(false);
-const message = ref('');
+const message = ref("");
 const names = ref<Record<string, string>>({});
 let timer: ReturnType<typeof setTimeout>;
 let alive = true;
 let sequence = 0;
 const labels = {
-  accent: 'Accent',
-  highlight: 'Highlight',
-  background: 'Background',
-  surface: 'Surface',
-  surfaceRaised: 'Raised surface',
-  text: 'Primary text',
-  textMuted: 'Secondary text',
-  border: 'Border',
+  accent: "Accent",
+  highlight: "Highlight",
+  background: "Background",
+  surface: "Surface",
+  surfaceRaised: "Raised surface",
+  text: "Primary text",
+  textMuted: "Secondary text",
+  border: "Border",
 };
 const active = computed(() => {
   const s = snapshot.value?.selection;
-  if (!s) return 'Loading…';
-  if (s.mode === 'preset')
+  if (!s) return "Loading…";
+  if (s.mode === "preset")
     return presets.find((p) => p.id === s.presetId)?.name;
-  if (s.mode === 'imported')
+  if (s.mode === "imported")
     return snapshot.value?.imports.find((x) => x.id === s.importId)?.name;
-  return s.mode === 'custom' ? 'My custom theme' : 'Original';
+  return s.mode === "custom" ? "My custom theme" : "Original";
 });
 const invalid = computed(() => {
   try {
     validateSelection(draft.value);
-    return '';
+    return "";
   } catch (e) {
     return (e as Error).message;
   }
@@ -64,7 +64,7 @@ function accept(result: ThemeResult, syncDraft = false) {
     );
     if (syncDraft) {
       draft.value = structuredClone(result.state.selection);
-      if (draft.value.mode === 'preset') {
+      if (draft.value.mode === "preset") {
         draft.value.tokens = {
           ...presets.find((p) => p.id === draft.value.presetId).tokens,
         };
@@ -73,8 +73,8 @@ function accept(result: ThemeResult, syncDraft = false) {
     }
   }
   message.value = result.ok
-    ? (result.state?.error ?? '')
-    : (result.error ?? 'Theme operation failed');
+    ? (result.state?.error ?? "")
+    : (result.error ?? "Theme operation failed");
 }
 async function run(action: () => Promise<ThemeResult>, syncDraft = true) {
   clearTimeout(timer);
@@ -89,6 +89,7 @@ async function run(action: () => Promise<ThemeResult>, syncDraft = true) {
   }
 }
 function preview() {
+  draft.value.overrides = false;
   editing.value = true;
   clearTimeout(timer);
   const request = ++sequence;
@@ -106,9 +107,9 @@ function preview() {
 async function selectPreset(id: string) {
   const selection = {
     ...defaultSelection(),
-    mode: 'preset' as const,
+    mode: "preset" as const,
     presetId: id,
-    overrides: snapshot.value?.selection.overrides ?? true,
+    overrides: false,
   };
   await run(() => api.apply(selection));
   editing.value = false;
@@ -116,10 +117,10 @@ async function selectPreset(id: string) {
 function copyPreset(id: string) {
   draft.value = {
     ...defaultSelection(),
-    mode: 'custom',
+    mode: "custom",
     presetId: id,
     tokens: { ...presets.find((p) => p.id === id).tokens },
-    overrides: snapshot.value?.selection.overrides ?? true,
+    overrides: false,
   };
   preview();
 }
@@ -128,7 +129,7 @@ function resetDraft() {
     ...presets.find((p) => p.id === draft.value.presetId).tokens,
   };
   draft.value.effects = { ...effects };
-  draft.value.mode = 'custom';
+  draft.value.mode = "custom";
   preview();
 }
 async function cancel() {
@@ -136,6 +137,7 @@ async function cancel() {
   editing.value = false;
 }
 async function apply() {
+  draft.value.overrides = false;
   await run(() => api.apply(JSON.parse(JSON.stringify(draft.value))));
   editing.value = false;
 }
@@ -147,7 +149,7 @@ async function activateImport(id: string) {
   await run(() =>
     api.apply({
       ...defaultSelection(),
-      mode: 'imported',
+      mode: "imported",
       importId: id,
       overrides: false,
     }),
@@ -173,7 +175,7 @@ onBeforeUnmount(() => {
       <div>
         <p class="eyebrow">YOUR MUSIC, YOUR COLORS</p>
         <h1>Theme Studio</h1>
-        <p>Eight palettes. One continuous canvas.</p>
+        <p>{{ presets.length }} palettes. One continuous canvas.</p>
       </div>
     </header>
     <div class="status">
@@ -182,9 +184,8 @@ onBeforeUnmount(() => {
       ><button :disabled="busy" @click="original">Restore original</button>
     </div>
     <p class="hint">
-      Theme layer → optional linked CSS overrides. Original restores the
-      official appearance and disables the override layer without deleting your
-      file.
+      Choose a built-in theme or import your CSS here. Restore original returns
+      to the official appearance.
     </p>
     <p v-if="message" class="notice" role="alert">{{ message }}</p>
     <div class="gallery">
@@ -351,24 +352,7 @@ onBeforeUnmount(() => {
         />
         Respect reduced motion</label
       >
-      <label class="check"
-        ><input
-          v-model="draft.overrides"
-          type="checkbox"
-          :disabled="busy"
-          @change="preview"
-        />
-        Include linked CSS overrides (configured in Appearance)</label
-      >
-      <p class="hint">
-        Linked file:
-        {{
-          snapshot?.legacyEnabled
-            ? 'enabled in Appearance'
-            : 'disabled in Appearance'
-        }}. An imported primary theme replaces the preset, not the settings
-        interface.
-      </p>
+
       <p v-if="invalid" class="notice" role="alert">{{ invalid }}</p>
       <p v-else-if="lowContrast" class="notice" role="status">
         Low text contrast: aim for at least 4.5:1 against the background and
@@ -597,7 +581,7 @@ input:focus-visible {
   display: flex;
   gap: 6px;
 }
-input[type='text'],
+input[type="text"],
 .import-row input {
   min-width: 0;
   width: 100%;
@@ -608,7 +592,7 @@ input[type='text'],
   padding: 8px;
   border-radius: 6px;
 }
-input[type='color'] {
+input[type="color"] {
   width: 36px;
   height: 33px;
   padding: 2px;

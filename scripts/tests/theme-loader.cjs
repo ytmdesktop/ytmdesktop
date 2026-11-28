@@ -1,8 +1,8 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const Module = require('node:module');
-const ts = require('typescript');
-const root = path.resolve(__dirname, '../..');
+const fs = require("node:fs");
+const path = require("node:path");
+const Module = require("node:module");
+const ts = require("typescript");
+const root = path.resolve(__dirname, "../..");
 module.exports = function loader(mocks = {}) {
   const cache = new Map();
   function load(file) {
@@ -13,28 +13,28 @@ module.exports = function loader(mocks = {}) {
     cache.set(file, m);
     m.require = (name) => {
       if (Object.hasOwn(mocks, name)) return mocks[name];
-      if (name.endsWith('?raw'))
+      if (name.endsWith("?raw"))
         return {
           __esModule: true,
           default: fs.readFileSync(
             path.resolve(path.dirname(file), name.slice(0, -4)),
-            'utf8',
+            "utf8",
           ),
         };
-      if (name.startsWith('~shared/'))
-        return load(path.join(root, 'src/shared', name.slice(8)) + '.ts');
-      if (name.startsWith('.')) {
+      if (name.startsWith("~shared/"))
+        return load(path.join(root, "src/shared", name.slice(8)) + ".ts");
+      if (name.startsWith(".")) {
         const base = path.resolve(path.dirname(file), name);
         return load(
-          fs.existsSync(base + '.ts')
-            ? base + '.ts'
-            : path.join(base, 'index.ts'),
+          fs.existsSync(base + ".ts")
+            ? base + ".ts"
+            : path.join(base, "index.ts"),
         );
       }
       return require(name);
     };
     m._compile(
-      ts.transpileModule(fs.readFileSync(file, 'utf8'), {
+      ts.transpileModule(fs.readFileSync(file, "utf8"), {
         compilerOptions: {
           module: ts.ModuleKind.CommonJS,
           target: ts.ScriptTarget.ES2022,

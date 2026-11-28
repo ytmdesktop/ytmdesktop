@@ -2,9 +2,16 @@ export function createStyleSheet() {
   const css = document.createElement("style");
   css.appendChild(
     document.createTextNode(`
+      .ytmd-history-back {
+        margin: 0 2px 0 18px;
+      }
+
+      .ytmd-history-forward {
+        margin: 0 18px 0 2px;
+      }
+
       .ytmd-history-back, .ytmd-history-forward {
         cursor: pointer;
-        margin: 0 18px 0 2px;
         font-size: 24px;
         color: rgba(255, 255, 255, 0.5);
       }
