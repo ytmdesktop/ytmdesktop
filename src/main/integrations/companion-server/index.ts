@@ -9,7 +9,11 @@ import cors from "@fastify/cors";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
 import Integration from "../integration";
-import { safeStorage } from "electron";
+import { app, ipcMain, safeStorage } from "electron";
+import path from "node:path";
+import { getIconPath } from "../../util";
+import AppWindowManager from "../../services/windowmanager";
+import { AppWindow } from "../../services/windowmanager/appwindow";
 import { MemoryStoreSchema } from "~shared/store/schema";
 import MemoryStore from "../../services/memorystore";
 import ConfigStore from "../../services/configstore";
@@ -22,6 +26,8 @@ import CompanionServerIpcClient from "./ipc-client";
 import { PlayerState } from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../services/playerstatestore";
 import fs from "node:fs";
+
+declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
 const API_VERSIONS = ["v1"];
 const TRANSFORM_PLAYER_STATE_FOR_VERSION: { [version: string]: (state: PlayerState) => unknown } = {
@@ -449,5 +455,87 @@ export default class CompanionServer extends Integration {
         this.authWindowTimeout = null;
       }
     }
+  }
+
+  public static openDebugAuthorizeWindow(
+    windowManager: AppWindowManager,
+    parentWindow: AppWindow<"Browser">,
+    devTools: boolean
+  ) {
+    if (windowManager.hasWindow("AuthorizeCompanion")) {
+      windowManager.getWindow("AuthorizeCompanion").showAndFocus();
+      return;
+    }
+
+    const requestId = "debug-request";
+    const bounds = parentWindow._getElectronWindow().getBounds();
+    const authWindow = windowManager.createWindow("Browser", {
+      name: "AuthorizeCompanion",
+      autoRecreate: false,
+      waitForViews: true,
+      url: app.isPackaged
+        ? "ytmd-app://authorize-companion"
+        : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html",
+      electronOptions: {
+        width: 640,
+        height: 480,
+        x: Math.round(bounds.x + (bounds.width - 640) / 2),
+        y: Math.round(bounds.y + (bounds.height - 480) / 2),
+        minimizable: false,
+        maximizable: false,
+        resizable: false,
+        frame: false,
+        show: false,
+        icon: getIconPath("ytmd.png"),
+        parent: parentWindow.isVisible() ? parentWindow._getElectronWindow() : undefined,
+        titleBarStyle: "hidden",
+        titleBarOverlay: { color: "#000000", symbolColor: "#BBBBBB", height: 36 },
+        webPreferences: {
+          sandbox: true,
+          contextIsolation: true,
+          preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
+          devTools,
+          additionalArguments: [requestId, "Debug Companion App", "1234"]
+        }
+      }
+    });
+
+    authWindow.setWindowOpenHandler(() => ({ action: "deny" }));
+    authWindow.webContents?.on("will-navigate", event => {
+      if (!app.isPackaged && event.url.startsWith("http://localhost")) return;
+
+      event.preventDefault();
+    });
+
+    const nativeWin = authWindow._getElectronWindow();
+    const closeAuthWindow = () => {
+      if (windowManager.hasWindow("AuthorizeCompanion")) {
+        windowManager.closeWindow(authWindow);
+      }
+    };
+
+    const ipcHandlers: Record<string, () => void> = {
+      [`companionAuthorization:result:${requestId}`]: closeAuthWindow,
+      [`companionWindow:close:${requestId}`]: closeAuthWindow,
+      [`companionWindow:minimize:${requestId}`]: () => {
+        if (!nativeWin.isDestroyed()) nativeWin.minimize();
+      },
+      [`companionWindow:maximize:${requestId}`]: () => {
+        if (!nativeWin.isDestroyed()) nativeWin.maximize();
+      },
+      [`companionWindow:restore:${requestId}`]: () => {
+        if (!nativeWin.isDestroyed()) nativeWin.restore();
+      }
+    };
+
+    for (const [channel, handler] of Object.entries(ipcHandlers)) {
+      ipcMain.on(channel, handler);
+    }
+
+    nativeWin.once("closed", () => {
+      for (const [channel, handler] of Object.entries(ipcHandlers)) {
+        ipcMain.removeListener(channel, handler);
+      }
+    });
   }
 }

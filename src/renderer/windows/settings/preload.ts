@@ -52,6 +52,7 @@ contextBridge.exposeInMainWorld("ytmd", {
   getTrueFilePath: (file: File) => webUtils.getPathForFile(file),
 
   lastFMStepAuthenticate: () => ipcRenderer.send("lastfm:authenticate"),
+  overrideSafeMode: (storeProperty: string) => ipcRenderer.send("integrations:overrideSafeMode", storeProperty),
 
   processVersions: { electron: process.versions.electron, chrome: process.versions.chrome }
 });

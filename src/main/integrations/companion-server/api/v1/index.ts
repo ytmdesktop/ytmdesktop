@@ -35,6 +35,7 @@ import ConfigStore from "../../../../services/configstore";
 import { PlayerState, RepeatMode } from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../../../services/playerstatestore";
 import ProtectedAPIManager from "../../../../services/protectedapimanager";
+import AppWindowManager from "../../../../services/windowmanager";
 
 declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
 
@@ -413,7 +414,7 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
 
       try {
         // Open the DevTools.
-        if (!app.isPackaged) {
+        if (!app.isPackaged && options.getService(AppWindowManager).autoOpenDevTools) {
           authorizationWindow.webContents.openDevTools({
             mode: "detach"
           });

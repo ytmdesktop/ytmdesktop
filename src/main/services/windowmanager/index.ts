@@ -4,6 +4,7 @@ import { AppWindow, AppWindowOptions, AppWindowType } from "./appwindow";
 
 export default class AppWindowManager extends Service {
   private activeWindows: { [windowName: string]: AppWindow<AppWindowType> } = {};
+  public autoOpenDevTools = false;
 
   public override onPreInitialized() {}
   public override onInitialized() {
@@ -49,6 +50,23 @@ export default class AppWindowManager extends Service {
   public forceWindowClosures() {
     for (const window of Object.values(this.activeWindows)) {
       window.forceWindowClosure();
+    }
+  }
+
+  public focusMainOrCloseMiniplayer() {
+    if (this.hasWindow("Miniplayer")) {
+      this.getWindow("Miniplayer").closeWindow();
+    } else if (this.hasWindow("Main")) {
+      this.getWindow("Main").showAndFocus();
+    }
+  }
+
+  public hideMainWindows() {
+    if (this.hasWindow("Miniplayer")) {
+      this.getWindow("Miniplayer").hide();
+    }
+    if (this.hasWindow("Main")) {
+      this.getWindow("Main").hide();
     }
   }
 }

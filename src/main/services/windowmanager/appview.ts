@@ -1,4 +1,4 @@
-import { app, IpcMainEvent, Rectangle, WebContentsView, WebContentsViewConstructorOptions } from "electron";
+import { IpcMainEvent, Rectangle, WebContentsView, WebContentsViewConstructorOptions } from "electron";
 import { AppWindow, AppWindowType } from "./appwindow";
 import assert from "node:assert";
 import log from "electron-log";
@@ -139,8 +139,6 @@ export class AppView extends EventEmitter<AppViewEventMap> {
     this.parentWindowResize();
 
     this.attachParentElectronWindowEvents();
-
-    if (!app.isPackaged) this.electronView?.webContents.openDevTools();
 
     log.debug(`AppView '${this.name}' attached to parent ${this.parentWindow.name} with index '${index ?? "end"}'`);
   }

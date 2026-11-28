@@ -100,6 +100,10 @@ export type MemoryStoreSchema = {
 
   appLoadingStatus: string;
 
+  gpuDisabledByFlag: boolean;
+  safeModeEnabled: boolean;
+  safeModeOverrides: string;
+
   lastFMAuthenticationStep: number;
   lastFMToken: string;
 };

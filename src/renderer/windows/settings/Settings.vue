@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, reactive, ref, type Ref, type WritableComputedRef } from "vue";
 import KeybindInput from "../../components/KeybindInput.vue";
 import YTMDSetting from "../../components/YTMDSetting.vue";
 import { StoreSchema, TrayIconStyle } from "~shared/store/schema";
@@ -138,6 +138,61 @@ const companionServerAuthWindowEnabled = ref<boolean>(await memoryStore.get("com
 
 const autoUpdaterDisabled = ref<boolean>(await memoryStore.get("autoUpdaterDisabled"));
 
+type SafeModeKey =
+  | "general.showNotificationOnSongChange"
+  | "appearance.customCSSEnabled"
+  | "playback.ratioVolume"
+  | "integrations.companionServerEnabled"
+  | "integrations.discordPresenceEnabled"
+  | "integrations.lastFMEnabled"
+  | "integrations.enhancedMediaServiceEnabled";
+
+function parseOverrides(raw: unknown): string[] {
+  return typeof raw === "string" ? raw.split(",").filter(Boolean) : [];
+}
+
+const gpuDisabledByFlag = ref<boolean>((await memoryStore.get("gpuDisabledByFlag")) === true);
+const safeModeEnabled = ref<boolean>((await memoryStore.get("safeModeEnabled")) === true);
+const safeModeOverrides = ref<string[]>(parseOverrides(await memoryStore.get("safeModeOverrides")));
+
+function isFlagActive(key: string, active: Ref<boolean>) {
+  return active.value && !safeModeOverrides.value.includes(key);
+}
+
+function flagOverride(key: string, source: Ref<boolean>, active: Ref<boolean>, value: boolean, isIntegration = false) {
+  return computed({
+    get: () => (isFlagActive(key, active) ? value : source.value),
+    set: next => {
+      source.value = next;
+
+      if (isIntegration) {
+        if (!safeModeOverrides.value.includes(key)) {
+          safeModeOverrides.value = [...safeModeOverrides.value, key];
+        }
+        if (active.value && next) window.ytmd.overrideSafeMode(key);
+      } else {
+        memoryStore.set("gpuDisabledByFlag", false);
+      }
+    }
+  });
+}
+
+function safeModeNote(key: SafeModeKey, fallback?: string) {
+  return isFlagActive(key, safeModeEnabled) ? "Disabled for this startup (--safe-mode)" : fallback;
+}
+
+const effectiveDisableHardwareAcceleration = flagOverride("general.disableHardwareAcceleration", disableHardwareAcceleration, gpuDisabledByFlag, true);
+
+const safeModeModels = reactive({
+  "general.showNotificationOnSongChange": flagOverride("general.showNotificationOnSongChange", showNotificationOnSongChange, safeModeEnabled, false, true),
+  "appearance.customCSSEnabled": flagOverride("appearance.customCSSEnabled", customCSSEnabled, safeModeEnabled, false, true),
+  "playback.ratioVolume": flagOverride("playback.ratioVolume", ratioVolume, safeModeEnabled, false, true),
+  "integrations.companionServerEnabled": flagOverride("integrations.companionServerEnabled", companionServerEnabled, safeModeEnabled, false, true),
+  "integrations.discordPresenceEnabled": flagOverride("integrations.discordPresenceEnabled", discordPresenceEnabled, safeModeEnabled, false, true),
+  "integrations.lastFMEnabled": flagOverride("integrations.lastFMEnabled", lastFMEnabled, safeModeEnabled, false, true),
+  "integrations.enhancedMediaServiceEnabled": flagOverride("integrations.enhancedMediaServiceEnabled", enhancedMediaServiceEnabled, safeModeEnabled, false, true)
+} satisfies Record<SafeModeKey, WritableComputedRef<boolean>>);
+
 const lastFMAuthenticationStep = ref<number>(await memoryStore.get("lastFMAuthenticationStep"));
 
 memoryStore.onStateChanged(newState => {
@@ -159,6 +214,9 @@ memoryStore.onStateChanged(newState => {
   safeStorageAvailable.value = newState.safeStorageAvailable;
 
   autoUpdaterDisabled.value = newState.autoUpdaterDisabled;
+  gpuDisabledByFlag.value = newState.gpuDisabledByFlag ?? false;
+  safeModeEnabled.value = newState.safeModeEnabled ?? false;
+  safeModeOverrides.value = parseOverrides(newState.safeModeOverrides);
   checkingForUpdate.value = newState.autoUpdaterChecking;
   updateAvailable.value = newState.autoUpdaterAvailable;
   updateNotAvailable.value = newState.autoUpdaterNotAvailable;
@@ -345,9 +403,10 @@ function stepLastFMAuth() {
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-model="showNotificationOnSongChange"
+            v-model="safeModeModels['general.showNotificationOnSongChange']"
             type="checkbox"
             name="Show notification on song change"
+            :description="safeModeNote('general.showNotificationOnSongChange')"
             @change="settingsChanged"
           />
           <YTMDSetting
@@ -361,10 +420,11 @@ function stepLastFMAuth() {
             <input v-model="startMinimized" @change="settingsChanged" class="toggle" type="checkbox" />
           </div>-->
           <YTMDSetting
-            v-model="disableHardwareAcceleration"
+            v-model="effectiveDisableHardwareAcceleration"
             type="checkbox"
             restart-required
             name="Disable hardware acceleration"
+            :description="isFlagActive('general.disableHardwareAcceleration', gpuDisabledByFlag) ? 'Disabled for this startup via launch flag' : undefined"
             @change="settingChangedRequiresRestart"
           />
         </div>
@@ -381,13 +441,14 @@ function stepLastFMAuth() {
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-model="customCSSEnabled"
+            v-model="safeModeModels['appearance.customCSSEnabled']"
             type="checkbox"
             name="Custom CSS"
+            :description="safeModeNote('appearance.customCSSEnabled')"
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-if="customCSSEnabled"
+            v-if="safeModeModels['appearance.customCSSEnabled']"
             v-model="customCSSPath"
             type="file"
             indented
@@ -448,9 +509,10 @@ function stepLastFMAuth() {
             @change="settingChangedRequiresRestart"
           />
           <YTMDSetting
-            v-model="ratioVolume"
+            v-model="safeModeModels['playback.ratioVolume']"
             type="checkbox"
             name="Ratio volume"
+            :description="safeModeNote('playback.ratioVolume')"
             @change="settingsChanged"
           />
         </div>
@@ -460,15 +522,16 @@ function stepLastFMAuth() {
           class="integrations-tab"
         >
           <YTMDSetting
-            v-model="companionServerEnabled"
+            v-model="safeModeModels['integrations.companionServerEnabled']"
             type="checkbox"
             name="Companion server"
+            :description="safeModeNote('integrations.companionServerEnabled')"
             :disabled="!safeStorageAvailable"
             disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-if="companionServerEnabled && safeStorageAvailable"
+            v-if="safeModeModels['integrations.companionServerEnabled'] && safeStorageAvailable"
             v-model="companionServerCORSWildcardEnabled"
             type="checkbox"
             indented
@@ -477,7 +540,7 @@ function stepLastFMAuth() {
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-if="companionServerEnabled && safeStorageAvailable"
+            v-if="safeModeModels['integrations.companionServerEnabled'] && safeStorageAvailable"
             v-model="companionServerAuthWindowEnabled"
             type="checkbox"
             indented
@@ -486,7 +549,7 @@ function stepLastFMAuth() {
             @change="memorySettingsChanged"
           />
           <YTMDSetting
-            v-if="companionServerEnabled && safeStorageAvailable"
+            v-if="safeModeModels['integrations.companionServerEnabled'] && safeStorageAvailable"
             type="custom"
             flex-column
             indented
@@ -534,13 +597,14 @@ function stepLastFMAuth() {
             </div>
           </YTMDSetting>
           <YTMDSetting
-            v-model="discordPresenceEnabled"
+            v-model="safeModeModels['integrations.discordPresenceEnabled']"
             type="checkbox"
             name="Discord rich presence"
+            :description="safeModeNote('integrations.discordPresenceEnabled')"
             @change="settingsChanged"
           />
           <div
-            v-if="discordPresenceEnabled && discordPresenceConnectionFailed"
+            v-if="safeModeModels['integrations.discordPresenceEnabled'] && discordPresenceConnectionFailed"
             class="setting indented"
           >
             <p class="discord-failure">
@@ -551,15 +615,16 @@ function stepLastFMAuth() {
             </button>
           </div>
           <YTMDSetting
-            v-model="lastFMEnabled"
+            v-model="safeModeModels['integrations.lastFMEnabled']"
             type="checkbox"
             name="Last.fm scrobbling"
+            :description="safeModeNote('integrations.lastFMEnabled')"
             :disabled="!safeStorageAvailable"
             disabled-message="This integration cannot be enabled due to safeStorage being unavailable"
             @change="settingsChanged"
           />
           <div
-            v-if="lastFMEnabled"
+            v-if="safeModeModels['integrations.lastFMEnabled']"
             class="setting indented"
           >
             <div class="name-with-description">
@@ -583,7 +648,7 @@ function stepLastFMAuth() {
             </button>
           </div>
           <div
-            v-if="lastFMEnabled && lastFMAuthenticationStep === 0"
+            v-if="safeModeModels['integrations.lastFMEnabled'] && lastFMAuthenticationStep === 0"
             class="setting indented"
           >
             <p>
@@ -594,7 +659,7 @@ function stepLastFMAuth() {
             </button>
           </div>
           <div
-            v-if="lastFMEnabled && lastFMAuthenticationStep === 1"
+            v-if="safeModeModels['integrations.lastFMEnabled'] && lastFMAuthenticationStep === 1"
             class="setting indented"
           >
             <p>
@@ -605,7 +670,7 @@ function stepLastFMAuth() {
             </button>
           </div>
           <YTMDSetting
-            v-if="lastFMEnabled"
+            v-if="safeModeModels['integrations.lastFMEnabled']"
             v-model="scrobblePercent"
             class="settings indented"
             type="range"
@@ -617,11 +682,11 @@ function stepLastFMAuth() {
             @change="settingsChanged"
           />
           <YTMDSetting
-            v-model="enhancedMediaServiceEnabled"
+            v-model="safeModeModels['integrations.enhancedMediaServiceEnabled']"
             type="checkbox"
             restart-required
             name="Enhanced media service"
-            description="An enhanced media service that can provide better media button controls"
+            :description="safeModeNote('integrations.enhancedMediaServiceEnabled', 'An enhanced media service that can provide better media button controls')"
             :disabled="isDarwin"
             disabled-message="This integration is not available on your platform"
             beta
