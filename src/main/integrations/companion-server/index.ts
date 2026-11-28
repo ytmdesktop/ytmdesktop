@@ -9,7 +9,7 @@ import cors from "@fastify/cors";
 import log from "electron-log";
 import { isDefinedAPIError } from "./api-shared/errors";
 import Integration from "../integration";
-import { app, ipcMain, safeStorage } from "electron";
+import { app, BrowserWindow, ipcMain, safeStorage } from "electron";
 import path from "node:path";
 import { getIconPath } from "../../util";
 import AppWindowManager from "../../services/windowmanager";
@@ -40,6 +40,61 @@ enum IpcOpcode {
   EVENT = 2,
   PING = 3,
   PONG = 4
+}
+
+export function createAuthorizeCompanionWindow(opts: {
+  requestId: string;
+  appName: string;
+  code: string;
+  autoOpenDevTools: boolean;
+  devTools?: boolean;
+  parentWindow?: AppWindow<"Browser">;
+}): BrowserWindow {
+  const bounds = opts.parentWindow?._getElectronWindow().getBounds();
+  const win = new BrowserWindow({
+    width: 640,
+    height: 480,
+    x: bounds ? Math.round(bounds.x + (bounds.width - 640) / 2) : undefined,
+    y: bounds ? Math.round(bounds.y + (bounds.height - 480) / 2) : undefined,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    frame: false,
+    show: false,
+    icon: getIconPath("ytmd.png"),
+    parent: opts.parentWindow?.isVisible() ? opts.parentWindow._getElectronWindow() : undefined,
+    titleBarStyle: "hidden",
+    titleBarOverlay: { color: "#000000", symbolColor: "#BBBBBB", height: 36 },
+    webPreferences: {
+      sandbox: true,
+      contextIsolation: true,
+      preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
+      devTools: opts.devTools,
+      additionalArguments: [opts.requestId, opts.appName, opts.code]
+    }
+  });
+
+  win.loadURL(
+    app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html"
+  );
+  win.once("ready-to-show", () => {
+    win.show();
+    win.focus();
+    win.moveTop();
+  });
+
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  win.webContents.on("will-navigate", event => {
+    if (!app.isPackaged && event.url.startsWith("http://localhost")) return;
+
+    event.preventDefault();
+  });
+
+  if (!app.isPackaged && opts.autoOpenDevTools) {
+    win.webContents.openDevTools({ mode: "detach" });
+  }
+
+  return win;
 }
 
 export default class CompanionServer extends Integration {
@@ -457,85 +512,41 @@ export default class CompanionServer extends Integration {
     }
   }
 
+  private static debugAuthWindow: BrowserWindow | null = null;
+
   public static openDebugAuthorizeWindow(
     windowManager: AppWindowManager,
     parentWindow: AppWindow<"Browser">,
     devTools: boolean
   ) {
-    if (windowManager.hasWindow("AuthorizeCompanion")) {
-      windowManager.getWindow("AuthorizeCompanion").showAndFocus();
+    if (this.debugAuthWindow && !this.debugAuthWindow.isDestroyed()) {
+      this.debugAuthWindow.show();
+      this.debugAuthWindow.focus();
+      this.debugAuthWindow.moveTop();
       return;
     }
 
     const requestId = "debug-request";
-    const bounds = parentWindow._getElectronWindow().getBounds();
-    const authWindow = windowManager.createWindow("Browser", {
-      name: "AuthorizeCompanion",
-      autoRecreate: false,
-      waitForViews: true,
-      url: app.isPackaged
-        ? "ytmd-app://authorize-companion"
-        : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html",
-      electronOptions: {
-        width: 640,
-        height: 480,
-        x: Math.round(bounds.x + (bounds.width - 640) / 2),
-        y: Math.round(bounds.y + (bounds.height - 480) / 2),
-        minimizable: false,
-        maximizable: false,
-        resizable: false,
-        frame: false,
-        show: false,
-        icon: getIconPath("ytmd.png"),
-        parent: parentWindow.isVisible() ? parentWindow._getElectronWindow() : undefined,
-        titleBarStyle: "hidden",
-        titleBarOverlay: { color: "#000000", symbolColor: "#BBBBBB", height: 36 },
-        webPreferences: {
-          sandbox: true,
-          contextIsolation: true,
-          preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
-          devTools,
-          additionalArguments: [requestId, "Debug Companion App", "1234"]
-        }
-      }
+    const authWindow = createAuthorizeCompanionWindow({
+      requestId,
+      appName: "Debug Companion App",
+      code: "1234",
+      devTools,
+      autoOpenDevTools: windowManager.autoOpenDevTools,
+      parentWindow
     });
+    this.debugAuthWindow = authWindow;
 
-    authWindow.setWindowOpenHandler(() => ({ action: "deny" }));
-    authWindow.webContents?.on("will-navigate", event => {
-      if (!app.isPackaged && event.url.startsWith("http://localhost")) return;
-
-      event.preventDefault();
-    });
-
-    const nativeWin = authWindow._getElectronWindow();
     const closeAuthWindow = () => {
-      if (windowManager.hasWindow("AuthorizeCompanion")) {
-        windowManager.closeWindow(authWindow);
-      }
+      if (!authWindow.isDestroyed()) authWindow.close();
     };
 
-    const ipcHandlers: Record<string, () => void> = {
-      [`companionAuthorization:result:${requestId}`]: closeAuthWindow,
-      [`companionWindow:close:${requestId}`]: closeAuthWindow,
-      [`companionWindow:minimize:${requestId}`]: () => {
-        if (!nativeWin.isDestroyed()) nativeWin.minimize();
-      },
-      [`companionWindow:maximize:${requestId}`]: () => {
-        if (!nativeWin.isDestroyed()) nativeWin.maximize();
-      },
-      [`companionWindow:restore:${requestId}`]: () => {
-        if (!nativeWin.isDestroyed()) nativeWin.restore();
-      }
-    };
-
-    for (const [channel, handler] of Object.entries(ipcHandlers)) {
-      ipcMain.on(channel, handler);
-    }
-
-    nativeWin.once("closed", () => {
-      for (const [channel, handler] of Object.entries(ipcHandlers)) {
-        ipcMain.removeListener(channel, handler);
-      }
+    ipcMain.once(`companionAuthorization:result:${requestId}`, closeAuthWindow);
+    ipcMain.once(`companionWindow:close:${requestId}`, closeAuthWindow);
+    authWindow.once("closed", () => {
+      this.debugAuthWindow = null;
+      ipcMain.removeListener(`companionAuthorization:result:${requestId}`, closeAuthWindow);
+      ipcMain.removeListener(`companionWindow:close:${requestId}`, closeAuthWindow);
     });
   }
 }

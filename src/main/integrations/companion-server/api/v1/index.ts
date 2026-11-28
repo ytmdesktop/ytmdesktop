@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { FastifyPluginCallback, FastifyPluginOptions } from "fastify";
 import { createAuthTokenAsync, getIsTemporaryAuthCodeValidAndRemove, getTemporaryAuthCode, isAuthValidAsync, isAuthValidMiddlewareAsync } from "../../api-shared/auth";
 import fastifyRateLimit from "@fastify/rate-limit";
@@ -26,7 +26,6 @@ import {
   YouTubeMusicTimeOutError,
   InvalidQueueAddRequestError
 } from "../../api-shared/errors";
-import path from "node:path";
 import Service from "../../../../services/service";
 import { Constructor } from "~shared/types";
 import MemoryStore from "../../../../services/memorystore";
@@ -36,8 +35,7 @@ import { PlayerState, RepeatMode } from "~shared/playerstatestore/types";
 import PlayerStateStore from "../../../../services/playerstatestore";
 import ProtectedAPIManager from "../../../../services/protectedapimanager";
 import AppWindowManager from "../../../../services/windowmanager";
-
-declare const ALL_WINDOWS_VITE_DEV_SERVER_URL: string;
+import { createAuthorizeCompanionWindow } from "../..";
 
 export const transformPlayerState = (state: PlayerState) => {
   return {
@@ -372,53 +370,17 @@ const CompanionServerAPIv1: FastifyPluginCallback<CompanionServerAPIv1Options> =
       let authorizationWindowClosed = false;
 
       // Create the authorization browser window.
-      const authorizationWindow = new BrowserWindow({
-        width: 640,
-        height: 480,
-        minimizable: false,
-        maximizable: false,
-        resizable: false,
-        frame: false,
-        titleBarStyle: "hidden",
-        titleBarOverlay: {
-          color: "#000000",
-          symbolColor: "#BBBBBB",
-          height: 36
-        },
-        webPreferences: {
-          sandbox: true,
-          contextIsolation: true,
-          preload: path.join(__dirname, `../preload/windows/authorize-companion/preload.cjs`),
-          additionalArguments: [requestId, authData.appName, request.body.code]
-        }
+      const authorizationWindow = createAuthorizeCompanionWindow({
+        requestId,
+        appName: authData.appName,
+        code: request.body.code,
+        autoOpenDevTools: options.getService(AppWindowManager).autoOpenDevTools
       });
-      authorizationWindow.loadURL(
-        app.isPackaged ? "ytmd-app://authorize-companion" : ALL_WINDOWS_VITE_DEV_SERVER_URL + "/windows/authorize-companion/index.html"
-      );
-      authorizationWindow.show();
       authorizationWindow.flashFrame(true);
-
-      authorizationWindow.webContents.setWindowOpenHandler(() => {
-        return {
-          action: "deny"
-        };
-      });
-
-      authorizationWindow.webContents.on("will-navigate", event => {
-        if (!app.isPackaged) if (event.url.startsWith("http://localhost")) return;
-
-        event.preventDefault();
-      });
 
       authorizationWindows.push(authorizationWindow);
 
       try {
-        // Open the DevTools.
-        if (!app.isPackaged && options.getService(AppWindowManager).autoOpenDevTools) {
-          authorizationWindow.webContents.openDevTools({
-            mode: "detach"
-          });
-        }
 
         let promiseResolve: (value: boolean | PromiseLike<boolean>) => void;
         let promiseInterval: string | number | NodeJS.Timeout;
